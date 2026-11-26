@@ -44,8 +44,13 @@ const INTEREST =
 	"60,000 baht of shared home-loan interest is stored for separate Returns, and this Return does not claim it. To state this Return's interest, use --mortgage-interest <amount> --merge; it replaces the stored mortgageInterest, which a later separate filing reads as one person's own, so state that again then."
 const KEPT =
 	'The claims stored for "partner" are kept for a separate filing, and this Return does not claim them.'
-const HINT =
-	" If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as the holder's own, so state the holder's own claims again when switching back."
+
+/** The hint, with the holder named and an example flag for a claim the kept set holds. */
+function hint(example: string): string {
+	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as the holder's own, so state "me"'s own claims again when switching back, for example ${example} --merge.`
+}
+
+const HINT = hint("--parents me=<n>")
 const CLAIMS = KEPT + HINT
 
 describe("shared interest a Return does not claim", () => {
@@ -102,6 +107,7 @@ describe("a partner's claims a Return does not claim", () => {
 	 * 60,000, two parents at 30,000 each = 280,000, so 6,500. A joint Return counts only the flat
 	 * claims, 160,000; stating them bare gives 1,500,000 - 200,000 - 180,000 = 1,120,000, so 145,000.
 	 * A later separate filing then reads those bare claims as the holder's: 71,000 and 6,500.
+	 * Following the caveat's flag with the holder's own value restores 83,000 and 6,500.
 	 */
 	it("warns that bare claims become the holder's on a later separate filing", async () => {
 		const home = await separate("--parents", "partner=2")
@@ -118,6 +124,27 @@ describe("a partner's claims a Return does not claim", () => {
 		expect(await filed(home)).toEqual([
 			["me", "71000.00"],
 			["partner", "6500.00"],
+		])
+		expect((await tax(home, "--merge", "--parents", "me=0")).code).toBe(0)
+		expect(await filed(home)).toEqual([
+			["me", "83000.00"],
+			["partner", "6500.00"],
+		])
+	})
+
+	it("takes the example flag from a claim the kept set holds", async () => {
+		const home = await separate("--life-insurance", "partner=80000")
+		const res = await refile(home, "married_joint")
+		expect(unclaimed(res)).toEqual([KEPT + hint("--life-insurance me=<amount>")])
+	})
+
+	it("keeps the older words when the plan names no holder", async () => {
+		const home = await separate("--parents", "partner=2")
+		const gone = await scenario(home, ["household", "base", "--none"])
+		expect(gone.code, gone.err).toBe(0)
+		const res = await refile(home, "married_joint")
+		expect(unclaimed(res)).toEqual([
+			`${KEPT} If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as the holder's own, so state the holder's own claims again when switching back.`,
 		])
 	})
 

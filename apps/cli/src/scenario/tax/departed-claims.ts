@@ -1,5 +1,6 @@
 import type { Household } from "../household/model"
-import type { TaxRequest } from "./flags"
+import { exampleFlagOf } from "./example-flag"
+import type { ReturnClaims, TaxRequest } from "./flags"
 
 /*
  * A person given a new id reads as another person (cli ADR-0075). The profile keeps what was claimed
@@ -24,8 +25,18 @@ export function departedClaimants(kept: TaxRequest, household: string | null): s
 /**
  * The sentence for one such id. No Return of any filing status counts the stored set, so it does not
  * say the set waits for a separate filing. A set whose claims were stated again under a person in
- * the household stays behind, so the sentence names the one write that drops it.
+ * the household stays behind, so the sentence names the one write that drops it. A write with Filers
+ * shows the person-keyed flag that restates the claims, which a write without one refuses.
  */
-export function departedClaims(id: string): string {
-	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person in the household; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+export function departedClaims(
+	id: string,
+	claims: ReturnClaims | undefined,
+	holder: string | undefined,
+	hasFilers: boolean,
+): string {
+	const how =
+		hasFilers && holder !== undefined && claims !== undefined
+			? `, for example with "<person>=<value>" flags such as ${exampleFlagOf([claims], holder)}, or with --tax`
+			: ""
+	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person in the household${how}; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }
