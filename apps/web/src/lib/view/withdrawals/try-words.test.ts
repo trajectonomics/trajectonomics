@@ -35,6 +35,27 @@ describe("the session bar's words for a tried Flow", () => {
 		}
 	})
 
+	test("a Flow the plan labels reads its label, and one it does not label reads its id", () => {
+		const flow = { id: "retirement-spending", kind: "expense", frequency: "monthly", rule: RULE }
+		const change = changeAt("flows.retirement-spending", flow)
+		const labelled = (id: string) => (id === "retirement-spending" ? "Retirement spending" : id)
+		expect(tryWords(change, account, labelled)).toBe(
+			"Retirement spending: spends 3.50% of savings at the start, then cuts and raises by guardrails, from Savings account and Index fund",
+		)
+		expect(tryWords(change, account)).toBe(
+			"retirement-spending: spends 3.50% of savings at the start, then cuts and raises by guardrails, from Savings account and Index fund",
+		)
+	})
+
+	test("two Flows that share a label read the label and the id in the session bar", () => {
+		const flow = { id: "retirement-spending", kind: "expense", frequency: "monthly", rule: RULE }
+		const change = changeAt("flows.retirement-spending", flow)
+		const twin = (id: string) => `Retirement spending (${id})`
+		expect(tryWords(change, account, twin)).toBe(
+			"Retirement spending (retirement-spending): spends 3.50% of savings at the start, then cuts and raises by guardrails, from Savings account and Index fund",
+		)
+	})
+
 	test("a level amount reads as one that keeps pace with inflation, with no amount", () => {
 		const level = {
 			id: "retirement-spending",
@@ -45,6 +66,9 @@ describe("the session bar's words for a tried Flow", () => {
 		expect(tryWords(changeAt("flows.retirement-spending", level), account)).toBe(
 			"retirement-spending: a level amount that keeps pace with inflation",
 		)
+		expect(
+			tryWords(changeAt("flows.retirement-spending", level), account, () => "Retirement spending"),
+		).toBe("Retirement spending: a level amount that keeps pace with inflation")
 	})
 
 	test("any other Flow tried as a whole reads in plain words, not as JSON", () => {

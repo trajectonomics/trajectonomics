@@ -5,6 +5,7 @@ import { preferences } from "../../client/preferences.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { fakeServer, HASH, held, settle, useSessionHooks } from "../../client/what-if.test-support"
 import { scenarioFlow } from "../../lib/contract"
+import { NO_ITEM_NAMES } from "../../lib/view/item-names"
 import { overviewView } from "../../lib/view/overview/view"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import { withdrawalsView } from "../../lib/view/withdrawals"
@@ -38,7 +39,9 @@ afterAll(() => {
 describe("the Withdrawals page", () => {
 	test("states each Rule year with its share and what the rule did, in words", () => {
 		const body = page()
-		expect(body).toContain("Year by year: retirement-spending")
+		expect(body).toMatch(
+			/Year by year: (<!--.*?-->)*<code[^>]*data-item="retirement-spending"[^>]*>retirement-spending<\/code>/,
+		)
 		expect(body).toContain("862,256.24")
 		expect(body).toContain("3.99%")
 		expect(body).toContain("Followed the rule")
@@ -95,7 +98,7 @@ describe("the Withdrawals page", () => {
 			null,
 			chance?.ok ? { ...chance.data, spendingBands: undefined } : null,
 		)
-		const props = { view, terms: "both" as const, title: "Saved plan" }
+		const props = { view, terms: "both" as const, title: "Saved plan", names: NO_ITEM_NAMES }
 		const none = render(WithdrawalsResult, { props: { ...props, spends: false } }).body
 		expect(none).toContain("There is no spending rule in this plan yet")
 		expect(none).not.toContain("A level amount has no rule years")
