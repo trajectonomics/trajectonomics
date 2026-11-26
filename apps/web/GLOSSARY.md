@@ -97,7 +97,7 @@ The changes one tab holds against one plan: switched items off (Removals), value
 _Avoid_: scratch plan, draft, scenario copy, simulation
 
 **Group** (in a What-if session):
-A loan, a real asset or a salary with its employer share changed as a whole: its parts (Account, Flows, debt, the share) are switched off, tried and taken back together, and the session bar lists them as one change. A part never changes alone, because the plan would not agree with itself. A path is in at most one group, and a debt the Baseline holds has no switch. Only the switch groups a salary with its share: a tried salary is listed as its separate changes, and a share a try cleared is its own chip.
+A loan, a real asset or a salary with its employer share changed as a whole: its parts (Account, Flows, debt, the share) are switched off, tried and taken back together, and the session bar lists them as one change. A loan's or an asset's part never changes alone, because the plan would not agree with itself. A path is in at most one group, and a debt the Baseline holds has no switch. Only the switch groups a salary with its share: a tried salary is listed as its separate changes, and a share a try cleared is its own chip.
 _Avoid_: bundle, batch
 
 **What-if lens**:

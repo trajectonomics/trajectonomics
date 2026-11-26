@@ -25,8 +25,8 @@ export function flowDraftForTry(
 }
 
 /**
- * The employer share a try's form starts from: as the session shows it, or the stored share while the salary is off,
- * because the session then holds the share out of what it shows. A share a try cleared before the switch stays cleared:
+ * The employer share a try's form starts from: as the session shows it, or, while the salary is off, the stored share
+ * or the share the session added, because the session then holds the share out of what it shows. A share a try cleared before the switch stays cleared:
  * its Removal is the switch's to keep, so the form must not fall back to the stored share.
  */
 export function employerStart(
@@ -44,7 +44,11 @@ export function employerStart(
 	if (session === null || !isOff(session, `flows.${existing.id}`)) return share
 	const group = groupOf(session, groupId({ kind: "salary", name: existing.id }))
 	if (group?.held.includes(`flows.${employerIdOf(existing.id)}`) === true) return null
-	return employerOf(doc.flows, existing.id) ?? share
+	const added = session.additions.filter((one) => one.list === "flows").map((one) => one.item)
+	return (
+		employerOf(doc.flows, existing.id) ??
+		employerOf(added as unknown as ScenarioFlow[], existing.id)
+	)
 }
 
 /** What a Flow form starts from: the draft and the employer section, as the session shows the plan when it tries a value. */

@@ -54,6 +54,7 @@ describe("a try with no edit on a switched-off Flow", () => {
 		whatIfSession.setGroupOff("base", HASH, SPEC, SPEC.paths, true)
 		// The form reads the stored salary's dates and the share the session added, so the draft differs from the try.
 		const again = flowFormStart(doc, "base", salary, true, whatIfSession.whatIf)
+		expect(again.employer.share).toBe("7.00")
 		const saved = await saveFlow({
 			name: "base",
 			contentHash: HASH,
@@ -69,6 +70,42 @@ describe("a try with no edit on a switched-off Flow", () => {
 		expect(whatIfSession.isOffIn("base", "flows.salary")).toBe(true)
 		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.salary.end", value: "2030-12-31" }])
 		expect(whatIfSession.whatIf?.additions).toHaveLength(1)
+	})
+
+	test("keeps a salary's added share when its try edits only the amount", async () => {
+		const form = flowFormStart(doc, "base", salary, true, whatIfSession.whatIf)
+		const first = await saveFlow({
+			name: "base",
+			contentHash: HASH,
+			doc,
+			kind: "income",
+			existing: salary,
+			draft: form.draft,
+			employer: { account: "fund", share: "7", rounding: "floor" },
+			tryValue: true,
+		})
+		expect(first.done).toBe(true)
+		whatIfSession.setGroupOff("base", HASH, SPEC, SPEC.paths, true)
+		const again = flowFormStart(doc, "base", salary, true, whatIfSession.whatIf)
+		const saved = await saveFlow({
+			name: "base",
+			contentHash: HASH,
+			doc,
+			kind: "income",
+			existing: salary,
+			draft: { ...again.draft, amount: "123456.00" },
+			employer: again.employer,
+			tryValue: true,
+		})
+		// The edit switches the salary and its share back on, and the share the session added is still tried.
+		expect(saved.done).toBe(true)
+		expect(whatIfSession.isOffIn("base", "flows.salary")).toBe(false)
+		expect(whatIfSession.whatIf?.sets).toContainEqual({
+			path: "flows.salary.amount",
+			value: "123456.00",
+		})
+		expect(whatIfSession.whatIf?.additions).toHaveLength(1)
+		expect(whatIfSession.whatIf?.additions[0]?.item).toMatchObject({ id: "salary-employer" })
 	})
 
 	test("keeps a held try when the form clears one field and nothing else", async () => {
