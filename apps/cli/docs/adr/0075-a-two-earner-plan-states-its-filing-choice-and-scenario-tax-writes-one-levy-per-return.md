@@ -284,16 +284,27 @@ the Return used the home-loan ceiling.
   ceiling. The separate-loans note stays on the ceiling's entry, because it says how a figure the
   Returns use was applied. An id no longer in the household has its sentence in `unclaimed` too
   (#614), not an entry of its own.
-- **A write that is not a separate one with Filers** names the shared interest the profile keeps, then
-  the other people whose claims it keeps. The second says how to state them bare with `--merge` only
-  under `married_joint` and `married_no_income_spouse`. A single or separate Return claims only the
-  Filer's own parents, and the bare count form bypasses tax-core's refusal of a spouse slot on it, so
-  there the hint would invite a claim the caller's filing cannot make. Where it prints, the hint is
-  conditional ("If this Return does not claim them yet"), so it stays true after it has been followed,
-  and it says that stating them bare replaces the stored flat claims, which a later separate filing
-  reads as the holder's own, so the holder's own claims must be stated again when switching back. A
-  later separate write that states more than a Return may claim, such as three parents, is refused;
-  within the cap nothing refuses it, so the holder's claims must be restated as above.
+- **A write that is not a separate one with Filers** names the shared interest the profile keeps,
+  then the other people whose claims it keeps. The second says how to state them bare with `--merge`
+  only under `married_joint` and `married_no_income_spouse`. A single or separate Return claims only
+  the Filer's own parents, and the bare count form bypasses tax-core's refusal of a spouse slot on
+  it, so there the hint would invite a claim the caller's filing cannot make. Where it prints, the
+  hint is conditional ("If this Return does not claim them yet"), so it stays true after it has been
+  followed, and it says that stating them bare replaces the stored flat claims, which a later
+  separate filing reads as the holder's own, so the holder's own claims must be stated again when
+  switching back. A joint write with a Return for the person whose flat claims they are
+  (`claimsHolder`, else the household holder) names that person and gives the switch-back command in
+  full, with a person-keyed flag for every field the kept sets hold and, when the profile also keeps
+  shared home-loan interest, that person's own `--mortgage-interest`, because the bare amount the
+  shared-interest sentence suggests would otherwise drop it (`for example --filing-status
+  married_separate --parents me=<n> --life-insurance me=<amount> --merge`). It also says to note
+  that person's own claims from `scenario show` before stating them bare, since a bare write
+  replaces the stored flat claims. A person id that starts with `-` takes the `=` form
+  (`--parents=-me=<n>`), because the space form's value reads as a flag. It does that only when this
+  write has a Return for that person, because a person-qualified value needs a separate filing and a
+  Return to carry it; otherwise it keeps the older words without a name or example. A later separate
+  write that states more than a Return may claim, such as three parents, is refused; within the cap
+  nothing refuses it, so the claims holder's claims must be restated as above. (#644)
 - **A separate write with Filers** says, for each person still in the household who has no Return and
   whose stored claims are not all zero: `"<person>" has no taxed income in this plan, so no Return
   claims their stored claims.` This covers an earlier partner still in the household, and also the
@@ -302,7 +313,12 @@ the Return used the home-loan ceiling.
 - **A departed id** is named in `unclaimed` by every write, whatever the filing status: the stored set
   is on no Return. No sentence says it is kept for a separate filing, because a separate Return counts
   it no more than a joint one does. The sentence says a `--tax` write drops the set, so it stays right
-  after the claims are stated again under a person in the household.
+  after the claims are stated again under a person who has a Return. A separate write with Filers also
+  shows how to restate them, with `"<person>=<value>"` flags such as `--filing-status married_separate
+  --life-insurance=<person>=<amount> --merge`. The example uses a literal `<person>` placeholder,
+  because the old id may have become any person in the household, and it names the separate filing
+  status so it also runs while the stored plan is still joint. Any other filing status shows no
+  example, because it refuses a person-qualified value. (#644)
 - The stored profile, the Levies and the money are unchanged.
 
 ## Amended (2026-11-26): the one-earner rule applies in every projection year (#619)
