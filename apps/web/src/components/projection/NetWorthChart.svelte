@@ -17,10 +17,12 @@ interface Props {
 	onTerms: (value: string) => void
 	/** Replaces the heading, such as the picker of the Projection page. Left out, the heading is "Net worth by year". */
 	title?: Snippet
+	/** True when the page lists the reached Milestones itself, so this chart's list is only for a screen reader. */
+	listedElsewhere?: boolean
 }
 
 /** The net worth chart by year, with the choice of terms in the address bar, and a mark for each reached Milestone. */
-let { run, terms, onTerms, title }: Props = $props()
+let { run, terms, onTerms, title, listedElsewhere = false }: Props = $props()
 const chosen = $derived(parseTerms(terms))
 const series = $derived(netWorthSeries(run, chosen, currentItemNames().people))
 const markers = $derived(milestoneMarkers(run, currentItemNames()))
@@ -38,8 +40,9 @@ const reached = $derived(milestoneView(run)?.reached ?? [])
 	</div>
 	<LineChart label="Net worth at the close of each year" {series} {markers} />
 	{#if reached.length > 0}
-		<!-- The marks above, in words, for a reader who cannot see them. -->
-		<ul class="sr-only">
+		<!-- The marks above in words: a phone has no hover to name a shortened or unlabelled rule, so the list
+		shows below the chart there unless the page lists them itself. A screen reader gets it at any width. -->
+		<ul class={["space-y-1 text-xs", listedElsewhere ? "sr-only" : "not-sr-only sm:sr-only"]}>
 			{#each reached as milestone (milestone.id)}
 				<li><ItemName kind="milestone" id={milestone.id} />: reached on {formatDate(milestone.date)}</li>
 			{/each}

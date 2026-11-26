@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument } from "../../contract"
-import { personNames } from "../item-names"
+import { NO_PEOPLE, personNames } from "../item-names"
 import { bindingSentence, type UnreachableBinding } from "./binding"
 import { fiFixture, REACHABLE, REFERENCE, UNREACHABLE } from "./fixtures.test-support"
 import { fiModelOf } from "./model"
@@ -16,7 +16,7 @@ const HOUSEHOLD: HouseholdDocument = {
 
 describe("fiModelOf: the reachable branch", () => {
 	test("shows the FI month and the day it names, as the main figure", () => {
-		const model = fiModelOf(fiFixture(REACHABLE))
+		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		expect(model.kind).toBe("reachable")
 		if (model.kind !== "reachable") return
 		expect(model.month).toBe("Mar 2041")
@@ -30,10 +30,10 @@ describe("fiModelOf: the reachable branch", () => {
 		]
 		const base = fiFixture(REACHABLE)
 		if (!base.fi.reachable) throw new Error("expected a reachable answer")
-		const stated = fiModelOf({ ...base, fi: { ...base.fi, ages } })
+		const stated = fiModelOf({ ...base, fi: { ...base.fi, ages } }, NO_PEOPLE)
 		if (stated.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(stated.ages).toBe("me 51, partner 49")
-		const none = fiModelOf(fiFixture(REACHABLE))
+		const none = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (none.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(none.ages).toBeNull()
 	})
@@ -51,7 +51,7 @@ describe("fiModelOf: the reachable branch", () => {
 	})
 
 	test("states the rule-of-thumb reference with its multiplier, date, basis, window and terms", () => {
-		const model = fiModelOf(fiFixture(REACHABLE))
+		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.multiplier).toBe("25×")
 		expect(model.reference.date).toBe("1 Mar 2041")
@@ -61,7 +61,7 @@ describe("fiModelOf: the reachable branch", () => {
 	})
 
 	test("says the reference is not met and is a full twelve months, when the CLI says so", () => {
-		const model = fiModelOf(fiFixture(REACHABLE))
+		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.met).toBe("Not met")
 		expect(model.reference.partial).toBe("Full: the window holds twelve months")
@@ -69,7 +69,10 @@ describe("fiModelOf: the reachable branch", () => {
 
 	test("says the reference is met and partial when the CLI says so", () => {
 		const reference = { ...REFERENCE, met: true, partial: true, terms: "real" as const }
-		const model = fiModelOf(fiFixture({ reachable: true, fiDate: REFERENCE.date, reference }))
+		const model = fiModelOf(
+			fiFixture({ reachable: true, fiDate: REFERENCE.date, reference }),
+			NO_PEOPLE,
+		)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.met).toBe("Met")
 		expect(model.reference.partial).toBe("Partial: the window holds less than twelve months")
@@ -77,7 +80,7 @@ describe("fiModelOf: the reachable branch", () => {
 	})
 
 	test("lists the reference's money figures as the CLI states them, with their labels", () => {
-		const model = fiModelOf(fiFixture(REACHABLE))
+		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.amounts).toEqual([
 			{ label: "Unlocked assets", amount: "1000000.00" },
@@ -88,14 +91,17 @@ describe("fiModelOf: the reachable branch", () => {
 	})
 
 	test("shows the multiple in basis points, and says so, when the CLI states one", () => {
-		const model = fiModelOf(fiFixture(REACHABLE))
+		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.multiple).toBe("200000 basis points, where 10,000 is one times")
 	})
 
 	test("has no multiple when the CLI states none", () => {
 		const reference = { ...REFERENCE, multipleBps: null }
-		const model = fiModelOf(fiFixture({ reachable: true, fiDate: REFERENCE.date, reference }))
+		const model = fiModelOf(
+			fiFixture({ reachable: true, fiDate: REFERENCE.date, reference }),
+			NO_PEOPLE,
+		)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.multiple).toBeNull()
 	})
@@ -103,7 +109,7 @@ describe("fiModelOf: the reachable branch", () => {
 
 describe("fiModelOf: the unreachable branch", () => {
 	test("reads no best case when no month could start a stop", () => {
-		const model = fiModelOf(fiFixture(UNREACHABLE.noCandidateMonth))
+		const model = fiModelOf(fiFixture(UNREACHABLE.noCandidateMonth), NO_PEOPLE)
 		expect(model.kind).toBe("unreachable")
 		if (model.kind !== "unreachable") return
 		expect(model.binding).toBe("noCandidateMonth")
@@ -120,7 +126,7 @@ describe("fiModelOf: the unreachable branch", () => {
 
 	for (const binding of bindings) {
 		test(`says what the ${binding} binding means, in its own words`, () => {
-			const model = fiModelOf(fiFixture(UNREACHABLE[binding]))
+			const model = fiModelOf(fiFixture(UNREACHABLE[binding]), NO_PEOPLE)
 			if (model.kind !== "unreachable") throw new Error("expected an unreachable answer")
 			expect(model.binding).toBe(binding)
 			expect(model.sentence).toBe(bindingSentence(binding))
@@ -128,7 +134,7 @@ describe("fiModelOf: the unreachable branch", () => {
 	}
 
 	test("reads a run-out best case: the month, the day the money runs out, and the unmet amount", () => {
-		const model = fiModelOf(fiFixture(UNREACHABLE.insufficientMoney))
+		const model = fiModelOf(fiFixture(UNREACHABLE.insufficientMoney), NO_PEOPLE)
 		if (model.kind !== "unreachable") throw new Error("expected an unreachable answer")
 		expect(model.best).toEqual({
 			kind: "runsOut",
@@ -139,7 +145,7 @@ describe("fiModelOf: the unreachable branch", () => {
 	})
 
 	test("reads a buffer-breach best case: the month, the breach day, and required against accessible", () => {
-		const model = fiModelOf(fiFixture(UNREACHABLE.minimumBuffer))
+		const model = fiModelOf(fiFixture(UNREACHABLE.minimumBuffer), NO_PEOPLE)
 		if (model.kind !== "unreachable") throw new Error("expected an unreachable answer")
 		expect(model.best).toEqual({
 			kind: "bufferBreach",

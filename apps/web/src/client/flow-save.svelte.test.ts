@@ -48,7 +48,7 @@ async function trySalary(edit: {
 }): Promise<void> {
 	const shown = lensDocument(doc, whatIfSession.changesFor("base") ?? NO_CHANGES)
 	const draft = {
-		...flowDraftOf(salary),
+		...flowDraftOf(shown.flows.find((flow) => flow.id === "salary") ?? salary),
 		...(edit.amount === undefined ? {} : { amount: edit.amount }),
 	}
 	const stored = employerDraftOf(employerOf(shown.flows, "salary"))

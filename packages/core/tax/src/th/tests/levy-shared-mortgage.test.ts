@@ -102,6 +102,71 @@ describe("a shared home loan is claimed per period (s.47(1)(ซ))", () => {
 		])
 		expect(found.allowances).toBe(90_000)
 	})
+
+	// The partner's s.40(4) interest is elected final and left off their Return, but it is still
+	// income for the one-earner rule, the conservative reading (cli ADR-0075). The holder keeps
+	// its 30,000 share.
+	it("counts the other Filer's income elected final", () => {
+		const interest = thFilerLabel(ThLevyIncomeLabel.Section40_4Interest, "partner")
+		const profile: ThLevyProfile = { ...holder(0), section40_4: { interest: "final" } }
+		expect(
+			figures(profile, [
+				[salary("me"), 1_000_000],
+				[interest, 500_000],
+			]).allowances,
+		).toBe(90_000)
+	})
+})
+
+describe("a shared loan must fit its Return", () => {
+	const field = ThAllowanceField.MortgageInterest
+	const loan = { other: "partner", own: 0, total: 60_000 }
+	const refused = (profile: ThLevyProfile) => fieldOf(() => emitThLevy(profile))
+
+	it("refuses a status or Filer count that is not one separate Return", () => {
+		expect(refused({ filingStatus: "single", sharedMortgage: loan })).toBe(field)
+		expect(
+			refused({ filingStatus: "married_joint", filers: ["me", "partner"], sharedMortgage: loan }),
+		).toBe(field)
+		expect(refused({ filingStatus: "married_separate", sharedMortgage: loan })).toBe(field)
+		expect(
+			refused({
+				filingStatus: "married_separate",
+				filers: ["me", "partner"],
+				sharedMortgage: loan,
+			}),
+		).toBe(field)
+	})
+
+	it("refuses the other Filer naming this Return's own Filer", () => {
+		const profile: ThLevyProfile = {
+			filingStatus: "married_separate",
+			filers: ["me"],
+			sharedMortgage: { ...loan, other: "me" },
+		}
+		expect(refused(profile)).toBe(field)
+	})
+
+	it("refuses a claim above this Return's own interest plus the whole loan", () => {
+		const profile: ThLevyProfile = {
+			filingStatus: "married_separate",
+			filers: ["me"],
+			allowances: { mortgageInterest: 60_001 },
+			sharedMortgage: loan,
+		}
+		expect(refused(profile)).toBe(field)
+	})
+
+	// 90071992547409.90 THB is 9007199254740990 satang and 0.02 THB is 2 more: a safe amount each,
+	// a sum past 2^53 - 1, which must fail at the mortgage field rather than the Measure's value.
+	it("refuses own plus the whole loan outside the safe integer range", () => {
+		const profile: ThLevyProfile = {
+			filingStatus: "married_separate",
+			filers: ["me"],
+			sharedMortgage: { other: "partner", own: 90_071_992_547_409.9, total: 0.02 },
+		}
+		expect(refused(profile)).toBe(field)
+	})
 })
 
 describe("an invalid shared loan is refused at its field", () => {

@@ -223,8 +223,9 @@ flag takes a person (`--parents partner=2`) so each Return states its own claims
 value names the holder, and each Return's children default to 0. A value for someone with
 no income is refused, because no Return carries it. A Return claims at most its own two
 parents. Interest on one loan borrowed together is stated once, as `--mortgage-interest
-shared=60000`: each Return claims half, an odd satang goes to the holder, and a sole
-person with income claims it all. The shared total is at most 100,000 baht
+shared=60000`: each Return claims half in a year both have income, the only Return with
+income that year claims all of it, a person with no income claims nothing of it, and an
+odd satang goes to the holder. The shared total is at most 100,000 baht
 (`MORTGAGE_OVER_CEILING`), and `shared=` is refused under any other filing status. A
 person's own `--mortgage-interest` is for their other loans, and each Return claims at
 most 100,000 baht of its own interest and its share together. `traj` cannot tell which
@@ -238,7 +239,9 @@ interest bare. A write that claims neither says so in its `assumptions`, on
 claims its other keys are, so if the household swaps which person is the holder, each
 person's claims stay theirs. A `projection run` then reports a `filer` on each `taxYears`
 entry, `--carry-in` takes one record per Levy, and `projection allowances` answers per
-Return.
+Return. A person given a new id reads as another person: no separate Return counts the
+claims stored under the old id, and each separate write says so in `assumptions`, at
+`returns.<old id>`, until a `--tax` write states the profile again.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,
@@ -262,7 +265,10 @@ and where it came from, and one that starts on a period boundary needs nothing:
 A Levy over Filers reads Filer labels, so its record names them: each of its 29 classes
 once per Filer (`income.section40_1@me`) and its 22 income classes once more for income
 of both (`income.section40_1@shared`), 80 for two Filers where a Levy over one label has
-29. A missing class is listed by name, and a bare label is refused.
+29. A separate Return that shares a home loan also reads the other Filer's 22 income
+classes, which the CLI fills from that Filer's own record: such a record states 51
+classes, this Return's 29 and the shared 22, and a class it does state must agree with
+the other Return's. A missing class is listed by name, and a bare label is refused.
 
 ## Chance of success
 

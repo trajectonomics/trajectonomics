@@ -21,6 +21,8 @@ function unreadable(path: string, levy: string, at: string, what: string): AppEr
 export type CarryInEntry = {
 	periodStart: string
 	tallies: StatedTally[]
+	/** The classes the record itself stated; a shared-loan fill reads the rest from the other Return. */
+	stated: ReadonlySet<string>
 	prepaid: number
 	source: CarryInSource
 }
@@ -48,7 +50,13 @@ export function flagEntry(input: {
 		flagProblem(problem, { base, levy: input.levy, periodStart }),
 	)
 	if (isAppError(tallies)) return tallies
-	return { periodStart, tallies, prepaid: amounts.prepaid, source: "flag" }
+	return {
+		periodStart,
+		tallies: tallies.tallies,
+		stated: tallies.stated,
+		prepaid: amounts.prepaid,
+		source: "flag",
+	}
 }
 
 /** One stored `levy.carryIn` record, resolved by the same class rule as the flag's. */
@@ -84,5 +92,11 @@ export function storedEntry(input: {
 		storedProblem(problem, { path: input.path, levy: input.levy, periodStart }),
 	)
 	if (isAppError(tallies)) return tallies
-	return { periodStart, tallies, prepaid, source: "document" }
+	return {
+		periodStart,
+		tallies: tallies.tallies,
+		stated: tallies.stated,
+		prepaid,
+		source: "document",
+	}
 }

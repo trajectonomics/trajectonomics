@@ -160,6 +160,16 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
     current holder's.
   - The record names a person by id. A holder given a new id reads as another person: the flat claims
     stay under the old id, and the new one's Return starts from nothing until the caller states them.
+    The result reports it (trajectonomics/trajectonomics#614). Every `married_separate` write, by
+    `--merge` or `--from-stored` and a dry run of either, adds to `assumptions` one entry for each id
+    in the written `returns` that no person in the household has. Such a set claims something, because
+    `returns` keeps no empty set for a person with no Return. The entry is at path `returns.<id>`,
+    with value 0 and status `unsourced`, and names the id. So a partner given a new id is reported as
+    a holder is, and the entry stays for as long as the claims sit on no Return. Stating them again
+    for a person in the household leaves the old set stored: a `--tax` write drops it, and a household
+    that has the old id again ends the entry. A joint or single write adds none, because it counts the
+    flat claims on its Return, and the kept-claims note (#606, below) names the sets in `returns`. A
+    write with no household cannot judge an id and adds none.
 - **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
   they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
   that claims something, whatever the filing status and also while the household names no partner or
@@ -240,10 +250,12 @@ This is the follow-up the shared home-loan ceiling left above.
   `assumptions` on `allowances.mortgageInterestCeiling`, that the shared interest the profile keeps is
   not claimed, with the amount and `--mortgage-interest <amount> --merge` as the way to state this
   Return's interest. It says the same of the claims kept for another person, naming them, whatever
-  they claim: every entry of `assumptions` is one of tax-core's figures, so this is the entry that
-  carries a sentence about a claim. The entry keeps tax-core's value and status, and is added when the
-  Levy claims no home-loan interest. A separate write whose sole Filer leaves the other person's
-  stored claims unclaimed says nothing, as before.
+  they claim: apart from the entries of #614, every entry of `assumptions` is one of tax-core's
+  figures, so this is the entry that carries a sentence about a claim. The entry keeps tax-core's
+  value and status, and is added when the Levy claims no home-loan interest. On a `married_separate`
+  write with no Filers, an id no longer in the household is left out of this sentence, because it has
+  its own entry (#614, above). A separate write whose sole Filer leaves the other person's stored
+  claims unclaimed says nothing of a person still in the household, as before.
 - **The assumption.** The separate-loans note on `allowances.mortgageInterestCeiling` is not added
   once the profile states shared interest, because the person has said which interest is shared. The
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
@@ -267,18 +279,31 @@ interest is right in every year of the Projection, not only in the first.
   split.
 - **What the write still computes.** The two shares and the odd satang (to the holder) are still
   made once, at the write, and stored as each Levy's both-earners claim; tax-core divides nothing.
-  The Levy carries the other Filer's id and this Return's own interest in `sharedMortgage`, and its
-  `pick` Measures decide the period's claim. A plan that has no other Filer (a sole Filer, or a plan
-  without Filers) keeps the fixed claim it wrote before.
+  The profile's `sharedMortgage` is an emit-time input: the Levy keeps no profile, and the emitted
+  Measures read the other Filer's income labels while its `pick` Measures decide the period's
+  claim. A plan that has no other Filer (a sole Filer, or a plan without Filers) keeps the fixed
+  claim it wrote before.
 - **The consequence for a mid-period start.** A shared-loan Levy tallies the other Filer's income
   labels so it can see that income. `--carry-in` for a period a shared-loan separate plan starts
-  inside therefore states 73 classes per Levy: 29 for the Filer, the 22 `@shared` income classes and
-  the other Filer's 22 income classes.
+  inside states 51 classes per Levy: 29 for the Filer and the 22 `@shared` income classes. The CLI
+  reads the other Filer's 22 income classes from that Filer's own record and fills them in, so an
+  ordinary file with one record per Levy, each stating only its own Filer's income, needs no
+  change. It refuses when a record states those classes differently from the other Return's record,
+  and when a record leaves them to `"rest": "0.00"` while the other Return has no record for the
+  period. The CLI finds the other Filer from the labels the emitted Measures read, because the
+  stored Levy keeps no `sharedMortgage` field.
+- **Assumption: what counts as income.** A Filer has income when any gross income label tallies a
+  positive amount, including Section 40(4) income elected final and left off the Return. This is the
+  conservative reading of s.57 sexies paragraph 2 and never understates the tax; confirmation from
+  the Revenue Department is still open.
 - **Hand check, in the projection tests.** Salaries of 1,000,000 and 500,000, separate filing, a
   60,000 loan, and the partner's salary ends in 2027. In 2026 and 2027 the holder claims 30,000 with
   its own interest, so allowances are 60,000 + 30,000 = 90,000, taxable 810,000 and tax 77,000. From
   2028 only the holder earns, so it claims all 60,000: allowances 120,000, taxable 780,000 and tax
-  71,000, not 77,000. The partner owes 8,500 in 2026 and 2027 and nothing later.
+  71,000, not 77,000. The partner owes 8,500 in 2026 and 2027 and nothing later. A Projection that
+  starts inside 2026 with a Carry-in stating the same 1,000,000 and 500,000 owes the same 77,000 and
+  8,500; with the partner's salary ended before the year, the holder claims the whole loan and owes
+  71,000 while the partner owes 0.
 - **Unchanged.** Two earners in every year keep the half split and the same tax. A plan without
   Filers keeps the fixed claim it wrote before, and its `scenario tax` and projection output are
   byte-identical to the build before this amendment.

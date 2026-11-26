@@ -1,5 +1,5 @@
 import type { ScenarioDocument, ScenarioFlow } from "../lib/contract"
-import { employerOf } from "../lib/view/plan-items/employer"
+import { employerIdOf, employerOf } from "../lib/view/plan-items/employer"
 import type { EmployerDraft } from "../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../lib/view/plan-items/flows"
 import type { Problems } from "../lib/view/plan-items/problems"
@@ -9,7 +9,7 @@ import {
 	withoutSalary,
 	withSalary,
 } from "../lib/view/plan-items/salary-draft"
-import { recordOf } from "../lib/what-if/session"
+import { recordOf, withoutAddition } from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 
@@ -48,6 +48,9 @@ function tryEmployer(input: FlowSave, result: Extract<SalaryResult, { ok: true }
 	}
 	if (result.dropped !== null)
 		whatIfSession.setOff(name, contentHash, `flows.${result.dropped}`, true)
+	const added = existing === undefined ? null : `flows.${employerIdOf(existing.id)}`
+	if (result.employer === null && stored === null && added !== null)
+		whatIfSession.tryChange(name, contentHash, (base) => withoutAddition(base, added))
 }
 
 /**

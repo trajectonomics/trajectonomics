@@ -1,6 +1,6 @@
 import type { LineSeries } from "../../chart"
 import type { ProjectionRun } from "../../contract"
-import { NO_PEOPLE, type PersonNames } from "../item-names"
+import type { PersonNames } from "../item-names"
 import { netWorthSeries } from "../projection/chart"
 import type { Terms } from "../projection/terms"
 
@@ -18,8 +18,8 @@ export function whatIfSeries(
 	whatIf: ProjectionRun,
 	baseline: ProjectionRun | null,
 	terms: Terms,
+	people: PersonNames,
 	hidden = false,
-	people: PersonNames = NO_PEOPLE,
 ): LineSeries[] {
 	// Two runs in two terms would be four lines, and the dash tells baseline from what-if, so "both" draws nominal.
 	const shown = terms === "both" ? "nominal" : terms

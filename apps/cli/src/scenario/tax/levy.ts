@@ -2,6 +2,7 @@ import { type AppError, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
 import { unclaimedNotes } from "./ceiling-notes"
 import { holderIdOf } from "./couple"
+import { departedClaimants } from "./departed-claims"
 import { leviesFor } from "./emitter"
 import { withoutFilerLabels } from "./filer-labels"
 import { type FilerScope, filerScopeOf, withFilerLabels } from "./filer-scope"
@@ -37,6 +38,8 @@ export type TaxLevyWritten = {
 	filers?: string[]
 	/** What the write says on the home-loan ceiling: what it assumed, or what its Return leaves out. */
 	ceilingNotes: string[]
+	/** The ids no longer in the household whose stored claims a separate filing's Returns leave out. */
+	departed: string[]
 }
 
 /** The document with each taxed item labelled for its Owner and each Prepayment pointed at its Levy. */
@@ -73,11 +76,13 @@ export function withTaxLevy(
 	const others = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	const kept = keptRequest(request, scope, holderIdOf(household))
 	const assumed = assumesSeparateLoans(request, scope, stated) ? [SEPARATE_LOANS_NOTE] : []
+	const departed = departedClaimants(kept, household)
 	return {
 		document: { ...next, levies: [...others, ...built] },
 		request: kept,
 		levies: built.map((levy) => levy["id"] as string),
 		...(scope === null ? {} : { filers: scope.filers }),
-		ceilingNotes: [...assumed, ...unclaimedNotes(kept, scope)],
+		ceilingNotes: [...assumed, ...unclaimedNotes(kept, scope, departed)],
+		departed,
 	}
 }

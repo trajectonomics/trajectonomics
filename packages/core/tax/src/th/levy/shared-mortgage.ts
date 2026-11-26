@@ -1,12 +1,13 @@
 import { TH_2026_PARAMETERS } from "../parameters"
 import { ThAllowanceField } from "../types"
 import { toSatang } from "../units"
-import { TH_LEVY_READ_PREFIX, TH_LEVY_SHARED_FILER, thFilerLabel, validateThFilers } from "./filers"
+import { TH_LEVY_READ_PREFIX, TH_LEVY_SHARED_FILER, thFilerLabel } from "./filers"
 import type { ThLevyGraph } from "./graph"
 import { capAt, sumMeasures } from "./graph-rates"
 import { ThLevyRounding } from "./graph-types"
 import { TH_LEVY_INCOME_LABELS } from "./labels"
 import type { ThLevyProfile, ThLevySharedMortgage } from "./profile-types"
+import { validateSharedMortgage } from "./shared-mortgage-check"
 import { addIncomeTallies, type ThLevyTallies } from "./tallies"
 
 /**
@@ -48,7 +49,8 @@ function incomeOf(graph: ThLevyGraph, other: string): string {
  * `this` and `other` are the Filer's gross income labels plus half of `@shared`, and `share` is
  * `allowances.mortgageInterest` minus this Return's own interest.
  * Units: THB major units in, integer satang Measures out.
- * Throws: TaxValidationError for an invalid other Filer id or a negative or unsafe amount.
+ * Throws: TaxValidationError for a profile that is not one separate Return, an invalid other
+ * Filer id or amount, a claim above own plus total, or a sum outside the safe integer range.
  *
  * @param graph Measure graph being built.
  * @param profile The Return's profile; `allowances.mortgageInterest` is its both-earners claim.
@@ -62,16 +64,10 @@ export function addSharedMortgageAllowance(
 	tallies: ThLevyTallies,
 	shared: ThLevySharedMortgage,
 ): string {
-	validateThFilers([shared.other], "married_separate")
 	const field = ThAllowanceField.MortgageInterest
-	const own = toSatang(shared.own, field)
-	const together = own + toSatang(shared.total, field)
+	const { together, claim } = validateSharedMortgage(profile, shared)
 	const ceiling = toSatang(TH_2026_PARAMETERS.allowances.mortgageInterestCeiling, field)
-	const both = capAt(
-		graph,
-		graph.constant(toSatang(profile.allowances?.mortgageInterest ?? 0, field)),
-		ceiling,
-	)
+	const both = capAt(graph, graph.constant(claim), ceiling)
 	const alone = capAt(graph, graph.constant(together), ceiling)
 	const zero = graph.constant(0)
 	const mine = sumMeasures(
