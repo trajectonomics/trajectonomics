@@ -323,19 +323,20 @@ interest is right in every year of the Projection, not only in the first.
   labels so it can see that income. `--carry-in` for a period a shared-loan separate plan starts
   inside states 51 classes per Levy: 29 for the Filer and the 22 `@shared` income classes. The CLI
   reads the other Filer's 22 income classes from that Filer's own record and fills them in, so an
-  ordinary file with one record per Levy, each stating only its own Filer's income, needs no
-  change. It also reconciles the 22 `@shared` classes between the pair, because tax-core decides
-  the other Filer's income from this Levy's shared tally: a stated class fills a record that leaves
-  it out, and two different claims are refused. A `"rest": "0.00"` is a claim of zero, so a rest
-  that disagrees with the other record is refused too; a record that leaves the other Return's
-  classes or a shared class out needs no `rest`. Each `@shared` class must still be stated by at
-  least one record of the pair, or covered by a `rest`: a class neither names is refused, so
-  forgotten shared income never reads as none. The CLI's own scope record, which stands for a
-  period it does not recompute (ADR-0032), says nothing about either income: a record whose pair
-  has only a scope record must state the other Filer's and the shared income itself. It refuses when a record states those classes
-  differently from the other Return's record, and when a record leaves them to `"rest": "0.00"`
-  while the other Return has no record for the period. The CLI finds the other Filer from the
-  labels the emitted Measures read, because the stored Levy keeps no `sharedMortgage` field.
+  ordinary file with one record per Levy, each stating only its own Filer's income, needs no change.
+  It also reconciles the 22 `@shared` classes between the pair, because tax-core decides the other
+  Filer's income from this Levy's shared tally: a stated class fills a record that leaves it out,
+  and two different claims are refused. A `"rest": "0.00"` is a claim of zero, so a rest that
+  disagrees with the other record is refused too; a record that leaves the other Return's classes or
+  a shared class out needs no `rest`. Each `@shared` class must still be stated by at least one
+  record of the pair, or covered by a `rest`: a class neither names is refused, so forgotten shared
+  income never reads as none. The CLI's own scope record, which stands for a period it does not
+  recompute (ADR-0032), says nothing about either income: a record whose pair has only a scope
+  record must state the other Filer's and the shared income itself. The CLI refuses a record that
+  states those classes differently from the other Return's record, and one that leaves them out or
+  to `"rest": "0.00"` while the other Return has no record of its own for the period. The CLI finds
+  the other Filer from the labels the emitted Measures read, because the stored Levy keeps no
+  `sharedMortgage` field.
 - **Assumption: what counts as income.** A Filer has income when any gross income label tallies a
   positive amount, including Section 40(4) income elected final and left off the Return. This is the
   conservative reading of s.57 sexies paragraph 2 and never understates the tax; confirmation from

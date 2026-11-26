@@ -22,7 +22,7 @@ export function refusedNoRecord(where: FillWhere, tally: StatedTally, rested: bo
 	return fail("invalid_input", {
 		path: where.path,
 		message: `The record for "${where.levy}" from ${where.periodStart} ${leaves}, but the Return of "${where.other}" has no Carry-in record of its own for that period to read it from.`,
-		hint: `State "${tally.label}" in this record, or a record for "${where.other}" for the same period with that Return's own income; the two Returns share one loan.`,
+		hint: `Add a record for "${where.other}" for the same period with that Return's own income, or state every income class of "${where.other}" (income.*@${where.other}) in this record; the two Returns share one loan.`,
 		details: {
 			levy: where.levy,
 			periodStart: where.periodStart,
@@ -58,7 +58,9 @@ export function refusedUnstated(
 		: `State it in this record, or add "rest": "0.00" to it if there was none.`
 	return fail("invalid_input", {
 		path: where.path,
-		message: `Neither the record for "${where.levy}" nor the record for "${where.other}" from ${where.periodStart} names "${tally.label}", the income both share.`,
+		message: otherHasRecord
+			? `Neither the record for "${where.levy}" nor the record for "${where.other}" from ${where.periodStart} names "${tally.label}", the income both share.`
+			: `The record for "${where.levy}" from ${where.periodStart} does not name "${tally.label}", the income both share, and "${where.other}" has no record of its own to read it from.`,
 		hint,
 		details: {
 			levy: where.levy,

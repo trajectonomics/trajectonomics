@@ -18,8 +18,9 @@ export function sourceEntryOf(
 }
 
 /**
- * The other record's amount for a class: its tally, zero when it owes no record for the period, and
- * undefined when it has none to read, as with the CLI's scope record (not recomputed, cli ADR-0032).
+ * The other record's amount for a class: its tally, or undefined when it has none to read. The CLI's
+ * scope record (not recomputed, cli ADR-0032) gives none, and every needed period has a record or a
+ * scope record by the time the pair is filled, so there is no other case.
  */
 export function sourceAmount(
 	source: ResolvedLevy | undefined,
@@ -31,10 +32,7 @@ export function sourceAmount(
 		const found = item.entry.tallies.find((it) => keyOf(it) === key)
 		return item.entry.source === "scope" ? undefined : found?.amount
 	}
-	const needed = source?.needed
-	if (needed === null || needed === undefined) return undefined
-	if (periodStart === needed.current && needed.starts.includes(needed.current)) return undefined
-	return 0
+	return undefined
 }
 
 /** One other-Filer class: the other record's amount, or the refusal that says why there is none. */
