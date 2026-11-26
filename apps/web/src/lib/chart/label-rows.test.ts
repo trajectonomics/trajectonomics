@@ -41,12 +41,13 @@ describe("placedLabels: rows", () => {
 		expect(placedLabels(marks, bareArea(600)).map((label) => label.row)).toEqual([0, 1, 0])
 	})
 
-	test("labels past the middle hang left of their rule and still never overlap", () => {
-		// Width 400: x 300 and 324 both hang left. The label at 324 stops at the rule at 300, and its "a…"
-		// still spans 301 to 320, only 5px after the label at 300 (226 to 296), so it takes the next row.
+	test("moves a label whole to the other side rather than shortening it", () => {
+		// Width 400: x 324 prefers the left, where the rule at 300 leaves 20px, but the right has 72px and
+		// holds the whole 70px label, so it goes there whole and both labels share the top row.
 		const placed = placedLabels(marksAt([300, 324]), bareArea(400))
-		expect(placed.map((label) => label.row)).toEqual([0, 1])
-		expect(placed.map((label) => label.leftwards)).toEqual([true, true])
+		expect(placed.map((label) => label.text)).toEqual(["abcdefghij", "abcdefghij"])
+		expect(placed.map((label) => label.leftwards)).toEqual([true, false])
+		expect(placed.map((label) => label.row)).toEqual([0, 0])
 	})
 
 	test("rows follow each marker's own index, whatever order the markers come in", () => {
@@ -80,6 +81,46 @@ describe("placedLabels: rules and the plot's edges", () => {
 		expect(placed.map((label) => label.text)).toEqual(["abcdefghij", "k"])
 		expect(placed.map((label) => label.leftwards)).toEqual([true, false])
 		expect(faults(marks, placed, bareArea(600))).toEqual([])
+	})
+
+	test("draws a label whole on the other side before shortening it on its own", () => {
+		// #633 at 1280px on Milestones: the rule 35px to the right leaves 31px, while 215px to the left hold
+		// the whole 60px Thai label, so it hangs left whole instead of drawing "เก…" on the right.
+		const marks = [
+			{ x: 250, label: "เกษียณอายุ" },
+			{ x: 285, label: "b" },
+		]
+		const placed = placedLabels(marks, { width: 600, left: 31, right: 600 })
+		expect(placed[0]).toMatchObject({ leftwards: true, text: "เกษียณอายุ" })
+	})
+
+	test("shortens on the roomier side when neither side holds the whole label", () => {
+		// The rule at 180 leaves 26px to the right, enough for "ab…" on the preferred side; the plot's edge at
+		// 90 leaves 56px to the left, less than the whole 70px label but enough for "abcdef…", so the label
+		// shortens on its roomier left side rather than on its preferred one.
+		const marks = [
+			{ x: 150, label: "abcdefghij" },
+			{ x: 180, label: "k" },
+		]
+		const area = { width: 600, left: 90, right: 600 }
+		const placed = placedLabels(marks, area)
+		expect(placed[0]).toEqual({ row: 0, leftwards: true, text: "abcdef…" })
+		expect(faults(marks, placed, area)).toEqual([])
+	})
+
+	test("keeps the preferred side when both sides have the same room", () => {
+		// Rules 40px either side of a marker left of the middle: neither side holds the whole label, both hold
+		// the same shortened words, and the tie goes to the preferred right side.
+		const marks = [
+			{ x: 160, label: "k" },
+			{ x: 200, label: "abcdefghij" },
+			{ x: 240, label: "k" },
+		]
+		const area = bareArea(600)
+		const placed = placedLabels(marks, area)
+		expect(placed[1]).toMatchObject({ leftwards: false })
+		expect(placed[1]?.text.endsWith("…")).toBe(true)
+		expect(faults(marks, placed, area)).toEqual([])
 	})
 
 	test("stops a moved label at the plot's left edge", () => {
