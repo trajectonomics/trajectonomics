@@ -20,6 +20,7 @@ export type {
 	ThLevyIdentity,
 	ThLevyProfile,
 	ThLevySection40_4Elections,
+	ThLevySharedMortgage,
 } from "./profile-types"
 export type { ThSeparateClaimOptions, ThSeparateClaimProblem } from "./separate-claims"
 export { ThSeparateClaimCode, thSeparateClaimProblems } from "./separate-claims"

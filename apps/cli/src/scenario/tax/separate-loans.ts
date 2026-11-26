@@ -17,7 +17,7 @@ import { records } from "./json"
 const CEILING = TH_2026_PARAMETERS.allowances.mortgageInterestCeiling.toLocaleString("en-US")
 
 /** What the ceiling's entry says when each Return's interest is taken to be on separate loans. */
-const SEPARATE_LOANS_NOTE = `Each separate Return's interest is taken to be on separate loans, each under its own ceiling; interest on one loan borrowed together shares a single ceiling between both Returns. If it is one loan borrowed together, state its interest as --mortgage-interest shared=<amount> instead, which splits it half to each Return under one ceiling of ${CEILING} baht.`
+const SEPARATE_LOANS_NOTE = `Each separate Return's interest is taken to be on separate loans, each under its own ceiling; interest on one loan borrowed together shares a single ceiling between both Returns. If it is one loan borrowed together, state its interest as --mortgage-interest shared=<amount> instead, which gives each Return half in a year both have income and the whole to the only Return with income, under one ceiling of ${CEILING} baht.`
 
 /**
  * Whether two Filers each state home-loan interest while the household says both own a loan, and no

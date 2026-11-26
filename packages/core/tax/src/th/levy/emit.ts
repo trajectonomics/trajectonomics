@@ -11,6 +11,7 @@ import type { ThLevy, ThLevyMonthDay } from "./graph-types"
 import { ThLevyMeasureId } from "./measure-ids"
 import type { ThLevyProfile } from "./profile-types"
 import { addSection40_4 } from "./regimes"
+import { validateSharedMortgage } from "./shared-mortgage-check"
 
 /** Default Levy id: Thailand Personal Income Tax for the 2026 tax year. */
 const DEFAULT_ID = "th-2026-pit"
@@ -33,8 +34,8 @@ const DEFAULT_SETTLEMENT: ThLevyMonthDay = { month: 3, day: 31 }
  * Units: Every monetary Measure is integer satang.
  * With `profile.filers`, each Filer's income is tallied under its Filer labels, and a joint Return
  * of two Filers is one bracket walk over the sum, with each Filer's own Section 42 bis ceiling.
- * Throws: TaxValidationError for an invalid profile allowance, donation, actual expense, or rate,
- * or for a `filers` list the filing status does not allow.
+ * Throws: TaxValidationError for an invalid profile allowance, donation, actual expense, rate,
+ * shared loan, or a `filers` list the filing status does not allow.
  *
  * @param profile Taxpayer profile and elections fixed at emit time.
  * @statute Thailand Revenue Code Sections 40, 42 bis, 47, 47 bis, 48(1)–(2), 50(2)(g), 56.
@@ -42,6 +43,9 @@ const DEFAULT_SETTLEMENT: ThLevyMonthDay = { month: 3, day: 31 }
 export function emitThLevy(profile: ThLevyProfile = {}): ThLevy {
 	const graph = new ThLevyGraph()
 	const status = profile.filingStatus ?? "single"
+	if (profile.sharedMortgage !== undefined) {
+		validateSharedMortgage(profile, profile.sharedMortgage)
+	}
 	const filers = profile.filers && validateThFilers(profile.filers, status)
 	const scope = addThLevyScope(graph, filers, status)
 	const tallies = scope.total
