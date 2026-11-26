@@ -1,7 +1,8 @@
 // The Overview's warning matcher against the sentences the real traj states (web ADR 0001): one
 // scratch ledger, one Scenario per warning the Demo snapshot does not state, and the CLI's own notes,
 // so rewording `withdraw-notes.ts` or `levies.ts` fails here instead of quietly dropping a warning
-// from the hero. `demo-warning-notes.test.ts` guards the funding note through the Demo.
+// from the hero. `demo-warning-notes.test.ts` guards the success note and both funding notes
+// through the Demo.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { mkdir } from "node:fs/promises"
 import { join } from "node:path"

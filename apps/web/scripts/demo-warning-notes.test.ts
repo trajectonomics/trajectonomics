@@ -33,9 +33,9 @@ function expectWarnings(notes: readonly string[], pattern: RegExp): void {
 describe("the Demo's real notes", () => {
 	test("state the CLI's success sentence in every good chance read, and never as a warning", async () => {
 		const parsed: Snapshot = snapshot.parse(await demoSnapshotJson())
-		for (const plan of ["base", "retire-early", "separate"]) {
-			expectSuccess(plan, notesOf(parsed.reads.chance[plan]))
-		}
+		const good = Object.entries(parsed.reads.chance).filter(([, read]) => read.ok)
+		expect(good.map(([plan]) => plan)).toEqual(Object.keys(parsed.reads.fi))
+		for (const [plan, read] of good) expectSuccess(plan, notesOf(read))
 	})
 
 	test("count the CLI's 'could not be funded' note as a warning the hero shows", async () => {
