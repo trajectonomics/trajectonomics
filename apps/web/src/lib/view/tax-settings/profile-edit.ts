@@ -4,7 +4,8 @@
  */
 import type { EditInput } from "../../edit/edit"
 import type { Problems } from "../plan-items/problems"
-import { mergeFlags, type TaxDraft, wholeFlags } from "./draft"
+import type { TaxDraft } from "./draft"
+import { mergeFlags, wholeFlags } from "./flags"
 import { chosenLabels } from "./label-edit"
 
 /** What a form sends: the plan, the hash it read, and the draft the form opened with (null when no profile was stored). */

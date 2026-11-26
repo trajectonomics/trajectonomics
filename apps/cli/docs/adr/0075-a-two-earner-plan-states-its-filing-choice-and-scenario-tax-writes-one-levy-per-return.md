@@ -260,9 +260,14 @@ This is the follow-up the shared home-loan ceiling left above.
   once the profile states shared interest, because the person has said which interest is shared. The
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
   note is added as before, and now names the flag.
-- **The Dashboard** reads `sharedMortgageInterest` but neither shows nor edits it, and a save of the
-  whole profile from the Dashboard drops it, as a write with `--tax` that leaves it out does.
-  Follow-up: trajectonomics/trajectonomics#618.
+- **The Dashboard** shows the stored `sharedMortgageInterest` in the separate filing's claims, beside
+  the Home card's own home-loan interest. Its tax profile form offers
+  `--mortgage-interest shared=<amount>` (an emptied or all-zero field is `shared=0`) whenever the draft
+  files separately and the household names a partner and Owners, which is what `traj` reads the flag
+  for. A whole save fills a stored value in whatever the profile's status, so a change from joint to
+  separate keeps it, and the form says when the save would drop it. The Home card marks the value kept
+  and not claimed by this Return when the stored status is not separate, or when no Levy id names a
+  Filer (`th-2026-pit@<filer>`), because no Return claims it then. (#618)
 
 ## Amended (2026-11-26): claims a write keeps and does not claim have their own field (#627)
 

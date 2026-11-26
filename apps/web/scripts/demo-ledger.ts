@@ -38,8 +38,8 @@ async function idsOf(place: DemoLedgerPlace): Promise<DemoAccountIds> {
 
 /**
  * Builds the fictional ledger in `place.home`: a chart of accounts, opening balances, about two years
- * of monthly transactions imported from CSV, and the Scenarios `base`, `retire-early` and `separate`,
- * with the Thai Levy on each. Every name and figure is invented.
+ * of monthly transactions imported from CSV, and the Scenarios `base`, `retire-early`, `separate` and its
+ * joint counterpart `joint`, with the Thai Levy on each. Every name and figure is invented.
  */
 export async function buildDemoLedger(place: DemoLedgerPlace): Promise<DemoAccountIds> {
 	await mkdir(place.home, { recursive: true })
