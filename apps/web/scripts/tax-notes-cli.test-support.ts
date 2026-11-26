@@ -28,6 +28,65 @@ export function store(home: string, name: string, document: unknown): void {
 	traj(home, ["scenario", "apply", name, "--file", "-", "--decimal"], JSON.stringify(document))
 }
 
+/** The household the plans share: each salary is its Owner's, and the loan is both people's. */
+export function household(loan: string, partner = "partner"): unknown {
+	return {
+		schemaVersion: 2,
+		people: [
+			{ id: "me", role: "holder", born: "1990-01", lifeExpectancy: 90 },
+			{ id: partner, role: "partner", born: "1992-01", lifeExpectancy: 90 },
+		],
+		anchors: [],
+		owners: [
+			{ path: "flows.salary", person: "me" },
+			{ path: "flows.partner-salary", person: partner },
+			{ path: `accounts.${loan}`, person: "shared" },
+		],
+	}
+}
+
+/** An earned monthly income Flow with no growth. */
+function salaryFlow(id: string, amount: string): unknown {
+	return {
+		id,
+		kind: "income",
+		earned: true,
+		amount,
+		frequency: "monthly",
+		start: "2026-01-01",
+		growth: { bps: 0 },
+	}
+}
+
+/** The couple's document: two salaries in the Bank, and one loan both people own. */
+export function coupleDocument(bank: string, loan: string): unknown {
+	return {
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [
+			{ id: bank, kind: "asset", rate: 0 },
+			{ id: loan, kind: "liability", rate: 0 },
+		],
+		flows: [salaryFlow("salary", "100000.00"), salaryFlow("partner-salary", "60000.00")],
+		cashflow: { surplus: [{ account: bank }], contribute: [], withdraw: [bank] },
+	}
+}
+
+/** The separate-filing flags, and both salaries' income labels. */
+const SEPARATE = ["--tax", "th-2026", "--filing-status", "married_separate"]
+const LABELS = [
+	"--label",
+	"salary=income.section40_1",
+	"--label",
+	"partner-salary=income.section40_1",
+]
+
+/** `traj scenario tax <name> --tax th-2026 --filing-status married_separate`, both salaries labelled. */
+export function taxSeparately(home: string, name: string, extra: readonly string[] = []): void {
+	traj(home, ["scenario", "tax", name, ...SEPARATE, ...extra, ...LABELS])
+}
+
 /** The plan's notes, read from a real dry run exactly as the Snapshot reads them. */
 export function readNotes(home: string, name: string): Read<TaxNotes> {
 	const argv = ["scenario", "tax", "--from-stored", "--dry-run", "--json", "--", name]

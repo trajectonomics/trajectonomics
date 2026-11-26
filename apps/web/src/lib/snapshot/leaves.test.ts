@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { leafOf, READ_LEAVES } from "./leaves"
+import { DRY_RUN_LEAVES, leafOf, READ_LEAVES } from "./leaves"
 
 describe("the read-leaf allowlist", () => {
 	test("is exactly the read leaves the Plan may emit, and no write leaf", () => {
@@ -19,15 +19,20 @@ describe("the read-leaf allowlist", () => {
 			"projection chance",
 			"projection path",
 			"projection allowances",
-			"scenario tax",
 		])
 		for (const write of ["tx add", "account add", "scenario apply", "scenario fork", "init"]) {
 			expect(READ_LEAVES as readonly string[]).not.toContain(write)
 		}
 	})
 
-	test("matches scenario tax, which the Plan emits only as a dry run", () => {
+	test("the only dry-run leaf is scenario tax, which the Plan emits only with --dry-run", () => {
+		expect([...DRY_RUN_LEAVES]).toEqual(["scenario tax"])
+	})
+
+	test("matches scenario tax only when --dry-run comes before any --", () => {
 		expect(leafOf(["scenario", "tax", "--from-stored", "--dry-run", "--json"])).toBe("scenario tax")
+		expect(leafOf(["scenario", "tax", "--from-stored", "--json", "--", "base"])).toBeNull()
+		expect(leafOf(["scenario", "tax", "--from-stored", "--json", "--", "--dry-run"])).toBeNull()
 	})
 
 	test("an argv is matched to the longest leaf it starts with, and a write argv to none", () => {

@@ -77,8 +77,6 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 {/if}
 {#if profile !== null}
 	<TaxClaimNotes lines={notes} />
-{/if}
-{#if profile !== null}
 	<TaxGroupCards cards={groupCards(profile, claimant, sharedClaimed)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 	<TaxNotStated items={notStated(show.taxAllowances)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 {/if}

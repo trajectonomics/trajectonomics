@@ -9,7 +9,15 @@ import { decodeRead } from "../src/lib/snapshot/decode-read"
 import { hasTaxProfile } from "../src/lib/snapshot/stage-two-tax-notes"
 import { SEPARATE_LOANS_SENTENCE } from "../src/lib/view/tax-settings/notes"
 import { makeScratch, removeScratch } from "./scratch"
-import { linesOf, spawn, store, traj } from "./tax-notes-cli.test-support"
+import {
+	coupleDocument,
+	household,
+	linesOf,
+	spawn,
+	store,
+	taxSeparately,
+	traj,
+} from "./tax-notes-cli.test-support"
 
 const SLOW_MS = 180_000
 
@@ -18,79 +26,20 @@ let home = ""
 let bank = ""
 let loan = ""
 
-/** The household the plans share: each salary is its Owner's, and the loan is both people's. */
-function household(partner = "partner"): unknown {
-	return {
-		schemaVersion: 2,
-		people: [
-			{ id: "me", role: "holder", born: "1990-01", lifeExpectancy: 90 },
-			{ id: partner, role: "partner", born: "1992-01", lifeExpectancy: 90 },
-		],
-		anchors: [],
-		owners: [
-			{ path: "flows.salary", person: "me" },
-			{ path: "flows.partner-salary", person: partner },
-			{ path: `accounts.${loan}`, person: "shared" },
-		],
-	}
-}
-
-function coupleDocument(): unknown {
-	return {
-		schemaVersion: 4,
-		currency: "THB",
-		economy: { inflation: 0 },
-		accounts: [
-			{ id: bank, kind: "asset", rate: 0 },
-			{ id: loan, kind: "liability", rate: 0 },
-		],
-		flows: [
-			{
-				id: "salary",
-				kind: "income",
-				earned: true,
-				amount: "100000.00",
-				frequency: "monthly",
-				start: "2026-01-01",
-				growth: { bps: 0 },
-			},
-			{
-				id: "partner-salary",
-				kind: "income",
-				earned: true,
-				amount: "60000.00",
-				frequency: "monthly",
-				start: "2026-01-01",
-				growth: { bps: 0 },
-			},
-		],
-		cashflow: { surplus: [{ account: bank }], contribute: [], withdraw: [bank] },
-	}
-}
-
-/** `traj scenario tax <name> --tax th-2026 --filing-status married_separate` with both salaries labelled. */
-function taxSeparately(name: string, extra: readonly string[] = []): void {
-	traj(home, [
-		"scenario",
-		"tax",
-		name,
-		"--tax",
-		"th-2026",
-		"--filing-status",
-		"married_separate",
-		...extra,
-		"--label",
-		"salary=income.section40_1",
-		"--label",
-		"partner-salary=income.section40_1",
-	])
-}
-
 /** Stores a plan, sets its household, and taxes it separately. */
 function plan(name: string, extra: readonly string[] = []): void {
-	store(home, name, coupleDocument())
-	traj(home, ["scenario", "household", name, "--file", "-"], JSON.stringify(household()))
-	taxSeparately(name, extra)
+	store(home, name, coupleDocument(bank, loan))
+	traj(home, ["scenario", "household", name, "--file", "-"], JSON.stringify(household(loan)))
+	taxSeparately(home, name, extra)
+}
+
+/** Applies the plan's stored document again without one Flow, keeping its stored tax profile. */
+function withoutFlow(name: string, flowId: string): void {
+	const shown = traj(home, ["scenario", "show", name, "--decimal"]) as {
+		scenario: { document: { flows: { id: string }[] } }
+	}
+	const document = shown.scenario.document
+	store(home, name, { ...document, flows: document.flows.filter((flow) => flow.id !== flowId) })
 }
 
 beforeAll(async () => {
@@ -138,9 +87,16 @@ beforeAll(async () => {
 	traj(home, ["scenario", "tax", "shared", "--merge", "--filing-status", "married_joint"])
 	// The partner's claims stay stored under an id the household no longer names.
 	plan("gone", ["--life-insurance", "partner=50000"])
-	traj(home, ["scenario", "household", "gone", "--file", "-"], JSON.stringify(household("bob")))
+	traj(
+		home,
+		["scenario", "household", "gone", "--file", "-"],
+		JSON.stringify(household(loan, "bob")),
+	)
+	// A separate Return writes no Return for the partner once their salary is gone: their parents' claims are on no Return.
+	plan("no-return", ["--parents", "partner=2"])
+	withoutFlow("no-return", "partner-salary")
 	// No tax profile at all: the Snapshot must not ask for notes.
-	store(home, "bare", coupleDocument())
+	store(home, "bare", coupleDocument(bank, loan))
 }, SLOW_MS)
 
 afterAll(async () => {
@@ -183,6 +139,14 @@ describe("the tax notes the real traj states", () => {
 		expect(linesOf(home, "gone")).toContainEqual(
 			expect.stringMatching(
 				/The claims stored for "partner", who is not in the household, are on no Return\./,
+			),
+		)
+	})
+
+	test("a separate filing's claim under a person with no taxed income", () => {
+		expect(linesOf(home, "no-return")).toContainEqual(
+			expect.stringMatching(
+				/"partner" has no taxed income in this plan, so no Return claims their stored claims\./,
 			),
 		)
 	})

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { stageOne } from "./fixtures.test-support"
-import { leafOf, READ_LEAVES } from "./leaves"
+import { DRY_RUN_LEAVES, leafOf, READ_LEAVES } from "./leaves"
 import { checkParams, type PlanInput } from "./params"
 import { planStageOne } from "./stage-one"
 import { planStageTwo } from "./stage-two"
@@ -40,6 +40,7 @@ function allArgvs(overrides: Partial<PlanInput>): string[][] {
 		two.netWorthHistory,
 		...Object.values(two.projections),
 		...Object.values(two.fi),
+		...Object.values(two.taxNotes),
 		two.compare,
 	]
 	return [
@@ -49,22 +50,40 @@ function allArgvs(overrides: Partial<PlanInput>): string[][] {
 	]
 }
 
+/** The tokens before any `--`: the flags `traj` reads. */
+function flagsOf(argv: readonly string[]): readonly string[] {
+	const end = argv.indexOf("--")
+	return end < 0 ? argv : argv.slice(0, end)
+}
+
+/** Asserts one argv starts with an allowlisted leaf, asks for JSON last, and dry-runs when its leaf does. */
+function expectAllowed(argv: string[]): void {
+	const leaf = leafOf(argv)
+	const flags = flagsOf(argv)
+	expect(leaf).not.toBeNull()
+	expect(flags.at(-1)).toBe("--json")
+	if (leaf !== null && (DRY_RUN_LEAVES as readonly string[]).includes(leaf)) {
+		expect(flags).toContain("--dry-run")
+	}
+}
+
 describe("every argv the Plan emits", () => {
 	test("starts with an allowlisted read leaf and asks for JSON before any --, under every combination", () => {
 		for (const overrides of combinations) {
-			for (const argv of allArgvs(overrides)) {
-				expect(leafOf(argv)).not.toBeNull()
-				const flags = argv.includes("--") ? argv.slice(0, argv.indexOf("--")) : argv
-				expect(flags.at(-1)).toBe("--json")
-			}
+			for (const argv of allArgvs(overrides)) expectAllowed(argv)
 		}
 	})
 
 	test("never names a write leaf, and every leaf it names is on the allowlist", () => {
+		const allowed = [...READ_LEAVES, ...DRY_RUN_LEAVES] as readonly (string | null)[]
 		for (const overrides of combinations) {
 			const leaves = allArgvs(overrides).map((argv) => leafOf(argv))
-			for (const leaf of leaves) expect(READ_LEAVES as readonly (string | null)[]).toContain(leaf)
+			for (const leaf of leaves) expect(allowed).toContain(leaf)
 		}
+	})
+
+	test("does not take a scenario tax argv without --dry-run as a leaf", () => {
+		expect(leafOf(["scenario", "tax", "--from-stored", "--json", "--", "base"])).toBeNull()
 	})
 })
 
@@ -72,7 +91,7 @@ describe("a Scenario name that looks like a flag", () => {
 	test("is never a token of its own, so traj reads it as a name", () => {
 		const names = { compare: { a: "--help", b: "-x" }, scenarios: ["--help"] }
 		for (const argv of allArgvs(names)) {
-			const flags = argv.includes("--") ? argv.slice(0, argv.indexOf("--")) : argv
+			const flags = flagsOf(argv)
 			expect(flags).not.toContain("--help")
 			expect(flags).not.toContain("-x")
 		}
