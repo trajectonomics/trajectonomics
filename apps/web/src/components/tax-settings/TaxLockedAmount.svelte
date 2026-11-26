@@ -20,6 +20,6 @@ let { id, label, digits, hint, problem }: Props = $props()
 <div class="space-y-1.5">
 	<label for={id} class="block text-sm font-medium text-foreground">{label}</label>
 	{#if hint}<p id="{id}-hint" class="text-xs text-muted-foreground">{hint}</p>{/if}
-	<output id={id} aria-describedby={problem ? `${id}-problem` : hint ? `${id}-hint` : undefined} class="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground"><MaskedAmount {digits} after=" THB" /></output>
+	<output id={id} aria-live="off" aria-describedby={problem ? `${id}-problem` : hint ? `${id}-hint` : undefined} class="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground"><MaskedAmount {digits} after=" THB" /></output>
 	{#if problem}<p id="{id}-problem" role="alert" class="text-sm text-destructive">{problem}</p>{/if}
 </div>

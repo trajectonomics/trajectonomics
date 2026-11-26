@@ -70,6 +70,19 @@ describe("the claims table after a holder swap", () => {
 	})
 })
 
+describe("the claims table with no household", () => {
+	test("keeps the columns apart by id, never two columns of the same words", () => {
+		const table = claimsTable(PROFILE, null, ["me", "partner"])
+		if (table === null) throw new Error("the profile files separately")
+		const body = render(TaxClaimsSection, {
+			props: { table, people: personNames(null), claimant: null, claimantId: "me" },
+		}).body
+		expect(body).toContain(">me<")
+		expect(body).toContain(">partner<")
+		expect(body).not.toContain(">Another person<")
+	})
+})
+
 describe("the CLI's departed-id note on the page", () => {
 	test("calls the recorded holder the earlier holder, so the page passes the profile's claimsHolder", () => {
 		const snapshot = structuredClone(DEMO) as Snapshot

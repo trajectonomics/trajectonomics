@@ -15,13 +15,16 @@ interface Props {
 }
 
 let { table, people, claimant = null, claimantId = null }: Props = $props()
-/** Each column's words: the recorded holder's, the household's, or "Another person" for an id it no longer names. */
+/**
+ * Each column's words: the recorded holder's, the household's, or "Another person" for an id the household no longer
+ * names. With no household at all every person shows by id (`NO_PEOPLE`), so the columns stay apart.
+ */
 const columns = $derived(
-	table.people.map((person) =>
-		person === claimantId && claimant !== null
-			? claimant.label
-			: (people.get(person)?.label ?? ANOTHER_PERSON_LABEL),
-	),
+	table.people.map((person) => {
+		if (person === claimantId && claimant !== null) return claimant.label
+		if (people.size === 0) return person
+		return people.get(person)?.label ?? ANOTHER_PERSON_LABEL
+	}),
 )
 </script>
 
