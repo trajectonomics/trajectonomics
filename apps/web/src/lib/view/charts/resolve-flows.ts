@@ -1,6 +1,6 @@
 import type { ProjectionRun } from "../../contract"
 import { lineKey, lineLabel } from "../cashflow/cashflow-labels"
-import { type ItemNames, itemNames } from "../item-names"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { annualRowsOf } from "../projection/annual"
 import type { Resolved } from "./types"
 import { periodsOf, pointAt } from "./year"
@@ -23,12 +23,11 @@ function lineHeader(
 	return { id: `cash:${lineKey(line)}`, name: `${prefix}: ${lineLabel(line, names)}` }
 }
 
-/** The cash-flow lines by Flow and by category, each as one series that follows its line from year to year. */
-export function cashflowFigures(
-	run: ProjectionRun,
-	accountNames: ReadonlyMap<string, string>,
-): Resolved[] {
-	const names = itemNames(accountNames, null)
+/**
+ * The cash-flow lines by Flow and by category, each as one series that follows its line from year to year. A series
+ * is named through the shown plan's item names, so a labelled Flow reads its label (web ADR 0029).
+ */
+export function cashflowFigures(run: ProjectionRun, names: ItemNames = NO_ITEM_NAMES): Resolved[] {
 	const ends = new Map(annualRowsOf(run).map((row) => [row.index, row.to]))
 	const periods = periodsOf(run)
 	const byKey = new Map<string, Resolved & { nominal: Resolved["nominal"][number][] }>()
@@ -50,10 +49,7 @@ export function cashflowFigures(
 }
 
 /** Each Account's value at the close of each year, nominal and real (`--accounts`). */
-export function accountFigures(
-	run: ProjectionRun,
-	accountNames: ReadonlyMap<string, string>,
-): Resolved[] {
+export function accountFigures(run: ProjectionRun, names: ItemNames = NO_ITEM_NAMES): Resolved[] {
 	const periods = periodsOf(run)
 	const byAccount = new Map<
 		string,
@@ -72,7 +68,7 @@ export function accountFigures(
 	}
 	return [...byAccount].map(([account, points]) => ({
 		id: `account:${account}`,
-		name: `Value of ${accountNames.get(account) ?? account}`,
+		name: `Value of ${names.accounts.get(account) ?? account}`,
 		group: "net-worth" as const,
 		...points,
 	}))

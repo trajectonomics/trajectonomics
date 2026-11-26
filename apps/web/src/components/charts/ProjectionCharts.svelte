@@ -29,10 +29,10 @@ let { run, terms, onTerms, charts }: Props = $props()
 const PICKER = "net-worth-chart"
 let drawer = $state<"new" | ChartDef | null>(null)
 const chosen = $derived(chartStore.charts.find((chart) => chart.id === charts.chart))
-const groups = $derived(buildCatalogue(charts.runs, run, charts.accountNames))
-const names = $derived(nameIndex(charts.runs, charts.accountNames))
+const groups = $derived(buildCatalogue(charts.runs, run, charts.names))
+const names = $derived(nameIndex(charts.runs, charts.names))
 const view = $derived(
-	chosen && chartView(chosen, seriesById(run, charts.accountNames), names, parseTerms(terms)),
+	chosen && chartView(chosen, seriesById(run, charts.names), names, parseTerms(terms)),
 )
 
 /** Gives focus to the picker, which is a new element once the chart changed. */

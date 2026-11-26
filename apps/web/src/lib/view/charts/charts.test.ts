@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test"
+import { scenarioDocument } from "../../contract"
+import { type ItemNames, itemNames } from "../item-names"
 import { buildCatalogue } from "./catalogue"
 import { defaultName, duplicateOf, mergeCharts, saveChart, uniqueId } from "./edit"
 import { plain, withTax } from "./fixtures.test-support"
@@ -8,6 +10,23 @@ import type { ChartDef } from "./types"
 import { periodText } from "./year"
 
 const NAMES = new Map([["savings", "Savings"]])
+const NO_NAMES = itemNames(NAMES, null)
+
+/** The names of a plan whose document states the labels `flows` carries, and no others. */
+function planNames(flows: readonly { id: string; displayLabel?: string }[]): ItemNames {
+	const document = scenarioDocument.parse({
+		currency: "THB",
+		accounts: [],
+		flows: flows.map(({ id, displayLabel }) => ({
+			id,
+			kind: "income",
+			frequency: "monthly",
+			start: "2026-01-01",
+			...(displayLabel === undefined ? {} : { displayLabel }),
+		})),
+	})
+	return itemNames(NAMES, null, document)
+}
 const CHART: ChartDef = {
 	id: "spend",
 	name: "Spend",
@@ -16,7 +35,7 @@ const CHART: ChartDef = {
 }
 
 function byId(run = withTax()) {
-	return new Map(resolveSeries(run, NAMES).map((item) => [item.id, item]))
+	return new Map(resolveSeries(run, NO_NAMES).map((item) => [item.id, item]))
 }
 
 describe("the series catalogue", () => {
@@ -35,6 +54,22 @@ describe("the series catalogue", () => {
 		expect(byId().get("account:savings")?.name).toBe("Value of Savings")
 		expect(byId().get("net-worth")?.real?.[0]?.amount).toBe("1200000.00")
 		expect(byId().get("income")?.real).toBeNull()
+	})
+
+	test("names a cash-flow series by the plan's label, the id when it states none, and twins with the id", () => {
+		const series = (names: ItemNames) =>
+			resolveSeries(withTax(), names).find((item) => item.id.startsWith("cash:"))?.name
+		expect(series(NO_NAMES)).toBe("Income: salary")
+		expect(series(planNames([{ id: "salary", displayLabel: "Salary" }]))).toBe("Income: Salary")
+		expect(series(planNames([{ id: "salary" }]))).toBe("Income: salary")
+		expect(
+			series(
+				planNames([
+					{ id: "salary", displayLabel: "Salary" },
+					{ id: "bonus", displayLabel: "Salary" },
+				]),
+			),
+		).toBe("Income: Salary (salary)")
 	})
 
 	test("keeps the CLI's strings and places a point at the day its period ends", () => {
@@ -64,7 +99,7 @@ describe("the series catalogue", () => {
 	})
 
 	test("greys out what the selected plan lacks, with the reason", () => {
-		const groups = buildCatalogue([withTax(), plain()], plain(), NAMES)
+		const groups = buildCatalogue([withTax(), plain()], plain(), NO_NAMES)
 		const tax = groups.find((group) => group.id === "tax")
 		expect(
 			tax?.entries.every((entry) => !entry.available && entry.reason === "this plan has no tax"),

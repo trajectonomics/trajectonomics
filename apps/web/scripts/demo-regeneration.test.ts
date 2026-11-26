@@ -4,6 +4,7 @@ import { seriesById } from "../src/lib/view/charts/catalogue"
 import { parseCharts, serializeCharts } from "../src/lib/view/charts/stored"
 import { type ChartDef, MAX_SERIES } from "../src/lib/view/charts/types"
 import { chartView } from "../src/lib/view/charts/view"
+import { type ItemNames, snapshotItemNames } from "../src/lib/view/item-names"
 import { generateDemo } from "./demo-generate"
 import { demoSnapshotText } from "./demo-snapshot"
 
@@ -36,13 +37,12 @@ describe("the Demo snapshot's bytes", () => {
 	}, 180_000)
 })
 
-/** The base plan's projection and the names of the Accounts, as the page resolves a series. */
-function planOf(text: string): { run: ProjectionRun; names: Map<string, string> } {
+/** The base plan's projection and its item names, as the page resolves a series. */
+function planOf(text: string): { run: ProjectionRun; names: ItemNames } {
 	const parsed: Snapshot = snapshot.parse(JSON.parse(text))
 	const base = parsed.reads.projections["base"]
-	const accounts = parsed.reads.accounts
-	if (base?.ok !== true || !accounts.ok) throw new Error("the Demo snapshot has no base plan")
-	return { run: base.data, names: new Map(accounts.data.accounts.map((a) => [a.id, a.name])) }
+	if (base?.ok !== true) throw new Error("the Demo snapshot has no base plan")
+	return { run: base.data, names: snapshotItemNames(parsed, "base") }
 }
 
 /** A chart of the Account and cash-flow series, which name a ledger id, as a visitor would save it. */

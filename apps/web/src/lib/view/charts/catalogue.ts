@@ -1,4 +1,5 @@
 import type { ProjectionRun } from "../../contract"
+import type { ItemNames } from "../item-names"
 import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
 import { GROUPS, type GroupId, type Resolved } from "./types"
@@ -48,14 +49,14 @@ const NOTES: readonly { group: GroupId; family: string; note: string }[] = [
 export function buildCatalogue(
 	runs: readonly ProjectionRun[],
 	selected: ProjectionRun | null,
-	accountNames: ReadonlyMap<string, string>,
+	names: ItemNames,
 ): CatalogueGroup[] {
-	const has = new Set(selected ? resolveSeries(selected, accountNames).map((s) => s.id) : [])
+	const has = new Set(selected ? resolveSeries(selected, names).map((s) => s.id) : [])
 	const known = new Map<string, { name: string; group: GroupId; real: boolean }>()
 	for (const item of ALWAYS)
 		known.set(item.id, { ...item, real: item.id === "net-worth" || item.id === "estate:heirs" })
 	for (const run of runs) {
-		for (const found of resolveSeries(run, accountNames)) {
+		for (const found of resolveSeries(run, names)) {
 			if (!known.has(found.id) || found.id === "net-worth") {
 				known.set(found.id, { name: found.name, group: found.group, real: found.real !== null })
 			}
@@ -93,19 +94,16 @@ function notesFor(group: GroupId, has: ReadonlySet<string>): string[] {
 /** The series of a Snapshot by id, for naming a chosen series that the selected plan lacks. */
 export function nameIndex(
 	runs: readonly ProjectionRun[],
-	accountNames: ReadonlyMap<string, string>,
+	names: ItemNames,
 ): ReadonlyMap<string, string> {
-	const names = new Map<string, string>(ALWAYS.map((item) => [item.id, item.name]))
+	const namesById = new Map<string, string>(ALWAYS.map((item) => [item.id, item.name]))
 	for (const run of runs) {
-		for (const found of resolveSeries(run, accountNames)) names.set(found.id, found.name)
+		for (const found of resolveSeries(run, names)) namesById.set(found.id, found.name)
 	}
-	return names
+	return namesById
 }
 
 /** Every series of one run by id. */
-export function seriesById(
-	run: ProjectionRun,
-	accountNames: ReadonlyMap<string, string>,
-): ReadonlyMap<string, Resolved> {
-	return new Map(resolveSeries(run, accountNames).map((item) => [item.id, item]))
+export function seriesById(run: ProjectionRun, names: ItemNames): ReadonlyMap<string, Resolved> {
+	return new Map(resolveSeries(run, names).map((item) => [item.id, item]))
 }

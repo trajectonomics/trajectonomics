@@ -4,6 +4,7 @@ import { chartStore } from "../../client/charts.svelte"
 import { preferences } from "../../client/preferences.svelte"
 import { plain, withTax } from "../../lib/view/charts/fixtures.test-support"
 import type { ChartDef } from "../../lib/view/charts/types"
+import { itemNames } from "../../lib/view/item-names"
 import ProjectionCharts from "./ProjectionCharts.svelte"
 
 const CHART: ChartDef = {
@@ -24,7 +25,7 @@ function show(chart: string, run = withTax(), made: ChartDef = CHART, terms = "b
 				chart,
 				onChart: () => {},
 				runs: [withTax(), plain()],
-				accountNames: new Map([["savings", "Savings"]]),
+				names: itemNames(new Map([["savings", "Savings"]]), null),
 			},
 		},
 	}).body

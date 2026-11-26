@@ -1,5 +1,5 @@
 <script lang="ts">
-import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { ProjectionRun, Read } from "../../lib/contract"
 import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
@@ -33,7 +33,7 @@ const charts = $derived(
 				chart: chart ?? "",
 				onChart,
 				runs: Object.values(projections).flatMap((read) => (read.ok ? [read.data] : [])),
-				accountNames: currentAccountNames(),
+				names: currentItemNames(),
 			},
 )
 const options = $derived(names.map((value) => ({ value, label: value })))

@@ -7,6 +7,7 @@ import { sameJson } from "../../what-if/same-json"
 import { recordOf } from "../../what-if/session-items"
 import type { TriedFlow } from "../../what-if/try-flow"
 import { flowAnchorLabels } from "../household/model"
+import { type ItemNames, itemText } from "../item-names"
 import type { Problems } from "../plan-items/problems"
 import { withdrawalFromDraft } from "./build"
 import type { WithdrawalContext } from "./context"
@@ -48,16 +49,18 @@ export function changedFlows(before: ScenarioDocument, after: ScenarioDocument):
 /**
  * The note that refuses a try, or null: the household pins a date of the Flow (its start or end) and the edited
  * Flow has none. A what-if would run without the date, while saving the plan fills it back in from the household.
+ * The Flow is named through the shown plan's item names (web ADR 0029).
  */
 export function anchorRefusal(
 	household: HouseholdDocument | null,
 	tried: TriedFlow,
+	names: ItemNames,
 ): string | null {
 	const labels = flowAnchorLabels(household, tried.edited.id)
 	for (const edge of ["start", "end"] as const) {
 		const label = labels[edge]
 		if (label !== null && tried.edited[edge] === undefined) {
-			return `Your household sets when ${tried.edited.id} ${edge === "start" ? "starts" : "ends"} (${label}), and this change leaves that date out. Save it to have the household fill the date in, or keep a ${edge} date in the form.`
+			return `Your household sets when ${itemText(names, "flow", tried.edited.id)} ${edge === "start" ? "starts" : "ends"} (${label}), and this change leaves that date out. Save it to have the household fill the date in, or keep a ${edge} date in the form.`
 		}
 	}
 	return null
@@ -68,10 +71,11 @@ export function triedFlows(
 	before: ScenarioDocument,
 	after: ScenarioDocument,
 	household: HouseholdDocument | null,
+	names: ItemNames,
 ): { ok: true; flows: TriedFlow[] } | { ok: false; note: string } {
 	const flows = changedFlows(before, after)
 	for (const one of flows) {
-		const note = anchorRefusal(household, one)
+		const note = anchorRefusal(household, one, names)
 		if (note !== null) return { ok: false, note }
 	}
 	return { ok: true, flows }
