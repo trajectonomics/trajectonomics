@@ -1,7 +1,10 @@
-import { textWidth } from "../lib/chart/label-width"
+import { type TextMeasure, textWidth } from "../lib/chart/label-width"
 
-/** The size of the diagram's label text: `text-xs` on the drawing, in pixels. */
+/** The size of the diagram's label text: `text-[12px]` on the drawing, in pixels. */
 const SIZE_PX = 12
+
+/** The most widths kept, by font and string, so a page left open does not grow without limit. */
+const MAX_MEASURED = 2000
 
 /** Widths already measured, by font and string, so a re-render does not measure the same words again. */
 const measured = new Map<string, number>()
@@ -25,18 +28,22 @@ function labelFont(): string | null {
 }
 
 /**
- * The width of a Cash flow label in the page's own font, measured once per font and string. A page that
- * cannot measure (no document, no canvas) gets the grapheme estimate, the same width a server draws by.
+ * A measure of the diagram's text for one render: it reads the page's font once, then measures each string
+ * once per font. A page that cannot measure (no document, no canvas) gets the grapheme estimate, the same
+ * width a server draws by.
  */
-export function flowTextWidth(text: string): number {
+export function flowMeasure(): TextMeasure {
 	const canvas = measuring()
 	const font = labelFont()
-	if (canvas === null || font === null) return textWidth(text, false)
-	const key = `${font}\u0000${text}`
-	const cached = measured.get(key)
-	if (cached !== undefined) return cached
+	if (canvas === null || font === null) return (text) => textWidth(text, false)
 	canvas.font = font
-	const width = canvas.measureText(text).width
-	measured.set(key, width)
-	return width
+	return (text) => {
+		const key = `${font}\u0000${text}`
+		const cached = measured.get(key)
+		if (cached !== undefined) return cached
+		const width = canvas.measureText(text).width
+		if (measured.size >= MAX_MEASURED) measured.clear()
+		measured.set(key, width)
+		return width
+	}
 }

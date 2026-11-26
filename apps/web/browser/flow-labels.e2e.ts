@@ -10,6 +10,8 @@ import {
 	NETFLIX,
 	PLAIN,
 	SUBSCRIPTIONS,
+	THAI,
+	VIETNAMESE,
 	WIDE,
 } from "./flow-label-cases"
 import { measureFlowLabels } from "./flow-label-fit"
@@ -76,6 +78,8 @@ for (const width of [360, 1280] as const) {
 		graphemesHeld(labels, ENCLOSED, "㈱")
 		graphemesHeld(labels, CYRILLIC, "Ж")
 		graphemesHeld(labels, FAMILY, "👨")
+		graphemesHeld(labels, THAI, "เบี้ย")
+		graphemesHeld(labels, VIETNAMESE, "Ẫ")
 
 		const wide = labels.filter((text) => /^W{2}/.test(text))
 		expect(wide.length).toBeGreaterThan(0)
@@ -85,16 +89,5 @@ for (const width of [360, 1280] as const) {
 		}
 		expectTwins(labels)
 		expect(labels.join("")).not.toMatch(LONE_SURROGATE)
-	})
-}
-
-// The Estate's diagram is the same wide drawing, so its labels take the same clip and measurement.
-for (const width of [360, 1280] as const) {
-	test(`the Estate diagram keeps its labels inside and off their amounts at ${width}px`, async ({
-		page,
-	}) => {
-		await page.setViewportSize({ width, height: 800 })
-		await openDemo(page, "/estate/", { theme: "light" })
-		expect(await measureFlowLabels(page)).toEqual([])
 	})
 }

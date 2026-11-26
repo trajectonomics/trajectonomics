@@ -2,6 +2,11 @@
 export interface CashflowRow {
 	readonly index?: number
 	readonly group?: string
+	/** An `estateLines` row's date, which a patch renames the lines of. */
+	date?: string
+	/** An `estateLines` row's line, which names its band and which a patch renames. */
+	line?: string
+	readonly kind?: string
 	id?: string | null
 	[key: string]: unknown
 }
@@ -32,6 +37,7 @@ export interface DocumentRead {
 }
 
 export interface FlowSnapshot {
+	readonly params: { readonly scenarios: readonly string[] }
 	readonly reads: {
 		readonly projections: Record<string, ProjectionRead>
 		readonly documents: Record<string, DocumentRead>

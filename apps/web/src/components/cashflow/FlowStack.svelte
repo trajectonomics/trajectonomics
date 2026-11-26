@@ -1,5 +1,5 @@
 <script lang="ts">
-import { flowTextWidth } from "../../client/flow-text.js"
+import { flowMeasure } from "../../client/flow-text.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { STACK_LABEL_HALF, type StackLayout, stackName } from "../../lib/chart/flow-stack"
 import { formatMoney, maskMoney } from "../../lib/format"
@@ -23,6 +23,9 @@ let { layout, picked, onPick, label }: Props = $props()
 /** The diagram's one id prefix, so each row's name clip is its own. */
 const uid = $props.id()
 
+/** The page's own font, read once for the whole drawing, so each name is fitted to the words a person sees. */
+const measure = flowMeasure()
+
 /** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
 const shown = (amount: string): string =>
 	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
@@ -30,14 +33,20 @@ const shown = (amount: string): string =>
 
 <!-- The figures are the CLI's strings. A bar is drawn by its share of the taller list; the table below repeats each one. -->
 <div class="mx-auto w-full max-w-md rounded-lg border border-border md:hidden">
-	<svg viewBox={`0 0 ${layout.width} ${layout.height}`} role="group" aria-label={label} class="h-auto w-full text-xs">
+	<svg
+		viewBox={`0 0 ${layout.width} ${layout.height}`}
+		role="group"
+		aria-label={label}
+		text-rendering="geometricPrecision"
+		class="h-auto w-full text-[12px]"
+	>
 		{#each layout.headings as heading (heading.side)}
 			<text x={heading.x} y={heading.y} dominant-baseline="middle" aria-hidden="true" class="fill-muted-foreground font-medium">
 				{heading.text}
 			</text>
 		{/each}
 		{#each layout.rows as row, index (row.key)}
-			{@const name = stackName(row.label, shown(row.amount), row.keep, flowTextWidth)}
+			{@const name = stackName(row.label, shown(row.amount), row.keep, measure)}
 			<g
 				role="button"
 				tabindex="0"
@@ -50,9 +59,9 @@ const shown = (amount: string): string =>
 				<clipPath id={`${uid}-${index}`}>
 					<rect
 						x={row.labelX}
-						y={row.labelY - STACK_LABEL_HALF}
+						y={row.labelY - 2 * STACK_LABEL_HALF}
 						width={name.room}
-						height={2 * STACK_LABEL_HALF}
+						height={4 * STACK_LABEL_HALF}
 					/>
 				</clipPath>
 				<text

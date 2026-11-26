@@ -1,15 +1,15 @@
 /** A generous width for one character of a marker label in the chart's small text, in pixels. */
-const CHAR_PX = 7.5
+const CHAR_PX = 7
 /** A monospace cell, which the chart's 11px code labels draw narrower than the sans-serif text. */
 const CODE_CHAR_PX = 7
 /** The width of a wide sans-serif letter, such as most capitals, in pixels. */
-const BROAD_PX = 9
+const BROAD_PX = 10
 /** The width of a wide Thai consonant, in either font, in pixels. */
 const THAI_BROAD_PX = 11
 /** The width of the widest characters: East Asian, or a sans-serif `m`, `M`, `W`, `@`, `%` or dash. */
-const WIDEST_PX = 13
+const WIDEST_PX = 12
 /** The width of one emoji in the chart's small text, in pixels: a glyph that is wider than a letter. */
-const EMOJI_PX = 16
+const EMOJI_PX = 14
 
 /** The graphemes of a label in Thai segmentation: a combining mark stays with its base, a pair never splits. */
 const GRAPHEMES = new Intl.Segmenter("th", { granularity: "grapheme" })

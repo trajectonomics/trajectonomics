@@ -30,19 +30,19 @@ describe("fittedLabel", () => {
 	})
 
 	test("shortens a long name with an ellipsis and keeps the whole amount", () => {
-		// Right: 202 units less the amount's 67.5 and a 7.5 space leaves 127, so 15 letters and the ellipsis.
+		// Right: 202 units less the amount's 63 and a 4-unit gap leaves 135, so 17 letters and the ellipsis.
 		expect(fittedLabel({ ...RIGHT, label: LONG }, "30,000.00")).toMatchObject({
-			label: "housing, utilit…",
+			label: "housing, utilitie…",
 			amount: "30,000.00",
-			amountX: 789.5,
-			clipWidth: 127,
+			amountX: 788,
+			clipWidth: 131,
 		})
-		// Left: 214 units, so 16 letters.
+		// Left: 214 units, so 18 letters.
 		expect(fittedLabel({ ...LEFT, label: LONG }, "30,000.00")).toMatchObject({
-			label: "housing, utiliti…",
+			label: "housing, utilities…",
 			amount: "30,000.00",
 			amountX: 222,
-			clipWidth: 139,
+			clipWidth: 147,
 		})
 	})
 
@@ -68,10 +68,15 @@ describe("fittedLabel", () => {
 	})
 
 	test("keeps a twin's (id) suffix in view when the name is cut", () => {
-		const right = fittedLabel({ ...RIGHT, label: TWIN }, "336,000.00")
-		expect(right.label).toBe("Salary…(salary)")
-		const left = fittedLabel({ ...LEFT, label: TWIN }, "336,000.00")
+		const right = fittedLabel({ ...RIGHT, label: TWIN, keep: "(salary)" }, "336,000.00")
+		expect(right.label).toBe("Salary a…(salary)")
+		const left = fittedLabel({ ...LEFT, label: TWIN, keep: "(salary)" }, "336,000.00")
 		expect(left.label.endsWith("(salary)")).toBe(true)
+	})
+
+	test("keeps a guessed suffix short beside the room, and part of the name with it", () => {
+		const drawn = fittedLabel({ ...RIGHT, label: "Rent for the old flat (id)" }, "1.00")
+		expect(drawn.label).toBe("Rent for the old f…(id)")
 	})
 
 	test("measures the page's own font when one is given, and keeps a label the estimate would cut", () => {
@@ -104,13 +109,48 @@ describe("fittedLabel", () => {
 			"1.00",
 			measure,
 		)
-		expect(one.label).toBe("…k-a) into Bank")
-		expect(two.label).toBe("…k-b) into Bank")
+		// The ids are too long to keep whole, so their tails are drawn, without the words after them.
+		expect(one.label).toBe("…om-the-bank-a)")
+		expect(two.label).toBe("…om-the-bank-b)")
 		expect(one.label).not.toBe(two.label)
 	})
 
+	test("never cuts a twin's id down to just its closing bracket", () => {
+		const measure = (text: string) => text.length * 10
+		const drawn = fittedLabel(
+			{ ...RIGHT, label: "Saving (from-the-bank-a) into Bank", keep: "(from-the-bank-a)" },
+			"1".repeat(17),
+			measure,
+		)
+		expect(drawn.label).toBe("S…")
+		expect(drawn.label.endsWith(")")).toBe(false)
+	})
+
+	test("keeps three twins apart when their ids differ only at the start", () => {
+		const labels = ["a0", "a1", "a2"].map((start) => {
+			const id = `(${start}-from-the-old-bank)`
+			return fittedLabel({ ...RIGHT, label: `Saving ${id} into Account`, keep: id }, "1.00").label
+		})
+		// The whole id alone fits where a cut id or its tail would lose the one character that differs.
+		expect(labels).toEqual([
+			"(a0-from-the-old-bank)",
+			"(a1-from-the-old-bank)",
+			"(a2-from-the-old-bank)",
+		])
+		expect(new Set(labels).size).toBe(3)
+	})
+
+	test("cuts an ordinary name ending in brackets normally, without keeping its brackets", () => {
+		const label = "Condo common area fees (annual, paid in January)"
+		const drawn = fittedLabel({ ...RIGHT, label }, "30,000.00")
+		expect(drawn.label).toBe("Condo common ar…")
+	})
+
 	test("cuts a whole stem rather than gluing its id on without a space", () => {
-		const drawn = fittedLabel({ ...RIGHT, label: "Rent (old flat)" }, "1,234,567.89")
+		const drawn = fittedLabel(
+			{ ...RIGHT, label: "Rent (old flat)", keep: "(old flat)" },
+			"1,234,567.8901",
+		)
 		expect(drawn.label).toBe("Re…(old flat)")
 		expect(drawn.label).not.toBe("Rent(old flat)")
 	})

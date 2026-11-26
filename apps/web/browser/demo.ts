@@ -23,6 +23,8 @@ export interface Choices {
 	readonly theme: Theme
 	/** Whether amounts are hidden (`traj.hideAmounts`), which swaps each figure for a mask. */
 	readonly hideAmounts?: boolean
+	/** The browser's own font size, in pixels, when a check wants a larger root than the default 16px. */
+	readonly rootFontSize?: number
 }
 
 /**
@@ -45,10 +47,13 @@ export async function openDemo(page: Page, path: string, choices: Choices): Prom
  */
 export async function chooseBeforeLoad(page: Page, choices: Choices): Promise<void> {
 	await page.addInitScript(
-		({ theme, hidden, font }) => {
+		({ theme, hidden, font, rootPx }) => {
 			localStorage.setItem("traj.theme", theme)
 			localStorage.setItem("traj.hideAmounts", hidden ? "1" : "0")
 			const pin = () => {
+				const root = document.documentElement
+				if (root === null) return false
+				if (rootPx !== null) root.style.setProperty("font-size", `${rootPx}px`, "important")
 				const body = document.body
 				if (body === null) return false
 				body.style.setProperty("font-family", `"${font}"`, "important")
@@ -61,7 +66,12 @@ export async function chooseBeforeLoad(page: Page, choices: Choices): Promise<vo
 				observer.observe(document, { childList: true, subtree: true })
 			}
 		},
-		{ theme: choices.theme, hidden: choices.hideAmounts === true, font: PINNED_FONT },
+		{
+			theme: choices.theme,
+			hidden: choices.hideAmounts === true,
+			font: PINNED_FONT,
+			rootPx: choices.rootFontSize ?? null,
+		},
 	)
 }
 

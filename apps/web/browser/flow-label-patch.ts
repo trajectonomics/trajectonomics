@@ -1,4 +1,5 @@
 import {
+	BRACKETED,
 	CYRILLIC,
 	ENCLOSED,
 	FAMILY,
@@ -9,6 +10,8 @@ import {
 	NETFLIX,
 	SAVING_IDS,
 	SUBSCRIPTIONS,
+	THAI,
+	VIETNAMESE,
 	WIDE,
 	WITHDRAWAL_IDS,
 } from "./flow-label-cases"
@@ -50,7 +53,17 @@ function patchCategories(year: Year): void {
 	first.id = SUBSCRIPTIONS
 	second.id = NETFLIX
 	if (third !== undefined) third.id = HOME_LOAN
-	const extras = [JAPANESE, JAPANESE_PUNCTUATION, CYRILLIC, ENCLOSED, WIDE, FAMILY]
+	const extras = [
+		JAPANESE,
+		JAPANESE_PUNCTUATION,
+		CYRILLIC,
+		ENCLOSED,
+		WIDE,
+		FAMILY,
+		THAI,
+		VIETNAMESE,
+		BRACKETED,
+	]
 	for (const id of extras) year.all.push({ ...first, id })
 }
 

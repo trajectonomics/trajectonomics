@@ -4,6 +4,9 @@ import type { FlowNode } from "./flow-types"
 import { fittedKeepingSuffix } from "./label-keep"
 import { type TextMeasure, textWidth } from "./label-width"
 
+/** The least space between a name and its amount, so a measurement that runs a little short cannot join them. */
+const NAME_GAP = 4
+
 /** The room a node's label has, from its anchor to the edge of the box on its side. */
 export function labelRoom(node: Pick<FlowNode, "labelX" | "anchor">): number {
 	return node.anchor === "end" ? node.labelX - FLOW_MARGIN : FLOW_WIDTH - FLOW_MARGIN - node.labelX
@@ -38,22 +41,24 @@ export function fittedLabel(
 	measure?: TextMeasure,
 ): FlowLabel {
 	const room = labelRoom(node)
-	const space = widthOf(" ", measure)
 	const amountWidth = widthOf(amount, measure)
-	const clipWidth = Math.max(0, room - amountWidth - space)
-	const fitted = fittedKeepingSuffix(node.label, clipWidth, false, node.keep ?? null, measure)
+	const nameRoom = Math.max(0, room - amountWidth - NAME_GAP)
+	const fitted = fittedKeepingSuffix(node.label, nameRoom, false, node.keep ?? null, measure)
 	const label = fitted.text
 	const leftwards = node.anchor === "end"
-	const labelX = leftwards ? node.labelX - amountWidth - space : node.labelX
+	const labelX = leftwards ? node.labelX - amountWidth - NAME_GAP : node.labelX
+	// A start-anchored name is clipped to the width it was fitted to, so the clip never runs on into the
+	// amount even when the page draws the words a little wider than the measure expected.
+	const clip = leftwards ? nameRoom : Math.min(nameRoom, fitted.width)
 	return {
 		label,
 		amount,
 		labelX,
-		clipX: leftwards ? labelX - clipWidth : labelX,
-		clipWidth,
+		clipX: leftwards ? labelX - clip : labelX,
+		clipWidth: clip,
 		amountX: leftwards
 			? node.labelX
-			: node.labelX + fitted.width + (label === "" ? 0 : space) + amountWidth,
+			: node.labelX + fitted.width + (label === "" ? 0 : NAME_GAP) + amountWidth,
 	}
 }
 

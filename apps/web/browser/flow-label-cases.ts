@@ -10,6 +10,12 @@ export const ENCLOSED = "㈱".repeat(30)
 export const WIDE = "W".repeat(80)
 /** Ten family emoji in one sequence: each is a grapheme the fitters must never split. */
 export const FAMILY = "👨‍👩‍👧‍👦".repeat(10)
+/** Thai tone marks above the line (`เบี้ย`, `ซื้อ`, `น้ำ`), which a clip of ±8 units cuts. */
+export const THAI = "เบี้ยประกันภัยบ้านและที่ดินน้ำท่วม"
+/** Vietnamese stacked marks on capitals (`Ẫ`, `Ỗ`), which reach above the line as Thai's marks do. */
+export const VIETNAMESE = "ẪỖ BẢO HIỂM NHÀ"
+/** An ordinary name ending in brackets, which is not a twin's id and must be cut normally. */
+export const BRACKETED = "Condo common area fees (annual, paid in January)"
 /** A plain label that fits every layout whole. */
 export const PLAIN = "Drawn from Bank"
 /** Capitals that fit on `main` at 360px and 1280px, and must still be whole. */

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { flowTextWidth } from "../../client/flow-text.js"
+import { flowMeasure } from "../../client/flow-text.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { FLOW_NODE_WIDTH, type FlowLayout, LABEL_HALF } from "../../lib/chart/flow"
 import { fittedLabel } from "../../lib/chart/flow-label"
@@ -26,6 +26,9 @@ let { layout, picked, onPick, label, stacked = false }: Props = $props()
 /** The diagram's one id prefix, so each name's clip is its own. */
 const uid = $props.id()
 
+/** The page's own font, read once for the whole drawing, so each name is fitted to the words a person sees. */
+const measure = flowMeasure()
+
 /** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
 const shown = (amount: string): string =>
 	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
@@ -37,7 +40,8 @@ const shown = (amount: string): string =>
 		viewBox={`0 0 ${layout.width} ${layout.height}`}
 		role="group"
 		aria-label={label}
-		class="h-auto min-w-[640px] w-full text-xs"
+		text-rendering="geometricPrecision"
+		class="h-auto min-w-[640px] w-full text-[12px]"
 	>
 		{#each layout.links as link (link.key)}
 			<path
@@ -63,7 +67,7 @@ const shown = (amount: string): string =>
 			class="fill-foreground"
 		/>
 		{#each layout.nodes as node, index (node.key)}
-			{@const words = fittedLabel(node, shown(node.amount), flowTextWidth)}
+			{@const words = fittedLabel(node, shown(node.amount), measure)}
 			<rect
 				x={node.x}
 				y={node.y}
@@ -74,9 +78,9 @@ const shown = (amount: string): string =>
 			<clipPath id={`${uid}-${index}`}>
 				<rect
 					x={words.clipX}
-					y={node.labelY - LABEL_HALF}
+					y={node.labelY - 2 * LABEL_HALF}
 					width={words.clipWidth}
-					height={2 * LABEL_HALF}
+					height={4 * LABEL_HALF}
 				/>
 			</clipPath>
 			<text
