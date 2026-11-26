@@ -32,8 +32,9 @@ export function largerThanOne(text: string): boolean {
 
 /** The allowance reads' inputs as the Snapshot states them: a limit the person left out is null. */
 export const allowancePlan = z.strictObject({
+	// A chosen label is bare; one that carries a Filer's suffix is still that label, which `bareLabelOf` takes off.
 	labels: z
-		.array(z.string().refine((label) => KNOWN_LABELS.includes(label)))
+		.array(z.string().refine((label) => KNOWN_LABELS.includes(bareLabelOf(label))))
 		.min(1, MESSAGE.labels)
 		.max(KNOWN_LABELS.length)
 		.refine((labels) => new Set(labels).size === labels.length, MESSAGE.labels),

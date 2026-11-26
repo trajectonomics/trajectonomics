@@ -118,11 +118,15 @@ describe("the page over the Demo snapshot", () => {
 		expect(page).toContain("traj scenario tax base --tax th-2026")
 	})
 
-	test("a separate filing says each Return has its own ceilings, and points to the follow-up", () => {
+	test("a separate filing shows a section per Return, named by the household's role", () => {
 		const page = body(DEMO, "separate")
-		expect(page).toContain("Not read for a separate filing yet")
-		expect(page).toContain("Each Return has its own allowance ceilings")
-		expect(page).toContain("#635")
+		expect(page).toContain('aria-label="You"')
+		expect(page).toContain('aria-label="Your partner"')
+		expect(page.match(/aria-label="This tax year"/g)).toHaveLength(2)
+		expect(page).toContain("th-2026-pit@me")
+		expect(page).toContain("th-2026-pit@partner")
+		expect(page).not.toContain("Not read for a separate filing yet")
+		expect(page).not.toContain("#635")
 	})
 
 	test("before the person chooses, no allowance is on and the page says nothing is read yet", () => {

@@ -146,10 +146,19 @@ describe("the Demo snapshot", () => {
 		const text = await demoSnapshotText()
 		const demo = snapshot.parse(JSON.parse(text))
 		expect(demo.params.allowances?.labels).toEqual(INPUTS.labels)
-		expect(Object.keys(demo.reads.allowances).sort()).toEqual(["base", "retire-early"])
+		expect(Object.keys(demo.reads.allowances).sort()).toEqual(["base", "retire-early", "separate"])
 		for (const read of Object.values(demo.reads.allowances)) {
 			expect(read.ok).toBe(true)
 			expect(read.argv.slice(0, 2)).toEqual(["projection", "allowances"])
 		}
+		// A plan without Filers keeps its bare labels; the separate filing reads each Return's own.
+		const base = demo.reads.allowances["base"]
+		const separate = demo.reads.allowances["separate"]
+		expect(base?.ok === true ? base.argv : []).toContain(
+			"allowance.retirement.rmf,allowance.thai_esg",
+		)
+		expect(separate?.ok === true ? separate.argv : []).toContain(
+			"allowance.retirement.rmf@me,allowance.thai_esg@me,allowance.retirement.rmf@partner,allowance.thai_esg@partner",
+		)
 	})
 })

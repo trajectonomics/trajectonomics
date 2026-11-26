@@ -60,4 +60,10 @@ describe("projection allowances on the taxed plan", () => {
 		expect(esg?.flow?.id).toBe("esg-fund-thai-esg-2027")
 		expect(esg?.flow?.start).toBe("2027-12-15")
 	})
+
+	it("states no filer for a plan whose Levy files no separate Return, so its bytes stay as they were", async () => {
+		const body = bodyOf(await allowances(await allowancesHome(), planFlags()))
+		expect(body.taxYears.every((year) => !("filer" in year))).toBe(true)
+		expect(body.allowances.every((row) => !("filer" in row))).toBe(true)
+	})
 })

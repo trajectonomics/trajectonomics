@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { ScenarioDocument } from "../../lib/contract"
 import type { YearView } from "../../lib/view/allowances"
+import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
 import type { Column } from "../ui/table-types"
@@ -11,9 +12,11 @@ interface Props {
 	years: readonly YearView[]
 	currency: string
 	plan: { name: string; contentHash: string; doc: ScenarioDocument } | null
+	/** The household's people, so a joint Return names each spouse's allowances. */
+	people?: PersonNames
 }
 
-let { years, currency, plan }: Props = $props()
+let { years, currency, plan, people = NO_PEOPLE }: Props = $props()
 let open: string | null = $state(null)
 const shown = $derived(years.find((year) => year.key === open))
 const columns: readonly Column<YearView>[] = [
@@ -42,7 +45,7 @@ const columns: readonly Column<YearView>[] = [
 	{#if shown}
 		<div class="space-y-3 rounded-lg border border-border p-4">
 			<h3 class="text-sm font-medium">{shown.period}</h3>
-			<LineList lines={shown.lines} {currency} />
+			<LineList lines={shown.lines} {currency} {people} />
 			{#if plan !== null}<YearActions year={shown} {plan} />{/if}
 		</div>
 	{/if}

@@ -1,19 +1,21 @@
-import type {
-	AllowanceFlow,
-	AllowanceRow,
-	AllowanceYear,
-	ProjectionAllowances,
-} from "../../contract"
-import { allowanceName, SSF_LABEL } from "../../contract/allowance-labels"
-import { formatDate } from "../../format"
+/**
+ * The page's reading of one `projection allowances` result: the tax year the As-of falls in first, then the later
+ * years, each in the CLI's order. Every figure is the CLI's own string; whether a year is the current one is a date
+ * comparison only. A read that names Filers is grouped into one section per Return (`returns.ts`). Pure.
+ */
+import type { AllowanceFlow, ProjectionAllowances } from "../../contract"
 import { type AssumptionLine, assumptionLines } from "../tax/assumptions"
-import { ESTIMATE_NOTE, SSF_WORDS, STOP_WORDS } from "./words"
+import { isFilerRead, type ReturnView, returnsView } from "./returns"
+import { ESTIMATE_NOTE } from "./words"
+import { yearOf } from "./year-of"
 
 /** One allowance in one tax year, as the page reads it. An SSF line has words and no figure (tax ADR 0007). */
 export interface LineView {
 	readonly key: string
 	readonly name: string
 	readonly ssf: boolean
+	/** The Filer whose allowance this is, for a Return over Filers; null when the plan keeps one Return. */
+	readonly filer: string | null
 	readonly planned: string
 	readonly extra: string
 	readonly saving: string
@@ -26,6 +28,10 @@ export interface LineView {
 export interface YearView {
 	readonly key: string
 	readonly levy: string
+	/** The Filer whose Return this year is; null for one Return over no Filer, or a joint Return over both. */
+	readonly filer: string | null
+	readonly from: string
+	readonly to: string
 	readonly period: string
 	readonly settles: string
 	readonly dueBefore: string
@@ -49,63 +55,23 @@ export interface AllowancesView {
 	readonly step: string
 	readonly current: YearView | null
 	readonly later: readonly YearView[]
+	/** One section per Return, when the read names Filers; empty for a plan without them. */
+	readonly returns: readonly ReturnView[]
 	readonly assumptions: readonly AssumptionLine[]
 	readonly notes: readonly string[]
 }
 
-function lineOf(row: AllowanceRow): LineView {
-	const ssf = row.label === SSF_LABEL
-	return {
-		key: `${row.levy}:${row.from}:${row.label}`,
-		name: allowanceName(row.label),
-		ssf,
-		planned: row.planned,
-		extra: row.extra,
-		saving: row.saving,
-		why: ssf ? SSF_WORDS : STOP_WORDS[row.stoppedBy],
-		flow: ssf ? undefined : row.flow,
-		hint: ssf ? undefined : row.hint,
-	}
-}
-
-function yearOf(year: AllowanceYear, rows: readonly AllowanceRow[]): YearView {
-	const lines = rows.filter((row) => row.levy === year.levy && row.from === year.from).map(lineOf)
-	const flows = lines.flatMap((line) => (line.flow === undefined ? [] : [line.flow]))
-	const placeable = flows.filter((flow) => flow.target !== undefined)
-	const unplaced = lines.flatMap((line) =>
-		line.flow !== undefined && line.flow.target === undefined
-			? [{ name: line.name, hint: line.hint ?? "" }]
-			: [],
-	)
-	return {
-		key: `${year.levy}:${year.from}`,
-		levy: year.levy,
-		period: `${formatDate(year.from)} to ${formatDate(year.to)}`,
-		settles: formatDate(year.settlementDate),
-		dueBefore: year.dueBefore,
-		dueAfter: year.dueAfter,
-		saving: year.saving,
-		lines,
-		flows,
-		placeable,
-		unplaced,
-		addable: placeable.length > 0,
-		hints: lines.flatMap((line) => (line.hint === undefined ? [] : [line.hint])),
-	}
-}
-
-/**
- * The page's view of a read: the tax year the As-of falls in first, then the later years, each in the CLI's
- * order. Every figure is the CLI's own string; whether a year is the current one is a date comparison only.
- */
+/** The page's view of a read, with each tax year as a card and each Return as a section when it names Filers. */
 export function allowancesView(data: ProjectionAllowances): AllowancesView {
 	const years = data.taxYears.map((year) => yearOf(year, data.allowances))
 	const currentAt = data.taxYears.findIndex((y) => y.from <= data.asOf && data.asOf <= y.to)
+	const current = years[currentAt] ?? null
 	return {
 		currency: data.currency,
 		step: data.step,
-		current: years[currentAt] ?? null,
+		current,
 		later: years.filter((_, index) => index !== currentAt),
+		returns: isFilerRead(data) ? returnsView(years, data.asOf) : [],
 		assumptions: assumptionLines(data.taxYears),
 		notes: data.notes.some((note) => /tax advice/i.test(note))
 			? data.notes

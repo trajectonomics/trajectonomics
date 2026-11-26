@@ -1,0 +1,56 @@
+/**
+ * The Returns a `projection allowances` read states: one per Filer of a separate filing, and one joint Return over
+ * Filers whose rows still name each spouse. A plan without Filers names none, and the page reads it as it always has.
+ * Pure: the years are grouped in the CLI's order and no figure changes.
+ */
+import type { AllowanceRow, ProjectionAllowances } from "../../contract"
+import { bareLabelOf } from "../../edit/tax-labels"
+import type { YearView } from "./years"
+
+/** One Return: the Filer whose Return it is, or null for one Return over no Filer, and its tax years. */
+export interface ReturnView {
+	/** The Filer, or the empty string for one Return over no Filer. */
+	readonly key: string
+	readonly filer: string | null
+	readonly current: YearView | null
+	readonly later: readonly YearView[]
+}
+
+/** The Filer a row names: the CLI's own field, else the suffix its label carries; null for neither. */
+export function filerOfRow(row: AllowanceRow): string | null {
+	if (row.filer !== undefined) return row.filer
+	const bare = bareLabelOf(row.label)
+	if (bare === row.label) return null
+	const filer = row.label.slice(bare.length + 1)
+	return filer === "" || filer === "shared" ? null : filer
+}
+
+/** Whether the read names any Filer, so the page groups its Returns; a plan without Filers groups nothing. */
+export function isFilerRead(data: ProjectionAllowances): boolean {
+	return (
+		data.taxYears.some((year) => year.filer !== undefined) ||
+		data.allowances.some((row) => filerOfRow(row) !== null)
+	)
+}
+
+/**
+ * One Return per Filer the read states, in the CLI's order, each with the tax year the As-of falls in first.
+ * Every Return takes its own current year: the As-of is the same date for each of them.
+ */
+export function returnsView(years: readonly YearView[], asOf: string): readonly ReturnView[] {
+	const grouped = new Map<string | null, YearView[]>()
+	for (const year of years) {
+		const held = grouped.get(year.filer)
+		if (held === undefined) grouped.set(year.filer, [year])
+		else held.push(year)
+	}
+	return [...grouped].map(([filer, held]) => {
+		const mine = held.find((year) => year.from <= asOf && asOf <= year.to) ?? null
+		return {
+			key: filer ?? "",
+			filer,
+			current: mine,
+			later: held.filter((year) => year !== mine),
+		}
+	})
+}
