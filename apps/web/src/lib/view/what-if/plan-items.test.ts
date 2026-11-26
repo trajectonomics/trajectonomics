@@ -75,6 +75,11 @@ describe("an Account card's payout in a What-if", () => {
 		expect(card?.payout?.text).toContain("Pays out 5% a year from Retirement")
 	})
 
+	test("reads the plan's name with no What-if session open", () => {
+		const view = accountItems(named, baselineRead(), null, {}, names)
+		expect(view.cards.find((one) => one.id === "bank")?.payout?.text).toContain("from Retirement")
+	})
+
 	test("shows the id in code when the plan states no name", () => {
 		const bare = { ...named, milestones: [] }
 		const changes = {
