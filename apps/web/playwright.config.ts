@@ -5,6 +5,8 @@ import {
 	HOSTED_ORIGIN,
 	HOSTED_PORT,
 	HOSTED_PREFIX,
+	SCRATCH_ORIGIN,
+	SCRATCH_PORT,
 } from "./browser/base-url"
 
 /**
@@ -48,6 +50,14 @@ export default defineConfig({
 			reuseExistingServer: false,
 			timeout: 30_000,
 			env: { TRAJ_WEB_BROWSER_HOSTED_PORT: String(HOSTED_PORT) },
+		},
+		// An editable Dashboard over a scratch fictional ledger, for the checks that write (cli ADR-0075).
+		{
+			command: "bun browser/serve-scratch.ts",
+			url: `${SCRATCH_ORIGIN}/`,
+			reuseExistingServer: false,
+			timeout: 180_000,
+			env: { TRAJ_WEB_BROWSER_SCRATCH_PORT: String(SCRATCH_PORT) },
 		},
 	],
 })

@@ -15,7 +15,13 @@ interface Props {
 let { draft = $bindable(), shown, visible = TAX_FLAG_KEYS }: Props = $props()
 const choices = [{ value: "", label: "Choose a filing status" }, ...FILING_CHOICES]
 const counts = $derived(COUNT_FIELDS.filter((field) => visible.includes(field.key)))
-const amounts = $derived(AMOUNT_FIELDS.filter((field) => visible.includes(field.key)))
+// The shared home-loan interest is stated only on a separate filing: `traj` refuses `shared=` under another status.
+const separate = $derived(draft.filingStatus === "married_separate")
+const amounts = $derived(
+	AMOUNT_FIELDS.filter(
+		(field) => visible.includes(field.key) && (field.key !== "sharedMortgageInterest" || separate),
+	),
+)
 </script>
 
 {#if visible.includes("filingStatus")}

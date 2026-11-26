@@ -4,7 +4,7 @@ import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioShow, TaxYear } from "../../lib/contract"
 import { personNames } from "../../lib/view/item-names"
 import { returnsOf } from "../../lib/view/tax"
-import { claimsTable } from "../../lib/view/tax-settings/claims"
+import { claimsTable, flatClaimant } from "../../lib/view/tax-settings/claims"
 import { type GroupKey, groupCards } from "../../lib/view/tax-settings/groups"
 import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
 import { notStated } from "../../lib/view/tax-settings/not-stated"
@@ -34,6 +34,8 @@ const people = $derived(personNames(show.household))
 /** The Filers the projection states, one column each: a profile with no Filer's Levy shows no claims table. */
 const filers = $derived(returnsOf(years).map((one) => one.filer))
 const claims = $derived(profile === null ? null : claimsTable(profile, show.household, filers))
+/** The person whose claims the flat keys are, when a holder swap left them with the other person: the cards name them. */
+const claimant = $derived(profile === null ? null : flatClaimant(profile, show.household, people))
 // While an income Flow has no tax label `scenario tax` refuses. A plan with tax labels its Flows in the label form first; a plan
 // with none labels them in the write that gives it tax, which the profile form carries.
 const unlabelled = $derived(unlabelledIncome(show.document))
@@ -66,7 +68,7 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 	<TaxClaimsSection table={claims} {people} />
 {/if}
 {#if profile !== null}
-	<TaxGroupCards cards={groupCards(profile)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
+	<TaxGroupCards cards={groupCards(profile, claimant)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 	<TaxNotStated items={notStated(show.taxAllowances)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 {/if}
 <div class="flex flex-wrap gap-3">

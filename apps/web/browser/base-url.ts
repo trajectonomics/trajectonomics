@@ -11,3 +11,8 @@ export const HOSTED_PORT = Number(process.env["TRAJ_WEB_BROWSER_HOSTED_PORT"] ??
 export const HOSTED_ORIGIN = `http://127.0.0.1:${HOSTED_PORT}`
 /** The path the hosted Demo is served under, as the Site serves it. */
 export const HOSTED_PREFIX = "/demo"
+
+/** The port the editable scratch Dashboard is served on, two above the loopback build's unless its own variable says otherwise. */
+export const SCRATCH_PORT = Number(process.env["TRAJ_WEB_BROWSER_SCRATCH_PORT"] ?? BROWSER_PORT + 2)
+/** Where the suite reaches the editable scratch Dashboard: loopback only, with no `?demo=1`. */
+export const SCRATCH_ORIGIN = `http://127.0.0.1:${SCRATCH_PORT}`

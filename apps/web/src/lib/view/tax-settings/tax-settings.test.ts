@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { TaxProfile } from "../../contract"
-import { blankDraft, draftOf, mergeFlags, wholeFlags } from "./draft"
+import { blankDraft, draftOf } from "./draft"
+import { mergeFlags, wholeFlags } from "./flags"
 import { taxEdit } from "./profile-edit"
 import { needsWholeProfile, taxFieldOfRefusal, taxShown } from "./refusal"
 import { groupDigits, profileRows } from "./rows"

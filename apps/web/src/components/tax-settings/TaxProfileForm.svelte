@@ -2,7 +2,8 @@
 import { editSession } from "../../client/edit.svelte.js"
 import type { TaxProfile } from "../../lib/contract"
 import { TAX_FLAG_KEYS } from "../../lib/edit/tax-flags"
-import { blankDraft, draftOf } from "../../lib/view/tax-settings/draft"
+import { draftOf, wholeDraftOf } from "../../lib/view/tax-settings/draft"
+import { sharedDropWarning } from "../../lib/view/tax-settings/flags"
 import { GROUPS, type GroupKey } from "../../lib/view/tax-settings/groups"
 import { taxEdit } from "../../lib/view/tax-settings/profile-edit"
 import { needsWholeProfile, taxShown } from "../../lib/view/tax-settings/refusal"
@@ -40,15 +41,22 @@ const visible = $derived(
 		: TAX_FLAG_KEYS,
 )
 const shown = $derived(taxShown(problems, editSession.failure, editSession.error, visible))
+// A whole save keeps the stored shared interest by filling it in; when the person clears it anyway, the form says so.
+const keepsShared = $derived(
+	profile !== null &&
+		profile.filingStatus === "married_separate" &&
+		profile.sharedMortgageInterest !== undefined,
+)
+const dropWarning = $derived(sharedDropWarning(profile, whole, draft))
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
-/** Switches between changing one item and stating the whole profile; nothing is pre-filled for the whole profile. */
+/** Switches between changing one item and stating the whole profile, which fills in only the stored shared interest. */
 function switchTo(next: boolean): void {
 	editSession.clear()
 	problems = {}
 	whole = next
-	draft = next ? blankDraft() : initial()
+	draft = next ? wholeDraftOf(profile) : initial()
 }
 
 async function save(event: SubmitEvent): Promise<void> {
@@ -69,10 +77,14 @@ async function save(event: SubmitEvent): Promise<void> {
 	{#if merging}
 		<p class="text-sm text-muted-foreground">Change an item and save: every other item of the stored profile stays. Empty an amount to take it out.</p>
 	{:else}
-		<p class="text-sm text-muted-foreground">State the whole profile. Nothing is filled in for you, an item left empty is none, and anything an earlier write stated and you leave out is dropped.</p>
+		<p class="text-sm text-muted-foreground">
+			State the whole profile. Nothing is filled in for you, an item left empty is none, and anything an earlier write stated and you leave out is dropped.{#if keepsShared}
+				A stored shared home-loan interest is filled in so a save keeps it.{/if}
+		</p>
 	{/if}
 	<TaxProfileFields bind:draft {shown} {visible} />
 	{#if !merging}<TaxFlowLabels flows={unlabelled} bind:labels {shown} />{/if}
+	{#if dropWarning}<p role="status" class="text-sm text-destructive">{dropWarning}</p>{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	{#if needsWholeProfile(editSession.failure)}
 		<button type="button" class={button} onclick={() => switchTo(true)}>Set the whole profile</button>

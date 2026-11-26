@@ -4,6 +4,7 @@
  * other Return's claims are its `returns` entry. The page shows the stored claims and applies nothing. Pure.
  */
 import type { HouseholdDocument, ReturnClaims, TaxProfile } from "../../contract"
+import type { PersonName, PersonNames } from "../item-names"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
 import { groupDigits } from "./rows"
 
@@ -22,8 +23,18 @@ export interface ClaimsTable {
 	readonly sharedInterest: string | null
 }
 
+/** One item a Return claims: the shared loan's interest is not a Return's own claim. */
+type ClaimField = TaxField & {
+	readonly key: Exclude<TaxField["key"], "sharedMortgageInterest">
+}
+
+/** The items a Return claims, in the page's order. */
+const CLAIM_FIELDS: readonly ClaimField[] = [...COUNT_FIELDS, ...AMOUNT_FIELDS].filter(
+	(field): field is ClaimField => field.key !== "sharedMortgageInterest",
+)
+
 /** What one Return states for one allowance: a count as it is, an amount in baht, and "None" for zero or absent. */
-function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: TaxField): string {
+function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: ClaimField): string {
 	const value = claims?.[field.key]
 	if (value === undefined || value === 0) return "None"
 	return field.kind === "count" ? String(value) : `${groupDigits(value)} THB`
@@ -54,7 +65,7 @@ export function claimsTable(
 		person === holder ? profile : profile.returns?.[person]
 	return {
 		people: [...filers],
-		rows: [...COUNT_FIELDS, ...AMOUNT_FIELDS].map((field) => ({
+		rows: CLAIM_FIELDS.map((field) => ({
 			key: field.key,
 			label: field.label,
 			cells: filers.map((person) => cellOf(claimsOf(person), field)),
@@ -64,4 +75,19 @@ export function claimsTable(
 				? null
 				: `${groupDigits(profile.sharedMortgageInterest)} THB`,
 	}
+}
+
+/**
+ * The person whose claims the profile's flat keys are, when a holder swap left them recorded for the other person: the
+ * cards then name them instead of saying "you". Null while the flat keys are the household's holder's own.
+ */
+export function flatClaimant(
+	profile: TaxProfile,
+	household: HouseholdDocument | null,
+	people: PersonNames,
+): PersonName | null {
+	const recorded = profile.claimsHolder
+	const holder = household?.people.find((person) => person.role === "holder")?.id
+	if (recorded === undefined || recorded === holder) return null
+	return people.get(recorded) ?? { label: recorded, subject: recorded }
 }

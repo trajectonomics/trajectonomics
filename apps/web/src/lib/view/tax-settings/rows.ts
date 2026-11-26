@@ -1,5 +1,6 @@
 /** The rows the page shows for a stored tax profile: what was stated, and "None" for the rest. Pure; no arithmetic. */
 import type { ScenarioShow, TaxProfile } from "../../contract"
+import type { PersonName } from "../item-names"
 import { AMOUNT_FIELDS, COUNT_FIELDS, filingLabel } from "./fields"
 
 /** One row: the item and what the profile states for it. */
@@ -17,8 +18,24 @@ export function groupDigits(value: number): string {
 	return part === undefined ? grouped : `${grouped}.${part}`
 }
 
-/** The filing status, then each count and amount; an item the profile does not state, or states as zero, reads "None". */
-export function profileRows(profile: TaxProfile): ProfileRow[] {
+/** The rows whose words say "you": a separate filing's flat keys may be the other person's claims after a holder swap. */
+const YOURS: Readonly<Record<string, (who: PersonName) => string>> = {
+	parents: (who) => `Parents ${who.subject} supports`,
+	disabledCare: (who) => `Relatives with a disability ${who.subject} cares for`,
+	healthInsurance: (who) => `${who.label}'s health insurance premiums`,
+	parentHealthInsurance: (who) => `Health insurance premiums for ${who.subject}'s parents`,
+}
+
+/** What an item is called: its own words, or the claimant's when the flat keys are the other person's claims. */
+function labelOf(key: string, label: string, claimant: PersonName | null): string {
+	return claimant === null ? label : (YOURS[key]?.(claimant) ?? label)
+}
+
+/**
+ * The filing status, then each count and amount; an item the profile does not state, or states as zero, reads "None".
+ * `claimant` names the person whose claims the flat keys are, when that is not the household's holder.
+ */
+export function profileRows(profile: TaxProfile, claimant: PersonName | null = null): ProfileRow[] {
 	const stated = (key: string): number | undefined =>
 		(profile as Record<string, unknown>)[key] as number | undefined
 	return [
@@ -27,13 +44,17 @@ export function profileRows(profile: TaxProfile): ProfileRow[] {
 			const counted = stated(key)
 			return {
 				key,
-				label,
+				label: labelOf(key, label, claimant),
 				value: counted === undefined || counted === 0 ? "None" : String(counted),
 			}
 		}),
 		...AMOUNT_FIELDS.map(({ key, label }) => {
 			const amount = stated(key)
-			return { key, label, value: amount === undefined ? "None" : `${groupDigits(amount)} THB` }
+			return {
+				key,
+				label: labelOf(key, label, claimant),
+				value: amount === undefined ? "None" : `${groupDigits(amount)} THB`,
+			}
 		}),
 	]
 }

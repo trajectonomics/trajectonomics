@@ -68,6 +68,7 @@ describe("the groups of the stored request", () => {
 		expect(insurance?.rows.find((row) => row.key === "lifeInsurance")?.value).toBe("20,000 THB")
 		expect(cards.find((card) => card.key === "home")?.rows.map((row) => row.value)).toEqual([
 			"None",
+			"None",
 		])
 		expect(cards.flatMap((card) => card.rows)).toHaveLength(TAX_FLAG_KEYS.length)
 	})

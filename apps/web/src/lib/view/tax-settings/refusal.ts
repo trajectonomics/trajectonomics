@@ -14,10 +14,13 @@ function keyOf(path: string): string {
 		.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
 }
 
-/** The form field a refusal names, or null when it names none. */
+/** The form field a refusal names, or null when it names none. A shared-interest refusal names its own field. */
 export function taxFieldOfRefusal(error: ErrorBody | null): string | null {
 	const key = error?.path === undefined ? "" : keyOf(error.path)
-	return (TAX_FLAG_KEYS as readonly string[]).includes(key) ? key : null
+	if (!(TAX_FLAG_KEYS as readonly string[]).includes(key)) return null
+	if (key === "mortgageInterest" && error?.message.includes("shared="))
+		return "sharedMortgageInterest"
+	return key
 }
 
 /** True when the CLI refused a `--merge` because no profile is stored: the profile has to be set whole. */
