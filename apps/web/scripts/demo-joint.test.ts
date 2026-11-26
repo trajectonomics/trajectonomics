@@ -12,7 +12,7 @@ import { demoSnapshotText } from "./demo-snapshot"
 //   `me` separate:  1,030,000 - 100,000 - (60,000 + 30,000 + 15,000) = 825,000  -> tax  80,000.00
 //   partner separate: 504,000 - 100,000 - (60,000 + 30,000 + 60,000 + 12,000) = 242,000 -> tax 4,600.00
 //   joint:          1,534,000 - 200,000 - (120,000 + 30,000 + 60,000 + 27,000) = 1,097,000 -> tax 139,250.00
-// Filing separately therefore saves 84,600.00 against the joint Return's 139,250.00.
+// Filing separately therefore costs 84,600.00 against the joint Return's 139,250.00, and saves 54,650.00.
 
 const DEMO: Snapshot = snapshot.parse(JSON.parse(await demoSnapshotText()))
 

@@ -1,9 +1,10 @@
 import type { DemoWrite } from "./separate"
 
 /**
- * `joint`, the Demo's fourth Scenario: the same couple, salaries and claims as `separate`, filed jointly so the Tax
- * page can show what filing separately saves beside it (cli ADR-0075). It forks `separate`, so no figure is stated
- * twice, and writes one Return claiming the household's one child, the partner's two parents and both life premiums.
+ * `joint`, the Demo's fourth Scenario: the same couple, salaries and claims as `separate`, filed jointly, so a person
+ * can switch between the two plans to see what filing separately saves (cli ADR-0075). It forks `separate`, reusing
+ * its Flows and household, and restates the claims for one Return: the household's one child, the partner's two
+ * parents and both life premiums.
  */
 export async function applyJointScenario(traj: DemoWrite): Promise<void> {
 	await traj(["scenario", "fork", "separate", "joint"])
