@@ -3,7 +3,7 @@
  * (an amount, a floor) is never in them, so hiding amounts has nothing to mask. Pure.
  */
 import type { Json } from "../../what-if/json"
-import { spendingRule } from "./rule"
+import { spendingRule, WITHDRAWAL_ID } from "./rule"
 import { ruleWords } from "./words"
 
 /** The Flow's id in a Set's path (`flows.rent.rule` names `rent`). The CLI names no Flow, so the id is shown as it is. */
@@ -18,7 +18,7 @@ function recordOf(value: Json): Record<string, Json> | null {
 
 /**
  * What a tried Flow, or a tried rule, says in words; `fallback` (the session's own label) when it is neither a
- * spending rule nor a level amount. `account` names an Account id the way the person knows it.
+ * spending rule nor the withdrawals page's level amount. `account` names an Account id the way the person knows it.
  */
 export function tryWords(
 	change: { path: string; value: Json; label: string },
@@ -30,7 +30,13 @@ export function tryWords(
 		const sentence = ruleWords(rule.data, account)
 		return `${nameOf(change.path)}: ${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`
 	}
-	if (flow !== null && flow["rule"] === undefined && flow["growth"] === "inflation") {
+	// Only the withdrawals page's own spending Flow reads this way: elsewhere a whole-Flow Set is just a try.
+	if (
+		nameOf(change.path) === WITHDRAWAL_ID &&
+		flow !== null &&
+		flow["rule"] === undefined &&
+		flow["growth"] === "inflation"
+	) {
 		return `${nameOf(change.path)}: a level amount that keeps pace with inflation`
 	}
 	return change.label

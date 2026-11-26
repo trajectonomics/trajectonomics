@@ -16,7 +16,7 @@ export type WhatIf = {
 	removals: string[]
 	/** The items the session puts on a list, which the plan does not hold (cli ADR 0062). */
 	additions: Addition[]
-	/** The loans and assets the session changes as a whole: their parts switch and try together (`session-group.ts`). */
+	/** The loans and assets the session changes as a whole, and a salary with its employer share (`session-group.ts`). */
 	groups: Group[]
 }
 
@@ -55,25 +55,6 @@ export function withoutSet(whatIf: WhatIf, path: string): WhatIf {
 	return { ...whatIf, sets: whatIf.sets.filter((set) => set.path !== path) }
 }
 
-/** Switches an item off: a Removal of its id. Switching off an item already off changes nothing. */
-export function switchedOff(whatIf: WhatIf, path: string): WhatIf {
-	return isOff(whatIf, path) ? whatIf : { ...whatIf, removals: [...whatIf.removals, path] }
-}
-
-/** Switches an item back on: its Removal is dropped. */
-export function switchedOn(whatIf: WhatIf, path: string): WhatIf {
-	return { ...whatIf, removals: whatIf.removals.filter((removal) => removal !== path) }
-}
-
-/** The Overrides of a session in the order `traj` takes them: removals, Additions, then Sets (cli ADR 0056, 0062). */
-export function overridesOf(whatIf: WhatIf): {
-	sets: SetChange[]
-	removals: string[]
-	additions: Addition[]
-} {
-	return { sets: whatIf.sets, removals: whatIf.removals, additions: whatIf.additions }
-}
-
 export { type Change, changesOf, namesChange } from "./session-changes"
 export {
 	type Group,
@@ -89,7 +70,15 @@ export {
 	clearedFields,
 	itemSets,
 	recordOf,
+	triedItemSets,
 	withAddition,
 	withoutAddition,
 	withoutItemChanges,
 } from "./session-items"
+export { isHeld, overridesOf } from "./session-overrides"
+export {
+	switchedOff,
+	switchedOn,
+	switchedOnUnit,
+	withTriedFields,
+} from "./session-switch"

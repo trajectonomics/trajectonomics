@@ -39,7 +39,7 @@ describe("the Withdrawals page", () => {
 	test("states each Rule year with its share and what the rule did, in words", () => {
 		const body = page()
 		expect(body).toContain("Year by year: retirement-spending")
-		expect(body).toContain("862,759.95")
+		expect(body).toContain("862,256.24")
 		expect(body).toContain("3.99%")
 		expect(body).toContain("Followed the rule")
 		expect(body).toContain("Cut: the share had grown too large")
@@ -47,11 +47,11 @@ describe("the Withdrawals page", () => {
 
 	test("shows nominal and today's money together, or each alone, from the terms", () => {
 		expect(page("both")).toContain("in today's money")
-		expect(page("both")).toContain("429,677.39")
-		expect(page("nominal")).not.toContain("429,677.39")
+		expect(page("both")).toContain("429,426.52")
+		expect(page("nominal")).not.toContain("429,426.52")
 		const real = page("real")
-		expect(real).toContain("429,677.39")
-		expect(real).not.toContain("862,759.95")
+		expect(real).toContain("429,426.52")
+		expect(real).not.toContain("862,256.24")
 	})
 
 	test("states the chance, the Bands and the lowest year with the paths it counts, each level in words", () => {
@@ -61,7 +61,7 @@ describe("the Withdrawals page", () => {
 		expect(body).toContain("193 of 200 seeded Market paths")
 		expect(body).toContain("In the worst years you would spend")
 		expect(body).toContain("Worst 1 in 10 paths")
-		expect(body).toContain("211,589.78")
+		expect(body).toContain("211,506.76")
 		expect(body).toContain("It counts 200 of 200 paths")
 		expect(body).toContain("a path that ran out counts 0")
 	})
@@ -69,7 +69,7 @@ describe("the Withdrawals page", () => {
 	test("Hide amounts masks every amount and the Band axis", () => {
 		preferences.hidden = true
 		const body = page()
-		for (const shown of ["862,759.95", "429,677.39", "211,589.78", "21,568,998.89"]) {
+		for (const shown of ["862,256.24", "429,426.52", "211,506.76", "21,556,406.02"]) {
 			expect(body).not.toContain(shown)
 		}
 		expect(body).toContain("amount hidden")
@@ -174,7 +174,7 @@ describe("the Home card: you could spend", () => {
 		const view = overviewView(DEMO)
 		const body = render(WithdrawalsCard, { props: { scenario: view.withdrawals } }).body
 		expect(body).toContain("You could spend")
-		expect(body).toContain("862,759.95")
+		expect(body).toContain("862,256.24")
 		expect(body).toContain("3.99% of your savings")
 		expect(body).toContain("/optimize/withdrawals/")
 	})

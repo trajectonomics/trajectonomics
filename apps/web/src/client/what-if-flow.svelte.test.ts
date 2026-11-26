@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { overridesOf } from "../lib/what-if/session"
 import { whatIfSession } from "./what-if.svelte.js"
 import { HASH, useSessionHooks } from "./what-if.test-support"
 
@@ -22,6 +23,80 @@ const LEVEL = {
 	amount: "40000.00",
 	growth: "inflation",
 }
+
+describe("trying a field the stored Flow lacks", () => {
+	const RENT = {
+		id: "rent",
+		kind: "expense",
+		frequency: "monthly",
+		start: "2026-11-01",
+		amount: "5000.00",
+	}
+	for (const [field, value] of [
+		["end", "2030-01-01"],
+		["category", "housing"],
+		["displayLabel", "Rent"],
+	] as const) {
+		test(`a first ${field} is one Set of the whole Flow`, () => {
+			whatIfSession.tryFlow("base", HASH, { stored: RENT, edited: { ...RENT, [field]: value } })
+			expect(whatIfSession.whatIf?.sets).toEqual([
+				{ path: "flows.rent", value: { ...RENT, [field]: value } },
+			])
+		})
+	}
+
+	test("a whole-item Set clears a field the form cleared, so nothing is reported as untried", () => {
+		const stored = { ...RENT, category: "housing" }
+		const edited = { ...RENT, end: "2030-01-01" }
+		expect(whatIfSession.tryFlow("base", HASH, { stored, edited })).toBe(true)
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.rent", value: edited }])
+	})
+})
+
+describe("switching a Flow off", () => {
+	test("holds its try out of what traj reads, and a switch back on restores it", () => {
+		whatIfSession.tryFlow("base", HASH, { stored: STORED, edited: LEVEL })
+		expect(whatIfSession.whatIf?.sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
+		whatIfSession.setOff("base", HASH, "flows.retirement-spending", true)
+		// The Set stays in the session, held back: `traj` refuses a Set of a Flow a Removal took out.
+		expect(whatIfSession.whatIf?.sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.retirement-spending"])
+		expect(overridesOf(whatIfSession.whatIf!).sets).toEqual([])
+		whatIfSession.setOff("base", HASH, "flows.retirement-spending", false)
+		expect(overridesOf(whatIfSession.whatIf!).sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
+	})
+
+	test("takes a salary's employer share with it as one group, and the bar's chip switches both back on", () => {
+		const spec = {
+			kind: "salary" as const,
+			name: "salary",
+			paths: ["flows.salary", "flows.salary-employer"],
+		}
+		whatIfSession.setOff("base", HASH, "flows.gym", true)
+		expect(whatIfSession.setGroupOff("base", HASH, spec, spec.paths, true)).toBe(true)
+		expect(whatIfSession.whatIf?.removals).toEqual([
+			"flows.gym",
+			"flows.salary",
+			"flows.salary-employer",
+		])
+		expect(whatIfSession.isGroupOffIn("base", spec)).toBe(true)
+		expect(whatIfSession.changes.map((change) => change.label)).toEqual([
+			"Gym switched off",
+			"Salary and its employer share switched off",
+		])
+		const change = whatIfSession.changes.find((one) => one.kind === "group")
+		if (change === undefined) throw new Error("no group change")
+		whatIfSession.removeChange(change)
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.gym"])
+		expect(whatIfSession.whatIf?.groups).toEqual([])
+	})
+})
 
 describe("trying a spending Flow as a what-if", () => {
 	test("a Flow the plan does not hold is an Addition", () => {

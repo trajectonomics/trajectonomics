@@ -19,6 +19,22 @@ export function itemSets(
 		.map((field) => ({ path: `${list}.${id}.${field}`, value: edited[field] ?? null }))
 }
 
+/**
+ * The Sets a try makes of an edited item: one per changed field, or one Set of the whole item when the try adds a
+ * field the stored item lacks. `traj` sets a path the stored item has and refuses an absent one (`No key or id`), so
+ * an open-ended Flow's first end or a first category is one Set of the whole Flow (cli ADR 0024, 0062, 0065).
+ */
+export function triedItemSets(
+	list: string,
+	id: string,
+	stored: Record<string, Json>,
+	edited: Record<string, Json>,
+): SetChange[] {
+	const changed = itemSets(list, id, stored, edited)
+	const adds = Object.keys(edited).some((field) => !(field in stored))
+	return adds && changed.length > 0 ? [{ path: `${list}.${id}`, value: edited }] : changed
+}
+
 /** The fields a form cleared: stored with a value, and absent from the edited item. A what-if cannot try them. */
 export function clearedFields(
 	stored: Record<string, Json>,

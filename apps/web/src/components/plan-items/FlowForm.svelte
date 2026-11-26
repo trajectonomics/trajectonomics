@@ -48,6 +48,10 @@ let employer = $state(start().employer)
 let problems: Problems = $state({})
 /** The fields a tried value cleared, which a what-if cannot hold. */
 let cleared: string[] = $state([])
+/** Whether a cleared field left the Flow switched off, so the what-if holds no other change to point at. */
+const keptOff = $derived(
+	cleared.length > 0 && whatIfSession.isOffIn(name, `flows.${existing?.id ?? ""}`),
+)
 const FIELDS = [
 	"name",
 	"displayLabel",
@@ -94,6 +98,6 @@ async function remove(): Promise<void> {
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : `Add ${kind}`}>
 	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
-	<TryNotice fields={cleared} />
+	<TryNotice fields={cleared} others={!keptOff} />
 	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
 </form>

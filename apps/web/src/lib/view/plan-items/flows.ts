@@ -4,7 +4,7 @@ import { formatBps } from "../../format/bps"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { ruleSummary } from "../withdrawals/words"
 import type { Words } from "../words"
-import { employerText } from "./employer"
+import { employerIdOf, employerText } from "./employer"
 import { datesOfCard } from "./flow-dates"
 
 /** The kinds of Flow a planner page lists: Income lists `income`, Expenses lists `expense`. */
@@ -33,6 +33,8 @@ export interface FlowCard {
 	readonly category: string | null
 	/** "Employer adds 5% to Provident fund" for a salary whose employer pays into an Account; null for any other Flow. */
 	readonly employer: string | null
+	/** The id of the Flow that carries that share, which switches off with the salary (`UNKNOWN_FLOW` otherwise); null when there is none. */
+	readonly employerId: string | null
 	/** False for a computed Flow, which the forms do not edit. */
 	readonly editable: boolean
 }
@@ -69,18 +71,22 @@ export function flowCards(
 ): FlowCard[] {
 	return flows
 		.filter((flow) => flow.kind === kind)
-		.map((flow) => ({
-			id: flow.id,
-			amount: flow.amount ?? null,
-			frequency: flow.frequency,
-			...datesOfCard(flow, household, names),
-			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
-			earned: earnedOf(flow, kind),
-			category: kind === "expense" ? (flow.category ?? null) : null,
-			employer: employerText(all, flow, kind, names.accounts),
-			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.
-			editable: !isComputed(flow) && flow.amount !== undefined,
-		}))
+		.map((flow) => {
+			const employer = employerText(all, flow, kind, names.accounts)
+			return {
+				id: flow.id,
+				amount: flow.amount ?? null,
+				frequency: flow.frequency,
+				...datesOfCard(flow, household, names),
+				growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
+				earned: earnedOf(flow, kind),
+				category: kind === "expense" ? (flow.category ?? null) : null,
+				employer,
+				employerId: employer === null ? null : employerIdOf(flow.id),
+				// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.
+				editable: !isComputed(flow) && flow.amount !== undefined,
+			}
+		})
 }
 
 /** The form's text for one Flow. A new Flow starts monthly, follows inflation and is earned. */

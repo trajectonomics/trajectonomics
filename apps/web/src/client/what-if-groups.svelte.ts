@@ -42,6 +42,7 @@ export class WhatIfGroups extends WhatIfChanges {
 		if (this.saving) return false
 		const base = this.sessionFor(plan, contentHash)
 		if (base === null) return false
+		// On takes the group back, and keeps a Removal made before its switch: a share a try cleared stays cleared.
 		this.keep(off ? withGroupOff(base, spec, removals) : withoutGroup(base, groupId(spec)))
 		return true
 	}

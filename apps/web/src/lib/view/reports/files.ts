@@ -14,10 +14,11 @@ export interface ReportFile {
 export const CSV_TYPE = "text/csv;charset=utf-8"
 export const JSON_TYPE = "application/json;charset=utf-8"
 
-/** The changes of a What-if session on a plan: the Sets and Removals that produced the session's figures. */
+/** The changes of a What-if session on a plan: the Sets, Removals and Additions that produced the session's figures. */
 export interface SessionChanges {
 	readonly sets: WhatIf["sets"]
 	readonly removals: WhatIf["removals"]
+	readonly additions: WhatIf["additions"]
 }
 
 /** A plan name made safe for a file name: path separators and control characters become a dash. */
@@ -76,7 +77,7 @@ function entriesOf<T>(
 
 /**
  * The selected plan's results in one JSON file: the Snapshot's entries for the plan, unchanged. In a What-if
- * session the file also says which changes produced the session's projection.
+ * session the file also says which Sets, Removals and Additions produced the session's projection.
  */
 export function everythingFile(
 	reads: Pick<Snapshot["reads"], "projections" | "fi" | "documents" | "chance">,
