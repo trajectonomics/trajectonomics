@@ -18,11 +18,8 @@ interface Props {
 let { scenario = "" }: Props = $props()
 </script>
 
-<!-- The Overview: the headline figures, each card linking to its page and naming its command. -->
-<PageShell
-	title="Overview"
-	intro="The headline figures of your ledger. Each card names the command that produced it."
->
+<!-- The Overview: the headline figures, each card linking to its page with its Details. -->
+<PageShell title="Overview" intro="The headline figures of your ledger.">
 	{#snippet children(snapshot)}
 		{@const plan = homePlan(snapshot, scenario)}
 		{@const hero = heroOf(snapshot, scenario)}

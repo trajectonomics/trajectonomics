@@ -40,7 +40,7 @@ const read = $derived(name === null ? undefined : projections[name])
 				<TaxBodyView name={scenario} {run} people={people[scenario] ?? NO_PEOPLE} />
 			{/snippet}
 		</ReadView>
-		<Provenance argv={scenarioRead.argv} />
+		<Provenance name={`Tax of ${scenario}`} commands={[scenarioRead.argv]} />
 	</div>
 {/snippet}
 

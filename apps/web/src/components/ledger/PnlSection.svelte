@@ -55,7 +55,7 @@ const totalColumns: Column<Total>[] = [
 						columns={totalColumns}
 					/>
 				{/if}
-				<Provenance argv={pnl.argv} />
+				<Provenance name="Profit and loss" commands={[pnl.argv]} />
 			</div>
 		{/snippet}
 	</ReadView>

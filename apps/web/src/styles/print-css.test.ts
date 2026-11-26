@@ -85,6 +85,13 @@ describe("the print stylesheet", () => {
 		expect(rule("pre")["white-space"]).toBe("pre-wrap")
 	})
 
+	test("shows a closed provenance Details' contents on paper, and only that disclosure's", () => {
+		expect(rule("details[data-provenance]::details-content")["content-visibility"]).toBe("visible")
+		expect([...print.keys()].filter((selector) => selector.startsWith("details"))).toEqual([
+			"details[data-provenance]::details-content",
+		])
+	})
+
 	test("repeats a table's header, keeps it from sticking, and does not split a row", () => {
 		expect(rule("thead")).toMatchObject({ display: "table-header-group", position: "static" })
 		expect(rule("tr")["break-inside"]).toBe("avoid")

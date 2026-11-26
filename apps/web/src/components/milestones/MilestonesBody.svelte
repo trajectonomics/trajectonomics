@@ -30,5 +30,5 @@ const view = $derived(milestoneView(run))
 		<MilestoneTimeline reached={view.reached} />
 		<UnreachedList unreached={view.unreached} />
 	{/if}
-	<Provenance {argv} />
+	<Provenance name="Milestones" commands={[argv]} />
 </div>

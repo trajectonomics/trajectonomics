@@ -39,5 +39,5 @@ const accounts = $derived(returnAccounts(path).map((id) => names.get(id) ?? id))
 		</p>
 		<PathTable {rows} {accounts} terms={parseTerms(terms)} currency={path.currency} />
 	</section>
-	<Provenance {argv} />
+	<Provenance name="Chance of this path" commands={[argv]} />
 </div>

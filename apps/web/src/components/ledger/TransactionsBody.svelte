@@ -64,7 +64,7 @@ function clearFilters(): void {
 					<TransactionCards rows={shown} />
 				</div>
 			{/if}
-			<Provenance argv={read.argv} />
+			<Provenance name="Transactions" commands={[read.argv]} />
 		</div>
 	{/snippet}
 </ReadView>

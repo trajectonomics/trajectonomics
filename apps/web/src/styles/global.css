@@ -74,6 +74,14 @@
 		white-space: pre-wrap;
 	}
 
+	/*
+	 * A closed provenance Details still prints what it holds, so a printed page keeps its commands and hashes.
+	 * Only provenance: every other disclosure (a monthly table, a loan schedule, a menu) stays closed on paper.
+	 */
+	details[data-provenance]::details-content {
+		content-visibility: visible;
+	}
+
 	table {
 		width: 100%;
 		min-width: 0;

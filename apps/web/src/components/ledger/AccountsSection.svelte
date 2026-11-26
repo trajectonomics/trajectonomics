@@ -39,10 +39,10 @@ const groups = $derived(accounts.ok ? accountGroups(accounts.data.accounts, rows
 						<AccountTable {group} />
 					{/each}
 				{/if}
-				<Provenance argv={accounts.argv} />
-				{#if balance.ok}
-					<Provenance argv={balance.argv} />
-				{/if}
+				<Provenance
+					name="Accounts and balances"
+					commands={balance.ok ? [accounts.argv, balance.argv] : [accounts.argv]}
+				/>
 			</div>
 		{/snippet}
 	</ReadView>
