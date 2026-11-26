@@ -2,7 +2,12 @@ import type { AppError } from "../errors"
 import { keyOf, type StatedTally } from "./carryin-classes"
 import type { CarryInEntry } from "./carryin-entry"
 import type { ResolvedLevy } from "./carryin-resolve"
-import { type FillWhere, refusedDifferent, refusedNoRecord } from "./carryin-shared-refuse"
+import {
+	type FillWhere,
+	refusedDifferent,
+	refusedNoRecord,
+	refusedUnstated,
+} from "./carryin-shared-refuse"
 
 /** The source record's entry for a period, when the other Return has one. */
 export function sourceEntryOf(
@@ -64,7 +69,9 @@ function asserted(
 /**
  * One shared class: equal claims stay, the one record that asserts a value fills a record that
  * leaves the class out, and two different claims refuse. A `rest` zero is a claim, so a record that
- * rests a class the other states differently is refused rather than silently overridden.
+ * rests a class the other states differently is refused rather than silently overridden. A class
+ * neither record asserts is refused too: one record of the pair must state it, or cover it with
+ * `rest`, so forgotten shared income never reads as none.
  */
 export function filledShared(input: {
 	entry: CarryInEntry
@@ -77,7 +84,9 @@ export function filledShared(input: {
 	const mine = asserted(input.entry, key, input.tally.amount)
 	const theirs = asserted(input.source, key, input.from)
 	if (mine === undefined) {
-		return theirs === undefined ? input.tally : { ...input.tally, amount: theirs }
+		return theirs === undefined
+			? refusedUnstated(input.where, input.tally)
+			: { ...input.tally, amount: theirs }
 	}
 	if (theirs === undefined) return input.tally
 	if (mine !== theirs) {

@@ -328,7 +328,9 @@ interest is right in every year of the Projection, not only in the first.
   the other Filer's income from this Levy's shared tally: a stated class fills a record that leaves
   it out, and two different claims are refused. A `"rest": "0.00"` is a claim of zero, so a rest
   that disagrees with the other record is refused too; a record that leaves the other Return's
-  classes or a shared class out needs no `rest`. It refuses when a record states those classes
+  classes or a shared class out needs no `rest`. Each `@shared` class must still be stated by at
+  least one record of the pair, or covered by a `rest`: a class neither names is refused, so
+  forgotten shared income never reads as none. It refuses when a record states those classes
   differently from the other Return's record, and when a record leaves them to `"rest": "0.00"`
   while the other Return has no record for the period. The CLI finds the other Filer from the
   labels the emitted Measures read, because the stored Levy keeps no `sharedMortgage` field.

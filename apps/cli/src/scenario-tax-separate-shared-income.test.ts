@@ -40,6 +40,26 @@ describe("the shared income both records state", () => {
 		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "document.0.tallies" })
 		expect(errorOf(res).message).toContain("income.section40_1@shared")
 		expect(errorOf(res).message).toContain("100000.00")
+		expect(errorOf(res).hint).toContain("too")
+	})
+
+	// Both earn, and each record states only its own 29 classes with no `rest`: neither names the
+	// shared income, so it is refused rather than read as none. Counted as 0 it would have given
+	// 77,000 and 8,500 for a period that had 100,000 of shared salary (87,000 and 13,500).
+	it("refuses a shared class neither record names", async () => {
+		const home = await separate(salaries("2026-12-31", "2026-12-31"))
+		const res = await projection(home, [
+			...RUN,
+			"--carry-in",
+			carryInFile(home, [
+				fullRecord("th-2026-pit@me", "1000000.00"),
+				fullRecord("th-2026-pit@partner", "500000.00"),
+			]),
+		])
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "document.0.tallies" })
+		expect(errorOf(res).message).toContain("@shared")
+		expect(errorOf(res).message).toContain("Neither the record")
 	})
 
 	/*
