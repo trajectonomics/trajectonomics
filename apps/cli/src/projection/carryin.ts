@@ -50,7 +50,7 @@ const tallyForm: z.ZodType<CarryInTallyForm> = z.strictObject({
 		.string()
 		.min(1)
 		.describe(
-			"A Tally label one of the Levy's own measures reads. A Levy over Filers, the joint Return of a household with a partner and Owners, reads Filer labels instead of bare ones: each of its 29 classes once for each Filer, as income.section40_1@<person id>, and its 22 income classes once more for income of both, as income.section40_1@shared.",
+			"A Tally label one of the Levy's own measures reads. A Levy over Filers, the joint Return of a household with a partner and Owners, reads Filer labels instead of bare ones: each of its 29 classes once for each Filer, as income.section40_1@<person id>, and its 22 income classes once more for income of both, as income.section40_1@shared. A separate Levy that shares a home loan also reads the other Filer's 22 income classes, which the CLI fills from that Filer's own record: state this Filer's 29 and the shared 22, and a class you do state must agree with the other record.",
 		),
 	basis: z.enum(CARRY_IN_BASES).describe("The basis that measure tallies it under."),
 	amount,

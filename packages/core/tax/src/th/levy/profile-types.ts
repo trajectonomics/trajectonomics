@@ -110,6 +110,25 @@ export interface ThLevySection40_4Elections {
 }
 
 /**
+ * The interest on one home loan borrowed together, as one separate Return shares it.
+ *
+ * Purpose: Lets a separate Return state a shared loan once and still apply the one-earner rule in
+ * each Settlement period, when the other Filer's income for that period is known.
+ * Math: No arithmetic at emit time; the emitted Measures read the other Filer's income tallies.
+ * Units: THB major units.
+ * Throws: TaxValidationError at emit time for an invalid Filer id or amount.
+ * @statute Thailand Revenue Code Section 47(1)(ซ).
+ */
+export interface ThLevySharedMortgage {
+	/** The other spouse's Filer id, whose income in a period decides this Return's share. */
+	readonly other: string
+	/** This Return's own home-loan interest, apart from the shared loan, THB major units. */
+	readonly own: number
+	/** The whole interest on the loan borrowed together, THB major units. */
+	readonly total: number
+}
+
+/**
  * Levy identity and Settlement period frozen at emit time.
  *
  * Purpose: Lets a caller name the Levy and override the default filing window.
@@ -155,4 +174,11 @@ export interface ThLevyProfile {
 	 * `married_joint`.
 	 */
 	readonly filers?: readonly string[] | undefined
+	/**
+	 * The interest on one home loan borrowed together, when this is a separate Return. A period in
+	 * which only one Filer has income gives that Filer the whole, capped, and a period in which both
+	 * do splits it (s.47(1)(ซ)). `allowances.mortgageInterest` is then what this Return claims when
+	 * both have income. Omitted, the allowances state every claim as a fixed amount.
+	 */
+	readonly sharedMortgage?: ThLevySharedMortgage | undefined
 }

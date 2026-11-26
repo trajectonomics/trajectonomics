@@ -58,7 +58,14 @@ export function completed(input: {
 		if (start === current) return needsRecord(input.id, start, input.classes)
 		if (!isTaxLevyId(input.id)) return needsOwnRecord(input.id, start)
 		next.push({
-			entry: { periodStart: start, tallies: [], prepaid: 0, source: "scope" },
+			entry: {
+				periodStart: start,
+				tallies: [],
+				stated: new Set(),
+				rested: new Set(),
+				prepaid: 0,
+				source: "scope",
+			},
 			flag: null,
 		})
 	}
