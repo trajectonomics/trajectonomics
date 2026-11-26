@@ -31,13 +31,13 @@ describe("a transfer names the Milestone it lands on", () => {
 	test("a labelled Milestone shows the plan's name as plain text", () => {
 		const html = plain(page("Retirement"))
 		expect(html).toContain(
-			'from when <span data-item="retire" data-kind="milestone">Retirement</span> fires',
+			'from when <span class="wrap-anywhere" data-item="retire" data-kind="milestone">Retirement</span> fires',
 		)
 	})
 
 	test("an unlabelled Milestone shows its id in code, so the page invents no name", () => {
 		expect(plain(page())).toContain(
-			'from when <code class="font-mono text-[0.9em]" data-item="retire" data-kind="milestone" data-unnamed="">retire</code> fires',
+			'from when <code class="font-mono text-[0.9em] wrap-anywhere" data-item="retire" data-kind="milestone" data-unnamed="">retire</code> fires',
 		)
 	})
 

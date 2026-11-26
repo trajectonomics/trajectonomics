@@ -115,7 +115,7 @@ describe("an Account card while a What-if changes its payout", () => {
 		}).body
 		const html = body.replace(/<!--[\s\S]*?-->/g, "")
 		expect(html).toContain(
-			'Pays out 5% a year from <span data-item="retire" data-kind="milestone">Retirement</span>',
+			'Pays out 5% a year from <span class="wrap-anywhere" data-item="retire" data-kind="milestone">Retirement</span>',
 		)
 	})
 })

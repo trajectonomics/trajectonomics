@@ -46,9 +46,15 @@ const code = (kind: string, id: string) =>
 describe("the household's people are called by role, never by id", () => {
 	test("a card heads with You, Your partner or Child, keeps the id in a row, and Edit says the name", () => {
 		const body = household()
-		expect(body).toContain('<span data-item="me" data-kind="person">You</span>')
-		expect(body).toContain('<span data-item="partner" data-kind="person">Your partner</span>')
-		expect(body).toContain('<span data-item="mali" data-kind="person">Child</span>')
+		expect(body).toContain(
+			'<span class="wrap-anywhere" data-item="me" data-kind="person">You</span>',
+		)
+		expect(body).toContain(
+			'<span class="wrap-anywhere" data-item="partner" data-kind="person">Your partner</span>',
+		)
+		expect(body).toContain(
+			'<span class="wrap-anywhere" data-item="mali" data-kind="person">Child</span>',
+		)
 		expect(body).toContain('aria-label="Edit You"')
 		expect(body).not.toContain('aria-label="Edit me"')
 		expect(body).toMatch(/<dt[^>]*>Id<\/dt>\s*<dd><code[^>]*>mali<\/code>/)
