@@ -13,8 +13,8 @@ import type { PlanParams } from "../src/lib/snapshot"
 import { SCRATCH_ORIGIN, SCRATCH_PORT } from "./base-url"
 
 const CLI = fileURLToPath(new URL("../../cli/src/index.ts", import.meta.url))
-// One plan per width, so two browser checks write without racing over the same stored profile.
-const PLANS = ["shared-360", "shared-1280"] as const
+// One plan per check, so two browser checks write without racing over the same stored profile; `swap-360` only reads.
+const PLANS = ["shared-360", "shared-1280", "swap-360"] as const
 
 /** The plans the write checks open: the Demo's separate-filing couple, with the carry-in its Levies need. */
 const PARAMS: PlanParams = {
@@ -47,6 +47,37 @@ for (const name of PLANS) {
 		process.exit(1)
 	}
 }
+
+/** A `traj` read or write the scratch ledger must take, or the server stops with its message. */
+async function run(argv: string[]): Promise<unknown> {
+	const made = await spawnCapture([traj, ...argv, "--json"], { env })
+	if (made.code !== 0) {
+		console.error(`The scratch Dashboard could not run ${argv.join(" ")}: ${made.stderr.trim()}`)
+		process.exit(1)
+	}
+	return JSON.parse(made.stdout.toString())
+}
+
+/** The household of one plan with the holder and partner roles swapped, before `--from-stored` has run. */
+async function swapRoles(name: string): Promise<void> {
+	const shown = (await run(["scenario", "show", name])) as {
+		scenario: { household: { people: { id: string; role: string }[] } & Record<string, unknown> }
+	}
+	const household = shown.scenario.household
+	const people = household.people.map((person) =>
+		person.role === "holder"
+			? { ...person, role: "partner" }
+			: person.role === "partner"
+				? { ...person, role: "holder" }
+				: person,
+	)
+	const file = join(scratch, `${name}-household.json`)
+	await writeFile(file, JSON.stringify({ ...household, people }))
+	await run(["scenario", "household", name, "--file", file])
+}
+
+// The swapped plan is the Demo's separate couple with its roles the other way round; no write moves the claims yet.
+await swapRoles("swap-360")
 const records = PLANS.flatMap((scenario) =>
 	demoSeparateCarryIn().map((record) => ({ ...(record as Record<string, unknown>), scenario })),
 )

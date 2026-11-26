@@ -1,7 +1,14 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument, TaxProfile } from "../../contract"
 import { NO_PEOPLE, personNames } from "../item-names"
-import { type ClaimCell, claimsTable, flatClaimant } from "./claims"
+import {
+	type ClaimCell,
+	claimsTable,
+	FLAT_CLAIM_KEYS,
+	flatClaimant,
+	flatClaimNote,
+	isFlatClaim,
+} from "./claims"
 
 const PROFILE: TaxProfile = {
 	tax: "th-2026",
@@ -120,5 +127,27 @@ describe("who the cards say the flat claims are", () => {
 			label: "The earlier holder",
 			subject: "the earlier holder",
 		})
+	})
+})
+
+describe("the flat claims a swapped holder must not write", () => {
+	test("names every count and amount but the shared interest, which is sent as shared=", () => {
+		expect(FLAT_CLAIM_KEYS).toContain("lifeInsurance")
+		expect(FLAT_CLAIM_KEYS).toContain("parents")
+		expect(FLAT_CLAIM_KEYS).not.toContain("sharedMortgageInterest")
+		expect(isFlatClaim("filingStatus")).toBe(false)
+		expect(isFlatClaim("sharedMortgageInterest")).toBe(false)
+	})
+
+	test("says why the controls wait, in the household's words and with the plan's command", () => {
+		const people = personNames(SWAPPED)
+		const claimant = flatClaimant(PROFILE, SWAPPED, people)
+		if (claimant === null) throw new Error("the swap names the recorded partner")
+		expect(flatClaimNote(claimant, "base")).toBe(
+			"These claims are still recorded under your partner. Run `traj scenario tax base --from-stored` to record them under each person, then edit them here.",
+		)
+		const gone = flatClaimant({ ...PROFILE, claimsHolder: "gone" }, HOUSEHOLD, people)
+		if (gone === null) throw new Error("the departed holder is named")
+		expect(flatClaimNote(gone, "base")).toContain("recorded under the earlier holder.")
 	})
 })

@@ -45,6 +45,17 @@ function moneyCell(amount: number): ClaimCell {
 	return { value: `${digits} THB`, amount: { digits, after: " THB" } }
 }
 
+/**
+ * The profile items whose bare value names the household's holder rather than a person: every claim but the shared
+ * interest, which is sent as `shared=`. A holder swap leaves these on the earlier holder until `--from-stored` runs.
+ */
+export const FLAT_CLAIM_KEYS: readonly string[] = CLAIM_FIELDS.map((field) => field.key)
+
+/** Whether a profile item is a flat claim, whose bare value a swapped holder would write to the new holder. */
+export function isFlatClaim(key: string): boolean {
+	return FLAT_CLAIM_KEYS.includes(key)
+}
+
 /** What one Return states for one allowance: a count as it is, an amount in baht, and "None" for zero or absent. */
 function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: ClaimField): ClaimCell {
 	const value = claims?.[field.key]
@@ -105,4 +116,12 @@ export function flatClaimant(
 	const holder = household?.people.find((person) => person.role === "holder")?.id
 	if (recorded === undefined || holder === undefined || recorded === holder) return null
 	return people.get(recorded) ?? { label: "The earlier holder", subject: "the earlier holder" }
+}
+
+/**
+ * Why the page waits before it changes the flat claims of a swapped holder, in the person's own words: they are still
+ * recorded under the claimant, and `--from-stored` moves them to each Return before an edit can name the right person.
+ */
+export function flatClaimNote(claimant: PersonName, plan: string): string {
+	return `These claims are still recorded under ${claimant.subject}. Run \`traj scenario tax ${plan} --from-stored\` to record them under each person, then edit them here.`
 }

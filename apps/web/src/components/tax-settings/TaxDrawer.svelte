@@ -20,6 +20,9 @@ interface Props {
 	unlabelled: readonly string[]
 	/** Whether the household names a partner and Owners, which `traj` needs for a `shared=` field; with none, it offers no field. */
 	sharedClaimable?: boolean
+	/** True after a holder swap, when a flat claim's field waits for `--from-stored`, and `flatClaimNote` says why. */
+	flatClaimsLocked?: boolean
+	flatClaimNote?: string
 	onClose: () => void
 }
 
@@ -32,6 +35,8 @@ let {
 	group,
 	unlabelled,
 	sharedClaimable = true,
+	flatClaimsLocked = false,
+	flatClaimNote = "",
 	onClose,
 }: Props = $props()
 const title = $derived.by(() => {
@@ -47,8 +52,11 @@ const title = $derived.by(() => {
 		<p role="status" class="text-sm text-foreground">The plan changed since you opened this form, so it shows the stored profile again. Enter your change again.</p>
 	{/if}
 	{#if open}
+		{#if flatClaimsLocked && flatClaimNote !== ""}
+			<p class="text-sm text-foreground">{flatClaimNote}</p>
+		{/if}
 		{#key contentHash}
-			<TaxProfileForm {name} {contentHash} {profile} {group} {unlabelled} {sharedClaimable} onDone={onClose} />
+			<TaxProfileForm {name} {contentHash} {profile} {group} {unlabelled} {sharedClaimable} {flatClaimsLocked} onDone={onClose} />
 		{/key}
 	{/if}
 </Drawer>

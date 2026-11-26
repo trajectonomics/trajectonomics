@@ -23,6 +23,8 @@ interface Props {
 	unlabelled?: readonly string[]
 	/** The plan's household names a partner and Owners, so a separate draft may state the shared home-loan interest. */
 	sharedClaimable?: boolean
+	/** True after a holder swap: every flat claim's field waits for `--from-stored`. */
+	flatClaimsLocked?: boolean
 	onDone: () => void
 }
 
@@ -33,6 +35,7 @@ let {
 	group = null,
 	unlabelled = [],
 	sharedClaimable = true,
+	flatClaimsLocked = false,
 	onDone,
 }: Props = $props()
 const unstored = () => profile === null
@@ -84,15 +87,15 @@ async function save(event: SubmitEvent): Promise<void> {
 			State the whole profile. An item left empty is none, and anything an earlier write stated and you leave out is dropped. {#if keepsShared && dropWarning === null}The stored shared home-loan interest is filled in so a save keeps it.{/if}
 		</p>
 	{/if}
-	<TaxProfileFields bind:draft {shown} {visible} {sharedClaimable} />
+	<TaxProfileFields bind:draft {shown} {visible} {sharedClaimable} lockedFlat={flatClaimsLocked} />
 	{#if !merging}<TaxFlowLabels flows={unlabelled} bind:labels {shown} />{/if}
 	{#if dropWarning}<p role="status" class="text-sm text-destructive">{dropWarning}</p>{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	{#if needsWholeProfile(editSession.failure)}
-		<button type="button" class={button} onclick={() => switchTo(true)}>Set the whole profile</button>
+		<button type="button" class={button} disabled={flatClaimsLocked} onclick={() => switchTo(true)}>Set the whole profile</button>
 	{/if}
 	{#if profile !== null}
-		<button type="button" class={button} onclick={() => switchTo(merging)}>
+		<button type="button" class={button} disabled={flatClaimsLocked && merging} onclick={() => switchTo(merging)}>
 			{merging ? "State the whole profile instead" : "Change one item instead"}
 		</button>
 	{/if}

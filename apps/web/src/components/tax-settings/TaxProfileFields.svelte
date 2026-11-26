@@ -12,6 +12,8 @@ interface Props {
 	visible?: readonly string[]
 	/** Whether the household names a partner and Owners: `traj` refuses `shared=` with no such pair. */
 	sharedClaimable?: boolean
+	/** True after a holder swap: every flat claim waits for `--from-stored`; the shared interest is not one. */
+	lockedFlat?: boolean
 }
 
 let {
@@ -19,6 +21,7 @@ let {
 	shown,
 	visible = TAX_FLAG_KEYS,
 	sharedClaimable = true,
+	lockedFlat = false,
 }: Props = $props()
 const choices = [{ value: "", label: "Choose a filing status" }, ...FILING_CHOICES]
 const counts = $derived(COUNT_FIELDS.filter((field) => visible.includes(field.key)))
@@ -35,11 +38,11 @@ const amounts = $derived(
 	<Field id="tax-filing-status" label="Filing status" options={choices} bind:value={draft.filingStatus} problem={shown.at("filingStatus")} />
 {/if}
 {#each counts as field (field.key)}
-	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="numeric" bind:value={draft[field.key]} problem={shown.at(field.key)} />
+	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="numeric" bind:value={draft[field.key]} problem={shown.at(field.key)} disabled={lockedFlat} />
 {/each}
 {#if amounts.length > 0}
 	<p class="text-sm text-muted-foreground">Amounts are what you paid in the tax year, in baht.</p>
 {/if}
 {#each amounts as field (field.key)}
-	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" bind:value={draft[field.key]} problem={shown.at(field.key)} />
+	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" bind:value={draft[field.key]} problem={shown.at(field.key)} disabled={lockedFlat && field.key !== "sharedMortgageInterest"} />
 {/each}
