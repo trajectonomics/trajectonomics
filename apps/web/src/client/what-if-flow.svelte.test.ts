@@ -23,6 +23,56 @@ const LEVEL = {
 	growth: "inflation",
 }
 
+describe("trying a field the stored Flow lacks", () => {
+	const RENT = {
+		id: "rent",
+		kind: "expense",
+		frequency: "monthly",
+		start: "2026-11-01",
+		amount: "5000.00",
+	}
+	for (const [field, value] of [
+		["end", "2030-01-01"],
+		["category", "housing"],
+		["displayLabel", "Rent"],
+	] as const) {
+		test(`a first ${field} is one Set of the whole Flow`, () => {
+			whatIfSession.tryItem("base", HASH, "flows", "rent", RENT, { ...RENT, [field]: value })
+			expect(whatIfSession.whatIf?.sets).toEqual([
+				{ path: "flows.rent", value: { ...RENT, [field]: value } },
+			])
+		})
+	}
+
+	test("a whole-item Set clears a field the form cleared, so nothing is reported as untried", () => {
+		const stored = { ...RENT, category: "housing" }
+		const edited = { ...RENT, end: "2030-01-01" }
+		expect(whatIfSession.tryItem("base", HASH, "flows", "rent", stored, edited)).toEqual([])
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.rent", value: edited }])
+	})
+})
+
+describe("switching a Flow off", () => {
+	test("drops its try, so no Set of a removed Flow is left for traj to refuse", () => {
+		whatIfSession.tryFlow("base", HASH, { stored: STORED, edited: LEVEL })
+		expect(whatIfSession.whatIf?.sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
+		whatIfSession.setOff("base", HASH, "flows.retirement-spending", true)
+		expect(whatIfSession.whatIf?.sets).toEqual([])
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.retirement-spending"])
+	})
+
+	test("takes a salary's employer share with it, and a switch back on leaves the share switched off", () => {
+		expect(
+			whatIfSession.setOff("base", HASH, "flows.salary", true, ["flows.salary-employer"]),
+		).toBe(true)
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.salary", "flows.salary-employer"])
+		whatIfSession.setOff("base", HASH, "flows.salary", false)
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.salary-employer"])
+	})
+})
+
 describe("trying a spending Flow as a what-if", () => {
 	test("a Flow the plan does not hold is an Addition", () => {
 		expect(whatIfSession.tryFlow("base", HASH, { stored: undefined, edited: STORED })).toBe(true)

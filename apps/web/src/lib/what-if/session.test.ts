@@ -9,6 +9,7 @@ import {
 	startWhatIf,
 	switchedOff,
 	switchedOn,
+	withAddition,
 	withoutSet,
 	withSet,
 } from "./session"
@@ -39,6 +40,16 @@ describe("the What-if session", () => {
 			{ path: "flows.salary.amount", value: "95000.00" },
 			{ path: "flows.gym.amount", value: "120.00" },
 		])
+	})
+
+	test("switching an item off drops its try and its Addition, which traj would refuse beside the Removal", () => {
+		let session = withSet(startWhatIf("base", HASH), "flows.gym.amount", "1")
+		session = withSet(session, "flows.gym", { id: "gym", amount: "2" })
+		session = withAddition(session, { list: "flows", item: { id: "gym", amount: "3" } })
+		session = switchedOff(session, "flows.gym")
+		expect(session.sets).toEqual([])
+		expect(session.additions).toEqual([])
+		expect(session.removals).toEqual(["flows.gym"])
 	})
 
 	test("dropping a Set leaves the others, and a Removal is not a Set", () => {

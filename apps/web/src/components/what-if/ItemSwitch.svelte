@@ -8,20 +8,23 @@ interface Props {
 	contentHash: string
 	/** The item's path, such as `flows.gym`: a switch off is a Removal of it. */
 	path: string
+	/** Other paths that switch off with this one: a salary's employer share is a Flow of its own (`UNKNOWN_FLOW` otherwise). */
+	also?: string[]
 	/** The item's id, which names the switch to a screen reader. */
 	label: string
 	/** Opens the item's drawer in what-if mode, where a value is tried rather than saved. */
 	onTry: () => void
 }
 
-let { plan, contentHash, path, label, onTry }: Props = $props()
+let { plan, contentHash, path, also = [], label, onTry }: Props = $props()
 const off = $derived(whatIfSession.isOffIn(plan, path))
 const button =
 	"rounded-md border border-border bg-card px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
 /** Makes the change the switch asks for; a refused one (another plan holds changes) puts the switch back. */
 function change(control: HTMLInputElement): void {
-	if (!whatIfSession.setOff(plan, contentHash, path, !control.checked)) restoreSwitch(control, !off)
+	if (!whatIfSession.setOff(plan, contentHash, path, !control.checked, also))
+		restoreSwitch(control, !off)
 }
 </script>
 

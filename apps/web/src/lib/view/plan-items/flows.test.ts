@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
 import { planDocument } from "./fixtures.test-support"
+import { switchPathsOf } from "./flow-switch"
 import { flowCards, flowDraftOf } from "./flows"
 
 describe("flowCards", () => {
@@ -20,6 +21,7 @@ describe("flowCards", () => {
 			earned: "Earned",
 			category: null,
 			employer: null,
+			employerId: null,
 			editable: true,
 		})
 		expect(cards[1]?.earned).toBe("Passive")
@@ -86,6 +88,40 @@ describe("flowCards of a once Flow", () => {
 		})
 		const [card] = flowCards([rent], "expense")
 		expect(card).toMatchObject({ startLabel: "Starts", start: "2026-11-01", end: "2030-01-01" })
+	})
+})
+
+describe("flowCards with an employer share", () => {
+	test("a salary's card names the employer Flow whose switch follows it", () => {
+		const flows = planDocument().flows
+		const salary = flows.find((flow) => flow.id === "salary")
+		if (salary === undefined) throw new Error("the fixture has a salary")
+		const employer = scenarioFlow.parse({
+			id: "salary-employer",
+			kind: "contribution",
+			target: "fund",
+			funding: "employer",
+			frequency: "monthly",
+			start: "2026-11-01",
+			derive: {
+				measures: [
+					{ id: "pay", op: "flow", flow: "salary" },
+					{ id: "share", op: "scale", of: "pay", num: 500, den: 10000, rounding: "floor" },
+				],
+				result: "share",
+			},
+		})
+		const [card] = flowCards([salary], "income", null, [salary, employer])
+		expect(card?.employer).not.toBeNull()
+		expect(card?.employerId).toBe("salary-employer")
+		expect(switchPathsOf(card ?? { id: "salary", employerId: null })).toEqual([
+			"flows.salary",
+			"flows.salary-employer",
+		])
+	})
+
+	test("a Flow with no share has only its own path", () => {
+		expect(switchPathsOf({ id: "pension", employerId: null })).toEqual(["flows.pension"])
 	})
 })
 

@@ -1,7 +1,7 @@
 import type { Json } from "./json"
 import {
 	clearedFields,
-	itemSets,
+	triedItemSets,
 	type WhatIf,
 	withAddition,
 	withoutItemChanges,
@@ -12,6 +12,11 @@ import {
 export interface TriedFlow {
 	readonly stored: Record<string, Json> | undefined
 	readonly edited: Record<string, Json> & { id: string }
+}
+
+/** The session with each of `sets` put in, in order. */
+function setEach(whatIf: WhatIf, sets: readonly { path: string; value: Json }[]): WhatIf {
+	return sets.reduce((one, set) => withSet(one, set.path, set.value), whatIf)
 }
 
 /**
@@ -28,15 +33,8 @@ export function withTriedItem(
 ): WhatIf {
 	const base = withoutItemChanges(whatIf, list, edited.id)
 	if (stored === undefined) return withAddition(base, { list, item: edited })
-	const fieldSets =
-		clearedFields(stored, edited).length === 0 &&
-		Object.keys(edited).every((field) => field in stored)
-	if (fieldSets)
-		return itemSets(list, edited.id, stored, edited).reduce(
-			(one, set) => withSet(one, set.path, set.value),
-			base,
-		)
-	return withSet(base, `${list}.${edited.id}`, edited)
+	if (clearedFields(stored, edited).length > 0) return withSet(base, `${list}.${edited.id}`, edited)
+	return setEach(base, triedItemSets(list, edited.id, stored, edited))
 }
 
 /** The session with a Flow tried in it (`withTriedItem`). */

@@ -170,4 +170,22 @@ describe("a second try on a Flow starts from the session", () => {
 		await tryLiving({})
 		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(true)
 	})
+
+	test("a tried Flow switched off drops its try, reopens on the stored values, and an edited try switches it back on", async () => {
+		await tryLiving({ amount: "31000.00" })
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+		whatIfSession.setOff("base", HASH, "flows.living", true)
+		// The switch takes the try with it: `traj` refuses a Set of a Flow a Removal took out, so the bar has no refusal.
+		expect(whatIfSession.whatIf?.sets).toEqual([])
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.living"])
+		// Reopened on the stored Flow, which the session no longer shows: a try with no edits leaves it off.
+		expect(draftOf("living", {}).amount).toBe("30000.00")
+		await tryLiving({})
+		expect(whatIfSession.whatIf?.sets).toEqual([])
+		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(true)
+		// An edited try is a change, so it drops the switch and switches the Flow back on.
+		await tryLiving({ amount: "31000.00" })
+		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(false)
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+	})
 })
