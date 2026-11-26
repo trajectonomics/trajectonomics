@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioAccount } from "../../contract"
 import { scenarioAccount } from "../../contract"
+import { itemNames } from "../item-names"
 import { NO_INCOME_CONTEXT } from "./account-income"
 import { accountLifetimesOf, accountYears } from "./account-years"
 import { accountCards } from "./accounts"
@@ -27,16 +28,29 @@ describe("the Account card", () => {
 
 	test("reads 'Pays out 3.5% a year from retire' and 'Fee 1.5% a year', with how it is paid", () => {
 		const card = read(fund(PAYS))
-		expect(card?.payout).toBe("Pays out 3.5% a year from retire")
+		expect(card?.payout?.text).toBe("Pays out 3.5% a year from retire")
 		expect(card?.payoutHow).toBe("Paid quarterly, counted as dividends")
 		expect(card?.fee).toBe("Fee 1.5% a year")
+	})
+
+	test("a payout that starts at a Milestone reads the name the plan states, or its id", () => {
+		const names = itemNames(new Map(), null, {
+			currency: "THB",
+			accounts: [],
+			flows: [],
+			milestones: [{ id: "retire", displayLabel: "Retirement" }],
+		})
+		expect(accountCards([fund(PAYS)], baselineRead(), undefined, names)[0]?.payout?.text).toBe(
+			"Pays out 3.5% a year from Retirement",
+		)
+		expect(read(fund(PAYS))?.payout?.text).toBe("Pays out 3.5% a year from retire")
 	})
 
 	test("a payout from a date says the date, and an Account with neither says nothing", () => {
 		const dated = fund({
 			payout: { bps: "4.00", frequency: "semiannual", rounding: "floor", start: "2030-01-01" },
 		})
-		expect(read(dated)?.payout).toBe("Pays out 4% a year from 1 Jan 2030")
+		expect(read(dated)?.payout?.text).toBe("Pays out 4% a year from 1 Jan 2030")
 		expect(read(dated)?.payoutHow).toBe("Paid twice a year")
 		expect(read(doc.accounts[0] as ScenarioAccount)).toMatchObject({
 			payout: null,

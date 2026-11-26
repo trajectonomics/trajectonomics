@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { formatMoney } from "../../format"
 import { startWhatIf } from "../../what-if/session"
+import { itemNames } from "../item-names"
 import { documentWith, sessionWith } from "./change"
 import { planWith } from "./fixtures.test-support"
 import { transferFromDraft } from "./transfer-build"
@@ -25,8 +26,10 @@ const make = (
 	draft: typeof blank,
 	existing?: Parameters<typeof transferFromDraft>[1]["existing"],
 ) => transferFromDraft(draft, { existing, taken: ["transfer"], ctx })
-const said = (flow: Parameters<typeof transferWords>[0]) =>
-	plainText(transferWords(flow, NAMES), formatMoney)
+const said = (
+	flow: Parameters<typeof transferWords>[0],
+	items?: Parameters<typeof transferWords>[2],
+) => plainText(transferWords(flow, NAMES, items), formatMoney)
 
 describe("a transfer in its drawer writes what the schema accepts", () => {
 	test("all of an account on a date: a derive that reads the source, once, no realise key", () => {
@@ -96,6 +99,15 @@ describe("a transfer in its drawer writes what the schema accepts", () => {
 		expect(real.flow).toMatchObject({ growth: "inflation", realise: true })
 		expect(said(real.flow)).toBe(
 			"Move 5,000 in today's money from Savings to Fixed deposit when retire fires",
+		)
+		const names = itemNames(new Map(), null, {
+			currency: "THB",
+			accounts: [],
+			flows: [],
+			milestones: [{ id: "retire", displayLabel: "Retirement" }],
+		})
+		expect(said(flat.flow, names)).toBe(
+			"Move 5,000 from Savings to Fixed deposit when Retirement fires",
 		)
 	})
 

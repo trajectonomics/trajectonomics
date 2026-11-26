@@ -1,16 +1,15 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
 import { deleteFlow, saveFlow } from "../../client/flow-save.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
-import { employerOf, employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
-import { employerDraftOf } from "../../lib/view/plan-items/employer-draft"
-import { flowDraftForTry } from "../../lib/view/plan-items/flow-try-draft"
+import { employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
+import { flowFormStart } from "../../lib/view/plan-items/flow-try-draft"
 import { categoriesOf, type FlowKind } from "../../lib/view/plan-items/flows"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { namedRefusal } from "../../lib/view/plan-items/refusal"
-import { shownFlows } from "../../lib/what-if/routing"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import TryNotice from "./TryNotice.svelte"
@@ -43,14 +42,9 @@ let {
 	tryValue = false,
 }: Props = $props()
 const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
-/** The plan's Flows as the form starts from them: as the session shows them, added Flows too, so a new try carries the earlier ones. */
-const startFlows = () => (tryValue ? shownFlows(doc, whatIfSession.whatIf, name) : doc.flows)
-const initial = () => flowDraftForTry(startFlows(), existing?.id, existing)
-let draft = $state(initial())
-/** What the employer adds on top of a salary: nothing until the person fills it in. */
-const initialEmployer = () =>
-	employerDraftOf(existing === undefined ? null : employerOf(startFlows(), existing.id))
-let employer = $state(initialEmployer())
+const start = () => flowFormStart(doc, name, existing, tryValue, whatIfSession.whatIf)
+let draft = $state(start().draft)
+let employer = $state(start().employer)
 let problems: Problems = $state({})
 /** The fields a tried value cleared, which a what-if cannot hold. */
 let cleared: string[] = $state([])
@@ -98,7 +92,7 @@ async function remove(): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : `Add ${kind}`}>
 	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
 	<TryNotice fields={cleared} />
 	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />

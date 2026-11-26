@@ -4,15 +4,11 @@
  */
 import { formatBps, percentWords } from "../../format"
 import { type AccountNames, nameOf } from "../account-names"
+import type { Part } from "../words"
 import { amountOf, type Entry, entryAccount, isReal, type Step, type Target } from "./entries"
 
-/** A piece of a sentence: words, or a money amount the page formats and masks. */
-export type Part = string | { readonly amount: string }
-
-/** A sentence's text with each amount grouped, for a label a screen reader or a test reads. */
-export function plainText(parts: readonly Part[], money: (amount: string) => string): string {
-	return parts.map((part) => (typeof part === "string" ? part : money(part.amount))).join("")
-}
+export type { Part } from "../words"
+export { plainText } from "../words"
 
 /** " in today's money" for a target that keeps its value, else nothing. */
 function realWords(target: Target | undefined): string {
