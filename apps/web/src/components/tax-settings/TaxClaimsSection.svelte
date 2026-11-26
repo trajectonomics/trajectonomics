@@ -1,6 +1,7 @@
 <script lang="ts">
-import { type PersonName, type PersonNames, personText } from "../../lib/view/item-names"
+import type { PersonName, PersonNames } from "../../lib/view/item-names"
 import type { ClaimsTable } from "../../lib/view/tax-settings/claims"
+import { ANOTHER_PERSON_LABEL } from "../../lib/view/tax-settings/flat-claims"
 import MaskedAmount from "../ui/MaskedAmount.svelte"
 
 interface Props {
@@ -14,9 +15,12 @@ interface Props {
 }
 
 let { table, people, claimant = null, claimantId = null }: Props = $props()
+/** Each column's words: the recorded holder's, the household's, or "Another person" for an id it no longer names. */
 const columns = $derived(
 	table.people.map((person) =>
-		person === claimantId && claimant !== null ? claimant.label : personText(people, person),
+		person === claimantId && claimant !== null
+			? claimant.label
+			: (people.get(person)?.label ?? ANOTHER_PERSON_LABEL),
 	),
 )
 </script>
