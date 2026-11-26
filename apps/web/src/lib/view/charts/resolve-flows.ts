@@ -1,5 +1,6 @@
 import type { ProjectionRun } from "../../contract"
 import { lineKey, lineLabel } from "../cashflow/cashflow-labels"
+import { type ItemNames, itemNames } from "../item-names"
 import { annualRowsOf } from "../projection/annual"
 import type { Resolved } from "./types"
 import { periodsOf, pointAt } from "./year"
@@ -15,11 +16,11 @@ const PREFIX = {
 /** The cash-flow line's id and name, which is the same for every year it appears in. */
 function lineHeader(
 	line: Parameters<typeof lineKey>[0] & { group: string },
-	accountNames: ReadonlyMap<string, string>,
+	names: ItemNames,
 ): { id: string; name: string } | null {
 	const prefix = PREFIX[line.group as keyof typeof PREFIX]
 	if (prefix === undefined) return null
-	return { id: `cash:${lineKey(line)}`, name: `${prefix}: ${lineLabel(line, accountNames)}` }
+	return { id: `cash:${lineKey(line)}`, name: `${prefix}: ${lineLabel(line, names)}` }
 }
 
 /** The cash-flow lines by Flow and by category, each as one series that follows its line from year to year. */
@@ -27,12 +28,13 @@ export function cashflowFigures(
 	run: ProjectionRun,
 	accountNames: ReadonlyMap<string, string>,
 ): Resolved[] {
+	const names = itemNames(accountNames, null)
 	const ends = new Map(annualRowsOf(run).map((row) => [row.index, row.to]))
 	const periods = periodsOf(run)
 	const byKey = new Map<string, Resolved & { nominal: Resolved["nominal"][number][] }>()
 	const lines = run.tables.flatMap((table) => (table.name === "cashflow" ? table.rows : []))
 	for (const line of lines) {
-		const head = lineHeader(line, accountNames)
+		const head = lineHeader(line, names)
 		const end = ends.get(line.index)
 		if (head === null || end === undefined) continue
 		const found = byKey.get(head.id) ?? {

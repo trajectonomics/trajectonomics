@@ -1,6 +1,19 @@
 import { expect, test } from "@playwright/test"
 import { chooseBeforeLoad, settle } from "./demo"
-import { expectNoSidewaysScroll, LONG, longFlow, serve, VIEWPORT } from "./long-labels"
+import { expectNoSidewaysScroll, LONG, longFlow, longFlows, serve, VIEWPORT } from "./long-labels"
+
+test("Cash flow and Withdrawals name an 80-character Flow and stay 360px wide", async ({
+	page,
+}) => {
+	await page.setViewportSize(VIEWPORT)
+	await serve(page, await longFlows(page))
+	await chooseBeforeLoad(page, { theme: "light" })
+	for (const path of ["/cash-flow/", "/optimize/withdrawals/"]) {
+		await page.goto(path)
+		await settle(page, "light")
+		await expectNoSidewaysScroll(page)
+	}
+})
 
 // The Edit controls are drawn only while a server answers a session, and never for the Demo snapshot, so this
 // serves the patched Snapshot as the person's own and fakes only the token: the page renders its Change control,

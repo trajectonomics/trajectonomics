@@ -1,16 +1,20 @@
 import { describe, expect, test } from "bun:test"
 import { layoutFlow } from "../../chart/flow"
 import { layoutStack } from "../../chart/flow-stack"
+import { itemNames } from "../item-names"
 import type { CashflowLine } from "./cashflow"
 import { rollupsOf, sectionsOf } from "./cashflow"
 import { flowOf } from "./cashflow-flow"
 import { lineLabel, rowKeyOf } from "./cashflow-labels"
 import { cashflowRunFixture } from "./fixtures.test-support"
 
-const NAMES = new Map([
-	["fund", "Dividend fund"],
-	["pension", "Provident fund"],
-])
+const NAMES = itemNames(
+	new Map([
+		["fund", "Dividend fund"],
+		["pension", "Provident fund"],
+	]),
+	null,
+)
 
 const line = (
 	group: CashflowLine["group"],

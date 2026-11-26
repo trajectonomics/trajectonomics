@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { LABEL_HALF, layoutFlow } from "../../chart/flow"
 import type { ProjectionRun, Read } from "../../contract"
+import { itemNames } from "../item-names"
 import { projectionRunFixture } from "../projection/fixtures.test-support"
 import { chooseRollup, hasCashflow, pickedKey, rollupsOf, sectionsOf, yearLabel } from "./cashflow"
 import { flowOf } from "./cashflow-flow"
@@ -13,6 +14,8 @@ const ACCOUNTS = new Map([
 	["acc-fund", "Fund"],
 	["acc-bank", "Bank"],
 ])
+
+const NAMES = itemNames(ACCOUNTS, null)
 
 describe("hasCashflow", () => {
 	test("a run with the cash flow table has it, and one without does not", () => {
@@ -124,7 +127,7 @@ describe("sectionsOf", () => {
 
 describe("flowOf", () => {
 	test("a normal year draws income, the borrowed and drawn money, a refund, and the uses on the right", () => {
-		const flow = flowOf(rollupsOf(cashflowRunFixture())[0] ?? fail(), ACCOUNTS)
+		const flow = flowOf(rollupsOf(cashflowRunFixture())[0] ?? fail(), NAMES)
 		expect(flow.sources.map((band) => [band.kind, band.label, band.amount])).toEqual([
 			["income", "salary", "120000.00"],
 			["withdrawal", "borrow from Car loan", "3000.00"],
@@ -144,7 +147,7 @@ describe("flowOf", () => {
 	})
 
 	test("a Shortfall year draws its unmet money as a source, and no use for it", () => {
-		const flow = flowOf(rollupsOf(cashflowRunFixture())[1] ?? fail(), ACCOUNTS)
+		const flow = flowOf(rollupsOf(cashflowRunFixture())[1] ?? fail(), NAMES)
 		expect(flow.sources.map((band) => [band.kind, band.amount])).toEqual([
 			["income", "1000.00"],
 			["unmet", "500.00"],
@@ -154,7 +157,7 @@ describe("flowOf", () => {
 
 	test("every label of each year's diagram lies inside the diagram's box", () => {
 		for (const rollup of rollupsOf(cashflowRunFixture())) {
-			const layout = layoutFlow(flowOf(rollup, ACCOUNTS))
+			const layout = layoutFlow(flowOf(rollup, NAMES))
 			for (const node of layout.nodes) {
 				expect(node.labelY - LABEL_HALF).toBeGreaterThanOrEqual(0)
 				expect(node.labelY + LABEL_HALF).toBeLessThanOrEqual(layout.height)
@@ -164,7 +167,7 @@ describe("flowOf", () => {
 
 	test("a band's key is its line's key, so a table row can name the band it shows", () => {
 		const rollup = rollupsOf(cashflowRunFixture())[0] ?? fail()
-		const flow = flowOf(rollup, ACCOUNTS)
+		const flow = flowOf(rollup, NAMES)
 		const keys = new Set(
 			rollup.lines.map((line) =>
 				JSON.stringify([line.group, line.id, line.account, line.category]),
@@ -180,8 +183,8 @@ describe("labels", () => {
 			(entry) => entry.group === "contribution",
 		)
 		if (line === undefined) throw new Error("a contribution line")
-		expect(lineLabel(line, ACCOUNTS)).toBe("invest into Investments")
-		expect(lineLabel(line, new Map())).toBe("invest into acc-invest")
+		expect(lineLabel(line, NAMES)).toBe("invest into Investments")
+		expect(lineLabel(line, itemNames(new Map(), null))).toBe("invest into acc-invest")
 	})
 
 	test("a year's label gives its span, its ages, and a mark for a partial year", () => {

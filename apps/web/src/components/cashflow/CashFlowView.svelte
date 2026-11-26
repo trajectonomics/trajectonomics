@@ -1,5 +1,5 @@
 <script lang="ts">
-import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionRun, Read } from "../../lib/contract"
 import { hasCashflow } from "../../lib/view/cashflow/cashflow"
@@ -26,7 +26,7 @@ interface Props {
 let { names: planNames, projections, scenario, year, onYear }: Props = $props()
 const name = $derived(chooseScenario(planNames, scenario))
 const read = $derived(name === null ? undefined : projections[name])
-const names = $derived(currentAccountNames())
+const names = $derived(currentItemNames())
 </script>
 
 {#if name === null || read === undefined}
@@ -44,7 +44,7 @@ const names = $derived(currentAccountNames())
 		{#if lens}<CashFlowWhatIf {lens} baseline={read.ok ? read.data : null} {year} />{/if}
 		<ReadView {read} label={`Cash flow of ${name}`}>
 			{#snippet children(run)}
-				<CashFlowBody {run} {year} {onYear} accountNames={names} />
+				<CashFlowBody {run} {year} {onYear} {names} />
 			{/snippet}
 		</ReadView>
 	</div>

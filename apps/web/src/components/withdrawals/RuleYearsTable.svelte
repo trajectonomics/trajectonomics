@@ -1,4 +1,5 @@
 <script lang="ts">
+import { type ItemNames, itemText } from "../../lib/view/item-names"
 import type { Terms } from "../../lib/view/projection/terms"
 import type { RuleYearRow, RuleYears } from "../../lib/view/withdrawals/years"
 import Badge from "../ui/Badge.svelte"
@@ -10,10 +11,12 @@ interface Props {
 	rule: RuleYears
 	currency: string
 	terms: Terms
+	/** The plan's names by id, for the caption naming the rule Flow. */
+	names: ItemNames
 }
 
 /** What one rule pays in each of its years: the amount it fixed, what was paid, its share of the savings and why. */
-let { rule, currency, terms }: Props = $props()
+let { rule, currency, terms, names }: Props = $props()
 
 const columns: Column<RuleYearRow>[] = [
 	{ key: "from", header: "Year from", cell: from },
@@ -44,4 +47,4 @@ const columns: Column<RuleYearRow>[] = [
 	{#if row.marked}<Badge tone="accent">{row.action}</Badge>{:else}{row.action}{/if}
 {/snippet}
 
-<DataTable caption={`${rule.flow}, each year in ${currency}`} {columns} rows={rule.rows} rowKey={(row) => row.key} />
+<DataTable caption={`${itemText(names, "flow", rule.flow)}, each year in ${currency}`} {columns} rows={rule.rows} rowKey={(row) => row.key} />
