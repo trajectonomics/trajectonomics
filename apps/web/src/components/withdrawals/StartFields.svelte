@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemText } from "../../client/item-names.svelte"
 import type { ScenarioFlow } from "../../lib/contract"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import type { WithdrawalDraft } from "../../lib/view/withdrawals/draft"
@@ -22,7 +23,7 @@ interface Props {
 let { draft = $bindable(), shown, milestones, plan, anchor, stoppable }: Props = $props()
 const choices = $derived([
 	{ value: "", label: "Choose a Milestone" },
-	...milestones.map((id) => ({ value: id, label: id })),
+	...milestones.map((id) => ({ value: id, label: currentItemText("milestone", id) })),
 ])
 </script>
 

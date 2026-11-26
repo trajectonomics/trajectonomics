@@ -31,31 +31,58 @@ function labelOf(key: string, label: string, claimant: PersonName | null): strin
 	return claimant === null ? label : (YOURS[key]?.(claimant) ?? label)
 }
 
+/** What the profile states at a key, or undefined when it states nothing. */
+function statedIn(profile: TaxProfile, key: string): number | undefined {
+	return (profile as Record<string, unknown>)[key] as number | undefined
+}
+
+/** An amount in baht, said to be kept and unclaimed when no Return of the plan claims the shared interest. */
+function amountValue(key: string, amount: number | undefined, sharedClaimed: boolean): string {
+	if (amount === undefined) return "None"
+	const value = `${groupDigits(amount)} THB`
+	return key === "sharedMortgageInterest" && !sharedClaimed
+		? `${value} (kept, not claimed by this Return)`
+		: value
+}
+
+/** The amount rows: the shared row only where the separate filing shows one or the profile stores it. */
+function amountRows(
+	profile: TaxProfile,
+	claimant: PersonName | null,
+	sharedClaimed: boolean,
+): ProfileRow[] {
+	return AMOUNT_FIELDS.flatMap(({ key, label }) => {
+		const amount = statedIn(profile, key)
+		if (key === "sharedMortgageInterest" && profile.filingStatus !== "married_separate") {
+			if (amount === undefined) return []
+		}
+		return [
+			{ key, label: labelOf(key, label, claimant), value: amountValue(key, amount, sharedClaimed) },
+		]
+	})
+}
+
 /**
  * The filing status, then each count and amount; an item the profile does not state, or states as zero, reads "None".
- * `claimant` names the person whose claims the flat keys are, when that is not the household's holder.
+ * `claimant` names the person whose claims the flat keys are, when that is not the household's holder, and
+ * `sharedClaimed` says whether a Return of the plan claims the stored shared home-loan interest.
  */
-export function profileRows(profile: TaxProfile, claimant: PersonName | null = null): ProfileRow[] {
-	const stated = (key: string): number | undefined =>
-		(profile as Record<string, unknown>)[key] as number | undefined
+export function profileRows(
+	profile: TaxProfile,
+	claimant: PersonName | null = null,
+	sharedClaimed = profile.filingStatus === "married_separate",
+): ProfileRow[] {
 	return [
 		{ key: "filingStatus", label: "Filing status", value: filingLabel(profile.filingStatus) },
 		...COUNT_FIELDS.map(({ key, label }) => {
-			const counted = stated(key)
+			const counted = statedIn(profile, key)
 			return {
 				key,
 				label: labelOf(key, label, claimant),
 				value: counted === undefined || counted === 0 ? "None" : String(counted),
 			}
 		}),
-		...AMOUNT_FIELDS.map(({ key, label }) => {
-			const amount = stated(key)
-			return {
-				key,
-				label: labelOf(key, label, claimant),
-				value: amount === undefined ? "None" : `${groupDigits(amount)} THB`,
-			}
-		}),
+		...amountRows(profile, claimant, sharedClaimed),
 	]
 }
 

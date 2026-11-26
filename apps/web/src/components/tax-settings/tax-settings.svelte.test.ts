@@ -144,7 +144,7 @@ describe("the tax profile form", () => {
 
 	test("a plan with no profile starts with nothing filled in and asks for the filing status", () => {
 		const body = form(null)
-		expect(body).toContain("Nothing is filled in for you")
+		expect(body).toContain("State the whole profile. An item left empty is none")
 		expect(body).not.toMatch(/<input[^>]*value="[^"]/)
 		expect(body).toContain("Choose a filing status")
 		expect(body).not.toContain("instead")

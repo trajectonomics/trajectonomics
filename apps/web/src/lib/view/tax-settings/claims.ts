@@ -78,16 +78,19 @@ export function claimsTable(
 }
 
 /**
- * The person whose claims the profile's flat keys are, when a holder swap left them recorded for the other person: the
- * cards then name them instead of saying "you". Null while the flat keys are the household's holder's own.
+ * The person whose claims the profile's flat keys are, when a separate filing's holder swap left them recorded for the
+ * other person: the cards then name them instead of saying "you". Null for a filing that keeps one Return, whose flat
+ * keys are that Return's own, and with no household holder to compare the record against. An id the household no longer
+ * names is called the earlier holder, never by its id.
  */
 export function flatClaimant(
 	profile: TaxProfile,
 	household: HouseholdDocument | null,
 	people: PersonNames,
 ): PersonName | null {
+	if (profile.filingStatus !== "married_separate") return null
 	const recorded = profile.claimsHolder
 	const holder = household?.people.find((person) => person.role === "holder")?.id
-	if (recorded === undefined || recorded === holder) return null
-	return people.get(recorded) ?? { label: recorded, subject: recorded }
+	if (recorded === undefined || holder === undefined || recorded === holder) return null
+	return people.get(recorded) ?? { label: "The earlier holder", subject: "the earlier holder" }
 }

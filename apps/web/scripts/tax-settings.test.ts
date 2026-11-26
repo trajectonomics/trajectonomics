@@ -79,6 +79,23 @@ describe("the tax profile through traj", () => {
 	)
 
 	slow(
+		"a shared interest too large lands at the shared field by the flags the form sent",
+		async () => {
+			await withProfile()
+			const big = "999999999999999"
+			const answer = await send("merge-tax", { sharedMortgageInterest: big })
+			if (answer.ok) throw new Error("the CLI took it")
+			expect(answer.error.code).toBe("invalid_input")
+			expect(answer.error.path).toBe("--mortgage-interest")
+			expect(answer.error.message).toBe("The value is outside its allowed range.")
+			expect(taxFieldOfRefusal(answer.error, { sharedMortgageInterest: big })).toBe(
+				"sharedMortgageInterest",
+			)
+			expect(taxFieldOfRefusal(answer.error, { mortgageInterest: big })).toBe("mortgageInterest")
+		},
+	)
+
+	slow(
 		"a plan with no profile is set whole, and a stale save is refused as the plan moved on",
 		async () => {
 			await send("remove-tax")

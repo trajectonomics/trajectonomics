@@ -34,6 +34,8 @@ const people = $derived(personNames(show.household))
 /** The Filers the projection states, one column each: a profile with no Filer's Levy shows no claims table. */
 const filers = $derived(returnsOf(years).map((one) => one.filer))
 const claims = $derived(profile === null ? null : claimsTable(profile, show.household, filers))
+// A shared interest only a separate filing's Filers claim: the cards say so, and the form offers no field without one.
+const sharedClaimable = $derived(claims !== null)
 /** The person whose claims the flat keys are, when a holder swap left them with the other person: the cards name them. */
 const claimant = $derived(profile === null ? null : flatClaimant(profile, show.household, people))
 // While an income Flow has no tax label `scenario tax` refuses. A plan with tax labels its Flows in the label form first; a plan
@@ -68,7 +70,7 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 	<TaxClaimsSection table={claims} {people} />
 {/if}
 {#if profile !== null}
-	<TaxGroupCards cards={groupCards(profile, claimant)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
+	<TaxGroupCards cards={groupCards(profile, claimant, sharedClaimable)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 	<TaxNotStated items={notStated(show.taxAllowances)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 {/if}
 <div class="flex flex-wrap gap-3">
@@ -77,4 +79,4 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 	{/if}
 	{#if editable && taxed}<TaxProfileRemove {name} contentHash={show.contentHash} income={incomeFlows(show.document)} disabled={wait} />{/if}
 </div>
-<TaxDrawer open={open && !trying} {name} contentHash={show.contentHash} {openedOn} {profile} {group} {unlabelled} onClose={() => showDrawer(false)} />
+<TaxDrawer open={open && !trying} {name} contentHash={show.contentHash} {openedOn} {profile} {group} {unlabelled} {sharedClaimable} onClose={() => showDrawer(false)} />

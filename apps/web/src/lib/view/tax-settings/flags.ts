@@ -1,7 +1,6 @@
 /**
- * The flags a draft of a tax profile makes ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)):
- * a change sends what differs from the profile the form opened with, a whole write what is filled. The shared interest is
- * `--mortgage-interest shared=<amount>`, on a separate filing only (cli ADR-0075). Pure.
+ * The flags a draft of a tax profile makes ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)): a change
+ * sends what differs, a whole write what is filled, and `--mortgage-interest shared=<amount>` on a separate filing only. Pure.
  */
 import type { TaxProfile } from "../../contract"
 import { AMOUNT_SHAPE, COUNT_SHAPE, type TaxFlags } from "../../edit/tax-flags"
@@ -10,10 +9,10 @@ import type { TaxDraft } from "./draft"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
 import { groupDigits } from "./rows"
 
+/** The flags a draft makes, or the problems at its fields. */
 export type TaxResult = { ok: true; flags: TaxFlags } | { ok: false; problems: Problems }
 
 const FIELDS = [...COUNT_FIELDS, ...AMOUNT_FIELDS]
-const SHARED = "sharedMortgageInterest"
 
 function shapeProblem(kind: "count" | "amount", text: string): string | undefined {
 	if (kind === "count") return COUNT_SHAPE.test(text) ? undefined : "Use whole digits, such as 2."
@@ -55,7 +54,7 @@ function sharedItem(field: TaxField, draft: TaxDraft, before: string | null): It
 
 /** One item of the draft, with the shared interest told apart from the items every status states. */
 function itemOf(field: TaxField, draft: TaxDraft, origin: TaxDraft | null): Item {
-	if (field.key !== SHARED) {
+	if (field.key !== "sharedMortgageInterest") {
 		const text = draft[field.key].trim()
 		return origin === null ? wholeItem(field, text) : changedItem(field, text, origin[field.key])
 	}
@@ -77,8 +76,7 @@ function collect(items: readonly (readonly [string, Item])[]): TaxResult {
 
 /** The flags of a change, each item whose text differs from `origin`, the draft the form opened with. Nothing changed is a problem. */
 export function mergeFlags(origin: TaxDraft, draft: TaxDraft): TaxResult {
-	const status: Item =
-		draft.filingStatus === origin.filingStatus ? null : statusItem(draft.filingStatus)
+	const status = draft.filingStatus === origin.filingStatus ? null : statusItem(draft.filingStatus)
 	const result = collect([
 		["filingStatus", status],
 		...FIELDS.map((field) => [field.key, itemOf(field, draft, origin)] as const),
@@ -97,17 +95,19 @@ export function wholeFlags(draft: TaxDraft): TaxResult {
 	])
 }
 
-/** The sentence a whole save shows when it would drop a stored shared home-loan interest, or null when it keeps it. */
+/**
+ * The sentence a whole save shows when it would drop a stored shared home-loan interest, or null when it keeps it. An
+ * all-zero amount is stated as `shared=0`, which the CLI reads as a removal, so it drops the value as an empty one does.
+ */
 export function sharedDropWarning(
 	profile: TaxProfile | null,
 	whole: boolean,
 	draft: TaxDraft,
 ): string | null {
 	const stored = profile?.sharedMortgageInterest
-	// Nothing is submitted before a filing status is chosen, and an empty status is its own problem at its field.
+	const text = draft.sharedMortgageInterest.trim()
 	if (!whole || stored === undefined || draft.filingStatus === "") return null
-	if (draft.filingStatus === "married_separate" && draft.sharedMortgageInterest.trim() !== "") {
-		return null
-	}
+	const kept = draft.filingStatus === "married_separate" && text !== "" && !/^0+(\.0*)?$/.test(text)
+	if (kept) return null
 	return `This save drops the stored shared home-loan interest of ${groupDigits(stored)} THB.`
 }

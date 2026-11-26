@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-import type { HouseholdDocument, ScenarioShow, TaxProfile } from "../../lib/contract"
+import type { HouseholdDocument, ScenarioShow, TaxProfile, TaxYear } from "../../lib/contract"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
+import { plainYear } from "../../lib/view/tax/brackets.test-support"
 import TaxDrawer from "./TaxDrawer.svelte"
 import TaxProfileCard from "./TaxProfileCard.svelte"
 
@@ -61,12 +62,21 @@ function show(profile: TaxProfile, household: HouseholdDocument | null): Scenari
 	}
 }
 
-const card = (profile: TaxProfile, household: HouseholdDocument | null): string =>
+const FILERS: readonly TaxYear[] = [
+	plainYear({ filer: "me", levy: "th-2026-pit@me" }),
+	plainYear({ filer: "partner", levy: "th-2026-pit@partner" }),
+]
+
+const card = (
+	profile: TaxProfile,
+	household: HouseholdDocument | null,
+	years: readonly TaxYear[] = [],
+): string =>
 	render(TaxProfileCard, {
-		props: { name: "base", show: show(profile, household), editable: true },
+		props: { name: "base", show: show(profile, household), editable: true, years },
 	}).body
 
-const drawer = (profile: TaxProfile): string =>
+const drawer = (profile: TaxProfile, sharedClaimable = true): string =>
 	render(TaxDrawer, {
 		props: {
 			open: true,
@@ -76,6 +86,7 @@ const drawer = (profile: TaxProfile): string =>
 			profile,
 			group: "home",
 			unlabelled: [],
+			sharedClaimable,
 			onClose: () => {},
 		},
 	}).body
@@ -93,6 +104,24 @@ describe("the shared home-loan interest", () => {
 		expect(drawer(SEPARATE)).toContain("Shared home-loan interest")
 		expect(drawer(JOINT)).not.toContain('id="tax-sharedMortgageInterest"')
 	})
+
+	test("the form offers no field when no Return of the plan claims the shared interest", () => {
+		expect(drawer(SEPARATE, false)).not.toContain('id="tax-sharedMortgageInterest"')
+	})
+
+	test("the Home card says a stored value a Return does not claim is kept and not claimed", () => {
+		const joint = { ...JOINT, sharedMortgageInterest: 60000 }
+		expect(card(joint, HOUSEHOLD, FILERS)).toContain(
+			"60,000 THB (kept, not claimed by this Return)",
+		)
+		expect(card(SEPARATE, HOUSEHOLD)).toContain("60,000 THB (kept, not claimed by this Return)")
+		expect(card(SEPARATE, HOUSEHOLD, FILERS)).toContain("60,000 THB")
+		expect(card(SEPARATE, HOUSEHOLD, FILERS)).not.toContain("kept, not claimed")
+	})
+
+	test("the Home card has no shared row on a joint plan that stores none", () => {
+		expect(card(JOINT, HOUSEHOLD, FILERS)).not.toContain("Shared home-loan interest")
+	})
 })
 
 describe("the cards after a holder swap", () => {
@@ -108,5 +137,34 @@ describe("the cards after a holder swap", () => {
 		const body = card(SEPARATE, HOUSEHOLD)
 		expect(body).toContain("Parents you support")
 		expect(body).toContain("Your health insurance premiums")
+	})
+
+	test("say you for a joint or single filing, whose flat keys are that Return's own", () => {
+		for (const filingStatus of ["married_joint", "single"] as const) {
+			const body = card({ ...SEPARATE, filingStatus }, SWAPPED)
+			expect(body).toContain("Parents you support")
+			expect(body).toContain("Your health insurance premiums")
+			expect(body).not.toContain("Parents your partner supports")
+		}
+	})
+
+	test("say you after --from-stored moved the record to the new holder", () => {
+		const body = card({ ...SEPARATE, claimsHolder: "partner" }, SWAPPED)
+		expect(body).toContain("Parents you support")
+		expect(body).toContain("Your health insurance premiums")
+	})
+
+	test("call a recorded holder the household no longer names the earlier holder", () => {
+		const body = card({ ...SEPARATE, claimsHolder: "gone" }, HOUSEHOLD)
+		expect(body).toContain("Parents the earlier holder supports")
+		expect(body).toMatch(/The earlier holder(?:&#39;|')s health insurance premiums/)
+		expect(body).not.toContain("Parents gone supports")
+	})
+
+	test("say you with no household, never an id", () => {
+		const body = card(SEPARATE, null)
+		expect(body).toContain("Parents you support")
+		expect(body).toContain("Your health insurance premiums")
+		expect(body).not.toContain("Parents me supports")
 	})
 })

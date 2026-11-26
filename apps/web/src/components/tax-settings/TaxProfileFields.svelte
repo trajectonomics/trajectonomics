@@ -10,13 +10,20 @@ interface Props {
 	shown: Shown
 	/** The items the form shows: one group's, or every item. */
 	visible?: readonly string[]
+	/** Whether a Return of the plan claims the shared interest: `traj` refuses `shared=` with no Filer. */
+	sharedClaimable?: boolean
 }
 
-let { draft = $bindable(), shown, visible = TAX_FLAG_KEYS }: Props = $props()
+let {
+	draft = $bindable(),
+	shown,
+	visible = TAX_FLAG_KEYS,
+	sharedClaimable = true,
+}: Props = $props()
 const choices = [{ value: "", label: "Choose a filing status" }, ...FILING_CHOICES]
 const counts = $derived(COUNT_FIELDS.filter((field) => visible.includes(field.key)))
-// The shared home-loan interest is stated only on a separate filing: `traj` refuses `shared=` under another status.
-const separate = $derived(draft.filingStatus === "married_separate")
+// The shared home-loan interest needs a separate filing whose projection names a Filer: `traj` refuses `shared=` otherwise.
+const separate = $derived(draft.filingStatus === "married_separate" && sharedClaimable)
 const amounts = $derived(
 	AMOUNT_FIELDS.filter(
 		(field) => visible.includes(field.key) && (field.key !== "sharedMortgageInterest" || separate),

@@ -18,10 +18,22 @@ interface Props {
 	group: GroupKey | null
 	/** The income Flows with no tax label, which a whole write labels. */
 	unlabelled: readonly string[]
+	/** Whether a Return of the plan claims the shared interest: with none, the form offers no `shared=` field. */
+	sharedClaimable?: boolean
 	onClose: () => void
 }
 
-let { open, name, contentHash, openedOn, profile, group, unlabelled, onClose }: Props = $props()
+let {
+	open,
+	name,
+	contentHash,
+	openedOn,
+	profile,
+	group,
+	unlabelled,
+	sharedClaimable = true,
+	onClose,
+}: Props = $props()
 const title = $derived.by(() => {
 	if (profile === null) return "Set the tax profile"
 	const card = GROUPS.find((one) => one.key === group)
@@ -36,7 +48,7 @@ const title = $derived.by(() => {
 	{/if}
 	{#if open}
 		{#key contentHash}
-			<TaxProfileForm {name} {contentHash} {profile} {group} {unlabelled} onDone={onClose} />
+			<TaxProfileForm {name} {contentHash} {profile} {group} {unlabelled} {sharedClaimable} onDone={onClose} />
 		{/key}
 	{/if}
 </Drawer>

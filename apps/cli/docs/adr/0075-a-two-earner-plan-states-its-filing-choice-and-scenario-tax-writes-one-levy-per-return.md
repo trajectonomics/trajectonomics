@@ -260,9 +260,13 @@ This is the follow-up the shared home-loan ceiling left above.
   once the profile states shared interest, because the person has said which interest is shared. The
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
   note is added as before, and now names the flag.
-- **The Dashboard** reads `sharedMortgageInterest` but neither shows nor edits it, and a save of the
-  whole profile from the Dashboard drops it, as a write with `--tax` that leaves it out does.
-  Follow-up: trajectonomics/trajectonomics#618.
+- **The Dashboard** shows the stored `sharedMortgageInterest` in the separate filing's claims, beside
+  the Home card's own home-loan interest, and its tax profile form sets and clears it on a separate
+  filing as `--mortgage-interest shared=<amount>` (an emptied or all-zero field is `shared=0`). A
+  whole save fills the stored value in, so leaving it alone keeps it, and says when it would drop it.
+  Where no Return claims the value (another filing status, or a separate profile whose projection
+  names no Filer) the Home card says it is kept and not claimed by this Return, and no `shared=`
+  field is offered. (#618)
 - **Known limit: the one-earner rule is applied once per write, not per projection year.** Who is a
   Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
   2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only

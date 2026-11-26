@@ -25,13 +25,13 @@ export function draftOf(profile: TaxProfile | null): TaxDraft {
 
 /**
  * The draft a whole write opens with: empty, except the shared home-loan interest a stored separate profile keeps, so a
- * whole save does not drop it by leaving it out. A profile under another status keeps none, because no Return claims it.
+ * whole save does not drop it by leaving it out. A profile under another status, or a plan whose projection names no
+ * Filer, keeps none: no Return claims it there, and `traj` refuses `shared=` on such a plan.
  */
-export function wholeDraftOf(profile: TaxProfile | null): TaxDraft {
+export function wholeDraftOf(profile: TaxProfile | null, sharedClaimable = true): TaxDraft {
 	const draft = blankDraft()
 	const stored = profile?.sharedMortgageInterest
-	if (profile?.filingStatus === "married_separate" && stored !== undefined) {
-		draft.sharedMortgageInterest = String(stored)
-	}
+	const keeps = sharedClaimable && profile?.filingStatus === "married_separate"
+	if (keeps && stored !== undefined) draft.sharedMortgageInterest = String(stored)
 	return draft
 }

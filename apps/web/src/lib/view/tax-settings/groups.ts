@@ -77,10 +77,15 @@ export interface GroupCard {
 
 /**
  * The cards of a stored profile: the same rows the page showed in one list, split by group. `claimant` names the person
- * the flat keys are when a holder swap left them with the other person, so a card never says "Yours" of their claims.
+ * the flat keys are when a holder swap left them with the other person, so a card never says "Yours" of their claims,
+ * and `sharedClaimed` says whether a Return of the plan claims the stored shared home-loan interest.
  */
-export function groupCards(profile: TaxProfile, claimant: PersonName | null = null): GroupCard[] {
-	const rows = profileRows(profile, claimant)
+export function groupCards(
+	profile: TaxProfile,
+	claimant: PersonName | null = null,
+	sharedClaimed = profile.filingStatus === "married_separate",
+): GroupCard[] {
+	const rows = profileRows(profile, claimant, sharedClaimed)
 	return GROUPS.map(({ key, title, items }) => ({
 		key,
 		title,

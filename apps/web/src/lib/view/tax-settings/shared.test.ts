@@ -4,7 +4,7 @@ import { taxTokens } from "../../edit/tax-flags"
 import { draftOf, wholeDraftOf } from "./draft"
 import { mergeFlags, sharedDropWarning, wholeFlags } from "./flags"
 import { taxEdit } from "./profile-edit"
-import { taxFieldOfRefusal } from "./refusal"
+import { taxFieldOfRefusal, taxShown } from "./refusal"
 
 const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
 const stored: TaxProfile = {
@@ -74,6 +74,29 @@ describe("the shared home-loan interest", () => {
 		expect(sharedDropWarning(null, true, cleared)).toBeNull()
 	})
 
+	test("an all-zero amount drops the stored value as an empty one does", () => {
+		const separate = { ...wholeDraftOf(stored), filingStatus: "married_separate" }
+		for (const text of ["0", "0.00", "000"]) {
+			expect(sharedDropWarning(stored, true, { ...separate, sharedMortgageInterest: text })).toBe(
+				"This save drops the stored shared home-loan interest of 60,000 THB.",
+			)
+			expect(wholeFlags({ ...separate, sharedMortgageInterest: text })).toEqual({
+				ok: true,
+				flags: { filingStatus: "married_separate", sharedMortgageInterest: text },
+			})
+		}
+	})
+
+	test("a whole write with no Filer fills in no shared interest and says what it drops", () => {
+		const draft = wholeDraftOf(stored, false)
+		expect(draft.sharedMortgageInterest).toBe("")
+		const separate = { ...draft, filingStatus: "married_separate" }
+		expect(wholeFlags(separate)).toEqual({ ok: true, flags: { filingStatus: "married_separate" } })
+		expect(sharedDropWarning(stored, true, separate)).toBe(
+			"This save drops the stored shared home-loan interest of 60,000 THB.",
+		)
+	})
+
 	test("a refusal of `shared=` lands at the shared field, not at the person's own interest", () => {
 		const error = {
 			code: "invalid_input",
@@ -85,5 +108,22 @@ describe("the shared home-loan interest", () => {
 		expect(taxFieldOfRefusal({ ...error, message: "--mortgage-interest is not an amount" })).toBe(
 			"mortgageInterest",
 		)
+	})
+
+	test("a `shared=` refusal that names no `shared=` lands at the shared field the flags sent", () => {
+		const error = {
+			code: "invalid_input",
+			exitCode: 2,
+			path: "mortgageInterest",
+			message: "The value is outside its allowed range.",
+		}
+		const big = "999999999999999"
+		expect(taxFieldOfRefusal(error, { sharedMortgageInterest: big })).toBe("sharedMortgageInterest")
+		expect(taxFieldOfRefusal(error, { mortgageInterest: big })).toBe("mortgageInterest")
+		expect(
+			taxShown({}, error, error.message, ["sharedMortgageInterest"], {
+				sharedMortgageInterest: big,
+			}).at("sharedMortgageInterest"),
+		).toBe(error.message)
 	})
 })

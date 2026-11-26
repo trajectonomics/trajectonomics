@@ -50,7 +50,20 @@ for (const width of [360, 1280] as const) {
 		await expect(page.locator("main")).toContainText("60,000 THB")
 		await fits(page)
 
-		// A whole write keeps the stored interest by filling it in, and says so before dropping it.
+		// A whole write fills the stored interest in, so stating the whole profile keeps it.
+		await page.getByRole("button", { name: "Edit home" }).click()
+		await dialog.getByRole("button", { name: "State the whole profile instead" }).click()
+		await dialog.getByLabel("Filing status").selectOption("married_separate")
+		await expect(dialog.getByLabel("Shared home-loan interest")).toHaveValue("60000")
+		await dialog.getByRole("button", { name: "Save", exact: true }).click()
+		await expect(dialog).toBeHidden({ timeout: SLOW })
+		await expect(
+			page.getByText("Shared home-loan interest, split half to each Return:"),
+		).toBeVisible({ timeout: SLOW })
+		await expect(page.locator("main")).toContainText("60,000 THB")
+		await fits(page)
+
+		// Clearing the filled-in value says what the save drops before it is saved.
 		await page.getByRole("button", { name: "Edit home" }).click()
 		await dialog.getByRole("button", { name: "State the whole profile instead" }).click()
 		await dialog.getByLabel("Filing status").selectOption("married_separate")

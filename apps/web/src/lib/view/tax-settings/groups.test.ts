@@ -66,11 +66,37 @@ describe("the groups of the stored request", () => {
 		expect(family?.rows.map((row) => row.value)).toEqual(["2", "1", "None", "None"])
 		const insurance = cards.find((card) => card.key === "insurance")
 		expect(insurance?.rows.find((row) => row.key === "lifeInsurance")?.value).toBe("20,000 THB")
+		// A joint filing claims no shared interest and stores none, so its Home card has only the one loan.
 		expect(cards.find((card) => card.key === "home")?.rows.map((row) => row.value)).toEqual([
 			"None",
-			"None",
 		])
-		expect(cards.flatMap((card) => card.rows)).toHaveLength(TAX_FLAG_KEYS.length)
+		expect(cards.flatMap((card) => card.rows)).toHaveLength(TAX_FLAG_KEYS.length - 1)
+	})
+
+	test("the Home card shows a shared row only on a separate filing or when the profile stores one", () => {
+		const home = (over: Partial<TaxProfile>, sharedClaimed?: boolean) =>
+			groupCards({ ...profile, ...over }, null, sharedClaimed)
+				.find((card) => card.key === "home")
+				?.rows.map((row) => [row.key, row.value])
+		expect(home({})).toEqual([["mortgageInterest", "None"]])
+		expect(home({ filingStatus: "married_separate" })).toEqual([
+			["mortgageInterest", "None"],
+			["sharedMortgageInterest", "None"],
+		])
+		expect(home({ sharedMortgageInterest: 60000 })).toEqual([
+			["mortgageInterest", "None"],
+			["sharedMortgageInterest", "60,000 THB (kept, not claimed by this Return)"],
+		])
+		expect(home({ filingStatus: "married_separate", sharedMortgageInterest: 60000 })).toEqual([
+			["mortgageInterest", "None"],
+			["sharedMortgageInterest", "60,000 THB"],
+		])
+		expect(
+			home({ filingStatus: "married_separate", sharedMortgageInterest: 60000 }, false),
+		).toEqual([
+			["mortgageInterest", "None"],
+			["sharedMortgageInterest", "60,000 THB (kept, not claimed by this Return)"],
+		])
 	})
 })
 
