@@ -14,7 +14,9 @@ import { SCRATCH_ORIGIN, SCRATCH_PORT } from "./base-url"
 
 const CLI = fileURLToPath(new URL("../../cli/src/index.ts", import.meta.url))
 // One plan per check, so two browser checks write without racing over the same stored profile; `swap-360` only reads.
-const PLANS = ["shared-360", "shared-1280", "swap-360"] as const
+const PLANS = ["shared-360", "shared-1280", "swap-360", "locked-save-360"] as const
+/** The home-loan interest `locked-save-360` stores before the swap, so a save changing only the shared one keeps it. */
+const LOCKED_HOME_LOAN = 14444
 
 /** The plans the write checks open: the Demo's separate-filing couple, with the carry-in its Levies need. */
 const PARAMS: PlanParams = {
@@ -78,6 +80,16 @@ async function swapRoles(name: string): Promise<void> {
 
 // The swapped plan is the Demo's separate couple with its roles the other way round; no write moves the claims yet.
 await swapRoles("swap-360")
+// This plan stores the earlier holder's own home-loan interest before the swap, so the locked drawer has a figure to keep.
+await run([
+	"scenario",
+	"tax",
+	"locked-save-360",
+	"--merge",
+	"--mortgage-interest",
+	String(LOCKED_HOME_LOAN),
+])
+await swapRoles("locked-save-360")
 const records = PLANS.flatMap((scenario) =>
 	demoSeparateCarryIn().map((record) => ({ ...(record as Record<string, unknown>), scenario })),
 )

@@ -78,7 +78,7 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 	<TaxLabelForm {name} {show} disabled={wait} />
 {/if}
 {#if claims}
-	<TaxClaimsSection table={claims} {people} {claimant} claimantId={profile?.claimsHolder ?? null} />
+	<TaxClaimsSection table={claims} {people} claimsHolder={profile?.claimsHolder ?? null} />
 {/if}
 {#if profile !== null}
 	<TaxClaimNotes lines={notes} />
