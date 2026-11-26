@@ -14,11 +14,20 @@ export interface DocumentNames {
 /** The labels of a page with no document: every Flow and Milestone shows by id. */
 export const NO_DOCUMENT_NAMES: DocumentNames = { flows: new Map(), milestones: new Map() }
 
+/** The labels one list states, by id: two items that state the same one take their id, so a page can tell them apart. */
+function labelsFrom(entries: readonly (readonly [string, string])[]): ReadonlyMap<string, string> {
+	const counts = new Map<string, number>()
+	for (const [, label] of entries) counts.set(label, (counts.get(label) ?? 0) + 1)
+	return new Map(
+		entries.map(([id, label]) => [id, counts.get(label) === 1 ? label : `${label} (${id})`]),
+	)
+}
+
 /** One list's labels, by id: an item with no `displayLabel` is left out, so the lookup falls back to the id. */
 function labelsOf(
 	items: readonly { id: string; displayLabel?: string | undefined }[] | undefined,
 ): ReadonlyMap<string, string> {
-	return new Map(
+	return labelsFrom(
 		(items ?? []).flatMap((item) =>
 			typeof item.displayLabel === "string" ? [[item.id, item.displayLabel] as const] : [],
 		),
@@ -27,7 +36,7 @@ function labelsOf(
 
 /** The labels a document states for its Milestones: each entry is read through `milestoneLabel`, and never copied back. */
 function milestoneLabelsOf(items: readonly unknown[] | undefined): ReadonlyMap<string, string> {
-	return new Map(
+	return labelsFrom(
 		(items ?? []).flatMap((item) => {
 			const read = milestoneLabel.safeParse(item)
 			if (!read.success || read.data.displayLabel === undefined) return []

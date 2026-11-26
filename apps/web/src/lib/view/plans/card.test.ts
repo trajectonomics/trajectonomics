@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { milestoneLabel } from "../../contract"
 import { DEMO } from "../what-if/fixtures.test-support"
 import { notProjected, planCard, planCards } from "./card"
 import { ledgerWith } from "./fixtures.test-support"
@@ -71,10 +72,36 @@ describe("a card", () => {
 			"car-paid-off",
 			"net-worth-ten-million",
 		])
-		expect(base.milestones.map((milestone) => milestone.id)).toEqual([
+		expect(base.milestones.map((milestone) => milestone.label.id)).toEqual([
 			"car-paid-off",
 			"net-worth-ten-million",
 		])
+	})
+
+	test("names each Milestone from its own plan's document, not from another plan's", () => {
+		const two = ledgerWith({ base: {}, "retire-early": {} })
+		const label = (plan: string, id: string, text: string) => {
+			const read = two.reads.documents[plan]
+			if (!read?.ok) throw new Error(`the Demo holds ${plan}`)
+			const milestones = read.data.scenario.document.milestones
+			if (milestones === undefined) throw new Error(`the Demo holds no Milestones in ${plan}`)
+			read.data.scenario.document.milestones = milestones.map((one) => {
+				const parsed = milestoneLabel.parse(one)
+				return parsed.id === id ? { ...parsed, displayLabel: text } : one
+			})
+		}
+		label("base", "car-paid-off", "Car paid off at 55")
+		label("retire-early", "car-paid-off", "Car paid off early")
+		const labels = Object.fromEntries(
+			planCards(two, ALL).map((card) => [
+				card.row.name,
+				card.milestones.find((one) => one.label.id === "car-paid-off")?.label.text,
+			]),
+		)
+		expect(labels).toEqual({
+			base: "Car paid off at 55",
+			"retire-early": "Car paid off early",
+		})
 	})
 
 	test("a range draws the first rows only, and drops a Milestone no drawn row holds", () => {
@@ -84,7 +111,7 @@ describe("a card", () => {
 			base.series[0]?.points.slice(0, 10).map((point) => point.x),
 		)
 		expect(ten.markers.map((marker) => marker.label)).toEqual(["car-paid-off"])
-		expect(ten.milestones.map((milestone) => milestone.id)).toEqual(["car-paid-off"])
+		expect(ten.milestones.map((milestone) => milestone.label.id)).toEqual(["car-paid-off"])
 		// The figures on the card are the plan's, whatever the range.
 		expect(ten.netWorth).toEqual(base.netWorth)
 		expect(ten.fi).toEqual(base.fi)

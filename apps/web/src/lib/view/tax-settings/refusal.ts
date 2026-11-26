@@ -4,7 +4,7 @@
  * offers to set the profile whole ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)).
  */
 import type { ErrorBody } from "../../contract"
-import { TAX_FLAG_KEYS } from "../../edit/tax-flags"
+import { TAX_FLAG_KEYS, type TaxFlags } from "../../edit/tax-flags"
 import type { Shown } from "../plan-items/problems"
 
 /** A flag's path as a key: `--children-at-higher-rate` is `childrenAtHigherRate`. */
@@ -14,10 +14,22 @@ function keyOf(path: string): string {
 		.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
 }
 
-/** The form field a refusal names, or null when it names none. */
-export function taxFieldOfRefusal(error: ErrorBody | null): string | null {
+/**
+ * The form field a refusal names, or null when it names none. A shared-interest refusal names `--mortgage-interest`
+ * too, so the flags the form sent tell the two apart when its message does not say `shared=`. When it sent both
+ * kinds and the message does not say which, no field can be told and the form shows the refusal whole.
+ */
+export function taxFieldOfRefusal(error: ErrorBody | null, flags?: TaxFlags | null): string | null {
 	const key = error?.path === undefined ? "" : keyOf(error.path)
-	return (TAX_FLAG_KEYS as readonly string[]).includes(key) ? key : null
+	if (!(TAX_FLAG_KEYS as readonly string[]).includes(key)) return null
+	if (key === "mortgageInterest") {
+		const sharedSent = flags?.sharedMortgageInterest !== undefined
+		const ownSent = flags?.mortgageInterest !== undefined
+		if (error?.message.includes("shared=") || (sharedSent && !ownSent))
+			return "sharedMortgageInterest"
+		if (sharedSent && ownSent) return null
+	}
+	return key
 }
 
 /** True when the CLI refused a `--merge` because no profile is stored: the profile has to be set whole. */
@@ -52,9 +64,10 @@ export function taxShown(
 	refusal: ErrorBody | null,
 	message: string | null,
 	visible: readonly string[] = TAX_FLAG_KEYS,
+	flags: TaxFlags | null = null,
 ): Shown {
 	// A refusal that names an item the form does not show (a merge checks the whole profile) is shown for the whole form.
-	const named = taxFieldOfRefusal(refusal)
+	const named = taxFieldOfRefusal(refusal, flags)
 	const refused = named !== null && visible.includes(named) ? named : null
 	const text = flowsSentence(refusal) ?? message ?? undefined
 	return {

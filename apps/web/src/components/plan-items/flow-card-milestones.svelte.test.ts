@@ -27,6 +27,19 @@ function names(displayLabel?: string): ItemNames {
 	})
 }
 
+/** Two Milestones the plan names alike, which only their ids tell apart. */
+function twinNames(): ItemNames {
+	return itemNames(new Map(), null, {
+		currency: "THB",
+		accounts: [],
+		flows: [],
+		milestones: [
+			{ id: "retire", displayLabel: "Retirement" },
+			{ id: "retire-2", displayLabel: "Retirement" },
+		],
+	})
+}
+
 function card(displayLabel?: string): FlowCard {
 	const flow = expense()
 	const [shown] = flowCards([flow], "expense", null, [flow], names(displayLabel))
@@ -54,7 +67,7 @@ const plain = (html: string) => html.replace(/<!--[\s\S]*?-->/g, "")
 describe("a Flow card names the Milestone that sets its date", () => {
 	test("an unlabelled Milestone shows its id in code, so the page invents no name", () => {
 		const html = plain(body([card()]))
-		expect(html).toContain('When <code class="font-mono text-[0.9em]"')
+		expect(html).toContain('When <code class="font-mono text-[0.9em] wrap-anywhere"')
 		expect(html).toContain(">retire</code> fires")
 	})
 
@@ -63,5 +76,13 @@ describe("a Flow card names the Milestone that sets its date", () => {
 		expect(html).toContain("When <span")
 		expect(html).toContain(">Retirement</span> fires")
 		expect(html).not.toContain(">retire</code> fires")
+	})
+
+	test("two Milestones of one label take their ids, so the card's sentence tells them apart", () => {
+		const flow = expense()
+		const [shown] = flowCards([flow], "expense", null, [flow], twinNames())
+		if (shown === undefined) throw new Error("the fixture has no card")
+		const html = plain(body([shown]))
+		expect(html).toContain(">Retirement (retire)</span> fires")
 	})
 })
