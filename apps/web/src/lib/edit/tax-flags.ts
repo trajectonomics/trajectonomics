@@ -26,6 +26,7 @@ export const AMOUNT_KEYS = [
 	"parentHealthInsurance",
 	"spouseLifeInsurance",
 	"mortgageInterest",
+	"sharedMortgageInterest",
 	"donation2x",
 	"donation1x",
 ] as const
@@ -56,6 +57,8 @@ export const taxFlags = z.strictObject({
 	parentHealthInsurance: amount.optional(),
 	spouseLifeInsurance: amount.optional(),
 	mortgageInterest: amount.optional(),
+	// The interest on one loan borrowed together, written `--mortgage-interest shared=<amount>` (cli ADR-0075).
+	sharedMortgageInterest: amount.optional(),
 	donation2x: amount.optional(),
 	donation1x: amount.optional(),
 })
@@ -75,6 +78,9 @@ export function flagOf(key: string): string {
 export function taxTokens(flags: TaxFlags): string[] {
 	return TAX_FLAG_KEYS.flatMap((key) => {
 		const value = flags[key]
-		return value === undefined ? [] : [flagOf(key), value]
+		if (value === undefined) return []
+		return key === "sharedMortgageInterest"
+			? ["--mortgage-interest", `shared=${value}`]
+			: [flagOf(key), value]
 	})
 }

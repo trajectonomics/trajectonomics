@@ -30,6 +30,25 @@ describe("the tax profile Edits", () => {
 		expect(writeCommand(edit, true).argv.slice(-2)).toEqual(["--dry-run", "--json"])
 	})
 
+	test("the shared home-loan interest is --mortgage-interest shared=<amount>, so a stated zero clears it", () => {
+		const stated = editSchema.parse(merge({ sharedMortgageInterest: "60000" }))
+		expect(writeCommand(stated, false).argv).toEqual([
+			"scenario",
+			"tax",
+			"early",
+			"--merge",
+			"--mortgage-interest",
+			"shared=60000",
+			"--if-hash",
+			HASH,
+			"--json",
+		])
+		const cleared = editSchema.parse(merge({ sharedMortgageInterest: "0" }))
+		expect(writeCommand(cleared, false).argv).toContain("shared=0")
+		// It is an amount like every other: a comma or a sign is not a value traj reads.
+		expect(editSchema.safeParse(merge({ sharedMortgageInterest: "1,000" })).success).toBe(false)
+	})
+
 	test("set-tax states the whole profile with --tax th-2026", () => {
 		const edit = editSchema.parse(
 			whole({ filingStatus: "single", childrenAtHigherRate: "1", socialSecurity: "9000.50" }),

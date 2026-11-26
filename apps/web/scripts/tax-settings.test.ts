@@ -2,7 +2,11 @@
 // a whole set states the profile, a remove takes it out, a refusal names its field, and a stale save is refused. Each test
 // sets up its own state, so each passes alone.
 import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
-import { needsWholeProfile, taxFieldOfRefusal } from "../src/lib/view/tax-settings/refusal"
+import {
+	needsWholeProfile,
+	taxFieldOfRefusal,
+	taxShown,
+} from "../src/lib/view/tax-settings/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import { settle } from "./editor-running.test-support"
 import { slow } from "./estate.test-support"
@@ -75,6 +79,45 @@ describe("the tax profile through traj", () => {
 			expect(merged.error.message).toContain("no tax profile stored")
 			expect(merged.error.hint).toContain("--tax th-2026")
 			expect(needsWholeProfile(merged.error)).toBe(true)
+		},
+	)
+
+	slow(
+		"a shared interest too large lands at the shared field by the flags the form sent",
+		async () => {
+			await withProfile()
+			const big = "999999999999999"
+			const answer = await send("merge-tax", { sharedMortgageInterest: big })
+			if (answer.ok) throw new Error("the CLI took it")
+			expect(answer.error.code).toBe("invalid_input")
+			expect(answer.error.path).toBe("--mortgage-interest")
+			expect(answer.error.message).toBe("The value is outside its allowed range.")
+			expect(taxFieldOfRefusal(answer.error, { sharedMortgageInterest: big })).toBe(
+				"sharedMortgageInterest",
+			)
+			expect(taxFieldOfRefusal(answer.error, { mortgageInterest: big })).toBe("mortgageInterest")
+		},
+	)
+
+	slow(
+		"a refusal with both interests sent and no shared= in it is shown for the whole form",
+		async () => {
+			await withProfile()
+			const flags = { mortgageInterest: "5000", sharedMortgageInterest: "999999999999999" }
+			const answer = await send("merge-tax", flags)
+			if (answer.ok) throw new Error("the CLI took it")
+			expect(answer.error.path).toBe("--mortgage-interest")
+			expect(answer.error.message).toBe("The value is outside its allowed range.")
+			expect(taxFieldOfRefusal(answer.error, flags)).toBeNull()
+			const shown = taxShown(
+				{},
+				answer.error,
+				answer.error.message,
+				["mortgageInterest", "sharedMortgageInterest"],
+				flags,
+			)
+			expect(shown.general).toBe(answer.error.message)
+			expect(shown.at("sharedMortgageInterest")).toBeUndefined()
 		},
 	)
 
