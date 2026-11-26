@@ -13,7 +13,7 @@ let { model, currency }: Props = $props()
 </script>
 
 <div class="space-y-6">
-	<Stat label="Survival method">
+	<Stat label="FI date">
 		{#snippet value()}Not reachable before {model.horizon}{/snippet}
 	</Stat>
 	<p class="max-w-prose">{model.sentence}</p>

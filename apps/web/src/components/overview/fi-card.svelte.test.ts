@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-
+import { insideDetails, outsideDetails } from "../../lib/view/details.test-support"
 import { fiView } from "../../lib/view/overview/fi"
 import { failedRead, okRead } from "../../lib/view/overview/fixtures.test-support"
 import { fi, reachableFi } from "../../lib/view/overview/projection-fixtures.test-support"
@@ -15,6 +15,17 @@ describe("FiCard", () => {
 		expect(body).toContain("Oct 2042")
 		expect(body).toContain("Scenario base")
 		expect(body).toContain('href="/fi/"')
+	})
+
+	test("keeps the command in one closed Details, outside the answer", () => {
+		const read = okRead(["fi"], fiView(reachableFi()))
+		const { body } = render(FiCard, {
+			props: { scenario: { status: "ready", name: "base", read } },
+		})
+		expect(body).toContain(">Details</summary>")
+		expect(body).not.toContain("<details open")
+		expect(outsideDetails(body)).not.toContain("traj fi")
+		expect(insideDetails(body)).toContain("traj fi")
 	})
 
 	test("says the horizon and what binds when FI is not reachable", () => {

@@ -18,6 +18,12 @@ The planner pages (Income, Expenses, and Assets and debts) list a plan's Flows a
 - **A change is object editing.** An item is replaced, added or removed by its `id`, and every field the form does not show is kept as it came, so a save that changed nothing leaves the plan `unchanged`.
 - **A rate is a percent by moving the decimal point.** A rate stays an integer of basis points in the document. `formatBps` and `parseBps` in `src/lib/format/bps.ts` move the point in the text, refuse more than two places, and never make a float. A rate is not money, so this is not a figure the page computes.
 
+## Amendment (2026-11-27): a multiple is a ratio, truncated to one decimal
+
+The FI reference's multiple is the one figure the page reduces. The CLI states it in integer basis points, and `formatMultiple` in `src/lib/format/multiple.ts` writes it to one decimal by integer arithmetic on that integer, truncating toward zero: 145376 becomes "14.5×", and 249999 stays "24.9×", below the 25× reference it does not meet. Truncation matters: rounding up let a multiple that was not met read as the reference it missed.
+
+This is the first place the page rounds a CLI figure, and the only one allowed. It formats a ratio: no money is added, subtracted or rounded, and the page still shows the CLI's decimal strings as they are.
+
 ## Considered Options
 
 - **Compute the deltas and the totals in the page.** Rejected. The point of `traj` is that its arithmetic is the one answer. A second implementation in the page would drift from it without any test noticing.

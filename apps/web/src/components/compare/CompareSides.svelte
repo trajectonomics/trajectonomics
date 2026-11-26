@@ -6,7 +6,7 @@ interface Props {
 	sides: readonly CompareSideHeading[]
 }
 
-/** Each side's letter, Scenario and shortened content hash, with a sample of its line style. */
+/** Each side's letter, Scenario and a sample of its line style. */
 let { sides }: Props = $props()
 </script>
 
@@ -24,7 +24,6 @@ let { sides }: Props = $props()
 				<span>{side.letter}, {side.dashed ? "dashed" : "solid"}</span>
 			</p>
 			<p class="mt-2 text-base font-semibold break-all">{side.name}</p>
-			<p class="mt-1 font-mono text-xs text-muted-foreground">Content hash {side.hash}</p>
 		</div>
 	{/each}
 </section>

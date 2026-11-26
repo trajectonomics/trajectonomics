@@ -44,5 +44,5 @@ const monthly = $derived(monthlyRowsOf(run))
 	{#if monthly}
 		<MonthlyTable rows={monthly} count={monthly.length} />
 	{/if}
-	<ResultStatement shape={run} {argv} />
+	<ResultStatement name="Projection" shape={run} {argv} />
 </div>

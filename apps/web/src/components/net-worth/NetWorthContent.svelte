@@ -30,7 +30,7 @@ let { view }: Props = $props()
 				{#if data.note}
 					<p class="rounded-md border border-border p-3 text-sm">{data.note}</p>
 				{/if}
-				<Provenance argv={view.netWorth.argv} />
+				<Provenance name="Net worth" commands={[view.netWorth.argv]} />
 			</section>
 			<HistoryChart history={view.history} />
 			<section aria-labelledby="composition-title" class="space-y-5">
