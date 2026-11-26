@@ -53,7 +53,7 @@ function wordsOf(change: Change): string {
 <ul class="space-y-1.5 text-sm">
 	{#each whatIfSession.changes as change (change.path + change.kind)}
 		<li class="flex flex-wrap items-center gap-2">
-			<span title={change.kind === "add" ? change.title : undefined}>{wordsOf(change)}</span>
+			<span class="min-w-0 wrap-anywhere" title={change.kind === "add" ? change.title : undefined}>{wordsOf(change)}</span>
 			{#if refusalOf(change) !== null}
 				<span role="alert" class="text-destructive">{refusalOf(change)}</span>
 			{/if}

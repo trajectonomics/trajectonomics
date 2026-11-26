@@ -9,4 +9,4 @@ interface Props {
 let { label }: Props = $props()
 </script>
 
-{#if label.named}<span>{label.text}</span>{:else}<code class="font-mono text-[0.9em]">{label.text}</code>{/if}
+{#if label.named}<span data-item={label.id} data-kind={label.kind}>{label.text}</span>{:else}<code class="font-mono text-[0.9em]" data-item={label.id} data-kind={label.kind} data-unnamed>{label.text}</code>{/if}

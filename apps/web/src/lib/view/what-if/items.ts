@@ -1,3 +1,5 @@
+import type { Words } from "../words"
+
 /** The card fields a what-if can change. */
 export type WasField =
 	| "amount"
@@ -17,8 +19,8 @@ export type WasField =
 	| "lifetimePayouts"
 	| "employer"
 
-/** The baseline's text of each field the session changed. */
-export type Was = { readonly [K in WasField]?: string }
+/** The baseline's text of each field the session changed. A date or a payout keeps its words, so an item's id shows in code. */
+export type Was = { readonly [K in WasField]?: string | Words }
 
 /** What a planner card shows of the session beside what the plan stores. */
 export interface ItemMarks {
@@ -43,6 +45,13 @@ function textOf(value: unknown): string {
 	return String(value ?? "")
 }
 
+/** The words a card field carries, when it carries words (a Flow's dates, an Account's payout), so they render as a sentence. */
+function wordsOfValue(value: unknown): Words | null {
+	if (typeof value !== "object" || value === null || !("parts" in value)) return null
+	const words = value as Words
+	return Array.isArray(words.parts) ? words : null
+}
+
 /**
  * The marks of one item: whether it is off, and the baseline's text of each field whose text differs from the
  * what-if's. The texts are compared as the cards show them; none is parsed or computed.
@@ -54,10 +63,11 @@ export function marksOf<T extends object>(
 	fields: readonly (keyof T & WasField)[],
 ): ItemMarks {
 	if (whatIf === undefined) return { off, was: {} }
-	const was: { [K in WasField]?: string } = {}
+	const was: { [K in WasField]?: string | Words } = {}
 	for (const field of fields) {
-		const before = textOf(baseline[field])
-		if (before !== textOf(whatIf[field])) was[field] = before
+		const before = baseline[field]
+		if (textOf(before) !== textOf(whatIf[field]))
+			was[field] = wordsOfValue(before) ?? textOf(before)
 	}
 	return { off, was }
 }

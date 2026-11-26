@@ -1,65 +1,82 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-import { type ScenarioFlow, scenarioFlow } from "../../lib/contract/scenario-show"
-import { type ItemNames, itemNames } from "../../lib/view/item-names"
-import { type FlowCard, flowCards } from "../../lib/view/plan-items/flows"
+import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
+import { flowDraftOf } from "../../lib/view/plan-items/flows"
+import { flowItems } from "../../lib/view/what-if/plan-items"
+import type { SetChange } from "../../lib/what-if/overrides"
 import FlowCards from "./FlowCards.svelte"
+import FlowFields from "./FlowFields.svelte"
 
-/** A monthly expense that starts and ends at the Milestone `retire`. */
-function expense(): ScenarioFlow {
-	return scenarioFlow.parse({
-		id: "retirement-spending",
-		kind: "expense",
-		frequency: "monthly",
-		start: "2026-10-31",
-		amount: "900.00",
-		startAt: "retire",
-		endAt: "retire",
-	})
-}
+const NO_PROBLEMS = { at: () => undefined, general: undefined }
+const HASH = "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
-function names(displayLabel?: string): ItemNames {
-	return itemNames(new Map(), null, {
-		currency: "THB",
-		accounts: [],
-		flows: [],
-		milestones: displayLabel === undefined ? [] : [{ id: "retire", displayLabel }],
-	})
-}
-
-function card(displayLabel?: string): FlowCard {
-	const flow = expense()
-	const [shown] = flowCards([flow], "expense", null, [flow], names(displayLabel))
-	if (shown === undefined) throw new Error("the fixture has no card")
-	return shown
-}
-
-function body(cards: readonly FlowCard[]): string {
+/** The income cards as a What-if that sets those Flow paths holds them. */
+function cards(sets: readonly SetChange[]): string {
+	const doc = planDocument()
+	const view = flowItems(doc, "income", null, { sets, removals: [] })
 	return render(FlowCards, {
 		props: {
-			cards,
-			currency: "THB",
+			cards: view.cards,
+			marks: view.marks,
+			currency: doc.currency,
 			editable: false,
-			onEdit: () => {},
 			plan: "base",
-			contentHash: "h",
+			contentHash: HASH,
+			onEdit: () => {},
 			onTry: () => {},
 		},
 	}).body
 }
 
-/** The markup with Svelte's render comments dropped, so a sentence reads as one string. */
-const plain = (html: string) => html.replace(/<!--[\s\S]*?-->/g, "")
+const rows = (body: string, label: string) =>
+	body.match(new RegExp(`<dt[^>]*>${label}</dt>`, "g"))?.length ?? 0
 
-describe("a Flow card names the Milestone that sets its date", () => {
-	test("an unlabelled Milestone shows its id in code, so the page invents no name", () => {
-		const html = plain(body([card()]))
-		expect(html).toContain('When <code class="font-mono text-[0.9em]">retire</code> fires')
+describe("a What-if that changes a Flow's frequency", () => {
+	test("a monthly Flow tried once keeps its Ends row, with the baseline's end struck through", () => {
+		const body = cards([{ path: "flows.salary.frequency", value: "once" }])
+		// The pension runs to the horizon, as before; the salary's struck end must still have a row to sit on.
+		expect(rows(body, "Ends")).toBe(2)
+		expect(body).toContain("2050-05-14")
 	})
 
-	test("a labelled Milestone shows the plan's name as plain text", () => {
-		const html = plain(body([card("Retirement")]))
-		expect(html).toContain("When <span>Retirement</span> fires")
-		expect(html).not.toContain(">retire</code> fires")
+	test("a once Flow tried monthly shows its end with nothing struck, as its baseline had no end", () => {
+		const body = cards([{ path: "flows.tax-refund.frequency", value: "monthly" }])
+		// Both recurring Flows and the tried once Flow have an end now.
+		expect(rows(body, "Ends")).toBe(3)
+		// Server rendering leaves a comment between "none" and the closing tag, so match across it.
+		expect(body).not.toMatch(/none(<!--.*?-->)*<\/s>/)
+	})
+})
+
+describe("the Flow form's Ends field", () => {
+	const form = (
+		id: string,
+		anchors: { start: string | null; end: string | null } = { start: null, end: null },
+	): string => {
+		const flow = planDocument().flows.find((item) => item.id === id)
+		return render(FlowFields, {
+			props: {
+				draft: flowDraftOf(flow),
+				kind: "income",
+				existing: flow,
+				shown: NO_PROBLEMS,
+				name: "base",
+				anchors,
+			},
+		}).body
+	}
+
+	test("is hidden for a once Flow, which lands on its one date", () => {
+		expect(form("tax-refund")).not.toContain('id="flow-end"')
+	})
+
+	test("is asked for when the Flow recurs", () => {
+		expect(form("salary")).toContain('id="flow-end"')
+	})
+
+	test("is shown, with its anchor, for a once Flow whose end the household pins, so a refusal is not silent", () => {
+		const body = form("tax-refund", { start: null, end: "at me, age 70" })
+		expect(body).toContain('id="flow-end"')
+		expect(body).toContain("at me, age 70")
 	})
 })

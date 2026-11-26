@@ -2,13 +2,14 @@ import { describe, expect, test } from "bun:test"
 import { placedLabels } from "./label-rows"
 import { bareArea, chartArea } from "./label-rows.test-support"
 
-// The words a label keeps when its room is short. A neighbour's rule at `next` leaves `next - 104` pixels.
+// The words a label keeps when its room is short. A neighbour's rule at `next` leaves `next - 104` pixels,
+// and the plot's left edge is placed to leave as many, so the label shortens on its preferred right side.
 function first(label: string, next: number, code = false): string {
 	const marks = [
 		{ x: 100, label, code },
 		{ x: next, label: "k" },
 	]
-	return placedLabels(marks, bareArea(600))[0]?.text ?? ""
+	return placedLabels(marks, { width: 600, left: 200 - next, right: 600 })[0]?.text ?? ""
 }
 
 /** The label of the middle of three rules, which has `room` pixels on each side. */
@@ -66,16 +67,17 @@ describe("a shortened marker label", () => {
 		)
 	})
 
-	test("keeps both of Plans' two Demo labels to their own side of the rules at 360px", () => {
+	test("keeps both of Plans' two Demo labels off the rules at 360px", () => {
 		// Plans' card at 360px holds a 294px chart, and the Demo's base plan reaches its two Milestones at
-		// these x. Both ids are drawn in code, whose ellipsis is one monospace cell.
+		// these x. Both ids are drawn in code, whose ellipsis is one monospace cell. The second prefers the
+		// left, but its rule leaves more room right (119px against 61px), so it shortens there.
 		const marks = [
 			{ x: 89.14581430745815, label: "car-paid-off", code: true },
 			{ x: 154.46412988330798, label: "net-worth-ten-million", code: true },
 		]
 		const placed = placedLabels(marks, chartArea(294))
-		expect(placed.map((label) => label.text)).toEqual(["car-pai…", "net-wor…"])
-		expect(placed.map((label) => label.leftwards)).toEqual([false, true])
-		expect(placed.map((label) => label.row)).toEqual([0, 1])
+		expect(placed.map((label) => label.text)).toEqual(["car-pai…", "net-worth-ten-mi…"])
+		expect(placed.map((label) => label.leftwards)).toEqual([false, false])
+		expect(placed.map((label) => label.row)).toEqual([0, 0])
 	})
 })

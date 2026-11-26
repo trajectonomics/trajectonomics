@@ -53,6 +53,8 @@ describe("the planner list names the Milestone a Flow starts at", () => {
 				contentHash: "h",
 			},
 		}).body
-		expect(plain(body)).toContain("When <span>Retirement</span> fires")
+		expect(plain(body)).toContain(
+			'When <span data-item="retire" data-kind="milestone">Retirement</span> fires',
+		)
 	})
 })

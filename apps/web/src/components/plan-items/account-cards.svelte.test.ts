@@ -50,12 +50,14 @@ const plain = (html: string) => html.replace(/<!--[\s\S]*?-->/g, "")
 describe("an Account card names the Milestone its payout starts at", () => {
 	test("an unlabelled Milestone shows its id in code, so the page invents no name", () => {
 		const html = plain(body([card()]))
-		expect(html).toContain('from <code class="font-mono text-[0.9em]">retire</code>')
+		expect(html).toContain(
+			'from <code class="font-mono text-[0.9em]" data-item="retire" data-kind="milestone" data-unnamed="">retire</code>',
+		)
 	})
 
 	test("a labelled Milestone shows the plan's name as plain text", () => {
 		const html = plain(body([card("Retirement")]))
-		expect(html).toContain("from <span>Retirement</span>")
+		expect(html).toContain('from <span data-item="retire" data-kind="milestone">Retirement</span>')
 		expect(html).not.toContain(">retire</code>")
 	})
 })

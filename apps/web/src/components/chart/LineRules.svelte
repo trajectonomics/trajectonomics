@@ -22,7 +22,7 @@ const ROW_PX = 14
 
 <!-- A vertical rule at each marker, labelled near its top. A label past the middle hangs to the left of its
 rule, one that would overlap an earlier label moves down a row, and one that would cross another rule or leave
-the plot is shortened, moved to the other side, or left to the list under the chart. -->
+the plot is moved whole to the other side, shortened on the roomier one, or left to the list under the chart. -->
 {#each layout.markers as marker, index (index)}
 	{@const label = labels[index]}
 	<g>

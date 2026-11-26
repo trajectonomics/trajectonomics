@@ -1,4 +1,7 @@
 import { describe, expect, test } from "bun:test"
+import type { ScenarioDocument } from "../../contract"
+import { itemNames } from "../item-names"
+import { baselineRead, planDocument } from "../plan-items/fixtures.test-support"
 import { DEMO } from "./fixtures.test-support"
 import { accountItems, flowItems } from "./plan-items"
 
@@ -49,5 +52,39 @@ describe("the planner cards while a session is open", () => {
 			removals: [`accounts.${account.id}`],
 		})
 		expect(off.marks[account.id]?.off).toBe(true)
+	})
+})
+
+describe("an Account card's payout in a What-if", () => {
+	const payout = { bps: "4.00", frequency: "annual", rounding: "halfUp", startAt: "retire" }
+	const base = planDocument()
+	const named: ScenarioDocument = {
+		...base,
+		milestones: [{ id: "retire", displayLabel: "Retirement" }],
+		accounts: base.accounts.map((one) => (one.id === "bank" ? { ...one, payout } : one)),
+	}
+	const names = itemNames(new Map(), null, named)
+
+	test("reads the plan's name for the Milestone the payout starts at, as the session shows it", () => {
+		const changes = {
+			sets: [{ path: "accounts.bank.payout", value: { ...payout, bps: "5.00" } }],
+			removals: [],
+		}
+		const view = accountItems(named, baselineRead(), changes, {}, names)
+		const card = view.cards.find((one) => one.id === "bank")
+		expect(card?.payout?.text).toContain("Pays out 5% a year from Retirement")
+	})
+
+	test("shows the id in code when the plan states no name", () => {
+		const bare = { ...named, milestones: [] }
+		const changes = {
+			sets: [{ path: "accounts.bank.payout", value: { ...payout, bps: "5.00" } }],
+			removals: [],
+		}
+		const view = accountItems(bare, baselineRead(), changes, {}, itemNames(new Map(), null, bare))
+		const card = view.cards.find((one) => one.id === "bank")
+		expect(card?.payout?.parts).toContainEqual({
+			item: { text: "retire", named: false, kind: "milestone", id: "retire" },
+		})
 	})
 })
