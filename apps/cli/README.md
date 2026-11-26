@@ -245,7 +245,7 @@ because the bare write replaces them. A separate filing names there each person 
 stored claims and no taxed income. Every write also names there each id in the stored
 `returns` that no person in the household has: no Return counts that set, and a `--tax`
 write drops it; a separate write with Filers also shows the person-keyed form that restates
-them (`--filing-status married_separate --life-insurance <person>=<amount> --merge`). The
+them (`--filing-status married_separate --life-insurance=<person>=<amount> --merge`). The
 stored profile's `claimsHolder` says whose claims its other
 keys are, so if the household swaps which person is the holder, each person's claims stay
 theirs. A `projection run` then reports a `filer` on each
