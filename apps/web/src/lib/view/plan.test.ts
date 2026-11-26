@@ -18,6 +18,7 @@ describe("scenarioNames", () => {
 		const snapshot = demoSnapshot()
 		expect(scenarioNames({ status: "ready", url: "/demo/snapshot.json", snapshot })).toEqual([
 			"base",
+			"joint",
 			"retire-early",
 			"separate",
 		])

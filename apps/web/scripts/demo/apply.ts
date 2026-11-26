@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { DEMO_ESTATE } from "./estate"
 import { HOME_ACCOUNTS, HOME_FLOWS } from "./home"
+import { applyJointScenario } from "./joint"
 import {
 	baseScenarioDocument,
 	DEMO_HOUSEHOLD,
@@ -28,7 +29,7 @@ async function writeDocument(
 	await traj(["scenario", "apply", name, "--file", path])
 }
 
-/** Applies `base`, adds the Thai Levy to it, then forks `retire-early` and `separate` from it. */
+/** Applies `base`, adds the Thai Levy to it, then forks `retire-early`, `separate` and its joint counterpart from it. */
 export async function applyScenarios(
 	place: Place,
 	traj: DemoWrite,
@@ -48,6 +49,7 @@ export async function applyScenarios(
 		`flows.salary.end="${RETIRE_EARLY_SALARY_END}"`,
 	])
 	await applySeparateScenario(place, traj)
+	await applyJointScenario(traj)
 	await addHome(place, traj, "base", demoSpendingFlows(ids))
 }
 
