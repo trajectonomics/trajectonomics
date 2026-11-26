@@ -1,6 +1,7 @@
 <script lang="ts">
+import { flowTextWidth } from "../../client/flow-text.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { type StackLayout, stackName } from "../../lib/chart/flow-stack"
+import { STACK_LABEL_HALF, type StackLayout, stackName } from "../../lib/chart/flow-stack"
 import { formatMoney, maskMoney } from "../../lib/format"
 import { cx } from "../ui/cx"
 import { keyed } from "./flow-keys"
@@ -19,6 +20,9 @@ interface Props {
 /** The phone flow diagram of one year: the sources above, the uses below, one bar for each band. Each bar is a control. */
 let { layout, picked, onPick, label }: Props = $props()
 
+/** The diagram's one id prefix, so each row's name clip is its own. */
+const uid = $props.id()
+
 /** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
 const shown = (amount: string): string =>
 	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
@@ -32,7 +36,8 @@ const shown = (amount: string): string =>
 				{heading.text}
 			</text>
 		{/each}
-		{#each layout.rows as row (row.key)}
+		{#each layout.rows as row, index (row.key)}
+			{@const name = stackName(row.label, shown(row.amount), row.keep, flowTextWidth)}
 			<g
 				role="button"
 				tabindex="0"
@@ -42,8 +47,24 @@ const shown = (amount: string): string =>
 				onkeydown={(event) => keyed(event, () => onPick(row.key))}
 				class="group cursor-pointer outline-none hover:opacity-85"
 			>
-				<text data-flow-label x={row.labelX} y={row.labelY} dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
-					{stackName(row.label, shown(row.amount))}
+				<clipPath id={`${uid}-${index}`}>
+					<rect
+						x={row.labelX}
+						y={row.labelY - STACK_LABEL_HALF}
+						width={name.room}
+						height={2 * STACK_LABEL_HALF}
+					/>
+				</clipPath>
+				<text
+					data-flow-label
+					x={row.labelX}
+					y={row.labelY}
+					dominant-baseline="middle"
+					aria-hidden="true"
+					class="fill-foreground"
+					clip-path={`url(#${uid}-${index})`}
+				>
+					{name.text}
 				</text>
 				<text data-flow-amount x={row.amountX} y={row.labelY} text-anchor="end" dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
 					{shown(row.amount)}

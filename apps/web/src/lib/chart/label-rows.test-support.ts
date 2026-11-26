@@ -13,8 +13,9 @@ export function bareArea(width: number): LabelArea {
 /** The pixels a drawn label covers, worked out here for labels of narrow ASCII letters only. */
 export function boxOf(mark: LabelledMark, label: PlacedLabel): { from: number; to: number } {
 	const ellipsis = mark.code === true ? 7 : 12
+	const cell = mark.code === true ? 7 : 7.5
 	const cut = label.text.endsWith("…")
-	const width = cut ? (label.text.length - 1) * 7 + ellipsis : label.text.length * 7
+	const width = cut ? (label.text.length - 1) * cell + ellipsis : label.text.length * cell
 	return label.leftwards
 		? { from: mark.x - 4 - width, to: mark.x - 4 }
 		: { from: mark.x + 4, to: mark.x + 4 + width }

@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test"
 import { type LabelledMark, placedLabels } from "./label-rows"
 import { bareArea, chartArea, faults, threeRules } from "./label-rows.test-support"
 
-// Each narrow letter is 7px, the sans-serif ellipsis is 12px and the monospace one 7px, a label stands 4px
-// off its rule and two labels keep 6px between them.
+// Each narrow letter is 7.5px in the chart's text (7px in monospace), the sans-serif ellipsis is 12px and
+// the monospace one 7px, a label stands 4px off its rule and two labels keep 6px between them.
 const marksAt = (xs: readonly number[], label = "abcdefghij"): LabelledMark[] =>
 	xs.map((x) => ({ x, label }))
 
@@ -19,7 +19,7 @@ describe("placedLabels: rows", () => {
 	})
 
 	test("markers far apart share the top row", () => {
-		// "ab" spans 104 to 118, so a label starting at 124 (x 120) fits beside it; one at 123 (x 119) does not.
+		// "ab" spans 104 to 119, so a label starting at 125 (x 121) fits beside it; one at 124 (x 120) does not.
 		const rows = (x: number) =>
 			placedLabels(
 				[
@@ -28,8 +28,8 @@ describe("placedLabels: rows", () => {
 				],
 				bareArea(600),
 			).map((label) => label.row)
-		expect(rows(120)).toEqual([0, 0])
-		expect(rows(119)).toEqual([0, 1])
+		expect(rows(121)).toEqual([0, 0])
+		expect(rows(120)).toEqual([0, 1])
 	})
 
 	test("a third marker goes back to the first row that is free", () => {
@@ -42,9 +42,9 @@ describe("placedLabels: rows", () => {
 	})
 
 	test("moves a label whole to the other side rather than shortening it", () => {
-		// Width 400: x 324 prefers the left, where the rule at 300 leaves 20px, but the right has 72px and
-		// holds the whole 70px label, so it goes there whole and both labels share the top row.
-		const placed = placedLabels(marksAt([300, 324]), bareArea(400))
+		// Width 410: x 324 prefers the left, where the rule at 300 leaves 20px, but the right has 82px and
+		// holds the whole 75px label, so it goes there whole and both labels share the top row.
+		const placed = placedLabels(marksAt([300, 324]), bareArea(410))
 		expect(placed.map((label) => label.text)).toEqual(["abcdefghij", "abcdefghij"])
 		expect(placed.map((label) => label.leftwards)).toEqual([true, false])
 		expect(placed.map((label) => label.row)).toEqual([0, 0])
@@ -95,8 +95,8 @@ describe("placedLabels: rules and the plot's edges", () => {
 	})
 
 	test("shortens on the roomier side when neither side holds the whole label", () => {
-		// The rule at 180 leaves 26px to the right, enough for "ab…" on the preferred side; the plot's edge at
-		// 90 leaves 56px to the left, less than the whole 70px label but enough for "abcdef…", so the label
+		// The rule at 180 leaves 26px to the right, enough for "a…" on the preferred side; the plot's edge at
+		// 90 leaves 56px to the left, less than the whole 75px label but enough for "abcde…", so the label
 		// shortens on its roomier left side rather than on its preferred one.
 		const marks = [
 			{ x: 150, label: "abcdefghij" },
@@ -104,7 +104,7 @@ describe("placedLabels: rules and the plot's edges", () => {
 		]
 		const area = { width: 600, left: 90, right: 600 }
 		const placed = placedLabels(marks, area)
-		expect(placed[0]).toEqual({ row: 0, leftwards: true, text: "abcdef…" })
+		expect(placed[0]).toEqual({ row: 0, leftwards: true, text: "abcde…" })
 		expect(faults(marks, placed, area)).toEqual([])
 	})
 
@@ -155,11 +155,11 @@ describe("placedLabels: rules and the plot's edges", () => {
 	})
 
 	test("draws the bare first letter where only that fits, and nothing where it does not", () => {
-		// 6px on each side of the rule at 150's neighbours: not even one 7px letter.
+		// 6px on each side of the rule at 150's neighbours: not even one 7.5px letter.
 		const none = marksAt([140, 150, 160])
 		expect(placedLabels(none, bareArea(600))[1]?.text).toBe("")
-		// 7px to the right of the middle rule, 6px to its left.
-		const one = marksAt([140, 150, 161])
+		// 8px to the right of the middle rule, 6px to its left.
+		const one = marksAt([140, 150, 162])
 		const placed = placedLabels(one, bareArea(600))
 		expect(placed[1]).toMatchObject({ leftwards: false, text: "a" })
 		expect(faults(one, placed, bareArea(600))).toEqual([])

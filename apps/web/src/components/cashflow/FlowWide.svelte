@@ -1,6 +1,7 @@
 <script lang="ts">
+import { flowTextWidth } from "../../client/flow-text.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { FLOW_NODE_WIDTH, type FlowLayout } from "../../lib/chart/flow"
+import { FLOW_NODE_WIDTH, type FlowLayout, LABEL_HALF } from "../../lib/chart/flow"
 import { fittedLabel } from "../../lib/chart/flow-label"
 import { formatMoney, maskMoney } from "../../lib/format"
 import { cx } from "../ui/cx"
@@ -21,6 +22,9 @@ interface Props {
 
 /** The wide flow diagram of one year, from a medium screen up. Each band is a control: a click, or Enter or Space, picks its table row. */
 let { layout, picked, onPick, label, stacked = false }: Props = $props()
+
+/** The diagram's one id prefix, so each name's clip is its own. */
+const uid = $props.id()
 
 /** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
 const shown = (amount: string): string =>
@@ -58,8 +62,8 @@ const shown = (amount: string): string =>
 			height={layout.cash.height}
 			class="fill-foreground"
 		/>
-		{#each layout.nodes as node (node.key)}
-			{@const words = fittedLabel(node, shown(node.amount))}
+		{#each layout.nodes as node, index (node.key)}
+			{@const words = fittedLabel(node, shown(node.amount), flowTextWidth)}
 			<rect
 				x={node.x}
 				y={node.y}
@@ -67,14 +71,31 @@ const shown = (amount: string): string =>
 				height={node.height}
 				class="fill-foreground/70"
 			/>
+			<clipPath id={`${uid}-${index}`}>
+				<rect
+					x={words.clipX}
+					y={node.labelY - LABEL_HALF}
+					width={words.clipWidth}
+					height={2 * LABEL_HALF}
+				/>
+			</clipPath>
 			<text
-				x={node.labelX}
+				x={words.labelX}
 				y={node.labelY}
 				text-anchor={node.anchor}
 				dominant-baseline="middle"
 				aria-hidden="true"
 				class="fill-foreground"
-			><tspan data-flow-label>{words.label}</tspan><tspan data-flow-amount>{words.label === "" ? words.amount : ` ${words.amount}`}</tspan></text>
+				clip-path={`url(#${uid}-${index})`}
+			><tspan data-flow-label>{words.label}</tspan></text>
+			<text
+				x={words.amountX}
+				y={node.labelY}
+				text-anchor="end"
+				dominant-baseline="middle"
+				aria-hidden="true"
+				class="fill-foreground"
+			><tspan data-flow-amount>{words.amount}</tspan></text>
 		{/each}
 	</svg>
 </div>

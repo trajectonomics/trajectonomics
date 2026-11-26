@@ -7,12 +7,17 @@ import { join } from "node:path"
 import { scenarioShow } from "../src/lib/contract"
 import { decodeRead } from "../src/lib/snapshot/decode-read"
 import { hasTaxProfile } from "../src/lib/snapshot/stage-two-tax-notes"
-import { SEPARATE_LOANS_SENTENCE } from "../src/lib/view/tax-settings/notes"
+import {
+	DEPARTED_CLAIMS_MARKER,
+	DEPARTED_CLAIMS_OPENING,
+	SEPARATE_LOANS_SENTENCE,
+} from "../src/lib/view/tax-settings/notes"
 import { makeScratch, removeScratch } from "./scratch"
 import {
 	coupleDocument,
 	household,
 	linesOf,
+	readNotes,
 	spawn,
 	store,
 	taxSeparately,
@@ -136,11 +141,19 @@ describe("the tax notes the real traj states", () => {
 	})
 
 	test("the claims stored under an id no longer in the household", () => {
+		// The CLI quotes the raw id; the page says it in neutral words instead. The holder `me` is still in the
+		// household, so the departed `partner` is never called the earlier holder.
+		const raw = readNotes(home, "gone")
+		if (!raw.ok) throw new Error(raw.error.message)
+		expect(raw.data.unclaimed).toContainEqual(
+			expect.stringContaining(`${DEPARTED_CLAIMS_OPENING}partner${DEPARTED_CLAIMS_MARKER}`),
+		)
 		expect(linesOf(home, "gone")).toContainEqual(
 			expect.stringMatching(
-				/The claims stored for "partner", who is not in the household, are on no Return\./,
+				/The claims stored for another person, who is not in the household, are on no Return\./,
 			),
 		)
+		expect(linesOf(home, "gone").join("\n")).not.toContain('"partner"')
 	})
 
 	test("a separate filing's claim under a person with no taxed income", () => {

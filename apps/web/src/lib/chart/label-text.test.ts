@@ -37,24 +37,24 @@ describe("a shortened marker label", () => {
 	})
 
 	test("cuts Thai text between clusters, never inside one", () => {
-		// "ซื้อบ้านหลังแรก" is clusters ซื้, อ, บ้, า, น, ...; 26px fits the first two and the ellipsis.
-		expect(first("ซื้อบ้านหลังแรก", 130)).toBe("ซื้อ…")
+		// "ซื้อบ้านหลังแรก" is clusters ซื้, อ, บ้, า, น, ...; 27px fits the first two and the ellipsis.
+		expect(first("ซื้อบ้านหลังแรก", 131)).toBe("ซื้อ…")
 	})
 
 	test("keeps a Thai tone mark with its base", () => {
-		// 19px fits one cluster and the ellipsis: "ผ่", the base with its tone mark, not "ผ" alone.
-		expect(first("ผ่อนรถหมดแล้ว", 123)).toBe("ผ่…")
+		// 20px fits one 7.5px cluster and the ellipsis: "ผ่", the base with its tone mark, not "ผ" alone.
+		expect(first("ผ่อนรถหมดแล้ว", 124)).toBe("ผ่…")
 	})
 
 	test("never ends on a Thai leading vowel, which belongs to the consonant after it", () => {
-		// 26px fits "เก" and the ellipsis; 33px would fit "ขอเ", which must not be cut there.
-		expect(first("เกษียณ", 130)).toBe("เก…")
+		// 27px fits "เก" and the ellipsis; 33px would fit "ขอเ", which must not be cut there.
+		expect(first("เกษียณ", 131)).toBe("เก…")
 		expect(first("ขอเกษียณ", 137)).toBe("ขอ…")
 	})
 
 	test("stubs a Thai label with its leading vowel and consonant together, or not at all", () => {
-		expect(between("เกษียณ", 14)).toBe("เก")
-		expect(between("เกษียณ", 13)).toBe("")
+		expect(between("เกษียณ", 15)).toBe("เก")
+		expect(between("เกษียณ", 14)).toBe("")
 		expect(between("แต่งงาน", 7)).toBe("")
 	})
 

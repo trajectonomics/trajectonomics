@@ -23,7 +23,10 @@ const run = $derived(name === null ? undefined : snapshot.reads.projections[name
 /** The words for the plan's people, so the per-year table names each Return of a separate filing by role. */
 const people = $derived(personNames(read?.ok === true ? read.data.scenario.household : null))
 /** The CLI's own notes about the stored claims, one paragraph each; none when it refused or the plan keeps no profile. */
-const notes = $derived(name === null ? [] : claimNoteLines(snapshot.reads.taxNotes[name]))
+const holder = $derived(read?.ok === true ? (read.data.scenario.tax?.claimsHolder ?? null) : null)
+const notes = $derived(
+	name === null ? [] : claimNoteLines(snapshot.reads.taxNotes[name], people, holder),
+)
 </script>
 
 {#if name === null || read === undefined}

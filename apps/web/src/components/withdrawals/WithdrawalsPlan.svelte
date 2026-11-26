@@ -5,6 +5,7 @@ import { currentSearch } from "../../client/location.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { Snapshot } from "../../lib/contract"
 import { editsShown } from "../../lib/edit/shown"
+import { snapshotItemNames } from "../../lib/view/item-names"
 import { parseTerms, type Terms } from "../../lib/view/projection/terms"
 import { withdrawalsView } from "../../lib/view/withdrawals"
 import { milestoneDatesOf } from "../../lib/view/withdrawals/context"
@@ -52,6 +53,8 @@ const ctx = $derived(
 		: null,
 )
 const spends = $derived(ctx === null ? true : mainFlow(ctx.doc.flows) !== undefined)
+/** The names of the plan this page shows: its own document's labels, never another plan's. */
+const names = $derived(snapshotItemNames(snapshot, name))
 </script>
 
 <!-- One plan: what its spending rule pays year by year, and in good and bad markets; a what-if shows both ways. -->
@@ -70,8 +73,8 @@ const spends = $derived(ctx === null ? true : mainFlow(ctx.doc.flows) !== undefi
 						<p>Set how you spend in retirement: a level amount, or a share of what your savings are worth. No rate is chosen for you; each is your own estimate.</p>
 					</EmptyState>
 				{/if}
-				{#if tried}<WithdrawalsResult view={tried} terms={chosen} title="With your try" />{/if}
-				{#if showSaved}<WithdrawalsResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} {spends} />{/if}
+				{#if tried}<WithdrawalsResult view={tried} terms={chosen} title="With your try" {names} />{/if}
+				{#if showSaved}<WithdrawalsResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} {spends} {names} />{/if}
 				{#if saved.rules.length > 0 && saved.bands === null}
 					<p class="text-sm text-muted-foreground">A Return model would show what the rule pays in good and bad markets: pass <code>--return-model FILE</code>, <code>--paths N</code> and <code>--seed HEX</code> to <code>traj dashboard</code>.</p>
 				{/if}

@@ -23,22 +23,26 @@ function drawnWidth(drawn: ReturnType<typeof fittedLabel>): number {
 
 describe("fittedLabel", () => {
 	test("keeps a plain ASCII label that fits, whole", () => {
-		expect(fittedLabel({ ...RIGHT, label: "housing" }, "30,000.00")).toEqual({
+		expect(fittedLabel({ ...RIGHT, label: "housing" }, "30,000.00")).toMatchObject({
 			label: "housing",
 			amount: "30,000.00",
 		})
 	})
 
 	test("shortens a long name with an ellipsis and keeps the whole amount", () => {
-		// Right: 202 units less the amount's 70 leaves 132, so 17 of the name and the ellipsis.
-		expect(fittedLabel({ ...RIGHT, label: LONG }, "30,000.00")).toEqual({
-			label: "housing, utilitie…",
+		// Right: 202 units less the amount's 67.5 and a 7.5 space leaves 127, so 15 letters and the ellipsis.
+		expect(fittedLabel({ ...RIGHT, label: LONG }, "30,000.00")).toMatchObject({
+			label: "housing, utilit…",
 			amount: "30,000.00",
+			amountX: 789.5,
+			clipWidth: 127,
 		})
-		// Left: 214 units, so 18 of the name.
-		expect(fittedLabel({ ...LEFT, label: LONG }, "30,000.00")).toEqual({
-			label: "housing, utilities…",
+		// Left: 214 units, so 16 letters.
+		expect(fittedLabel({ ...LEFT, label: LONG }, "30,000.00")).toMatchObject({
+			label: "housing, utiliti…",
 			amount: "30,000.00",
+			amountX: 222,
+			clipWidth: 139,
 		})
 	})
 
@@ -68,6 +72,47 @@ describe("fittedLabel", () => {
 		expect(right.label).toBe("Salary…(salary)")
 		const left = fittedLabel({ ...LEFT, label: TWIN }, "336,000.00")
 		expect(left.label.endsWith("(salary)")).toBe(true)
+	})
+
+	test("measures the page's own font when one is given, and keeps a label the estimate would cut", () => {
+		const measure = (text: string) => text.length * 4
+		const short = { ...RIGHT, label: "HOME LOAN AND CONDO FEES" }
+		expect(fittedLabel(short, "171,012.54", measure)).toMatchObject({
+			label: "HOME LOAN AND CONDO FEES",
+			amount: "171,012.54",
+		})
+		// The estimate reserves 9 px a capital and cuts it; the measured 4 px a character holds it whole.
+		expect(fittedLabel(short, "171,012.54").label).toMatch(/…$/)
+	})
+
+	test("keeps a twin's id when it sits before the line's words", () => {
+		const label = "Salary (salary) into the Bangkok apartment"
+		const measure = (text: string) => text.length * 10
+		const drawn = fittedLabel({ ...RIGHT, label, keep: "(salary)" }, "1.00", measure)
+		expect(drawn.label).toBe("Salary…(salary)")
+	})
+
+	test("keeps the tail of an id too long to fit, so two twins stay distinct", () => {
+		const measure = (text: string) => text.length * 10
+		const one = fittedLabel(
+			{ ...RIGHT, label: "Saving (from-the-bank-a) into Bank", keep: "(from-the-bank-a)" },
+			"1.00",
+			measure,
+		)
+		const two = fittedLabel(
+			{ ...RIGHT, label: "Saving (from-the-bank-b) into Bank", keep: "(from-the-bank-b)" },
+			"1.00",
+			measure,
+		)
+		expect(one.label).toBe("…k-a) into Bank")
+		expect(two.label).toBe("…k-b) into Bank")
+		expect(one.label).not.toBe(two.label)
+	})
+
+	test("cuts a whole stem rather than gluing its id on without a space", () => {
+		const drawn = fittedLabel({ ...RIGHT, label: "Rent (old flat)" }, "1,234,567.89")
+		expect(drawn.label).toBe("Re…(old flat)")
+		expect(drawn.label).not.toBe("Rent(old flat)")
 	})
 
 	test("every label it draws stays inside the box on its side", () => {

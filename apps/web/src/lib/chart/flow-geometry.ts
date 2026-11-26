@@ -112,6 +112,7 @@ export function nodesOf(
 		key: slot.band.key,
 		kind: slot.band.kind,
 		label: slot.band.label,
+		keep: slot.band.keep,
 		amount: slot.band.amount,
 		side,
 		x: round(x),

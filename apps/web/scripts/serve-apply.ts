@@ -4,6 +4,12 @@ import { z } from "zod"
 import type { ErrorBody } from "../src/lib/contract"
 import { type Edit, writeCommand } from "../src/lib/edit/edit"
 import { templateRead } from "../src/lib/edit/plan-command"
+import {
+	carriesFlatClaim,
+	taxSwapRead,
+	taxSwapRefusal,
+	taxSwapShow,
+} from "../src/lib/edit/tax-swap"
 import { type RunContext, runTraj } from "./run-traj"
 
 /** Whether the Edit starts a plan from the ledger's accounts, so the server reads the template first. */
@@ -59,9 +65,22 @@ function wasCreated(data: unknown): boolean {
 	return status.success && status.data.status === "created"
 }
 
+/**
+ * Reads the plan again before a tax Edit that carries a flat claim, and refuses while its stored profile still records
+ * those claims under someone else: `scenario household` leaves the content hash unchanged, so the page's hash cannot
+ * tell that it read before the swap (issue #665, cli ADR-0055).
+ */
+async function swapRefusal(context: RunContext, edit: Edit): Promise<ErrorBody | null> {
+	if (!carriesFlatClaim(edit)) return null
+	const read = await runTraj(context, taxSwapRead(edit.name).argv, taxSwapShow)
+	return read.ok ? taxSwapRefusal(read.data.scenario, edit.name) : read.error
+}
+
 /** Runs one Edit, dry and then real. It ran, or it is the CLI's error (or the refusal) as data. */
 export async function runEdit(context: RunContext, edit: Edit): Promise<EditRun> {
 	const stopped = (error: ErrorBody): EditRun => ({ ok: false, error })
+	const swapped = await swapRefusal(context, edit)
+	if (swapped !== null) return stopped(swapped)
 	let template: string | undefined
 	if (startsPlan(edit)) {
 		const read = await runTraj(context, templateRead(edit.template.asOf), z.string())

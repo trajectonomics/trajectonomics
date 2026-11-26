@@ -8,7 +8,7 @@ import { measureOverflow } from "./fit"
 // write them to the new holder waits with the command that fixes it. The check runs at 360px, the phone width of #352.
 
 const NOTE =
-	"These claims are still recorded under your partner. Run `traj scenario tax swap-360 --from-stored` to record them under each person, then edit them here."
+	"These claims are still recorded under your partner. Run traj scenario tax swap-360 --from-stored to record them under each person, then edit them here."
 
 async function fits(page: Page): Promise<void> {
 	const fit = await measureOverflow(page, true)

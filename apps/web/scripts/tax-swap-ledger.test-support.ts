@@ -18,6 +18,7 @@ type Shown = {
 	scenario: {
 		tax?: TaxProfile | null
 		contentHash: string
+		version: number
 		household: { people: { id: string; role: string }[] } & Record<string, unknown>
 	}
 }
@@ -89,6 +90,11 @@ export function storedProfile(): TaxProfile | null {
 /** The plan's content hash, which every Edit names. */
 export function contentHash(): string {
 	return shown().contentHash
+}
+
+/** The row's version: a write that runs moves it, so a refusal that wrote nothing leaves it as it was. */
+export function planVersion(): number {
+	return shown().version
 }
 
 export async function disposeSwap(): Promise<void> {

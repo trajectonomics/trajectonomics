@@ -4,7 +4,6 @@
  * other Return's claims are its `returns` entry. The page shows the stored claims and applies nothing. Pure.
  */
 import type { HouseholdDocument, ReturnClaims, TaxProfile } from "../../contract"
-import type { PersonName, PersonNames } from "../item-names"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
 import { groupDigits, type ShownAmount } from "./rows"
 
@@ -38,6 +37,14 @@ type ClaimField = TaxField & {
 const CLAIM_FIELDS: readonly ClaimField[] = [...COUNT_FIELDS, ...AMOUNT_FIELDS].filter(
 	(field): field is ClaimField => field.key !== "sharedMortgageInterest",
 )
+
+/** The table's own row words, neutral because each column is one person's Return: a "you" row would show another's figure. */
+const CLAIM_ROW_LABELS: Readonly<Partial<Record<ClaimField["key"], string>>> = {
+	parents: "Parents supported",
+	disabledCare: "Relatives with a disability cared for",
+	healthInsurance: "Health insurance premiums",
+	parentHealthInsurance: "Health insurance premiums for parents",
+}
 
 /** An amount in baht, with the digits Hide amounts masks and the currency after them. */
 function moneyCell(amount: number): ClaimCell {
@@ -90,7 +97,7 @@ export function claimsTable(
 		people: [...filers],
 		rows: CLAIM_FIELDS.map((field) => ({
 			key: field.key,
-			label: field.label,
+			label: CLAIM_ROW_LABELS[field.key] ?? field.label,
 			cells: filers.map((person) => cellOf(claimsOf(person), field)),
 		})),
 		sharedInterest:
@@ -98,30 +105,4 @@ export function claimsTable(
 				? null
 				: moneyCell(profile.sharedMortgageInterest),
 	}
-}
-
-/**
- * The person whose claims the profile's flat keys are, when a separate filing's holder swap left them recorded for the
- * other person: the cards then name them instead of saying "you". Null for a filing that keeps one Return, whose flat
- * keys are that Return's own, and with no household holder to compare the record against. An id the household no longer
- * names is called the earlier holder, never by its id.
- */
-export function flatClaimant(
-	profile: TaxProfile,
-	household: HouseholdDocument | null,
-	people: PersonNames,
-): PersonName | null {
-	if (profile.filingStatus !== "married_separate") return null
-	const recorded = profile.claimsHolder
-	const holder = household?.people.find((person) => person.role === "holder")?.id
-	if (recorded === undefined || holder === undefined || recorded === holder) return null
-	return people.get(recorded) ?? { label: "The earlier holder", subject: "the earlier holder" }
-}
-
-/**
- * Why the page waits before it changes the flat claims of a swapped holder, in the person's own words: they are still
- * recorded under the claimant, and `--from-stored` moves them to each Return before an edit can name the right person.
- */
-export function flatClaimNote(claimant: PersonName, plan: string): string {
-	return `These claims are still recorded under ${claimant.subject}. Run \`traj scenario tax ${plan} --from-stored\` to record them under each person, then edit them here.`
 }

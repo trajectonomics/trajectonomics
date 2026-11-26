@@ -1,12 +1,16 @@
 <script lang="ts">
+import { type ItemNames, itemLabel } from "../../lib/view/item-names"
 import type { Terms } from "../../lib/view/projection/terms"
 import type { WithdrawalsView } from "../../lib/view/withdrawals"
+import ItemWords from "../ui/ItemWords.svelte"
 import BandsSection from "./BandsSection.svelte"
 import RuleYearsTable from "./RuleYearsTable.svelte"
 
 interface Props {
 	view: WithdrawalsView
 	terms: Terms
+	/** The plan's names by id, for the label of each rule Flow. */
+	names: ItemNames
 	/** Names the block when a what-if shows two: "With your try" or "Saved plan". Absent when there is one. */
 	title?: string | undefined
 	/** False when the plan holds no spending Flow at all, so a block with no rule years says that and not "a level amount". */
@@ -14,15 +18,16 @@ interface Props {
 }
 
 /** The Rule years of each rule Flow and, when the plan reads a Return model, what the rule pays in good and bad markets. */
-let { view, terms, title, spends = true }: Props = $props()
+let { view, terms, names, title, spends = true }: Props = $props()
 </script>
 
 <div class="space-y-6">
 	{#if title}<h2 class="text-lg font-semibold">{title}</h2>{/if}
 	{#each view.rules as rule (rule.flow)}
-		<section aria-label="{rule.flow} year by year" class="space-y-2">
-			<h3 class="text-base font-semibold">Year by year: {rule.flow}</h3>
-			<RuleYearsTable {rule} currency={view.currency} {terms} />
+		{@const label = itemLabel(names, "flow", rule.flow)}
+		<section aria-label={`${label.text} year by year`} class="space-y-2">
+			<h3 class="text-base font-semibold">Year by year: <ItemWords {label} /></h3>
+			<RuleYearsTable {rule} currency={view.currency} {terms} {names} />
 		</section>
 	{/each}
 	{#if view.chance}

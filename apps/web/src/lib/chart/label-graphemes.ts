@@ -1,7 +1,9 @@
 /** A generous width for one character of a marker label in the chart's small text, in pixels. */
-const CHAR_PX = 7
+const CHAR_PX = 7.5
+/** A monospace cell, which the chart's 11px code labels draw narrower than the sans-serif text. */
+const CODE_CHAR_PX = 7
 /** The width of a wide sans-serif letter, such as most capitals, in pixels. */
-const BROAD_PX = 10
+const BROAD_PX = 9
 /** The width of a wide Thai consonant, in either font, in pixels. */
 const THAI_BROAD_PX = 11
 /** The width of the widest characters: East Asian, or a sans-serif `m`, `M`, `W`, `@`, `%` or dash. */
@@ -19,9 +21,13 @@ const LEADING_VOWELS = /^[เ-ไ]+$/
 const ZERO_WIDTH = /^[\p{Mn}\p{Me}\p{Cf}]$/u
 /** A grapheme that holds a pictograph, such as an emoji or a flag: one glyph, wider than a letter. */
 const PICTURE = /[\p{Extended_Pictographic}\p{Regional_Indicator}]/u
-/** East Asian scripts, and the CJK punctuation and full-width forms drawn at a full em beside them. */
+/**
+ * East Asian scripts, and the CJK punctuation and full-width forms drawn at a full em beside them. The
+ * scripts match on `Script_Extensions`, so `ー` and `・` count with the kana they extend even though their
+ * own script is Common, and U+3200–33FF holds the enclosed CJK letters and months such as `㈱`.
+ */
 const EAST_ASIAN =
-	/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\u3000-\u303F\uFF01-\uFF60\uFFE0-\uFFE6]$/u
+	/^[\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Hangul}\u3000-\u303F\u3200-\u33FF\uFF01-\uFF60\uFFE0-\uFFE6]$/u
 const THAI_BROAD = /^[ญฌฒณ]$/
 /** Sans-serif characters wider than {@link CHAR_PX}. A monospace font draws them as wide as the others. */
 const WIDEST = /^[mMW@%—]$/
@@ -50,18 +56,13 @@ function clusters(label: string): string[] {
 }
 
 /**
- * The width of one grapheme: a Thai base with its marks one character, and a joined emoji every pictograph
- * it is built from. A font without the joined glyph draws each emoji on its own, so none may go uncounted.
+ * The width of one grapheme: a joined emoji counts once, as the one glyph a page with an emoji font draws,
+ * and a Thai base with its marks one character.
  */
 function graphemeWidth(grapheme: string, code: boolean): number {
+	if (PICTURE.test(grapheme)) return code ? CODE_CHAR_PX * 2 : EMOJI_PX
 	let width = 0
-	for (const character of grapheme) {
-		width += PICTURE.test(character)
-			? code
-				? CHAR_PX * 2
-				: EMOJI_PX
-			: characterWidth(character, code)
-	}
+	for (const character of grapheme) width += characterWidth(character, code)
 	return width
 }
 
@@ -70,7 +71,7 @@ function characterWidth(character: string, code: boolean): number {
 	if (ZERO_WIDTH.test(character)) return 0
 	if (EAST_ASIAN.test(character)) return WIDEST_PX
 	if (THAI_BROAD.test(character)) return THAI_BROAD_PX
-	if (code) return CHAR_PX
+	if (code) return CODE_CHAR_PX
 	if (WIDEST.test(character)) return WIDEST_PX
 	return BROAD.test(character) ? BROAD_PX : CHAR_PX
 }

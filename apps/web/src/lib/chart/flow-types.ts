@@ -21,6 +21,8 @@ export interface FlowBand {
 	readonly key: string
 	readonly kind: FlowKind
 	readonly label: string
+	/** A twin Flow's `(id)`, which a fitted label keeps in view; null or absent for any other band. */
+	readonly keep?: string | null | undefined
 	readonly amount: string
 }
 
@@ -35,6 +37,8 @@ export interface FlowNode {
 	readonly key: string
 	readonly kind: FlowKind
 	readonly label: string
+	/** A twin Flow's `(id)`, which a fitted label keeps in view; null or absent for any other band. */
+	readonly keep?: string | null | undefined
 	readonly amount: string
 	readonly side: "source" | "use"
 	readonly x: number

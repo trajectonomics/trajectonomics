@@ -1,6 +1,7 @@
 import { columnTotal, round, sized } from "./flow-geometry"
 import type { FlowInput, FlowKind } from "./flow-types"
-import { fittedKeepingSuffix, textWidth } from "./label-width"
+import { fittedKeepingSuffix } from "./label-keep"
+import { type TextMeasure, textWidth } from "./label-width"
 
 /**
  * The flow diagram of one year, for a phone: the sources above and the uses below, two lists of bars on
@@ -51,6 +52,8 @@ export interface StackRow {
 	readonly key: string
 	readonly kind: FlowKind
 	readonly label: string
+	/** A twin Flow's `(id)`, which a fitted label keeps in view; null or absent for any other band. */
+	readonly keep?: string | null | undefined
 	readonly amount: string
 	readonly side: "source" | "use"
 	/** Where the name starts (left-anchored) and where the amount ends (right-anchored), both on `labelY`. */
@@ -99,6 +102,7 @@ export function layoutStack(input: FlowInput): StackLayout {
 				key: band.key,
 				kind: band.kind,
 				label: band.label,
+				keep: band.keep,
 				amount: band.amount,
 				side,
 				labelX: STACK_MARGIN,
@@ -116,14 +120,26 @@ export function layoutStack(input: FlowInput): StackLayout {
 	return { width: STACK_WIDTH, height: round(bottom + STACK_MARGIN), headings, rows }
 }
 
+/** A row's name as drawn: the words in its room, and that room, which its clip holds. */
+export interface StackName {
+	readonly text: string
+	readonly room: number
+}
+
 /**
- * A row's name as it is drawn: the name shortened with an ellipsis so that it and the amount fit the line.
- * The amount is as the page shows it and is never shortened: the name gives way first, cut between
- * graphemes and measured at a conservative width, so it never covers the amount or leaves the line. A
- * twin's `(id)` suffix stays in view. The full name stays in the band's label and the table, so nothing is
- * lost to a screen reader.
+ * A row's name as it is drawn. The name is shortened with an ellipsis so that it and the amount fit the
+ * line, measured in the page's font when `measure` is given and in a conservative estimate when not. The
+ * amount is as the page shows it and is never shortened: the name gives way first, cut between graphemes,
+ * so it never covers the amount or leaves the line. A twin's `(id)` stays in view. The full name stays in
+ * the band's label and the table, so nothing is lost to a screen reader.
  */
-export function stackName(label: string, shownAmount: string): string {
-	const room = STACK_WIDTH - 2 * STACK_MARGIN - NAME_GAP - textWidth(shownAmount, false)
-	return fittedKeepingSuffix(label, room, false).text
+export function stackName(
+	label: string,
+	shownAmount: string,
+	keep: string | null = null,
+	measure?: TextMeasure,
+): StackName {
+	const amount = measure === undefined ? textWidth(shownAmount, false) : measure(shownAmount)
+	const room = Math.max(0, STACK_WIDTH - 2 * STACK_MARGIN - NAME_GAP - amount)
+	return { text: fittedKeepingSuffix(label, room, false, keep, measure).text, room }
 }
