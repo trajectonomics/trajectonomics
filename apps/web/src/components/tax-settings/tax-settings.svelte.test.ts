@@ -150,6 +150,19 @@ describe("the tax profile form", () => {
 		expect(body).not.toContain("instead")
 	})
 
+	test("lists the CLI's notes about the stored claims, on a joint plan too", () => {
+		const body = render(TaxProfileCard, {
+			props: {
+				name: "base",
+				show: show({ tax: profile, taxed: true }),
+				editable: true,
+				notes: ['The claims stored for "partner" are kept for a separate filing.'],
+			},
+		}).body
+		expect(body).toContain("Notes on the stored claims")
+		expect(body).toContain('The claims stored for "partner" are kept for a separate filing.')
+	})
+
 	test("every item of the profile has a field", () => {
 		const draft = blankDraft()
 		const body = render(TaxProfileFields, {

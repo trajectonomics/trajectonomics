@@ -10,11 +10,13 @@ interface Props {
 	/** The plan as `scenario show` reads it: its tax profile, whether it is taxed, and the hash every Edit names. */
 	show: ScenarioShow["scenario"]
 	editable: boolean
+	/** The CLI's own notes about the stored claims, one paragraph each. */
+	notes?: readonly string[]
 	/** The plan's tax years, whose assumptions the page echoes for two separate Returns that share a home loan. */
 	years?: readonly TaxYear[]
 }
 
-let { name, show, editable, years = [] }: Props = $props()
+let { name, show, editable, notes = [], years = [] }: Props = $props()
 const profile = $derived(show.tax ?? null)
 // A Snapshot saved before profiles were kept states no `taxed`; the plan's own tax rules say it.
 const taxed = $derived(isTaxed(show))
@@ -32,5 +34,5 @@ const taxed = $derived(isTaxed(show))
 	{:else if profile === null}
 		<p class="text-sm text-foreground">Plan {name} is not taxed, so its figures are before tax.</p>
 	{/if}
-	<TaxProfileActions {name} {show} {editable} {years} />
+	<TaxProfileActions {name} {show} {editable} {notes} {years} />
 </section>

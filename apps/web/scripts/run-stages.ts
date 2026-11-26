@@ -27,6 +27,7 @@ import { runAllowances } from "./run-allowances"
 import { runHistory } from "./run-history"
 import { runPaths } from "./run-paths"
 import { runPlanned } from "./run-planned"
+import { runTaxNotes } from "./run-tax-notes"
 import type { RunContext } from "./run-traj"
 
 /** Runs each item in order, one at a time, so the ledger is read in a fixed sequence. */
@@ -97,5 +98,6 @@ export async function runStageTwo(
 		chance,
 		paths: await runPaths(context, plan, chance, records),
 		allowances: await runAllowances(context, plan, documents, projections, records),
+		taxNotes: await runTaxNotes(context, plan, documents, records),
 	}
 }

@@ -16,6 +16,7 @@ import { projectionRun } from "./projection-run"
 import { readOf } from "./read"
 import { scenarioList } from "./scenario-list"
 import { scenarioShow } from "./scenario-show"
+import { taxNotes } from "./tax-notes"
 import { txList } from "./tx-list"
 
 /** The version of the Snapshot document. A change to its shape bumps it. */
@@ -66,6 +67,9 @@ export const snapshotReads = z.strictObject({
 	paths: z.record(z.string(), z.record(z.string(), readOf(projectionPath))).default({}),
 	// One `projection allowances` per plan that has a Levy, when the Snapshot states allowance inputs.
 	allowances: z.record(z.string(), readOf(projectionAllowances)).default({}),
+	// The CLI's own notes about a plan's stored claims, from `scenario tax --from-stored --dry-run`, one
+	// per plan with a tax profile; absent from a Snapshot made before the notes, so it reads as none.
+	taxNotes: z.record(z.string(), readOf(taxNotes)).default({}),
 })
 export type SnapshotReads = z.infer<typeof snapshotReads>
 

@@ -28,14 +28,17 @@ describe("the Snapshot against the real traj", () => {
 	})
 
 	test(
-		"every read of a fresh demo ledger is ok, and the whole document parses",
+		"every read of a fresh demo ledger is ok but a refused tax-notes dry run, and the whole document parses",
 		async () => {
 			const run = await demoRun()
 			if (!run.ok) throw new Error(`the demo did not run: ${run.message}`)
-			const failed = readsOf(run.snapshot)
-				.filter((read) => !read.ok)
-				.map((read) => `${read.argv.join(" ")}: ${read.ok ? "" : read.error.message}`)
-			expect(failed).toEqual([])
+			const failed = readsOf(run.snapshot).filter((read) => !read.ok)
+			// `base` gained an income Flow without a tax label after its Levy was written, so the CLI refuses
+			// `--from-stored`; the read keeps the refusal, and the tax page shows no note for it.
+			const notes = failed.filter((read) => read.argv[0] === "scenario" && read.argv[1] === "tax")
+			expect(notes).toHaveLength(1)
+			if (notes[0]?.ok === false) expect(notes[0].error.code).toBe("invalid_input")
+			expect(failed.filter((read) => !notes.includes(read))).toEqual([])
 			expect(snapshot.safeParse(run.snapshot).success).toBe(true)
 		},
 		SLOW_MS,

@@ -28,6 +28,7 @@ function holding(over: Record<string, unknown> = {}): Snapshot {
 		chance: {},
 		paths: {},
 		allowances: {},
+		taxNotes: {},
 		compare: null,
 		...over,
 	}
