@@ -66,7 +66,7 @@ describe("the Projection's charts", () => {
 		expect(body).toContain("stacked chart draws one set of terms")
 	})
 
-	test("two series that read the same name are keyed apart and told apart by their ids", () => {
+	test("two series whose labels read the same are told apart by their ids", () => {
 		const run = withExpenseFlows(["a", "rent"])
 		const names = planNames([{ id: "a", displayLabel: "rent" }, { id: "rent" }])
 		const series = resolveSeries(run, names)

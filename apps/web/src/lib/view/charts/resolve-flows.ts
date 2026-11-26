@@ -23,6 +23,22 @@ function lineHeader(
 	return { id: `cash:${lineKey(line)}`, name: `${prefix}: ${lineLabel(line, names)}` }
 }
 
+/**
+ * The item a cash-flow series names, read from its id (`cash:[group, id, account, category]`): the Flow or category id,
+ * else the Account, else words for a line that names neither ("no category"). Any other series answers its own id.
+ */
+export function seriesLabelId(seriesId: string): string {
+	if (!seriesId.startsWith("cash:")) return seriesId
+	try {
+		const [group, itemId, account] = JSON.parse(seriesId.slice("cash:".length)) as unknown[]
+		if (typeof itemId === "string") return itemId
+		if (typeof account === "string") return account
+		return group === "category" ? "no category" : String(group)
+	} catch {
+		return seriesId
+	}
+}
+
 /** A series while it is collected, with the id its name takes when another series of the run would read the same. */
 interface Collected extends Resolved {
 	readonly nominal: Resolved["nominal"][number][]
@@ -70,7 +86,7 @@ export function cashflowFigures(run: ProjectionRun, names: ItemNames = NO_ITEM_N
 			group: "money" as const,
 			nominal: [],
 			real: null,
-			labelId: line.id ?? line.account ?? head.id,
+			labelId: seriesLabelId(head.id),
 		}
 		found.nominal.push(pointAt(end, line.amount, periods.get(end) ?? null))
 		byKey.set(head.id, found)

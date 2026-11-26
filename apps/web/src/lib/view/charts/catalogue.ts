@@ -2,6 +2,7 @@ import type { ProjectionRun } from "../../contract"
 import { type ItemNames, itemNames } from "../item-names"
 import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
+import { seriesLabelId } from "./resolve-flows"
 import { GROUPS, type GroupId, type Resolved } from "./types"
 
 /** One series the picker lists: whether the selected plan has it, and if not, why not. */
@@ -55,19 +56,39 @@ export function buildCatalogue(
 	const known = new Map<string, { name: string; group: GroupId; real: boolean }>()
 	for (const item of ALWAYS)
 		known.set(item.id, { ...item, real: item.id === "net-worth" || item.id === "estate:heirs" })
-	for (const run of runs) {
+	// The selected plan's runs first, so a series it draws keeps the very name its chart shows.
+	const ordered = selected === null ? runs : [selected, ...runs.filter((run) => run !== selected)]
+	for (const run of ordered) {
 		for (const found of resolveSeries(run, names)) {
 			if (!known.has(found.id) || found.id === "net-worth") {
 				known.set(found.id, { name: found.name, group: found.group, real: found.real !== null })
 			}
 		}
 	}
+	const listed = apart([...known], has)
 	return GROUPS.map((group) => {
-		const entries = [...known]
+		const entries = listed
 			.filter(([, item]) => item.group === group.id)
 			.map(([id, item]) => entryOf(id, item, has))
 		return { id: group.id, title: group.title, entries, notes: notesFor(group.id, has) }
 	})
+}
+
+/**
+ * The picker's names told apart: a series the selected plan draws keeps its chart's name, and any other series whose
+ * name another entry also reads takes its item's id, as a twin does (web ADR 0029), so no two choices read alike.
+ */
+function apart<T extends { readonly name: string }>(
+	entries: readonly (readonly [string, T])[],
+	has: ReadonlySet<string>,
+): (readonly [string, T])[] {
+	const counts = new Map<string, number>()
+	for (const [, item] of entries) counts.set(item.name, (counts.get(item.name) ?? 0) + 1)
+	return entries.map(([id, item]) =>
+		has.has(id) || (counts.get(item.name) ?? 0) < 2
+			? ([id, item] as const)
+			: ([id, { ...item, name: `${item.name} (${seriesLabelId(id)})` }] as const),
+	)
 }
 
 function entryOf(
