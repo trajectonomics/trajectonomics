@@ -1,3 +1,5 @@
+import { type ItemLabel, type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
+import { wordsOf } from "../words"
 import type { CashflowLine } from "./cashflow"
 
 /** The key of a line, unique in its roll-up, so a band and its table row can name each other. */
@@ -22,27 +24,77 @@ export function isRefund(line: CashflowLine): boolean {
 	return line.group === "settlement" && line.amount.startsWith("-")
 }
 
-/** The label of a line given its Account's name, by the line's group. */
-type Namer = (line: CashflowLine, account: string) => string
+/**
+ * The groups whose line's `id` names a Flow, which the plan's label names. A prepaid or settlement id names a Levy, a
+ * category's names a category, and the rest name no item (web ADR 0029).
+ */
+const FLOW_GROUPS: ReadonlySet<CashflowLine["group"]> = new Set([
+	"income",
+	"expense",
+	"contribution",
+	"unfunded",
+	"employer",
+	"withdrawal",
+])
 
-const NAMERS: Readonly<Record<CashflowLine["group"], Namer>> = {
-	income: (line) => line.id ?? "Income",
-	payout: (_line, account) => `Paid out by ${account}`,
-	prepaid: (line) => `Prepayment, ${line.id ?? ""}`,
-	settlement: (line) => `${isRefund(line) ? "Refund" : "Settlement"}, ${line.id ?? ""}`,
-	expense: (line) => line.id ?? "Expense",
-	category: (line) => line.id ?? "Uncategorised",
-	contribution: (line, account) => `${line.id ?? ""} into ${account}`,
-	unfunded: (line, account) => `${line.id ?? ""} not funded into ${account}`,
-	employer: (line, account) => `From your employer into ${account} (${line.id ?? ""})`,
-	withdrawal: (line, account) => `${line.id ?? ""} from ${account}`,
-	drawn: (_line, account) => `Drawn from ${account}`,
-	surplus: (_line, account) => `Left over in ${account}`,
-	unmet: () => "Unmet",
+/** The label of a line given its Account's name and the Flow it names, by the line's group. */
+type Namer = (line: CashflowLine, account: string, flow: ItemLabel | null) => readonly LinePart[]
+
+/** A piece of a line's label: words, or the plan's words for a Flow, which a page without a label draws in code. */
+export type LinePart = string | { readonly item: ItemLabel }
+
+/** A Flow's words as a part: its plan's label, or the id in code when the plan states none. */
+function flowPart(flow: ItemLabel | null): LinePart {
+	return flow === null ? "" : { item: flow }
 }
 
-/** A line's label, with the Account's name where the line has one. A null category is named as uncategorised. */
-export function lineLabel(line: CashflowLine, accountName: ReadonlyMap<string, string>): string {
+const NAMERS: Readonly<Record<CashflowLine["group"], Namer>> = {
+	income: (_line, _account, flow) => (flow === null ? ["Income"] : [flowPart(flow)]),
+	payout: (_line, account) => [`Paid out by ${account}`],
+	prepaid: (line) => [`Prepayment, ${line.id ?? ""}`],
+	settlement: (line) => [`${isRefund(line) ? "Refund" : "Settlement"}, ${line.id ?? ""}`],
+	expense: (_line, _account, flow) => (flow === null ? ["Expense"] : [flowPart(flow)]),
+	category: (line) => [line.id ?? "Uncategorised"],
+	contribution: (_line, account, flow) => [flowPart(flow), ` into ${account}`],
+	unfunded: (_line, account, flow) => [flowPart(flow), ` not funded into ${account}`],
+	employer: (_line, account, flow) => [
+		"From your employer into ",
+		account,
+		" (",
+		flowPart(flow),
+		")",
+	],
+	withdrawal: (_line, account, flow) => [flowPart(flow), ` from ${account}`],
+	drawn: (_line, account) => [`Drawn from ${account}`],
+	surplus: (_line, account) => [`Left over in ${account}`],
+	unmet: () => ["Unmet"],
+}
+
+/** The words of a Flow a line names, or null for a line that names none. */
+function flowOf(line: CashflowLine, names: ItemNames): ItemLabel | null {
+	if (line.id === null || !FLOW_GROUPS.has(line.group)) return null
+	return itemLabel(names, "flow", line.id)
+}
+
+/**
+ * A line's label as parts, with the Account's name where the line has one and the plan's words for the Flow it names.
+ * A Flow the plan labels reads its label, and one it does not label shows its id in code. A null category is named as
+ * uncategorised.
+ */
+export function lineWords(
+	line: CashflowLine,
+	accountName: ReadonlyMap<string, string>,
+	names: ItemNames = NO_ITEM_NAMES,
+): readonly LinePart[] {
 	const account = line.account === null ? "" : (accountName.get(line.account) ?? line.account)
-	return NAMERS[line.group](line, account)
+	return NAMERS[line.group](line, account, flowOf(line, names))
+}
+
+/** A line's label as plain text, for a chart's label, which holds no markup (web ADR 0029). */
+export function lineLabel(
+	line: CashflowLine,
+	accountName: ReadonlyMap<string, string>,
+	names: ItemNames = NO_ITEM_NAMES,
+): string {
+	return wordsOf(lineWords(line, accountName, names)).text
 }

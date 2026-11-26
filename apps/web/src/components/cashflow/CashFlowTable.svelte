@@ -1,24 +1,26 @@
 <script lang="ts">
 import type { CashflowLine, Section } from "../../lib/view/cashflow/cashflow"
-import { lineKey, lineLabel } from "../../lib/view/cashflow/cashflow-labels"
+import { lineKey, lineWords } from "../../lib/view/cashflow/cashflow-labels"
+import type { ItemNames } from "../../lib/view/item-names"
 import { cx } from "../ui/cx"
+import ItemWords from "../ui/ItemWords.svelte"
 import Money from "../ui/Money.svelte"
 
 interface Props {
 	/** The sections of the year, in the order a person reads them: each total, then its parts' lines. */
 	sections: readonly Section[]
-	/** The Accounts' names by id, for a line's label. */
-	accountNames: ReadonlyMap<string, string>
+	/** The plan's names by id: its Accounts', and the labels its document states for its Flows. */
+	names: ItemNames
 	/** The key of the band the person picked, whose row is shown picked. */
 	picked: string | null
 	onPick: (key: string) => void
 }
 
 /** The year's lines under the CLI's section totals. The page adds nothing: each total is the CLI's string. */
-let { sections, accountNames, picked, onPick }: Props = $props()
+let { sections, names, picked, onPick }: Props = $props()
 
-function label(line: CashflowLine): string {
-	return lineLabel(line, accountNames)
+function words(line: CashflowLine) {
+	return lineWords(line, names.accounts, names)
 }
 
 const isEmpty = (section: Section): boolean =>
@@ -69,7 +71,7 @@ const isEmpty = (section: Section): boolean =>
 									onclick={() => onPick(key)}
 									class="text-left outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring"
 								>
-									{label(line)}
+									{#each words(line) as part, index (index)}{#if typeof part === "string"}{part}{:else}<ItemWords label={part.item} />{/if}{/each}
 								</button>
 							</td>
 							<td class="px-3 py-2 text-right align-top tabular-nums">

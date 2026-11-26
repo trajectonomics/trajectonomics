@@ -41,7 +41,9 @@ function isFigure(change: Change): change is Extract<Change, { kind: "set" }> {
 function wordsOf(change: Change): string {
 	const label = labelWithNames(change, names)
 	if (change.kind === "flow") {
-		return tryWords({ ...change, label }, (id) => itemText(names, "account", id))
+		const accountText = (id: string) => itemText(names, "account", id)
+		const flowText = (id: string) => itemText(names, "flow", id)
+		return tryWords({ ...change, label }, accountText, flowText)
 	}
 	if (!isFigure(change) || !preferences.hidden) return label
 	// A figure's label ends with its value as typed, so the value's place is masked and the rest kept.

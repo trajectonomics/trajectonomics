@@ -13,6 +13,7 @@ import {
 } from "../../lib/view/cashflow/cashflow"
 import { flowOf } from "../../lib/view/cashflow/cashflow-flow"
 import { rowKeyOf } from "../../lib/view/cashflow/cashflow-labels"
+import type { ItemNames } from "../../lib/view/item-names"
 import EmptyState from "../ui/EmptyState.svelte"
 import CashFlowTable from "./CashFlowTable.svelte"
 import FlowDiagram from "./FlowDiagram.svelte"
@@ -24,18 +25,18 @@ interface Props {
 	/** The year the address bar asks for. An unknown one shows the first. */
 	year: string
 	onYear: (index: string) => void
-	/** The Accounts' names by id. */
-	accountNames: ReadonlyMap<string, string>
+	/** The plan's names by id: its Accounts', and the labels its document states for its Flows. */
+	names: ItemNames
 }
 
 /** The selected year: the year picker, its flow diagram, and the table of its lines. A pick is shared by both. */
-let { run, year, onYear, accountNames }: Props = $props()
+let { run, year, onYear, names }: Props = $props()
 /** The band the person picked, with the roll-up it was picked in: a pick does not carry over to another year. */
 let pickedIn: Pick | null = $state(null)
 
 const rollups = $derived(rollupsOf(run))
 const rollup = $derived(chooseRollup(rollups, year))
-const flow = $derived(rollup === null ? null : flowOf(rollup, accountNames))
+const flow = $derived(rollup === null ? null : flowOf(rollup, names.accounts, names))
 const layout = $derived(flow === null ? null : layoutFlow(flow))
 const stack = $derived(flow === null ? null : layoutStack(flow))
 const sections = $derived(rollup === null ? [] : sectionsOf(rollup))
@@ -61,7 +62,7 @@ function pick(band: string): void {
 				A refund is shown as money in, so the tax band is the tax paid, and the tax total is the tax paid
 				less the refund.
 			</p>
-			<CashFlowTable {sections} {accountNames} {picked} onPick={pick} />
+			<CashFlowTable {sections} {names} {picked} onPick={pick} />
 		{/key}
 	</div>
 {/if}

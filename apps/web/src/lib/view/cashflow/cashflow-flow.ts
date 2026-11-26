@@ -1,4 +1,5 @@
 import type { FlowBand, FlowInput, FlowKind } from "../../chart/flow"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import type { CashflowLine, Rollup } from "./cashflow"
 import { intoKey, isRefund, lineKey, lineLabel } from "./cashflow-labels"
 
@@ -8,11 +9,15 @@ import { intoKey, isRefund, lineKey, lineLabel } from "./cashflow-labels"
  * refund is a source with the sign taken off its CLI string. Unfunded money is not in the flow: the
  * engine's identity does not count it, so it is only in the table.
  */
-export function flowOf(rollup: Rollup, accountName: ReadonlyMap<string, string>): FlowInput {
+export function flowOf(
+	rollup: Rollup,
+	accountName: ReadonlyMap<string, string>,
+	names: ItemNames = NO_ITEM_NAMES,
+): FlowInput {
 	const band = (line: CashflowLine, kind: FlowKind, amount = line.amount): FlowBand => ({
 		key: lineKey(line),
 		kind,
-		label: lineLabel(line, accountName),
+		label: lineLabel(line, accountName, names),
 		amount,
 	})
 	// Each side's bands follow the order the diagram reads: a source by its kind, a use by its kind.

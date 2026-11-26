@@ -135,6 +135,27 @@ describe("CashFlowView", () => {
 		)
 	})
 
+	test("a Flow the plan labels is named so in the bands' accessible names and in the table", () => {
+		const base = structuredClone(DEMO)
+		const doc = base.reads.documents["base"]
+		if (doc?.ok !== true) throw new Error("the Demo reads base")
+		const salary = doc.data.scenario.document.flows.find((flow) => flow.id === "salary")
+		if (salary === undefined) throw new Error("the Demo earns a salary")
+		salary.displayLabel = "Your salary"
+		replaceSnapshot({ ...base, reads: { ...base.reads, accounts: ACCOUNTS } })
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		// The chart's labels are text: a bar's accessible name carries the plan's words, not the id.
+		expect(body).toContain('aria-label="Your salary, 120,000.00"')
+		expect(body).toContain(">Your salary</span>")
+		expect(body).not.toContain('aria-label="salary, 120,000.00"')
+	})
+
+	test("a Flow the plan does not label keeps its id, in code, and in the bar's accessible name", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		expect(body).toContain('aria-label="salary, 120,000.00"')
+		expect(body).toMatch(/<code[^>]*data-item="salary"[^>]*>salary<\/code>/)
+	})
+
 	test("the stacked diagram of a Shortfall year draws its unmet money, and the page keeps one table for a screen reader", () => {
 		const body = renderView({ base: okRun(cashflowRunFixture()) }, "1")
 		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))

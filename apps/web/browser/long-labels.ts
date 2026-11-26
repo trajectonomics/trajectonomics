@@ -88,6 +88,20 @@ export async function longFlow(page: Page): Promise<DemoSnapshot> {
 	return snapshot
 }
 
+/**
+ * The Demo snapshot with an 80-character label on the Flow it receives rent through and the one its spending rule
+ * spends by: Cash flow names both, and Withdrawals names the rule's Flow in its heading and table caption.
+ */
+export async function longFlows(page: Page): Promise<DemoSnapshot> {
+	const snapshot = await longFlow(page)
+	const read = snapshot.reads.documents["base"]
+	if (read?.ok !== true || read.data === undefined) throw new Error("the Demo reads no base plan")
+	const rent = read.data.scenario.document.flows.find((one) => one.id === "condo-rent")
+	if (rent === undefined) throw new Error("the Demo receives rent")
+	rent["displayLabel"] = LONG
+	return snapshot
+}
+
 /** Serves the patched Snapshot on both the Demo's path and the person's own. */
 export async function serve(page: Page, snapshot: DemoSnapshot): Promise<void> {
 	await page.route(/\/snapshot\.json$/, (route) => route.fulfill({ json: snapshot }))
