@@ -35,7 +35,9 @@ const names = $derived(seriesNames(charts.runs, run, charts.names, ALWAYS_NAMES)
 /** The same names with no plan label, so a default chart name reads the ids and fits every plan. */
 const defaultNames = $derived(defaultNameIndex(charts.runs, charts.names))
 const byId = $derived(seriesById(run, charts.names))
-const view = $derived(chosen && chartView(chosen, byId, names, parseTerms(terms), charts.names.accounts))
+const view = $derived(
+	chosen && chartView(chosen, byId, names, parseTerms(terms), charts.names.accounts),
+)
 const title = $derived(chosen && view ? chosen.name : "Net worth by year")
 /** The chart is taller from `md` (Tailwind's 48rem) up, and shorter on a phone. */
 const height = $derived(screen.medium ? 320 : 220)
