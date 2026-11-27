@@ -2,6 +2,7 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { OverviewState } from "../client/overview.svelte"
+import { collectingLabel, daysFromCollection } from "../lib/collecting"
 import { freshness } from "../lib/freshness"
 import { planTotals } from "../lib/plan-totals"
 import { readAsOf } from "../lib/query"
@@ -21,13 +22,18 @@ $effect(() => {
 })
 
 const days = $derived(state.days)
-const series = $derived(
-	state.usage === null || days === null ? [] : chartSeries(state.usage.rows, days.days),
+const collectedSince = $derived(state.health?.collectingSince ?? null)
+const collecting = $derived(
+	collectedSince === null || days === null ? null : collectingLabel(collectedSince, days.to),
 )
+const chartDays = $derived(days === null ? [] : daysFromCollection(collectedSince, days.days))
+const chartFrom = $derived(chartDays[0] ?? days?.from ?? "")
+const series = $derived(state.usage === null ? [] : chartSeries(state.usage.rows, chartDays))
 const rows = $derived(state.usage === null ? [] : usageTable(state.usage.rows))
 const totals = $derived(
 	state.usage === null || days === null ? [] : planTotals(state.usage.rows, days.to),
 )
+const usageRows = $derived(state.usage?.rows ?? [])
 const fresh = $derived(state.health === null ? null : freshness(state.health))
 </script>
 
@@ -43,6 +49,7 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 			<span>{fresh.label}</span>
 			{#if fresh.at !== null}<span class="visually-hidden">({fresh.at})</span>{/if}
 			{#if fresh.note !== null}<span class="freshness-note">{fresh.note}</span>{/if}
+			{#if collecting !== null}<span class="freshness-collecting">{collecting}</span>{/if}
 		</p>
 	{/if}
 
@@ -70,12 +77,17 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 	{:else if days !== null}
 		<section class="section-block" aria-labelledby="plans-title">
 			<h2 id="plans-title" class="meta-label section-title">Tokens we used on each plan</h2>
-			<PlanSummary {totals} day={days.to} />
+			<PlanSummary {totals} rows={usageRows} day={days.to} since={collectedSince} />
 		</section>
 
 		{#if state.peaks !== null && state.peaks.plans.length > 0}
 			<section class="section-block" aria-labelledby="peaks-title">
-				<PlanPeaks plans={state.peaks.plans} ranked={totals} day={days.to} />
+				<PlanPeaks
+					plans={state.peaks.plans}
+					ranked={totals}
+					day={days.to}
+					planSince={state.health?.planSince ?? {}}
+				/>
 			</section>
 		{/if}
 
@@ -83,15 +95,15 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 			<h2 id="details-title" class="meta-label section-title">Details</h2>
 			<section class="detail-block" aria-labelledby="chart-title">
 				<h3 id="chart-title" class="meta-label detail-title">Tokens per day</h3>
-				<UsageChart {series} from={days.from} to={days.to} />
+				<UsageChart {series} from={chartFrom} to={days.to} />
 			</section>
 			<section class="detail-block" aria-labelledby="breakdown-title">
 				<h3 id="breakdown-title" class="meta-label detail-title">Where the tokens went</h3>
-				<PlanBreakdown {totals} from={days.from} to={days.to} />
+				<PlanBreakdown {totals} from={chartFrom} to={days.to} />
 			</section>
 			<section class="detail-block" aria-labelledby="table-title">
 				<h3 id="table-title" class="meta-label detail-title">Tokens per plan and model</h3>
-				<UsageTable {rows} from={days.from} to={days.to} />
+				<UsageTable {rows} from={chartFrom} to={days.to} />
 			</section>
 		</section>
 	{/if}

@@ -50,7 +50,13 @@ const days = $derived(series[0]?.points ?? [])
 					class="chart-axis"
 					x={tick.x}
 					y={chart.height - 10}
-					text-anchor={index === 0 ? "start" : index === chart.xTicks.length - 1 ? "end" : "middle"}
+					text-anchor={chart.xTicks.length === 1
+						? "middle"
+						: index === 0
+							? "start"
+							: index === chart.xTicks.length - 1
+								? "end"
+								: "middle"}
 				>
 					{tick.day}
 				</text>
@@ -121,7 +127,7 @@ const days = $derived(series[0]?.points ?? [])
 			</table>
 		</div>
 		<figcaption class="chart-caption">
-			Total tokens per UTC day, {from} to {to} ({days.length} days).
+			Total tokens per UTC day, {from} to {to} ({days.length} {days.length === 1 ? "day" : "days"}).
 		</figcaption>
 	</figure>
 {/if}

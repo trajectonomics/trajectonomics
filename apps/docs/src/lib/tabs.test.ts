@@ -10,11 +10,15 @@ describe("Docs Portal Tabs", () => {
 		expect(TABS.map(tabUrl)).toEqual(["/docs/cli/", "/docs/contribute/"])
 	})
 
-	test("each Tab has a Landing Page entry naming its audience and what it is for", () => {
+	test("each Tab has a Landing Page entry saying what its reader gets", () => {
 		expect(TABS.map((tab) => tab.entry)).toEqual([
-			"For Operators: install and run the CLI",
+			"Use traj: install it and get your first answer",
 			"For Contributors: help make the tax rules right",
 		])
+	})
+
+	test("each Tab has a reader-facing label that never shows its internal audience", () => {
+		expect(TABS.map((tab) => tab.label)).toEqual(["Most people start here", "Contribute"])
 	})
 
 	test("each Tab folder is a Fumadocs root folder titled as the Tab", async () => {

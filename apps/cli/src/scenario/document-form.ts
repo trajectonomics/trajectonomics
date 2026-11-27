@@ -25,10 +25,11 @@ const properties = scenarioShapeProperties(version)
  * A required date a household may anchor: the document form's `check()` runs before the anchors
  * resolve and never reads the store, so the hint is conditional and shows at every anchorable path.
  * The household fills only a missing date and refuses a different one, so an anchored date must be
- * the one it holds (cli ADR-0048).
+ * the one it holds (cli ADR-0048). It names the item rather than a position, because `show` keys its
+ * anchors by id, and a position moves when an item is inserted or reordered.
  */
 const ANCHORED_DATE =
-	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write the date that command prints at this path, because any other date is refused; otherwise write the real date.'
+	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write the date that command shows for this item, because any other date is refused; otherwise write the real date.'
 
 export const scenarioDocument: z.ZodType<unknown> = z
 	.unknown()

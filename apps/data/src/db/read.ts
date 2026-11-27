@@ -1,7 +1,9 @@
 import type { D1Database } from "@cloudflare/workers-types"
 import type { Granularity } from "@trajectonomics/data-collector/types"
+import type { CollectingDays } from "../core/health"
 import type { UsageFilter } from "../core/query"
 import { nextDay } from "../core/rules"
+import type { Series } from "../core/types"
 
 /** The rollup columns the public API serves; no machine, contributor or hour. */
 export type RollupDbRow = {
@@ -48,23 +50,30 @@ export async function readRollups(db: D1Database, filter: UsageFilter): Promise<
 	return result.results
 }
 
-/** One plan's tokens at one UTC bucket, summed over models and machines and nothing else. */
+/**
+ * One plan's tokens at one UTC bucket, summed over models and machines and nothing else.
+ * `tokens_total` leaves cache reads out, and `cache_read` holds them apart.
+ */
 export type PeakDbRow = {
 	plan: string
 	hour_utc: string
 	granularity: Granularity
 	tokens_total: number
+	cache_read: number
 }
 
 /**
  * Reads every hourly and daily bucket up to and including `asOf`, one figure per plan and bucket.
  * `usage_hourly` keeps no series; its org rows are what the rollups' `measured-by-us` series is
- * built from, so the join selects the same rows the public rollups hold. The peaks core turns the
- * hours into a start day; no hour leaves this module.
+ * built from, so the join selects the same rows the public rollups hold. Cache reads are summed
+ * apart, so a cache-heavy hour never becomes the headline figure. The peaks core turns the hours
+ * into a start day; no hour leaves this module.
  */
 export async function readPeaks(db: D1Database, asOf: string): Promise<PeakDbRow[]> {
 	const sql = `SELECT usage_hourly.plan AS plan, usage_hourly.hour_utc AS hour_utc,
-		 usage_hourly.granularity AS granularity, SUM(usage_hourly.tokens_total) AS tokens_total
+		 usage_hourly.granularity AS granularity,
+		 SUM(MAX(0, usage_hourly.tokens_total - COALESCE(usage_hourly.cache_read, 0))) AS tokens_total,
+		 SUM(COALESCE(usage_hourly.cache_read, 0)) AS cache_read
 		 FROM usage_hourly
 		 JOIN contributor ON contributor.id = usage_hourly.contributor_id
 		 WHERE contributor.kind = 'org' AND usage_hourly.hour_utc < ?
@@ -83,4 +92,27 @@ export async function readLastIngest(db: D1Database): Promise<string | null> {
 		.prepare("SELECT received_at FROM ingest_log ORDER BY received_at DESC LIMIT 1")
 		.first<{ received_at: string }>()
 	return row?.received_at ?? null
+}
+
+/**
+ * The first UTC day each plan holds a rollup for, and the earliest of them. One query over the
+ * series' days: the public answer is a day, never an hour, a machine or a contributor.
+ */
+export async function readCollectingDays(
+	db: D1Database,
+	series: Series = "measured-by-us",
+): Promise<CollectingDays> {
+	const result = await db
+		.prepare("SELECT plan, MIN(day) AS first_day FROM rollup_daily WHERE series = ? GROUP BY plan")
+		.bind(series)
+		.all<{ plan: string; first_day: string }>()
+	const planSince: Record<string, string> = {}
+	let collectingSince: string | null = null
+	for (const row of result.results) {
+		planSince[row.plan] = row.first_day
+		if (collectingSince === null || row.first_day < collectingSince) {
+			collectingSince = row.first_day
+		}
+	}
+	return { collectingSince, planSince }
 }

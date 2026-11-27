@@ -9,7 +9,7 @@ The public documentation site for Trajectonomics. Everything in it is public; no
 _Avoid_: Docs site, developer portal, wiki
 
 **Operator**:
-A person who installs and runs the Trajectonomics CLI.
+A person who installs and runs the Trajectonomics CLI. The term is internal: readers see "Most people start here" and "Use traj" on the Landing Page, and the CLI & Quickstart Tab in navigation.
 _Avoid_: User, end user, customer
 
 **Contributor**:

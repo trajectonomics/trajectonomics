@@ -30,10 +30,10 @@ describe("the plan totals", () => {
 	test("counts only days with tokens as active, across a day's models", () => {
 		const totals = planTotals(
 			[
-				row({ day: "2026-11-24", model: "a", tokensTotal: 100 }),
-				row({ day: "2026-11-24", model: "b", tokensTotal: 50 }),
-				row({ day: "2026-11-25", model: "a", tokensTotal: 0 }),
-				row({ day: "2026-11-26", model: "a", tokensTotal: 20 }),
+				row({ day: "2026-11-24", model: "a", tokensTotal: 100, cacheRead: 70 }),
+				row({ day: "2026-11-24", model: "b", tokensTotal: 50, cacheRead: 30 }),
+				row({ day: "2026-11-25", model: "a", tokensTotal: 0, cacheRead: 0 }),
+				row({ day: "2026-11-26", model: "a", tokensTotal: 20, cacheRead: 0 }),
 			],
 			TO,
 		)
@@ -41,8 +41,11 @@ describe("the plan totals", () => {
 			planName: "Claude",
 			activeDays: 2,
 			tokensTotal: 170,
+			tokensUncached: 70,
+			cacheRead: 100,
+			cacheReadShare: 100 / 170,
 			requests: 4,
-			tokensPerActiveDay: 85,
+			tokensPerActiveDay: 35,
 			lastDay: "2026-11-26",
 		})
 	})
@@ -61,10 +64,11 @@ describe("the plan totals", () => {
 	})
 
 	test("has no busiest day or last day when every row is zero", () => {
-		const totals = planTotals([row({ tokensTotal: 0 })], TO)
+		const totals = planTotals([row({ tokensTotal: 0, cacheRead: 0 })], TO)
 		expect(find(totals, "claude")).toMatchObject({
 			activeDays: 0,
 			tokensPerActiveDay: 0,
+			cacheReadShare: null,
 			busiestDay: null,
 			lastDay: null,
 			inUse: false,
@@ -132,6 +136,18 @@ describe("the plan totals", () => {
 		expect(totals.map((total) => total.plan)).toEqual(["mistral", "claude", "antigravity"])
 	})
 
+	test("ranks by tokens without cache reads, not by a cache-heavy total", () => {
+		const totals = planTotals(
+			[
+				row({ plan: "claude", tokensTotal: 1_000, cacheRead: 990 }),
+				row({ plan: "mistral", model: "mistral-large", tokensTotal: 200, cacheRead: 0 }),
+			],
+			TO,
+		)
+		expect(totals.map((total) => total.plan)).toEqual(["mistral", "claude"])
+		expect(find(totals, "claude")?.tokensUncached).toBe(10)
+	})
+
 	test("breaks a tied rate with the plan table's order", () => {
 		const totals = planTotals(
 			[row({ plan: "mistral", model: "mistral-large" }), row({ plan: "claude" })],
@@ -165,6 +181,7 @@ describe("the grand total", () => {
 		)
 		expect(grandTotal(totals)).toEqual({
 			tokensTotal: 100,
+			tokensUncached: 70,
 			requests: 5,
 			activeDays: 2,
 			tokensIn: 10,

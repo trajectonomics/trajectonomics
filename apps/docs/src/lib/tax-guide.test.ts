@@ -39,6 +39,7 @@ describe("the generated tax guide page", () => {
 
 	test("carries the frontmatter Fumadocs titles the page by, and no second title line", () => {
 		expect(committed.startsWith("---\ntitle: Tax contributor guide\n")).toBe(true)
+		expect(committed).toContain("\nmascot: tax\n")
 		expect(committed).not.toContain("\n# Contributing tax rules")
 	})
 

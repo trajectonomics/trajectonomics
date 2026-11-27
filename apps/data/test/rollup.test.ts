@@ -37,6 +37,23 @@ describe("healthReport", () => {
 			lastIngestAt: null,
 			minutesSinceIngest: null,
 			stale: true,
+			collectingSince: null,
+			planSince: {},
+		})
+	})
+
+	test("carries the first collected day, globally and per plan", () => {
+		expect(
+			healthReport("2026-11-25T09:01:00.000Z", Date.parse("2026-11-25T12:00:00.000Z"), {
+				collectingSince: "2026-11-24",
+				planSince: { claude: "2026-11-24", cursor: "2026-11-25" },
+			}),
+		).toEqual({
+			lastIngestAt: "2026-11-25T09:01:00.000Z",
+			minutesSinceIngest: 179,
+			stale: false,
+			collectingSince: "2026-11-24",
+			planSince: { claude: "2026-11-24", cursor: "2026-11-25" },
 		})
 	})
 

@@ -4,7 +4,9 @@ import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
 import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
+import FormAlert from "../ui/FormAlert.svelte"
 import ItemName from "../ui/ItemName.svelte"
+import SiteLink from "../ui/SiteLink.svelte"
 import AnchoredNote from "./AnchoredNote.svelte"
 import EmployerFields from "./EmployerFields.svelte"
 import Field from "./Field.svelte"
@@ -26,6 +28,8 @@ interface Props {
 	/** What the employer adds to a salary, and the Accounts it may pay into. */
 	employer?: EmployerDraft
 	targets?: readonly string[]
+	/** The Tax labels page a new income in a taxed plan must be given its label on, or null. */
+	note?: string | null
 }
 
 let {
@@ -39,23 +43,34 @@ let {
 	categories = [],
 	employer = $bindable({ account: "", share: "", rounding: "" }),
 	targets = [],
+	note = null,
 }: Props = $props()
+
+/** What the Ends field says: the once rule, the household's date, or both when the household pins a once Flow's end. */
+const endHint = $derived.by(() => {
+	const once = "A once Flow ends when it starts."
+	const household = "The household sets this date, so it cannot be cleared here."
+	if (anchors.end === null)
+		return draft.frequency === "once" ? once : "YYYY-MM-DD, or empty to run to the horizon"
+	return draft.frequency === "once" ? `${once} ${household}` : household
+})
 </script>
 
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
 <div class="space-y-4">
+	{#if note}<p class="text-sm text-muted-foreground">This plan's tax counts only income it knows by its label. After you save, give this income a label in <SiteLink href={note} class="underline underline-offset-4">Tax labels</SiteLink>.</p>{/if}
 	{#if existing}
 		<p class="text-sm text-foreground">Item <span class="font-medium"><ItemName kind="flow" id={existing.id} /></span></p>
 	{:else}
 		<Field id="flow-name" label="Id" hint="The name this plan addresses the item by; it never changes" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
 	<Field id="flow-label" label="Name" hint="Shown in place of the id, on cards, charts and pickers. Optional." bind:value={draft.displayLabel} problem={shown.at("displayLabel")} />
-	<Field id="flow-amount" label="Amount per occurrence" inputmode="decimal" hint="A decimal number, such as 9000.50" bind:value={draft.amount} problem={shown.at("amount")} />
+	<Field id="flow-amount" label="Amount per occurrence" inputmode="decimal" money hint="A decimal number, such as 9000.50" bind:value={draft.amount} problem={shown.at("amount")} />
 	<Field id="flow-frequency" label="How often" options={FREQUENCY_CHOICES} bind:value={draft.frequency} problem={shown.at("frequency")} />
 	<Field id="flow-start" label="Starts" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} disabled={anchors.start !== null} />
 	{#if anchors.start !== null}<AnchoredNote anchor={anchors.start} plan={name} />{/if}
 	{#if draft.frequency !== "once" || anchors.end !== null}
-		<Field id="flow-end" label="Ends" hint={draft.frequency === "once" ? "A once Flow ends when it starts." : "YYYY-MM-DD, or empty to run to the horizon"} bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
+		<Field id="flow-end" label="Ends" hint={endHint} bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
 		{#if anchors.end !== null}<AnchoredNote anchor={anchors.end} plan={name} />{/if}
 		{#if trying && draft.frequency === "once" && anchors.end !== null && draft.start !== draft.end}
 			<p class="-mt-3 text-sm text-muted-foreground">A once Flow ends when it starts, so applying this one to the plan will be refused while the household sets its end {anchors.end}.</p>
@@ -84,5 +99,5 @@ let {
 			{#if shown.at("category")}<p role="alert" class="text-sm text-destructive">{shown.at("category")}</p>{/if}
 		</div>
 	{/if}
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 </div>

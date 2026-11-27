@@ -14,7 +14,14 @@ import { SCRATCH_ORIGIN, SCRATCH_PORT } from "./base-url"
 
 const CLI = fileURLToPath(new URL("../../cli/src/index.ts", import.meta.url))
 // One plan per check, so two browser checks write without racing over the same stored profile; `swap-360` only reads.
-const PLANS = ["shared-360", "shared-1280", "swap-360", "locked-save-360"] as const
+const PLANS = [
+	"shared-360",
+	"shared-1280",
+	"swap-360",
+	"locked-save-360",
+	"hidden-amount-360",
+	"labels-360",
+] as const
 /** The home-loan interest `locked-save-360` stores before the swap, so a save changing only the shared one keeps it. */
 const LOCKED_HOME_LOAN = 14444
 

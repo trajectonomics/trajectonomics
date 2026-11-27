@@ -4,6 +4,8 @@
 
 Accepted, 2026-11-26. Follow-up to issue #592.
 
+Amended by [ADR 0010](0010-data-starts-when-collecting-starts.md), 2026-11-27: the page's history no longer comes from a backfill; it starts with the hourly collector's first live run.
+
 ## Context
 
 The first ingest read each affected day, merged the stored and incoming rows in TypeScript, then

@@ -5,6 +5,8 @@ import Layout from "../layouts/Layout.astro"
 import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 
 const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estimated-tiers-scale-a-measured-floor-by-a-stated-multiplier.md`
+const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md`
+const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data-starts-when-collecting-starts.md`
 ---
 
 <Layout
@@ -114,18 +116,20 @@ const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estima
 
 		<h2>The peaks</h2>
 		<p>
-			“What each plan gives” shows the most tokens a plan carried in any 5 clock hours, any 7 UTC
-			days and any 30 UTC days. Missing hours and days count as zero, so a window is
-			calendar-consecutive, not consecutive in the rows. Each figure is <em>at least</em> that
-			much: it is what we used, never the plan's limit, and a quiet window says nothing about the
-			headroom left.
+			“What each plan gives” shows the most tokens a plan carried in a window, with cache reads
+			counted apart: they cost far less, so they never lift the figure. Missing hours and days
+			count as zero, so a window is calendar-consecutive, not consecutive in the rows. Claude's
+			5 hours start at its first active hour, because its session starts with the first message;
+			other plans' windows slide over the clock. Claude and Antigravity state no monthly window,
+			so their 30-day figure is the week × 30/7. Every figure is what we used, never the plan's
+			limit. The reasoning is in <a href={PEAKS_ADR_URL}>ADR 0009</a>.
 		</p>
 
 		<h2>Estimated tiers</h2>
 		<p>
 			We measure one tier per plan. Another tier is estimated from a tier we measured times the
-			multiplier its vendor states, and 30 days use the weekly multiplier. An estimate is still
-			an <em>at least</em> figure; a tier whose multiplier the vendor does not state shows “–”.
+			multiplier its vendor states, and 30 days use the weekly multiplier. An estimate is a lower
+			bound, not the plan's limit; a tier whose multiplier the vendor does not state shows “–”.
 			The reasoning is in <a href={ESTIMATE_ADR_URL}>ADR 0008</a>.
 		</p>
 
@@ -134,6 +138,12 @@ const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estima
 			Every row here belongs to the <code>measured-by-us</code> series: our collector counted it
 			from our own usage records. It is not a vendor invoice and not a plan's own meter. Meta rows
 			are marked best-effort. Mistral rows come from its daily console export.
+		</p>
+		<p>
+			Collection starts at the first hour a collector runs, and the site shows only usage the
+			collector measured live, never a backfilled history. A window longer than what we have
+			collected shows its days so far instead of a figure. The reasoning is in
+			<a href={COLLECTING_ADR_URL}>ADR 0010</a>.
 		</p>
 
 		<h2>The asOf view</h2>

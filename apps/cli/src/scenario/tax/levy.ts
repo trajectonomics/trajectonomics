@@ -1,5 +1,6 @@
 import { type AppError, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
+import type { Household } from "../household/model"
 import { holderIdOf } from "./couple"
 import { departedClaimants } from "./departed-claims"
 import { leviesFor } from "./emitter"
@@ -60,7 +61,7 @@ export function withTaxLevy(
 	document: ScenarioDocument,
 	request: TaxRequest,
 	labels: readonly FlowLabel[],
-	household: string | null = null,
+	household: Household | null = null,
 ): TaxLevyWritten | AppError {
 	const stated = withFlowLabels(withoutFilerLabels(document), labels)
 	if (isAppError(stated)) return stated
@@ -75,10 +76,8 @@ export function withTaxLevy(
 	const next = decorated(stated, scope)
 	const others = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	const holder = holderIdOf(household)
-	if (isAppError(holder)) return holder
 	const kept = keptRequest(request, scope, holder)
 	const departed = departedClaimants(kept, household)
-	if (isAppError(departed)) return departed
 	return {
 		document: { ...next, levies: [...others, ...built] },
 		request: kept,

@@ -20,6 +20,22 @@ export type UsageRow = {
 	bestEffort: boolean
 }
 
+/** A quota window a plan publishes. */
+export type QuotaWindow = "five_hour" | "weekly" | "monthly"
+
+/** A plan whose subscription quota is sampled. */
+export type QuotaPlan = "claude" | "opencode-go"
+
+/** One observed quota percentage for a plan window, stamped at the start of a UTC hour. */
+export type QuotaRow = {
+	contributor: "trajectonomics"
+	plan: QuotaPlan
+	window: QuotaWindow
+	sampledAt: string
+	usedPct: number
+	resetsAt: string | null
+}
+
 /** One usage observation, before it is bucketed and summed. */
 export type UsageSample = {
 	plan: string
