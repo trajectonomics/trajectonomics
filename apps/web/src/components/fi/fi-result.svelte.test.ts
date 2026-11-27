@@ -9,6 +9,19 @@ import FiResult from "./FiResult.svelte"
 
 const ARGV = ["fi", "--scenario", "base", "--as-of", "2026-10-31", "--json"]
 
+const TAX_YEAR = {
+	levy: "fixture-levy",
+	from: "2026-01-01",
+	to: "2026-12-31",
+	settlementDate: "2027-03-31",
+	due: "89000.00",
+	prepaid: "0.00",
+	owed: "89000.00",
+	settled: true,
+	partial: false,
+	assumptions: [],
+}
+
 function renderFi(fi: Fi): string {
 	return render(FiResult, { props: { fi, argv: ARGV } }).body
 }
@@ -103,25 +116,27 @@ describe("FiResult: unreachable", () => {
 		expect(body).not.toContain("Best case")
 	})
 
-	test("points to the Tax page when the Scenario has tax years", () => {
-		const taxYear = {
-			levy: "fixture-levy",
-			from: "2026-01-01",
-			to: "2026-12-31",
-			settlementDate: "2027-03-31",
-			due: "89000.00",
-			prepaid: "0.00",
-			owed: "89000.00",
-			settled: true,
-			partial: false,
-			assumptions: [],
-		}
-		const body = renderFi(fiFixture(UNREACHABLE.minimumBuffer, { taxYears: [taxYear] }))
-		expect(body).toContain('href="/tax/"')
-		expect(body).toContain("shows the plan as written, without stopping work")
+	test("points to this plan's Tax page, as the plan as written, when the Scenario has tax years", () => {
+		const fi = fiFixture(UNREACHABLE.minimumBuffer, { taxYears: [TAX_YEAR] })
+		const body = renderFi(fi)
+		expect(body).toContain(`href="/tax/?scenario=${encodeURIComponent(fi.scenario.name)}"`)
+		expect(body).toContain("shows the plan as written.")
+		// An unreachable answer has no stopped path, so nothing contrasts the two.
+		expect(body).not.toContain("without stopping work")
+		expect(body).not.toContain("This plan has tax years")
 	})
 
 	test("has no pointer to the Tax page when there are no tax years", () => {
 		expect(renderFi(fiFixture(REACHABLE))).not.toContain("/tax/")
+	})
+})
+
+describe("FiResult: the Tax page pointer of a reachable answer", () => {
+	test("says the Tax page does not stop work at the FI date, and underlines the link", () => {
+		const fi = fiFixture(REACHABLE, { taxYears: [TAX_YEAR] })
+		const body = renderFi(fi)
+		expect(body).toContain(`href="/tax/?scenario=${encodeURIComponent(fi.scenario.name)}"`)
+		expect(body).toContain("shows the plan as written, without stopping work at the FI date.")
+		expect(body).toMatch(/class="[^"]*\bunderline\b[^"]*"[^>]*>(<!---->)?Tax page</)
 	})
 })
