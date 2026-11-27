@@ -1,0 +1,96 @@
+/*
+ * The lists of a docs page: an ordered list as a numbered step rail, and a "What next" list as two
+ * columns of hairline link cards. Both stay real lists; only their shape changes.
+ */
+
+/* A step rail: a counter in a circle, joined by a hairline. */
+#nd-page .prose ol:not(.docs-flow) {
+	counter-reset: docs-step;
+	list-style: none;
+	padding-inline-start: 0;
+}
+
+#nd-page .prose ol:not(.docs-flow) > li {
+	counter-increment: docs-step;
+	position: relative;
+	padding-inline-start: 2.5rem;
+}
+
+#nd-page .prose ol:not(.docs-flow) > li::before {
+	content: counter(docs-step);
+	position: absolute;
+	inset-inline-start: 0;
+	inset-block-start: 0.125rem;
+	display: grid;
+	place-items: center;
+	inline-size: 1.5rem;
+	block-size: 1.5rem;
+	line-height: 1;
+	background-color: var(--color-fd-secondary);
+	clip-path: circle(50%);
+}
+
+#nd-page .prose ol:not(.docs-flow) > li::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 0.75rem;
+	inset-block-start: 1.75rem;
+	inset-block-end: -0.25rem;
+	inline-size: 1px;
+	background-color: var(--color-fd-border);
+}
+
+#nd-page .prose ol:not(.docs-flow) > li:last-child::after {
+	content: none;
+}
+
+/* Link cards: a real list drawn as two columns of hairline cards, one on a phone. */
+#nd-page .prose ul.docs-link-cards {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+	list-style: none;
+	padding-inline-start: 0;
+	margin-block: 1.5rem;
+}
+
+#nd-page .prose ul.docs-link-cards > li {
+	position: relative;
+	border: 1px solid var(--color-fd-border);
+	background-color: var(--color-fd-card);
+	padding: 1rem;
+	transition: border-color 200ms;
+	overflow-wrap: anywhere;
+}
+
+#nd-page .prose ul.docs-link-cards > li:is(:hover, :focus-within) {
+	border-color: var(--color-fd-accent);
+}
+
+#nd-page .prose ul.docs-link-cards a {
+	display: block;
+	color: var(--color-fd-card-foreground);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+#nd-page .prose ul.docs-link-cards a::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+}
+
+#nd-page .prose ul.docs-link-cards a:focus-visible {
+	outline: 2px solid var(--color-fd-ring);
+	outline-offset: 4px;
+}
+
+#nd-page .prose ul.docs-link-cards .docs-link-card-line {
+	color: var(--color-fd-muted-foreground);
+}
+
+@media (max-width: 39.9375rem) {
+	#nd-page .prose ul.docs-link-cards {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
