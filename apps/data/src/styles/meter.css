@@ -17,10 +17,6 @@
 }
 
 /* A plan we have not used lately stays readable but steps back from the ones in use. */
-.meter-dim {
-	opacity: 0.6;
-}
-
 .meter-identity {
 	display: flex;
 	min-width: 0;
@@ -49,6 +45,11 @@
 	overflow: hidden;
 	border-radius: 999px;
 	background: var(--ds-color-secondary);
+}
+
+/* Only the bar dims: text in a plan out of use keeps full contrast. */
+.meter-dim .meter-track {
+	opacity: 0.6;
 }
 
 .meter-bar {

@@ -42,7 +42,8 @@ export function peakNote(peak: Peak, key: PeakWindowKey, cacheSplit = true): str
 
 /** The words a screen reader gets for one cell. */
 export function peakSpoken(peak: Peak, column: PeakColumn): string {
-	const start = peak.derived === true ? "the week × 30/7" : `from ${peak.fromDay}`
+	const start =
+		peak.derived === true ? "worked out as the busiest week × 30/7" : `from ${peak.fromDay}`
 	const cache = cacheShareLabel(cacheShare(peak.tokens, peak.cacheRead))
 	const extra = cache === null ? "" : `, ${cache}`
 	return `${displayCount(peak.tokens)} tokens in ${column.spoken}, ${start}${extra}`

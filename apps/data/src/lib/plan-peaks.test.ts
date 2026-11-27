@@ -134,7 +134,7 @@ describe("a derived month", () => {
 		expect(month).toEqual({ tokens: 3_000, fromDay: "2026-11-24", cacheRead: null, derived: true })
 		expect(peakNote(month as Peak, "thirtyDays")).toBe("week × 30/7")
 		expect(peakSpoken(month as Peak, PEAK_COLUMNS[2] as (typeof PEAK_COLUMNS)[number])).toBe(
-			"3,000 tokens in 30 days, the week × 30/7",
+			"3,000 tokens in 30 days, worked out as the busiest week × 30/7",
 		)
 	})
 

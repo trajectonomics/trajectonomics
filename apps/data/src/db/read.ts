@@ -70,7 +70,7 @@ export type PeakDbRow = {
 export async function readPeaks(db: D1Database, asOf: string): Promise<PeakDbRow[]> {
 	const sql = `SELECT usage_hourly.plan AS plan, usage_hourly.hour_utc AS hour_utc,
 		 usage_hourly.granularity AS granularity,
-		 SUM(usage_hourly.tokens_total - COALESCE(usage_hourly.cache_read, 0)) AS tokens_total,
+		 SUM(MAX(0, usage_hourly.tokens_total - COALESCE(usage_hourly.cache_read, 0))) AS tokens_total,
 		 SUM(COALESCE(usage_hourly.cache_read, 0)) AS cache_read
 		 FROM usage_hourly
 		 JOIN contributor ON contributor.id = usage_hourly.contributor_id
