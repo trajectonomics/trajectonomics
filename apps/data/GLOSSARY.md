@@ -31,6 +31,14 @@ identity is machine, plan, model, bucket and source, so replaying it is an upser
 One observation of a plan window's meter: the percentage used and the reset time, at a UTC hour.
 Claude and OpenCode Go are the plans with a readable meter.
 
+## Limit estimate
+
+The tokens a plan window would hold at 100%, estimated from its own usage meter: tokens we used
+between two readings ÷ the percentage points the meter moved × 100. Readings that share a reset
+period form one segment; a reset, a change of reset time or a fall in the meter starts a new one.
+Whole-percent rounding widens the range by one point per segment. Only the estimate, its range and
+its evidence are published, never a reading or its time (ADR 0011).
+
 ## Window
 
 The period a quota percentage covers: `five_hour`, `weekly`, or `monthly`.

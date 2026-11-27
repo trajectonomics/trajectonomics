@@ -7,6 +7,7 @@ import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estimated-tiers-scale-a-measured-floor-by-a-stated-multiplier.md`
 const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md`
 const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data-starts-when-collecting-starts.md`
+const LIMITS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0011-limits-are-estimated-from-the-usage-meter.md`
 ---
 
 <Layout
@@ -125,6 +126,18 @@ const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data
 			limit. The reasoning is in <a href={PEAKS_ADR_URL}>ADR 0009</a>.
 		</p>
 
+		<h2>Limits from the meter</h2>
+		<p>
+			Claude and OpenCode Go publish their own usage meter, and the collector reads it every hour.
+			A window's 100% is estimated from how far that meter moved against the tokens we used
+			meanwhile: tokens used ÷ percentage points moved × 100. Consecutive readings that share a
+			reset time form one segment; a reset, a change of reset time or a fall in the percentage
+			starts a new one. Each reading is rounded to a whole percent, so the range widens by one
+			point per segment. Only the estimate, its range and its evidence leave the Worker, never a
+			reading, its time or its reset time. The reasoning is in
+			<a href={LIMITS_ADR_URL}>ADR 0011</a>.
+		</p>
+
 		<h2>Estimated tiers</h2>
 		<p>
 			We measure one tier per plan. Another tier is estimated from a tier we measured times the
@@ -157,7 +170,8 @@ const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data
 		<h2>Quota numbers</h2>
 		<p>
 			Quota percentages exist only for plans with a readable meter. Claude and OpenCode Go are the
-			plans whose meter we can read. A plan with no meter means no quota number on this site.
+			plans whose meter we can read, so they are the plans whose 100% is estimated. A plan with no
+			meter means no quota number on this site.
 		</p>
 
 		<div class="method-repo">

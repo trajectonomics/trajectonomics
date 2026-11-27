@@ -3,7 +3,7 @@ import type { Granularity } from "@trajectonomics/data-collector/types"
 import type { CollectingDays } from "../core/health"
 import type { UsageFilter } from "../core/query"
 import { nextDay } from "../core/rules"
-import type { Series } from "../core/types"
+import type { QuotaWindow, Series } from "../core/types"
 
 /** The rollup columns the public API serves; no machine, contributor or hour. */
 export type RollupDbRow = {
@@ -83,6 +83,35 @@ export async function readPeaks(db: D1Database, asOf: string): Promise<PeakDbRow
 		.prepare(sql)
 		.bind(`${nextDay(asOf)}T00:00:00.000Z`)
 		.all<PeakDbRow>()
+	return result.results
+}
+
+/** One stored quota sample with its window; `resets_at` groups its segment and never leaves. */
+export type QuotaDbRow = {
+	plan: string
+	window: QuotaWindow
+	sampled_at: string
+	used_pct: number
+	resets_at: string | null
+}
+
+/**
+ * Reads every org quota sample up to and including `asOf`, in time order per plan and window.
+ * The public API turns them into aggregates: a reading, its hour and its reset time never leave
+ * the Worker, as ADR 0007 requires of peaks.
+ */
+export async function readQuotaSamples(db: D1Database, asOf: string): Promise<QuotaDbRow[]> {
+	const sql = `SELECT quota_sample.plan AS plan, quota_sample.window AS window,
+		 quota_sample.sampled_at AS sampled_at, quota_sample.used_pct AS used_pct,
+		 quota_sample.resets_at AS resets_at
+		 FROM quota_sample
+		 JOIN contributor ON contributor.id = quota_sample.contributor_id
+		 WHERE contributor.kind = 'org' AND quota_sample.sampled_at < ?
+		 ORDER BY quota_sample.plan, quota_sample.window, quota_sample.sampled_at`
+	const result = await db
+		.prepare(sql)
+		.bind(`${nextDay(asOf)}T00:00:00.000Z`)
+		.all<QuotaDbRow>()
 	return result.results
 }
 

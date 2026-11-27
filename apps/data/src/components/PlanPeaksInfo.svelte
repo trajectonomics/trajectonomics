@@ -24,10 +24,13 @@ function place(event: ToggleEvent): void {
 </script>
 
 <div id="peaks-info-panel" class="peaks-info-panel" popover ontoggle={place}>
-	<p>Each figure is the most tokens we used in that window, not the plan's limit.</p>
 	<p>
-		A window shows a figure once we have collected for its full length; before that it shows the
-		days seen so far.
+		Each figure is the most tokens we used in that window, or an estimate of what 100% would be
+		from the plan's own usage meter.
+	</p>
+	<p>
+		A measured figure shows once we have collected for the window's full length; a meter estimate
+		can show sooner, with the days seen so far.
 	</p>
 	<p>Cache reads are counted apart because they cost far less, so they never lift a figure.</p>
 	<p>
@@ -38,7 +41,10 @@ function place(event: ToggleEvent): void {
 	<p>
 		Highlighted: ≈ estimated from a tier we measured. – means the vendor states no multiplier.
 	</p>
-	<p>Real limits will come from reading each plan's usage meter.</p>
+	<p>
+		≈ at 100%: worked out from the plan's own usage meter, tokens used ÷ points the meter moved ×
+		100.
+	</p>
 	<ul class="peaks-info-sources">
 		{#each sources as source (source.url)}
 			<li><a href={source.url}>{source.label}</a>, read {source.read}</li>
