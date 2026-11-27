@@ -6,6 +6,7 @@ import { buildPeriods, type Period } from "../output/periods"
 import { buildRollups } from "../output/rollups"
 import { accountRules } from "../output/rules"
 import type { Baseline, DateString, MinorUnits, Scenario, Timeline } from "../types"
+import type { MilestoneResult } from "../types/milestone"
 import type { ProjectionProblem, RunsOut } from "../types/projection"
 import { rollupGrid, rollupObservations } from "./grid"
 import { lowestOf } from "./lowest"
@@ -33,6 +34,8 @@ export interface PathOutcome {
 	readonly spent?: readonly MinorUnits[]
 	/** The path's lowest year of that spending, absent when it has no whole year and did not run out. */
 	readonly lowestYear?: MinorUnits
+	/** Each Milestone's result on this path; present only with the `milestoneDates` option (ADR 0011). */
+	readonly milestones?: readonly MilestoneResult[]
 }
 
 export type PathResult =
@@ -55,7 +58,11 @@ export function pathInputs(baseline: Baseline, scenario: Scenario, timeline: Tim
  * Runs one Market path through the engine and reads its roll-ups. A path that runs out is pinned,
  * un-grown, at the net worth it died with in every later period, so it still counts in every roll-up.
  */
-export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
+export function outcomeOf(
+	inputs: PathInputs,
+	returns: Returns,
+	milestoneDates = false,
+): PathResult {
 	const { timeline } = inputs
 	const result = runEngine(
 		inputs.baseline,
@@ -86,6 +93,7 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 				}),
 		...(spent.spent === undefined ? {} : { spent: spent.spent }),
 		...(spent.lowest === undefined ? {} : { lowestYear: spent.lowest }),
+		...(milestoneDates ? { milestones: result.run.milestones ?? [] } : {}),
 	}
 	return { ok: true, outcome }
 }
