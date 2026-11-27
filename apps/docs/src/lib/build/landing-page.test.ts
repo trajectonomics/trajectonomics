@@ -30,7 +30,7 @@ function searchIndex(pageIds: readonly string[]): BuiltFile {
 
 /** The Landing Page body around its Tab links and the release line, when the build has one. */
 function landingBody(links: string, line = ""): string {
-	return `<main>${links}${line}</main>`
+	return `<div id="landing-body">${links}${line}</div>`
 }
 
 function codesOf(files: readonly BuiltFile[], releaseLine?: string): readonly string[] {
@@ -72,10 +72,16 @@ describe("the built Landing Page", () => {
 		])
 	})
 
-	test("links that are not into a Tab, such as the header title, do not count", () => {
-		const title = '<a href="/">Trajectonomics Docs</a>'
+	test("links outside the page body, such as the header title and Tabs, do not count", () => {
+		const header = [
+			'<header id="nd-nav">',
+			'<a href="/">Trajectonomics Docs</a>',
+			'<a href="/docs/cli/">CLI &amp; Quickstart</a>',
+			'<a href="/docs/contribute/">Contribute</a>',
+			"</header>",
+		].join("")
 
-		expect(codesOf([landingPage(`<header>${title}</header>${TWO_ENTRIES}`)])).toEqual([])
+		expect(codesOf([landingPage(`${header}${TWO_ENTRIES}`)])).toEqual([])
 	})
 
 	test("a search index with an entry for the Landing Page is reported as LANDING_PAGE_INDEXED", () => {

@@ -51,11 +51,86 @@
 }
 
 /*
- * The header is one row of 56px. The Tabs are laid over that row and centred on the page, so the
- * brand at the start of the row cannot push them off centre (docs#91).
+ * The header is one row of 64px, the shared frame every static site draws
+ * (`@trajectonomics/brand/header.css`): the bar inside the full-width header is capped at 94.5rem
+ * and centred, with the same inset as the other sites, while the hairline and the background span
+ * the page. Fumadocs draws the row's markup, so the shell adapts it to that frame. The Tabs are laid
+ * over the row and centred on the page, so the brand at the start of the row cannot push them off
+ * centre (docs#91, ADR 0009's 2026-11-27 amendment).
  */
+/*
+ * Fumadocs derives the layout's row height from the header's own 56px class through `:has()`; the
+ * shared frame is 64px, so the layout follows it and the sidebar keeps starting below the row.
+ */
+#nd-notebook-layout:has(> #nd-subnav),
+#nd-home-layout:has(> #nd-nav) {
+	--fd-header-height: 4rem;
+}
+
+#nd-subnav {
+	height: 4rem;
+	border-bottom: 1px solid var(--ds-color-border);
+	background-color: var(--ds-color-background);
+	--fd-header-height: 4rem;
+}
+
 #nd-subnav [data-header-body] {
 	position: relative;
+	width: 100%;
+	height: 100%;
+	max-width: 94.5rem;
+	margin-inline: auto;
+	padding-inline: 1rem;
+	border-bottom-width: 0;
+}
+
+/* The tile and the marker sit 12px apart, as they do on the blog and the data site. */
+#nd-subnav [data-header-brand],
+#nd-nav [data-header-brand] {
+	gap: 12px;
+}
+
+/* The home layout's header row draws the same frame at the same inset. */
+#nd-nav {
+	height: 4rem;
+}
+
+#nd-nav > div {
+	height: 4rem;
+	background-color: var(--ds-color-background);
+}
+
+/* The row's own wrapper, so the bar caps at the shared 94.5rem and keeps the shared inset. */
+#nd-nav > div > div:first-child {
+	width: 100%;
+	height: 100%;
+	max-width: 94.5rem;
+}
+
+#nd-nav nav {
+	height: 100%;
+	max-width: 94.5rem;
+	padding-inline: 1rem;
+}
+
+@media (min-width: 40rem) {
+	#nd-subnav [data-header-body] {
+		padding-inline: 2.5rem;
+	}
+
+	#nd-nav nav {
+		padding-inline: 2.5rem;
+	}
+}
+
+@media (max-width: 30rem) {
+	#nd-subnav [data-header-body] {
+		padding-inline: 0.75rem;
+	}
+
+	#nd-nav nav {
+		padding-inline: 0.75rem;
+	}
 }
 
 #nd-subnav [data-shell-tabs] {

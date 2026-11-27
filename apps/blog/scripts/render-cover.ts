@@ -1,7 +1,7 @@
 import { mkdir, readFile } from "node:fs/promises"
 import { dirname, extname, resolve } from "node:path"
+import { decorativeMark } from "@trajectonomics/brand/mark"
 import { chromium } from "playwright-core"
-import { decorativeMark } from "../src/lib/mark"
 import { themeRole } from "../src/lib/theme-role"
 import { buildCoverHtml, parseCoverArgs } from "./cover-template"
 
