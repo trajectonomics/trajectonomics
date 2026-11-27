@@ -6,10 +6,12 @@ import type {
 	ProjectionChance,
 	ProjectionRun,
 	Read,
+	Snapshot,
 } from "../../lib/contract"
 import { chooseScenario } from "../../lib/view/plan"
 import { firstAges, planPeople, planStats } from "../../lib/view/projection/plan"
 import ProjectionCharts from "../charts/ProjectionCharts.svelte"
+import PlanItemTabs from "../plan-items/PlanItemTabs.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import PlanFooter from "./PlanFooter.svelte"
@@ -17,6 +19,8 @@ import PlanPeople from "./PlanPeople.svelte"
 import PlanStats from "./PlanStats.svelte"
 
 interface Props {
+	/** The whole Snapshot, whose plan document the item tabs read. */
+	snapshot: Snapshot
 	/** The Scenarios the Snapshot planned, main first. */
 	names: readonly string[]
 	/** The projection Reads of the Snapshot, by Scenario name. */
@@ -36,10 +40,14 @@ interface Props {
 	/** The custom chart the address bar names ("" for none) and its setter. */
 	chart: string
 	onChart: (id: string) => void
+	/** The item tab the address bar names, and the setter that writes it. */
+	items: string
+	onItems: (value: string) => void
 }
 
-/** The Plan: its people, the three figures, and its chart. The top bar's plan button picks the plan. */
+/** The Plan: its people, the three figures, its chart, and its items as tabs under it. The top bar's plan button picks the plan. */
 let {
+	snapshot,
 	names,
 	projections,
 	scenario,
@@ -51,6 +59,8 @@ let {
 	onTerms,
 	chart,
 	onChart,
+	items,
+	onItems,
 }: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : projections[name])
@@ -76,6 +86,7 @@ const charts = $derived({
 				<ProjectionCharts {run} {terms} {onTerms} {charts} />
 			{/snippet}
 		</ReadView>
+		<PlanItemTabs {snapshot} {scenario} {editable} {items} {onItems} />
 		<PlanFooter />
 	</div>
 {/if}
