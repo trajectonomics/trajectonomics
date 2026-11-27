@@ -78,8 +78,8 @@ describe("a chart on a plan", () => {
 		const real = (series: string[]) => chartView({ ...CHART, series }, byId(), new Map(), "real")
 		const allReal = real(["net-worth", "account:savings"])
 		expect(allReal.series.map((line) => line.name)).toEqual([
-			"Net worth at the close of the year, in As-of terms",
-			"Value of Savings, in As-of terms",
+			"Net worth at the close of the year in today's money",
+			"Value of Savings in today's money",
 		])
 		expect(allReal.series[0]?.points[0]?.display).toBe("1,200,000.00")
 		expect(allReal.notes.join(" ")).not.toContain("one set of terms")

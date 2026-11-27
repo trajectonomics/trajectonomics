@@ -1,7 +1,8 @@
 import { FAN_LEVELS, fanSeriesName, type LineSeries, toChartNumber } from "../../chart"
 import type { ProjectionChance } from "../../contract"
-import { formatDate, formatMoney, formatShare } from "../../format"
+import { formatDate, formatMoney, formatShare, trimPercent, yearOf } from "../../format"
 import { type ChanceSource, chanceSourceWords } from "../assumptions/chance"
+import { chanceLasts } from "./words"
 
 /**
  * A roll-up's year is labelled on every fifth bar, and on every tenth once the row passes 50 bars, so a
@@ -12,11 +13,12 @@ const BARS_PER_LABEL_STEP = 50
 
 /** The share and its facts, as the Home card shows them. Every figure is the CLI's, shown as it stands. */
 export interface ChanceSummary {
-	/** The success share, from the CLI's basis points: "87.30%". */
+	/** The chance, from the CLI's basis points, with its trailing zeros dropped: "87.3%". */
 	readonly share: string
 	readonly succeeded: number
 	readonly paths: number
-	readonly horizon: string
+	/** "Lasts to 2028 in 174 of 200 markets." */
+	readonly lasts: string
 	readonly currency: string
 }
 
@@ -55,10 +57,10 @@ export interface ChanceView extends ChanceSummary {
 /** The summary of one chance read: the share and the facts beside it. */
 export function chanceSummaryOf(read: ProjectionChance): ChanceSummary {
 	return {
-		share: formatShare(read.successBps),
+		share: trimPercent(formatShare(read.successBps)),
 		succeeded: read.succeeded,
 		paths: read.paths,
-		horizon: formatDate(read.horizon),
+		lasts: chanceLasts(read.succeeded, read.paths, read.horizon),
 		currency: read.currency,
 	}
 }
@@ -74,11 +76,6 @@ export function chanceViewOf(read: ProjectionChance): ChanceView {
 		notes: read.notes,
 		source: chanceSourceWords(read),
 	}
-}
-
-/** The year a roll-up's last day falls in, read as text: the CLI's date, not a calendar computation. */
-function yearOf(date: string): string {
-	return date.slice(0, 4)
 }
 
 /**

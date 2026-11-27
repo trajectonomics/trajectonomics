@@ -1,8 +1,11 @@
 import type { z } from "zod"
 import { checkDocument, type FlagDocument } from "./document"
+import type { DocumentSpec } from "./document-spec"
 import type { AppError, ErrorCode } from "./errors"
 import { checkPositionals, deriveFlags, type FlagSpec } from "./flags"
 import type { RenderHint } from "./table"
+
+export type { DocumentSpec, RequiredDocumentField } from "./document-spec"
 
 export type Env = Readonly<Record<string, string | undefined>>
 
@@ -33,36 +36,6 @@ export type Context = {
 	 */
 	afterSuccess?: string[]
 	source?: import("./store/types").Source // the clock and ids a write reads; only the demo entry sets it (ADR-0074)
-}
-
-/** A field the document form cannot work without, and the sentence naming what is missing. It is
- * checked before the document is read, and the usage line marks it required (ADR-0020). */
-export type RequiredDocumentField = { field: string; sentence: string }
-
-/**
- * A leaf's second input form: a JSON document named by `flag` (a path, or `-` for stdin). The
- * document schema is a shape of its own; `allowed` names the flags that may accompany it, and
- * every other input field is exclusive to the flag form (ADR-0020). `required` names the input
- * fields the document form needs, in the order a caller fixes them.
- */
-export type DocumentSpec<D extends z.ZodType = z.ZodType> = {
-	flag: string
-	schema: D
-	allowed?: readonly string[]
-	required?: readonly RequiredDocumentField[]
-	/** The hint a refusal of the document flag beside a flag it cannot take carries. */
-	hint?: string
-	/**
-	 * The hint for one flag the document form cannot take, when that flag names a form of its own;
-	 * `hint` serves every other flag (cli ADR-0057).
-	 */
-	exclusiveHints?: Readonly<Record<string, string>>
-	/**
-	 * A second form of the same document, taken instead of `schema` when the boolean input field
-	 * `flag` is true, such as `--decimal` (ADR-0047). It is published by `traj schema` beside the
-	 * first, and the two never mix: the flag selects one schema before the document is read.
-	 */
-	alternate?: { flag: string; schema: z.ZodType }
 }
 
 type Outcome<T> = Result<T> | AppError | Promise<Result<T> | AppError>

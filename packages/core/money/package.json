@@ -3,7 +3,7 @@
 	"private": true,
 	"version": "0.0.0-development",
 	"description": "Pure decimal scaling: major units to integer Minor Units and back, with precision supplied by the caller.",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/trajectonomics/trajectonomics.git",

@@ -56,7 +56,7 @@ describe("fiModelOf: the reachable branch", () => {
 		expect(model.reference.date).toBe("1 Mar 2041")
 		expect(model.reference.basis).toBe("Unlocked assets")
 		expect(model.reference.window).toBe("The next twelve months of expenses")
-		expect(model.reference.terms).toBe("Nominal money")
+		expect(model.reference.terms).toBe("Future money")
 	})
 
 	test("says the reference is not met and is a full twelve months, when the CLI says so", () => {
@@ -75,7 +75,7 @@ describe("fiModelOf: the reachable branch", () => {
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.met).toBe("Met")
 		expect(model.reference.partial).toBe("Partial: the window holds less than twelve months")
-		expect(model.reference.terms).toBe("Real money")
+		expect(model.reference.terms).toBe("Today's money")
 	})
 
 	test("drops 'a year of' from the multiple when the window is partial", () => {

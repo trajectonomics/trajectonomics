@@ -46,7 +46,7 @@ function clearFilters(): void {
 			<p class="text-sm text-muted-foreground">{`Showing ${shown.length} of ${rows.length} transactions, from ${describePeriod(read.argv)}.`}</p>
 			{#if rows.length === 0}
 				<EmptyState title="No transactions in this period">
-					<p>The Snapshot holds no transaction between its two dates.</p>
+					<p>These figures hold no transaction between the two dates.</p>
 				</EmptyState>
 			{:else if shown.length === 0}
 				<EmptyState title="No transaction matches these filters">

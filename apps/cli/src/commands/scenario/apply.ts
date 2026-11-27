@@ -48,7 +48,9 @@ export const apply: Leaf = defineCommand({
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 		decimal: decimalFlag,
 		ifHash: IF_HASH,
-		set: setFlag,
+		set: setFlag.describe(
+			`${setFlag.description ?? ""} Applied to the stored plan, the Set is saved.`,
+		),
 		without: withoutFlag.describe(
 			"Take one list item out by its id, such as flows.gym, before any --set. Applied to the stored plan, the removal is saved.",
 		),

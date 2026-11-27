@@ -5,8 +5,8 @@ import type { SegmentedOption } from "../ui/segmented-option"
 
 const TERM_OPTIONS: readonly SegmentedOption<Terms>[] = [
 	{ value: "both", label: "Both" },
-	{ value: "nominal", label: "Nominal" },
-	{ value: "real", label: "Real, in As-of terms" },
+	{ value: "nominal", label: "Future money" },
+	{ value: "real", label: "Today's money" },
 ]
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 	onChange: (value: Terms) => void
 }
 
-/** The choice of terms for a year-by-year chart: nominal, real in As-of terms, or both. */
+/** The choice of terms for a year-by-year chart: future money, today's money, or both. */
 let { value, onChange }: Props = $props()
 </script>
 

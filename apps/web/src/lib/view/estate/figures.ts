@@ -79,17 +79,17 @@ export function figuresAt(run: ProjectionRun, date: string): EstateFigures | nul
 /** How a line is shown under the terms asked for: the amount in the main place, a tag and, beside it, today's money. */
 export interface Shown {
 	readonly amount: string
-	/** "Today's money" or "Nominal" when the terms ask for today's money alone; the engine states only two such figures. */
+	/** "Today's money" or "Future money" when the terms ask for today's money alone; the engine states only two such figures. */
 	readonly tag: string | null
-	/** The figure in today's money, shown beside the nominal one when both are asked for. */
+	/** The figure in today's money, shown beside the future-money one when both are asked for. */
 	readonly aside: string | null
 }
 
-/** The line's amounts under the terms. Only a line the engine states in today's money (net, heirs) ever moves; the rest stay nominal, and say so. */
+/** The line's amounts under the terms. Only a line the engine states in today's money (net, heirs) ever moves; the rest stay in future money, and say so. */
 export function shownUnder(item: Item, terms: "both" | "nominal" | "real"): Shown {
 	if (terms === "real") {
 		return item.real === null
-			? { amount: item.amount, tag: "Nominal", aside: null }
+			? { amount: item.amount, tag: "Future money", aside: null }
 			: { amount: item.real, tag: "Today's money", aside: null }
 	}
 	return { amount: item.amount, tag: null, aside: terms === "both" ? item.real : null }

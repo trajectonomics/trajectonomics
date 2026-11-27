@@ -16,9 +16,9 @@ const page = createRawSnippet(() => ({ render: () => "<p>the page</p>" }))
 
 const renderLayout = () => render(Layout, { props: { children: page } }).body
 
-/** The plan the switcher marks as the one the pages show. */
+/** The plan the switcher's top-bar button names as the one the pages show. */
 function chosenPlan(body: string): string | undefined {
-	return body.match(/aria-current="true"[^>]*>\s*([^<]+?)\s*</)?.[1]
+	return topBar(body).match(/aria-label="Plan: ([^"]+)\. Change plan"/)?.[1]
 }
 
 /** The top bar's markup. */

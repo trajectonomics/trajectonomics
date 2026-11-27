@@ -21,6 +21,8 @@ export interface LoanCard {
 	readonly title: string
 	readonly amountLabel: string
 	readonly amount: string | null
+	/** How often the loan's Flow lands, as the CLI states it, shown after the amount. */
+	readonly frequency: string
 	readonly rows: readonly LoanRow[]
 }
 
@@ -38,24 +40,22 @@ function datesOf(flow: ScenarioFlow): LoanRow[] {
 	]
 }
 
-/** The rows of a withdrawal: what it borrows from, how often, its dates and its growth. */
+/** The rows of a withdrawal: what it borrows from, its dates and its growth. */
 function withdrawalRows(flow: ScenarioFlow): LoanRow[] {
 	return [
 		{ label: "Borrows from", value: flow.source ?? "", account: true },
-		{ label: "How often", value: flow.frequency },
 		...datesOf(flow),
 		{ label: "Growth", value: flow.derive === undefined ? growthText(flow) : "Computed" },
 	]
 }
 
-/** The rows of a level loan: its lender, its payment count and rounding, how often, and its start. */
+/** The rows of a level loan: its lender, its payment count and rounding, and its start. */
 function levelRows(flow: ScenarioFlow): LoanRow[] {
 	const level = flow.level
 	return [
 		{ label: "Repays", value: flow.target ?? "", account: true },
 		{ label: "Payments", value: level === undefined ? "" : `${level.payments} equal payments` },
 		{ label: "Rounding", value: level?.rounding ?? "" },
-		{ label: "How often", value: flow.frequency },
 		{ label: "Starts", value: formatDate(flow.start) },
 	]
 }
@@ -69,6 +69,7 @@ export function loanCards(flows: readonly ScenarioFlow[]): LoanCard[] {
 					title: "Withdrawal",
 					amountLabel: "Amount per occurrence",
 					amount: flow.amount ?? null,
+					frequency: flow.frequency,
 					rows: withdrawalRows(flow),
 				}
 			: {
@@ -76,6 +77,7 @@ export function loanCards(flows: readonly ScenarioFlow[]): LoanCard[] {
 					title: "Level loan",
 					amountLabel: "Principal",
 					amount: flow.level.principal,
+					frequency: flow.frequency,
 					rows: levelRows(flow),
 				},
 	)

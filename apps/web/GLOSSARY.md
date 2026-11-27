@@ -270,7 +270,7 @@ The one plan the ledger marks as the person's real plan (`scenario main`). It is
 _Avoid_: default plan, primary plan, active plan
 
 **Plan notes**:
-The plain text a plan keeps about what it assumes (`scenario notes`), outside the Scenario document and its hash. A card shows the first line and opens the rest; the switcher shows a notes icon beside a plan that has some.
+The plain text a plan keeps about what it assumes (`scenario notes`), outside the Scenario document and its hash. A card on the Plans page shows the first line and opens the rest.
 _Avoid_: comment, description, memo
 
 **Plans page**:

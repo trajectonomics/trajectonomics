@@ -80,26 +80,34 @@ describe("the plan table's tier history", () => {
 	test("gives every known plan a tier, except the one we cannot name", () => {
 		for (const plan of plans) {
 			if (plan.id === "meta") expect(plan.tiers).toEqual([])
+			else if (plan.id === "claude") expect(plan.tiers.length).toBe(2)
 			else expect(plan.tiers.length).toBe(1)
 		}
+	})
+
+	test("keeps Claude's Pro tier before Max began", () => {
+		expect(tierOn("claude", "2026-10-16")?.name).toBe("Pro")
+		expect(tierOn("claude", "2026-10-17")?.name).toBe("Max")
+		expect(tierOn("claude", "2026-10-16")?.to).toBe("2026-10-16")
 	})
 })
 
 describe("tierOn", () => {
 	test("reads the tier a plan ran on that day", () => {
-		expect(tierOn("claude", "2026-11-24")?.name).toBe("Max 5x")
+		expect(tierOn("claude", "2026-11-24")?.name).toBe("Max")
 		expect(tierOn("antigravity", "2026-11-24")?.name).toBe("Google AI Pro")
 		expect(tierOn("mistral", "2026-11-21")?.name).toBe("Pro")
+		expect(tierOn("cursor", "2026-11-24")?.name).toBe("Premium")
 	})
 
 	test("treats a null bound as open-ended", () => {
-		expect(tierOn("claude", "2026-10-17")?.name).toBe("Max 5x")
-		expect(tierOn("claude", "2099-01-01")?.name).toBe("Max 5x")
+		expect(tierOn("claude", "2026-10-17")?.name).toBe("Max")
+		expect(tierOn("claude", "2099-01-01")?.name).toBe("Max")
 		expect(tierOn("antigravity", "2020-01-01")?.name).toBe("Google AI Pro")
 	})
 
-	test("answers null before the tier starts", () => {
-		expect(tierOn("claude", "2026-10-16")).toBeNull()
+	test("treats the earliest tier's null start as open-ended", () => {
+		expect(tierOn("claude", "1999-01-01")?.name).toBe("Pro")
 	})
 
 	test("answers null for a plan with no tier and for a plan the table does not name", () => {

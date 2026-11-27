@@ -60,4 +60,4 @@ This package is not published. It ships inside the `traj` CLI's binaries through
 
 ## License
 
-MIT
+AGPL-3.0-only

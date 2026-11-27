@@ -1,12 +1,27 @@
 <script lang="ts">
+import { afterNavigate } from "$app/navigation"
 import { preferences } from "../../client/preferences.svelte.js"
 import { shellPanels } from "../../client/shell.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { formatDate } from "../../lib/format"
+import type { PlanRow } from "../../lib/view/plans/rows"
 import { cx } from "../ui/cx"
 import NavIcon from "./NavIcon.svelte"
+import PlanButton from "./PlanButton.svelte"
 import SnapshotStatus from "./SnapshotStatus.svelte"
 
+interface Props {
+	/** The Scenario names the Snapshot holds, and the one the pages show. */
+	names: readonly string[]
+	selected: string
+	onPlan: (name: string) => unknown
+	/** What the Snapshot says of each plan, for the Main tag. */
+	rows?: readonly PlanRow[]
+	/** Whether the server answers Edits, so the plan menu offers a new plan. */
+	editable?: boolean
+}
+
+let { names, selected, onPlan, rows = [], editable = false }: Props = $props()
 const snapshotState = $derived(currentSnapshot())
 const asOf = $derived(
 	snapshotState.status === "ready" ? formatDate(snapshotState.snapshot.params.asOf) : null,
@@ -21,6 +36,13 @@ $effect(() => {
 	const open = shellPanels.menu
 	if (wasOpen && !open) menuButton?.focus()
 	wasOpen = open
+})
+
+// A link in the drawer is followed, so SvelteKit puts focus back on the body: the menu button takes it again.
+afterNavigate(() => {
+	if (!shellPanels.menuFocusPending) return
+	shellPanels.menuFocusPending = false
+	menuButton?.focus()
 })
 
 const BUTTON = cx(
@@ -45,7 +67,9 @@ const BUTTON = cx(
 		>
 			<NavIcon name="menu" />
 		</button>
-		<div class="min-w-0 flex-1"></div>
+		<div class="min-w-0 flex-1">
+			<PlanButton {names} {selected} onChange={onPlan} {editable} {rows} />
+		</div>
 		{#if asOf !== null}
 			<span
 				class="hidden h-[34px] items-center rounded-md border border-border bg-card px-3 text-sm text-muted-foreground sm:inline-flex"

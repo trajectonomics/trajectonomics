@@ -59,6 +59,6 @@ describe("a loan card in a What-if session", () => {
 		const body = assets({ baseline: held })
 		expect(body).not.toContain("Include loan in the what-if")
 		expect(body).toContain("Already owed: the ledger holds this debt")
-		expect(body).toContain("Try a value")
+		expect(body).toContain("What if…")
 	})
 })

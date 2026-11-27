@@ -1,5 +1,5 @@
 import type { ProjectionRun } from "../../contract"
-import { formatDate } from "../../format"
+import { formatDate, periodWords } from "../../format"
 
 /** The first settlement period of a run, as the Tax card states it. */
 export interface TaxPeriod {
@@ -36,7 +36,7 @@ export function taxView(run: ProjectionRun): TaxView {
 				: {
 						levy: row.levy,
 						owed: row.owed,
-						period: `${formatDate(row.from)} to ${formatDate(row.to)}`,
+						period: periodWords(row.from, row.to),
 						settlement: formatDate(row.settlementDate),
 						settled: row.settled,
 						partial: row.partial,

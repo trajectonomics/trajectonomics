@@ -22,11 +22,11 @@ const projection = $derived(name === null ? undefined : snapshot.reads.projectio
 </script>
 
 {#if name === null || read === undefined}
-	<EmptyState title="No plan document in this Snapshot">
-		<p>The Snapshot holds no document for the selected plan, so its items cannot be shown.</p>
+	<EmptyState title="No plan document to show">
+		<p>These figures hold no document for the selected plan, so its items cannot be shown.</p>
 	</EmptyState>
 {:else}
-	<ReadView {read} label={`The plan ${name}`}>
+	<ReadView {read} label={`The plan of ${name}`}>
 		{#snippet children(data)}
 			<PlanItemsList
 				{kind}
