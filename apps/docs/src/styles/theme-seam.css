@@ -124,6 +124,12 @@
 #nd-nav :is(a, button):focus-visible,
 #nd-notebook-layout :is(#nd-subnav, #nd-sidebar, #nd-sidebar-mobile) :is(a, button):focus-visible {
 	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+/* The header's brand and marker keep the shared frame's 4px offset, as on every static site. */
+#nd-nav :is(.ds-brand, .ds-marker):focus-visible,
+#nd-subnav :is(.ds-brand, .ds-marker):focus-visible {
 	outline-offset: 4px;
 }
 
