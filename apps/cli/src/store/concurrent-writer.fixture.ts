@@ -15,7 +15,7 @@ const [home = "", writer = "0", count = "0", busy, mode, name, hash, set] = proc
 
 function failed(outcome: unknown): outcome is AppError {
 	if (!isAppError(outcome)) return false
-	console.error(JSON.stringify(outcome.body))
+	process.stderr.write(`${JSON.stringify(outcome.body)}\n`)
 	process.exitCode = 1
 	return true
 }
@@ -80,7 +80,7 @@ async function applyWhatIf(): Promise<void> {
 		process.exitCode = code
 		if (code !== 5 || !busyEnvelope(errors) || Date.now() - started >= budget) break
 	}
-	for (const line of errors) console.error(line)
+	for (const line of errors) process.stderr.write(`${line}\n`)
 }
 
 if (mode === "apply") {

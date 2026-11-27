@@ -10,6 +10,7 @@ import { filersOf, readForFilers } from "../src/lib/snapshot/allowance-filers"
 import { isFilerPlan } from "../src/lib/snapshot/allowance-params"
 import type { PlannedRead } from "../src/lib/snapshot/planned"
 import { runPlanned } from "./run-planned"
+import { mapPool } from "./run-pool"
 import type { RunContext } from "./run-traj"
 
 type ProjectionRead = SnapshotReads["projections"][string] | undefined
@@ -44,13 +45,18 @@ export async function runAllowances(
 	projections: SnapshotReads["projections"],
 	records: readonly unknown[],
 ): Promise<Record<string, Read<ProjectionAllowances>>> {
-	const reads: Record<string, Read<ProjectionAllowances>> = {}
+	const eligible: [string, PlannedRead][] = []
 	for (const [name, planned] of Object.entries(plan.allowances)) {
 		const shown = documents[name]
 		if (shown?.ok !== true || !hasLevy(shown)) continue
 		const read = readOf(planned, shown.data.scenario.document, projections[name])
 		if (read === null) continue
-		reads[name] = await runPlanned(context, read, projectionAllowances, records)
+		eligible.push([name, read])
 	}
-	return reads
+	const results = await mapPool(
+		eligible,
+		async ([name, read]) =>
+			[name, await runPlanned(context, read, projectionAllowances, records)] as const,
+	)
+	return Object.fromEntries(results)
 }

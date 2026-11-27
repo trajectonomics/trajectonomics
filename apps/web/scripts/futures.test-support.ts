@@ -7,7 +7,7 @@ import type { PlanParams } from "../src/lib/snapshot"
 import { pathAnswer } from "../src/lib/snapshot/paths"
 import { demoCarryIn } from "./demo/carry-in"
 import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
@@ -26,7 +26,7 @@ let params: PlanParams | null = null
 export async function setupFutures(): Promise<void> {
 	scratch = await makeScratch("traj-web-futures-")
 	const home = join(scratch, "traj-home")
-	const ids = await buildDemoLedger({ binary: BINARY, home, scratch })
+	const ids = await copyDemoLedger({ binary: BINARY, home, scratch })
 	const model = join(scratch, "return-model.json")
 	await writeFile(model, JSON.stringify(demoReturnModel(ids)))
 	traj = { binary: BINARY, env: { ...process.env, TRAJ_HOME: home } }

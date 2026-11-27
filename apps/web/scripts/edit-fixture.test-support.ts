@@ -4,7 +4,7 @@
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { demoCarryIn } from "./demo/carry-in"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { SLOW_MS } from "./edit-slow.test-support"
 import { recorded } from "./editor-running.test-support"
@@ -54,7 +54,7 @@ export async function setupEditor(): Promise<Editor> {
 	if (editor !== null) return editor
 	scratch = await makeScratch("traj-web-edit-")
 	home = join(scratch, "traj-home")
-	await buildDemoLedger({ binary: BINARY, home, scratch })
+	await copyDemoLedger({ binary: BINARY, home, scratch })
 	// The demo ledger's Levy needs the Carry-in the demo states, or the projection of `base` is refused.
 	const next = createEditor({
 		traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home, DO_NOT_TRACK: "1" } },

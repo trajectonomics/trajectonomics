@@ -15,13 +15,20 @@ if (value !== undefined && source === undefined) {
 	process.exit(2)
 }
 
-process.exit(
-	await run(
-		Bun.argv.slice(2),
-		{ out: (line) => console.log(line), err: (line) => console.error(line) },
-		process.env,
-		undefined,
-		undefined,
-		source,
-	),
+const code = await run(
+	Bun.argv.slice(2),
+	{
+		out: (line) => console.log(line),
+		err: (line) => {
+			process.stderr.write(`${line}\n`)
+		},
+	},
+	process.env,
+	undefined,
+	undefined,
+	source,
 )
+await new Promise<void>((resolve) => {
+	process.stderr.write("", () => resolve())
+})
+process.exit(code)
