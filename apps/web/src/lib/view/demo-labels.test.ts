@@ -22,11 +22,9 @@ function demoItems(): DemoItem[] {
 			id: flow.id,
 			label: flow.displayLabel,
 		}))
-		const milestones: DemoItem[] = (document.milestones ?? []).flatMap((one) => {
-			const parsed = milestoneLabel.safeParse(one)
-			return parsed.success
-				? [{ kind: "milestone", id: parsed.data.id, label: parsed.data.displayLabel }]
-				: []
+		const milestones: DemoItem[] = (document.milestones ?? []).map((one) => {
+			const parsed = milestoneLabel.parse(one)
+			return { kind: "milestone", id: parsed.id, label: parsed.displayLabel }
 		})
 		return [...flows, ...milestones]
 	})
