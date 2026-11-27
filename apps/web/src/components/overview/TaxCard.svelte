@@ -1,4 +1,5 @@
 <script lang="ts">
+import { dropLeadingMinus } from "../../lib/format/direction"
 import type { CardFigure } from "../../lib/view/overview/card-details"
 import type { ScenarioView } from "../../lib/view/overview/scenario"
 import type { TaxView } from "../../lib/view/overview/tax"
@@ -56,7 +57,13 @@ function taxRules(shown: ScenarioView<TaxView>): string | null {
 		{:else}
 			<div class="space-y-1">
 				<p class="text-lg font-semibold tracking-tight">
-					<Money amount={data.first.owed} currency={data.currency} compact />
+					<Money
+						amount={isRefund(data.first.owed)
+							? dropLeadingMinus(data.first.owed)
+							: data.first.owed}
+						currency={data.currency}
+						compact
+					/>
 				</p>
 				<p class="text-sm text-muted-foreground">Due {data.first.settlement}</p>
 				{#if data.first.partial}

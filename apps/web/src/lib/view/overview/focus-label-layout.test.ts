@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { PlotBox } from "./focus-chart-axis"
 import { curveYsIn, type LabelBox, placeBox, placeLabel } from "./focus-label-layout"
+import { BAND_PAD } from "./focus-label-scan"
 
 const PLOT: PlotBox = { left: 12, right: 188, top: 16, bottom: 144 }
 const BOX: LabelBox = { width: 60, height: 20 }
@@ -9,6 +10,14 @@ const RISING = [
 	{ x: 12, y: 120 },
 	{ x: 100, y: 104 },
 	{ x: 188, y: 60 },
+]
+/** A wall of line at x 100 that leaves the box no room where the answer's point is. */
+const WALL = [
+	{ x: 12, y: 120 },
+	{ x: 120, y: 120 },
+	{ x: 120, y: 20 },
+	{ x: 120, y: 140 },
+	{ x: 188, y: 140 },
 ]
 
 describe("placeLabel", () => {
@@ -35,6 +44,39 @@ describe("placeLabel", () => {
 		expect(label.y + BOX.height).toBeLessThanOrEqual(PLOT.bottom)
 	})
 
+	test("moves to another x when the preferred one clears nothing", () => {
+		const label = placeLabel(WALL, PLOT, { x: 100, y: 100 }, BOX, "right")
+		expect(label.band).toBe(false)
+		expect(label.x).not.toBe(108)
+		expect(label.x).toBeGreaterThanOrEqual(PLOT.left)
+		expect(label.x + BOX.width).toBeLessThanOrEqual(PLOT.right)
+		const ys = curveYsIn(WALL, label.x, label.x + BOX.width)
+		expect(label.y + BOX.height).toBeLessThanOrEqual(Math.min(...ys))
+	})
+
+	test("puts a box that clears the line nowhere in the band above the plot", () => {
+		const flat = [
+			{ x: 12, y: 80 },
+			{ x: 188, y: 80 },
+		]
+		const tall: LabelBox = { width: 60, height: 120 }
+		const label = placeLabel(flat, PLOT, { x: 100, y: 80 }, tall, "right")
+		expect(label.band).toBe(true)
+		expect(label.y).toBe(BAND_PAD)
+		expect(label.y).toBeLessThan(PLOT.top)
+	})
+
+	test("keeps a placed box inside the plot's bounds", () => {
+		for (const preferred of [-100, 12, 40, 100, 180, 400]) {
+			const box = placeBox(RISING, PLOT, preferred, BOX)
+			expect(box.band).toBe(false)
+			expect(box.x).toBeGreaterThanOrEqual(PLOT.left)
+			expect(box.x + BOX.width).toBeLessThanOrEqual(PLOT.right)
+			expect(box.y).toBeGreaterThanOrEqual(PLOT.top)
+			expect(box.y + BOX.height).toBeLessThanOrEqual(PLOT.bottom)
+		}
+	})
+
 	test("keeps a box that would overhang the plot inside it", () => {
 		const wide: LabelBox = { width: 120, height: 20 }
 		expect(placeLabel(RISING, PLOT, { x: 20, y: 120 }, wide, "left").x).toBe(PLOT.left)
@@ -48,11 +90,16 @@ describe("placeLabel", () => {
 		expect(centred.x).toBe(70)
 		expect(centred.y + BOX.height).toBeLessThanOrEqual(100)
 	})
+})
 
-	test("never leaves the plot when the box is taller than the plot", () => {
+describe("placeBox", () => {
+	test("puts a box taller than the plot in the band above it", () => {
 		const tall: LabelBox = { width: 40, height: 300 }
 		const box = placeBox(RISING, PLOT, 40, tall)
-		expect(box.y).toBeGreaterThanOrEqual(PLOT.top)
+		expect(box.band).toBe(true)
+		expect(box.y).toBe(BAND_PAD)
+		expect(box.x).toBeGreaterThanOrEqual(PLOT.left)
+		expect(box.x + tall.width).toBeLessThanOrEqual(PLOT.right)
 	})
 })
 

@@ -10,8 +10,8 @@ let { counts }: Props = $props()
 const squares = $derived(Array.from({ length: counts.paths }, (_, index) => index))
 </script>
 
-<div aria-hidden="true" class="flex items-center gap-3">
-	<div class="grid grid-cols-[repeat(50,4px)] gap-px">
+<div aria-hidden="true" class="flex flex-wrap items-center gap-3">
+	<div class="grid max-w-full grid-cols-[repeat(50,minmax(0,4px))] gap-px">
 		{#each squares as index (index)}
 			<span
 				class={index < counts.succeeded

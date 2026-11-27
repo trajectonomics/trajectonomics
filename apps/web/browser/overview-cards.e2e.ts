@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { openDemo, SCREENSHOTS } from "./demo"
+import { measureOverflow } from "./fit"
+import { lineHitsTheLabel } from "./focus-line"
 import { visibleTextOf } from "./visible-text"
 
 // The summary below the focus point is a grid of quiet cards: each one is a single stretched link with
@@ -48,6 +50,10 @@ test("a plan that runs out puts its month on the chart and its shortfall under i
 	await page.setViewportSize({ width: 360, height: 800 })
 	await openDemo(page, "/?scenario=retire-early", { theme: "light" })
 	await expect(page.locator("[data-focus-answer]")).toHaveText("Feb 2053")
+	const hits = await page.evaluate(lineHitsTheLabel)
+	expect(hits, "the line through the label's box").toEqual([])
+	const fit = await measureOverflow(page, true)
+	expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.innerWidth)
 	await page.screenshot({
 		path: `${SCREENSHOTS}/screen/360/light/home-runs-out.png`,
 		fullPage: true,

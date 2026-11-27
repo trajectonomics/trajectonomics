@@ -63,7 +63,7 @@ describe("TaxCard", () => {
 		expect(body).toContain('href="/tax/"')
 	})
 
-	test("calls a negative owed a refund, keeps the CLI's string and does not colour it as a debt", () => {
+	test("calls a negative owed a refund, drops its minus on the face and keeps it in Details", () => {
 		const run = projectionRun({ taxYears: [taxYear("2026-01-01", "2026-12-31", "-12000.00")] })
 		const read = okRead(["projection"], taxView(run))
 		const { body } = render(TaxCard, {
@@ -71,7 +71,10 @@ describe("TaxCard", () => {
 		})
 		expect(body).toContain("Refund for 2026")
 		expect(body).not.toContain("Tax for 2026")
-		expect(body).toContain("−12k")
+		expect(body).toContain("12k")
+		expect(body).not.toContain("−12k")
+		// Details keeps the CLI's signed string, so a reviewer can match it to the `traj` output.
+		expect(body).toContain("−12,000.00")
 		expect(body).not.toContain("text-destructive")
 	})
 })

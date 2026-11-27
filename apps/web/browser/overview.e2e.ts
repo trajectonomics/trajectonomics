@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { openDemo } from "./demo"
+import { measureOverflow } from "./fit"
 import { outlineStyle, tabTo } from "./shell"
 
 // The Overview opens on one focus point (#704): the answer is the largest text on the page, its whole
@@ -94,15 +95,13 @@ test("a phone shows the summary in two columns", async ({ page }) => {
 })
 
 test("a phone keeps the whole answer off the page and never scrolls sideways", async ({ page }) => {
-	await page.setViewportSize({ width: 360, height: 800 })
-	await openDemo(page, "/", { theme: "light" })
-	const heading = await page.locator("[data-focus-heading]").boundingBox()
-	expect(heading, "the hidden heading is laid out").not.toBeNull()
-	expect(heading?.width ?? 0, "the heading is screen-reader only").toBeLessThanOrEqual(1)
-	expect(heading?.height ?? 0, "the heading is screen-reader only").toBeLessThanOrEqual(1)
-	const fit = await page.evaluate(() => ({
-		scrollWidth: document.documentElement.scrollWidth,
-		clientWidth: document.documentElement.clientWidth,
-	}))
-	expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.clientWidth)
+	for (const width of [360, 320]) {
+		await page.setViewportSize({ width, height: 800 })
+		await openDemo(page, "/", { theme: "light" })
+		const heading = await page.locator("[data-focus-heading]").boundingBox()
+		expect(heading?.width ?? 0, "the heading is screen-reader only").toBeLessThanOrEqual(1)
+		expect(heading?.height ?? 0, "the heading is screen-reader only").toBeLessThanOrEqual(1)
+		const fit = await measureOverflow(page, true)
+		expect(fit.scrollWidth, `a ${width}px page's scroll width`).toBeLessThanOrEqual(fit.innerWidth)
+	}
 })

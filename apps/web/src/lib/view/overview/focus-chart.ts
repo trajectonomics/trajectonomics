@@ -31,18 +31,22 @@ export interface FocusChartGeometry {
 const MARGIN = { left: 12, right: 12, top: 16, bottom: 56 }
 const BAR_HEIGHT = 10
 
-/** The chart's geometry: the phased line and fills, the stop point, the answer's side, the flag and the bar. */
+/**
+ * The chart's geometry: the phased line and fills, the stop point, the answer's side, the flag and
+ * the bar. `band` is the height reserved above the plot for a box that clears the line nowhere.
+ */
 export function focusChart(
 	rows: readonly ChartRow[],
 	stopDate: string | null,
 	endDate: string | null,
 	width: number,
 	height: number,
+	band = 0,
 ): FocusChartGeometry {
 	const plot: PlotBox = {
 		left: MARGIN.left,
 		right: width - MARGIN.right,
-		top: MARGIN.top,
+		top: MARGIN.top + band,
 		bottom: height - MARGIN.bottom,
 	}
 	const placement = placeRows(rows, plot, stopDate, endDate)

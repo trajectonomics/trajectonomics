@@ -10,6 +10,8 @@ interface Props {
 	chart: FocusChartGeometry
 	width: number
 	height: number
+	/** The flag year's box, placed by the layout so the year clears the line. */
+	flagBox: { readonly x: number; readonly y: number } | null
 	/** The shortfall, compact and masked when amounts are hidden. */
 	unmet: string
 	firstAge: string
@@ -17,7 +19,7 @@ interface Props {
 }
 
 /** The focus point's SVG: the line and its fills, the stop, the flag or the bar, and the first and last age. */
-let { focus, chart, width, height, unmet, firstAge, lastAge }: Props = $props()
+let { focus, chart, width, height, flagBox, unmet, firstAge, lastAge }: Props = $props()
 </script>
 
 <svg
@@ -75,13 +77,12 @@ let { focus, chart, width, height, unmet, firstAge, lastAge }: Props = $props()
 		/>
 		<circle cx={chart.stop.x} cy={chart.stop.y} r="3.5" class="fill-accent print:fill-foreground" />
 	{/if}
-	{#if focus.kind === "reachable" && chart.flag}
+	{#if focus.kind === "reachable" && chart.flag && flagBox}
 		<FocusFlag
 			x={chart.flag.x}
 			y={chart.flag.y}
 			year={focus.horizonYear ?? ""}
-			points={chart.points}
-			plot={chart.plot}
+			box={flagBox}
 		/>
 	{/if}
 	{#if focus.kind === "runsOut" && chart.bar}
