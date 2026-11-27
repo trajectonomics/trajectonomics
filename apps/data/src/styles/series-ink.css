@@ -1,0 +1,99 @@
+/* Pointing at a series: its brand ink stays, the others step back, and a readout names the figure. */
+
+.chart-svg:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+.chart-guide {
+	stroke: var(--ds-color-foreground);
+	stroke-opacity: 0.35;
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
+}
+
+.chart-line {
+	pointer-events: none;
+}
+
+.chart-svg.is-choosing .chart-line {
+	opacity: 0.28;
+}
+
+.chart-svg.is-choosing .chart-line.chart-line-on {
+	opacity: 1;
+}
+
+.legend-button {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 2px 6px;
+	border: 0;
+	border-radius: var(--ds-radius-sm);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.legend-button[aria-pressed="true"] {
+	background: var(--ds-color-secondary);
+}
+
+.legend-button:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+.chart-readout {
+	position: absolute;
+	top: 2px;
+	right: 0;
+	left: 0;
+	margin: 0;
+	font-family: var(--font-meta);
+	font-size: 12px;
+	line-height: 1.45;
+	color: var(--ds-color-foreground);
+	pointer-events: none;
+}
+
+.bars-series {
+	cursor: pointer;
+	outline: none;
+}
+
+.bars-figure.is-choosing .bars-series {
+	opacity: 0.35;
+}
+
+.bars-figure.is-choosing .bars-series.bars-series-on {
+	opacity: 1;
+}
+
+.bars-series:focus-visible .bars-fill,
+.bars-series:focus-visible .bars-stub {
+	stroke: var(--ds-color-ring);
+	stroke-width: 2;
+	vector-effect: non-scaling-stroke;
+}
+
+.scatter-mark {
+	cursor: pointer;
+	outline: none;
+}
+
+.scatter-figure.is-choosing .scatter-mark {
+	opacity: 0.35;
+}
+
+.scatter-figure.is-choosing .scatter-mark.scatter-mark-on {
+	opacity: 1;
+}
+
+.scatter-mark:focus-visible .scatter-dot {
+	stroke: var(--ds-color-ring);
+	stroke-width: 3;
+}

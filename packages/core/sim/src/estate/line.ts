@@ -1,7 +1,8 @@
 import { grownAmount } from "../engine/amount"
 import { minBigInt } from "../engine/min"
 import { scaleValue } from "../levy/scale"
-import type { AccountId, BasisPoints, EstateCost, EstateGift, Rounding } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { AccountId, BasisPoints, DateString, EstateCost, EstateGift, Rounding } from "../types"
 
 /** What a row's Accounts are worth, in minor units. */
 export interface Worth {
@@ -10,10 +11,11 @@ export interface Worth {
 	readonly byAccount: ReadonlyMap<AccountId, bigint>
 }
 
-/** Where a line sits: whole years since `Timeline.start`, and the Economy's inflation. */
+/** Where a line sits: its row's date, whole years since `Timeline.start`, and the run's inflation. */
 export interface Footing {
+	readonly date: DateString
 	readonly years: number
-	readonly inflation: BasisPoints
+	readonly inflation: Inflation
 }
 
 /** `base * bps / 10000` rounded once; a base below zero counts as zero, so a share is never negative. */
@@ -29,7 +31,7 @@ function base(of: "gross" | { readonly accounts: readonly AccountId[] }, worth: 
 /** One cost's amount on a row: a share of the gross estate or of named Accounts, or a grown fixed amount. */
 export function costAmount(cost: EstateCost, worth: Worth, footing: Footing): bigint {
 	if ("amount" in cost) {
-		return grownAmount(cost.amount, cost.growth, footing.years, footing.inflation)
+		return grownAmount(cost.amount, cost.growth, footing.years, footing.inflation, footing.date)
 	}
 	return shareOf(base(cost.of, worth), cost.bps, cost.rounding)
 }
@@ -37,7 +39,7 @@ export function costAmount(cost: EstateCost, worth: Worth, footing: Footing): bi
 /** A gift's wish: a share of the net estate (zero when net is not above zero) or a grown fixed amount. */
 function wish(gift: EstateGift, net: bigint, footing: Footing): bigint {
 	if ("amount" in gift)
-		return grownAmount(gift.amount, gift.growth, footing.years, footing.inflation)
+		return grownAmount(gift.amount, gift.growth, footing.years, footing.inflation, footing.date)
 	return shareOf(net, gift.bps, gift.rounding)
 }
 

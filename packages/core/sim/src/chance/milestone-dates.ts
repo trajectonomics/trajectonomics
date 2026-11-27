@@ -2,7 +2,7 @@ import { formatDate, parseDate } from "../calendar/civil"
 import type { ChanceMilestone, ChanceMilestoneDate, ChanceMilestoneYear } from "../types"
 import type { DateString } from "../types/common"
 import { BAND_LEVELS } from "./band"
-import type { PathOutcome } from "./path"
+import type { PathOutcome } from "./path-outcome"
 import { ascending, nearestRank } from "./rank"
 
 const MONTHS = 12
