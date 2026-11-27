@@ -16,6 +16,14 @@ let stroke = $state(0)
  */
 let seen: { width: number; height: number } | null = null
 
+/** Whether a box size equals another; never when there is none yet. */
+function sameSize(
+	a: { width: number; height: number } | null,
+	b: { width: number; height: number },
+): boolean {
+	return a !== null && a.width === b.width && a.height === b.height
+}
+
 /** Forgets the widths measured in the old font, so every name is fitted again at the size it now draws. */
 function changed(): void {
 	measured.clear()
@@ -39,9 +47,9 @@ export function observeFlowText(svg: Element): () => void {
 		const rect = entries[0]?.contentRect
 		if (rect === undefined) return
 		const size = { width: rect.width, height: rect.height }
-		const moved = own !== null && (own.width !== size.width || own.height !== size.height)
+		const moved = own !== null && !sameSize(own, size)
 		own = size
-		if (seen !== null && size.width === seen.width && size.height === seen.height) {
+		if (sameSize(seen, size)) {
 			if (moved) stroke += 1
 			return
 		}
