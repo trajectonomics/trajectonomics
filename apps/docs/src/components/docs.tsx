@@ -4,8 +4,10 @@ import { DocsLayout } from "fumadocs-ui/layouts/notebook"
 import { DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/notebook/page"
 import type { LayoutTab } from "fumadocs-ui/layouts/shared"
 import { baseOptions } from "../lib/layout.shared"
+import type { PageMascotPose } from "../lib/mascot"
 import { isTabPath, TABS, tabUrl } from "../lib/tabs"
 import { DocsSidebarBanner, HeaderTabs, noHeaderSearchTrigger } from "./docs-shell"
+import { Mascot } from "./mascot"
 import { Provider, type ProviderProps } from "./provider"
 
 export interface DocsProps extends ProviderProps {
@@ -13,6 +15,8 @@ export interface DocsProps extends ProviderProps {
 	title: string
 	description?: string | undefined
 	toc: TOCItemType[]
+	/** The pose the page's `mascot` frontmatter names, drawn beside its title (ADR 0018). */
+	mascot?: PageMascotPose | undefined
 }
 
 /**
@@ -39,7 +43,7 @@ function headerTabs(pathname: string): LayoutTab[] {
 }
 
 /** React island for a Docs Portal page; the page content is passed as children. */
-export function Docs({ tree, title, description, toc, children, ...props }: DocsProps) {
+export function Docs({ tree, title, description, toc, mascot, children, ...props }: DocsProps) {
 	const data = useFumadocsLoader({ tree })
 	const options = baseOptions()
 	const tabs = headerTabs(props.pathname)
@@ -61,9 +65,21 @@ export function Docs({ tree, title, description, toc, children, ...props }: Docs
 				containerProps={{ style: { gridTemplate: SHELL_GRID } }}
 			>
 				<DocsPage toc={toc} tableOfContent={{ enabled: toc.length > 0 }}>
-					<DocsTitle className="text-4xl font-semibold tracking-tight md:text-5xl">
-						{title}
-					</DocsTitle>
+					{/* The page's Mascot sits with its title: under it and right-aligned on a phone,
+					    and at the title's right end from xl up, where the reading column has room
+					    for both. It pushes no words aside (ADR 0018). */}
+					<div className="relative">
+						<DocsTitle
+							className={`text-4xl font-semibold tracking-tight md:text-5xl${mascot === undefined ? "" : " xl:pr-40"}`}
+						>
+							{title}
+						</DocsTitle>
+						{mascot === undefined ? null : (
+							<div className="mt-4 flex justify-end xl:absolute xl:right-0 xl:bottom-0 xl:mt-0">
+								<Mascot pose={mascot} eager className="h-[72px] w-auto sm:h-24" />
+							</div>
+						)}
+					</div>
 					<DocsDescription className="text-lg">{description}</DocsDescription>
 					{children}
 				</DocsPage>

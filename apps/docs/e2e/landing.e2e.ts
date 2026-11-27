@@ -55,10 +55,12 @@ test("the hero picture keeps its column clear of the prompt at 1024px", async ({
 	)
 })
 
-test("the Landing Page has one entry per audience, each linking to its Tab", async ({ page }) => {
+test("the Landing Page has one entry per Tab, each linking to its Tab", async ({ page }) => {
 	await page.goto(LANDING_PATH)
 
-	const entries = page.getByRole("main").getByRole("link", { name: /^For / })
+	const entries = page
+		.getByRole("main")
+		.locator(TABS.map((tab) => `a[href="${tabUrl(tab)}"]`).join(", "))
 	await expect(entries).toHaveCount(TABS.length)
 	for (const tab of TABS) {
 		await expect(page.getByRole("link", { name: tab.entry, exact: true })).toHaveAttribute(
