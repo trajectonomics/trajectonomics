@@ -1,20 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-
 import { preferences } from "../../client/preferences.svelte.js"
 import type { Read } from "../../lib/contract"
-import {
-	doctor,
-	failed,
-	failedRead,
-	okRead,
-	passed,
-	pnl,
-	row,
-} from "../../lib/view/overview/fixtures.test-support"
-import { type HealthView, healthView } from "../../lib/view/overview/health"
+import { failedRead, okRead, pnl, row } from "../../lib/view/overview/fixtures.test-support"
 import { pnlView } from "../../lib/view/overview/pnl"
-import HealthCard from "./HealthCard.svelte"
 import PnlCard from "./PnlCard.svelte"
 
 const THB = (amount: string) => [{ currency: "THB", amount }]
@@ -113,34 +102,6 @@ describe("PnlCard", () => {
 		const read: Read<ReturnType<typeof pnlView>> = failedRead(["report", "pnl"])
 		expect(render(PnlCard, { props: { pnl: read } }).body).toContain(
 			"Profit and loss could not be read",
-		)
-	})
-})
-
-describe("HealthCard", () => {
-	test("shows Needs attention and the number of failed checks", () => {
-		const data = doctor([passed("directory"), failed("integrity")], false)
-		const { body } = render(HealthCard, {
-			props: { health: okRead(["doctor"], healthView(data)) },
-		})
-		expect(body).toContain("Needs attention")
-		expect(body).toContain("1 of 2 checks failed.")
-		expect(body).toContain('href="/health/"')
-	})
-
-	test("shows OK when the ledger passes", () => {
-		const data = doctor([passed("directory")])
-		const { body } = render(HealthCard, {
-			props: { health: okRead(["doctor"], healthView(data)) },
-		})
-		expect(body).toContain("OK")
-		expect(body).toContain("All 1 checks pass.")
-	})
-
-	test("is its own error when its Read failed", () => {
-		const read: Read<HealthView> = failedRead(["doctor"])
-		expect(render(HealthCard, { props: { health: read } }).body).toContain(
-			"Ledger health could not be read",
 		)
 	})
 })

@@ -6,7 +6,7 @@ import ReadView from "../ui/ReadView.svelte"
 
 interface Props {
 	title: string
-	/** The page this card summarises. */
+	/** The page this card summarises. A card whose read is missing or failed does not link. */
 	href: string
 	/** The name of the Read this card shows, such as "FI". Named in its error. */
 	label: string
@@ -15,27 +15,36 @@ interface Props {
 	body: Snippet<[T]>
 	/** Extra provenance for the card's Details, such as the tax rules its figures came from. */
 	details?: Snippet<[ScenarioView<T>]> | undefined
+	/** The heading's level: a page's section heading is h2, and a card inside a section is h3. */
+	level?: 2 | 3
+	/** Classes for the card itself, such as the grid span of a wide card. */
+	className?: string | undefined
 }
 
-let { title, href, label, scenario, body, details }: Props = $props()
+let { title, href, label, scenario, body, details, level = 2, className }: Props = $props()
+/** The words a card says when the Snapshot holds no read for its plan, or no plan at all. */
+const missing = $derived(
+	scenario.status === "none"
+		? "No plan is named in these figures."
+		: scenario.status === "unread"
+			? `These figures hold no ${label} read for plan ${scenario.name}.`
+			: null,
+)
 </script>
 
-<!-- A card for one plan's Read: it links to its page, and says what is missing when there is none. -->
-{#if scenario.status === "none"}
-	<Card {title} {href}>
-		<p class="text-sm text-muted-foreground">No plan is named in these figures.</p>
-	</Card>
-{:else if scenario.status === "unread"}
-	<Card {title} {href}>
-		<p class="text-sm text-muted-foreground">
-			These figures hold no {label} read for plan {scenario.name}.
-		</p>
+<!-- A card for one plan's Read: it links to its page while the Read answers, and says what is missing otherwise. -->
+{#if scenario.status !== "ready"}
+	<Card quiet {title} {level} {className}>
+		<p class="text-sm text-muted-foreground">{missing}</p>
 	</Card>
 {:else}
 	{#snippet cardDetails()}{@render details?.(scenario)}{/snippet}
 	<Card
+		quiet
 		{title}
-		{href}
+		{level}
+		{className}
+		href={scenario.read.ok ? href : undefined}
 		argv={scenario.read.argv}
 		details={details === undefined ? undefined : cardDetails}
 	>

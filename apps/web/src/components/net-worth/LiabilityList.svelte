@@ -5,9 +5,11 @@ import DirectedMoney from "../ui/DirectedMoney.svelte"
 
 interface Props {
 	rows: readonly AmountRow[]
+	/** A card's short form of each amount, truncated toward zero; the exact figure stays in its title. */
+	compact?: boolean
 }
 
-let { rows }: Props = $props()
+let { rows, compact = false }: Props = $props()
 </script>
 
 <!-- The liability accounts, each read by its sign: a negative state is what you owe, a positive one what is owed to you. The ledger's signed figure stays in the title. -->
@@ -20,7 +22,7 @@ let { rows }: Props = $props()
 				<li class="flex items-center justify-between gap-3 py-2">
 					<span class="min-w-0 truncate"><AccountName id={row.account.id} name={row.account.name} /></span>
 					<span class="shrink-0">
-						<DirectedMoney amount={row.amount} currency={row.currency} kind="owed" />
+						<DirectedMoney amount={row.amount} currency={row.currency} kind="owed" {compact} />
 					</span>
 				</li>
 			{/each}

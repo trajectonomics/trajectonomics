@@ -180,6 +180,7 @@ describe("the Home card", () => {
 			],
 			currency: "THB",
 			period: "2026",
+			notes: expect.any(Array),
 		})
 	})
 

@@ -1,5 +1,4 @@
-import type { Fi, HouseholdDocument, ProjectionChance, Read, Snapshot } from "../../contract"
-import { chanceLasts } from "../chance/words"
+import type { Fi, HouseholdDocument, Snapshot } from "../../contract"
 import { type BestCaseView, fiModelOf, type UnreachableFi } from "../fi/model"
 import { householdOf, type PersonNames, personNames } from "../item-names"
 import { noteAnchor } from "../projection/notes"
@@ -16,29 +15,15 @@ export interface HeroWarning {
 	readonly label: string
 }
 
-/** The line below the answer: the label, then the CLI's note on the plan as written. */
-export interface PlanNote {
-	/** The words that label the note: "Your plan as written:". */
-	readonly label: string
-	/** The CLI's note, or the chance's own horizon and counts when it states none; `fromCli` says which. */
-	readonly text: string
-	readonly fromCli: boolean
-}
-
 /** Home's answer to "when could I stop working?", built only from Snapshot fields. */
 export interface HeroView {
 	/** The answer: the FI date and the holder's and partner's ages. */
 	readonly sentence: string
-	/** The plan-as-written line below the answer, or null when no chance read states one. */
-	readonly planNote: PlanNote | null
 	/** The notes worth checking, in the CLI's order. */
 	readonly warnings: readonly HeroWarning[]
 	/** "1 thing to check", "2 things to check", or null when the CLI states none. */
 	readonly warningsLabel: string | null
 }
-
-/** What the CLI's success note begins with: the one sentence that says what the chance read measured. */
-export const SUCCESS_NOTE_PREFIX = "The plan holds to "
 
 /** The hero of a Snapshot's plan, or null when it has no plan or no FI read to answer from. */
 export function heroOf(snapshot: Snapshot, requested = ""): HeroView | null {
@@ -51,7 +36,6 @@ export function heroOf(snapshot: Snapshot, requested = ""): HeroView | null {
 	const warnings = warningsOf(read.data, plan)
 	return {
 		sentence: sentenceOf(read.data, household, people),
-		planNote: planNoteOf(snapshot.reads.chance[plan]),
 		warnings,
 		warningsLabel: warningsLabel(warnings.length),
 	}
@@ -89,14 +73,6 @@ function agesClauseOf(
 function andList(parts: readonly string[]): string {
 	if (parts.length === 1) return parts[0] ?? ""
 	return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
-}
-
-/** The plan-as-written line: the CLI's success note when it states one, else the chance's horizon and counts. */
-function planNoteOf(chance: Read<ProjectionChance> | undefined): PlanNote | null {
-	if (chance === undefined || !chance.ok) return null
-	const stated = chance.data.notes.find((note) => note.startsWith(SUCCESS_NOTE_PREFIX))
-	const text = stated ?? chanceLasts(chance.data.succeeded, chance.data.paths, chance.data.horizon)
-	return { label: "Your plan as written:", text, fromCli: stated !== undefined }
 }
 
 /** The unreachable answer: the horizon, the FI model's binding sentence and the CLI's best case, if any. */

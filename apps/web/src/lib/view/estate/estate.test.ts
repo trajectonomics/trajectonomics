@@ -196,16 +196,16 @@ describe("the notes and the Home card", () => {
 			date: "2053-12-31",
 			currency: "THB",
 			noCost: false,
-			basis: "beyond",
 			short: false,
+			notes: base.run.notes,
 		})
 		const bare = demoPlan("retire-early")
 		expect(estateSummaryOf(bare.run, bare.doc, bare.household)?.noCost).toBe(true)
 	})
 
-	test("a household with no adult reads the plan's last year, and the card says why", () => {
-		expect(estateSummaryOf(base.run, base.doc, null)?.basis).toBe("no-adult")
-		expect(estateSummaryOf(base.run, base.doc, householdOf([]))?.basis).toBe("no-adult")
+	test("a household with no adult reads the plan's last year", () => {
+		expect(estateSummaryOf(base.run, base.doc, null)?.date).toBe("2053-12-31")
+		expect(estateSummaryOf(base.run, base.doc, householdOf([]))?.date).toBe("2053-12-31")
 	})
 
 	test("no diagram is drawn when the gross estate is nothing", () => {

@@ -1,33 +1,16 @@
 /**
  * The rows that make up one user+client grant family, and their deletion order.
  *
- * Revocation deletes the consent first, then the token family (the same user+client family
- * 1.7.28 uses for replay detection), the pending device codes and the pending authorization
- * codes. Deleting the consent first narrows the concurrent-rotation window: a refresh that
- * slips through after the token delete lands on a grant with no approval record, so the next
- * refresh fails closed (ADR 0002).
- *
- * Authorization codes are not a table of their own in 1.7.28: the provider stores each one in
- * `verification` under the hashed code, with `value` holding the JSON `authorization_code`
- * record (user id and `query.client_id`). There is no client index, so finding the pending
- * codes for a grant is a scan of that table; the row count is small and a revoke is rare.
+ * `revoke.ts` deletes a grant's consents, device codes, tokens and pending authorization codes in
+ * one D1 batch, so the whole family goes or none of it does. A consent created for a fresh approval
+ * deletes its token family through here first: an old token must never attach to a new approval.
+ * Pending authorization codes live in `verification` and are deleted by `verification-sql.ts`.
  */
-import { adapterOf } from "./store"
+import { adapterOf } from "./adapter"
 
 export type GrantOwner = {
 	userId: string
 	clientId: string
-}
-
-type StoredVerification = {
-	id: string
-	value?: unknown
-}
-
-type AuthorizationCodeValue = {
-	type?: unknown
-	userId?: unknown
-	query?: { client_id?: unknown } | null
 }
 
 export async function deleteConsentRow(ctx: { context: unknown }, id: string): Promise<void> {
@@ -37,25 +20,12 @@ export async function deleteConsentRow(ctx: { context: unknown }, id: string): P
 	})
 }
 
-export async function deleteTokenFamily(
-	ctx: { context: unknown },
-	owner: GrantOwner,
-): Promise<void> {
-	const adapter = adapterOf(ctx)
-	const where = [
-		{ field: "clientId", value: owner.clientId },
-		{ field: "userId", value: owner.userId },
-	]
-	await adapter.deleteMany({ model: "oauthAccessToken", where })
-	await adapter.deleteMany({ model: "oauthRefreshToken", where })
-}
-
-export async function deleteDeviceCodes(
+export async function deleteAccessTokens(
 	ctx: { context: unknown },
 	owner: GrantOwner,
 ): Promise<void> {
 	await adapterOf(ctx).deleteMany({
-		model: "deviceCode",
+		model: "oauthAccessToken",
 		where: [
 			{ field: "clientId", value: owner.clientId },
 			{ field: "userId", value: owner.userId },
@@ -63,41 +33,23 @@ export async function deleteDeviceCodes(
 	})
 }
 
-export async function deletePendingAuthorizationCodes(
+export async function deleteRefreshTokens(
 	ctx: { context: unknown },
 	owner: GrantOwner,
 ): Promise<void> {
-	const adapter = adapterOf(ctx)
-	const rows = (await adapter.findMany({
-		model: "verification",
-		where: [],
-	})) as StoredVerification[]
-	for (const row of rows) {
-		if (typeof row.id !== "string" || !isAuthorizationCodeFor(row.value, owner)) continue
-		await adapter.delete({
-			model: "verification",
-			where: [{ field: "id", value: row.id }],
-		})
-	}
+	await adapterOf(ctx).deleteMany({
+		model: "oauthRefreshToken",
+		where: [
+			{ field: "clientId", value: owner.clientId },
+			{ field: "userId", value: owner.userId },
+		],
+	})
 }
 
-/** True only for an unconsumed authorization code issued to this user and client. */
-function isAuthorizationCodeFor(value: unknown, owner: GrantOwner): boolean {
-	const parsed = parseAuthorizationCodeValue(value)
-	return (
-		parsed !== null &&
-		parsed.type === "authorization_code" &&
-		parsed.userId === owner.userId &&
-		parsed.query?.client_id === owner.clientId
-	)
-}
-
-function parseAuthorizationCodeValue(value: unknown): AuthorizationCodeValue | null {
-	if (typeof value !== "string") return null
-	try {
-		const parsed = JSON.parse(value) as unknown
-		return parsed !== null && typeof parsed === "object" ? (parsed as AuthorizationCodeValue) : null
-	} catch {
-		return null
-	}
+export async function deleteTokenFamily(
+	ctx: { context: unknown },
+	owner: GrantOwner,
+): Promise<void> {
+	await deleteAccessTokens(ctx, owner)
+	await deleteRefreshTokens(ctx, owner)
 }

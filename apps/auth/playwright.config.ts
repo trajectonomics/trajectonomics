@@ -48,7 +48,10 @@ export default defineConfig({
 	fullyParallel: false,
 	workers: 1,
 	retries: 0,
-	reporter: "list",
+	// A committed `test.only` would run one test and pass the required CI job.
+	forbidOnly: Boolean(process.env["CI"]),
+	// CI keeps an HTML report beside the traces, uploaded when the job fails.
+	reporter: process.env["CI"] ? [["list"], ["html", { open: "never" }]] : "list",
 	globalTeardown: "./e2e/teardown.ts",
 	use: { baseURL: BASE_URL, trace: "retain-on-failure" },
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],

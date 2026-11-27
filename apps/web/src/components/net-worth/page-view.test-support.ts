@@ -4,6 +4,7 @@ import type { NetWorthPageView } from "../../lib/view/net-worth/page"
 import { netWorthView } from "../../lib/view/net-worth/view"
 import { mapRead } from "../../lib/view/overview/map-read"
 import { netWorthHistorySeries } from "../../lib/view/overview/net-worth-history"
+import { pnlView } from "../../lib/view/overview/pnl"
 
 /** The report's argv for an As-of. */
 export const argv = (asOf: string) => ["report", "networth", "--as-of", asOf, "--json"]
@@ -19,6 +20,14 @@ export function pageView(
 ): NetWorthPageView {
 	return {
 		netWorth: mapRead(read, netWorthView),
+		pnl: mapRead(
+			{
+				argv: ["report", "pnl", "--json"],
+				ok: true,
+				data: { since: "2026-01-01", until: "2026-10-31", project: null, rows: [], totals: [] },
+			},
+			pnlView,
+		),
 		history: {
 			series: netWorthHistorySeries(reads),
 			rows: monthEndRows(reads),

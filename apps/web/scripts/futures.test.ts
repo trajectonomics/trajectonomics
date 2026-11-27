@@ -2,10 +2,12 @@
 // five representative paths, the earliest run-out opens with its fall year and run-out marker, and a path the Snapshot did
 // not read is read live through POST /reread, leaving the Snapshot alone.
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
+import { snapshotLoader } from "../src/client/browser"
 import { pathReads } from "../src/client/path-reads.svelte"
 import type { Snapshot } from "../src/lib/contract"
 import { pathAnswer, pathKey, sameRun } from "../src/lib/snapshot/paths"
 import { runKey } from "../src/lib/view/chance/path-state"
+import { LOADING } from "../src/lib/view/state"
 import { demoCarryIn } from "./demo/carry-in"
 import { DEMO_PATHS } from "./demo/return-model"
 import { SLOW_MS } from "./edit-fixture.test-support"
@@ -27,6 +29,8 @@ import { answerPath } from "./serve-path"
 
 beforeAll(setupFutures, SLOW_MS)
 afterAll(disposeFutures)
+// The page a future test renders loads a Snapshot into the shared store; a later file must see none.
+afterAll(() => snapshotLoader.replace(LOADING))
 afterEach(settle, SLOW_MS)
 
 describe("the Snapshot's futures", () => {

@@ -190,7 +190,22 @@ The report's `checks` block from a passing run (`bun run spike`, exit 0):
 	"expiredDeviceCodePollCreatesNoConsent": true,
 	"smuggledJsonResourceArrayRejected": true,
 	"reapprovalAfterExpiryWorks": true,
-	"revokeKillsPendingAuthCode": true
+	"revokeKillsPendingAuthCode": true,
+	"revokeHoldsWithManyVerificationRows": true,
+	"revokeHoldsUnderConcurrentVerificationDeletes": true,
+	"revokeIsFastWithManyRows": true,
+	"updateConsentPathDisabled": true,
+	"deviceCodeContentTypeSmugglingRejected": true,
+	"postAuthorizeRejected": true,
+	"expiredConsentNeverIssuesCode": true,
+	"deviceConsentExistsBeforeRedeem": true,
+	"revokeRemovesDuplicateConsents": true,
+	"emptyScopeDeviceRequestRejected": true,
+	"consentScopesAreUnion": true,
+	"failedDoubleApproveKeepsConsent": true,
+	"failedApprovalUndoesConsent": true,
+	"redeemedBeforeSettlementKeepsConsent": true,
+	"revokeRetryAfterPartialFailure": true
 }
 ```
 
@@ -217,8 +232,8 @@ How each gate is exercised:
 
 ## Security-review round
 
-The independent review of #799 reproduced each hole below against `wrangler dev --local`; every
-case is now a `true` check:
+The independent reviews of #799 and #814 reproduced each hole below against
+`wrangler dev --local`; every case is now a `true` check:
 
 | Check | What it drives |
 |---|---|
@@ -231,6 +246,21 @@ case is now a `true` check:
 | `smuggledJsonResourceArrayRejected` | A JSON body sent as `application/json; x=application/x-www-form-urlencoded`, alone and beside a query resource, is rejected with `invalid_target`. |
 | `reapprovalAfterExpiryWorks` | An expired device grant re-approves into a working first refresh, and an expired web consent is recreated with a fresh `createdAt`. |
 | `revokeKillsPendingAuthCode` | An authorization code issued before a revoke cannot be exchanged afterwards (`invalid_grant`). |
+| `revokeHoldsWithManyVerificationRows` | A pending code and an approved device code past Better Auth's 100-row `findMany` page still die with the grant. |
+| `revokeHoldsUnderConcurrentVerificationDeletes` | The library's expired-row purge runs while the revoke reads the same table; the pending code is still dead afterwards. |
+| `revokeIsFastWithManyRows` | 40,000 inert `verification` rows do not turn the revoke into a paged scan: it stays under one second. |
+| `updateConsentPathDisabled` | `POST /oauth2/update-consent` answers `404`, so no request can raise a consent's scopes behind the hooks. |
+| `deviceCodeContentTypeSmugglingRejected` | A `/device/code` body whose media type merely contains the form type is rejected. |
+| `postAuthorizeRejected` | `POST /oauth2/authorize` answers `400 invalid_request`. |
+| `expiredConsentNeverIssuesCode` | An expired consent cannot issue an authorization code on any path. |
+| `deviceConsentExistsBeforeRedeem` | A trigger refuses to mark a code `approved` unless its consent row already exists. |
+| `revokeRemovesDuplicateConsents` | A revoke deletes every consent row for the user and client, not only the id it was given. |
+| `emptyScopeDeviceRequestRejected` | `/device/code` with no scope answers `400 invalid_request`. |
+| `consentScopesAreUnion` | Two approvals of one client keep one row carrying the union of both scope sets. |
+| `failedDoubleApproveKeepsConsent` | Request A writes the consent and parks; B approves the same code (200); A then answers 400 but keeps the consent, so the poll mints tokens, the grant stays listed and the first refresh works. |
+| `failedApprovalUndoesConsent` | A code is denied while its approve is parked, so the approve answers 400: a new consent is gone, and a merged one has its previous scopes, resources and timestamps byte for byte. |
+| `redeemedBeforeSettlementKeepsConsent` | The approve is parked in the after-hook while the device redeems the code, for a new grant and for a scope merge: it answers 200, the grant stays listed with every scope and refresh answers 200. |
+| `revokeRetryAfterPartialFailure` | A trigger aborts one delete in the batch, so the revoke answers 500 and the grant stays listed; after the trigger is dropped the retry answers 200, and the pending code and the device poll both fail. |
 
 ## Plugins on Workers
 
@@ -286,4 +316,5 @@ user identifier.
   same response; a replay after it revokes the family. The CLI should retry a failed refresh once
   inside a minute before falling back to a new device flow.
 - **Migrations before deploy.** `0002_rate_limit.sql` and `0003_oauth_clients.sql` must be applied
-  before the Worker starts; the deploy workflow will do that when the auth app joins it.
+  before the Worker starts; `.github/workflows/deploy.yml` applies `migrations/` before it deploys
+  the auth Worker.
