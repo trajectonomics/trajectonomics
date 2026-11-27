@@ -84,10 +84,26 @@ describe("settleDeviceApproval", () => {
 		expect(consents.rows).toEqual([])
 	})
 
-	it("deletes the created consent when the code ended up denied", async () => {
-		const { store, consents, ctx, database } = setup([
+	it("keeps a successful approval whose code was redeemed before settlement", async () => {
+		const { consents, ctx, database } = setup([
 			{ id: "consent-1", updatedAt: WRITTEN_AT.toISOString() },
 		])
+		// No device row: the poll redeemed the code and the library deleted it.
+		rememberDeviceApproval(ctx, {
+			userCode: "ABCDEFGH",
+			userId: "user-1",
+			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
+		})
+		await settleDeviceApproval(ctx, database)
+		expect(consents.statements).toEqual([])
+		expect(consents.rows).toHaveLength(1)
+	})
+
+	it("deletes the created consent when the code ended up denied", async () => {
+		const { store, consents, ctx, database } = setup(
+			[{ id: "consent-1", updatedAt: WRITTEN_AT.toISOString() }],
+			REFUSED,
+		)
 		device(store, "denied")
 		rememberDeviceApproval(ctx, {
 			userCode: "ABCDEFGH",

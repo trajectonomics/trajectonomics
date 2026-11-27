@@ -15,12 +15,14 @@ import { checkRevokeRemovesDuplicateConsents } from "./security-duplicates"
 import { checkReapprovalAfterExpiry, checkRevokeKillsPendingAuthCode } from "./security-expiry"
 import { checkExpiredConsentNeverIssuesCode } from "./security-expiry-followup"
 import { checkRevokeHoldsWithManyVerificationRows } from "./security-paging"
+import { checkRedeemedBeforeSettlementKeepsConsent } from "./security-redeemed"
 import {
 	checkDeviceCodeContentTypeSmugglingRejected,
 	checkEmptyScopeDeviceRequestRejected,
 	checkPostAuthorizeRejected,
 } from "./security-request-shape"
 import { checkRevokeRetryAfterPartialFailure } from "./security-revoke-retry"
+import { checkFailedApprovalUndoesConsent } from "./security-settlement"
 import {
 	checkRevokeHoldsUnderConcurrentVerificationDeletes,
 	checkRevokeIsFastWithManyRows,
@@ -62,6 +64,11 @@ export async function runSecurityChecks(
 		emptyScopeDeviceRequestRejected: await checkEmptyScopeDeviceRequestRejected(session, scratch),
 		consentScopesAreUnion: await checkConsentScopesAreUnionOnApproval(session, scratch),
 		failedDoubleApproveKeepsConsent: await checkFailedDoubleApproveKeepsConsent(session, scratch),
+		failedApprovalUndoesConsent: await checkFailedApprovalUndoesConsent(session, scratch),
+		redeemedBeforeSettlementKeepsConsent: await checkRedeemedBeforeSettlementKeepsConsent(
+			session,
+			scratch,
+		),
 		revokeRetryAfterPartialFailure: await checkRevokeRetryAfterPartialFailure(session, scratch),
 	}
 }

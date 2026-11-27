@@ -85,18 +85,30 @@ approve. A code nobody has claimed yet is not refused there: the endpoint answer
 
 The before-hook remembers what its write changed: a row it created, with the `updatedAt` it
 stamped, or the previous scopes, resources and `updatedAt` of the row it merged into. An
-**after**-hook on `/device/approve` reads the final device-code status, whether the endpoint
-returned or threw. When that status is `approved` and its user is the approving user, the write is
-kept and never undone, including when the endpoint refused a second submit of an already-approved
-code. Otherwise the after-hook runs one conditional statement: a delete of the created row, or an
-update restoring the merged row's previous scopes, resources and `updatedAt`, each filtered by the
-`updatedAt` its write stamped. Zero changed rows means someone else owns the row now and it is left
-alone; the read-then-write this replaced could always be raced.
+**after**-hook on `/device/approve` takes that write back only when the endpoint failed. It first
+reads the endpoint's answer from the hook context (`context.returned`). Anything but an `Error`
+(an `APIError` is one) is a success, and the write is kept without reading the code: the device may
+have polled and redeemed it already, which deletes the row, and undoing then would leave a live
+token for a grant that is not listed. After an error, the final device-code status decides. When it
+is `approved` and its user is the approving user, the write is kept, so a refused second submit of
+an already-approved code undoes nothing. Otherwise the after-hook runs one conditional statement: a
+delete of the created row, or an update restoring the merged row's previous scopes, resources and
+`updatedAt`, each filtered by the `updatedAt` its write stamped. Zero changed rows means someone
+else owns the row now and it is left alone; the read-then-write this replaced could always be raced.
 
 Only the request whose own insert created the surviving row may record a row to delete. Two
 concurrent approvals can both find no consent; both insert, and the second one's re-read merges the
 two rows. That request records nothing to undo, because the row it would delete is the approval the
 other request just made.
+
+A merge is conditional too: it updates the row only while it carries the `updatedAt` the merge was
+computed from, and deletes duplicate rows only after that update changed a row. Otherwise another
+request's undo, a revoke or another approval got there first, and the whole record step runs again
+from a fresh read, then inserts or merges. It does the same when the row it inserted is gone and no
+row holds its scopes and resources. After three passes it deletes its own insert, if nothing has
+changed that row, and fails the request with `500 server_error`, so an approval never succeeds
+without its consent. The write it records, `created` or `merged`, is the one that happened on the
+last pass.
 
 An endpoint that throws something other than an `APIError` skips the after-hook entirely, and its
 consent is then left without an approval. It grants nothing: no token is issued without an
@@ -108,6 +120,11 @@ in-flight requests: a device poll that read an approved `deviceCode` row before 
 exchange already running, and an authorize that writes its code after the revoke's delete. Each can
 leave at most one access token, which lives fifteen minutes and whose refresh fails because no
 consent remains.
+
+Two parked approvals on one grant that both fail, undone oldest first, can leave a single consent
+behind: the older undo finds a row the newer one has bumped, and the newer one restores the older
+one's write. The consent is listed, grants nothing new by itself and is removed by a revoke. Nothing
+is built for that case.
 
 One user may approve the same client from several machines. The consent is keyed by user and
 client, and 1.7.28 has no unique constraint on that pair, so the hooks merge instead of relying
@@ -232,11 +249,12 @@ only when the dev sign-in gate is open: `ENVIRONMENT=development`, `DEV_ONLY=tru
 three. The spike sends the header on one refresh and asserts `invalid_grant`.
 
 The same gate opens one more spike affordance: an `x-spike-hold` header on one `/device/approve`
-request. The before-hook records the consent and then polls the code it is about to approve until
-another request moves it off `pending`. That is what makes the double-submit race deterministic:
-the first request is parked after writing its consent, the second approves the code, and the first
-endpoint then refuses it. Neither header is read unless the gate is open, so a production
-deployment cannot use either.
+request. With the value `1`, the before-hook records the consent and then polls the code it is about
+to approve until another request moves it off `pending`. That is what makes the double-submit race
+deterministic: the first request is parked after writing its consent, the second approves the code,
+and the first endpoint then refuses it. With the value `after`, the after-hook parks before it
+settles until the code's row is gone, so the spike can redeem the code of a successful approval
+first. Neither header is read unless the gate is open, so a production deployment cannot use either.
 
 ## Consequences
 

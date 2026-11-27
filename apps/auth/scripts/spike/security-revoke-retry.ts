@@ -23,8 +23,10 @@ const TRIGGER = "spike_revoke_fail"
 /**
  * A revoke is one atomic D1 batch. A trigger that aborts the refresh-token delete makes the whole
  * batch roll back, including the consents it had already deleted, so the 500 leaves the grant
- * listed and the retry still has something to revoke. After the retry the pending device code and
- * the pending authorization code are both gone, so neither can mint tokens.
+ * listed and the retry still has something to revoke. After the retry the approved but unredeemed
+ * device code is gone and the old refresh token fails, so neither can mint tokens. The
+ * authorization code at the end belongs to the web grant, which its own revoke removes: it does
+ * not prove anything about the failed batch.
  */
 export async function checkRevokeRetryAfterPartialFailure(
 	session: Session,
@@ -63,7 +65,9 @@ export async function checkRevokeRetryAfterPartialFailure(
 	await revokeAll(session)
 	return (
 		retried.status === 200 &&
-		poll.status !== 200 &&
+		poll.status === 400 &&
+		poll.body["error"] === "invalid_grant" &&
+		poll.body["error_description"] === "Invalid device code" &&
 		isInvalidGrant(refresh) &&
 		webRevoked.status === 200 &&
 		isInvalidGrant(exchange)

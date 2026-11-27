@@ -72,5 +72,7 @@ export type SecurityEvidence = {
 	emptyScopeDeviceRequestRejected: boolean
 	consentScopesAreUnion: boolean
 	failedDoubleApproveKeepsConsent: boolean
+	failedApprovalUndoesConsent: boolean
+	redeemedBeforeSettlementKeepsConsent: boolean
 	revokeRetryAfterPartialFailure: boolean
 }

@@ -10,6 +10,7 @@ import { expireConsentForSession } from "./expiry"
 import { prepareInteractiveConsent } from "./interactive"
 import { authorizationClientId, isEndpointRequest, type OAuthHookOptions } from "./request"
 import { checkResourceCount } from "./resource-gate"
+import { holdDeviceSettlement } from "./spike-hold"
 import { checkTokenRequest } from "./token-hook"
 import { readField } from "./values"
 
@@ -56,6 +57,8 @@ export function oauthBeforeHook(options: OAuthHookOptions): AuthMiddleware {
 export function oauthAfterHook(options: OAuthHookOptions): AuthMiddleware {
 	return createAuthMiddleware(async (ctx) => {
 		if (ctx.path !== "/device/approve") return
+		// Dev-only: let the spike redeem the code before this request settles.
+		await holdDeviceSettlement(ctx, options)
 		await settleDeviceApproval(ctx, options.database)
 	})
 }

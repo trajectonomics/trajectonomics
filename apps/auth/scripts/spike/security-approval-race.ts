@@ -1,9 +1,9 @@
-import type { Database } from "bun:sqlite"
-import { SPIKE_HOLD_HEADER } from "../../src/oauth/spike-hold"
+import { SPIKE_HOLD_BEFORE } from "../../src/oauth/spike-hold"
 import { openScratchDatabase } from "./database"
 import { listGrants, redeemDeviceCode, refreshRequest, requestDeviceCode } from "./flow"
 import type { Session } from "./http"
 import { requestResult } from "./request"
+import { countConsents, parkedApproval, waitUntil } from "./security-hold"
 import { COLLECTOR, DATA, DEFAULT_SCOPE, reset, revokeAll, sql } from "./security-shared"
 
 /**
@@ -27,12 +27,9 @@ export async function checkFailedDoubleApproveKeepsConsent(
 	await session.json(`/api/auth/device?user_code=${encodeURIComponent(device.user_code)}`)
 	const database = openScratchDatabase(scratch)
 	try {
-		const parked = requestResult(
-			session,
-			"/api/auth/device/approve",
-			parkedApproval(device.user_code),
-		)
-		const wrote = await waitForConsent(database, COLLECTOR)
+		const parked = parkedApproval(session, device.user_code, SPIKE_HOLD_BEFORE)
+		// A's before-hook writes the consent before A parks.
+		const wrote = await waitUntil(() => countConsents(database, COLLECTOR) > 0)
 		const second = await requestResult(session, "/api/auth/device/approve", {
 			method: "POST",
 			headers: { "content-type": "application/json" },
@@ -58,28 +55,4 @@ export async function checkFailedDoubleApproveKeepsConsent(
 	} finally {
 		database.close()
 	}
-}
-
-function parkedApproval(userCode: string): RequestInit {
-	return {
-		method: "POST",
-		headers: { "content-type": "application/json", [SPIKE_HOLD_HEADER]: "1" },
-		body: JSON.stringify({ userCode }),
-	}
-}
-
-/** A's before-hook writes the consent before A parks, so the row appears within one hold poll. */
-async function waitForConsent(database: Database, clientId: string): Promise<boolean> {
-	for (let attempt = 0; attempt < 200; attempt += 1) {
-		if (countConsents(database, clientId) > 0) return true
-		await Bun.sleep(25)
-	}
-	return false
-}
-
-function countConsents(database: Database, clientId: string): number {
-	const row = database
-		.query("select count(*) as n from oauthConsent where clientId = ?")
-		.get(clientId) as { n?: number } | null
-	return Number(row?.n ?? -1)
 }

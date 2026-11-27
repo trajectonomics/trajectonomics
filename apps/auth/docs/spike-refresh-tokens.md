@@ -203,6 +203,8 @@ The report's `checks` block from a passing run (`bun run spike`, exit 0):
 	"emptyScopeDeviceRequestRejected": true,
 	"consentScopesAreUnion": true,
 	"failedDoubleApproveKeepsConsent": true,
+	"failedApprovalUndoesConsent": true,
+	"redeemedBeforeSettlementKeepsConsent": true,
 	"revokeRetryAfterPartialFailure": true
 }
 ```
@@ -256,6 +258,8 @@ The independent reviews of #799 and #814 reproduced each hole below against
 | `emptyScopeDeviceRequestRejected` | `/device/code` with no scope answers `400 invalid_request`. |
 | `consentScopesAreUnion` | Two approvals of one client keep one row carrying the union of both scope sets. |
 | `failedDoubleApproveKeepsConsent` | Request A writes the consent and parks; B approves the same code (200); A then answers 400 but keeps the consent, so the poll mints tokens, the grant stays listed and the first refresh works. |
+| `failedApprovalUndoesConsent` | A code is denied while its approve is parked, so the approve answers 400: a new consent is gone, and a merged one has its previous scopes, resources and timestamps byte for byte. |
+| `redeemedBeforeSettlementKeepsConsent` | The approve is parked in the after-hook while the device redeems the code, for a new grant and for a scope merge: it answers 200, the grant stays listed with every scope and refresh answers 200. |
 | `revokeRetryAfterPartialFailure` | A trigger aborts one delete in the batch, so the revoke answers 500 and the grant stays listed; after the trigger is dropped the retry answers 200, and the pending code and the device poll both fail. |
 
 ## Plugins on Workers

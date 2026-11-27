@@ -1,12 +1,24 @@
-import { pickConsentKeeper, unionValues } from "../core/consent"
+import { APIError } from "better-auth/api"
 import { adapterOf } from "./adapter"
-import type { ConsentWrite } from "./consent-write"
+import { consentCovers, mergeIntoKeeper } from "./consent-merge"
+import { type ConsentWrite, undoConsentWrite } from "./consent-write"
 import { consentExpired } from "./expiry"
 import { deleteConsentRow, deleteTokenFamily } from "./family"
 import { hookNow, type OAuthHookOptions } from "./request"
 import { findConsents, type StoredConsent } from "./store"
-import { storedResources } from "./values"
 import { deletePendingAuthorizationCodes } from "./verification-sql"
+
+const ATTEMPTS = 3
+
+type Approval = { clientId: string; userId: string; scopes: string[]; resources: string[] }
+type Inserted = { id: string; writtenAt: Date }
+type Recording = {
+	ctx: { context: unknown; headers?: Headers | undefined }
+	input: Approval
+	options: OAuthHookOptions
+	/** The row this request inserted, once it has. */
+	inserted?: Inserted | undefined
+}
 
 /**
  * Writes one approval to the consent row, merging any duplicates. A live consent keeps its
@@ -16,36 +28,79 @@ import { deletePendingAuthorizationCodes } from "./verification-sql"
  *
  * The return value says what the write changed, so the `/device/approve` after-hook can take it
  * back when the endpoint refuses the code the approval was written for. Only the request whose own
- * insert created the surviving row may record `created`: everything else is `none`, because undoing
- * a row another approval has merged into would delete a grant that approval relies on.
+ * insert created the surviving row may record `created`; undoing a row another approval has merged
+ * into would delete a grant that approval relies on.
  *
  * The library has no unique constraint on (clientId, userId), so two concurrent approvals can
  * insert two rows. The create path re-reads and merges, keeping the deterministic keeper, so both
  * passes converge on one row.
+ *
+ * Another request can change or delete a row between this one's read and its merge. The merge then
+ * writes nothing and the step runs again from a fresh read. After three such passes it throws, so
+ * the approval fails instead of succeeding without its consent.
  */
 export async function recordConsent(
-	ctx: { context: unknown; headers?: Headers | undefined },
-	input: { clientId: string; userId: string; scopes: string[]; resources: string[] },
+	ctx: Recording["ctx"],
+	input: Approval,
 	options: OAuthHookOptions,
 ): Promise<ConsentWrite> {
-	const owner = { clientId: input.clientId, userId: input.userId }
-	const now = hookNow(ctx, options)
-	const rows = await findConsents(ctx, input.clientId, input.userId)
-	const live = rows.filter((row) => !consentExpired(ctx, row, options))
-	if (live.length > 0) {
-		const merged = await mergeIntoKeeper(ctx, rows, live, [input.scopes], [input.resources], now)
-		return merged === null ? { kind: "none" } : { kind: "merged", ...merged, writtenAt: now }
+	const recording: Recording = { ctx, input, options }
+	for (let attempt = 0; attempt < ATTEMPTS; attempt += 1) {
+		const write = await recordOnce(recording)
+		if (write !== null) return write
 	}
-	// A newly created consent never attaches to tokens from an earlier grant. Never move
-	// `createdAt` without deleting the family.
-	for (const row of rows) await deleteConsentRow(ctx, row.id)
+	if (recording.inserted !== undefined) {
+		await undoConsentWrite(options.database, { kind: "created", ...recording.inserted })
+	}
+	throw new APIError("INTERNAL_SERVER_ERROR", {
+		error: "server_error",
+		error_description: "the approval could not be recorded; approve the device again",
+	})
+}
+
+/** One pass. `null` means a row moved on between the read and the write. */
+async function recordOnce(recording: Recording): Promise<ConsentWrite | null> {
+	if (recording.inserted !== undefined) return finishCreate(recording, recording.inserted)
+	const { rows, live } = await readConsents(recording)
+	if (live.length > 0) return merge(recording, rows, live)
+	const inserted = await insertFresh(recording, rows)
+	if (inserted === null) return { kind: "none" }
+	recording.inserted = inserted
+	return finishCreate(recording, inserted)
+}
+
+async function readConsents({ ctx, input, options }: Recording) {
+	const rows = await findConsents(ctx, input.clientId, input.userId)
+	return { rows, live: rows.filter((row) => !consentExpired(ctx, row, options)) }
+}
+
+function merge(
+	{ ctx, input, options }: Recording,
+	rows: readonly StoredConsent[],
+	live: readonly StoredConsent[],
+): Promise<ConsentWrite | null> {
+	const { scopes, resources } = input
+	const now = hookNow(ctx, options)
+	return mergeIntoKeeper(ctx, options.database, { rows, live, scopes, resources, now })
+}
+
+/**
+ * A newly created consent never attaches to tokens from an earlier grant. Never move `createdAt`
+ * without deleting the family.
+ */
+async function insertFresh(
+	{ ctx, input, options }: Recording,
+	expired: readonly StoredConsent[],
+): Promise<Inserted | null> {
+	const owner = { clientId: input.clientId, userId: input.userId }
+	for (const row of expired) await deleteConsentRow(ctx, row.id)
 	await deleteTokenFamily(ctx, owner)
 	await deletePendingAuthorizationCodes(options.database, owner)
+	const now = hookNow(ctx, options)
 	const created = (await adapterOf(ctx).create({
 		model: "oauthConsent",
 		data: {
-			clientId: input.clientId,
-			userId: input.userId,
+			...owner,
 			scopes: input.scopes,
 			resources: input.resources.length > 0 ? input.resources : null,
 			referenceId: null,
@@ -54,73 +109,24 @@ export async function recordConsent(
 		},
 	})) as { id?: unknown } | null
 	const id = created === null ? undefined : created.id
-	if (typeof id !== "string") return { kind: "none" }
-	return finishCreate(ctx, input, options, { id, writtenAt: now })
+	return typeof id === "string" ? { id, writtenAt: now } : null
 }
 
-/** Decides what one insert may undo, after a concurrent approval may have joined it. */
+/** Decides what this request's insert may undo, after a concurrent approval may have joined it. */
 async function finishCreate(
-	ctx: { context: unknown; headers?: Headers | undefined },
-	input: { clientId: string; userId: string },
-	options: OAuthHookOptions,
-	write: { id: string; writtenAt: Date },
-): Promise<ConsentWrite> {
-	const reread = await findConsents(ctx, input.clientId, input.userId)
-	const liveAgain = reread.filter((row) => !consentExpired(ctx, row, options))
-	if (liveAgain.length > 1) {
-		// Another request inserted its own row and this request merged into it. Its approval is
-		// not this request's to undo, whether or not this row is the keeper.
-		await mergeIntoKeeper(ctx, reread, liveAgain, [], [], write.writtenAt)
-		return { kind: "none" }
+	recording: Recording,
+	inserted: Inserted,
+): Promise<ConsentWrite | null> {
+	const { rows, live } = await readConsents(recording)
+	if (live.length > 1) {
+		// Another request inserted its own row and this one merges with it. That approval is not
+		// this request's to undo, whichever row is the keeper.
+		return (await merge(recording, rows, live)) === null ? null : { kind: "none" }
 	}
-	const only = liveAgain[0]
-	return only !== undefined && only.id === write.id
-		? { kind: "created", id: write.id, writtenAt: write.writtenAt }
-		: { kind: "none" }
-}
-
-type PreviousConsent = {
-	id: string
-	previousScopes: unknown
-	previousResources: unknown
-	previousUpdatedAt: unknown
-}
-
-async function mergeIntoKeeper(
-	ctx: { context: unknown },
-	rows: readonly StoredConsent[],
-	live: readonly StoredConsent[],
-	extraScopes: readonly (readonly string[])[],
-	extraResources: readonly (readonly string[])[],
-	now: Date,
-): Promise<PreviousConsent | null> {
-	const keeper = pickConsentKeeper(live)
-	if (keeper === null) return null
-	const previous = live.find((row) => row.id === keeper)
-	if (previous === undefined) return null
-	const scopes = unionValues([...live.map(consentScopes), ...extraScopes])
-	const resources = unionValues([...live.map(consentResources), ...extraResources])
-	await adapterOf(ctx).update({
-		model: "oauthConsent",
-		where: [{ field: "id", value: keeper }],
-		update: { scopes, resources: resources.length > 0 ? resources : null, updatedAt: now },
-	})
-	for (const row of rows) {
-		if (row.id === keeper) continue
-		await deleteConsentRow(ctx, row.id)
-	}
-	return {
-		id: keeper,
-		previousScopes: previous.scopes,
-		previousResources: previous.resources,
-		previousUpdatedAt: previous.updatedAt,
-	}
-}
-
-function consentScopes(consent: StoredConsent): string[] {
-	return storedResources(consent.scopes)
-}
-
-function consentResources(consent: StoredConsent): string[] {
-	return storedResources(consent.resources)
+	const only = live[0]
+	if (only?.id === inserted.id) return { kind: "created", ...inserted }
+	if (only !== undefined && consentCovers(only, recording.input)) return { kind: "none" }
+	// The inserted row is gone and no row holds this approval: start from the top.
+	recording.inserted = undefined
+	return null
 }

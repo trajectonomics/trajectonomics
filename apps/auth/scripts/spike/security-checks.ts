@@ -25,6 +25,8 @@ export function securityChecks(gates: SecurityEvidence): Record<string, boolean>
 		emptyScopeDeviceRequestRejected: gates.emptyScopeDeviceRequestRejected,
 		consentScopesAreUnion: gates.consentScopesAreUnion,
 		failedDoubleApproveKeepsConsent: gates.failedDoubleApproveKeepsConsent,
+		failedApprovalUndoesConsent: gates.failedApprovalUndoesConsent,
+		redeemedBeforeSettlementKeepsConsent: gates.redeemedBeforeSettlementKeepsConsent,
 		revokeRetryAfterPartialFailure: gates.revokeRetryAfterPartialFailure,
 	}
 }
