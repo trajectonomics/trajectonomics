@@ -18,7 +18,7 @@ let { assets }: Props = $props()
 	<ReadView read={assets} label="Net worth">
 		{#snippet children(view)}
 			<div class="space-y-5">
-				<CompositionBars bars={view.bars} />
+				<CompositionBars bars={view.bars} compact />
 				<LiabilityList rows={view.liabilities} />
 			</div>
 		{/snippet}

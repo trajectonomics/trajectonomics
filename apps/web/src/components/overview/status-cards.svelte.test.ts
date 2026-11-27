@@ -30,7 +30,8 @@ describe("PnlCard", () => {
 		})
 		expect(body).toContain("Profit and loss, year to date")
 		expect(body).toContain("Money in")
-		expect(body).toContain("760,000.00")
+		expect(body).toContain("760k")
+		expect(body).toContain("The ledger states 760,000.00 THB")
 		expect(body).toContain("Money out")
 		expect(body).toContain("140,000.00")
 		expect(body).toContain("Salary")
@@ -47,7 +48,8 @@ describe("PnlCard", () => {
 			props: { pnl: okRead(["report", "pnl"], pnlView(data)) },
 		})
 		expect(body).toContain("Money out")
-		expect(body).toContain("50,000.00")
+		expect(body).toContain("50k")
+		expect(body).toContain('title="The ledger states −50,000.00')
 	})
 
 	test("reads a refunded expense as money in and a reversed income as money out, not by account type", () => {

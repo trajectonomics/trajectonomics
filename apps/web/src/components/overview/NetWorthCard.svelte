@@ -20,7 +20,7 @@ let { netWorth }: Props = $props()
 		{#snippet children(view)}
 			<div class="space-y-4">
 				<div>
-					<Totals totals={view.totals} className="text-3xl font-semibold tracking-tight" />
+					<Totals totals={view.totals} className="text-3xl font-semibold tracking-tight" compact />
 					<p class="mt-1 text-sm text-muted-foreground">As of {view.asOf}</p>
 				</div>
 				{#if view.fees}

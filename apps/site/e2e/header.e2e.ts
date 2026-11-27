@@ -30,7 +30,7 @@ test.describe("the header on a 360 px phone", () => {
 	test.use({ viewport: { width: 360, height: 740 } })
 
 	for (const openJot of OPENJOT_PAGES) {
-		test(`fits the three links, the repository count and the Language menu on the ${openJot.name} without a sideways scroll`, async ({
+		test(`fits the four links, the repository count and the Language menu on the ${openJot.name} without a sideways scroll`, async ({
 			page,
 		}) => {
 			await openPage(page, openJot)
