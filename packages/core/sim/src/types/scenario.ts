@@ -9,6 +9,11 @@ import type { Milestone } from "./milestone"
 
 export interface Economy {
 	readonly inflation: BasisPoints
+	/**
+	 * The standard deviation of one year's inflation, in bps (0 to 10000). Only the chance of success
+	 * draws it; absent or 0 holds inflation at `inflation` on every Market path (ADR 0033).
+	 */
+	readonly inflationVolatility?: BasisPoints
 }
 
 export interface Scenario {

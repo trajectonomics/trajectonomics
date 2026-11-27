@@ -15,10 +15,10 @@
 		"prebuild": "bun scripts/copy-brand-assets.ts",
 		"build": "astro build && wrangler deploy --dry-run --outdir .wrangler/deploy",
 		"test": "bun test ./test ./src ./scripts",
-		"typecheck": "astro sync && tsc -p tsconfig.worker.json && tsc -p tsconfig.json && astro check && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+		"typecheck": "astro sync && bun ../../tooling/scripts/run-parallel.ts \"tsc -p tsconfig.worker.json\" \"tsc -p tsconfig.json\" \"astro check --noSync\" \"svelte-check --tsconfig ./tsconfig.json --fail-on-warnings\"",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun run build"
+		"check": "bun ../../tooling/scripts/run-parallel.ts \"bun run lint\" \"bun run typecheck\" \"bun run test\" && bun ../../tooling/scripts/build-unless-turbo.ts"
 	},
 	"dependencies": {
 		"@trajectonomics/brand": "workspace:*",

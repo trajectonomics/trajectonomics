@@ -30,6 +30,7 @@ export function projectPath(
 		BigInt(`0x${selection.seed}`),
 		selection.index,
 		timeline,
+		scenario.economy.inflation,
 	)
 	const result = projectChecked(baseline, scenario, timeline, options, returns)
 	if (!result.ok) return result
