@@ -1,5 +1,5 @@
 annual (2 rows)
-index  from        to          Ages  openingNetWorth  closingNetWorth      income  withdrawals  transfers    expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
+index  from        to          ages  openingNetWorth  closingNetWorth      income  withdrawals  transfers    expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
     0  2026-01-01  2026-12-31                   0.00        440000.00  1200000.00      3000.00   33000.00  760000.00       55000.00                5000.00      0.00   0.00  false    {"date":"2027-01-01","amount":"495145.62"}
     1  2027-01-01  2027-01-01              440000.00        510000.00   100000.00         0.00       0.00   30000.00        5000.00                   0.00      0.00   0.00  true     {"date":"2027-01-01","amount":"495145.62"}
 

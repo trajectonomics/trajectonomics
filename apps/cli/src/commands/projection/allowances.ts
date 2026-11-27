@@ -78,6 +78,7 @@ export const allowances: Leaf = defineCommand({
 				without: input.without ?? [],
 				add: input.add ?? [],
 				decimal: input.decimal,
+				readHousehold: false,
 			})
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
