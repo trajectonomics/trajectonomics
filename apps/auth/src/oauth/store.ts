@@ -1,4 +1,5 @@
 import { userCodeCandidates } from "../core/device-code"
+import { adapterOf, findAllPages } from "./adapter"
 import { hashToken } from "./values"
 
 export type StoredRefreshToken = {
@@ -14,42 +15,15 @@ export type StoredConsent = {
 	resources?: unknown
 	referenceId?: string | null
 	createdAt?: unknown
+	updatedAt?: unknown
 }
 export type StoredDeviceCode = {
 	clientId?: string | null
 	userId?: string | null
 	status?: string | null
 	scope?: string | null
+	expiresAt?: unknown
 	resources?: unknown
-}
-
-type Adapter = {
-	findOne: (input: {
-		model: string
-		where: Array<{ field: string; value: unknown }>
-	}) => Promise<unknown>
-	findMany: (input: {
-		model: string
-		where: Array<{ field: string; value: unknown }>
-	}) => Promise<unknown[]>
-	create: (input: { model: string; data: Record<string, unknown> }) => Promise<unknown>
-	update: (input: {
-		model: string
-		where: Array<{ field: string; value: unknown }>
-		update: Record<string, unknown>
-	}) => Promise<unknown>
-	delete: (input: {
-		model: string
-		where: Array<{ field: string; value: unknown }>
-	}) => Promise<unknown>
-	deleteMany: (input: {
-		model: string
-		where: Array<{ field: string; value: unknown }>
-	}) => Promise<unknown>
-}
-
-export function adapterOf(ctx: { context: unknown }): Adapter {
-	return (ctx.context as { adapter: Adapter }).adapter
 }
 
 export async function findRefreshToken(
@@ -68,14 +42,20 @@ export async function findConsent(
 	clientId: string,
 	userId: string,
 ): Promise<StoredConsent | null> {
-	const rows = (await adapterOf(ctx).findMany({
-		model: "oauthConsent",
-		where: [
-			{ field: "clientId", value: clientId },
-			{ field: "userId", value: userId },
-		],
-	})) as StoredConsent[]
+	const rows = await findConsents(ctx, clientId, userId)
 	return rows.find(isDefaultConsent) ?? rows[0] ?? null
+}
+
+/** Every consent row for one user and client. More than one is a duplicate the hooks must merge. */
+export async function findConsents(
+	ctx: { context: unknown },
+	clientId: string,
+	userId: string,
+): Promise<StoredConsent[]> {
+	return findAllPages<StoredConsent>(ctx, "oauthConsent", [
+		{ field: "clientId", value: clientId },
+		{ field: "userId", value: userId },
+	])
 }
 
 /**

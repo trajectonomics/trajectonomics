@@ -60,4 +60,20 @@ export type SecurityEvidence = {
 	smuggledJsonResourceArrayRejected: boolean
 	reapprovalAfterExpiryWorks: boolean
 	revokeKillsPendingAuthCode: boolean
+	revokeHoldsWithManyVerificationRows: boolean
+	revokeHoldsUnderConcurrentVerificationDeletes: boolean
+	revokeIsFastWithManyRows: boolean
+	updateConsentPathDisabled: boolean
+	deviceCodeContentTypeSmugglingRejected: boolean
+	postAuthorizeRejected: boolean
+	expiredConsentNeverIssuesCode: boolean
+	deviceConsentExistsBeforeRedeem: boolean
+	revokeRemovesDuplicateConsents: boolean
+	emptyScopeDeviceRequestRejected: boolean
+	consentScopesAreUnion: boolean
+	failedDoubleApproveKeepsConsent: boolean
+	failedApprovalUndoesConsent: boolean
+	redeemedBeforeSettlementKeepsConsent: boolean
+	revokeRetryAfterPartialFailure: boolean
+	signedApprovalBodyRejected: boolean
 }
