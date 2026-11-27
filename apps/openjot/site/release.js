@@ -1,29 +1,38 @@
-// Request handling for the openjot.trajectonomics.com Worker (entry: worker.js), which also
-// serves moojot.trajectonomics.com and redirects it to the new host. The landing page moved to the
-// Site on 2026-11-26: see apps/site (ADR 0032).
+// Request handling for the OpenJot Worker (entry: worker.js): the short links, the release
+// API, the PostHog proxy and the comparison page under https://trajectonomics.com/openjot/,
+// plus 301s from the old hosts openjot.trajectonomics.com and moojot.trajectonomics.com.
+// The landing page moved to the Site on 2026-11-26: see apps/site (ADR 0032).
 //
-// Static files in ./public are served by Workers Static Assets. The Worker
-// only runs for the paths listed in wrangler.jsonc `run_worker_first`:
+// Static files in ./public are served by Workers Static Assets at the public path
+// /openjot/meowjot-alternative (wrangler.jsonc `assets.base_path`). The Worker runs for the
+// paths listed in `routes` and `run_worker_first`:
 //
-//   /            301 to the landing page on the Site, keeping the query.
-//   /download     302 to the APK in the newest `openjot-v*` GitHub release of the
-//                 monorepo, so a reel can say "openjot.trajectonomics.com/download"
+//   /openjot/download     302 to the APK in the newest `openjot-v*` GitHub release of the
+//                 monorepo, so a reel can say "trajectonomics.com/openjot/download"
 //                 and the link never goes stale. Until the first one exists it uses
 //                 the archived trajectonomics/moojot repository's latest release.
-//                 /download/<source> does the same and records where the click came from.
-//   /download/checksums  302 to that release's SHA256SUMS, through the same lookup.
-//   /api/release  JSON describing that release, used by the comparison page.
-//   /go/*, /ingest/*  Source links and the PostHog proxy: see tracking.js.
+//                 /openjot/download/<source> does the same and records where the click came from.
+//   /openjot/download/checksums  302 to that release's SHA256SUMS, through the same lookup.
+//   /openjot/api/release  JSON describing that release, used by the comparison page.
+//   /openjot/go/*, /openjot/ingest/*  Source links and the PostHog proxy: see tracking.js.
+//   /openjot/meowjot-alternative/*  The comparison page's files, from Static Assets.
+//
+// On the old hosts every GET/HEAD outside /ingest answers 301 to the same path under
+// https://trajectonomics.com/openjot. /ingest stays proxied, because installed apps post there.
 
 import { count, downloadSource, handleGo, proxyIngest, redirect } from "./tracking.js";
 
 export const REPO = "trajectonomics/trajectonomics";
-/** The site's own host. */
-export const SITE_HOST = "openjot.trajectonomics.com";
-/** The host the site moved from; it redirects here, except for the analytics proxy. */
-export const OLD_SITE_HOST = "moojot.trajectonomics.com";
-/** The landing page's address on the Site: `/` on this host answers 301 here. */
-export const LANDING_URL = "https://trajectonomics.com/openjot/";
+/** The host that now serves every product page and short link. */
+export const SITE_HOST = "trajectonomics.com";
+/** The path this Worker owns on that host. */
+export const SITE_PATH = "/openjot";
+/** The landing page's address on the Site. */
+export const LANDING_URL = `https://${SITE_HOST}${SITE_PATH}/`;
+/** The comparison page's one address, with its trailing slash. */
+export const COMPARISON_URL = `${LANDING_URL}meowjot-alternative/`;
+/** The hosts that used to serve the site; they only redirect and relay analytics now. */
+export const OLD_SITE_HOSTS = ["openjot.trajectonomics.com", "moojot.trajectonomics.com"];
 /** The app's releases carry this prefix, so a `cli-v*` or `tax-v*` release never wins. */
 export const TAG_PREFIX = "openjot-v";
 /** The app's home before the move; its latest release is the fallback until the first openjot-v* one. */
@@ -31,7 +40,7 @@ export const ARCHIVED_REPO = "trajectonomics/moojot";
 export const RELEASES_URL = `https://github.com/${REPO}/releases?q=${TAG_PREFIX}`;
 export const NO_RELEASE_PATH = LANDING_URL;
 const CACHE_SECONDS = 300;
-const CACHE_KEY = "https://moojot.trajectonomics.com/__cache/latest-release";
+const CACHE_KEY = `https://${SITE_HOST}${SITE_PATH}/__cache/latest-release`;
 const API = "https://api.github.com";
 const WEB = "https://github.com";
 /** How many candidate tags the github.com fallback inspects before giving up. */
@@ -107,7 +116,7 @@ async function archivedRelease(fetchImpl) {
   }
 }
 
-const UA = { "user-agent": "openjot-site (+https://openjot.trajectonomics.com)" };
+const UA = { "user-agent": `openjot-site (+${LANDING_URL})` };
 
 async function fromApiList(fetchImpl) {
   const res = await fetchImpl(`${API}/repos/${REPO}/releases?per_page=100`, {
@@ -224,27 +233,47 @@ export async function fromWebLatest(fetchImpl, repo = REPO) {
   return fromWebTag(fetchImpl, repo, decodeURIComponent(tagMatch[1]));
 }
 
+/** Where a GET/HEAD on an old host goes: the same path under the Site's /openjot/. */
+export function oldHostLocation(pathname, search = "") {
+  if (pathname === "/" || pathname === "/index.html") return `${LANDING_URL}${search}`;
+  if (pathname === "/meowjot-alternative" || pathname === "/meowjot-alternative.html") {
+    return `${COMPARISON_URL}${search}`;
+  }
+  return `https://${SITE_HOST}${SITE_PATH}${pathname}${search}`;
+}
+
+function methodNotAllowed() {
+  return new Response("method not allowed", {
+    status: 405,
+    headers: { allow: "GET, HEAD" },
+  });
+}
+
 export async function handle(request, env, ctx, deps = {}) {
   const url = new URL(request.url);
   const { pathname } = url;
-
-  // The site moved to SITE_HOST. App versions up to 1.4.0 post their analytics to the old
-  // host's /ingest, where a 301 would drop them, so that path is exempt and proxied as before.
-  if (url.hostname === OLD_SITE_HOST) {
-    const method = request.method.toUpperCase();
-    const isIngest = pathname === "/ingest" || pathname.startsWith("/ingest/");
-    if ((method === "GET" || method === "HEAD") && !isIngest) {
-      return redirect(`https://${SITE_HOST}${pathname}${url.search}`, 301);
-    }
-  }
-
-  // The landing page moved to the Site; its own Worker still owns downloads, go links and the API.
   const method = request.method.toUpperCase();
-  if ((method === "GET" || method === "HEAD") && (pathname === "/" || pathname === "/index.html")) {
-    return redirect(`${LANDING_URL}${url.search}`, 301);
+
+  // The old hosts only redirect now, except /ingest: app versions up to 1.4.0 post their
+  // analytics to moojot.trajectonomics.com/ingest and 1.5.0 to openjot.trajectonomics.com/ingest,
+  // where a 301 would drop their events.
+  if (OLD_SITE_HOSTS.includes(url.hostname)) {
+    if (pathname === "/ingest" || pathname.startsWith("/ingest/")) {
+      return proxyIngest(request, env, deps);
+    }
+    if (method === "GET" || method === "HEAD") {
+      return redirect(oldHostLocation(pathname, url.search), 301);
+    }
+    return methodNotAllowed();
   }
 
-  if (pathname === "/download/checksums") {
+  // The Worker only owns the paths under /openjot; every other path on the apex is the Site's.
+  if (pathname !== SITE_PATH && !pathname.startsWith(`${SITE_PATH}/`)) {
+    return env.ASSETS.fetch(request);
+  }
+  const rest = pathname.slice(SITE_PATH.length);
+
+  if (rest === "/download/checksums") {
     let to = RELEASES_URL;
     try {
       const release = await latestRelease(ctx, deps);
@@ -255,7 +284,7 @@ export async function handle(request, env, ctx, deps = {}) {
     return redirect(to);
   }
 
-  if (pathname === "/download" || pathname.startsWith("/download/")) {
+  if (rest === "/download" || rest.startsWith("/download/")) {
     let to = RELEASES_URL;
     let outcome = "releases_page";
     let version = null;
@@ -268,17 +297,21 @@ export async function handle(request, env, ctx, deps = {}) {
       // GitHub is unavailable: send people to the releases page.
     }
     await count(request, env, ctx, deps, "apk_download", {
-      ...downloadSource(request),
+      ...downloadSource(request, SITE_PATH),
       outcome,
       apk_version: version,
     });
     return redirect(to);
   }
 
-  if (pathname === "/go" || pathname.startsWith("/go/")) return handleGo(request, env, ctx, deps);
-  if (pathname.startsWith("/ingest/")) return proxyIngest(request, env, deps);
+  if (rest === "/go" || rest.startsWith("/go/")) {
+    return handleGo(request, env, ctx, deps, SITE_PATH);
+  }
+  if (rest === "/ingest" || rest.startsWith("/ingest/")) {
+    return proxyIngest(request, env, deps, SITE_PATH);
+  }
 
-  if (pathname === "/api/release") {
+  if (rest === "/api/release") {
     try {
       const release = await latestRelease(ctx, deps);
       return Response.json(
@@ -293,5 +326,6 @@ export async function handle(request, env, ctx, deps = {}) {
     }
   }
 
+  // The comparison page and its files: Static Assets at `assets.base_path`.
   return env.ASSETS.fetch(request);
 }

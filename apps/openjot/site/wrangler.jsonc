@@ -1,31 +1,40 @@
 {
   "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
-  // openjot.trajectonomics.com: the download short links and the comparison page;
-  // moojot.trajectonomics.com redirects to it (except /ingest, see release.js). `/` redirects
-  // to the Site's OpenJot page. See site/README.md.
+  // trajectonomics.com/openjot/*: the download short links, /go links, release API and the
+  // comparison page, served by this Worker through zone routes; every other /openjot path
+  // stays the Site's. openjot.trajectonomics.com and moojot.trajectonomics.com stay attached
+  // only to redirect here (except /ingest). See site/README.md.
   "name": "moojot-site",
   "main": "worker.js",
   "compatibility_date": "2026-11-01",
   "workers_dev": false,
   "routes": [
+    { "pattern": "trajectonomics.com/openjot/download*", "zone_name": "trajectonomics.com" },
+    { "pattern": "trajectonomics.com/openjot/go*", "zone_name": "trajectonomics.com" },
+    { "pattern": "trajectonomics.com/openjot/api/*", "zone_name": "trajectonomics.com" },
+    { "pattern": "trajectonomics.com/openjot/ingest*", "zone_name": "trajectonomics.com" },
+    { "pattern": "trajectonomics.com/openjot/meowjot-alternative*", "zone_name": "trajectonomics.com" },
     { "pattern": "openjot.trajectonomics.com", "custom_domain": true },
     { "pattern": "moojot.trajectonomics.com", "custom_domain": true }
   ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    // The pages and short links run the Worker: `/` redirects to the Site, the comparison page
-    // and the old host's redirects need the script, and downloads and /go must be counted. Every
-    // other path is a static file and never wakes the script.
+    // The comparison page keeps its files at the root of ./public and is served at this
+    // public path. Requests outside it run the Worker script.
+    "base_path": "/openjot/meowjot-alternative",
+    // The Worker owns the short links and the proxy. The comparison page's files are served
+    // straight from assets, so a page view wakes no script; an old-host request for a path that
+    // already starts with /openjot/meowjot-alternative/ is served there too, which no old link
+    // ever named.
     "run_worker_first": [
-      "/",
-      "/meowjot-alternative",
-      "/download",
-      "/download/*",
-      "/go",
-      "/go/*",
-      "/api/*",
-      "/ingest/*"
+      "/openjot/download",
+      "/openjot/download/*",
+      "/openjot/go",
+      "/openjot/go/*",
+      "/openjot/api/*",
+      "/openjot/ingest",
+      "/openjot/ingest/*"
     ],
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"

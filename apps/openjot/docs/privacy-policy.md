@@ -1,8 +1,8 @@
 # OpenJot Privacy Policy
 
-**Last updated: 26 November 2026**
+**Last updated: 27 November 2026**
 
-Trajectonomics publishes OpenJot (formerly MooJot), a personal income and expense tracker. This policy says what the Android app, the OpenJot page at <https://trajectonomics.com/openjot/> and the website at <https://openjot.trajectonomics.com> do with information. The same text is shown in My Moo → About → Privacy.
+Trajectonomics publishes OpenJot (formerly MooJot), a personal income and expense tracker. This policy says what the Android app and the OpenJot pages at <https://trajectonomics.com/openjot/> do with information. The same text is shown in My Moo → About → Privacy.
 
 The short version: the ledger stays on your phone. Trajectonomics has no account server and does not receive your records. OpenJot sends us nothing about how you use it unless you choose to share anonymous usage statistics (which screens and features get used, never your records, amounts, or slips). That switch is off until you turn it on. Separately, to read English text on slips, the app uses Google ML Kit. ML Kit reads the photo on the phone, but it sends Google metrics about its own performance and use, such as your device model and a per-installation identifier. OpenJot cannot switch that off. The section "Google ML Kit metrics" below lists what is sent. The website uses cookies only if you allow them. The only upload of a slip image the code can make is optional. It happens only if an AksonOCR API key is already stored in the local database. The settings screen does not ask for that key.
 
@@ -82,11 +82,11 @@ What an event can contain:
 
 The list of allowed events and labels is in the app's source code (`src/lib/analyticsEvents.ts`), and the app drops anything not on it before sending. Events never contain amounts, payees, notes, category, tag or account names, slip images, OCR text, file names, or anything you type. We do not link the random ID to your name, email, phone number, or advertising ID. There is no session recording and no automatic capture of what is on the screen.
 
-Events go over HTTPS to `openjot.trajectonomics.com`, or to `moojot.trajectonomics.com` from app versions before 1.5.0. Both hosts pass them to PostHog, our analytics provider, on its EU Cloud. PostHog receives the IP address of the connection and uses it to estimate your country and city. Turning the switch off stops sending at once and resets the random ID, so if you turn it on again, the app starts with a new ID. Because the ID is not linked to you, we usually cannot find past events for one person. Ask through the contact links below if you want us to try.
+Events go over HTTPS to `trajectonomics.com/openjot/ingest` from the next release, to `openjot.trajectonomics.com` for versions 1.5.0 up to the current release, and to `moojot.trajectonomics.com` before 1.5.0. All three pass them to PostHog, our analytics provider, on its EU Cloud. PostHog receives the IP address of the connection and uses it to estimate your country and city. Turning the switch off stops sending at once and resets the random ID, so if you turn it on again, the app starts with a new ID. Because the ID is not linked to you, we usually cannot find past events for one person. Ask through the contact links below if you want us to try.
 
 ## Website
 
-The OpenJot landing page lives on the Trajectonomics Site at <https://trajectonomics.com/openjot/>. That Site asks before it sets an analytics cookie, and its own notice and privacy terms apply on that page. This section describes what the OpenJot website at <https://openjot.trajectonomics.com> still does.
+The OpenJot pages live on the Trajectonomics Site at <https://trajectonomics.com/openjot/>. The Site asks before it sets an analytics cookie, and its own notice and privacy terms apply to the landing page. This section describes what the OpenJot short links and the comparison page under <https://trajectonomics.com/openjot/> still do.
 
 The OpenJot website counts clicks on its short links and downloads of the app without cookies. For each one, the site's server records only where the click came from (for example, which social post or campaign link), the country our hosting provider (Cloudflare) resolved, a coarse platform (Android, iPhone, desktop, or other), and which in-app browser was used, if any. It sends that to PostHog with a new random ID every time, so clicks cannot be tied together. It does not send your IP address or browser details for these counts.
 

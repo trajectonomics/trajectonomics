@@ -11,10 +11,10 @@ export const ABSOLUTE_OPENJOT_URL = `https://trajectonomics.com${OPENJOT_PATH}`
  * Where a download starts: the OpenJot Worker's short link, which finds the newest `openjot-v*` APK and
  * counts the download. The Site's build never learns a release URL (ADR 0032).
  */
-export const OPENJOT_DOWNLOAD_URL = "https://openjot.trajectonomics.com/download"
+export const OPENJOT_DOWNLOAD_URL = "https://trajectonomics.com/openjot/download"
 
 /** The same lookup's checksum file: the release's `SHA256SUMS`. */
-export const OPENJOT_CHECKSUMS_URL = "https://openjot.trajectonomics.com/download/checksums"
+export const OPENJOT_CHECKSUMS_URL = "https://trajectonomics.com/openjot/download/checksums"
 
 /** Every `openjot-v*` release, with its notes and its checksums. */
 export const OPENJOT_RELEASES_URL =

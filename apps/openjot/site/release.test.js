@@ -60,7 +60,9 @@ function refsAdvert(...refs) {
 }
 
 const env = { ASSETS: { fetch: async () => new Response("asset") } };
-const req = (path) => new Request(`https://openjot.trajectonomics.com${path}`);
+const req = (path) => new Request(`https://trajectonomics.com/openjot${path}`);
+const oldReq = (path, host = "moojot.trajectonomics.com") =>
+  new Request(`https://${host}${path}`);
 
 function routes(table) {
   const calls = [];
@@ -264,46 +266,62 @@ test("/api/release answers 503 when GitHub is unavailable", async () => {
   assert.deepEqual(await res.json(), { release: null, error: "unavailable" });
 });
 
-test("other paths are served from static assets", async () => {
-  const res = await handle(req("/styles.css"), env, null, {});
-  assert.equal(await res.text(), "asset");
+test("the comparison page's files, and paths outside /openjot, are served from static assets", async () => {
+  for (const url of [
+    "https://trajectonomics.com/openjot/meowjot-alternative/",
+    "https://trajectonomics.com/openjot/meowjot-alternative/styles.css",
+    "https://trajectonomics.com/blog/",
+  ]) {
+    const res = await handle(new Request(url), env, null, {});
+    assert.equal(await res.text(), "asset", url);
+  }
 });
 
-test("/ answers 301 to the landing page on the Site, keeping the query", async () => {
-  const res = await handle(req("/?utm_source=instagram"), env, null, {});
-  assert.equal(res.status, 301);
-  assert.equal(res.headers.get("location"), `${LANDING_URL}?utm_source=instagram`);
-  const head = await handle(new Request("https://openjot.trajectonomics.com/", { method: "HEAD" }), env, null, {});
-  assert.equal(head.status, 301);
-  assert.equal(head.headers.get("location"), LANDING_URL);
+test("both old hosts answer 301 to the Site's OpenJot page for /, keeping the query", async () => {
+  for (const host of ["openjot.trajectonomics.com", "moojot.trajectonomics.com"]) {
+    const res = await handle(oldReq("/?utm_source=instagram", host), env, null, {});
+    assert.equal(res.status, 301, host);
+    assert.equal(res.headers.get("location"), `${LANDING_URL}?utm_source=instagram`);
+    const head = await handle(new Request(`https://${host}/`, { method: "HEAD" }), env, null, {});
+    assert.equal(head.status, 301, host);
+    assert.equal(head.headers.get("location"), LANDING_URL);
+  }
 });
 
-test("/openjot/ is still a static file if the Worker is ever asked for it", async () => {
-  const res = await handle(req("/openjot/"), env, null, {});
-  assert.equal(await res.text(), "asset");
+test("old short links answer 301 to the same path under /openjot, so they count once, at the new address", async () => {
+  const cases = [
+    ["/download/ig?x=1", "https://trajectonomics.com/openjot/download/ig?x=1"],
+    ["/go/ig?x=1", "https://trajectonomics.com/openjot/go/ig?x=1"],
+    ["/download", "https://trajectonomics.com/openjot/download"],
+    ["/api/release", "https://trajectonomics.com/openjot/api/release"],
+  ];
+  for (const [path, location] of cases) {
+    const res = await handle(oldReq(path), env, null, {});
+    assert.equal(res.status, 301, path);
+    assert.equal(res.headers.get("location"), location);
+  }
 });
 
-test("the old host answers 301 to the new host, keeping the path and query", async () => {
-  const res = await handle(
-    new Request("https://moojot.trajectonomics.com/download/ig?x=1"),
+test("the old comparison page answers 301 to its new address with a trailing slash", async () => {
+  for (const path of ["/meowjot-alternative", "/meowjot-alternative.html", "/meowjot-alternative/"]) {
+    const res = await handle(oldReq(path), env, null, {});
+    assert.equal(res.status, 301, path);
+    assert.equal(res.headers.get("location"), "https://trajectonomics.com/openjot/meowjot-alternative/");
+  }
+});
+
+test("a non-GET/HEAD request on an old host answers 405 instead of forwarding it", async () => {
+  const post = await handle(
+    new Request("https://openjot.trajectonomics.com/download", { method: "POST", body: "x" }),
     env,
     null,
     {},
   );
-  assert.equal(res.status, 301);
-  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/download/ig?x=1");
+  assert.equal(post.status, 405);
+  assert.equal(post.headers.get("allow"), "GET, HEAD");
 });
 
-test("the old host redirects the comparison page, and the new host serves it from assets", async () => {
-  const old = await handle(
-    new Request("https://moojot.trajectonomics.com/meowjot-alternative"),
-    env,
-    null,
-    {},
-  );
-  assert.equal(old.status, 301);
-  assert.equal(old.headers.get("location"), "https://openjot.trajectonomics.com/meowjot-alternative");
-
+test("the comparison page is served from assets at its new address", async () => {
   const calls = [];
   const assets = {
     fetch: async (request) => {
@@ -312,26 +330,70 @@ test("the old host redirects the comparison page, and the new host serves it fro
     },
   };
   const res = await handle(
-    new Request("https://openjot.trajectonomics.com/meowjot-alternative"),
+    new Request("https://trajectonomics.com/openjot/meowjot-alternative/"),
     { ASSETS: assets },
     null,
     {},
   );
   assert.equal(res.status, 200);
   assert.equal(await res.text(), "asset");
-  assert.deepEqual(calls, ["https://openjot.trajectonomics.com/meowjot-alternative"]);
+  assert.deepEqual(calls, ["https://trajectonomics.com/openjot/meowjot-alternative/"]);
 });
 
-test("the old host still proxies /ingest events instead of redirecting them", async () => {
+test("both old hosts still proxy /ingest events instead of redirecting them", async () => {
+  for (const host of ["openjot.trajectonomics.com", "moojot.trajectonomics.com"]) {
+    const calls = [];
+    const fetch = async (url) => {
+      calls.push(url);
+      return new Response("{}", { status: 200 });
+    };
+    const res = await handle(
+      new Request(`https://${host}/ingest/e/`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      }),
+      env,
+      null,
+      { fetch },
+    );
+    assert.equal(res.status, 200, host);
+    assert.deepEqual(calls, ["https://eu.i.posthog.com/e/"]);
+  }
+});
+
+test("both old hosts still proxy /ingest and its scripts instead of redirecting them", async () => {
+  for (const host of ["openjot.trajectonomics.com", "moojot.trajectonomics.com"]) {
+    const calls = [];
+    const fetch = async (url) => {
+      calls.push(url);
+      return new Response("// posthog", { status: 200 });
+    };
+    const exact = await handle(new Request(`https://${host}/ingest`), env, null, { fetch });
+    assert.notEqual(exact.status, 301, host);
+    const script = await handle(
+      new Request(`https://${host}/ingest/static/array.js`),
+      env,
+      null,
+      { fetch },
+    );
+    assert.notEqual(script.status, 301, host);
+    assert.deepEqual(calls, [
+      "https://eu.i.posthog.com/",
+      "https://eu-assets.i.posthog.com/static/array.js",
+    ]);
+  }
+});
+
+test("the apex /openjot/ingest proxy strips the prefix and keeps the path and query", async () => {
   const calls = [];
   const fetch = async (url) => {
     calls.push(url);
     return new Response("{}", { status: 200 });
   };
   const res = await handle(
-    new Request("https://moojot.trajectonomics.com/ingest/e/", {
+    new Request("https://trajectonomics.com/openjot/ingest/e/?compression=gzip-js", {
       method: "POST",
-      headers: { "content-type": "application/json" },
       body: "{}",
     }),
     env,
@@ -339,34 +401,7 @@ test("the old host still proxies /ingest events instead of redirecting them", as
     { fetch },
   );
   assert.equal(res.status, 200);
-  assert.deepEqual(calls, ["https://eu.i.posthog.com/e/"]);
-});
-
-test("the old host still proxies /ingest scripts instead of redirecting them", async () => {
-  const calls = [];
-  const fetch = async (url) => {
-    calls.push(url);
-    return new Response("// posthog", { status: 200 });
-  };
-  const res = await handle(
-    new Request("https://moojot.trajectonomics.com/ingest/static/array.js"),
-    env,
-    null,
-    { fetch },
-  );
-  assert.notEqual(res.status, 301);
-  assert.deepEqual(calls, ["https://eu-assets.i.posthog.com/static/array.js"]);
-});
-
-test("the new host sends its landing page to the Site", async () => {
-  const res = await handle(
-    new Request("https://openjot.trajectonomics.com/"),
-    env,
-    null,
-    {},
-  );
-  assert.equal(res.status, 301);
-  assert.equal(res.headers.get("location"), LANDING_URL);
+  assert.deepEqual(calls, ["https://eu.i.posthog.com/e/?compression=gzip-js"]);
 });
 
 test("when the API is rate limited, the ref advertisement gives the newest openjot APK, not the archived one", async () => {
