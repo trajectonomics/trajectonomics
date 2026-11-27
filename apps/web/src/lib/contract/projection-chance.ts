@@ -24,6 +24,8 @@ const tableRow = z.strictObject({
 	to: dateString,
 	p10: money,
 	p50: money,
+	// Present only when the Return model has an inflation factor (cli ADR-0085).
+	p50Real: money.optional(),
 	p90: money,
 })
 
@@ -72,6 +74,8 @@ export const planReturnModel = z.strictObject({
 	source: z.literal("plan"),
 	buckets: integer,
 	accounts: z.array(z.strictObject({ id: z.string(), rate: integer, volatility: integer })),
+	// Present only when the Scenario states an `inflationVolatility` above 0 (cli ADR-0085).
+	inflation: z.strictObject({ rate: integer, volatility: integer }).optional(),
 })
 
 /**
@@ -112,6 +116,8 @@ export const projectionChance = z.strictObject({
 	succeeded: integer,
 	successBps: integer,
 	bands: z.array(band),
+	// Present only when the Return model has an inflation factor (cli ADR-0085).
+	realBands: z.array(band).optional(),
 	runsOut: z.array(runsOut),
 	// Present only when the Scenario has a spending rule Flow (cli ADR-0063).
 	spendingBands: z.array(spendingBand).optional(),

@@ -33,6 +33,24 @@ function modelField(problem: ProjectionProblem): readonly (string | number)[] {
 	return "path" in problem && problem.path[0] === "model" ? problem.path.slice(1) : []
 }
 
+/** The sentence for a problem in the inflation factor, where the market's words would say a month. */
+function inflationMessage(
+	problem: ProjectionProblem,
+	field: readonly (string | number)[],
+): string | undefined {
+	if (field[0] !== "inflation") return undefined
+	if (problem.code === "RATE_OUT_OF_RANGE") {
+		return "A rate in the Return model's inflation factor must be from -9999 to 10000 basis points a year."
+	}
+	if (problem.code === "TOO_MANY_ENTRIES") {
+		return "The Return model's inflation factor has more than 1,024 buckets."
+	}
+	if (problem.code === "RETURN_WEIGHT_TOTAL") {
+		return "The weights of the Return model's inflation factor must add up to 4294967296 (2^32), the whole of the probability."
+	}
+	return undefined
+}
+
 /** The sentence for one refused input: the code's own, or what a code that means two things means here. */
 function messageOf(problem: ProjectionProblem): string {
 	const field = modelField(problem)
@@ -45,7 +63,11 @@ function messageOf(problem: ProjectionProblem): string {
 	if (problem.code === "TOO_MANY_ENTRIES" && field[0] === "buckets") {
 		return "The Return model has more than 1,024 buckets."
 	}
-	return MESSAGES[problem.code] ?? `The engine refused this input (${problem.code}).`
+	return (
+		inflationMessage(problem, field) ??
+		MESSAGES[problem.code] ??
+		`The engine refused this input (${problem.code}).`
+	)
 }
 
 /** What to do about `flag`, for a problem in the option it states. */

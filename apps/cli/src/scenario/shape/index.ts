@@ -43,6 +43,13 @@ export function scenarioShapeProperties(version: number | undefined): Record<str
 					type: "integer",
 					description: `${BASIS_POINTS} Per year; negative is deflation.`,
 				},
+				inflationVolatility: {
+					type: "integer",
+					minimum: 0,
+					maximum: 10000,
+					description:
+						"Only the chance of success reads this: the standard deviation of one year's inflation, in basis points (2% is 200). Absent or 0 holds inflation at `inflation` on every Market path. The figure is the caller's own: traj ships none.",
+				},
 			},
 			required: ["inflation"],
 			additionalProperties: false,

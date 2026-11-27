@@ -34,6 +34,17 @@ describe("the projection path contract against the CLI's golden", () => {
 		expect(annual?.rows.at(-1)?.closingNetWorth).toBe(outcome?.closingNetWorth)
 	})
 
+	it("parses each roll-up's own inflation, and leaves it absent without the factor (cli ADR-0085)", async () => {
+		const body = (await golden("path.output")) as { returns: Record<string, unknown>[] }
+		const withInflation = {
+			...body,
+			returns: body.returns.map((rollup) => ({ ...rollup, inflationBps: 250 })),
+		}
+		const parsed = projectionPath.parse(withInflation)
+		expect(parsed.returns.map((rollup) => rollup.inflationBps)).toEqual([250, 250, 250])
+		expect(projectionPath.parse(body).returns[0]?.inflationBps).toBeUndefined()
+	})
+
 	it("refuses a key the contract does not name", async () => {
 		const body = (await golden("path.output")) as object
 		expect(projectionPath.safeParse({ ...body, extra: 1 }).success).toBe(false)
