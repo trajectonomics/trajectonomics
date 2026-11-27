@@ -41,7 +41,7 @@ const maxima = $derived({
 		<PlanMark plan={row.plan} name={row.planName} size={24} />
 		<span class="peaks-name">{row.planName}</span>
 		{#if row.tier !== null}
-			<span class="plan-tier" title={row.tier.note ?? undefined}>{row.tier.name}</span>
+			<span class="plan-tier" title={row.tier.note ?? undefined}>{row.tier.name}{#if row.tier.note}<span class="visually-hidden">{`, ${row.tier.note}`}</span>{/if}</span>
 		{/if}
 	</span>
 {/snippet}

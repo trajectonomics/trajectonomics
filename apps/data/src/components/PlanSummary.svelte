@@ -37,7 +37,7 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 					<PlanMark plan={total.plan} name={total.planName} />
 					<span class="meter-name">{total.planName}</span>
 					{#if tier !== null}
-						<span class="plan-tier" title={tier.note ?? undefined}>{tier.name}</span>
+						<span class="plan-tier" title={tier.note ?? undefined}>{tier.name}{#if tier.note}<span class="visually-hidden">{`, ${tier.note}`}</span>{/if}</span>
 					{/if}
 					{#if total.inUse}
 						<span class="use-dot" aria-hidden="true"></span>
