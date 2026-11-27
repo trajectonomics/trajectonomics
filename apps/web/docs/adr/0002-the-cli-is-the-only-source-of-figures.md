@@ -22,7 +22,7 @@ The planner pages (Income, Expenses, and Assets and debts) list a plan's Flows a
 
 The FI reference's multiple is the one figure the page reduces. The CLI states it in integer basis points, and `formatMultiple` in `src/lib/format/multiple.ts` writes it to one decimal by integer arithmetic on that integer, truncating toward zero: 145376 becomes "14.5×", and 249999 stays "24.9×", below the 25× reference it does not meet. Truncation matters: rounding up let a multiple that was not met read as the reference it missed.
 
-This is the first place the page rounds a CLI figure, and the only one allowed. It formats a ratio: no money is added, subtracted or rounded, and the page still shows the CLI's decimal strings as they are.
+This is the first place the page rounds a CLI figure, and the only one allowed until the amendment below, which lets a card shorten a money string. It formats a ratio: no money is added, subtracted or rounded, and the page still shows the CLI's decimal strings as they are.
 
 ## Amendment (2026-11-27): a card may shorten a money string, cutting digits and never rounding up
 

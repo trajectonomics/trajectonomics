@@ -3,7 +3,7 @@ import { join } from "node:path"
 import { formatCompact } from "./compact"
 
 describe("formatCompact", () => {
-	test("writes a six-figure amount or more in millions, keeping two places", () => {
+	test("writes an amount of seven to nine whole digits in millions", () => {
 		expect(formatCompact("1214900.00")).toBe("1.21M")
 		expect(formatCompact("7514766.37")).toBe("7.51M")
 		expect(formatCompact("15671500.52")).toBe("15.6M")
