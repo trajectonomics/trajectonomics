@@ -4,6 +4,24 @@ const CASH = "cash:"
 const ACCOUNT = "account:"
 const NO_CATEGORY = "no category"
 
+/** The word each cash-flow group names its series by, as `resolve-flows.ts` does. */
+const GROUP_WORDS: Readonly<Record<string, string>> = {
+	income: "Income",
+	expense: "Expense",
+	category: "Spending on",
+	contribution: "Saving",
+	withdrawal: "Withdrawal",
+}
+
+/** The word a cash-flow group names its Account by, as its drawn line does. */
+const ACCOUNT_WORDS: Readonly<Record<string, string>> = {
+	contribution: "into",
+	withdrawal: "from",
+}
+
+const TAX = "tax:"
+const RULE = "rule:"
+
 function bare(id: string): string {
 	return id.startsWith(ACCOUNT) ? id.slice(ACCOUNT.length) : id
 }
@@ -46,9 +64,44 @@ export function seriesAccount(seriesId: string, accounts: AccountNames): string 
 	return accounts.get(account) ?? bare(account)
 }
 
-/** A series no plan states, in words built from its id: its item and its category, never its key (web ADR 0029). */
-export function seriesWords(seriesId: string): string {
-	const category = seriesCategory(seriesId)
+/** A tax series' words, as `resolve-later.ts` names one. */
+function taxWords(seriesId: string): string | null {
+	if (!seriesId.startsWith(TAX)) return null
+	const [levy, kind] = seriesId.slice(TAX.length).split(":")
+	if (levy === undefined || kind === undefined) return null
+	if (kind === "due") return `Tax due, ${levy}`
+	return kind === "taxable" ? `Taxable income, ${levy}` : null
+}
+
+/** A spending-rule series' words, as `resolve-later.ts` names one. */
+function ruleWords(seriesId: string): string | null {
+	return seriesId.startsWith(RULE)
+		? `Paid by the spending rule ${seriesId.slice(RULE.length)}`
+		: null
+}
+
+/** A series no plan states, in words built from its id: its group, item, category and Account, never its key. */
+export function seriesWords(seriesId: string, accounts: AccountNames = new Map()): string {
+	const fields = cashFields(seriesId)
+	if (seriesId.startsWith(CASH) && fields === null) return NO_CATEGORY
+	if (fields === null) return taxWords(seriesId) ?? ruleWords(seriesId) ?? bare(seriesId)
+	const group = typeof fields[0] === "string" ? fields[0] : ""
+	const prefix = GROUP_WORDS[group]
 	const label = seriesLabelId(seriesId)
-	return category === null ? label : `${label} (${category})`
+	const item = fields[1] === NO_CATEGORY ? `"${label}"` : label
+	const category = seriesCategory(seriesId)
+	const base = `${prefix === undefined ? "" : `${prefix}: `}${item}${category === null ? "" : ` (${category})`}`
+	return withAccount(base, group, seriesId, accounts)
+}
+
+/** The words followed by the Account a contribution moves into or a withdrawal moves from, when it names one. */
+function withAccount(
+	base: string,
+	group: string,
+	seriesId: string,
+	accounts: AccountNames,
+): string {
+	const word = ACCOUNT_WORDS[group]
+	const account = word === undefined ? null : seriesAccount(seriesId, accounts)
+	return account === null ? base : `${base} ${word} ${account}`
 }

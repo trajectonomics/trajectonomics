@@ -1,10 +1,11 @@
 import { type LineSeries, toChartNumber } from "../../chart"
 import { formatMoney } from "../../format"
+import type { AccountNames } from "../account-names"
 import type { Terms } from "../projection/terms"
 import { dashLater, linesOf, tableOf } from "./lines"
 import { chartNotes, type Drawn } from "./notes"
 import { reasonFor } from "./reasons"
-import { seriesWords } from "./series-ids"
+import { missingNames } from "./series-missing"
 import type { ChartDef, Resolved } from "./types"
 import { periodText } from "./year"
 
@@ -57,6 +58,7 @@ export function chartView(
 	available: ReadonlyMap<string, Resolved>,
 	names: ReadonlyMap<string, string>,
 	terms: Terms,
+	accounts: AccountNames = new Map(),
 ): ChartView {
 	const found = chart.series.map((id) => ({ id, series: available.get(id) }))
 	const present = found.flatMap((item) => (item.series ? [item.series] : []))
@@ -67,6 +69,8 @@ export function chartView(
 	const drawn = present.flatMap((item) => linesOf(item, effective))
 	const lines = chart.kind === "line" ? drawn.map(dashLater) : drawn
 	const has = new Set(available.keys())
+	const absent = found.flatMap((item) => (item.series ? [] : [item.id]))
+	const missing = missingNames(absent, names, accounts)
 	return {
 		series: lines.map(lineOf),
 		table: tableOf(lines),
@@ -74,7 +78,7 @@ export function chartView(
 			.filter((item) => !item.series)
 			.map((item) => ({
 				id: item.id,
-				name: names.get(item.id) ?? seriesWords(item.id),
+				name: missing.get(item.id) ?? item.id,
 				reason: reasonFor(item.id, has),
 			})),
 		notes: chartNotes({

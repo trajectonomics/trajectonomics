@@ -22,3 +22,6 @@ ADR-0049 amends this: `RenderHint` gains the human-only hooks `display` and `blo
 
 `projection chance` amends the hint again: `RenderHint` gains a `lead` field naming one result field of plain sentences printed before the tables, and that command's `shown()` moves the success-share note into the `headline` the field names, without adding, renaming or dropping a value in the JSON.
 
+## Addendum: a column may format its own value (2026-11-27)
+
+`projection run` amends the hint once more: a column may declare `show`, which reads one value the row already carries and returns the text its cell prints, such as the `ages` list as `me 37, partner 35`. It is not the `toText` callback the considered options rejected: it is one column of the map rather than the leaf, and whatever it returns is escaped and padded by the same renderer as any other cell, so it cannot move layout, and it adds, renames and drops no column or key. The text of its own cell is the callback's responsibility. `--json` never reads it, and the output schema stays the contract.
