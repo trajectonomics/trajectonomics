@@ -38,13 +38,23 @@ describe("the paths another Worker's zone route mounts", () => {
 		})
 	}
 
-	it("passes a path that only starts with a reserved name", () => {
+	it("fails a path the route pattern takes although it only starts with the name", () => {
 		expect(
 			codes([
 				HOME,
-				{ path: "documents/index.html", content: "<html></html>" },
 				{ path: "blogroll.html", content: "<html></html>" },
 				{ path: "database.json", content: "{}" },
+			]),
+		).toEqual(["RESERVED_MOUNT_PATH_BUILT", "RESERVED_MOUNT_PATH_BUILT"])
+	})
+
+	it("passes a path that does not start with a reserved name", () => {
+		expect(
+			codes([
+				HOME,
+				{ path: "demo/index.html", content: "<html></html>" },
+				{ path: "openjot/index.html", content: "<html></html>" },
+				{ path: "th/docs/index.html", content: "<html></html>" },
 			]),
 		).toEqual([])
 	})

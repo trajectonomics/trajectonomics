@@ -191,8 +191,8 @@ counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.m
 _Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:
-The JSON-LD block a page carries, naming the `WebSite` (the brand's name, with `traj` as its
-alternate name), the `Organization` that publishes it with its `logo` and `sameAs`, and traj as a
+The JSON-LD block a page carries, naming the `WebSite` (on a Language home, the brand's name with
+`traj` as its alternate name; on the OpenJot page, OpenJot), the `Organization` that publishes it with its `logo` and `sameAs`, and traj as a
 free `SoftwareApplication` on the home or OpenJot as a `MobileApplication`. It states only what the
 page or the repository states, and never a rating, so it is data and outside the Program JavaScript
 budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md),

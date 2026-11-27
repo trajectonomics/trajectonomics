@@ -124,14 +124,15 @@ describe("the README first screen", () => {
 	})
 
 	it("links the landing page and the docs page, and no other site host", () => {
-		// A trajectonomics.com link is allowed only for the landing page and the docs path.
+		// A trajectonomics.com link, on any of its hosts, is allowed only for the landing page and the docs path.
 		const siteUrls = [
 			"https://trajectonomics.com/",
 			"https://trajectonomics.com/docs/",
 			// The `tx` page of the Docs Portal, which documents `traj tx import` (cli#96).
 			"https://trajectonomics.com/docs/cli/commands/tx/",
 		]
-		const linked = beforeDevelopment.match(/https?:\/\/trajectonomics\.com[^\s)\]]*/g) ?? []
+		const linked =
+			beforeDevelopment.match(/https?:\/\/(?:[\w-]+\.)?trajectonomics\.com[^\s)\]]*/g) ?? []
 		expect(linked.length).toBeGreaterThan(0)
 		for (const url of linked) {
 			expect(siteUrls).toContain(url)

@@ -35,16 +35,22 @@ from someone else, and this repository now declares the public route itself.
   `Sitemap: https://trajectonomics.com/docs/sitemap.xml` and the blog's beside the Site's own, and
   still carries no `Disallow:`, because it speaks for the whole host and three other Workers serve
   under it.
-- **The Site reserves the paths it does not serve.** The build fails when it produces a file under
-  `/docs`, `/blog` or `/data`, which a zone route mounts on another Worker, or at the Reserved preload
-  path `/__mf-preload.js`. The local probe expects all four to be 404 from the Site alone. This keeps a
-  local `wrangler dev` run from pretending the Site serves a page it does not, and keeps the build from
-  shadowing a mount in the deployed order.
+- **The Site reserves the paths it does not serve.** The build fails when it produces a file whose path
+  starts with `docs`, `blog` or `data`, because each zone route pattern (`trajectonomics.com/blog*`)
+  takes every such path, `/blogroll` as well as `/blog/`, or at the Reserved preload path
+  `/__mf-preload.js`. The local probe expects the mounts and the preload path to be 404 from the Site
+  alone. In production the route would hide such a file behind the other Worker, while a local
+  `wrangler dev` run would still serve it, so the build refuses it.
 - **The search title names Trajectonomics.** The English document title is
   `Trajectonomics — traj: financial simulation for AI agents` and the Thai one names
-  the same brand; both descriptions open with `Trajectonomics`. The head states the brand capitalised
-  in `og:site_name`, in the `WebSite` name (with `traj` as its `alternateName`) and in the
-  `Organization` name. The visible hero copy and the footer wordmark do not change.
+  the same brand; both descriptions open with `Trajectonomics`, within the 60- and 155-character
+  guards. Every page's head states the brand capitalised in `og:site_name` and the `Organization`
+  name. The two Language homes, whose `WebSite` node is the one a search engine reads the site's name
+  from, name it `Trajectonomics` with `traj` as its `alternateName`; the OpenJot page keeps its own
+  `WebSite` node named `OpenJot` ([ADR 0032](./0032-the-site-serves-openjot-at-openjot.md)). The share
+  image draws the Thai SARA AM (ำ) as its two parts, because its renderer overlaps the precomposed
+  vowel with the next consonant when a line starts with Thai. The visible hero copy and the footer
+  wordmark do not change.
 - **No Content-Security-Policy on the Site's pages, yet.** The router used to inject an inline style
   and an inline script, which is why ADR 0002 forbade a policy; nothing injects them now, so a policy is
   possible. This change does not add one, because it changes the address model and the head, and a
@@ -79,7 +85,8 @@ from someone else, and this repository now declares the public route itself.
   the built-file rule keeps the pages as they are.
 - A deploy of the Site no longer depends on a router deploy, and a deploy of the docs, blog or data
   Worker carries its own zone route.
-- `wrangler dev` infers the route's hostname, so a local Worker would see `trajectonomics.com` and set
-  the production cookie `Domain`, which a browser on `127.0.0.1` refuses. The probe, the Playwright
-  server and `bun run preview` pass `--infer-origin-from-routes=false`, so a local run keeps its own
-  origin; a hand-run `wrangler dev` needs the same flag to keep the consent cookies.
+- With a route declared, `wrangler dev` infers its hostname, so the local Worker sees
+  `trajectonomics.com` and writes the production cookie `Domain`, which the local proxy rewrites to
+  `Domain=127.0.0.1`. The probe expects the host-only cookie a local origin gets, so the probe, the
+  Playwright server and `bun run preview` pass `--infer-origin-from-routes=false`, and a local run
+  sees its own origin as it did before the route was declared.

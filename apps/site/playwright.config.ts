@@ -31,8 +31,8 @@ export default defineConfig({
 	},
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 	webServer: {
-		// The apex route would otherwise make the Worker see trajectonomics.com and set the production
-		// cookie Domain, which a browser on 127.0.0.1 refuses (ADR 0033).
+		// The apex route would otherwise make the Worker see trajectonomics.com and write the production
+		// cookie Domain; the flag keeps the local origin, so cookies stay host-only (ADR 0033).
 		command: `./node_modules/.bin/wrangler dev --ip 127.0.0.1 --port ${PORT} --inspector-port ${PORT + 1} --infer-origin-from-routes=false --show-interactive-dev-session=false`,
 		url: `${BASE_URL}/`,
 		reuseExistingServer: false,

@@ -9,8 +9,9 @@ const RESERVED_PRELOAD_PATH = "__mf-preload.js"
 
 /**
  * The mount points zone routes give other Workers on the Site's host: the Docs Portal, the blog and
- * the data site. A file the Site built under one would shadow that Worker in a local run and mislead
- * the build, so the build fails instead.
+ * the data site. Each route pattern is `trajectonomics.com/<name>*`, which takes every path that
+ * starts with the name, `/blogroll` as well as `/blog/`. A file the Site built there would be
+ * hidden by that route in production while a local run still served it, so the build fails instead.
  */
 const RESERVED_MOUNT_PATHS: readonly string[] = Object.freeze([DOCS_PATH, BLOG_PATH, DATA_PATH])
 
@@ -19,10 +20,10 @@ function mountDirectory(mount: string): string {
 	return mount.replace(/^\/|\/$/g, "")
 }
 
-/** Every built file under one mount: the directory itself or a file inside it. */
+/** Every built file a mount's route pattern takes: any path that starts with the mount's name. */
 function builtUnder(files: readonly BuiltFile[], mount: string): readonly BuiltFile[] {
-	const directory = mountDirectory(mount)
-	return files.filter((file) => file.path === directory || file.path.startsWith(`${directory}/`))
+	const name = mountDirectory(mount)
+	return files.filter((file) => file.path.startsWith(name))
 }
 
 /** The Reserved preload path stays unbuilt: no Worker serves it, so the Site must not claim it. */
