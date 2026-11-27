@@ -5,8 +5,9 @@
  */
 import { type ConsentRow, FakeConsentDatabase } from "./fake-consent-database"
 
-type Where = Array<{ field: string; value: unknown; operator?: "eq" | "lt" }>
-type AdapterInput = { model: string; where: Where }
+type SortBy = { field: string; direction: "asc" | "desc" }
+type Where = Array<{ field: string; value: unknown; operator?: "eq" | "lt" | "gt" | "in" }>
+type AdapterInput = { model: string; where: Where; limit?: number; sortBy?: SortBy }
 
 export const NOW = "2026-11-28T00:00:00.000Z"
 export const EARLIER = "2026-11-01T00:00:00.000Z"
@@ -20,17 +21,25 @@ export class FakeConsentAdapter {
 	afterInsert: ((rows: ConsentRow[]) => void) | undefined
 	/** Runs after each consent read: whatever lands before this request writes. */
 	afterRead: ((rows: ConsentRow[], read: number) => void) | undefined
+	/** The `where` of every `deleteMany`, for a check that reads the statement's shape. */
+	readonly deleted: Where[] = []
 	private reads = 0
 	private inserts = 0
 
 	findOne = async (): Promise<unknown> => null
 
-	findMany = async ({ model, where }: AdapterInput): Promise<unknown[]> => {
-		if (model !== "oauthConsent") return []
-		const found = this.consents.rows.filter((row) => matches(row, where)).map((row) => ({ ...row }))
-		this.reads += 1
-		this.afterRead?.(this.consents.rows, this.reads)
-		return found.slice(0, 100)
+	findMany = async ({ model, where, limit, sortBy }: AdapterInput): Promise<unknown[]> => {
+		// The copies are made before the read hook runs, so a row it changes is only seen next time.
+		const found = this.rowsOf(model)
+			.filter((row) => matches(row, where))
+			.map((row) => ({ ...row }))
+		if (sortBy !== undefined) found.sort((left, right) => compare(left, right, sortBy))
+		if (model === "oauthConsent") {
+			this.reads += 1
+			this.afterRead?.(this.consents.rows, this.reads)
+		}
+		// Better Auth caps a read at 100 rows unless the caller asks for a limit.
+		return found.slice(0, limit ?? 100)
 	}
 
 	create = async ({ data }: { data: Record<string, unknown> }): Promise<unknown> => {
@@ -48,9 +57,14 @@ export class FakeConsentAdapter {
 	}
 
 	deleteMany = async ({ model, where }: AdapterInput): Promise<unknown> => {
+		this.deleted.push(where)
 		this.tokens = this.tokens.filter((row) => row.model !== model || !matches(row, where))
 		return null
 	}
+
+	/** Consent rows, or the tokens tagged with the model, as the adapter would list them. */
+	private rowsOf = (model: string): readonly ConsentRow[] =>
+		model === "oauthConsent" ? this.consents.rows : this.tokens.filter((row) => row.model === model)
 }
 
 /** Another approval's row for the same grant. */
@@ -86,18 +100,24 @@ export function consentSetup(rows: ConsentRow[] = []) {
 }
 
 function matches(row: ConsentRow, where: Where): boolean {
-	return where.every((clause) => matchesClause(row[clause.field], clause))
+	return where.every(({ field, value, operator = "eq" }) => {
+		const at = row[field]
+		if (operator === "in")
+			return Array.isArray(value) && value.some((item) => at === columnText(item))
+		if (operator === "lt") return before(at, value)
+		if (operator === "gt") return before(value, at)
+		return at === columnText(value)
+	})
 }
 
-function matchesClause(value: unknown, clause: Where[number]): boolean {
-	if (clause.operator === "lt") return before(value, clause.value)
-	return value === columnText(clause.value)
+function compare(left: ConsentRow, right: ConsentRow, sortBy: SortBy): number {
+	const order = String(left[sortBy.field]).localeCompare(String(right[sortBy.field]))
+	return sortBy.direction === "asc" ? order : -order
 }
 
 /** The D1 adapter binds a `Date` as its ISO text, so the comparison is text against text. */
 function before(value: unknown, limit: unknown): boolean {
-	const text = columnText(value)
-	const bound = columnText(limit)
+	const [text, bound] = [columnText(value), columnText(limit)]
 	return typeof text === "string" && typeof bound === "string" && text < bound
 }
 

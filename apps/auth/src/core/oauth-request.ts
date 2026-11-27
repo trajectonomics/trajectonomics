@@ -54,10 +54,13 @@ export function deviceApproveBodyRejection(body: unknown): DeviceApproveBodyReje
 export type ClaimsParameterRejection = "claims-parameter"
 
 /**
- * OIDC's `claims` request parameter is not supported. The provider issues the claims its scopes
- * and client define and never resolves a request's claims object, so carrying the parameter
- * changes nothing; refusing it says that instead of silently ignoring what the client asked for.
- * Any value counts, including an empty one, and every source that can hold the field is read.
+ * OIDC's `claims` request parameter is refused, and this check must not be relaxed. The library
+ * does resolve a request's claims object: its userinfo answer releases a claim when the granted
+ * scopes include the claim's scope or when the request names it, so a client holding only `openid`
+ * that sends `claims={"userinfo":{"email":null}}` would receive the email from `/userinfo`, which
+ * the consent screen never showed. Refusing the parameter is what keeps a token to the claims the
+ * consent screen shows. Any value counts, including an empty one, and every source that can hold
+ * the field is read.
  */
 export function claimsParameterRejection(
 	...sources: readonly unknown[]

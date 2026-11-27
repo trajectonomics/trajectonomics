@@ -111,13 +111,15 @@ changed that row, and fails the request with `500 server_error`, so an approval 
 without its consent. The write it records, `created` or `merged`, is the one that happened on the
 last pass.
 
-Every write that sets a consent row's `updatedAt` stamps `max(now, previous + 1 ms)`, where
-`previous` is the latest `updatedAt` it read. An insert also moves past every expired row it
+Every write this Worker makes to a consent row's `updatedAt` stamps `max(now, previous + 1 ms)`,
+where `previous` is the latest `updatedAt` it read. An insert also moves past every expired row it
 replaced, a merge past the row it merged into, and a restore past the `updatedAt` the failed write
-had stamped. Two writes in one millisecond therefore never share a stamp, and the first request's
-undo, still filtered by the exact `updatedAt` its write stored, cannot match the row the second
-write now owns. The restored `updatedAt` is a fresh stamp, not the value from before the merge:
-`updatedAt` is the undo guard, not part of the grant's state.
+had stamped. Two of these writes in one millisecond therefore never share a stamp, and the first
+request's undo, still filtered by the exact `updatedAt` its write stored, cannot match the row the
+second write now owns. The library's own `/oauth2/consent` endpoint is the one exception: it writes
+a whole-second `updatedAt` through the adapter, so a stamp it writes is outside this rule. The
+restored `updatedAt` is a fresh stamp, not the value from before the merge: `updatedAt` is the undo
+guard, not part of the grant's state.
 
 Undoing a merge restores the keeper's previous scopes and resources; the duplicate rows the merge
 deleted stay deleted. The undo can therefore only remove grants, never add one.
@@ -169,10 +171,14 @@ grants, and the operator cannot see who the request belongs to until they sign i
 auto-consent path compares scopes and resources but not the approval age, so deleting the expired
 row is what makes every code-issuing path fail closed into the consent page.
 
-Whenever a consent is newly created, the access and refresh tokens for that user and client that
-were created before the read that found no consent are deleted first, so an old token can never
-attach to the new approval. A token another approval minted after that read survives the delete:
-that approval's consent is live even though this read could not see it.
+Whenever a consent is newly created, the read that found no live consent first snapshots the ids
+of that user's and that client's access and refresh tokens, and only those tokens are deleted. An
+old token can therefore never attach to the new approval, and a token another approval mints after
+the snapshot survives the delete, because that approval's consent is live even though this read
+could not see it. The ids, not a timestamp, are the boundary: the library stores a token's
+`createdAt` in whole seconds, so a token minted later in the second a read lands in carries an
+earlier `createdAt` than that read, and a filter on the read's clock would delete a live token. The
+delete is one `in` statement per hundred ids, D1's bound-parameter limit.
 
 `src/oauth-grants.ts` adds two session-scoped endpoints:
 

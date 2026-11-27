@@ -3,12 +3,13 @@ import { adapterOf } from "./adapter"
 import { consentCovers, mergeIntoKeeper } from "./consent-merge"
 import { type ConsentWrite, nextConsentUpdatedAt, undoConsentWrite } from "./consent-write"
 import { consentExpired } from "./expiry"
-import { deleteConsentRow, deleteTokenFamily } from "./family"
+import { deleteConsentRow, deleteTokenFamily, snapshotTokenFamily, type TokenIds } from "./family"
 import { hookNow, type OAuthHookOptions } from "./request"
 import { findConsents, type StoredConsent } from "./store"
 import { deletePendingAuthorizationCodes } from "./verification-sql"
 
 const ATTEMPTS = 3
+const NONE: ConsentWrite = { kind: "none" }
 
 type Approval = { clientId: string; userId: string; scopes: string[]; resources: string[] }
 type Inserted = { id: string; writtenAt: Date }
@@ -64,19 +65,21 @@ export async function recordConsent(
 /** One pass. `null` means a row moved on between the read and the write. */
 async function recordOnce(recording: Recording): Promise<ConsentWrite | null> {
 	if (recording.inserted !== undefined) return finishCreate(recording, recording.inserted)
-	const { rows, live, now } = await readConsents(recording)
+	const { rows, live, now, family } = await readConsents(recording)
 	if (live.length > 0) return merge(recording, rows, live, now)
-	const inserted = await insertFresh(recording, rows, now)
-	if (inserted === null) return { kind: "none" }
+	const inserted = await insertFresh(recording, rows, family, now)
+	if (inserted === null) return NONE
 	recording.inserted = inserted
 	return finishCreate(recording, inserted)
 }
 
 async function readConsents({ ctx, input, options }: Recording) {
-	// The clock of the read: an approval that lands after this point is not this pass's to delete.
+	// The token family as it stood before the read: a token another approval mints after this
+	// snapshot is not this pass's to delete, even when the read cannot see its consent.
+	const family = await snapshotTokenFamily(ctx, input)
 	const now = hookNow(ctx, options)
 	const rows = await findConsents(ctx, input.clientId, input.userId)
-	return { rows, live: rows.filter((row) => !consentExpired(ctx, row, options)), now }
+	return { rows, live: rows.filter((row) => !consentExpired(ctx, row, options)), now, family }
 }
 
 function merge(
@@ -91,17 +94,19 @@ function merge(
 
 /**
  * A newly created consent never attaches to tokens from an earlier grant. Never move `createdAt`
- * without deleting the family. Only tokens created before the read that found no consent go: a
- * token another approval minted after that read is that approval's, not a leftover.
+ * without deleting the family. Only the tokens the snapshot taken before the read listed go: a
+ * token another approval minted after that snapshot is that approval's, not a leftover, and the
+ * snapshot's ids keep it safe from the whole-second `createdAt` the library stores.
  */
 async function insertFresh(
 	{ ctx, input, options }: Recording,
 	expired: readonly StoredConsent[],
+	ids: TokenIds,
 	now: Date,
 ): Promise<Inserted | null> {
 	const owner = { clientId: input.clientId, userId: input.userId }
 	for (const row of expired) await deleteConsentRow(ctx, row.id)
-	await deleteTokenFamily(ctx, owner, now)
+	await deleteTokenFamily(ctx, ids)
 	await deletePendingAuthorizationCodes(options.database, owner)
 	const updatedAt = nextConsentUpdatedAt(now, ...expired.map((row) => row.updatedAt))
 	const created = (await adapterOf(ctx).create({
@@ -115,8 +120,7 @@ async function insertFresh(
 			updatedAt,
 		},
 	})) as { id?: unknown } | null
-	const id = created === null ? undefined : created.id
-	return typeof id === "string" ? { id, writtenAt: updatedAt } : null
+	return typeof created?.id === "string" ? { id: created.id, writtenAt: updatedAt } : null
 }
 
 /** Decides what this request's insert may undo, after a concurrent approval may have joined it. */
@@ -125,14 +129,12 @@ async function finishCreate(
 	inserted: Inserted,
 ): Promise<ConsentWrite | null> {
 	const { rows, live, now } = await readConsents(recording)
-	if (live.length > 1) {
-		// Another request inserted its own row and this one merges with it. That approval is not
-		// this request's to undo, whichever row is the keeper.
-		return (await merge(recording, rows, live, now)) === null ? null : { kind: "none" }
-	}
+	// Another request inserted its own row and this one merges with it. That approval is not this
+	// request's to undo, whichever row is the keeper.
+	if (live.length > 1) return (await merge(recording, rows, live, now)) === null ? null : NONE
 	const only = live[0]
 	if (only?.id === inserted.id) return { kind: "created", ...inserted }
-	if (only !== undefined && consentCovers(only, recording.input)) return { kind: "none" }
+	if (only !== undefined && consentCovers(only, recording.input)) return NONE
 	// The inserted row is gone and no row holds this approval: start from the top.
 	recording.inserted = undefined
 	return null

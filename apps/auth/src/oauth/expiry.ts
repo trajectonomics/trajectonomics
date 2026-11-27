@@ -8,7 +8,7 @@
  */
 import { getSessionFromCtx } from "better-auth/api"
 import { grantLifetimeRejection } from "../core/resource-request"
-import { deleteConsentRow, deleteTokenFamily } from "./family"
+import { deleteConsentRow, deleteTokenFamily, snapshotTokenFamily } from "./family"
 import { hookNow, type OAuthHookOptions } from "./request"
 import { findConsents, type StoredConsent } from "./store"
 import { asDate } from "./values"
@@ -68,7 +68,8 @@ async function expireSignedInConsent(
 	const userId = session?.user?.id
 	if (typeof userId !== "string" || userId === "") return
 	const owner = { clientId, userId }
-	const readAt = hookNow(ctx, options)
+	// The family as it stood before the read, so a token another approval mints afterwards survives.
+	const family = await snapshotTokenFamily(ctx, owner)
 	const rows = await findConsents(ctx, clientId, userId)
 	const live = rows.filter((consent) => !consentExpired(ctx, consent, options))
 	for (const consent of rows) {
@@ -78,6 +79,6 @@ async function expireSignedInConsent(
 	}
 	if (live.length > 0) return
 	if (rows.length === 0 && !cleanupWhenAbsent) return
-	await deleteTokenFamily(ctx, owner, readAt)
+	await deleteTokenFamily(ctx, family)
 	await deletePendingAuthorizationCodes(options.database, owner)
 }

@@ -80,10 +80,12 @@ the answer.
 
 `/oauth2/authorize` refuses any request whose query or body carries OIDC's `claims` parameter with
 `400 invalid_request` and `the claims parameter is not supported`. Any value counts, including an
-empty one. The provider issues the claims its scopes and client already define and never resolves a
-request's claims object, so the parameter cannot change a token; refusing it tells the client that
-instead of silently ignoring what it asked for. The pure rule is `claimsParameterRejection` in
-`src/core/oauth-request.ts`.
+empty one. The provider does resolve a request's claims object: its userinfo answer releases a claim
+when the granted scopes include the claim's scope or when the request names it, so a client granted
+only `openid` that sends `claims={"userinfo":{"email":null}}` would receive the email from
+`/userinfo`, which the consent screen never showed. Refusing the parameter is what keeps a token to
+the claims the consent screen shows, and the check must not be relaxed. The pure rule is
+`claimsParameterRejection` in `src/core/oauth-request.ts`.
 
 Better Auth 1.7.28 advertises `claims_parameter_supported: true` in its discovery document as a
 hard-coded value, and it offers no option to change it: `advertisedMetadata` covers only
