@@ -177,7 +177,7 @@ describe("a Flow and a Milestone the plan states no label for show the id in cod
 				name: "base",
 				doc: scenario.document,
 				household: scenario.household,
-				contentHash: scenario.contentHash,
+				householdHash: scenario.householdHash,
 				editable: true,
 			},
 		}).body
@@ -192,7 +192,7 @@ describe("a Flow and a Milestone the plan states no label for show the id in cod
 			props: {
 				name: "base",
 				household: scenario.household!,
-				contentHash: scenario.contentHash,
+				householdHash: scenario.householdHash,
 				flows: scenario.document.flows,
 				onDone: () => {},
 			},
