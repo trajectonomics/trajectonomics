@@ -95,7 +95,7 @@ describe("with no session, a page is its content and nothing more", () => {
 			onTerms: () => {},
 		})
 		const page = bodyOf(ComparePage, { terms: "nominal", onTerms: () => {} })
-		expect(shown(page)).toBe(framed("Compare", content))
+		expect(shown(page)).toBe(framed("Compare plans", content))
 	})
 
 	test("Home", () => {

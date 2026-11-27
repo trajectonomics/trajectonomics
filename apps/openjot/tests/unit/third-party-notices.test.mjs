@@ -21,7 +21,8 @@ test("the notices file starts with its header and says what it is", () => {
   // assert.ok, not assert.match: a failed match would print the whole multi-megabyte file.
   const has = (re) => assert.ok(re.test(notices), `the notices file does not match ${re}`);
   assert.ok(notices.startsWith("OPENJOT THIRD-PARTY NOTICES\n"));
-  has(/MIT License/);
+  has(/GNU AFFERO GENERAL PUBLIC LICENSE/);
+  has(/OpenJot .* - AGPL-3\.0-only \[L\d+\]/);
   has(/Google ML Kit[\s\S]*?NOT\s+open\s+source/);
   has(/node tools\/third-party-notices\.mjs --apk/);
 });

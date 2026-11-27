@@ -19,10 +19,10 @@ function renderView(
 }
 
 describe("ChanceView", () => {
-	test("shows the success share as the headline, with the paths beside it and the seed and model id in Details", () => {
+	test("shows the chance as the headline, with the markets beside it and the seed and model id in Details", () => {
 		const body = renderView({ base: { argv: ARGV, ok: true, data: chanceFixture() } })
-		expect(body).toContain("87.00%")
-		expect(body).toContain("174 of 200 seeded Market paths never run out before 31 Dec 2028.")
+		expect(body).toContain("87%")
+		expect(body).toContain("Lasts to 2028 in 174 of 200 markets.")
 		const outside = outsideDetails(body)
 		expect(outside).not.toContain("0123456789abcdef")
 		expect(outside).not.toContain(">Seed<")
@@ -50,9 +50,9 @@ describe("ChanceView", () => {
 		expect(body).toContain('name="scenario"')
 	})
 
-	test("says how to add a Return model when the Snapshot holds no chance read", () => {
+	test("says how to add a Return model when these figures hold no chance read", () => {
 		const body = renderView({})
-		expect(body).toContain("No chance of success in this Snapshot")
+		expect(body).toContain("No chance of success for this plan")
 		expect(body).toContain("--return-model FILE")
 		expect(body).toContain("--paths N")
 		expect(body).toContain("--seed HEX")

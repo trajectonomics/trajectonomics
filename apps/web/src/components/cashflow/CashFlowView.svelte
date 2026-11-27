@@ -6,7 +6,6 @@ import { hasCashflow } from "../../lib/view/cashflow/cashflow"
 import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
-import SiteLink from "../ui/SiteLink.svelte"
 import CashFlowWhatIf from "../what-if/CashFlowWhatIf.svelte"
 import CashFlowBody from "./CashFlowBody.svelte"
 
@@ -33,14 +32,11 @@ const names = $derived(currentItemNames())
 	<EmptyState title="No plan to show" />
 {:else if read.ok && !hasCashflow(read)}
 	<EmptyState title={`No cash flow for ${name}`}>
-		<p>The Snapshot holds this plan's projection without its cash flow.</p>
+		<p>These figures hold this plan's projection without its cash flow.</p>
 	</EmptyState>
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}
 	<div class="space-y-8">
-		<p class="text-sm text-muted-foreground">
-			The order money is saved and drawn in is set on <SiteLink href="/routing/" class="underline">Where money goes</SiteLink>.
-		</p>
 		{#if lens}<CashFlowWhatIf {lens} baseline={read.ok ? read.data : null} {year} />{/if}
 		<ReadView {read} label={`Cash flow of ${name}`}>
 			{#snippet children(run)}

@@ -72,8 +72,8 @@ const assumptions = $derived(assumptionLines(years))
 		</div>
 	{/if}
 	{#if shown.kind === "no-levy"}
-		<EmptyState title="No Levy in this plan">
-			<p>Its figures are before tax, because the plan has no Levy. Add Thailand's with:</p>
+		<EmptyState title="No tax rules in this plan">
+			<p>Its figures are before tax, because the plan has no tax rules. Add Thailand's with:</p>
 			<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code>{addLevyCommand(name)}</code></pre>
 		</EmptyState>
 	{:else}

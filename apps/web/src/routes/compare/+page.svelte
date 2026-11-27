@@ -4,7 +4,7 @@ import ComparePage from "../../components/pages/ComparePage.svelte"
 </script>
 
 <svelte:head>
-	<title>Compare · Dashboard</title>
+	<title>Compare plans · Dashboard</title>
 </svelte:head>
 
 <ComparePage

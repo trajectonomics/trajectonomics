@@ -144,7 +144,7 @@ describe("the path page", () => {
 			"Spending",
 			"Income",
 			"Net worth",
-			"Real net worth",
+			"Net worth in today's money",
 		]) {
 			expect(body).toContain(text)
 		}
@@ -152,7 +152,7 @@ describe("the path page", () => {
 	})
 
 	test("shows only the terms asked for in the table", () => {
-		expect(pathPage("2", stored, "nominal")).not.toContain("Real net worth</th>")
+		expect(pathPage("2", stored, "nominal")).not.toContain("in today's money</th>")
 		expect(pathPage("2", stored, "real")).not.toContain(">Net worth</th>")
 	})
 

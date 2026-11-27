@@ -7,7 +7,7 @@
     "url": "git+https://github.com/trajectonomics/trajectonomics.git",
     "directory": "skills/internal"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "private": false,
   "bin": {
     "install-skills-profile": "./scripts/install-profile.mjs"

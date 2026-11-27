@@ -57,7 +57,6 @@ const loans = $derived(loanPage(kind, doc, { run, baseline }, changes))
 
 <div class="space-y-4">
 	<div class="flex flex-wrap items-center justify-between gap-3">
-		<p class="text-sm text-muted-foreground">Plan {name}</p>
 		{#if editable}
 			<PlanToolbar {kind} {noun} open={setDrawer} />
 		{/if}

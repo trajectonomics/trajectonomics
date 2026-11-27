@@ -9,6 +9,8 @@ import { subscribeWide } from "./media"
 export class ShellPanels {
 	menu = $state(false)
 	options = $state(false)
+	/** Whether a link in the menu was followed: the menu button then takes focus after the new page shows. */
+	menuFocusPending = false
 
 	constructor() {
 		if (typeof window === "undefined") return
@@ -24,8 +26,14 @@ export class ShellPanels {
 		this.options = true
 	}
 
-	/** A link in the menu is followed, so the drawer it sits in shuts. */
+	/** A link in the menu is followed, so the drawer shuts. */
 	closeMenu(): void {
+		this.menu = false
+	}
+
+	/** A link in the menu is followed: the drawer shuts, and the menu button takes focus after the new page shows. */
+	navigateFromMenu(): void {
+		this.menuFocusPending = true
 		this.menu = false
 	}
 

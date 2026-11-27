@@ -2,7 +2,7 @@
 	"name": "@trajectonomics/blog",
 	"version": "0.0.0-development",
 	"description": "The Trajectonomics blog at trajectonomics.com/blog: static Astro served by the Worker blog. Never published to npm.",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"type": "module",
 	"private": true,
 	"packageManager": "bun@1.4.4",

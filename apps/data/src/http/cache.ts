@@ -60,14 +60,27 @@ export function usageStaleCacheKey(request: Request): Request {
 	return staleKey(normalizedReadUrl(request, USAGE_PARAMS))
 }
 
-/** The cache key for a peaks request: the canonical URL, with its as-of day. */
+/**
+ * The shape of the peaks body. A change to the body bumps it, so a cached body of the old shape is
+ * never served to a page built for the new one: on 2026-11-27 a cached body without `measured`
+ * broke the overview for hours after the deploy that added it.
+ */
+export const PEAKS_SHAPE = "2"
+
+function peaksUrl(request: Request): URL {
+	const url = normalizedReadUrl(request, PEAKS_PARAMS)
+	url.searchParams.set("shape", PEAKS_SHAPE)
+	return url
+}
+
+/** The cache key for a peaks request: the canonical URL, its as-of day and the body's shape. */
 export function peaksCacheKey(request: Request): Request {
-	return new Request(normalizedReadUrl(request, PEAKS_PARAMS).toString())
+	return new Request(peaksUrl(request).toString())
 }
 
 /** The key the peaks endpoint's stale copy lives under. */
 export function peaksStaleCacheKey(request: Request): Request {
-	return staleKey(normalizedReadUrl(request, PEAKS_PARAMS))
+	return staleKey(peaksUrl(request))
 }
 
 /** The cache key for the health endpoint. */
