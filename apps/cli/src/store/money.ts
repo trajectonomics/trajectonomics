@@ -47,6 +47,14 @@ export function parseMinorUnits(
 	return guard(() => toMinor(value, digitsOf(currency), path))
 }
 
+/**
+ * Whether `parseMinorUnits` accepts `value` in `currency`, so a hint that offers the decimal form
+ * tests a value with the same check the `--decimal` parser makes and the two cannot drift.
+ */
+export function isDecimalAmount(value: string, currency: string): boolean {
+	return !isAppError(parseMinorUnits(value, currency))
+}
+
 /** `1234567` THB → `"12345.67"`: always the currency's full scale, `-` only when negative. */
 export function formatMinorUnits(minor: number, currency: string): string {
 	if (!Number.isSafeInteger(minor)) throw new RangeError(`${minor} is not a safe integer`)
