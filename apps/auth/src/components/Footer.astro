@@ -1,0 +1,31 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { dictionaryFor, type Language, pagePath } from "../lib/language"
+import { LICENCE_URL, SOURCE_URL } from "../lib/site"
+
+interface Props {
+	readonly language: Language
+}
+
+const { language } = Astro.props
+const words = dictionaryFor(language)
+const links = [
+	{ text: words.footerPrivacy, href: pagePath(language, "privacy") },
+	{ text: words.footerTerms, href: pagePath(language, "terms") },
+	{ text: words.footerSource, href: SOURCE_URL },
+	{ text: words.footerLicence, href: LICENCE_URL },
+]
+---
+
+<footer class="auth-footer">
+	<ul class="footer-links">
+		{
+			links.map((link) => (
+				<li><a href={link.href}>{link.text}</a></li>
+			))
+		}
+	</ul>
+</footer>

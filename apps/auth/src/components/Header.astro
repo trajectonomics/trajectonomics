@@ -1,0 +1,44 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import LanguageMenu from "@trajectonomics/site-header/LanguageMenu.astro"
+import SiteHeader from "@trajectonomics/site-header/SiteHeader.astro"
+import { dictionaryFor, LANGUAGES, type Language, type Page, pagePath } from "../lib/language"
+import { SITE_HOME_URL } from "../lib/site"
+
+interface Props {
+	readonly language: Language
+	readonly page: Page
+}
+
+const { language, page } = Astro.props
+const words = dictionaryFor(language)
+// A page reached from an app carries its signed query; the other language keeps it, so switching
+// never drops the flow the person is in the middle of.
+const search = Astro.url.search
+const choices = LANGUAGES.map((code) => ({
+	href: `${pagePath(code, page)}${search}`,
+	lang: code,
+	hreflang: code,
+	label: dictionaryFor(code).languageName,
+	current: code === language,
+}))
+---
+
+<SiteHeader
+	homeHref={SITE_HOME_URL}
+	homeLabel={words.homeLabel}
+	marker={{ href: pagePath(language, "account"), label: words.accountMarker, current: page === "account" }}
+	class="auth-header"
+	navLabel={words.accountMarker}
+>
+	<Fragment slot="end">
+		<LanguageMenu
+			summaryLabel={`${words.languageMenuLabel}: ${words.languageSwitchLabel}`}
+			currentLabel={words.languageSwitchLabel}
+			choices={choices}
+		/>
+	</Fragment>
+</SiteHeader>

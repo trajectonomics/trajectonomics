@@ -1,10 +1,12 @@
 import type { BetterAuthOptions } from "better-auth"
+import { recordPendingDeletion } from "./account-deletion"
 import { buildPlugins } from "./auth-plugins"
 import { buildSocialProviders } from "./auth-providers"
 import { devSignInAllowed } from "./core/dev"
 import { REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS } from "./core/resources"
 import { requireSecret } from "./core/secret"
 import type { Env } from "./env"
+import { hasMarketingConsent } from "./marketing-consent-store"
 import {
 	type OAuthHookOptions,
 	oauthAfterHook,
@@ -48,6 +50,21 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 			enabled: devSignIn,
 			minPasswordLength: 12,
 		},
+		user: {
+			deleteUser: {
+				enabled: true,
+				// The person's marketing consent rows go with the user row (the schema cascades on
+				// `userId`). The data side holds only the anonymous id, so it is told separately and
+				// retried by the cron until it acknowledges (issue #601 builds the endpoint).
+				afterDelete: async (user) => {
+					await recordPendingDeletion({
+						db: input.env.DB,
+						data: input.env.DATA,
+						authUserId: user.id,
+					})
+				},
+			},
+		},
 		socialProviders: buildSocialProviders({
 			googleClientId: input.env.GOOGLE_CLIENT_ID,
 			googleClientSecret: input.env.GOOGLE_CLIENT_SECRET,
@@ -87,6 +104,8 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 			baseURL,
 			passkeyRpID: input.env.PASSKEY_RP_ID ?? new URL(baseURL).hostname,
 			passkeyOrigin: input.env.PASSKEY_ORIGIN ?? new URL(baseURL).origin,
+			requiresMarketingConsent: async (userId) =>
+				!(await hasMarketingConsent(input.env.DB, userId)),
 		}),
 	}
 }

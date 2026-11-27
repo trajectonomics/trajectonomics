@@ -1,11 +1,12 @@
 import { createAuth } from "./auth"
 import { authHandlerPath } from "./core/route"
 import type { Env } from "./env"
+import { retryPendingDeletions } from "./pending-deletion-retry"
 
 /**
- * The auth Worker. Every Better Auth endpoint lives under `/api/auth`; `/jwks` is the public
- * alias the design promises at the host root. There is no HTML page yet: `/device` and `/sign-in`
- * are the next slice.
+ * The auth Worker. Better Auth answers `/api/auth/*`, `/jwks` and `/.well-known/*` first; every
+ * other path is a static page from `dist-site`, served by the assets binding. The hourly cron
+ * retries the data Worker's deletion notices that did not get through.
  */
 export default {
 	fetch(request: Request, env: Env): Promise<Response> {
@@ -18,4 +19,7 @@ export default {
 		rewritten.pathname = path
 		return createAuth({ env }).handler(new Request(rewritten, request))
 	},
-}
+	async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
+		await retryPendingDeletions({ db: env.DB, data: env.DATA, nowMs: Date.now() })
+	},
+} satisfies ExportedHandler<Env>

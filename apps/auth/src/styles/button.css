@@ -1,0 +1,60 @@
+/* Buttons: one primary action per screen, everything else secondary or destructive. */
+
+.button {
+	display: inline-flex;
+	min-height: 2.75rem;
+	align-items: center;
+	justify-content: center;
+	padding: var(--ds-space-3) var(--ds-space-5);
+	border: 1px solid transparent;
+	border-radius: var(--ds-radius-md);
+	font: inherit;
+	font-weight: 600;
+	line-height: 1.2;
+	text-align: center;
+	cursor: pointer;
+}
+
+.button:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+.button:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.button-primary {
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.button-primary:hover:not(:disabled) {
+	opacity: 0.9;
+}
+
+.button-secondary {
+	border-color: var(--ds-color-border);
+	background: var(--ds-color-secondary);
+	color: var(--ds-color-secondary-foreground);
+}
+
+.button-secondary:hover:not(:disabled) {
+	border-color: var(--ds-color-input);
+}
+
+.button-danger {
+	background: var(--ds-color-destructive);
+	color: var(--ds-color-destructive-foreground);
+}
+
+.button-danger:hover:not(:disabled) {
+	opacity: 0.9;
+}
+
+.button-small {
+	min-height: 2.25rem;
+	padding: var(--ds-space-2) var(--ds-space-3);
+	font-size: var(--ds-font-size-sm);
+}

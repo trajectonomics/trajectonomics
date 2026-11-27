@@ -6,8 +6,9 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
 ## Rules
 
 1. `traj-auth` holds people: the Better Auth `user`, `account`, `session`, `passkey`, `jwks`,
-   OAuth client/token and `deviceCode` tables, and later the marketing consent record. `traj-data`
-   never holds an email or a name; it keeps numbers and the auth user id only.
+   OAuth client/token and `deviceCode` tables, the append-only `marketingConsent` history and the
+   `pendingDeletion` notification queue. `traj-data` never holds an email or a name; it keeps
+   numbers and the auth user id only.
 2. Every auth pull request is reviewed by a model different from the one that wrote it. Say which
    model wrote the diff and which one reviewed it in the PR body.
 3. Better Auth is pinned to one exact stable version in `package.json` and in the migration header.
@@ -23,8 +24,9 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    `0003_oauth_clients.sql`. `0003` is one-shot: the generator refuses to overwrite it, and
    `src/core/clients-migration.test.ts` compares it with the generator's output. A later manifest
    change ships as a new numbered migration with explicit `update`/`insert` statements, never by
-   regenerating `0003`. Deployment is not wired yet; when the auth app joins the deploy workflow,
-   it must apply the migrations before deploying the Worker.
+   regenerating `0003`. `0004_marketing_consent.sql` and `0005_pending_deletion.sql` are generated
+   the same way from the two account plugins. Deployment is not wired yet; when the auth app joins
+   the deploy workflow, it must apply the migrations before deploying the Worker.
 6. The dev-only email + password path exists for the spike's test user only. It needs
    `ENVIRONMENT=development`, `DEV_ONLY=true` and a loopback `BETTER_AUTH_URL`; production config
    can satisfy none of the three.
@@ -45,3 +47,35 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
     `wrangler whoami`; never hard-code it in this repository. The five Worker secrets
     (`BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`,
     `GITHUB_CLIENT_SECRET`) are already set in Cloudflare.
+
+## The pages
+
+1. The person-facing pages are Astro with Svelte 5 islands, built into `dist-site` and served by the
+   Worker's `assets` binding. The Worker runs first only for `/api/*`, `/jwks` and `/.well-known/*`;
+   every other path is a static asset (ADR 0003). `/` is a client redirect because a static asset
+   cannot read the session.
+2. `src/lib/` is pure and tested with `bun test`: paths, the `?next=` rule, scope words, dates, the
+   language dictionary. `src/client/auth.ts` is the only module that creates or calls the Better
+   Auth client; `src/client/account.ts` and `src/client/oauth.ts` go through its `request` helper.
+   `<script>` in an island never calls `createAuthClient` itself.
+3. English is at `/` and Thai under `/th/`, from one typed dictionary. Both trees have every page,
+   the dictionary test fails a missing key, and the language menu keeps the current query so a
+   signed OAuth query or `user_code` survives a switch. The Thai legal page says the English text is
+   official.
+4. Every page paints from `--ds-*` roles and renders the shared `@trajectonomics/site-header`; the
+   colour-literal test is the guard. No page has an intro sentence, and each has one focal point and
+   at most one primary action.
+5. `?next=` is a same-origin path only (`src/lib/next.ts`). Never pass it to `location.assign` before
+   that check.
+6. `marketingConsent` is append-only: a new answer is a new row, and withdrawing stamps
+   `withdrawnAt` on the previous true row. Never update or delete an earlier answer by hand; a
+   wording change is a new `wordingVersion`. The rows cascade when the account is deleted.
+7. Account deletion queues a `pendingDeletion` row in `afterDelete` and calls the data Worker once.
+   The `DATA` service binding is optional on purpose. The cron retries at most fifty due rows an
+   hour with exponential backoff; the timing is pure in `src/core/deletion.ts`. The data endpoint is
+   issue #601's, not this app's.
+8. `bun run test:e2e` builds the pages, migrates a scratch D1 database under `~/.cache`, starts
+   `wrangler dev --local` and runs Playwright; it never reaches the owner's Cloudflare account.
+   `test:e2e` also runs axe at 360 px and 1280 px, in light and dark, in both languages, and writes
+   the pull request's screenshots to `e2e/screenshots/`. A new page adds itself to the review list.
+9. Done still means `bun run check` here; for a page change it also means `bun run test:e2e` passes.

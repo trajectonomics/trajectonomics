@@ -1,0 +1,21 @@
+/* The app a person is reviewing, and the permissions it asked for in plain words. */
+
+.device-app {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: var(--ds-font-size-xl);
+	font-weight: 400;
+	overflow-wrap: anywhere;
+}
+
+.device-wants {
+	margin: var(--ds-space-4) 0 var(--ds-space-2);
+	color: var(--ds-color-muted-foreground);
+}
+
+.scope-list {
+	margin: 0 0 var(--ds-space-6);
+	padding-inline-start: var(--ds-space-5);
+	display: grid;
+	gap: var(--ds-space-1);
+}

@@ -9,13 +9,20 @@ import {
 	REFRESH_TOKEN_REUSE_INTERVAL_SECONDS,
 	REFRESH_TOKEN_TTL_SECONDS,
 } from "./core/resources"
+import { marketingConsent } from "./marketing-consent"
 import { grantManagement } from "./oauth-grants"
+import { pendingDeletion } from "./pending-deletion"
+
+/** Where a signed-in person answers the marketing question before an OAuth flow continues. */
+export const POST_LOGIN_PAGE = "/welcome"
 
 /** The plugin list, split out so `auth-options.ts` stays readable. */
 export function buildPlugins(input: {
 	baseURL: string
 	passkeyRpID: string
 	passkeyOrigin: string
+	/** True when this person has never answered the marketing question. */
+	requiresMarketingConsent: (userId: string) => Promise<boolean>
 }): NonNullable<BetterAuthOptions["plugins"]> {
 	return [
 		jwt({
@@ -34,6 +41,14 @@ export function buildPlugins(input: {
 		oauthProvider({
 			loginPage: "/sign-in",
 			consentPage: "/consent",
+			// A person with no marketing answer sees one question before the flow continues. Once a
+			// record exists, `shouldRedirect` returns false and the provider resumes normally.
+			postLogin: {
+				page: POST_LOGIN_PAGE,
+				// There is no organisation or account chooser to reference.
+				consentReferenceId: () => undefined,
+				shouldRedirect: async ({ user }) => input.requiresMarketingConsent(user.id),
+			},
 			scopes: [...OAUTH_SCOPES],
 			resources: OAUTH_RESOURCES.map((resource) => ({
 				identifier: resource.identifier,
@@ -53,7 +68,11 @@ export function buildPlugins(input: {
 			refreshTokenReuseInterval: REFRESH_TOKEN_REUSE_INTERVAL_SECONDS,
 			allowDynamicClientRegistration: false,
 		}),
-		oauthDeviceAuthorization(),
+		// The CLI prints this page as the verification address; the trailing slash is the page's
+		// built address, so the person never goes through a redirect.
+		oauthDeviceAuthorization({ verificationUri: "/device/" }),
 		grantManagement(),
+		marketingConsent(),
+		pendingDeletion(),
 	]
 }
