@@ -39,3 +39,9 @@ export function barKindWords(bar: PlanBar): string {
 	if (bar.kind === "collecting") return "Still collecting"
 	return "No figure"
 }
+
+/** The exact figure a bar shows on hover, on focus, and to assistive technology. */
+export function barTip(bar: PlanBar): string {
+	if (bar.tokens === null) return `${bar.planName}. ${barKindWords(bar)}.`
+	return `${bar.planName}: ${displayCount(bar.tokens)} tokens. ${barKindWords(bar)}.`
+}
