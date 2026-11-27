@@ -69,7 +69,9 @@ export function Docs({ tree, title, description, toc, mascot, children, ...props
 					    and at the title's right end from xl up, where the reading column has room
 					    for both. It pushes no words aside (ADR 0018). */}
 					<div className="relative">
-						<DocsTitle className="text-4xl font-semibold tracking-tight md:text-5xl">
+						<DocsTitle
+							className={`text-4xl font-semibold tracking-tight md:text-5xl${mascot === undefined ? "" : " xl:pr-40"}`}
+						>
 							{title}
 						</DocsTitle>
 						{mascot === undefined ? null : (
