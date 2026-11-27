@@ -23,7 +23,7 @@ let { title, href, argv, details, children }: Props = $props()
 			{#if href}
 				<SiteLink
 					{href}
-					class="outline-none after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+					class="after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ring"
 					>{title}</SiteLink
 				>
 			{:else}
@@ -31,7 +31,11 @@ let { title, href, argv, details, children }: Props = $props()
 			{/if}
 		</h2>
 	</header>
-	<div class="mt-4 flex-1">{@render children()}</div>
+	<div
+		class="mt-4 flex-1 [&_[role=alert]]:relative [&_[role=alert]]:z-10 [&_[title]]:relative [&_[title]]:z-10 [&_pre]:relative [&_pre]:z-10"
+	>
+		{@render children()}
+	</div>
 	{#if argv}
 		<footer class="relative mt-4 border-t border-border pt-3">
 			<Provenance name={title} commands={[argv]} {details} />

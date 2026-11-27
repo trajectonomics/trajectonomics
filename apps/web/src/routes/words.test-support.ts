@@ -28,7 +28,7 @@ const BANNED_WORDS: readonly { readonly word: RegExp; readonly name: string }[] 
 	{ word: /as-of terms/i, name: "As-of terms" },
 	{ word: /nominal/i, name: "Nominal" },
 	{ word: /snapshot/i, name: "Snapshot" },
-	{ word: /levy /i, name: "Levy " },
+	{ word: /levy\b/i, name: "Levy " },
 	{ word: /success share/i, name: "success share" },
 	// Case-sensitive: this names the eyebrow exactly, and a plan may be called "base".
 	{ word: /Plan base/, name: "Plan base" },

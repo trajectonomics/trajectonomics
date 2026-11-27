@@ -4,9 +4,18 @@ import { demoSnapshotText } from "../../scripts/demo-snapshot"
 import { setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
+import { whatIfSession } from "../client/what-if.svelte"
+import { HASH, useSessionHooks } from "../client/what-if.test-support"
+import SeriesPicker from "../components/charts/SeriesPicker.svelte"
 import FigureChart from "../components/routing/FigureChart.svelte"
+import ProjectionWhatIf from "../components/what-if/ProjectionWhatIf.svelte"
+import TaxWhatIf from "../components/what-if/TaxWhatIf.svelte"
+import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
+import { NO_PEOPLE } from "../lib/view/item-names"
 import { LOADING } from "../lib/view/state"
+import { demoLens, statedCompare } from "../lib/view/what-if/fixtures.test-support"
+import { startWhatIf, withSet } from "../lib/what-if/session"
 import Layout from "./+layout.svelte"
 import {
 	pageSnippet,
@@ -69,6 +78,45 @@ describe("a page of the Demo Snapshot", () => {
 	})
 })
 
+describe("the What-if session", () => {
+	useSessionHooks()
+
+	test("says plain words in its bar and its figure panels", () => {
+		replaceSnapshot(DEMO)
+		whatIfSession.whatIf = withSet(startWhatIf("base", HASH), "flows.rent.start", "2027-03-01")
+		const lens = demoLens(statedCompare())
+		const bodies = [
+			render(WhatIfBar, { props: {} }).body,
+			render(ProjectionWhatIf, {
+				props: { lens, baseline: null, terms: "nominal", keys: ["closingNetWorth", "levy"] },
+			}).body,
+			render(TaxWhatIf, { props: { lens, people: NO_PEOPLE } }).body,
+		]
+		expect(problemsOf(bodies.join(""))).toEqual([])
+	})
+
+	test("says future money in the series picker's names", () => {
+		const body = render(SeriesPicker, {
+			props: {
+				groups: [
+					{
+						id: "money",
+						title: "Money in and out",
+						entries: [{ id: "income", name: "Income", available: true, reason: null, real: false }],
+						notes: [],
+					},
+				],
+				chosen: [],
+				names: new Map<string, string>(),
+				accounts: new Map<string, string>(),
+				onToggle: () => undefined,
+			},
+		}).body
+		expect(body).toContain("(future money only)")
+		expect(problemsOf(body)).toEqual([])
+	})
+})
+
 describe("the guard", () => {
 	test("finds a Scenario in an aria-label, even with an ISO date beside it", () => {
 		expect(problemsOf('<p aria-label="The two Scenarios on 2026-10-31"></p>')).toEqual([
@@ -88,6 +136,7 @@ describe("the guard", () => {
 			["Nominal net worth", "Nominal"],
 			["Loading the Snapshot.", "Snapshot"],
 			["Levy th-2026-pit", "Levy "],
+			["The Levy's change", "Levy "],
 			["a success share of 96.50%", "success share"],
 			["Plan base", "Plan base"],
 		]

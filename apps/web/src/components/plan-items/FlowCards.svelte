@@ -50,9 +50,9 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 				{:else}
 					<span class="text-muted-foreground">computed</span>
 				{/if}
+				<WasText was={mark.was.amount} money {currency} />
 				<span class="ml-1 text-sm text-muted-foreground">{frequencyWords(card.frequency)}</span>
 				{#if mark.was.frequency !== undefined}<WasText was={typeof mark.was.frequency === "string" ? frequencyWords(mark.was.frequency) : mark.was.frequency} />{/if}
-				<WasText was={mark.was.amount} money {currency} />
 			</p>
 			<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 				<dt class="text-muted-foreground">{card.startLabel}</dt>

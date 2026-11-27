@@ -9,7 +9,7 @@ import type { Triple } from "./triple"
 /** The figures the Overview's what-if adds to the headline set: the chance of success, the first tax year and the fees over the plan. */
 export interface OverviewExtras {
 	readonly chance: ChanceTriple | null
-	/** The first tax year's owed amount, named by its Levy and period; null when the plan has no Levy. */
+	/** The first tax year's owed amount, named by its period and Filer; null when the plan has no tax year. */
 	readonly tax: Triple | null
 	/** The fees over the plan as the what-if's run states them beside the baseline's; null when the what-if's run states none above zero. */
 	readonly fees: Triple | null
@@ -45,7 +45,7 @@ export function overviewExtras(
 		tax:
 			first === undefined || owed === undefined
 				? null
-				: { ...owed, label: `Tax owed for ${first.period}` },
+				: { ...owed, label: `Tax for ${first.period}` },
 		fees: feesTriple(lens, baselineRun),
 	}
 }

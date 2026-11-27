@@ -38,7 +38,7 @@ const full = $derived(chosen.length >= MAX_SERIES)
 						class="mt-0.5"
 					/>
 					<span>
-						{entry.name}{entry.real ? "" : " (nominal only)"}
+						{entry.name}{entry.real ? "" : " (future money only)"}
 						{#if !entry.available}<span class="block text-xs">{entry.reason}</span>{/if}
 					</span>
 				</label>

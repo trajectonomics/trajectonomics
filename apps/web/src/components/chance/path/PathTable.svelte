@@ -30,7 +30,7 @@ const head = "border-b border-border px-3 py-2 font-medium text-muted-foreground
 				<th scope="col" class={`${head} text-right`}>Income</th>
 				<th scope="col" class={`${head} text-right`}>Spending</th>
 				{#if terms !== "real"}<th scope="col" class={`${head} text-right`}>Net worth</th>{/if}
-				{#if terms !== "nominal"}<th scope="col" class={`${head} text-right`}>Real net worth</th>{/if}
+				{#if terms !== "nominal"}<th scope="col" class={`${head} text-right`}>Net worth in today's money</th>{/if}
 			</tr>
 		</thead>
 		<tbody>

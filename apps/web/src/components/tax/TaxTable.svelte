@@ -15,7 +15,7 @@ let { rows, currency }: Props = $props()
 const columns: readonly Column<TaxRow>[] = [
 	{ key: "levy", header: "Tax rules", cell: levyCell },
 	{ key: "period", header: "Period", cell: periodCell },
-	{ key: "settles", header: "Due", cell: settlesCell },
+	{ key: "settles", header: "Due date", cell: settlesCell },
 	{ key: "due", header: "Due before prepayment", numeric: true, cell: dueCell },
 	{ key: "prepaid", header: "Prepaid", numeric: true, cell: prepaidCell },
 	{ key: "owed", header: "Owed", numeric: true, cell: owedCell },
