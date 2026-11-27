@@ -42,13 +42,13 @@ describe("usageCacheKey", () => {
 describe("peaksCacheKey", () => {
 	test("keeps the as-of day and drops every other param", () => {
 		const key = peaksCacheKey(get("/api/peaks?plan=claude&asOf=2026-11-20&from=2026-11-01"))
-		expect(key.url).toBe("https://trajectonomics.com/data/api/peaks?asOf=2026-11-20")
+		expect(key.url).toBe("https://trajectonomics.com/data/api/peaks?asOf=2026-11-20&shape=2")
 	})
 
 	test("gives the stale copy its own key", () => {
 		const request = get("/api/peaks?asOf=2026-11-20")
 		expect(peaksStaleCacheKey(request).url).toBe(
-			"https://trajectonomics.com/data/api/peaks?asOf=2026-11-20&__stale=1",
+			"https://trajectonomics.com/data/api/peaks?asOf=2026-11-20&shape=2&__stale=1",
 		)
 		expect(peaksStaleCacheKey(request).url).not.toBe(peaksCacheKey(request).url)
 	})

@@ -97,6 +97,22 @@ function tableRow(entry: PlanPeak, day: string): PeakTableRow {
 		fiveHours: entry.fiveHours,
 		sevenDays: entry.sevenDays,
 		thirtyDays: entry.thirtyDays,
-		measured: entry.measured,
+		measured: measuredOf(entry),
 	}
+}
+
+/**
+ * The tiers a plan was measured on. A body cached before `measured` existed has none, so the
+ * plan's own figures stand in as its current tier, and the page still renders.
+ */
+export function measuredOf(entry: PlanPeak): MeasuredTier[] {
+	if (Array.isArray(entry.measured)) return entry.measured
+	return [
+		{
+			tier: entry.tier,
+			fiveHours: entry.fiveHours,
+			sevenDays: entry.sevenDays,
+			thirtyDays: entry.thirtyDays,
+		},
+	]
 }

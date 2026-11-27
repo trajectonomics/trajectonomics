@@ -49,3 +49,7 @@ redirects its pages (ADR 0006).
    the upserts plus each affected day's SQL rollup rebuild share one `DB.batch` (one D1 query).
 7. The schema changes only through numbered files in `migrations/`; the deploy workflow applies
    them before deploying the Worker.
+8. A cached read outlives a deploy (`/api/peaks` keeps a body for 4 hours). A change to a read's
+   body shape bumps that read's cache-key shape (`PEAKS_SHAPE` in `src/http/cache.ts`), and the
+   page tolerates the old shape: on 2026-11-27 a cached peaks body without `measured` broke the
+   overview after #748 deployed.
