@@ -55,6 +55,16 @@ describe("a link that names a plan", () => {
 		expect(whatIfSession.whatIf?.plan).toBe("base")
 	})
 
+	test("asks again when the same plan is asked for again, so the question comes back", () => {
+		setTestUrl("http://127.0.0.1/fi/?scenario=base")
+		whatIfSession.setOff("base", HASH, "flows.salary", true)
+		followPlanLink(click().event, "retire-early")
+		const asked = whatIfSession.asks
+		followPlanLink(click().event, "retire-early")
+		expect(whatIfSession.asks).toBe(asked + 1)
+		expect(whatIfSession.asking).toBe("retire-early")
+	})
+
 	test("leaves a modified click to the browser: no switch, no question, no navigation here", () => {
 		setTestUrl("http://127.0.0.1/fi/?scenario=base")
 		whatIfSession.setOff("base", HASH, "flows.salary", true)

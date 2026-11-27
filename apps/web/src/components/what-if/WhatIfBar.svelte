@@ -18,9 +18,10 @@ let question: HTMLDivElement | undefined = $state()
 let returnTo: HTMLElement | null = null
 
 // A question takes the screen: it scrolls into view and takes focus, since the bar sits at the top of the page and the
-// link that asked may be far below it. Its scroll margin clears the sticky top bar.
+// link that asked may be far below it. Its scroll margin clears the sticky top bar. Each request counts (asks), so
+// a repeat of the same question brings it back into view too.
 $effect(() => {
-	if (whatIfSession.asking === null || question === undefined) return
+	if (whatIfSession.asks === 0 || whatIfSession.asking === null || question === undefined) return
 	returnTo = takeQuestionFocus(question)
 })
 
