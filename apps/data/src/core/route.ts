@@ -29,10 +29,14 @@ function legacyTarget(pathname: string): string {
 
 /**
  * The old host keeps the API and the ingest it always had: a redirect there would turn the
- * collector's POST into a GET. Every other GET or HEAD is a page, and answers a permanent
- * redirect to the same path under the apex's base path.
+ * collector's POST into a GET. It also answers them under the base path, because an asset under
+ * `/data/` is served on every host before this script runs, and such a page calls `/data/api/*`
+ * on the host it came from; a redirect would make that call cross-origin. Every other GET or HEAD
+ * is a page, and answers a permanent redirect to the same path under the apex's base path.
  */
 function legacyRoute(input: RouteInput): Route {
+	const prefixed = isUnderBase(input.pathname) ? siteRoute(input) : undefined
+	if (prefixed !== undefined && prefixed.kind !== "not_found") return prefixed
 	if (input.pathname === "/api/usage") return { kind: "usage" }
 	if (input.pathname === "/api/health") return { kind: "health" }
 	if (input.pathname.startsWith("/api/")) return { kind: "not_found" }

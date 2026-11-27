@@ -48,6 +48,12 @@ describe("routeRequest on the old host", () => {
 		expect(at(OLD, "/ingest", { method: "POST" })).toEqual({ kind: "ingest" })
 	})
 
+	test("answers the API and ingest under the base too, which a page served there calls", () => {
+		expect(at(OLD, "/data/api/usage")).toEqual({ kind: "usage" })
+		expect(at(OLD, "/data/api/health")).toEqual({ kind: "health" })
+		expect(at(OLD, "/data/ingest", { method: "POST" })).toEqual({ kind: "ingest" })
+	})
+
 	test("redirects the root to the data root", () => {
 		expect(at(OLD, "/")).toEqual({
 			kind: "redirect",

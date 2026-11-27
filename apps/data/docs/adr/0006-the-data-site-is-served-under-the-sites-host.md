@@ -49,11 +49,12 @@ Moving the pages alone would break the collector and any saved link. Manual send
 - Existing links and search results to the old host reach the page after one 301. A link that
   already names `/data/...` on the old host is answered by the assets binding before the Worker
   runs when that path is an asset; the redirect rule and its single-prefix rule cover every request
-  the Worker does receive.
+  the Worker does receive. Such a page calls `/data/api/*` on the host it came from, so the old host
+  answers the API and ingest under the base path too, rather than redirecting them cross-origin.
 - The collector can keep POSTing to the old host's `/ingest`. Moving it to
   `https://trajectonomics.com/data/ingest` is a one-line change, not a requirement.
 - Two addresses for one read share a cache entry, so a purge or a fresh read fills both.
-- A change to the base path touches `src/core/urls.ts`, `astro.config.ts` and `wrangler.jsonc`
-  together; the pure router tests fail if they drift.
+- A change to the base path touches `src/core/urls.ts` and `wrangler.jsonc` together;
+  `astro.config.ts` reads the constant, and `test/wrangler-config.test.ts` fails if the two drift.
 - Retiring the old host means removing its route, the legacy branch in `src/core/route.ts`, and the
   old-host tests.
