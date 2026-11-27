@@ -4,7 +4,7 @@ Bring a screen down to one focal point: one question, its answer drawn large, an
 
 ## Steps
 
-1. **Name the question and its answer.** Find them in the issue, its epic or the package's ADRs (for the Dashboard's pages, #697 and #707). When none of them states it, ask the owner that one question: the focal point is a product decision.
+1. **Name the question and its answer.** Find them in the issue, its epic or the package's ADRs. For the Dashboard's pages, the approved epic #697 and its slice #707 name them; both are still open. When none of them states it, take the answer that the nearest ADR or `org/goals/GOALS.md` implies. Write it in the pull request as "Assumed question: …" for the owner to confirm.
 2. **Sort the inventory** into three piles:
    - the answer: exactly one element;
    - the support: what a person needs to act on the answer, at most four items;

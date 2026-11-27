@@ -1,6 +1,6 @@
 ---
 name: visual-first
-description: "Visual-first design passes: critique a screen, distill it to one focal point, turn text into a picture, cut and plain its words, or design its first run and empty states. Use when building, simplifying or reviewing a screen, chart, landing page or doc page, or writing the words on one."
+description: "Visual-first design passes: critique a screen, distill it to one focal point, turn text into a picture, cut and plain its words, or design its first run and empty states. Use when building, simplifying or reviewing a screen, chart, landing page or doc page, or writing its words."
 ---
 
 # Visual first
@@ -17,7 +17,7 @@ The passes that apply [`DESIGN_PRINCIPLES.md`](https://github.com/trajectonomics
 | clarify | a label, a sentence, a button or an error message | [reference/clarify.md](reference/clarify.md) |
 | onboard | a first run, an empty state, or a screen with no data yet | [reference/onboard.md](reference/onboard.md) |
 
-With no pass named, run critique, then the passes its findings name, in this order: distill, visualize, clarify. Structure comes before pictures, and pictures before words, so no word is polished that distill would remove.
+With no pass named, run critique, then the passes its findings name, in this order: distill, visualize, clarify. Structure comes before pictures, and pictures before words, so no word is polished that distill would remove. Stop when a fresh critique reports no P1 or P2 finding.
 
 ## The surface sets the ambition
 
@@ -29,15 +29,21 @@ With no pass named, run critique, then the passes its findings name, in this ord
 
 ## The loop
 
-1. **See it.** Serve the page (the package's `dev` script; for the Dashboard, the browser checks write screenshots to `apps/web/screenshots/`). Screenshot it at 390px and 1280px wide into a directory you made with `mktemp -d -p ~/.cache`: `apps/web/node_modules/.bin/playwright screenshot --viewport-size=390,844 <url> <dir>/before-390.png`. Open each PNG and look at it.
-2. **Inventory the first screen**, meaning what a 390px phone shows before scrolling. List every element with its rung on the ladder and its word count. Total the focal points, the primary actions and the words. This list is the before.
+1. **See it** at 360px and 1280px wide, then open each PNG and look at it:
+
+   | Surface | How |
+   |---|---|
+   | Dashboard | Build it (`bunx turbo run @trajectonomics/web#build` at the root), then run `bun run test:browser` in `apps/web` (once before, `bunx playwright install chromium`). It screenshots every Demo page at both widths and in both themes into `apps/web/screenshots/`. The Demo is the way to see the Dashboard, because `bun run dashboard` reads the ledger in `TRAJ_HOME`, which is the owner's real one when unset. |
+   | Site, docs, blog, OpenJot | Run the package's `dev` script, then `apps/web/node_modules/.bin/playwright screenshot --viewport-size=360,800 <url> <dir>/before-360.png` into a directory from `mktemp -d -p ~/.cache`. Repeat at `1280,800`, and with `--color-scheme=dark`. |
+
+2. **Inventory the first screen**, meaning what a 360px phone shows before scrolling. List every element with its rung on the ladder and its word count. Total the focal points, the primary actions and the words. This list is the before.
 3. **Run the pass** from its reference.
 4. **See it again** at both widths, and in both themes when the surface has two. The pass is done when its reference's completion test holds.
 5. **Show it.** The pull request carries the before and after screenshots, and the inventory's totals before → after (for example "words on the first screen: 64 → 9").
 
 ## Guardrails
 
-- A figure is shown as its source states it. In the Dashboard the CLI is the only source ([web ADR 0002](https://github.com/trajectonomics/trajectonomics/blob/main/apps/web/docs/adr/0002-the-cli-is-the-only-source-of-figures.md)): shorten an amount with `formatCompact`, and compute nothing.
+- A figure is shown as its source states it. In the Dashboard the CLI is the only source ([web ADR 0002](https://github.com/trajectonomics/trajectonomics/blob/main/apps/web/docs/adr/0002-the-cli-is-the-only-source-of-figures.md)): pass the CLI's string through, and shorten an amount only with `formatCompact`.
 - Every fact taken off the first screen stays reachable one tap away (Details, a table, the hover title, screen-reader text). Removing a fact from the product is the owner's decision.
 - Words state only what the product does and what its data says. A name comes from a Read ([web ADR 0029](https://github.com/trajectonomics/trajectonomics/blob/main/apps/web/docs/adr/0029-plan-items-are-named-by-what-a-read-states-and-never-made-up.md)), and a claim on the Site is one the product keeps today.
 - Colours, type and spacing come from `@trajectonomics/brand`'s `--ds-*` tokens. Charts are hand-drawn SVG in Svelte 5. The `tufte` skill gives chart craft and `fixing-accessibility` the accessibility check, both within the limits that `DESIGN_PRINCIPLES.md` sets.

@@ -15,7 +15,7 @@ Design a first run and its empty states so that a new person sees an answer befo
    | something failed | the error, written as clarify says, and "Try again" |
 
    OpenJot's `EmptyMonthArt` is the model: a picture where the data will be.
-3. **Teach at the moment of use.** One hint, placed beside the control it explains, dismissible and shown once. A first run has no tour and no paragraph.
+3. **Teach at the moment of use.** One hint, placed beside the control it explains, dismissible and shown once. All teaching happens in place, one hint at a time.
 4. **Name the first step by its outcome** ("Add your salary"), and make it the screen's one primary action.
 
 ## Done when
