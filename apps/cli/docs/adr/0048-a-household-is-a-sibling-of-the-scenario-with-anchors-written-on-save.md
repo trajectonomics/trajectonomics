@@ -26,6 +26,8 @@ A wrapper document holding the Scenario and the household together was rejected 
 
 ## Consequences
 
+A required anchored date must still be stated in the document `scenario apply` receives. The document's `check()` runs before the household resolves, so `flows.<id>.start` cannot be left out even when the household anchors it; write any date there and the household overwrites it. The refusal names the path, and a hint says the date is anchored and that the household sets it. An anchored date the shape makes optional, such as `flows.<id>.end`, may be left out, and the household fills it.
+
 A backup written at schema version 2 restores with every household null. The reader keeps an explicit layout per readable schema version and refuses any other, so a restore never guesses a column; a schema 3 backup is refused by an older build (ADR-0038). Export, backup and restore carry the household losslessly, as its canonical JSON text, and `scenario show` prints it.
 
 A household's anchored dates are overwritten by the household, so a person who edits one by hand is refused at apply with the household that would move it, rather than silently losing or keeping the edit. `projection run --set` stays transient and is not re-anchored (ADR-0024).

@@ -3,6 +3,7 @@ import { version as cliVersion } from "../../package.json"
 import { decimalAmountHint } from "./decimal-amount-hint"
 import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
 import { moneyPathsOf } from "./field-paths"
+import { anchorableSegments } from "./household/anchorable"
 import { wordsOf } from "./problem-words"
 import {
 	SCENARIO_SHAPE_REQUIRED,
@@ -22,6 +23,13 @@ const version = acceptedScenarioSchemaVersion()
 const properties = scenarioShapeProperties(version)
 const moneyPaths = moneyPathsOf({ properties })
 
+/**
+ * A required date the household would write: the document form's `check()` runs before the anchors
+ * resolve, so an anchored `flows.<id>.start` must still be stated (cli ADR-0048).
+ */
+const ANCHORED_DATE =
+	"This date is anchored by the household; write any date here and the household sets it."
+
 export const scenarioDocument: z.ZodType<unknown> = z
 	.unknown()
 	.superRefine((value, ctx) => {
@@ -35,13 +43,19 @@ export const scenarioDocument: z.ZodType<unknown> = z
 			const refusal = refusalOf(problem, "document")
 			// A code the refusal table words states its sentence and way out, then the schema hint (ADR-0052).
 			const said = wordsOf(problem)
+			const anchored =
+				problem.code === "MISSING_KEY" && anchorableSegments(problem.segments.map(String))
+					? ANCHORED_DATE
+					: undefined
 			ctx.addIssue({
 				code: "custom",
 				message: said?.message ?? refusal.message,
 				path: [...problem.segments],
 				params: {
 					code: problem.code,
-					hint: [said?.hint, decimal, refusal.hint].filter((part) => part !== undefined).join(" "),
+					hint: [said?.hint, decimal, anchored, refusal.hint]
+						.filter((part) => part !== undefined)
+						.join(" "),
 				},
 			})
 		}

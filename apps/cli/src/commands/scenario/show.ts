@@ -14,7 +14,7 @@ import { withStore } from "../../with-store"
 export const show: Leaf = defineCommand({
 	name: "show",
 	summary: "Show one Scenario with its document, household and owners",
-	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark and the tax allowances.",
+	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark, the tax allowances and the household with its householdHash.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().describe("The Scenario's exact name or its id."),

@@ -43,6 +43,27 @@ describe("scenario household, and the writes that keep it", () => {
 		})
 	})
 
+	it("hints at the household when an apply leaves out a required anchored date", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, {
+			...HOUSEHOLD,
+			anchors: [{ path: "flows.salary.start", person: "me", age: 36 }],
+		})
+		const document = (await shown(home)).document
+		const { start: _start, ...salary } = document.flows[0] as Record<string, unknown>
+		const res = await applyScenario(home, "base", {
+			...document,
+			flows: [salary, document.flows[1]],
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "document.flows.0.start",
+		})
+		expect(errorOf(res).hint).toContain("anchored by the household")
+	})
+
 	it("copies the household on a fork, and refuses a --set that moves an anchored date", async () => {
 		const home = scenarioHome()
 		await seedBase(home)
@@ -58,7 +79,10 @@ describe("scenario household, and the writes that keep it", () => {
 			'flows.salary.end="2030-01-01"',
 		])
 		expect(moved.code).toBe(2)
-		expect(errorOf(moved)).toMatchObject({ code: "invalid_input", path: "document.flows.0.end" })
+		const error = errorOf(moved)
+		expect(error).toMatchObject({ code: "invalid_input", path: "document.flows.0.end" })
+		expect(error.hint).toContain("scenario household late")
+		expect(error.hint).not.toContain("household base")
 	})
 
 	it("publishes the household's document schema with one labelled example", async () => {

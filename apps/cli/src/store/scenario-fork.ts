@@ -38,7 +38,8 @@ export function forkScenario(
 			const parsed = JSON.parse(source.document) as ScenarioDocument
 			const changed = options.transform === undefined ? parsed : options.transform(parsed)
 			if (isAppError(changed)) return changed
-			const resolved = anchorsFor(source, changed, source.name)
+			// The refusal names the fork, because the household it would move is the copy's (cli ADR-0048).
+			const resolved = anchorsFor(source, changed, name)
 			if (isAppError(resolved)) return resolved
 			const document = canonicalDocument(resolved.document)
 			const taken = liveScenario(ctx, "name", name)

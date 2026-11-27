@@ -115,6 +115,36 @@ describe("scenario household", () => {
 		expect((await shown(home)).household).toBeNull()
 	})
 
+	it("names the YYYY-MM rule at a malformed birth month", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		for (const born of ["1990-13", "1990-6"]) {
+			const res = await setHousehold(home, {
+				...HOUSEHOLD,
+				people: [{ ...HOLDER, born }, PARTNER],
+			})
+			expect(res.code).toBe(2)
+			expect(errorOf(res)).toMatchObject({
+				code: "invalid_input",
+				path: "document.people.0.born",
+			})
+			expect(errorOf(res).hint).toContain("YYYY-MM")
+		}
+	})
+
+	it("names the 0001-9998 rule at an anchored date outside it", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		const res = await setHousehold(home, {
+			...HOUSEHOLD,
+			anchors: [{ ...HOUSEHOLD.anchors[0], age: 8100 }],
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "document.anchors.0" })
+		expect(errorOf(res).hint).toContain("0001")
+		expect(errorOf(res).hint).toContain("9998")
+	})
+
 	it("refuses an anchor that makes the Scenario's own check fail, at that anchor", async () => {
 		const home = scenarioHome()
 		await seedBase(home)
