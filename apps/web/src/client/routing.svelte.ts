@@ -20,26 +20,25 @@ class Routing {
 	/** The ids of the Flows of the document the last save sent, in order, which a refusal's position in its path names. */
 	sent = $state<string[]>([])
 	private readonly failure = $derived(editSession.source === SOURCE ? editSession.failure : null)
+	/**
+	 * Whether this page's last Edit failed with words for a form. A write that landed and could not be read again is
+	 * the stale notice's to say, never a form's error (web ADR 0008).
+	 */
+	private readonly ownError = $derived(
+		editSession.source === SOURCE &&
+			!editSession.savedUnread &&
+			(editSession.failure !== null || editSession.error !== null),
+	)
 	/** The message of a refusal or a failure to reach traj, as its source words it: the CLI's, or the server's own. */
 	readonly message = $derived.by(() => {
-		if (
-			editSession.source === SOURCE &&
-			(editSession.failure !== null || editSession.error !== null)
-		) {
-			return editSession.failure?.message ?? editSession.error
-		}
+		if (this.ownError) return editSession.failure?.message ?? editSession.error
 		return this.refused !== null && placeOf(this.refused, this.sent) !== null
 			? this.refused.message
 			: null
 	})
 	/** Whether `message` is the CLI's own words, or the server's or the page's sentence about not reaching it. */
 	readonly messageFromCli = $derived.by(() => {
-		if (
-			editSession.source === SOURCE &&
-			(editSession.failure !== null || editSession.error !== null)
-		) {
-			return isCliError(editSession.failure)
-		}
+		if (this.ownError) return isCliError(editSession.failure)
 		return this.refused !== null && placeOf(this.refused, this.sent) !== null
 	})
 	/**
