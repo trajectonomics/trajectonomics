@@ -38,7 +38,7 @@ const filers = $derived(
 const RETURN_COLUMN: Column<TaxRow> = { key: "return", header: "Return", cell: returnCell }
 const COLUMNS: readonly Column<TaxRow>[] = [
 	{ key: "period", header: "Tax year", cell: periodCell },
-	{ key: "settles", header: "Due", cell: settlesCell },
+	{ key: "settles", header: "Due date", cell: settlesCell },
 	{ key: "due", header: "Due before prepayment", numeric: true, cell: dueCell },
 	{ key: "owed", header: "Owed", numeric: true, cell: owedCell },
 ]

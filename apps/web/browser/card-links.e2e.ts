@@ -18,7 +18,7 @@ test("a keyboard-focused card link draws its ring around the card", async ({ pag
 		link: getComputedStyle(element).outlineStyle,
 		overlay: getComputedStyle(element, "::after").outlineStyle,
 	}))
-	expect(ring.link !== "none" || ring.overlay !== "none").toBe(true)
+	expect(ring.overlay).toBe("solid")
 })
 
 test("an Overview card's compact amount sits above the stretched link", async ({ page }) => {

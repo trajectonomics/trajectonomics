@@ -28,7 +28,7 @@ const filers = $derived([
 function headingOf(year: TaxYearTriples): string {
 	if (year.filer === null) return `Tax for ${year.period}`
 	const filer = returnLabel(year.filer, people, claimsHolder, filers).text
-	return `Tax for ${filer}, ${year.period}`
+	return `${filer}: tax for ${year.period}`
 }
 </script>
 
