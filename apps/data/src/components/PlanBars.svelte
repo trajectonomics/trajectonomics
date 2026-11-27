@@ -3,10 +3,11 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 
 import { barGeometry } from "../lib/bar-chart"
-import { barAriaLabel, barKindWords } from "../lib/bar-words"
+import { barAriaLabel, barKindWords, barTip } from "../lib/bar-words"
 import { compactCount, displayCount } from "../lib/format"
 import { PEAK_COLUMNS } from "../lib/peak-words"
 import type { PlanBar } from "../lib/plan-bars"
+import { planColour } from "../lib/plan-colour"
 import type { PeakWindowKey } from "../lib/types"
 import PlanMark from "./PlanMark.svelte"
 
@@ -22,6 +23,28 @@ let {
 
 const chart = $derived(barGeometry(bars))
 const label = $derived(barAriaLabel(bars, selected))
+let active = $state<string | null>(null)
+const activeBar = $derived(bars.find((bar) => bar.plan === active) ?? null)
+
+function pointerLeft(event: PointerEvent) {
+	const plot = event.currentTarget
+	const focused = document.activeElement
+	if (plot instanceof HTMLElement && focused instanceof Node && plot.contains(focused)) return
+	active = null
+}
+
+function focusLeft(event: FocusEvent) {
+	const plot = event.currentTarget
+	const next = event.relatedTarget
+	if (plot instanceof HTMLElement && next instanceof Node && plot.contains(next)) return
+	active = null
+}
+
+function chooseKey(event: KeyboardEvent, plan: string) {
+	if (event.key !== "Enter" && event.key !== " ") return
+	event.preventDefault()
+	active = plan
+}
 </script>
 
 <div class="plan-bars">
@@ -39,11 +62,19 @@ const label = $derived(barAriaLabel(bars, selected))
 	</div>
 
 	{#if chart !== null}
-		<figure class="bars-figure">
+		<figure
+			class="bars-figure"
+			class:is-choosing={active !== null}
+			onpointerleave={pointerLeft}
+			onfocusout={focusLeft}
+		>
+			{#if activeBar !== null}
+				<p class="chart-readout">{barTip(activeBar)}</p>
+			{/if}
 			<svg
 				class="bars-svg"
 				viewBox={`0 0 ${chart.width} ${chart.height}`}
-				role="img"
+				role="group"
 				aria-label={label}
 			>
 				<defs>
@@ -78,6 +109,23 @@ const label = $derived(barAriaLabel(bars, selected))
 					</text>
 				{/each}
 				{#each chart.bars as mark (mark.bar.plan)}
+					{@const openSide = mark.center < chart.width / 2 ? "start" : "end"}
+					{@const labelX = mark.openHigh
+						? openSide === "start"
+							? mark.x + mark.width + 4
+							: mark.x - 4
+						: mark.center}
+					<g
+						class="bars-series"
+						class:bars-series-on={active === null || active === mark.bar.plan}
+						style={`--plan-ink: ${planColour(mark.bar.plan)}`}
+						role="button"
+						tabindex="0"
+						aria-label={barTip(mark.bar)}
+						onpointerenter={() => (active = mark.bar.plan)}
+						onfocus={() => (active = mark.bar.plan)}
+						onkeydown={(event) => chooseKey(event, mark.bar.plan)}
+					>
 					{#if mark.bar.kind === "estimate" && mark.lowY !== null}
 						<g class="bars-whisker">
 							<line
@@ -125,12 +173,6 @@ const label = $derived(barAriaLabel(bars, selected))
 							height={mark.height}
 						></rect>
 					{/if}
-					{@const openSide = mark.center < chart.width / 2 ? "start" : "end"}
-					{@const labelX = mark.openHigh
-						? openSide === "start"
-							? mark.x + mark.width + 4
-							: mark.x - 4
-						: mark.center}
 					<text
 						class="bars-value"
 						x={labelX}
@@ -149,6 +191,7 @@ const label = $derived(barAriaLabel(bars, selected))
 							text-anchor={mark.openHigh ? openSide : "middle"}>rough</text
 						>
 					{/if}
+					</g>
 				{/each}
 			</svg>
 			<div class="bars-labels" style={`--bar-count: ${chart.bars.length}`}>

@@ -1,6 +1,7 @@
 /* The chart: a hand-drawn SVG on the page, with a legend that repeats every line's cues. */
 
 .chart-figure {
+	position: relative;
 	margin: 0;
 	padding: 24px 0 32px;
 	border-bottom: 1px solid var(--ds-color-border);
@@ -10,6 +11,9 @@
 	display: block;
 	width: 100%;
 	height: auto;
+	cursor: crosshair;
+	touch-action: pan-y;
+	outline: none;
 }
 
 .chart-grid {
@@ -44,7 +48,6 @@
 .chart-legend li {
 	display: flex;
 	align-items: center;
-	gap: 8px;
 	font-size: 13px;
 }
 

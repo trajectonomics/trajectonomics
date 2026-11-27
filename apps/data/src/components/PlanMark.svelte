@@ -1,13 +1,14 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
+import { planColour } from "../lib/plan-colour"
 import { planLogo } from "../lib/plan-logos"
 
 let { plan, name, size = 28 }: { plan: string; name: string; size?: number } = $props()
 
 const logo = $derived(planLogo(plan))
 const initial = $derived(name.slice(0, 1).toUpperCase())
-const box = $derived(`--plan-mark-size: ${size}px`)
+const box = $derived(`--plan-mark-size: ${size}px; --plan-ink: ${planColour(plan)}`)
 </script>
 
 {#if logo !== null}
