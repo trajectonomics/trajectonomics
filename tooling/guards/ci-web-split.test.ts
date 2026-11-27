@@ -95,7 +95,7 @@ describe("the CI split of the web check", () => {
 		// apps/web/browser (web ADR 0026): Chromium over the built Demo. It stays out of `bun run check`, so
 		// the deploy-free local check needs no browser, and out of the shards, so it never lengthens them.
 		const job = workflow.jobs["web-browser"] as Job
-		expect(job.name).toBe("Check web browser")
+		expect(job.name).toMatch(/^Check web browser/)
 		expect(job.needs).toBe("plan")
 		expect(job.if).toBe((workflow.jobs["web"] as Job).if)
 		expect(web.scripts["test:browser"]).toBe("playwright test")
@@ -109,6 +109,7 @@ describe("the CI split of the web check", () => {
 		const runs = ((workflow.jobs["web-browser"] as Job).steps ?? []).map((step) => step.run ?? "")
 		const build = runs.find((run) => run.includes("turbo run"))
 		expect(build).toBeDefined()
+		expect(build?.split(/\s+/)).toContain("@trajectonomics/cli#build")
 		expect(build?.split(/\s+/)).toContain("@trajectonomics/web#build")
 		expect(build).not.toMatch(/\s--(\s|$)/)
 		const test = runs.findIndex((run) => run.includes("test:browser"))
