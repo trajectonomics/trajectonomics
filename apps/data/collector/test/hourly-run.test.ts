@@ -7,7 +7,6 @@ import type { SendReport } from "../src/send/client"
 import { quotaRow, usageRow } from "./support/rows"
 
 const NOW = Date.parse("2026-11-27T14:26:00.000Z")
-const DAY_MS = 86_400_000
 
 const ALPHA: HostConfig = {
 	name: "alpha",
@@ -97,7 +96,7 @@ describe("runHourly", () => {
 			"--",
 			"beta-synthetic",
 		])
-		expect(betaCall).toContain(new Date(NOW - 7 * DAY_MS).toISOString())
+		expect(betaCall).toContain("2026-11-27T14:00:00.000Z")
 	})
 
 	test("sends every host's usage and quota and advances both cursors", async () => {

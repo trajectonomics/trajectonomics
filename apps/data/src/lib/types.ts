@@ -21,11 +21,15 @@ export type UsagePayload = {
 	rows: UsageRow[]
 }
 
-/** The body of the health API. */
+/** The body of the health API; an older cached body has neither collected-day field. */
 export type Health = {
 	lastIngestAt: string | null
 	minutesSinceIngest: number | null
 	stale: boolean
+	/** The first UTC day collection is known to cover. */
+	collectingSince?: string | null
+	/** The first collected UTC day per plan. */
+	planSince?: Record<string, string>
 }
 
 /**

@@ -180,8 +180,9 @@ in the cursor filename, so they are lowercase and unique.
 For each host the runner executes `usage --since <cursor minus 6 hours>`, adding
 `--skip-opencode-before` when configured, and then `quota` when `quota` is true. The machine label
 is left at the collector's default, so each machine keeps its own hash alias. A host with no cursor
-reads 7 days back; the 6-hour overlap lets late rows and clock skew arrive, and the upsert makes the
-resend harmless.
+begins at the start of the current UTC hour. A first run sends nothing from before the current hour;
+the site shows only what was collected live (ADR 0010). The 6-hour overlap lets late rows and clock
+skew arrive, and the upsert makes the resend harmless.
 
 Each host's cursor is `~/.local/state/traj-data/cursor-<name>`, holding the latest `hourUtc` that
 was accepted. A host that is offline, exits non-zero or prints a malformed line is logged and

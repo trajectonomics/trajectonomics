@@ -2,22 +2,26 @@ import { join } from "node:path"
 import { type IngestRow, isQuotaRow } from "../rows"
 
 const HOUR_MS = 3_600_000
-const DAY_MS = 86_400_000
 
 /** How far before the cursor each run re-reads, so late rows and clock skew still arrive. */
 export const CURSOR_OVERLAP_MS = 6 * HOUR_MS
-
-/** How far back the first run reads when a host has no cursor yet. */
-export const FIRST_RUN_MS = 7 * DAY_MS
 
 /** The path of one host's cursor file. */
 export function cursorPath(stateDir: string, name: string): string {
 	return join(stateDir, `cursor-${name}`)
 }
 
-/** The `--since` value for a cursor: six hours before it, or seven days back on a first run. */
+/** The start of the UTC hour a clock reading falls in, as the API's canonical timestamp. */
+function hourStart(nowMs: number): string {
+	return new Date(Math.floor(nowMs / HOUR_MS) * HOUR_MS).toISOString()
+}
+
+/**
+ * The `--since` value for a cursor: six hours before it, or the start of the current UTC hour on a
+ * first run. A first run sends no history; the site shows only what was collected live.
+ */
 export function sinceForCursor(cursor: string | null, nowMs: number): string {
-	if (cursor === null) return new Date(nowMs - FIRST_RUN_MS).toISOString()
+	if (cursor === null) return hourStart(nowMs)
 	const ms = Date.parse(cursor)
 	if (Number.isNaN(ms)) throw new Error(`cursor is not an ISO timestamp: ${cursor}`)
 	return new Date(ms - CURSOR_OVERLAP_MS).toISOString()
