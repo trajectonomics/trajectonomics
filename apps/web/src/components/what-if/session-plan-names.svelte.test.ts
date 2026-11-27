@@ -59,4 +59,21 @@ describe("the What-if bar words a change by its session plan", () => {
 		expect(body).toContain("Alpha spending amount set to 5.00")
 		expect(body).not.toContain("Beta spending")
 	})
+
+	test("an Account a Flow moves to reads as its ledger name, and the employer share's Account too", () => {
+		replaceSnapshot(DEMO)
+		const accounts = DEMO.reads.accounts
+		if (!accounts.ok) throw new Error("the Demo reads its accounts")
+		const fund = accounts.data.accounts.find((account) => account.name === "Fund")
+		if (fund === undefined) throw new Error("the Demo has a Fund Account")
+		whatIfSession.whatIf = withSet(
+			withSet(startWhatIf("base", HASH), "flows.fund.target", fund.id),
+			"flows.salary-employer.target",
+			fund.id,
+		)
+		const body = render(WhatIfChanges, { props: {} }).body
+		expect(body).toContain("move to set to Fund")
+		expect(body).toContain("account set to Fund")
+		expect(body).not.toContain(fund.id)
+	})
 })

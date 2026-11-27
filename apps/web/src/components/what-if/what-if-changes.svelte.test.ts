@@ -47,6 +47,23 @@ describe("the What-if bar's changes", () => {
 		expect(html).not.toContain("90000.00")
 	})
 
+	test("hides only money: a name, how often, a category and an Account stay", () => {
+		preferences.hidden = true
+		const shown: [string, string, string][] = [
+			["flows.salary.displayLabel", "Pay", "salary name set to Pay"],
+			["flows.salary.frequency", "annual", "salary how often set to annual"],
+			["flows.salary.category", "home", "salary category set to home"],
+			["flows.salary.target", "fund", "salary move to set to fund"],
+		]
+		for (const [path, value, words] of shown) {
+			whatIfSession.whatIf = withSet(startWhatIf("base", HASH), path, value)
+			const html = body()
+			expect(html).toContain(words)
+			expect(html).not.toContain("amount hidden")
+			expect(html).not.toContain("•••••")
+		}
+	})
+
 	test("marks a refusal as the CLI's text only when the CLI wrote it", () => {
 		whatIfSession.whatIf = withSet(startWhatIf("base", HASH), "flows.salary.earned", true)
 		whatIfSession.answer = refused("invalid_input", "The CLI refused the change.")
