@@ -27,6 +27,8 @@ const READ_CONTROLS = [
 
 /** Where the fence applies: the page, and the plan menu in the top bar, which sits outside `main`. A dialog is left alone: a switched-off control is the only way to open an Edit drawer, and the charts' own drawer keeps a person's charts in their own browser. */
 const FENCED = 'main, [role="menu"][aria-label="Plans"]'
+/** The plan menu, outside `main`: its New plan is an Edit on every page, a read page's too. */
+const PLAN_MENU = '[role="menu"][aria-label="Plans"]'
 
 /** Pages whose controls all read: the report picker, the downloads and Print. */
 const READ_PAGES: readonly string[] = ["/reports/"]
@@ -102,8 +104,8 @@ function fenceRegion(region: Element): void {
 
 /** Switches off every control under the fenced regions that is not a read control. Safe to run again. */
 export function fence(root: ParentNode, pathname: string): void {
-	if (READ_PAGES.some((page) => pathname.endsWith(page))) return
-	for (const region of root.querySelectorAll(FENCED)) fenceRegion(region)
+	const regions = READ_PAGES.some((page) => pathname.endsWith(page)) ? PLAN_MENU : FENCED
+	for (const region of root.querySelectorAll(regions)) fenceRegion(region)
 }
 
 /** Fences the document now and again whenever the page changes. Returns the stop. */

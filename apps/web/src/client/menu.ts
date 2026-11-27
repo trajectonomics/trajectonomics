@@ -3,9 +3,11 @@
  * document; this module does, through the element refs the component hands it.
  */
 
-/** The items of a menu, in the order the person reads them: the plans, then "All plans" and "New plan". */
+/** The items of a menu that can take focus, in reading order: the plans, then "All plans" and "New plan" (not when switched off). */
 function itemsOf(menu: HTMLElement | undefined): HTMLElement[] {
-	return menu === undefined ? [] : [...menu.querySelectorAll<HTMLElement>('[role^="menuitem"]')]
+	return menu === undefined
+		? []
+		: [...menu.querySelectorAll<HTMLElement>('[role^="menuitem"]:not(:disabled)')]
 }
 
 /** How many items the menu holds. */

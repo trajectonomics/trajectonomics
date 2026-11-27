@@ -59,10 +59,10 @@ test("a nav link and a group heading draw a focus ring when the keyboard reaches
 	const heading = nav.getByRole("button", { name: "Plan", exact: true })
 
 	await tabTo(page, link)
-	expect(await outlineStyle(link), "the nav link's focus ring").not.toBe("none")
+	expect(await outlineStyle(link), "the nav link's focus ring").toBe("solid")
 
 	await tabTo(page, heading)
-	expect(await outlineStyle(heading), "the group heading's focus ring").not.toBe("none")
+	expect(await outlineStyle(heading), "the group heading's focus ring").toBe("solid")
 })
 
 test("photographs the open menu drawer and the open plan menu at a phone's width", async ({
