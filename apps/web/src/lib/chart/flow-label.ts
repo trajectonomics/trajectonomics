@@ -5,7 +5,7 @@ import { fitted, type TextMeasure, textWidth } from "./label-width"
 
 /** The least space between a name and its amount, so a measurement that runs a little short cannot join them. */
 const NAME_GAP = 3
-/** How far a name's clip reaches past the fitted text on each side, for a glyph that paints past the canvas measure. */
+/** How far a name's clip reaches past the fitted text on each side, for a glyph that paints past its measured advance. */
 const CLIP_SLACK = 2
 
 /** The room a node's label has, from its anchor to the edge of the box on its side. */

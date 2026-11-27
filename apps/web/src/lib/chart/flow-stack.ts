@@ -37,7 +37,7 @@ export const STACK_HEADING_HEIGHT = 2 * STACK_LABEL_HALF + 6
 export const STACK_SECTION_GAP = 14
 /** The gap between a row's name and its amount. */
 const NAME_GAP = 8
-/** How far a row's name clip reaches past its room on each side, for a glyph that paints past the canvas measure. */
+/** How far a row's name clip reaches past its room on each side, for a glyph that paints past its measured advance. */
 export const STACK_CLIP_SLACK = 2
 
 /** A heading above one list: the words and where its text starts. */
