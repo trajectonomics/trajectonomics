@@ -310,6 +310,24 @@ test("the old comparison page answers 301 to its new address with a trailing sla
   }
 });
 
+test("the old comparison page's files answer 301 to the same file under its new path", async () => {
+  const page = "https://trajectonomics.com/openjot/meowjot-alternative/";
+  for (const [path, location] of [
+    ["/img/og.jpg", `${page}img/og.jpg`],
+    ["/fonts/x.woff2", `${page}fonts/x.woff2`],
+    ["/styles.css?v=2", `${page}styles.css?v=2`],
+    ["/app.js", `${page}app.js`],
+    ["/sitemap.xml", `${page}sitemap.xml`],
+    ["/robots.txt", "https://trajectonomics.com/robots.txt"],
+    ["/llms.txt", "https://trajectonomics.com/llms.txt"],
+  ]) {
+    const [pathname, query = ""] = path.split("?");
+    const res = await handle(oldReq(`${pathname}${query ? `?${query}` : ""}`), env, null, {});
+    assert.equal(res.status, 301, path);
+    assert.equal(res.headers.get("location"), location, path);
+  }
+});
+
 test("a non-GET/HEAD request on an old host answers 405 instead of forwarding it", async () => {
   const post = await handle(
     new Request("https://openjot.trajectonomics.com/download", { method: "POST", body: "x" }),

@@ -233,12 +233,27 @@ export async function fromWebLatest(fetchImpl, repo = REPO) {
   return fromWebTag(fetchImpl, repo, decodeURIComponent(tagMatch[1]));
 }
 
-/** Where a GET/HEAD on an old host goes: the same path under the Site's /openjot/. */
+/** The comparison page's own files on the old hosts, which now live beside it under its path. */
+const COMPARISON_FILES = new Set(["/styles.css", "/app.js", "/boot.js", "/analytics.js", "/sitemap.xml"]);
+const COMPARISON_FOLDERS = ["/img/", "/fonts/"];
+
+/** The crawler files the Site now answers at the host root. */
+const SITE_ROOT_FILES = new Set(["/robots.txt", "/llms.txt"]);
+
+/**
+ * Where a GET/HEAD on an old host goes. The two pages go to their new addresses, the comparison
+ * page's files (a shared card's og:image among them) go to the same file under its new path, the
+ * crawler files go to the Site's, and anything else to the same path under the Site's /openjot/.
+ */
 export function oldHostLocation(pathname, search = "") {
   if (pathname === "/" || pathname === "/index.html") return `${LANDING_URL}${search}`;
   if (pathname === "/meowjot-alternative" || pathname === "/meowjot-alternative.html") {
     return `${COMPARISON_URL}${search}`;
   }
+  if (COMPARISON_FILES.has(pathname) || COMPARISON_FOLDERS.some((folder) => pathname.startsWith(folder))) {
+    return `${COMPARISON_URL}${pathname.slice(1)}${search}`;
+  }
+  if (SITE_ROOT_FILES.has(pathname)) return `https://${SITE_HOST}${pathname}${search}`;
   return `https://${SITE_HOST}${SITE_PATH}${pathname}${search}`;
 }
 

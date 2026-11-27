@@ -76,26 +76,26 @@ test("every FAQ question and answer in the JSON-LD is on the page in the same wo
 })
 
 test("every stylesheet, script, image and font resolves under the new public path and exists", () => {
-	const paths = new Set(
-		[...html.matchAll(/(?:src|href|data-animated)="(\/openjot\/meowjot-alternative\/[^"]+)"/g)].map(
-			(match) => match[1],
-		),
-	)
-	// og:image is absolute, so the regex above does not see it.
+	// Every asset reference, prefixed or not, so a reference that lost the prefix fails here.
+	const ASSET = /\.(?:css|js|png|jpe?g|webp|gif|svg|ico|woff2?|ttf|json|xml|txt)(?:[?#].*)?$/
+	const references = [
+		...[...html.matchAll(/(?:src|data-animated)="([^"]+)"/g)].map((match) => match[1]),
+		...[...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]).filter((href) => ASSET.test(href)),
+	]
+	for (const source of [read("styles.css"), read("app.js"), read("analytics.js")]) {
+		for (const match of source.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)) references.push(match[1])
+	}
+	// og:image is absolute, so it is read on its own.
 	const ogImage = html.match(/<meta property="og:image" content="([^"]+)">/)?.[1]
 	assert.equal(ogImage, `${PAGE}img/og.jpg`)
-	paths.add(ogImage.slice(SITE.length))
 
-	for (const source of [read("styles.css"), read("app.js"), read("analytics.js")]) {
-		for (const match of source.matchAll(/url\((\/openjot\/meowjot-alternative\/[^)]+)\)/g)) {
-			paths.add(match[1])
-		}
+	const local = references.filter((reference) => !/^(?:data:|https?:|#)/.test(reference))
+	assert.ok(local.length > 20, "the page and its stylesheet name their assets")
+	for (const reference of local) {
+		assert.ok(reference.startsWith(ASSET_PATH), `${reference} is under ${ASSET_PATH}`)
 	}
-
-	assert.ok(paths.size > 20, "the page and its stylesheet name their assets")
-	for (const path of paths) {
-		assert.ok(path.startsWith(ASSET_PATH), `${path} is under ${ASSET_PATH}`)
-		const name = path.slice(ASSET_PATH.length)
+	for (const path of new Set([...local, ogImage.slice(SITE.length)])) {
+		const name = path.slice(ASSET_PATH.length).split(/[?#]/)[0]
 		assert.ok(existsSync(file(name)), `${path} is in public/${name}`)
 	}
 })

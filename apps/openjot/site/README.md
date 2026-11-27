@@ -54,7 +54,9 @@ declines the cookie banner.
 - Add a campaign as a second part, for example `/openjot/go/ig/reel-12` or
   `/openjot/download/tiktok/launch`. Use lowercase letters, digits, `-` and `_`, up to 40
   characters.
-- `/openjot/go/ig?lang=en` also forces the landing page language.
+- A `?lang=` on a `/go` link is not forwarded: the Site's `?lang=` stores a choice and redirects,
+  which would drop the `utm_*` tags, so the landing page resolves the Language as it does for any
+  visitor.
 
 | Where | Landing page | Direct download |
 |---|---|---|
@@ -95,14 +97,16 @@ the same Worker (`moojot-site`, see `wrangler.jsonc`):
 - Every `GET` and `HEAD` on `openjot.trajectonomics.com` or `moojot.trajectonomics.com` answers
   `301` to the same path under `https://trajectonomics.com/openjot`, keeping the query. `/` goes
   to `https://trajectonomics.com/openjot/`, and `/meowjot-alternative` goes to
-  `https://trajectonomics.com/openjot/meowjot-alternative/`. Old short links such as
-  `/download/ig` and `/go/ig` keep working, and are counted once, at the new address.
+  `https://trajectonomics.com/openjot/meowjot-alternative/`. The comparison page's old files
+  (`/img/*`, `/fonts/*`, `/styles.css`, the scripts, `/sitemap.xml`) go to the same file under
+  that path, so a shared card's old `og:image` still loads, and `/robots.txt` and `/llms.txt` go
+  to the Site's. Old short links such as `/download/ig` and `/go/ig` keep working, and are counted
+  once, at the new address.
 - Other methods on the old hosts answer `405` with `Allow: GET, HEAD`.
 - The one exception is `/ingest` and `/ingest/*`: it is proxied to PostHog exactly as before.
   App versions up to 1.4.0 send their analytics to `moojot.trajectonomics.com/ingest`, and 1.5.0
-  up to the current release send them to `openjot.trajectonomics.com/ingest`; a redirect would
-  drop those requests. The next app release sends them to
-  `https://trajectonomics.com/openjot/ingest`.
+  through 1.6.0 send them to `openjot.trajectonomics.com/ingest`; a redirect would drop those
+  requests. Versions later than 1.6.0 send them to `https://trajectonomics.com/openjot/ingest`.
 - The Worker keeps its name `moojot-site`: renaming it would create a second Worker, which cannot
   take over the custom domain. The name is infrastructure, not the product's.
 - `tracking.js` counts a download whose referrer is a page under
@@ -161,10 +165,11 @@ is a public project key that can only send events, so it is not a secret.
 - Every indexable page has a `<link rel="canonical">`, a description in both languages, Open Graph
   tags and JSON-LD structured data (`FAQPage` and `BreadcrumbList` on the comparison page). JSON-LD
   is a data block, not a script, so the CSP doesn't block it.
-- The Site owns host-root files now: `robots.txt`, `sitemap.xml` and `llms.txt` are served by
-  `apps/site`, not by this Worker. The comparison page's canonical is
-  `https://trajectonomics.com/openjot/meowjot-alternative/`; its Sitemap entry and `llms.txt` line
-  belong in the Site's files.
+- The Site owns host-root files now: `robots.txt` and `llms.txt` are served by `apps/site`, not by
+  this Worker. The comparison page's canonical is
+  `https://trajectonomics.com/openjot/meowjot-alternative/`, and its own sitemap is
+  `/openjot/meowjot-alternative/sitemap.xml`, which the Site's `robots.txt` names; its `llms.txt`
+  line belongs in the Site's file.
 - When FAQ answers change, change the matching JSON-LD answer in the same file.
 - The comparison page's scripts and images are served from `/openjot/meowjot-alternative/`, so
   every reference in the page, its CSS and its JS includes that prefix.
