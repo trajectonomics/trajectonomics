@@ -1,6 +1,4 @@
 <script lang="ts">
-import { tick } from "svelte"
-import { focusById } from "../../client/browser.js"
 import { chartStore } from "../../client/charts.svelte.js"
 import type { ProjectionRun } from "../../lib/contract"
 import { ALWAYS_NAMES, buildCatalogue, defaultNameIndex } from "../../lib/view/charts/catalogue"
@@ -10,12 +8,11 @@ import type { ChartDef, ChartKind } from "../../lib/view/charts/types"
 import { chartView } from "../../lib/view/charts/view"
 import { parseTerms } from "../../lib/view/projection/terms"
 import NetWorthChart from "../projection/NetWorthChart.svelte"
-import TermsControl from "../projection/TermsControl.svelte"
 import ChartDrawer from "./ChartDrawer.svelte"
-import ChartFiles from "./ChartFiles.svelte"
+import ChartHeader from "./ChartHeader.svelte"
 import ChartMenu from "./ChartMenu.svelte"
 import ChartNotices from "./ChartNotices.svelte"
-import ChartPicker from "./ChartPicker.svelte"
+import ChartOptions from "./ChartOptions.svelte"
 import CustomChart from "./CustomChart.svelte"
 import type { ChartsContext } from "./context"
 
@@ -26,10 +23,10 @@ interface Props {
 	charts: ChartsContext
 }
 
-/** The Projection's chart: its title picks the net worth chart or one the person made, and makes a new one. */
+/** The Plan's chart: the net worth chart or one the person made, with its picker behind the Charts button. */
 let { run, terms, onTerms, charts }: Props = $props()
-const PICKER = "net-worth-chart"
 let drawer = $state<"new" | ChartDef | null>(null)
+let width = $state(0)
 const chosen = $derived(chartStore.charts.find((chart) => chart.id === charts.chart))
 const groups = $derived(buildCatalogue(charts.runs, run, charts.names))
 const names = $derived(seriesNames(charts.runs, run, charts.names, ALWAYS_NAMES))
@@ -45,35 +42,34 @@ const view = $derived(
 			charts.names.accounts,
 		),
 )
-
-/** Gives focus to the picker, which is a new element once the chart changed. */
-function refocus(): void {
-	void tick().then(() => focusById(`${PICKER}-select`))
-}
-
-function close(): void {
-	drawer = null
-	refocus()
-}
+/** The chart is large at `md` and above (Tailwind's 48rem), and shorter on a phone. */
+const height = $derived(width >= 768 ? 320 : 220)
 
 function save(draft: { name: string; kind: ChartKind; series: readonly string[] }): void {
 	const id = drawer === "new" || drawer === null ? chartStore.idFor(draft.name) : drawer.id
 	if (chartStore.save({ id, ...draft })) charts.onChart(id)
-	close()
+	drawer = null
 }
 </script>
 
-{#snippet picker()}
-	<ChartPicker id={PICKER} charts={chartStore.charts} value={chosen?.id ?? ""} onChange={charts.onChart} onNew={() => (drawer = "new")} />
+{#snippet options()}
+	<ChartOptions
+		charts={chartStore.charts}
+		value={chosen?.id ?? ""}
+		onChange={charts.onChart}
+		onNew={() => (drawer = "new")}
+		onExport={() => chartStore.exportFile()}
+		onImport={(file) => chartStore.importFile(file)}
+		hasCharts={chartStore.charts.length > 0}
+	/>
 {/snippet}
 
-<div class="space-y-3">
+<div class="space-y-3" bind:clientWidth={width}>
 	{#if chosen && view}
-		<section aria-labelledby={PICKER} class="space-y-3">
-			<div class="flex flex-wrap items-center justify-between gap-3">
-				{@render picker()}
-				<TermsControl value={parseTerms(terms)} onChange={onTerms} />
-			</div>
+		<section aria-label={chosen.name} class="space-y-3">
+			<ChartHeader title={chosen.name} {terms} {onTerms}>
+				{#snippet actions()}{@render options()}{/snippet}
+			</ChartHeader>
 			{#key chosen.id}
 				<ChartMenu
 					name={chosen.name}
@@ -85,16 +81,16 @@ function save(draft: { name: string; kind: ChartKind; series: readonly string[] 
 					onDelete={() => {
 						chartStore.remove(chosen.id)
 						charts.onChart("")
-						refocus()
 					}}
 				/>
 			{/key}
-			<CustomChart chart={chosen} {view} />
+			<CustomChart chart={chosen} {view} {height} />
 		</section>
 	{:else}
-		<NetWorthChart {run} {terms} {onTerms} title={picker} />
+		<NetWorthChart {run} {terms} {onTerms} {height}>
+			{#snippet actions()}{@render options()}{/snippet}
+		</NetWorthChart>
 	{/if}
 	<ChartNotices problem={chartStore.problem} unsaved={chartStore.unsaved} notice={chartStore.notice} />
-	<ChartFiles hasCharts={chartStore.charts.length > 0} onExport={() => chartStore.exportFile()} onImport={(file) => chartStore.importFile(file)} />
-	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={close} />
+	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={() => (drawer = null)} />
 </div>

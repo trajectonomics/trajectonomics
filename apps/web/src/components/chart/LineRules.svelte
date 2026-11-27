@@ -1,13 +1,15 @@
 <script lang="ts">
 import { LABEL_OFFSET_PX, type LineLayout, placedLabels } from "../../lib/chart"
-import { HEIGHT, MARGIN } from "./geometry"
+import { MARGIN } from "./geometry"
 
 interface Props {
 	layout: LineLayout
 	width: number
+	/** The chart's height in pixels. */
+	height: number
 }
 
-let { layout, width }: Props = $props()
+let { layout, width, height }: Props = $props()
 /** Each label's row, side and words, so none overlaps another, crosses a rule or leaves the plot. */
 const labels = $derived(
 	placedLabels(layout.markers, {
@@ -32,7 +34,7 @@ the plot is moved whole to the other side, shortened on the roomier one, or left
 			x1={marker.x}
 			x2={marker.x}
 			y1={MARGIN.top}
-			y2={HEIGHT - MARGIN.bottom}
+			y2={height - MARGIN.bottom}
 			stroke-dasharray="4 3"
 			class="stroke-foreground"
 		/>

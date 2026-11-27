@@ -8,13 +8,14 @@ interface Props {
 	label: string
 	layout: LineLayout
 	width: number
+	height: number
 	masked: boolean
 	/** The hovered or focused index into the layout's x positions, or null for none. */
 	active: number | null
 	onActive: (index: number | null) => void
 }
 
-let { label, layout, width, masked, active, onActive }: Props = $props()
+let { label, layout, width, height, masked, active, onActive }: Props = $props()
 const count = $derived(layout.xPixels.length)
 const index = $derived(active !== null && active < count ? active : null)
 const valueText = $derived(
@@ -51,7 +52,7 @@ function onKeyDown(event: KeyboardEvent): void {
 	onkeydown={onKeyDown}
 	class="relative rounded-md outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 >
-	<LineSvg {label} {layout} {width} {masked} {index} />
+	<LineSvg {label} {layout} {width} {height} {masked} {index} />
 	{#if index !== null}
 		<LineTooltip
 			x={layout.xPixels[index] ?? 0}
