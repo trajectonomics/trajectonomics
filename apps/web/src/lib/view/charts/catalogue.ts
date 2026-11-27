@@ -1,7 +1,9 @@
 import type { ProjectionRun } from "../../contract"
+import { type ItemNames, itemNames } from "../item-names"
 import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
-import { GROUPS, type GroupId, type Resolved } from "./types"
+import { seriesNames } from "./series-names"
+import { GROUPS, type GroupId } from "./types"
 
 /** One series the picker lists: whether the selected plan has it, and if not, why not. */
 export interface CatalogueEntry {
@@ -33,6 +35,11 @@ const ALWAYS: readonly { id: string; name: string; group: GroupId }[] = [
 	{ id: "estate:heirs", name: "What heirs would receive", group: "retirement" },
 ]
 
+/** The names of the series every plan could state, so one the plan lacks still reads its name. */
+export const ALWAYS_NAMES: ReadonlyMap<string, string> = new Map(
+	ALWAYS.map((item) => [item.id, item.name]),
+)
+
 /** What a plan has none of, said once per group instead of as a row of greyed lines. */
 const NOTES: readonly { group: GroupId; family: string; note: string }[] = [
 	{ group: "net-worth", family: "account:", note: "This plan states no Account values." },
@@ -48,19 +55,10 @@ const NOTES: readonly { group: GroupId; family: string; note: string }[] = [
 export function buildCatalogue(
 	runs: readonly ProjectionRun[],
 	selected: ProjectionRun | null,
-	accountNames: ReadonlyMap<string, string>,
+	names: ItemNames,
 ): CatalogueGroup[] {
-	const has = new Set(selected ? resolveSeries(selected, accountNames).map((s) => s.id) : [])
-	const known = new Map<string, { name: string; group: GroupId; real: boolean }>()
-	for (const item of ALWAYS)
-		known.set(item.id, { ...item, real: item.id === "net-worth" || item.id === "estate:heirs" })
-	for (const run of runs) {
-		for (const found of resolveSeries(run, accountNames)) {
-			if (!known.has(found.id) || found.id === "net-worth") {
-				known.set(found.id, { name: found.name, group: found.group, real: found.real !== null })
-			}
-		}
-	}
+	const has = new Set(selected ? resolveSeries(selected, names).map((series) => series.id) : [])
+	const known = knownSeries(runs, selected, names)
 	return GROUPS.map((group) => {
 		const entries = [...known]
 			.filter(([, item]) => item.group === group.id)
@@ -69,43 +67,60 @@ export function buildCatalogue(
 	})
 }
 
+/** The picker's series by id: the always-listed ones, then every series any run states. */
+function knownSeries(
+	runs: readonly ProjectionRun[],
+	selected: ProjectionRun | null,
+	names: ItemNames,
+): Map<string, { name: string; group: GroupId; real: boolean }> {
+	const named = seriesNames(runs, selected, names, ALWAYS_NAMES)
+	const known = new Map<string, { name: string; group: GroupId; real: boolean }>()
+	for (const item of ALWAYS)
+		known.set(item.id, {
+			name: item.name,
+			group: item.group,
+			real: item.id === "net-worth" || item.id === "estate:heirs",
+		})
+	for (const found of (selected === null ? runs : [selected, ...runs]).flatMap((run) =>
+		resolveSeries(run, names),
+	)) {
+		if (known.has(found.id)) continue
+		known.set(found.id, {
+			name: named.get(found.id) ?? found.name,
+			group: found.group,
+			real: found.real !== null,
+		})
+	}
+	return known
+}
+
 function entryOf(
 	id: string,
 	item: { name: string; real: boolean },
 	has: ReadonlySet<string>,
 ): CatalogueEntry {
-	const available = has.has(id)
 	return {
 		id,
 		name: item.name,
-		available,
-		reason: available ? null : reasonFor(id, has),
+		available: has.has(id),
+		reason: has.has(id) ? null : reasonFor(id, has),
 		real: item.real,
 	}
 }
 
 function notesFor(group: GroupId, has: ReadonlySet<string>): string[] {
-	return NOTES.filter(
-		(note) => note.group === group && ![...has].some((id) => id.startsWith(note.family)),
-	).map((note) => note.note)
+	const missing = (note: (typeof NOTES)[number]) =>
+		![...has].some((id) => id.startsWith(note.family))
+	return NOTES.filter((note) => note.group === group && missing(note)).map((note) => note.note)
 }
 
-/** The series of a Snapshot by id, for naming a chosen series that the selected plan lacks. */
-export function nameIndex(
+/**
+ * The series names a new chart's default name reads: the same map with no plan label, so the name comes from the
+ * series ids and fits every plan. The names a chart shows still read the plan's labels.
+ */
+export function defaultNameIndex(
 	runs: readonly ProjectionRun[],
-	accountNames: ReadonlyMap<string, string>,
+	names: ItemNames,
 ): ReadonlyMap<string, string> {
-	const names = new Map<string, string>(ALWAYS.map((item) => [item.id, item.name]))
-	for (const run of runs) {
-		for (const found of resolveSeries(run, accountNames)) names.set(found.id, found.name)
-	}
-	return names
-}
-
-/** Every series of one run by id. */
-export function seriesById(
-	run: ProjectionRun,
-	accountNames: ReadonlyMap<string, string>,
-): ReadonlyMap<string, Resolved> {
-	return new Map(resolveSeries(run, accountNames).map((item) => [item.id, item]))
+	return seriesNames(runs, null, itemNames(names.accounts, null), ALWAYS_NAMES)
 }

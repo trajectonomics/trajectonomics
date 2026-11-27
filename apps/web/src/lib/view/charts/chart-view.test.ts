@@ -1,11 +1,12 @@
 import { describe, expect, test } from "bun:test"
+import { itemNames } from "../item-names"
 import { plain, withTax } from "./fixtures.test-support"
 import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
 import type { ChartDef } from "./types"
 import { chartView } from "./view"
 
-const NAMES = new Map([["savings", "Savings"]])
+const NAMES = itemNames(new Map([["savings", "Savings"]]), null)
 const CHART: ChartDef = {
 	id: "spend",
 	name: "Spend",
