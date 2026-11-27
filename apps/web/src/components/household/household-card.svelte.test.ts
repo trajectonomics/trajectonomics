@@ -2,12 +2,19 @@ import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:tes
 import { render } from "svelte/server"
 import { snapshotLoader } from "../../client/browser"
 import { editSession } from "../../client/edit.svelte.js"
+import { removeHousehold, saveHousehold } from "../../client/household-save.js"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
-import type { HouseholdDocument, Snapshot } from "../../lib/contract"
+import { RAN } from "../../client/what-if.test-support"
+import type { HouseholdDocument, ScenarioShow, Snapshot } from "../../lib/contract"
+import { brandHouseholdHash } from "../../lib/contract/household-hash.test-support"
+import { householdWithPerson } from "../../lib/view/household/document"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { LOADING } from "../../lib/view/state"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import HouseholdCard from "./HouseholdCard.svelte"
+import HouseholdSection from "./HouseholdSection.svelte"
+
+const realFetch = globalThis.fetch
 
 const household: HouseholdDocument = {
 	schemaVersion: 1,
@@ -34,22 +41,47 @@ function withHousehold(next: HouseholdDocument): Snapshot {
 beforeEach(() => replaceSnapshot(withHousehold(household)))
 afterAll(() => snapshotLoader.replace(LOADING))
 
+const HOUSEHOLD_HASH = `jcs1:sha256:${"01".repeat(32)}`
+
+/** The Demo's base read with the hashes apart, and a contentHash the household UI must not read (cli ADR 0055). */
+function splitHashes(): { snapshot: Snapshot; read: ScenarioShow["scenario"] } {
+	const read = DEMO.reads.documents["base"]
+	if (read?.ok !== true) throw new Error("the Demo reads its base plan")
+	const scenario: ScenarioShow["scenario"] = {
+		...read.data.scenario,
+		household,
+		householdHash: brandHouseholdHash(HOUSEHOLD_HASH),
+	}
+	Object.defineProperty(scenario, "contentHash", {
+		get() {
+			throw new Error("the household UI read the contentHash instead of the householdHash")
+		},
+	})
+	const documents = { ...DEMO.reads.documents, base: { ...read, data: { scenario } } }
+	return { snapshot: { ...DEMO, reads: { ...DEMO.reads, documents } }, read: scenario }
+}
+
 function card(options: { household?: HouseholdDocument | null; editable?: boolean } = {}): string {
 	return render(HouseholdCard, {
 		props: {
 			name: "base",
 			doc: planDocument(),
 			household: options.household === undefined ? household : options.household,
-			householdHash: "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			householdHash: brandHouseholdHash(
+				"jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			),
 			editable: options.editable ?? true,
 		},
 	}).body
 }
 
 afterEach(() => {
+	editSession.token = null
 	editSession.error = null
+	editSession.failure = null
 	editSession.stale = false
 	editSession.source = "form"
+	globalThis.fetch = realFetch
 })
 
 describe("the household card", () => {
@@ -114,5 +146,41 @@ describe("the household card", () => {
 		expect(body).toContain('aria-label="Edit You"')
 		expect(body).toMatch(/<button[^>]*>\s*Pin a date\s*<\/button>/)
 		expect(body).toContain("Remove household")
+	})
+
+	test("a save from the household read posts its householdHash, not its contentHash", async () => {
+		const { snapshot, read } = splitHashes()
+		const body = render(HouseholdSection, {
+			props: { snapshot, scenario: "base", editable: true },
+		}).body
+		expect(body).toContain("Account holder")
+
+		const sent: unknown[] = []
+		editSession.token = "token"
+		globalThis.fetch = (async (_url: string, init: RequestInit) => {
+			sent.push(JSON.parse(String(init.body)))
+			return Response.json(RAN)
+		}) as unknown as typeof fetch
+		const next = householdWithPerson(read.household, {
+			id: "me",
+			role: "holder",
+			born: "1990-06",
+			lifeExpectancy: 61,
+		})
+		await saveHousehold("base", read.householdHash, next)
+		expect(sent).toEqual([
+			{
+				kind: "set-household",
+				name: "base",
+				householdHash: read.householdHash,
+				household: next,
+			},
+		])
+		await removeHousehold("base", read.householdHash)
+		expect(sent[1]).toEqual({
+			kind: "remove-household",
+			name: "base",
+			householdHash: read.householdHash,
+		})
 	})
 })
