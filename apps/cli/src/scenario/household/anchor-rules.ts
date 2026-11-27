@@ -33,6 +33,13 @@ function checkTarget(people: readonly Person[], entry: Anchor, index: number, ct
 	return true
 }
 
+/** The rule the anchor broke, worded for its kind: a join month has no age or life expectancy. */
+function rangeHint(entry: Anchor): string {
+	return "at" in entry && entry.at === "joins"
+		? "A join month lands in the year it states; keep that year between 0001 and 9998."
+		: "An age lands in the year born + age, and a life end in the year born + lifeExpectancy; keep that year between 0001 and 9998."
+}
+
 /** The path is a dotted path naming an anchorable date field, and no path is anchored twice. */
 function checkPath(entry: Anchor, index: number, seen: Set<string>, ctx: Ctx): void {
 	const segments = parsePath(entry.path, 0)
@@ -71,7 +78,7 @@ export function checkAnchors(value: Household, ctx: Ctx): void {
 				ctx,
 				`anchors.${index}: the date falls outside 0001-9998`,
 				["anchors", index],
-				"An age lands in the year born + age, and a life end in the year born + lifeExpectancy; keep that year between 0001 and 9998.",
+				rangeHint(entry),
 			)
 		}
 	}

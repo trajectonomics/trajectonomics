@@ -1,5 +1,6 @@
 import { type AppError, fail, isAppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"
+import { forkConflictHint } from "../scenario/household/conflict-hint"
 import type { Ctx } from "./context"
 import { write } from "./guard"
 import {
@@ -38,13 +39,14 @@ export function forkScenario(
 			const parsed = JSON.parse(source.document) as ScenarioDocument
 			const changed = options.transform === undefined ? parsed : options.transform(parsed)
 			if (isAppError(changed)) return changed
-			// The refusal names the fork, because the household it would move is the copy's (cli ADR-0048).
-			const resolved = anchorsFor(source, changed, name)
-			if (isAppError(resolved)) return resolved
-			const document = canonicalDocument(resolved.document)
+			// A taken name is refused before the anchors, so the conflict never names an unrelated plan.
 			const taken = liveScenario(ctx, "name", name)
 			if (taken)
 				return { status: "name_taken", scenario: taken, droppedAnchors: [], droppedOwners: [] }
+			// The refusal names both plans, because the copy does not exist until the anchors pass (cli ADR-0048).
+			const resolved = anchorsFor(source, changed, forkConflictHint(source.name, name))
+			if (isAppError(resolved)) return resolved
+			const document = canonicalDocument(resolved.document)
 			return {
 				status: "forked",
 				scenario: insertScenario(ctx, {

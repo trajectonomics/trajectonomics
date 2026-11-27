@@ -1,5 +1,6 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import { parsePath } from "../set-parse"
+import type { ConflictHint } from "./conflict-hint"
 import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, canonicalHousehold, type Household } from "./model"
 import { resolveOwners } from "./owner-held"
@@ -27,7 +28,7 @@ export type ResolvedAnchors = {
  * and the household that would move it.
  */
 function conflict(
-	owner: string,
+	hint: ConflictHint,
 	anchor: Anchor,
 	date: string,
 	at: readonly Step[],
@@ -37,7 +38,7 @@ function conflict(
 	return fail("invalid_input", {
 		path,
 		message: `${path}: ${anchor.path} is anchored to ${date} by the household, and this value differs`,
-		hint: `Run "traj scenario household ${owner} --file <path>" to move the anchor, or remove the value so the anchor fills it.`,
+		hint: hint(anchor),
 		details: { anchor, anchored: date, value },
 	})
 }
@@ -50,7 +51,7 @@ function resolveOne(
 	pinned: readonly (readonly string[])[],
 	anchor: Anchor,
 	document: unknown,
-	owner: string,
+	hint: ConflictHint,
 ): Outcome | AppError {
 	const segments = parsePath(anchor.path, 0)
 	if (isAppError(segments)) return segments
@@ -60,7 +61,7 @@ function resolveOne(
 	const locus = locate(document, segments)
 	if (locus.kind === "missing") return { dropped: true }
 	if (locus.kind === "found") {
-		if (locus.value !== date) return conflict(owner, anchor, date, locus.at, locus.value)
+		if (locus.value !== date) return conflict(hint, anchor, date, locus.at, locus.value)
 		return { document }
 	}
 	return { document: fillFollowers(setAt(document, locus.at, date), segments, date, pinned) }
@@ -94,7 +95,7 @@ function fillFollowers(
 export function resolveHousehold(
 	stored: string,
 	document: unknown,
-	owner: string,
+	hint: ConflictHint,
 ): ResolvedAnchors | AppError {
 	const household = JSON.parse(stored) as Household
 	const pinned = anchoredSegments(household.anchors)
@@ -102,7 +103,7 @@ export function resolveHousehold(
 	const kept: Anchor[] = []
 	const dropped: string[] = []
 	for (const anchor of household.anchors) {
-		const outcome = resolveOne(household, pinned, anchor, current, owner)
+		const outcome = resolveOne(household, pinned, anchor, current, hint)
 		if (isAppError(outcome)) return outcome
 		if ("dropped" in outcome) {
 			dropped.push(anchor.path)

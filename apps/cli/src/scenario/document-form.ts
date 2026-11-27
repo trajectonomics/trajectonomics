@@ -24,11 +24,12 @@ const properties = scenarioShapeProperties(version)
 const moneyPaths = moneyPathsOf({ properties })
 
 /**
- * A required date the household would write: the document form's `check()` runs before the anchors
- * resolve, so an anchored `flows.<id>.start` must still be stated (cli ADR-0048).
+ * A required date a household may anchor: the document form's `check()` runs before the anchors
+ * resolve and never reads the store, so the hint is conditional and shows at every anchorable path
+ * (cli ADR-0048).
  */
 const ANCHORED_DATE =
-	"This date is anchored by the household; write any date here and the household sets it."
+	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write any date here and the household sets it; otherwise write the real date.'
 
 export const scenarioDocument: z.ZodType<unknown> = z
 	.unknown()

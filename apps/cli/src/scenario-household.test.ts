@@ -145,6 +145,37 @@ describe("scenario household", () => {
 		expect(errorOf(res).hint).toContain("9998")
 	})
 
+	it("names the join month rule at a joins anchor outside 0001-9998", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		for (const joins of ["9999-01", "0000-01"]) {
+			const res = await setHousehold(home, {
+				...HOUSEHOLD,
+				people: [HOLDER, { ...PARTNER, joins }],
+				anchors: [{ path: "flows.bonus.start", person: "partner", at: "joins" }],
+			})
+			expect(res.code).toBe(2)
+			expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "document.anchors.0" })
+			expect(errorOf(res).hint).toContain("join month")
+			expect(errorOf(res).hint).not.toContain("lifeExpectancy")
+		}
+	})
+
+	it("names the birth year rule at a birth year below 0001", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		const res = await setHousehold(home, {
+			...HOUSEHOLD,
+			people: [{ ...HOLDER, born: "0000-01" }, PARTNER],
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "document.people.0.born",
+		})
+		expect(errorOf(res).hint).toContain("0001")
+	})
+
 	it("refuses an anchor that makes the Scenario's own check fail, at that anchor", async () => {
 		const home = scenarioHome()
 		await seedBase(home)

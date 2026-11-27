@@ -59,7 +59,7 @@ export const apply: Leaf = defineCommand({
 		),
 	}),
 	document: DOCUMENT,
-	note: "The --decimal form ships in 0.8.0, and so do --if-hash, the what-if form with --set and --without, --add, and the droppedAnchors a household write reports.",
+	note: "The --decimal form ships in 0.8.0, and so do --if-hash, the what-if form with --set and --without, --add, and the droppedAnchors it reports.",
 	output: z.union([z.string(), applyResult, whatIfResult]),
 	examples: APPLY_EXAMPLES,
 	errorCodes: [
