@@ -63,18 +63,13 @@ export function segmentsOf(readings: readonly QuotaReading[]): Segment[] {
 }
 
 /**
- * The uncached tokens used between two readings. A reading in slot H is taken at about H:01, so it
- * reflects use up to the end of H−1: hours from the first reading's slot up to but not including
- * the last reading's slot.
+ * The hourly keys a segment covers. A reading in slot H is taken at about H:01, so it reflects use
+ * up to the end of H−1: hours from the first reading's slot up to but not including the last's.
  */
-export function tokensBetween(
-	hourlyTokens: ReadonlyMap<number, number>,
-	from: string,
-	to: string,
-): number {
+export function hoursBetween(from: string, to: string): number[] {
 	const start = hourKey(from)
 	const end = hourKey(to)
-	let tokens = 0
-	for (let hour = start; hour < end; hour += 1) tokens += hourlyTokens.get(hour) ?? 0
-	return tokens
+	const hours: number[] = []
+	for (let hour = start; hour < end; hour += 1) hours.push(hour)
+	return hours
 }
