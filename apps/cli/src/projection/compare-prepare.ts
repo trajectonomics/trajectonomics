@@ -23,7 +23,9 @@ type CompareFlags = {
  * stored.
  */
 function secondSide(flags: CompareFlags, prepare: Prepare): ReturnType<Prepare> {
-	if (flags.b !== undefined) return prepare({ scenario: flags.b, scenarioPath: "b", sets: [] })
+	if (flags.b !== undefined) {
+		return prepare({ scenario: flags.b, scenarioPath: "b", sets: [], readHousehold: false })
+	}
 	return prepare({
 		scenario: flags.a,
 		scenarioPath: "a",
@@ -31,6 +33,7 @@ function secondSide(flags: CompareFlags, prepare: Prepare): ReturnType<Prepare> 
 		without: flags.without ?? [],
 		add: flags.add ?? [],
 		decimal: flags.decimal ?? false,
+		readHousehold: false,
 	})
 }
 
@@ -42,7 +45,7 @@ export function compared(input: {
 	prepare: Prepare
 }): CompareView | AppError {
 	const { prepare } = input
-	const a = prepare({ scenario: input.input.a, scenarioPath: "a", sets: [] })
+	const a = prepare({ scenario: input.input.a, scenarioPath: "a", sets: [], readHousehold: false })
 	if (isAppError(a)) return a
 	const b = secondSide(input.input, prepare)
 	if (isAppError(b)) return b
