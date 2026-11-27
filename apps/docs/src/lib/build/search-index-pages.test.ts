@@ -26,7 +26,7 @@ function indexedAt(pageIds: readonly string[]): BuiltFile {
 	)
 }
 
-const INDEXED_PAGES = ["/cli", "/cli/commands", "/contribute"]
+const INDEXED_PAGES = ["/docs/cli", "/docs/cli/commands", "/docs/contribute"]
 
 describe("the search index's coverage of the built content pages", () => {
 	test("an entry for every content page reports no failure", () => {
@@ -36,11 +36,11 @@ describe("the search index's coverage of the built content pages", () => {
 	})
 
 	test("a built content page with no page entry is reported as SEARCH_INDEX_PAGE_MISSING", () => {
-		const files = [...CONTENT_PAGES.map(page), indexedAt(["/cli", "/contribute"])]
+		const files = [...CONTENT_PAGES.map(page), indexedAt(["/docs/cli", "/docs/contribute"])]
 
 		const failures = checkSearchIndexPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["SEARCH_INDEX_PAGE_MISSING"])
-		expect(failures[0]?.message).toContain("/cli/commands")
+		expect(failures[0]?.message).toContain("/docs/cli/commands")
 	})
 
 	test("the page list is read from the build, so a new content page must be indexed", () => {

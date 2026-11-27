@@ -8,7 +8,7 @@ const CONTENT_SECURITY_POLICY = "content-security-policy"
 
 /**
  * Whether a `_headers` file sets its policies only for the hosted Demo. The Demo may carry one; the
- * Site's own pages may not, because the router injects an inline style and script (ADR 0002).
+ * Site's own pages carry none yet (ADR 0031, ADR 0033).
  */
 function demoOnlyPolicies(content: string): boolean {
 	return parseHeadersFile(content).every(
@@ -17,9 +17,9 @@ function demoOnlyPolicies(content: string): boolean {
 }
 
 /**
- * The Site sets no policy on its own pages, in HTML or in a headers file, because the router injects
- * inline style and script. The one policy the build may carry is the hosted Demo's, scoped to
- * `/demo/*` (ADR 0031).
+ * The Site sets no policy on its own pages, in HTML or in a headers file: nothing injects one any
+ * more, but this change keeps the pages as they are (ADR 0033). The one policy the build may carry is
+ * the hosted Demo's, scoped to `/demo/*` (ADR 0031).
  */
 export function checkContentSecurityPolicy(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return files
@@ -29,7 +29,7 @@ export function checkContentSecurityPolicy(files: readonly BuiltFile[]): readonl
 			buildFailure(
 				"CONTENT_SECURITY_POLICY_PRESENT",
 				file.path,
-				`the Site sets no Content-Security-Policy on its own pages; the router injects an inline style and script. Only ${DEMO_HEADER_PATTERN} may carry one.`,
+				`the Site sets no Content-Security-Policy on its own pages yet. Only ${DEMO_HEADER_PATTERN} may carry one (ADR 0033).`,
 			),
 		)
 }

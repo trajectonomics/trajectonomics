@@ -116,7 +116,7 @@ The APK, AAB and `SHA256SUMS` are attached to the run as an artifact for 7 days.
 
 **Publish a release:**
 
-1. Set the same version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`, and merge that change.
+1. Set the same version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`, add the release's entry to `src/lib/whatsNew.ts` (a unit test requires one), and merge that change. The new entry changes the `settings-whats-new` screenshot, which lists every release, so take that baseline from the PR's failed `Screenshots` job (`tests/screenshots/README.md`) before merging.
 2. Tag `main` and push the tag:
 
    ```bash

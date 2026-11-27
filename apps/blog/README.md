@@ -1,9 +1,10 @@
 # @trajectonomics/blog
 
-The Trajectonomics blog at [blog.trajectonomics.com](https://blog.trajectonomics.com/): static
+The Trajectonomics blog at [trajectonomics.com/blog](https://trajectonomics.com/blog/): static
 [Astro](https://astro.build) with Tailwind and a Markdown content collection, served by the Worker
-`blog` with Static Assets only, on its own host
-([ADR 0002](./docs/adr/0002-the-blog-is-static-on-its-own-host.md)). It is never published to npm.
+`blog` at the Site's `/blog/` path, with Static Assets under `assets.base_path`. The smallest Worker
+script answers the old blog host with a permanent redirect to the new address
+([ADR 0004](./docs/adr/0004-the-blog-is-served-under-the-sites-host.md)). It is never published to npm.
 
 **Status:** the Shell, the front page, the Post page, English and Thai Language Trees, and the
 first Posts. The type filter, the compare template, structured data and the first Compare Page
@@ -13,13 +14,14 @@ first Posts. The type filter, the compare template, structured data and the firs
 
 Add `src/content/posts/<slug>/<language>.md`, where `<language>` is `en` or `th`, with `title`,
 `description`, `type` (`compare`, `guide` or `news`), `publishedOn`, `cover` (`src`, `alt`,
-`width`, `height`) and optionally `draft: true`. Its images go in `public/posts/<slug>/` as WebP.
+`width`, `height`) and optionally `draft: true`. Its images go in `public/posts/<slug>/` as WebP, and
+a `src` is their public path under the blog's base, such as `/blog/posts/<slug>/cover.webp`.
 
 To translate a Post, add another `<language>.md` in the same folder. Translate `title`,
 `description`, `cover.alt` and the body, and keep `type`, `publishedOn`, `cover.src`, the cover's
 size and `draft` exactly as the other Translations have them: the build refuses a mismatch.
 
-A `guide` is served at `/guides/<slug>/` in English and at `/th/guides/<slug>/` in Thai. Every Post
+A `guide` is served at `/blog/guides/<slug>/` in English and at `/blog/th/guides/<slug>/` in Thai. Every Post
 has both pages. A page whose Language the Post is not written in shows the English Translation (or
 the Post's own Language when there is no English) with a notice, and lists the Languages the Post
 is written in ([ADR 0003](./docs/adr/0003-interface-language-and-post-language-are-separate.md)).
@@ -33,7 +35,7 @@ add it to the table in `src/lib/dictionary.ts`. The type checker names every wor
 
 ```sh
 bun install
-bun run dev        # http://localhost:4321/
+bun run dev        # http://localhost:4321/blog/
 bun run preview    # the build behind the real Worker config, with wrangler dev
 ```
 

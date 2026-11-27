@@ -1,6 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { currentItemText } from "../../client/item-names.svelte.js"
+import { currentItemNames, currentItemText } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
@@ -66,7 +66,7 @@ async function save(event: SubmitEvent): Promise<void> {
 function tryIt(): void {
 	const result = prepare()
 	if (result === null) return
-	const tried = triedFlows(ctx.doc, result.document, household)
+	const tried = triedFlows(ctx.doc, result.document, household, currentItemNames())
 	if (!tried.ok) {
 		problems = { general: tried.note }
 		return

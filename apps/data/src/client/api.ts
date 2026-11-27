@@ -1,3 +1,4 @@
+import { API_PATH } from "../lib/site"
 import type { Health, UsagePayload } from "../lib/types"
 import type { DayWindow } from "../lib/window"
 
@@ -16,7 +17,7 @@ async function readJson<T>(path: string): Promise<T> {
 function usagePath(window: DayWindow, asOf: string | null): string {
 	const params = new URLSearchParams({ from: window.from, to: window.to })
 	if (asOf !== null) params.set("asOf", asOf)
-	return `/api/usage?${params.toString()}`
+	return `${API_PATH}/usage?${params.toString()}`
 }
 
 /** Fetches the window's rollups and the freshness report; the only module that calls `fetch`. */
@@ -26,7 +27,7 @@ export async function loadOverview(
 ): Promise<OverviewPayload> {
 	const [usage, health] = await Promise.all([
 		readJson<UsagePayload>(usagePath(window, asOf)),
-		readJson<Health>("/api/health"),
+		readJson<Health>(`${API_PATH}/health`),
 	])
 	return { usage, health }
 }

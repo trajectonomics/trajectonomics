@@ -1,20 +1,30 @@
-/** The data site's own host: every canonical URL is built on it. */
-export const SITE_ORIGIN = "https://data.trajectonomics.com"
+import { API_PATH, BASE_PATH, SITE_ORIGIN } from "../core/urls"
 
-/** The overview page, the root of the host. */
-export const DATA_PATH = "/"
+/** The one host every static site is served under: the apex. */
+export { API_PATH, BASE_PATH, SITE_ORIGIN }
+
+/** The overview page, the root of the data site. */
+export const DATA_PATH = `${BASE_PATH}/`
 
 /** The method page. */
-export const METHOD_PATH = "/method/"
+export const METHOD_PATH = `${BASE_PATH}/method/`
+
+/** The public path of a file the build emits at the root of the data site. */
+export function assetPath(path: string): string {
+	if (!path.startsWith("/")) {
+		throw new Error(`assetPath: "${path}" is not an absolute path`)
+	}
+	return `${BASE_PATH}${path}`
+}
 
 /** The organisation's name, as the header and the footer write it. */
 export const SITE_NAME = "Trajectonomics"
 
 /** The Site Home at the root of the apex. */
-export const SITE_HOME_URL = "https://trajectonomics.com/"
+export const SITE_HOME_URL = "/"
 
-/** The Docs Portal, on its own host. */
-export const DOCS_URL = "https://docs.trajectonomics.com/"
+/** The Docs Portal, under the apex. */
+export const DOCS_URL = "/docs/"
 
 /** The monorepo that holds the data site's source. */
 export const SOURCE_URL = "https://github.com/trajectonomics/trajectonomics"

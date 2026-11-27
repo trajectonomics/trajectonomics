@@ -8,7 +8,7 @@ export async function removeStaleRedirects(assetsRoot: string): Promise<void> {
 	await rm(join(assetsRoot, "_redirects"), { force: true })
 }
 
-// A `_redirects` file in the assets root would send `/` away from the Landing Page. Astro
+// A `_redirects` file in the assets root would send `/docs/` away from the Landing Page. Astro
 // empties `outDir`, and this still removes one a plugin writes during the build.
 /** The Astro integration that runs {@link removeStaleRedirects} after every build. */
 export function staleRedirects(): AstroIntegration {

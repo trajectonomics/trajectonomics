@@ -1,3 +1,4 @@
+import { BASE_PATH, INGEST_PATH, LEGACY_HOST, SITE_ORIGIN } from "../../src/core/urls"
 import type { Env } from "../../src/env"
 import type { CacheLike } from "../../src/http/cache"
 import { type Statement, type TestDb, testDb } from "./d1"
@@ -60,13 +61,19 @@ export function memoryCache(): MemoryCache {
 }
 
 export function ingestRequest(body: unknown, key = TEST_KEY): Request {
-	return new Request("https://data.test/ingest", {
+	return new Request(`${SITE_ORIGIN}${INGEST_PATH}`, {
 		method: "POST",
 		headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
 		body: JSON.stringify(body),
 	})
 }
 
+/** A GET to a path inside the data site's base on the one host. */
 export function get(path: string): Request {
-	return new Request(`https://data.test${path}`)
+	return new Request(`${SITE_ORIGIN}${BASE_PATH}${path}`)
+}
+
+/** A request to the old host, with the path as that host served it. */
+export function legacy(path: string, init?: RequestInit): Request {
+	return new Request(`https://${LEGACY_HOST}${path}`, init)
 }

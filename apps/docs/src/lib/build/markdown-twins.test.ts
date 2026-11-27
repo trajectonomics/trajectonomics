@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test"
 import { indexReference } from "../agent/index-reference"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN, SITE_ORIGIN } from "../site"
 import type { BuiltFile } from "./built-files"
 import { DOCS_INDEX_FILE } from "./docs-index-file"
 import { checkMarkdownTwins } from "./markdown-twins"
 
 const ENTRIES = [
-	["Trajectonomics Docs", `${SITE_ORIGIN}/index.md`],
-	["Quickstart", `${SITE_ORIGIN}/cli.md`],
-	["tx", `${SITE_ORIGIN}/cli/commands/tx.md`],
+	["Trajectonomics Docs", `${PORTAL_ORIGIN}/index.md`],
+	["Quickstart", `${PORTAL_ORIGIN}/cli.md`],
+	["tx", `${PORTAL_ORIGIN}/cli/commands/tx.md`],
 ] as const
 
 function docsIndex(entries: readonly (readonly [string, string])[] = ENTRIES): BuiltFile {
@@ -72,7 +72,7 @@ describe("a Markdown twin's shape", () => {
 	test("a relative link to the index counts, because the twin and the index share the Portal's origin", () => {
 		const files = COMPLETE_BUILD.map((file) =>
 			file.path === "cli.md"
-				? twin("cli.md", "Quickstart", "Part of the [Docs index](/llms.txt).")
+				? twin("cli.md", "Quickstart", "Part of the [Docs index](/docs/llms.txt).")
 				: file,
 		)
 

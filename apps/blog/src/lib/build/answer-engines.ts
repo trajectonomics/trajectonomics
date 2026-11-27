@@ -1,7 +1,7 @@
 import { type Failure, failure } from "./failures"
 import { isArticle, jsonLdTypes } from "./html"
 
-/** The llms.txt the blog serves for answer engines, at the host root. */
+/** The llms.txt the blog serves for answer engines, under the Site's /blog/ path. */
 export const LLMS_FILE = "llms.txt"
 
 /** A Post page states a BlogPosting, so an answer engine reads its headline, date and author. */

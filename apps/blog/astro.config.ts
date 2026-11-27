@@ -1,11 +1,12 @@
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
-import { SITE_ORIGIN } from "./src/lib/site"
+import { BLOG_BASE, SITE_ORIGIN } from "./src/lib/site"
 
-// The blog is the root of its own host, blog.trajectonomics.com (ADR 0002): no base, and the build
-// lands in the assets root the Worker serves.
+// The blog is served under the Site's /blog/ path (ADR 0004): Astro builds the pages at the assets
+// root, and the Worker's `assets.base_path` serves that root under the prefix.
 export default defineConfig({
 	site: SITE_ORIGIN,
+	base: BLOG_BASE,
 	output: "static",
 	outDir: "./dist",
 	trailingSlash: "always",

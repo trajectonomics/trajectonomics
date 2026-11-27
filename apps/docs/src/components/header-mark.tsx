@@ -24,9 +24,9 @@ function decoration(artwork: string): string {
 
 /**
  * The Docs Portal's header brand, the blog's: the Site's glyph on a tile, 32 px and 40 px from
- * `sm` up, is the way back to the Site Home, a full document load because it is another host; the
- * `Docs` marker beside it in the display face links to the Landing Page under the portal's name
- * (ADR 0009).
+ * `sm` up, is the way back to the Site Home, a full document load because the Site is another
+ * Worker rather than a page of this app; the `Docs` marker beside it in the display face links to
+ * the Landing Page under the portal's name (ADR 0009, ADR 0017).
  */
 export function HeaderMark({ href, className }: ComponentProps<"a">) {
 	return (

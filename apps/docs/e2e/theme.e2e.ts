@@ -1,12 +1,13 @@
 import type { Page } from "@playwright/test"
+import { DOCS_BASE_PATH } from "../src/lib/tabs"
 import { NOT_FOUND_PATH, openPage, pagesUnderTest } from "./built-site"
 import { waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
 import { expectDarkTheme, seedStoredLightTheme } from "./theme"
 
 /** The page whose links the shell swaps in without a reload, and the Tab one of them opens. */
-const LANDING_PATH = "/"
-const OPERATOR_PATH = "/cli/"
+const LANDING_PATH = `${DOCS_BASE_PATH}/`
+const OPERATOR_PATH = `${DOCS_BASE_PATH}/cli/`
 
 /** A property on `window`, which only a swapped-in page keeps: a full load gives it back empty. */
 const NAVIGATION_MARKER = "__docsPortalNavigationMarker"

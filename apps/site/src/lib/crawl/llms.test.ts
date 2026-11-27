@@ -3,9 +3,9 @@ import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor, languageBuildUrl } from "../language/languages"
 import {
-	DOCS_CLI_INSTALL_PATH,
-	DOCS_CLI_PATH,
-	DOCS_PATH,
+	DOCS_CLI_INSTALL_URL,
+	DOCS_CLI_URL,
+	DOCS_URL,
 	GITHUB_CLI_URL,
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
@@ -44,9 +44,9 @@ describe("the short Answer engine file", () => {
 
 	it("links the Docs Portal, both repositories and the MIT licence the footer links", () => {
 		for (const url of [
-			DOCS_PATH,
-			DOCS_CLI_PATH,
-			DOCS_CLI_INSTALL_PATH,
+			DOCS_URL,
+			DOCS_CLI_URL,
+			DOCS_CLI_INSTALL_URL,
 			GITHUB_CLI_URL,
 			GITHUB_SKILLS_URL,
 			SKILLS_LICENCE_URL,
