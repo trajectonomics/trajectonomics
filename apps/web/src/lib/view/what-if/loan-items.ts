@@ -25,6 +25,9 @@ export interface LoanItems {
 	readonly marks: Readonly<Record<string, LoanMarks>>
 }
 
+/** A page's loan cards, and the loan Flows no card places, which are shown read-only. */
+export type LoanPage = LoanItems & { readonly other: readonly LoanCard[] }
+
 /** The marks of one loan: its terms' texts that differ between the baseline's card and the what-if's, as the cards show them. */
 function marksOf(
 	baseline: LoanCardView,
@@ -81,7 +84,7 @@ export function loanPage(
 	doc: ScenarioDocument,
 	context: { run: ProjectionRun | undefined; baseline: Read<Baseline> | undefined },
 	changes: PlanChanges | null,
-): LoanItems & { readonly other: readonly LoanCard[] } {
+): LoanPage {
 	if (kind !== "assets") return { cards: [], marks: {}, other: [] }
 	return { ...loanItems(doc, context, changes), other: loanCards(unplacedFlows(doc)) }
 }
