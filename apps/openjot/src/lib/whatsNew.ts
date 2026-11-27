@@ -36,8 +36,8 @@ export const CHANGELOG: WhatsNewRelease[] = [
           th: "ธีมใหม่ Trajectonomics",
         },
         body: {
-          en: "A dark theme with the Trajectonomics robot. Pick it under Theme in My Moo. Pink & White and Black & Orange are still there.",
-          th: "ธีมสีเข้มพร้อมหุ่นยนต์ของ Trajectonomics เลือกได้ที่ธีมในมูของฉัน ธีมชมพูขาวและดำส้มยังอยู่เหมือนเดิม",
+          en: "A dark theme with the Trajectonomics robot. Pick it under App Color Theme in My Moo. Pink & White and Black & Orange are still there.",
+          th: "ธีมสีเข้มพร้อมหุ่นยนต์ของ Trajectonomics เลือกได้ที่ธีมสีของแอปในมูของฉัน ธีมชมพู & ขาว และดำ & ส้มยังอยู่เหมือนเดิม",
         },
       },
     ],
