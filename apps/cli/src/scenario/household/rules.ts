@@ -51,7 +51,12 @@ export function checkPeople(value: Household, ctx: Ctx): void {
 		}
 		seen.add(entry.id)
 		if (yearOf(entry.born) < 1) {
-			issue(ctx, `people.${index}.born: the year must be 0001 or later`, ["people", index, "born"])
+			issue(
+				ctx,
+				`people.${index}.born: the year must be 0001 or later`,
+				["people", index, "born"],
+				"Use a birth year of 0001 or later.",
+			)
 		}
 	}
 }

@@ -1,0 +1,39 @@
+/*
+ * A `tree` fence drawn as a directory: one hairline indent per level, each row a glyph and its
+ * name, with the note muted beside it. The glyph only decorates.
+ */
+
+#nd-page .prose .docs-tree {
+	list-style: none;
+	padding-inline-start: 0;
+	margin-block: 1.5rem;
+}
+
+#nd-page .prose .docs-tree .docs-tree {
+	padding-inline-start: 1.25rem;
+	border-inline-start: 1px solid var(--color-fd-border);
+	margin-block: 0.25rem;
+}
+
+#nd-page .prose .docs-tree li {
+	margin-block: 0.25rem;
+	overflow-wrap: anywhere;
+}
+
+#nd-page .prose .docs-tree-row {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+}
+
+#nd-page .prose .docs-tree-glyph {
+	flex: none;
+	width: 1rem;
+	height: 1rem;
+	align-self: center;
+	color: var(--color-fd-muted-foreground);
+}
+
+#nd-page .prose .docs-tree-note {
+	color: var(--color-fd-muted-foreground);
+}

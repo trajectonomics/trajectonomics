@@ -3,17 +3,26 @@ import { type TextMeasure, textWidth } from "../lib/chart/label-width"
 /** The most widths kept, by string, so a page left open does not grow without limit. */
 const MAX_MEASURED = 2000
 
-/** The hidden `<text>` a diagram measures its labels with: it draws nothing and says nothing. */
-const PROBE = "[data-flow-probe]"
-
 /** Widths already measured, in the drawing's units, so a re-render does not measure the same words again. */
 const measured = new Map<string, number>()
 
-/** Diagrams whose probe and size are watched, so a resize or a font change bumps `stroke` once each. */
-const watched = new WeakSet<Element>()
-
-/** Counts the changes the drawing cannot state, such as a larger browser font, so each measure re-runs. */
+/** Counts a change in the drawn text's size, so each diagram fits its names again at the size it now draws. */
 let stroke = $state(0)
+
+/**
+ * The size the cached widths were measured under, shared by every probe: a new probe's first callback
+ * compares the size it draws with it, so widths cached before the font changed on another page are
+ * cleared when the diagram comes back.
+ */
+let seen: { width: number; height: number } | null = null
+
+/** Whether a box size equals another; never when there is none yet. */
+function sameSize(
+	a: { width: number; height: number } | null,
+	b: { width: number; height: number },
+): boolean {
+	return a !== null && a.width === b.width && a.height === b.height
+}
 
 /** Forgets the widths measured in the old font, so every name is fitted again at the size it now draws. */
 function changed(): void {
@@ -22,41 +31,54 @@ function changed(): void {
 }
 
 /**
- * Watches the drawing's font and whether it is drawn: a hidden `1em` box grows when the root font does,
- * and the `<svg>` itself gains a size when a breakpoint shows it. Either change re-measures every name.
+ * Watches the probe's hidden sample text: its box grows with the drawn font's size and family and with
+ * the user's letter and word spacing, so every name is measured again at the size and spacing it now
+ * draws. Only a real change of the box's size clears the widths: a year change, a re-render or a resize
+ * leaves them be. A new probe's first callback compares the size it draws with the size the widths were
+ * measured under, so a font changed on another page clears them. Returns the teardown that disconnects it.
  */
-function watch(svg: SVGSVGElement): void {
-	if (watched.has(svg) || typeof ResizeObserver === "undefined") return
-	watched.add(svg)
-	const box = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-	box.setAttribute("width", "1em")
-	box.setAttribute("height", "1em")
-	box.setAttribute("visibility", "hidden")
-	svg.append(box)
-	const observer = new ResizeObserver(changed)
+export function observeFlowText(svg: Element): () => void {
+	if (typeof ResizeObserver === "undefined") return () => {}
+	const box = svg.querySelector("[data-flow-size]") ?? svg
+	// This probe's own last size: a probe that was hidden while another saw the font change comes back at the
+	// shared size, and its diagram, fitted by the estimate while hidden, is fitted again.
+	let own: { width: number; height: number } | null = null
+	const observer = new ResizeObserver((entries) => {
+		const rect = entries[0]?.contentRect
+		if (rect === undefined) return
+		const size = { width: rect.width, height: rect.height }
+		const moved = own !== null && !sameSize(own, size)
+		own = size
+		if (sameSize(seen, size)) {
+			if (moved) stroke += 1
+			return
+		}
+		const first = seen === null
+		seen = size
+		if (!first) changed()
+	})
 	observer.observe(box)
-	observer.observe(svg)
+	return () => observer.disconnect()
 }
 
 /**
- * A measure of the diagram's text for one render. Each string is drawn by the diagram's own hidden probe
- * and its width read with `getComputedTextLength`, in the drawing's units, so the fit is the size the SVG
- * draws, including a browser minimum font. It is cached per string until the font or the drawing changes,
- * and re-measured when either does. A page without a drawn probe (server-rendered, or the diagram hidden
- * at this breakpoint) gets the grapheme estimate, the width a server draws by.
+ * A measure of the diagram's text for one render, through the one probe the page always draws. Each string
+ * is written to the probe and its width read with `getComputedTextLength`, in the drawing's units, so the
+ * fit is the size the SVG draws, including a browser minimum font and user text spacing. The probe's text
+ * is hidden and emptied after each measurement, so a name or an amount it measures never stays in the
+ * page. It is cached per string until the drawn font changes. A page without a probe (server-rendered,
+ * before hydration) gets the grapheme estimate, the width a server draws by.
  */
-export function flowMeasure(diagram: Element | null = null): TextMeasure {
+export function flowMeasure(probe: SVGTextElement | null = null): TextMeasure {
 	const estimate = (text: string): number => textWidth(text, false)
-	if (typeof document === "undefined" || !(diagram instanceof SVGSVGElement)) return estimate
-	watch(diagram)
+	if (probe === null) return estimate
 	void stroke
-	const probe = diagram.querySelector<SVGTextElement>(PROBE)
-	if (probe === null || diagram.getBoundingClientRect().width === 0) return estimate
 	return (text) => {
 		const cached = measured.get(text)
 		if (cached !== undefined) return cached
 		probe.textContent = text
 		const width = probe.getComputedTextLength()
+		probe.textContent = ""
 		if (width === 0) return estimate(text)
 		if (measured.size >= MAX_MEASURED) measured.clear()
 		measured.set(text, width)

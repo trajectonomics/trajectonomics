@@ -1,6 +1,6 @@
 /*
  * Render the curated screenshots `design/portal-shell.md` requires and commits under
- * `screenshots/`: the built Docs Portal at 1280, 2000 and 390px in light and dark, driven
+ * `docs/screenshots/`: the built Docs Portal at 1280, 2000 and 390px in light and dark, driven
  * the way `e2e/screenshots.e2e.ts` drives it (same viewport height, full page, settled page).
  * The e2e suite's own tree stays flat and gitignored; this one is the evidence a PR carries.
  *
@@ -74,9 +74,9 @@ async function waitForServer(): Promise<void> {
 	throw new Error(`screenshots: nothing answered on ${BASE_URL}. Run \`bun run build\` first.`)
 }
 
-/** Capture every curated screenshot into `screenshots/`. */
+/** Capture every curated screenshot into `docs/screenshots/`. */
 async function main(): Promise<void> {
-	const shots = curatedShots()
+	const shots = curatedShots("docs/screenshots")
 	const stopServing = await serve()
 	const browser = await chromium.launch()
 	try {

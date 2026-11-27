@@ -61,8 +61,7 @@ function withAges(answer: FiAnswer, prepared: Placed): FiLeafAnswer {
 }
 
 /** Said when `taxYears` describes the working path, because no FI date exists to stop it at (ADR-0051). */
-export const WORKING_PATH_NOTE =
-	"FI is not reachable, so taxYears describes the plan as written, with earned income running to the horizon."
+export const WORKING_PATH_NOTE = "FI is not reachable, so taxYears describes the plan as written."
 
 /** `traj fi`: the survival answer with its definition echoed (ADR-0008). */
 export function independenceOf(prepared: Placed): FiView | AppError {
