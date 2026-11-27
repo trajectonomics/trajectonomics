@@ -118,7 +118,7 @@ describe("FiResult: unreachable", () => {
 		}
 		const body = renderFi(fiFixture(UNREACHABLE.minimumBuffer, { taxYears: [taxYear] }))
 		expect(body).toContain('href="/tax/"')
-		expect(body).toContain("See them on the Tax page")
+		expect(body).toContain("shows the plan as written, without stopping work")
 	})
 
 	test("has no pointer to the Tax page when there are no tax years", () => {

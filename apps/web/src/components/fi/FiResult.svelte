@@ -41,10 +41,10 @@ const reference = $derived(model.kind === "reachable" ? model.reference : null)
 	</ResultStatement>
 	{#if fi.taxYears.length > 0}
 		<p class="text-sm text-muted-foreground">
-			This plan has tax years. <SiteLink
+			This plan has tax years. The <SiteLink
 				href="/tax/"
-				class="text-accent underline-offset-4 hover:underline">See them on the Tax page</SiteLink
-			>.
+				class="text-accent underline-offset-4 hover:underline">Tax page</SiteLink
+			> shows the plan as written, without stopping work.
 		</p>
 	{/if}
 </div>
