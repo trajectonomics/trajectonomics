@@ -78,29 +78,22 @@ On 2026-11-25 the owner subscribed to OpenCode Go and made `opencode-go/deepseek
 - An implementation brief goes to `opencode-go/deepseek-v4.1-flash` before `claude-haiku-5-5`, which keeps reading, searching and cheap checks. A brief DeepSeek cannot finish goes to `claude-sonnet-5-5`.
 - The independent review stays on Claude, on `claude-opus-5-5` when `claude-sonnet-5-5` wrote the diff.
 
+## Token budget
+
+Every model call re-reads the whole context, so spend grows with context size times calls. In the week to 2026-11-28, 40% of the Claude spend went on calls with more than 200k tokens of context. The DeepSeek delegates averaged 173k per call.
+
+- One thread per issue or PR. When its PR is merged the thread settles, and the next issue starts a fresh thread: a fresh start loads about 50k tokens, while a long thread re-reads 300k or more on every call.
+- Wait on a background task with `t3_background_wait`, on a delegate with its `next`, and on a PR with `watch_pull_request`. Each turn of a `sleep` loop re-reads the full context.
+- Read output narrowly: `rg -l` before `rg`, `git diff --stat` before the diff, `| tail -40` on check output, `sed -n` ranges on long files. When a broad search sweeps many files, give it to an Explore or `claude-haiku-5-5` subagent and keep only its conclusion.
+- Read only the screenshot that answers the question, cropped to the region you check (`ffmpeg -loglevel error -i in.png -vf crop=W:H:X:Y out.png`). Each image you read stays in context for the rest of the thread.
+- Drive a browser flow with one script that prints only what you check, rather than one tool call per click.
+- A delegate brief names the files in scope, so the delegate opens those instead of exploring the repository.
+
 ## Agent skills
 
-### Where the skills come from
+### Adding or editing a skill
 
-| Source | Lives in | Pinned | Used by |
-|---|---|---|---|
-| [`mattpocock/skills`](https://github.com/mattpocock/skills) (external) | `.agents/skills/<name>/` (real copy) | `skills-lock.json` | every agent |
-| `RefoundAI/lenny-skills` (external, `goal-setting-okrs`) | `.agents/skills/goal-setting-okrs/` (real copy) | `skills-lock.json` | every agent |
-| `aref-vc/tufte-claude-skill` (external, `tufte`) and `ibelick/ui-skills` (external, `fixing-accessibility`) | `.agents/skills/<name>/` (real copy) | `skills-lock.json` | every agent; [`DESIGN_PRINCIPLES.md`](DESIGN_PRINCIPLES.md) says where they yield to this repository's rules |
-| `trajectonomics/internal-skills` (internal) | `skills/internal/skills/<name>/`, linked from `.agents/skills/<name>` | not in the lock | every agent |
-| First-party customer skills | `skills/customer/skills/<name>/` | `skills.manifest.json` | the product; never installed here |
-
-- The canonical copy of every installed skill is `.agents/skills/` at the root. `.claude/skills/<name>` (Claude Code) and `.vibe/skills/<name>` (Mistral Vibe) are relative symlinks to `../../.agents/skills/<name>`, and `.grok/skills/goal-setting-okrs` is one more. Never edit the external copies or the symlinks by hand.
-- Edit an internal skill in `skills/internal/skills/<name>/`, the source of truth. Its `.agents/skills/` entry is a symlink, so the change is picked up everywhere.
-- A first-party customer skill is hand-edited in `skills/customer/skills/`. It is never in `skills-lock.json` and never copied into `.agents/skills/`: a lock entry would stop `npx skills add trajectonomics/trajectonomics/skills/customer --skill <name>` from installing it.
-- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock, then list the copy in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (a new upstream also needs its own section with its licence), or `bun run check` fails; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
-
-### Commands
-
-- Check: `bun run skills:check` (`bunx skills@latest check`)
-- Update: `bun run skills:update` (`bunx skills@latest update`)
-- Reinstall the external set: `npx skills add mattpocock/skills --skill '*' -a claude-code codex opencode antigravity-cli pi -y`
-- Restore from the lock: `npx skills experimental_install`, then recreate the Claude Code and Vibe symlinks.
+Read [`docs/agents/skills.md`](docs/agents/skills.md) first: where each skill comes from (external, internal, customer), which copy to edit, the symlinks, the lock, and the `skills` commands.
 
 ### Reviewing a diff
 
