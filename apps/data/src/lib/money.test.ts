@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { usdLabel, usdTick } from "./money"
+import { compactUsd, usdLabel, usdTick } from "./money"
 
 describe("usdLabel", () => {
 	test("keeps the cents", () => {
@@ -19,5 +19,15 @@ describe("usdTick", () => {
 
 	test("drops trailing zeros", () => {
 		expect(usdTick(100)).toBe("$100")
+	})
+})
+
+describe("compactUsd", () => {
+	test("keeps cents below a thousand", () => {
+		expect(compactUsd(4.2)).toBe("$4.20")
+	})
+
+	test("cuts a large figure to a short unit", () => {
+		expect(compactUsd(1_300)).toBe("$1.3K")
 	})
 })

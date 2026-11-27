@@ -1,4 +1,5 @@
 import type { PlanBar } from "./plan-bars"
+import { type TickKind, tickText } from "./tick-label"
 
 export const BAR_WIDTH = 720
 export const BAR_HEIGHT = 340
@@ -33,13 +34,16 @@ export type BarMark = {
 	openY: number
 }
 
+/** One axis tick: its value, where it sits, and its label in the bars' unit. */
+export type BarTick = { value: number; y: number; label: string }
+
 /** Everything the bar chart's SVG draws, computed without a browser. */
 export type BarGeometry = {
 	width: number
 	height: number
 	max: number
 	bars: BarMark[]
-	yTicks: { value: number; y: number }[]
+	yTicks: BarTick[]
 }
 
 /** Places one bar per plan on a shared scale; a whisker uses the larger of its figures and range. */
@@ -53,9 +57,10 @@ export function barGeometry(bars: readonly PlanBar[]): BarGeometry | null {
 	const slot = PLOT_WIDTH / bars.length
 	const width = Math.min(72, slot * 0.56)
 	const marks = bars.map((bar, index) => markOf(bar, index, slot, width, yFor, base))
+	const tickKind: TickKind = bars[0]?.unit === "usd" ? "usd" : "tokens"
 	const yTicks = Array.from({ length: 6 }, (_, index) => {
 		const value = max - (max / 5) * index
-		return { value, y: yFor(value) }
+		return { value, y: yFor(value), label: tickText(tickKind, value) }
 	})
 	return { width: BAR_WIDTH, height: BAR_HEIGHT, max, bars: marks, yTicks }
 }

@@ -33,11 +33,14 @@ Claude and OpenCode Go are the plans with a readable meter.
 
 ## Limit estimate
 
-The tokens a plan window would hold at 100%, estimated from its own usage meter: tokens we used
-between two readings ÷ the percentage points the meter moved × 100. Readings that share a reset
-period form one segment; a reset, a change of reset time or a fall in the meter starts a new one.
-Whole-percent rounding widens the range by one point per segment. Only the estimate, its range and
-its evidence are published, never a reading or its time (ADR 0011).
+The tokens a plan window would hold at 100%, estimated from its own usage meter: the tokens we used
+between two readings ÷ the percentage points the meter moved × 100. It comes in three measures:
+uncached tokens, processed tokens (cache reads counted in full) and API list dollars (every token
+kind at its model's list price). Readings that share a reset period form one segment; a reset, a
+change of reset time or a fall in the meter starts a new one. Whole-percent rounding widens the
+range by one point per segment. An estimate is rough until it has three points of meter over at
+least 24 hours. Only the estimates, their ranges and their evidence are published, never a reading
+or its time (ADR 0011, ADR 0013).
 
 ## Window
 
@@ -54,6 +57,11 @@ window starts at the first activity at least five hours after the previous start
 Tokens a provider serves from its prompt cache, stored in `cache_read`. They cost far less than
 input, output or cache writes, so the peaks count them apart and leave them out of the headline
 figure.
+
+## Processed tokens
+
+All tokens a plan processed, cache reads included: the stored `tokens_total`. The peaks and the
+Limit estimate's token measure leave cache reads out; its `With cache` measure counts them in full.
 
 ## Derived Month
 

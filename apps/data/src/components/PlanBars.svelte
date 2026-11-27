@@ -3,21 +3,31 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 
 import { barGeometry } from "../lib/bar-chart"
-import { barAriaLabel, barKindWords } from "../lib/bar-words"
-import { compactCount, displayCount } from "../lib/format"
+import {
+	barAriaLabel,
+	barFigureText,
+	barKindWords,
+	barValueText,
+	unitHeading,
+} from "../lib/bar-words"
 import { PEAK_COLUMNS } from "../lib/peak-words"
-import type { PlanBar } from "../lib/plan-bars"
+import type { PlanBar, PlanUnit } from "../lib/plan-bars"
+import { PLAN_UNITS } from "../lib/plan-unit"
 import type { PeakWindowKey } from "../lib/types"
 import PlanMark from "./PlanMark.svelte"
 
 let {
 	bars,
 	selected,
+	unit,
 	onWindow,
+	onUnit,
 }: {
 	bars: PlanBar[]
 	selected: PeakWindowKey
+	unit: PlanUnit
 	onWindow: (key: PeakWindowKey) => void
+	onUnit: (key: PlanUnit) => void
 } = $props()
 
 const chart = $derived(barGeometry(bars))
@@ -25,17 +35,31 @@ const label = $derived(barAriaLabel(bars, selected))
 </script>
 
 <div class="plan-bars">
-	<div class="window-tabs" role="group" aria-label="Window">
-		{#each PEAK_COLUMNS as column (column.key)}
-			<button
-				class="window-tab"
-				type="button"
-				aria-pressed={selected === column.key}
-				onclick={() => onWindow(column.key)}
-			>
-				{column.label}
-			</button>
-		{/each}
+	<div class="bars-controls">
+		<div class="window-tabs" role="group" aria-label="Window">
+			{#each PEAK_COLUMNS as column (column.key)}
+				<button
+					class="window-tab"
+					type="button"
+					aria-pressed={selected === column.key}
+					onclick={() => onWindow(column.key)}
+				>
+					{column.label}
+				</button>
+			{/each}
+		</div>
+		<div class="window-tabs" role="group" aria-label="Unit">
+			{#each PLAN_UNITS as choice (choice.unit)}
+				<button
+					class="window-tab"
+					type="button"
+					aria-pressed={unit === choice.unit}
+					onclick={() => onUnit(choice.unit)}
+				>
+					{choice.label}
+				</button>
+			{/each}
+		</div>
 	</div>
 
 	{#if chart !== null}
@@ -74,7 +98,7 @@ const label = $derived(barAriaLabel(bars, selected))
 						y2={tick.y}
 					></line>
 					<text class="bars-axis" x="48" y={tick.y} text-anchor="end" dominant-baseline="middle">
-						{compactCount(tick.value)}
+						{tick.label}
 					</text>
 				{/each}
 				{#each chart.bars as mark (mark.bar.plan)}
@@ -137,7 +161,9 @@ const label = $derived(barAriaLabel(bars, selected))
 						y={mark.valueY}
 						text-anchor={mark.openHigh ? openSide : "middle"}
 					>
-						{#if mark.bar.kind === "estimate"}≈ {compactCount(mark.bar.tokens ?? 0)}{:else if mark.bar.kind === "fallback"}{compactCount(mark.bar.tokens ?? 0)}{:else if mark.bar.kind === "collecting"}<tspan x={labelX}
+						{#if mark.bar.kind === "estimate"}≈ {barFigureText(mark.bar)}{:else if mark.bar.kind === "fallback"}{barFigureText(
+								mark.bar,
+							)}{:else if mark.bar.kind === "collecting"}<tspan x={labelX}
 								>{mark.bar.collecting?.seen} of {mark.bar.collecting?.of}</tspan
 							><tspan x={labelX} dy="1.1em">days</tspan>{:else}–{/if}
 					</text>
@@ -170,7 +196,7 @@ const label = $derived(barAriaLabel(bars, selected))
 						<tr>
 							<th scope="col">Plan</th>
 							<th scope="col">Tier</th>
-							<th scope="col">Tokens</th>
+							<th scope="col">{unitHeading(unit)}</th>
 							<th scope="col">How</th>
 						</tr>
 					</thead>
@@ -184,7 +210,7 @@ const label = $derived(barAriaLabel(bars, selected))
 										? bar.collecting === null
 											? "–"
 											: `${bar.collecting.seen} of ${bar.collecting.of} days`
-										: displayCount(bar.tokens)}
+										: barValueText(bar)}
 								</td>
 								<td>{barKindWords(bar)}</td>
 							</tr>

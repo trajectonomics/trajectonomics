@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { estimateLimit, type QuotaReading } from "./limits"
+import type { MeterHour } from "./meter-hours"
 import { HOUR_MS } from "./rules"
 
 /** A reading at an hour of 2026-11-24 with a shared 15:00 reset unless a test says otherwise. */
@@ -11,10 +12,13 @@ function reading(
 	return { sampledAt: `2026-11-24T${sampledAt}:00.000Z`, usedPct, resetsAt }
 }
 
-/** Hourly uncached tokens keyed by epoch hour, as the peaks read gives them. */
-function hours(entries: readonly (readonly [string, number])[]): Map<number, number> {
+/** Hourly measures keyed by epoch hour; nothing here is priced and no cache read is counted. */
+function hours(entries: readonly (readonly [string, number])[]): Map<number, MeterHour> {
 	return new Map(
-		entries.map(([hour, tokens]) => [Date.parse(`2026-11-24T${hour}:00.000Z`) / HOUR_MS, tokens]),
+		entries.map(([hour, tokens]) => [
+			Date.parse(`2026-11-24T${hour}:00.000Z`) / HOUR_MS,
+			{ uncached: tokens, processed: tokens, usd: null },
+		]),
 	)
 }
 
