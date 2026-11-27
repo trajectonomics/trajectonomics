@@ -2,6 +2,7 @@ import {
 	accountList,
 	balance,
 	baseline,
+	baselineRates,
 	doctor,
 	fi,
 	netWorth,
@@ -17,7 +18,6 @@ import {
 	txList,
 } from "../src/lib/contract"
 import {
-	type PlannedRead,
 	type PlanParams,
 	planStageOne,
 	type StageOneReads,
@@ -27,45 +27,28 @@ import { runAllowances } from "./run-allowances"
 import { runHistory } from "./run-history"
 import { runPaths } from "./run-paths"
 import { runPlanned } from "./run-planned"
+import { createPool, recordPool, recordWithPool } from "./run-pool"
 import { runTaxNotes } from "./run-tax-notes"
 import type { RunContext } from "./run-traj"
 
-/** Runs each item in order, one at a time, so the ledger is read in a fixed sequence. */
-async function sequential<T, R>(items: readonly T[], run: (item: T) => Promise<R>): Promise<R[]> {
-	const out: R[] = []
-	for (const item of items) out.push(await run(item))
-	return out
-}
-
-/** Runs every planned read of a keyed plan, keeping the same keys. */
-async function recordOf<T>(
-	plans: Record<string, PlannedRead>,
-	run: (planned: PlannedRead) => Promise<T>,
-): Promise<Record<string, T>> {
-	const entries = await sequential(
-		Object.entries(plans),
-		async ([key, planned]) => [key, await run(planned)] as const,
-	)
-	return Object.fromEntries(entries)
-}
-
-/** Stage one: the Scenarios, the accounts and net worth at the As-of. */
+/** Stage one: the Scenarios, the accounts and net worth at the As-of, read concurrently. */
 export async function runStageOne(context: RunContext, params: PlanParams): Promise<StageOneReads> {
 	const plan = planStageOne(params)
-	return {
-		scenarios: await runPlanned(context, plan.scenarios, scenarioList, []),
-		accounts: await runPlanned(context, plan.accounts, accountList, []),
-		netWorth: await runPlanned(context, plan.netWorth, netWorth, []),
-	}
+	const [scenarios, accounts, netWorthRead] = await Promise.all([
+		runPlanned(context, plan.scenarios, scenarioList, []),
+		runPlanned(context, plan.accounts, accountList, []),
+		runPlanned(context, plan.netWorth, netWorth, []),
+	])
+	return { scenarios, accounts, netWorth: netWorthRead }
 }
 
-/** The chance reads of a plan, one at a time; none when the plan states no chance inputs. */
-export async function runChance(
+/** The chance reads of a plan, with bounded concurrency; none when the plan states no chance inputs. */
+export function runChance(
 	context: RunContext,
 	plan: StageTwoPlan,
 	records: readonly unknown[],
 ): Promise<Record<string, Read<ProjectionChance>>> {
-	return recordOf(plan.chance, (planned) => runPlanned(context, planned, projectionChance, records))
+	return recordPool(plan.chance, (p) => runPlanned(context, p, projectionChance, records))
 }
 
 /** Stage two: every other read, planned from the Scenarios and the first transaction date. */
@@ -73,31 +56,49 @@ export async function runStageTwo(
 	context: RunContext,
 	plan: StageTwoPlan,
 	records: readonly unknown[],
-): Promise<Omit<SnapshotReads, "accounts" | "netWorth" | "scenarios">> {
-	const documents = await recordOf(plan.documents, (planned) =>
-		runPlanned(context, planned, scenarioShow, records),
-	)
-	const projections = await recordOf(plan.projections, (planned) =>
-		runPlanned(context, planned, projectionRun, records),
-	)
-	const chance = await runChance(context, plan, records)
+): Promise<
+	Omit<SnapshotReads, "accounts" | "netWorth" | "scenarios"> &
+		Required<Pick<SnapshotReads, "rates">>
+> {
+	const pool = createPool()
+	const comparePlan = plan.compare
+	const phaseOne = await Promise.all([
+		recordWithPool(pool, plan.documents, (p) => runPlanned(context, p, scenarioShow, records)),
+		recordWithPool(pool, plan.projections, (p) => runPlanned(context, p, projectionRun, records)),
+		recordWithPool(pool, plan.chance, (p) => runPlanned(context, p, projectionChance, records)),
+		pool(() => runPlanned(context, plan.doctor, doctor, records)),
+		pool(() => runPlanned(context, plan.balance, balance, records)),
+		pool(() => runPlanned(context, plan.pnl, pnl, records)),
+		pool(() => runPlanned(context, plan.transactions, txList, records)),
+		pool(() => runPlanned(context, plan.baseline, baseline, records)),
+		pool(() => runHistory(context, plan, records)),
+		recordWithPool(pool, plan.fi, (p) => runPlanned(context, p, fi, records)),
+		comparePlan === null
+			? Promise.resolve(null)
+			: pool(() => runPlanned(context, comparePlan, projectionCompare, records)),
+		pool(() => runPlanned(context, plan.rates, baselineRates, records)),
+	])
+	const [documents, projections, chance] = phaseOne
+	const [paths, allowances, taxNotes] = await Promise.all([
+		runPaths(context, plan, chance, records, pool),
+		runAllowances(context, plan, documents, projections, records, pool),
+		runTaxNotes(context, plan, documents, records, pool),
+	])
 	return {
-		doctor: await runPlanned(context, plan.doctor, doctor, records),
-		balance: await runPlanned(context, plan.balance, balance, records),
-		pnl: await runPlanned(context, plan.pnl, pnl, records),
-		transactions: await runPlanned(context, plan.transactions, txList, records),
-		baseline: await runPlanned(context, plan.baseline, baseline, records),
-		netWorthHistory: await runHistory(context, plan, records),
+		doctor: phaseOne[3],
+		balance: phaseOne[4],
+		pnl: phaseOne[5],
+		transactions: phaseOne[6],
+		baseline: phaseOne[7],
+		rates: phaseOne[11],
+		netWorthHistory: phaseOne[8],
 		documents,
 		projections,
-		fi: await recordOf(plan.fi, (planned) => runPlanned(context, planned, fi, records)),
-		compare:
-			plan.compare === null
-				? null
-				: await runPlanned(context, plan.compare, projectionCompare, records),
+		fi: phaseOne[9],
+		compare: phaseOne[10],
 		chance,
-		paths: await runPaths(context, plan, chance, records),
-		allowances: await runAllowances(context, plan, documents, projections, records),
-		taxNotes: await runTaxNotes(context, plan, documents, records),
+		paths,
+		allowances,
+		taxNotes,
 	}
 }

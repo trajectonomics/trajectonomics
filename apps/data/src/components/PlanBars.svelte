@@ -3,47 +3,103 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 
 import { barGeometry } from "../lib/bar-chart"
-import { barAriaLabel, barKindWords } from "../lib/bar-words"
-import { compactCount, displayCount } from "../lib/format"
+import {
+	barAriaLabel,
+	barFigureText,
+	barKindWords,
+	barTip,
+	barValueText,
+	unitHeading,
+} from "../lib/bar-words"
 import { PEAK_COLUMNS } from "../lib/peak-words"
-import type { PlanBar } from "../lib/plan-bars"
+import type { PlanBar, PlanUnit } from "../lib/plan-bars"
+import { planColour } from "../lib/plan-colour"
+import { PLAN_UNITS } from "../lib/plan-unit"
 import type { PeakWindowKey } from "../lib/types"
 import PlanMark from "./PlanMark.svelte"
 
 let {
 	bars,
 	selected,
+	unit,
 	onWindow,
+	onUnit,
 }: {
 	bars: PlanBar[]
 	selected: PeakWindowKey
+	unit: PlanUnit
 	onWindow: (key: PeakWindowKey) => void
+	onUnit: (key: PlanUnit) => void
 } = $props()
 
 const chart = $derived(barGeometry(bars))
 const label = $derived(barAriaLabel(bars, selected))
+let active = $state<string | null>(null)
+const activeBar = $derived(bars.find((bar) => bar.plan === active) ?? null)
+
+function pointerLeft(event: PointerEvent) {
+	const plot = event.currentTarget
+	const focused = document.activeElement
+	if (plot instanceof HTMLElement && focused instanceof Node && plot.contains(focused)) return
+	active = null
+}
+
+function focusLeft(event: FocusEvent) {
+	const plot = event.currentTarget
+	const next = event.relatedTarget
+	if (plot instanceof HTMLElement && next instanceof Node && plot.contains(next)) return
+	active = null
+}
+
+function chooseKey(event: KeyboardEvent, plan: string) {
+	if (event.key !== "Enter" && event.key !== " ") return
+	event.preventDefault()
+	active = plan
+}
 </script>
 
 <div class="plan-bars">
-	<div class="window-tabs" role="group" aria-label="Window">
-		{#each PEAK_COLUMNS as column (column.key)}
-			<button
-				class="window-tab"
-				type="button"
-				aria-pressed={selected === column.key}
-				onclick={() => onWindow(column.key)}
-			>
-				{column.label}
-			</button>
-		{/each}
+	<div class="bars-controls">
+		<div class="window-tabs" role="group" aria-label="Window">
+			{#each PEAK_COLUMNS as column (column.key)}
+				<button
+					class="window-tab"
+					type="button"
+					aria-pressed={selected === column.key}
+					onclick={() => onWindow(column.key)}
+				>
+					{column.label}
+				</button>
+			{/each}
+		</div>
+		<div class="window-tabs" role="group" aria-label="Unit">
+			{#each PLAN_UNITS as choice (choice.unit)}
+				<button
+					class="window-tab"
+					type="button"
+					aria-pressed={unit === choice.unit}
+					onclick={() => onUnit(choice.unit)}
+				>
+					{choice.label}
+				</button>
+			{/each}
+		</div>
 	</div>
 
 	{#if chart !== null}
-		<figure class="bars-figure">
+		<figure
+			class="bars-figure"
+			class:is-choosing={active !== null}
+			onpointerleave={pointerLeft}
+			onfocusout={focusLeft}
+		>
+			{#if activeBar !== null}
+				<p class="chart-readout">{barTip(activeBar)}</p>
+			{/if}
 			<svg
 				class="bars-svg"
 				viewBox={`0 0 ${chart.width} ${chart.height}`}
-				role="img"
+				role="group"
 				aria-label={label}
 			>
 				<defs>
@@ -68,16 +124,33 @@ const label = $derived(barAriaLabel(bars, selected))
 				{#each chart.yTicks as tick}
 					<line
 						class="bars-grid"
-						x1="56"
+						x1="64"
 						x2={chart.width - 16}
 						y1={tick.y}
 						y2={tick.y}
 					></line>
-					<text class="bars-axis" x="48" y={tick.y} text-anchor="end" dominant-baseline="middle">
-						{compactCount(tick.value)}
+					<text class="bars-axis" x="56" y={tick.y} text-anchor="end" dominant-baseline="middle">
+						{tick.label}
 					</text>
 				{/each}
 				{#each chart.bars as mark (mark.bar.plan)}
+					{@const openSide = mark.center < chart.width / 2 ? "start" : "end"}
+					{@const labelX = mark.openHigh
+						? openSide === "start"
+							? mark.x + mark.width + 4
+							: mark.x - 4
+						: mark.center}
+					<g
+						class="bars-series"
+						class:bars-series-on={active === null || active === mark.bar.plan}
+						style={`--plan-ink: ${planColour(mark.bar.plan)}`}
+						role="button"
+						tabindex="0"
+						aria-label={barTip(mark.bar)}
+						onpointerenter={() => (active = mark.bar.plan)}
+						onfocus={() => (active = mark.bar.plan)}
+						onkeydown={(event) => chooseKey(event, mark.bar.plan)}
+					>
 					{#if mark.bar.kind === "estimate" && mark.lowY !== null}
 						<g class="bars-whisker">
 							<line
@@ -125,19 +198,15 @@ const label = $derived(barAriaLabel(bars, selected))
 							height={mark.height}
 						></rect>
 					{/if}
-					{@const openSide = mark.center < chart.width / 2 ? "start" : "end"}
-					{@const labelX = mark.openHigh
-						? openSide === "start"
-							? mark.x + mark.width + 4
-							: mark.x - 4
-						: mark.center}
 					<text
 						class="bars-value"
 						x={labelX}
 						y={mark.valueY}
 						text-anchor={mark.openHigh ? openSide : "middle"}
 					>
-						{#if mark.bar.kind === "estimate"}≈ {compactCount(mark.bar.tokens ?? 0)}{:else if mark.bar.kind === "fallback"}{compactCount(mark.bar.tokens ?? 0)}{:else if mark.bar.kind === "collecting"}<tspan x={labelX}
+						{#if mark.bar.kind === "estimate"}≈ {barFigureText(mark.bar)}{:else if mark.bar.kind === "fallback"}{barFigureText(
+								mark.bar,
+							)}{:else if mark.bar.kind === "collecting"}<tspan x={labelX}
 								>{mark.bar.collecting?.seen} of {mark.bar.collecting?.of}</tspan
 							><tspan x={labelX} dy="1.1em">days</tspan>{:else}–{/if}
 					</text>
@@ -145,10 +214,12 @@ const label = $derived(barAriaLabel(bars, selected))
 						<text
 							class="bars-meta"
 							x={labelX}
-							y={Math.max(10, mark.valueY - 12)}
+							y={mark.valueY}
+							dy="-1.35em"
 							text-anchor={mark.openHigh ? openSide : "middle"}>rough</text
 						>
 					{/if}
+					</g>
 				{/each}
 			</svg>
 			<div class="bars-labels" style={`--bar-count: ${chart.bars.length}`}>
@@ -170,7 +241,7 @@ const label = $derived(barAriaLabel(bars, selected))
 						<tr>
 							<th scope="col">Plan</th>
 							<th scope="col">Tier</th>
-							<th scope="col">Tokens</th>
+							<th scope="col">{unitHeading(unit)}</th>
 							<th scope="col">How</th>
 						</tr>
 					</thead>
@@ -184,7 +255,7 @@ const label = $derived(barAriaLabel(bars, selected))
 										? bar.collecting === null
 											? "–"
 											: `${bar.collecting.seen} of ${bar.collecting.of} days`
-										: displayCount(bar.tokens)}
+										: barValueText(bar)}
 								</td>
 								<td>{barKindWords(bar)}</td>
 							</tr>

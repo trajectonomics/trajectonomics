@@ -7,6 +7,8 @@ export class Session {
 	async request(path: string, init: RequestInit = {}): Promise<Response> {
 		const headers = new Headers(init.headers)
 		headers.set("origin", BASE_URL)
+		// Cloudflare sets this in production. Sending it locally exercises the rate-limit key.
+		headers.set("cf-connecting-ip", "127.0.0.1")
 		if (this.cookies.size > 0) {
 			headers.set("cookie", this.cookieHeader())
 		}
@@ -42,11 +44,14 @@ export class Session {
 }
 
 /** A form-encoded POST, which the OAuth and device endpoints accept. */
-export function form(fields: Record<string, string>): RequestInit {
+export function form(
+	fields: Record<string, string> | string,
+	headers: Record<string, string> = {},
+): RequestInit {
 	return {
 		method: "POST",
-		headers: { "content-type": "application/x-www-form-urlencoded" },
-		body: new URLSearchParams(fields).toString(),
+		headers: { "content-type": "application/x-www-form-urlencoded", ...headers },
+		body: typeof fields === "string" ? fields : new URLSearchParams(fields).toString(),
 	}
 }
 

@@ -35,6 +35,23 @@ describe("withSearch", () => {
 		expect(withSearch("/net-worth/", "")).toBe("/net-worth/")
 		expect(withSearch("/a/?x=1", "?demo=1")).toBe("/a/?x=1&demo=1")
 	})
+
+	test("a parameter the link states replaces the page's value of it, and the page's others stay", () => {
+		expect(withSearch("/tax/?scenario=separate", "?scenario=base&demo=1")).toBe(
+			"/tax/?scenario=separate&demo=1",
+		)
+		// The link's parameters stay first, and the page's others follow in the page's order.
+		expect(withSearch("/chance/?index=3&scenario=base", "?demo=1&scenario=base&x=1")).toBe(
+			"/chance/?index=3&scenario=base&demo=1&x=1",
+		)
+	})
+
+	test("keeps one scenario when the address a link made is the page's query for the next link", () => {
+		const first = withSearch("/projection/?scenario=retire-early", "?scenario=base&demo=1")
+		expect(first).toBe("/projection/?scenario=retire-early&demo=1")
+		const page = first.slice(first.indexOf("?"))
+		expect(withSearch("/tax/?scenario=joint", page)).toBe("/tax/?scenario=joint&demo=1")
+	})
 })
 
 describe("parseSnapshotText", () => {

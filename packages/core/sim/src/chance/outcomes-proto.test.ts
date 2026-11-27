@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { pathOutcomes } from "./outcomes"
-import type { PathOutcome } from "./path"
+import type { PathOutcome } from "./path-outcome"
 
 /** One path that fired a Milestone whose id is `__proto__`, the one id a plain object assignment loses. */
 function fired(): PathOutcome {

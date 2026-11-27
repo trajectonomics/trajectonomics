@@ -16,8 +16,9 @@
 		"typecheck": "tsc -p tsconfig.json",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun ../../tooling/scripts/build-unless-turbo.ts",
+		"check": "bun ../../tooling/scripts/run-parallel.ts \"bun run lint\" \"bun run typecheck\" \"bun run test\" && bun ../../tooling/scripts/build-unless-turbo.ts",
 		"schema": "bun run scripts/generate-schema.ts",
+		"clients:sql": "bun run scripts/generate-clients.ts",
 		"spike": "bun run scripts/spike.ts"
 	},
 	"dependencies": {

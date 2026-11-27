@@ -10,6 +10,7 @@ const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estima
 const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md`
 const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data-starts-when-collecting-starts.md`
 const LIMITS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0011-limits-are-estimated-from-the-usage-meter.md`
+const LIMITS_CACHE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0014-limits-are-priced-and-counted-with-cache.md`
 const VALUE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0012-prices-enter-with-a-dated-source.md`
 
 const planPriceRows = Object.entries(PLAN_PRICES).flatMap(([plan, prices]) =>
@@ -143,14 +144,14 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 			whatever the local clock says.
 		</p>
 
-		<h2 id="plans">What each plan gives</h2>
+		<h2 id="plans">Limits</h2>
 		<p>
-			“What each plan gives” shows the most tokens a plan carried in a window, with cache reads
-			counted apart: they cost far less, so they never lift the figure. Missing hours and days
-			count as zero, so a window is calendar-consecutive, not consecutive in the rows. Claude's
-			5 hours start at its first active hour, because its session starts with the first message;
-			other plans' windows slide over the clock. Claude and Antigravity state no monthly window,
-			so their 30-day figure is the week × 30/7. Every figure is what we used, never the plan's
+			“Limits” shows the most tokens a plan carried in a window, with cache reads counted
+			apart: they cost far less, so they never lift the figure. Missing hours and days count as
+			zero, so a window is calendar-consecutive, not consecutive in the rows. Claude's 5 hours
+			start at its first active hour, because its session starts with the first message; other
+			plans' windows slide over the clock. Claude and Antigravity state no monthly window, so
+			their 30-day figure is the week × 30/7. Every figure is what we used, never the plan's
 			limit. The reasoning is in <a href={PEAKS_ADR_URL}>ADR 0009</a>.
 		</p>
 
@@ -162,8 +163,15 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 			reset time form one segment; a reset, a change of reset time or a fall in the percentage
 			starts a new one. Each reading is rounded to a whole percent, so the range widens by one
 			point per segment. Only the estimate, its range and its evidence leave the Worker, never a
-			reading, its time or its reset time. The reasoning is in
-			<a href={LIMITS_ADR_URL}>ADR 0011</a>.
+			reading, its time or its reset time.
+		</p>
+		<p>
+			The estimate comes in three units. Tokens leaves cache reads out, as the peaks do. With cache
+			counts them in full. API $ prices every token kind at its model's list price per million, so
+			cache reads count at their real weight; an hour holding a model with no list price makes that
+			hour's dollars unknown, so the window has no dollar figure. An estimate is rough until it has
+			three points of meter over at least 24 hours. The reasoning is in
+			<a href={LIMITS_ADR_URL}>ADR 0011</a> and <a href={LIMITS_CACHE_ADR_URL}>ADR 0014</a>.
 		</p>
 
 		<h2>Estimated tiers</h2>
@@ -174,12 +182,12 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 			The reasoning is in <a href={ESTIMATE_ADR_URL}>ADR 0008</a>.
 		</p>
 
-		<h2 id="value">Value for money</h2>
+		<h2 id="value">Value</h2>
 		<p>
-			“Value for money” plots tokens per $1 against API value per $1, one dot per plan with a
-			weekly figure and a price. The weekly price is the monthly USD price × 12 / 52. Tokens per
-			$1 is the week's tokens ÷ the weekly price. API value per $1 is the week's tokens × the
-			blended API list price of the plan's own mix ÷ the weekly price.
+			“Value” plots tokens per $1 against API value per $1, one dot per plan with a weekly figure
+			and a price. The weekly price is the monthly USD price × 12 / 52. Tokens per $1 is the
+			week's tokens ÷ the weekly price. API value per $1 is the week's tokens × the blended API
+			list price of the plan's own mix ÷ the weekly price.
 		</p>
 		<p>
 			The blend prices what we used on each model at that model's list price, adds it up, and
@@ -190,7 +198,7 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 			axes, or the upper-right third with fewer than three dots.
 		</p>
 
-		<h2 id="tokens">Where the tokens went</h2>
+		<h2 id="tokens">Cache</h2>
 		<p>
 			The bars split each plan's tokens into input, output, cache read and cache write. Cache rate
 			is cache read ÷ all tokens; a source that reports no cache split says so and has no dot in

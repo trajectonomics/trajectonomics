@@ -1,6 +1,7 @@
-import { describe, expect, test } from "bun:test"
+import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 
+import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import type { Fi } from "../../lib/contract"
 import { insideDetails, outsideDetails } from "../../lib/view/details.test-support"
 import { bindingSentence } from "../../lib/view/fi/binding"
@@ -25,6 +26,9 @@ const TAX_YEAR = {
 function renderFi(fi: Fi): string {
 	return render(FiResult, { props: { fi, argv: ARGV } }).body
 }
+
+beforeEach(() => setTestUrl("http://127.0.0.1/"))
+afterAll(() => setTestUrl("http://127.0.0.1/"))
 
 describe("FiResult: reachable", () => {
 	test("shows the FI month as the main figure, under the label FI date", () => {
@@ -128,6 +132,15 @@ describe("FiResult: unreachable", () => {
 
 	test("has no pointer to the Tax page when there are no tax years", () => {
 		expect(renderFi(fiFixture(REACHABLE))).not.toContain("/tax/")
+	})
+
+	test("keeps this plan's Tax link when the page names another plan, and still carries demo=1", () => {
+		setTestUrl("http://127.0.0.1/fi/?scenario=retire-early&demo=1")
+		const fi = fiFixture(UNREACHABLE.minimumBuffer, { taxYears: [TAX_YEAR] })
+		const body = renderFi(fi)
+		expect(body).toContain(
+			`href="/tax/?scenario=${encodeURIComponent(fi.scenario.name)}&amp;demo=1"`,
+		)
 	})
 })
 

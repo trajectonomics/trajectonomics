@@ -1,7 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import { planBars } from "../lib/plan-bars"
+import { type PlanUnit, planBars } from "../lib/plan-bars"
 import { METHOD_PATH } from "../lib/site"
 import { planTakeaway } from "../lib/takeaways"
 import type { PeakWindowKey, PlanPeak } from "../lib/types"
@@ -22,19 +22,20 @@ let {
 } = $props()
 
 let selected = $state<PeakWindowKey>("sevenDays")
-const bars = $derived(planBars(plans, { day, planSince, window: selected }))
-const takeaway = $derived(planTakeaway(bars, selected))
+let unit = $state<PlanUnit>("tokens")
+const bars = $derived(planBars(plans, { day, planSince, window: selected, unit }))
+const takeaway = $derived(planTakeaway(bars, selected, unit))
 </script>
 
 <DataSection
 	id="plans"
-	title="What each plan gives"
+	title="Limits"
 	href={`${METHOD_PATH}#plans`}
-	direction="More tokens is better."
+	direction="Higher is better."
 	{takeaway}
 >
 	{#snippet chart()}
-		<PlanBars {bars} {selected} onWindow={(key) => (selected = key)} />
+		<PlanBars {bars} {selected} {unit} onWindow={(key) => (selected = key)} onUnit={(key) => (unit = key)} />
 		{#if plans.length > 0}
 			<details class="table-details">
 				<summary>Show the table</summary>
@@ -46,13 +47,15 @@ const takeaway = $derived(planTakeaway(bars, selected))
 		<p>
 			A bar is the plan's estimated 100% from its own usage meter when it has one: tokens used ÷
 			points the meter moved × 100. A hatched bar is the most we used once the window was full,
-			a lower bound and not the plan's limit. A rough estimate moved fewer than three points of
-			meter. A stub still filling shows the days seen. Every figure is measured by us.
+			a lower bound and not the plan's limit. A stub still filling shows the days seen. With
+			cache counts cache reads in full; API $ prices every token at its model's list price, so
+			cache reads count at their real weight. An estimate is rough until it has 3 points of
+			meter over at least 24 hours. Every figure is measured by us.
 		</p>
 		<p>
 			Tiers are the ones each plan runs on today. The table's other tiers are estimated from a
 			measured tier times the multiplier its vendor states. The reasoning is in
-			<a href={`${METHOD_PATH}#plans`}>What each plan gives</a>.
+			<a href={`${METHOD_PATH}#plans`}>Limits</a>.
 		</p>
 	{/snippet}
 </DataSection>

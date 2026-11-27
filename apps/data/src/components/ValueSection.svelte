@@ -17,20 +17,20 @@ const takeaway = $derived(valueTakeaway(points))
 
 <DataSection
 	id="value"
-	title="Value for money"
+	title="Value"
 	href={`${METHOD_PATH}#value`}
-	direction="Up and to the right is better: more API value per dollar."
+	direction="Up-right is better."
 	{takeaway}
 >
 	{#snippet chart()}
 		{#if points.length > 0}
 			<ScatterChart
 				{points}
-				xTitle="API value per $1"
-				yTitle="Tokens per $1"
+				xTitle="API value/$"
+				yTitle="Tokens/$"
 				xKind="usd"
 				yKind="tokens"
-				caption="Tokens per $1 against API value per $1, one dot per priced plan. A hollow dot is the most we used, not an estimate."
+				caption="One dot per priced plan; a hollow dot is the most we used."
 			/>
 		{:else}
 			<p class="section-empty">No plan has both a weekly figure and a price yet.</p>
@@ -38,11 +38,11 @@ const takeaway = $derived(valueTakeaway(points))
 	{/snippet}
 	{#snippet notes()}
 		<p>
-			Tokens per $1 is the week's tokens from <a href="#plans">What each plan gives</a> ÷ the
-			weekly price (monthly USD × 12 / 52). API value per $1 is the week's tokens × the blended
-			API list price of the plan's own model mix ÷ the weekly price. The blend prices the tokens
-			in, out, cache read and cache write we actually used, and divides by the tokens without
-			cache reads.
+			Tokens/$ is the week's tokens from <a href="#plans">Limits</a> ÷ the weekly price
+			(monthly USD × 12 / 52). API value/$ is the week's tokens × the blended API list price
+			of the plan's own model mix ÷ the weekly price. The blend prices the tokens in, out,
+			cache read and cache write we actually used, and divides by the tokens without cache
+			reads.
 		</p>
 		<p>
 			Rows missing a price are left out: a model with no list price stays out of the blend, and a

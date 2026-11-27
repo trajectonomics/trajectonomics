@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { join } from "node:path"
 import { snapshot } from "../src/lib/contract"
 import { demoCarryIn } from "./demo/carry-in"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS, withAmount } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { makeScratch, removeScratch } from "./scratch"
@@ -87,7 +87,7 @@ function serve(): Editor {
 beforeAll(async () => {
 	scratch = await makeScratch("traj-web-loans-")
 	home = join(scratch, "traj-home")
-	await buildDemoLedger({ binary: BINARY, home, scratch })
+	await copyDemoLedger({ binary: BINARY, home, scratch })
 	applyInTerminal(PLAN, loanDocument())
 	loans = loansOf(PLAN)
 	editor = createEditor({

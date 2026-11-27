@@ -1,6 +1,7 @@
 import { growthYears } from "../calendar/arith"
 import { countedDays } from "../calendar/counted"
 import { isSafeInteger, overflow } from "../engine/overflow"
+import { inflationOf } from "../engine/run-scenario"
 import type {
 	AccountId,
 	Estate,
@@ -46,8 +47,12 @@ export function estateStatement(
 	timeline: Timeline,
 	liabilities: ReadonlySet<AccountId>,
 ): StatementOutcome {
-	const inflation = scenario.economy.inflation
-	const footing: Footing = { years: growthYears(timeline.start, row.date), inflation }
+	const inflation = inflationOf(scenario)
+	const footing: Footing = {
+		date: row.date,
+		years: growthYears(timeline.start, row.date),
+		inflation,
+	}
 	const worth = worthOf(row, liabilities)
 	const costs = (estate?.costs ?? []).map((cost) => costAmount(cost, worth, footing))
 	const costsTotal = costs.reduce((sum, cost) => sum + cost, 0n)

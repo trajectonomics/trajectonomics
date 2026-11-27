@@ -20,10 +20,10 @@
 	"scripts": {
 		"build": "vite build && bun scripts/pack.ts",
 		"build:hosted": "TRAJ_WEB_TARGET=hosted vite build",
-		"typecheck": "svelte-kit sync && tsc -p tsconfig.json && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
-		"test": "bun test ./src ./scripts",
+		"typecheck": "svelte-kit sync && bun ../../tooling/scripts/run-parallel.ts \"tsc -p tsconfig.json\" \"svelte-check --tsconfig ./tsconfig.json --fail-on-warnings\"",
+		"test": "bun test --parallel=2 --no-isolate ./src ./scripts",
 		"test:src": "bun test ./src",
-		"test:scripts": "bun test ./scripts",
+		"test:scripts": "bun test --parallel=2 --no-isolate ./scripts",
 		"test:browser": "playwright test",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",

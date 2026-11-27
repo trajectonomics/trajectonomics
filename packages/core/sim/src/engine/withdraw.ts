@@ -1,9 +1,11 @@
+import type { Inflation } from "../money/inflation"
 import type { DateString, Scenario, WithdrawEntry } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { LevySet } from "./levy-set"
 import { minBigInt } from "./min"
 import { mutate } from "./mutate"
 import { entryAccount, routedAt } from "./routed"
+import { inflationOf } from "./run-scenario"
 import type { AccountState, StateMap } from "./state"
 import { addTracked, NO_ROUTING } from "./tracked"
 import { valuation } from "./value"
@@ -38,7 +40,7 @@ function drawable(
 	state: AccountState,
 	entry: WithdrawEntry,
 	date: DateString,
-	inflation: number,
+	inflation: Inflation,
 ): bigint {
 	const value = valuation(state, date)
 	if (typeof entry === "string") return value
@@ -89,7 +91,7 @@ function takeSteps(
 		const entry = withdraw[position]!
 		const state = states.get(entryAccount(entry))!
 		if (isLocked(state, date)) continue
-		const available = drawable(state, entry, date, scenario.economy.inflation)
+		const available = drawable(state, entry, date, inflationOf(scenario))
 		const result = takeFrom(state, available, date, remaining, levies)
 		remaining = result.remaining
 		addTracked(taken, String(position), result.take)
