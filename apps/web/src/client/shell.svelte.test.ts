@@ -87,14 +87,14 @@ describe("the shell panels", () => {
 		expect([panels.menu, panels.options]).toEqual([false, false])
 	})
 
-	test("following a link shuts the menu and leaves Display options as it was", () => {
+	test("closeMenu shuts the menu and leaves Display options as it was", () => {
 		panels.openMenu()
 		panels.openOptions()
 		panels.closeMenu()
 		expect([panels.menu, panels.options]).toEqual([false, true])
 	})
 
-	test("shutting Display options leaves the menu as it was", () => {
+	test("closeOptions shuts Display options and leaves the menu as it was", () => {
 		panels.openMenu()
 		panels.openOptions()
 		panels.closeOptions()

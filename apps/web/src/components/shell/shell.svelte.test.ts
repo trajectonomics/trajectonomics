@@ -112,11 +112,17 @@ describe("DisplayOptions", () => {
 
 		const saved = { hidden: preferences.hidden, theme: preferences.theme }
 		try {
+			// One switch on at a time, so a switch that read the other's state would fail.
 			preferences.hidden = true
+			preferences.theme = "light"
+			const hidden = render(DisplayOptions, {}).body
+			expect(switchState(hidden, "Hide amounts")).toBe("true")
+			expect(switchState(hidden, "Dark theme")).toBe("false")
+			preferences.hidden = false
 			preferences.theme = "dark"
-			const on = render(DisplayOptions, {}).body
-			expect(switchState(on, "Hide amounts")).toBe("true")
-			expect(switchState(on, "Dark theme")).toBe("true")
+			const dark = render(DisplayOptions, {}).body
+			expect(switchState(dark, "Hide amounts")).toBe("false")
+			expect(switchState(dark, "Dark theme")).toBe("true")
 		} finally {
 			preferences.hidden = saved.hidden
 			preferences.theme = saved.theme

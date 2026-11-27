@@ -1,5 +1,5 @@
 <script lang="ts">
-import { navLinks } from "../../lib/view/shell/links"
+import { NAV_GROUPS, routesShown } from "../../lib/view/routes"
 import { cx } from "../ui/cx"
 import SiteLink from "../ui/SiteLink.svelte"
 import NavIcon from "./NavIcon.svelte"
@@ -31,7 +31,7 @@ let {
 
 <!-- The pages in groups: a group with a heading, then the pages that belong to no group. -->
 <nav aria-label="Pages" class="space-y-5">
-	{#each navLinks(current, onNavigate, planDocument, milestones, cashflow, levy) as group, index (index)}
+	{#each NAV_GROUPS as group, index (index)}
 		<div>
 			{#if group.heading}
 				<h2 class="px-3 pb-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
@@ -39,21 +39,22 @@ let {
 				</h2>
 			{/if}
 			<ul class="space-y-1">
-				{#each group.links as link (link.path)}
+				{#each routesShown(group, planDocument, milestones, cashflow, levy) as route (route.path)}
+					{@const isCurrent = route.path === current}
 					<li>
 						<SiteLink
-							href={link.path}
-							aria-current={link.current ? "page" : undefined}
-							onclick={link.follow}
+							href={route.path}
+							aria-current={isCurrent ? "page" : undefined}
+							onclick={onNavigate}
 							class={cx(
 								"flex items-center gap-3 rounded-md px-3 py-2 text-sm whitespace-nowrap outline-none focus-visible:outline-2 focus-visible:outline-ring",
-								link.current
+								isCurrent
 									? "bg-secondary font-medium text-foreground"
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
-							<NavIcon name={link.icon} />
-							{link.label}
+							<NavIcon name={route.icon} />
+							{route.label}
 						</SiteLink>
 					</li>
 				{/each}
