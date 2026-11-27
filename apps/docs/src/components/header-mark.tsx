@@ -1,5 +1,5 @@
-import { decorativeMark } from "@trajectonomics/brand/mark"
 import glyph from "@trajectonomics/brand/current/logo/mark.svg?raw"
+import { decorativeMark } from "@trajectonomics/brand/mark"
 import type { ComponentProps } from "react"
 import { PORTAL_NAME } from "../lib/portal"
 import { SITE_HOME_LOAD, SITE_HOME_NAME, SITE_HOME_PATH } from "../lib/site-home"
