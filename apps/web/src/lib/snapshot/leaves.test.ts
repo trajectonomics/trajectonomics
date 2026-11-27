@@ -11,6 +11,7 @@ describe("the read-leaf allowlist", () => {
 			"report pnl",
 			"tx list",
 			"baseline show",
+			"baseline rates",
 			"scenario list",
 			"scenario show",
 			"projection run",

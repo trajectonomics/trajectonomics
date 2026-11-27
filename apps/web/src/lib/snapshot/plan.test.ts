@@ -35,7 +35,7 @@ function allArgvs(overrides: Partial<PlanInput>): string[][] {
 	const one = stageOne("2026-10-31", ["base", "retire-early"])
 	const two = planStageTwo(result.params, one)
 	const first = Object.values(planStageOne(result.params)).map((read) => read.argv)
-	const reads = [two.doctor, two.balance, two.pnl, two.transactions, two.baseline]
+	const reads = [two.doctor, two.balance, two.pnl, two.transactions, two.baseline, two.rates]
 	const rest = [
 		two.netWorthHistory,
 		...Object.values(two.projections),
@@ -84,6 +84,13 @@ describe("every argv the Plan emits", () => {
 
 	test("does not take a scenario tax argv without --dry-run as a leaf", () => {
 		expect(leafOf(["scenario", "tax", "--from-stored", "--json", "--", "base"])).toBeNull()
+	})
+
+	test("the rates read asks for the run-rates at the As-of", () => {
+		const result = checkParams(base)
+		if (!result.ok) throw new Error(`fixture parameters must hold: ${result.error.code}`)
+		const two = planStageTwo(result.params, stageOne("2026-10-31", ["base"]))
+		expect(two.rates.argv).toEqual(["baseline", "rates", "--as-of", "2026-10-31", "--json"])
 	})
 })
 

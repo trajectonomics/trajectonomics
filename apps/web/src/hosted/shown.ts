@@ -5,3 +5,8 @@
 export function editsShown(_token: string | null, _search: string): boolean {
 	return true
 }
+
+/** A drawer opened from a compact card is a read of the facts here: the hosted Demo has no write path. */
+export function drawerEditsShown(): boolean {
+	return false
+}

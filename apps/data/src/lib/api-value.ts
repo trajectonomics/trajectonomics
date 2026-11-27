@@ -1,22 +1,21 @@
-import { type ModelPrice, modelPriceOn } from "@trajectonomics/data-collector/price-catalog"
+import {
+	type ModelPrice,
+	modelPriceOn,
+	tokenCost,
+} from "@trajectonomics/data-collector/price-catalog"
 import type { TableRow } from "./table"
-
-const PER_MILLION = 1_000_000
 
 /** A row's tokens without cache reads, the measure every per-token figure divides by. */
 export function uncachedTokens(row: TableRow): number {
 	return row.tokensTotal - (row.cacheRead ?? 0)
 }
 
-/** One model row's cost at list prices; a cache write with no price is priced as input. */
+/**
+ * One model row's cost at list prices, through the collector's own `tokenCost` so the site and
+ * the Worker price the same way; a row with no split has nothing to price and costs nothing here.
+ */
 export function modelCost(row: TableRow, price: ModelPrice): number {
-	const writePrice = price.cacheWrite ?? price.input
-	const tokens =
-		(row.tokensIn ?? 0) * price.input +
-		(row.tokensOut ?? 0) * price.output +
-		(row.cacheRead ?? 0) * price.cacheRead +
-		(row.cacheWrite ?? 0) * writePrice
-	return tokens / PER_MILLION
+	return tokenCost(row, price) ?? 0
 }
 
 /**

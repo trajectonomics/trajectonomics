@@ -50,16 +50,16 @@ describe("ci.yml, the one CI for the monorepo", () => {
 	it("checks only the packages a pull request affects, against its base commit", () => {
 		const affected = (job().steps ?? []).find((step) => step.run?.includes("--affected"))
 		expect(affected?.run).toContain(
-			`bunx turbo run check --affected ${WITHOUT_WEB} --concurrency=2`,
+			`bunx turbo run check --affected ${WITHOUT_WEB} --concurrency=4`,
 		)
 		expect(String(affected?.env?.["TURBO_SCM_BASE"])).toContain(
 			"github.event.pull_request.base.sha",
 		)
 	})
 
-	it("checks every package on main and by hand, two tasks at a time", () => {
+	it("checks every package on main and by hand, four tasks at a time", () => {
 		const full = (job().steps ?? []).find(
-			(step) => step.run === `bunx turbo run check ${WITHOUT_WEB} --concurrency=2`,
+			(step) => step.run === `bunx turbo run check ${WITHOUT_WEB} --concurrency=4`,
 		)
 		expect(full).toBeDefined()
 	})
@@ -111,11 +111,12 @@ describe("browser.yml, the workflow that needs a browser", () => {
 		expect(workflow.permissions).toEqual({ contents: "read" })
 	})
 
-	it("runs the Playwright steps inside apps/site", () => {
+	it("builds the Site once through turbo and runs the Playwright and performance steps inside apps/site", () => {
 		const playwright = steps().filter((step) => step.run?.includes("playwright install"))
 		expect(playwright).toHaveLength(1)
-		expect(steps().some((step) => step.run?.includes("bun run test:browser"))).toBe(true)
-		expect(steps().some((step) => step.run?.includes("bun run test:performance"))).toBe(true)
+		expect(steps().some((step) => step.run?.includes("@trajectonomics/site#build"))).toBe(true)
+		expect(steps().some((step) => step.run?.includes("playwright test"))).toBe(true)
+		expect(steps().some((step) => step.run?.includes("scripts/performance.ts"))).toBe(true)
 	})
 })
 

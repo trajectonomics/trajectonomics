@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { returnFocus, takeQuestionFocus } from "../../client/question-focus.js"
 import { selectPlan } from "../../client/select-plan.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import WhatIfActions from "./WhatIfActions.svelte"
@@ -10,6 +11,24 @@ import WhatIfNotices from "./WhatIfNotices.svelte"
 function switchNow(): void {
 	const name = whatIfSession.revertAndSwitch()
 	if (name !== null) void selectPlan(name)
+}
+
+let question: HTMLDivElement | undefined = $state()
+/** The control that had focus when the question came; Stay returns the person to it. */
+let returnTo: HTMLElement | null = null
+
+// A question takes the screen: it scrolls into view and takes focus, since the bar sits at the top of the page and the
+// link that asked may be far below it. Its scroll margin clears the sticky top bar. Each request counts (asks), so
+// a repeat of the same question brings it back into view too.
+$effect(() => {
+	if (whatIfSession.asks === 0 || whatIfSession.asking === null || question === undefined) return
+	returnTo = takeQuestionFocus(question)
+})
+
+/** Keeps the changes, closes the question, and puts the focus back on the control that asked. */
+function stay(): void {
+	whatIfSession.stay()
+	returnFocus(returnTo)
 }
 </script>
 
@@ -23,10 +42,10 @@ function switchNow(): void {
 			<WhatIfChanges />
 			<WhatIfNotices />
 			{#if whatIfSession.asking !== null}
-				<div role="alert" class="flex flex-wrap items-center gap-3 text-sm">
+				<div bind:this={question} role="alert" tabindex="-1" class="scroll-mt-20 flex flex-wrap items-center gap-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 					<span>Switching to {whatIfSession.asking} drops the changes on {whatIfSession.whatIf.plan}.</span>
 					<button type="button" onclick={switchNow} disabled={whatIfSession.saving} class="underline disabled:opacity-50">Revert and switch</button>
-					<button type="button" onclick={() => whatIfSession.stay()} class="underline">
+					<button type="button" onclick={stay} class="underline">
 						Stay on {whatIfSession.whatIf.plan}
 					</button>
 				</div>

@@ -11,11 +11,19 @@ import { checkMilestones } from "./milestones"
 import { checkObligationWithdrawn } from "./obligation-withdrawn"
 import { checkReservedFlowIds } from "./reserved-ids"
 import { checkContributionRouting, checkIlliquidRouting } from "./routing"
-import { rate, str } from "./scalars"
+import { boundedInt, rate, str } from "./scalars"
 import { anyVersion, checkShape, isRecord, opt, req } from "./shape"
 
 const economy: Check = (value, path, emit) => {
-	checkShape(value, path, { inflation: req(rate) }, emit)
+	checkShape(
+		value,
+		path,
+		{
+			inflation: req(rate),
+			inflationVolatility: opt(boundedInt(0, 10_000, "RATE_OUT_OF_RANGE")),
+		},
+		emit,
+	)
 }
 
 /** Ids of the entries of a Scenario list (Levies, Milestones), for every reference a Flow may make. */

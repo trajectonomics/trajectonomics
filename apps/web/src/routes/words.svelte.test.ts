@@ -55,6 +55,15 @@ describe("a page of the Demo Snapshot", () => {
 		expect(found).toEqual([])
 	})
 
+	test("the Plan says plain words with each of its item tabs selected", () => {
+		const page = PAGES.find((one) => one.path === "/projection/")
+		if (page === undefined) throw new Error("no page renders /projection/")
+		for (const items of ["income", "expenses", "assets", "milestones"]) {
+			setTestUrl(`http://127.0.0.1/projection/?demo=1&scenario=base&items=${items}`)
+			expect(problemsOf(render(page.page).body), items).toEqual([])
+		}
+	})
+
 	test("the Demo's six pages say the new words, and a card is one link with no Open text", () => {
 		const words: Readonly<Record<string, readonly string[]>> = {
 			"/": ["Today's money", "Money lasts to the end of the plan", "Tax for", "Due", "chance"],

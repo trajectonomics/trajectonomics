@@ -8,6 +8,7 @@ import {
 	contributionSavings,
 	financialIndependence,
 	planReturnModel,
+	projectPath,
 } from "../index"
 import type { ChanceOfSuccessOptions, ProjectionResult, Scenario, SurvivalOptions } from "../types"
 import { EVERY_PARITY_CASE } from "./every-parity-case"
@@ -22,6 +23,7 @@ interface Recorded {
 	readonly chance?: ChanceOfSuccessOptions
 	readonly chanceSha256?: string
 	readonly planSha256?: string
+	readonly pathSha256?: string
 	readonly savingsSha256?: string
 }
 
@@ -66,6 +68,21 @@ function expectChance(
 	)
 }
 
+/** A per-path replay first builds the plan model, then hashes `projectPath` of the chosen index. */
+function expectPath(
+	{ baseline, scenario, timeline }: Fixture,
+	path: ParityCase["path"] | undefined,
+	record: Recorded | undefined,
+): void {
+	if (path === undefined) return
+	const built = planReturnModel(scenario, path)
+	if (!built.ok) throw new Error("the plan model was refused")
+	const selection = { model: built.model, seed: path.seed, paths: path.paths, index: path.index }
+	expect(hash(projectPath(baseline, scenario, timeline, selection))).toBe(
+		record?.pathSha256 ?? "missing",
+	)
+}
+
 describe("parity/cases.json", () => {
 	it("lists exactly the parity cases", () => {
 		expect(recorded.map((item) => item.name)).toEqual(EVERY_PARITY_CASE.map((item) => item.name))
@@ -73,7 +90,7 @@ describe("parity/cases.json", () => {
 
 	it.each(EVERY_PARITY_CASE.map((item) => [item.name, item] as const))(
 		"%s hashes as recorded (run `bun run parity:update` after an intended change)",
-		(name, { fixture, options, chance, plan, projectOptions, savings }) => {
+		(name, { fixture, options, chance, plan, path, projectOptions, savings }) => {
 			const { baseline, scenario, timeline } = fixture
 			const record = recorded.find((item) => item.name === name)
 			const projection = project(baseline, scenario, timeline, projectOptions)
@@ -87,6 +104,7 @@ describe("parity/cases.json", () => {
 				)
 			}
 			expectChance(fixture, { plan, chance }, record)
+			expectPath(fixture, path, record)
 		},
 	)
 })

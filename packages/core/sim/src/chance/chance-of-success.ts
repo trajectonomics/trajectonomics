@@ -26,8 +26,15 @@ export function chanceOfSuccess(
 
 function outcomesOf(inputs: PathInputs, options: ChanceOfSuccessOptions): ChanceOfSuccessResult {
 	const seed = BigInt(`0x${options.seed}`)
+	const inflation = inputs.scenario.economy.inflation
 	const outcomes: PathOutcome[] = []
-	for (const returns of marketReturns(options.model, seed, options.paths, inputs.timeline)) {
+	for (const returns of marketReturns(
+		options.model,
+		seed,
+		options.paths,
+		inputs.timeline,
+		inflation,
+	)) {
 		const result = outcomeOf(inputs, returns, options.milestoneDates === true)
 		if (!result.ok) return { ok: false, problems: [result.problem] }
 		outcomes.push(result.outcome)

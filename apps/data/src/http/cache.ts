@@ -65,9 +65,10 @@ export function usageStaleCacheKey(request: Request): Request {
  * never served to a page built for the new one: on 2026-11-27 a cached body without `measured`
  * broke the overview for hours after the deploy that added it. Shape 3 leaves cache reads out of
  * the token figure and adds `cacheRead` beside it; shape 4 adds each window's `limits` estimate
- * from the plan's usage meter.
+ * from the plan's usage meter; shape 5 adds the estimate's processed-token and list-dollar
+ * measures and its 24-hour rough rule.
  */
-export const PEAKS_SHAPE = "4"
+export const PEAKS_SHAPE = "5"
 
 function peaksUrl(request: Request): URL {
 	const url = normalizedReadUrl(request, PEAKS_PARAMS)
