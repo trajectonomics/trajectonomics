@@ -1,7 +1,9 @@
 // `scenario apply <name> --set/--without`: a what-if applied to the stored plan it came from (cli ADR-0057).
 // Its Overrides are the ones `projection run` applies, so the stored hash is the one it echoes.
 import { describe, expect, it } from "bun:test"
+import { SIM_SCENARIO } from "./baseline/fixture"
 import { baseFlags, projection, projectionHome } from "./projection/testing"
+import { MILESTONES } from "./projection-milestones-support"
 import { echoed } from "./projection-what-if-support"
 import { applyScenario, errorOf } from "./scenario-test-support"
 import { apply, bodyOf, derivedScenario, stored } from "./scenario-what-if-support"
@@ -50,6 +52,23 @@ describe("scenario apply --set, in place", () => {
 			flows: { id: string; amount: number }[]
 		}
 		expect(shownRent.flows.find((flow) => flow.id === "rent")?.amount).toBe(2_500_050)
+	})
+
+	it("drops a plan's only Milestone and stores the Milestone-less document's hash", async () => {
+		const home = await projectionHome()
+		const one = { ...SIM_SCENARIO, milestones: [MILESTONES[1]] }
+		expect((await applyScenario(home, "onems", one)).code).toBe(0)
+		const flags = ["--without", "milestones.never"]
+		const projected = echoed(await projection(home, ["run", ...baseFlags("onems"), ...flags]))
+		const res = await apply(home, ["onems", ...flags])
+		expect(res.code).toBe(0)
+		const body = bodyOf(res)
+		expect(body.removals).toEqual(["milestones.never"])
+		expect(body.scenario.document).not.toHaveProperty("milestones")
+		expect(body.scenario.contentHash).toBe(projected.scenario.effectiveContentHash)
+		const storedRow = await stored(home, "onems")
+		expect(storedRow.contentHash).toBe(projected.scenario.effectiveContentHash)
+		expect(storedRow.row["document"]).not.toHaveProperty("milestones")
 	})
 
 	it("refuses a Set on a removed item at the --set, with the message projection run gives", async () => {
