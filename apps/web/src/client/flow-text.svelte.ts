@@ -32,11 +32,19 @@ function changed(): void {
 export function observeFlowText(svg: Element): () => void {
 	if (typeof ResizeObserver === "undefined") return () => {}
 	const box = svg.querySelector("[data-flow-size]") ?? svg
+	// This probe's own last size: a probe that was hidden while another saw the font change comes back at the
+	// shared size, and its diagram, fitted by the estimate while hidden, is fitted again.
+	let own: { width: number; height: number } | null = null
 	const observer = new ResizeObserver((entries) => {
 		const rect = entries[0]?.contentRect
 		if (rect === undefined) return
 		const size = { width: rect.width, height: rect.height }
-		if (seen !== null && size.width === seen.width && size.height === seen.height) return
+		const moved = own !== null && (own.width !== size.width || own.height !== size.height)
+		own = size
+		if (seen !== null && size.width === seen.width && size.height === seen.height) {
+			if (moved) stroke += 1
+			return
+		}
 		const first = seen === null
 		seen = size
 		if (!first) changed()
