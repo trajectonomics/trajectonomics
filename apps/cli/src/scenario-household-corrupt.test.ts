@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { edited } from "./baseline/testing"
-import { setHousehold } from "./scenario-household-support"
+import { setHousehold, shown } from "./scenario-household-support"
 import { applyScenario, errorOf, scenarioHome } from "./scenario-test-support"
 import { SCENARIO_DOCUMENT } from "./store/testing"
 import { capture } from "./test-support"
@@ -48,6 +48,12 @@ describe("a stored household that does not parse", () => {
 		expect(body.hint).toContain("Report it at")
 	})
 
+	it("is the internal failure of scenario apply", async () => {
+		const res = await applyScenario(await corrupted(), "base", SCENARIO_DOCUMENT)
+		expect(res.code).toBe(1)
+		expect(errorOf(res).message).toBe(MESSAGE)
+	})
+
 	it("is the internal failure of scenario fork, in both forms", async () => {
 		const { human, json } = await answers(await corrupted(), ["fork", "base", "copy"])
 		expect(human.code).toBe(1)
@@ -58,5 +64,18 @@ describe("a stored household that does not parse", () => {
 		const body = errorOf(json)
 		expect(body.code).toBe("internal")
 		expect(body.message).toBe(MESSAGE)
+	})
+})
+
+describe("a stored household that parses", () => {
+	it("is shown as it is stored, key for key", async () => {
+		const home = scenarioHome()
+		expect((await applyScenario(home, "base", SCENARIO_DOCUMENT)).code).toBe(0)
+		expect((await setHousehold(home, HOUSEHOLD)).code).toBe(0)
+		const household = (await shown(home)).household as Record<string, unknown>
+		// The stored text is canonical, with sorted keys; a schema-built copy would reorder them.
+		expect(Object.keys(household)).toEqual(["anchors", "people", "schemaVersion"])
+		const [person] = household["people"] as Record<string, unknown>[]
+		expect(Object.keys(person ?? {})).toEqual(["born", "id", "lifeExpectancy", "role"])
 	})
 })
