@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { type HouseholdHash, saveHousehold } from "../../client/household-save.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, ScenarioFlow } from "../../lib/contract"
 import {
@@ -17,7 +18,7 @@ interface Props {
 	name: string
 	household: HouseholdDocument
 	/** The hash of the document and household the page read, which every Edit to it names (cli ADR 0055). */
-	householdHash: string
+	householdHash: HouseholdHash
 	/** The Flows the Scenario holds: the items a date may be pinned on. */
 	flows: readonly ScenarioFlow[]
 	/** Runs once the Edit has run, so the drawer closes. */
@@ -53,13 +54,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
-	if (
-		await editSession.run(
-			{ kind: "set-household", name, householdHash, household: next },
-			"household",
-		)
-	)
-		onDone()
+	if (await saveHousehold(name, householdHash, next)) onDone()
 }
 </script>
 
