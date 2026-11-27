@@ -1,27 +1,10 @@
 /*
- * The header's own layout: the Blog marker on the left, the mono nav on the right. The frame, the
- * tile and the link type come from the shared `@trajectonomics/brand/header.css`.
+ * The blog's header is sticky at the top. The frame, the three-column grid, the tile, the marker and
+ * the link type come from `@trajectonomics/brand/header.css`, and the Language menu from
+ * `@trajectonomics/site-header`.
  */
 
 .blog-header {
 	position: sticky;
 	top: 0;
-}
-
-.blog-header-inner {
-	justify-content: space-between;
-	gap: 12px;
-}
-
-.blog-header-brand {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-/* The header's end: the Language menu, then Docs. */
-.blog-header-end {
-	display: flex;
-	align-items: center;
-	gap: 16px;
 }

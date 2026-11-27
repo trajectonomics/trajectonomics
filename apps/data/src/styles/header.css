@@ -1,26 +1,9 @@
 /*
- * The header's own layout: the Data marker on the left, the mono nav on the right. The frame, the
- * tile and the link type come from the shared `@trajectonomics/brand/header.css`.
+ * The data site's header is sticky at the top. The frame, the three-column grid, the tile, the
+ * marker and the link type come from `@trajectonomics/brand/header.css`.
  */
 
 .data-header {
 	position: sticky;
 	top: 0;
-}
-
-.data-header-inner {
-	justify-content: space-between;
-	gap: 12px;
-}
-
-.data-header-brand {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-.data-header-nav {
-	display: flex;
-	align-items: center;
-	gap: 20px;
 }

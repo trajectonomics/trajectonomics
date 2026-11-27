@@ -1,77 +1,14 @@
 /*
- * The header (ADR 0007): the mark's tile, the centred mono nav, and the repository link with the
- * Language menu at the end. The frame, the tile and the nav-link type come from the shared
- * `@trajectonomics/brand/header.css`; this file holds only the Site's three-column layout.
+ * The header (ADR 0007): the tile, the centred mono nav, and the repository link with the Language
+ * menu at the end. The frame, the three-column grid, the tile and the nav-link type come from the
+ * shared `@trajectonomics/brand/header.css`; this file holds only what the Site alone draws.
  */
 
-/*
- * Three columns, so the nav stays centred between the mark and the repository link. The side columns
- * share the spare width, but never shrink below their content: on a narrow phone the nav moves off
- * centre rather than under the repository link.
- */
-.header-bar {
-	display: grid;
-	grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
-	align-items: center;
-	column-gap: 1rem;
-}
-
-.header-bar > .brand {
-	justify-self: start;
-}
-
-@media (min-width: 40rem) {
-	.header-bar {
-		column-gap: 1.25rem;
-	}
-}
-
-/* The nav's items, centred: mono, uppercase, 12 px, with a 10 px hairline between each pair. */
-.header-nav {
-	display: flex;
-	align-items: center;
-	justify-self: center;
-	gap: 1rem;
-}
-
-@media (min-width: 40rem) {
-	.header-nav {
-		gap: 2rem;
-	}
-}
-
-/* The right column: the repository link, a hairline, then the Language menu, pushed to the end. */
-.header-end {
-	display: flex;
-	align-items: center;
-	justify-self: end;
-	gap: 1rem;
-}
-
-@media (min-width: 40rem) {
-	.header-end {
-		gap: 1.25rem;
-	}
-}
-
+/* The hairline between the repository link and the Language menu. */
 .header-sep {
 	display: block;
 	width: 1px;
 	height: 10px;
 	flex: none;
 	background: var(--ds-color-border);
-}
-
-/* The disclosure the Language menu draws: the shared link type over a native summary. */
-.header-menu-summary {
-	cursor: pointer;
-	list-style: none;
-}
-
-.header-menu-summary::-webkit-details-marker {
-	display: none;
-}
-
-.header-menu-summary::marker {
-	content: "";
 }

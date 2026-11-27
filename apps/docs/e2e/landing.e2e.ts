@@ -34,6 +34,26 @@ test("the /docs mount reaches the Landing Page", async ({ page }) => {
 	await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
 })
 
+test("the Landing Page's header carries the two centred Tabs from lg up", async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: TEST_VIEWPORT_HEIGHT_PX })
+	await page.goto(LANDING_PATH)
+
+	const tabs = page.locator("#nd-nav [data-shell-tabs] a")
+	await expect(tabs).toHaveCount(TABS.length)
+	for (const tab of TABS) {
+		await expect(page.locator(`#nd-nav [data-shell-tabs] a[href="${tabUrl(tab)}"]`)).toBeVisible()
+	}
+	// The Landing Page belongs to no Tab, so neither is marked current.
+	await expect(page.locator('#nd-nav [data-shell-tabs] a[aria-current="page"]')).toHaveCount(0)
+})
+
+test("the Landing Page's header drops the Tabs below lg", async ({ page }) => {
+	await page.setViewportSize({ width: 390, height: TEST_VIEWPORT_HEIGHT_PX })
+	await page.goto(LANDING_PATH)
+
+	await expect(page.locator("#nd-nav [data-shell-tabs] a").filter({ visible: true })).toHaveCount(0)
+})
+
 test("the hero picture keeps its column clear of the prompt at 1024px", async ({ page }) => {
 	await page.setViewportSize({ width: 1024, height: TEST_VIEWPORT_HEIGHT_PX })
 	await page.goto(LANDING_PATH)

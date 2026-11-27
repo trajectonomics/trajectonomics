@@ -15,6 +15,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 - `packages/core`: `@trajectonomics/core`, the engine bundle the CLI builds on (private, not published). It bundles the four packages below as subpath exports (`/money`, `/ledger`, `/tax`, `/sim`).
   - [`packages/core/money`](packages/core/money/AGENTS.md), [`packages/core/ledger`](packages/core/ledger/AGENTS.md), [`packages/core/tax`](packages/core/tax/AGENTS.md), [`packages/core/sim`](packages/core/sim/AGENTS.md): private workspace packages.
 - [`packages/brand`](packages/brand/AGENTS.md): `@trajectonomics/brand`, the white-label brand folders, themes and assets. Not published. It also holds the one header frame every static site draws (`header.css` and `decorativeMark` from `./mark`), so the logo never moves between the Site, the blog, the data site and the docs; `tooling/guards/header-frame.test.ts` fails an app that keeps its own copy.
+- [`packages/site-header`](packages/site-header/AGENTS.md): `@trajectonomics/site-header`, the one Astro header and Language menu the Site, the blog and the data site render (raw `.astro`, no build step). Not published.
 - [`skills/customer`](skills/customer/AGENTS.md): the first-party customer skills that the product publishes (`@trajectonomics/skills`).
 - [`skills/internal`](skills/internal/AGENTS.md): the internal skills. Their source lives here, and `.agents/skills/` links to it.
 - [`org/goals`](org/goals/AGENTS.md): the organisation's goals (`GOALS.md`).

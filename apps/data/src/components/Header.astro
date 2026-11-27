@@ -2,9 +2,8 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 
-import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
-import { decorativeMark } from "@trajectonomics/brand/mark"
-import { DATA_PATH, DOCS_URL, METHOD_PATH, SITE_HOME_URL, SITE_NAME } from "../lib/site"
+import SiteHeader from "@trajectonomics/site-header/SiteHeader.astro"
+import { DATA_PATH, METHOD_PATH, SITE_HOME_URL, SITE_NAME } from "../lib/site"
 
 interface Props {
 	/** Which header link is the current page. */
@@ -12,26 +11,25 @@ interface Props {
 }
 
 const { current } = Astro.props
-const artwork = decorativeMark(mark)
 ---
 
-<header class="data-header ds-header">
-	<nav class="data-header-inner ds-header-inner" aria-label="Main">
-		<div class="data-header-brand">
-			<a class="ds-brand" href={SITE_HOME_URL} aria-label={`${SITE_NAME} home`}>
-				<span class="ds-brand-tile"><Fragment set:html={artwork} /></span>
-			</a>
-			<a class="ds-marker" href={DATA_PATH} aria-current={current === "overview" ? "page" : undefined}>
-				Data
-			</a>
-		</div>
-		<div class="data-header-nav">
-			<a
-				class="ds-nav-link"
-				href={METHOD_PATH}
-				aria-current={current === "method" ? "page" : undefined}>Method</a
-			>
-			<a class="ds-nav-link" href={DOCS_URL}>Docs</a>
-		</div>
-	</nav>
-</header>
+<SiteHeader
+	homeHref={SITE_HOME_URL}
+	homeLabel={`${SITE_NAME} home`}
+	marker={{ href: DATA_PATH, label: "Data", current: current === "overview" }}
+	class="data-header"
+	navLabel="Main"
+>
+	<Fragment slot="nav">
+		<a
+			class="ds-nav-link"
+			href={DATA_PATH}
+			aria-current={current === "overview" ? "page" : undefined}>Overview</a
+		>
+		<a
+			class="ds-nav-link"
+			href={METHOD_PATH}
+			aria-current={current === "method" ? "page" : undefined}>Method</a
+		>
+	</Fragment>
+</SiteHeader>

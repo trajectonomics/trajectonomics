@@ -14,6 +14,7 @@
 		"packages/core/sim",
 		"packages/core",
 		"packages/brand",
+		"packages/site-header",
 		"apps/cli",
 		"apps/site",
 		"apps/docs",

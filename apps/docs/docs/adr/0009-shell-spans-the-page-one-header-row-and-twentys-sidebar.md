@@ -79,3 +79,19 @@ shared display-face marker from `@trajectonomics/brand/header.css`; inside the f
 bar is capped at 94.5rem and centred, with the shared 1rem and 2.5rem inset, while the header's
 hairline and background still span the page. The Tabs stay centred on the page and no sidebar offset
 changes: the one row still sets the sidebar's top.
+
+## Amendment (2026-11-27): left brand, centre Tabs, right search on every page
+
+The header's layout is now the same on all four static sites: where you are at the left (the glyph
+tile and the `Docs` marker), this site's sections in the centre, and only tools at the right. The
+Tabs take the centre of every Portal page at `lg` and up, the Landing Page's header included; below
+`lg` the notebook's sidebar Tab dropdown and the Landing Page's body links carry them, and the
+Landing Page's header draws none. Neither Tab is current on the Landing Page, which belongs to no
+Tab; a Tab page still marks its own with `aria-current="page"`.
+
+The search leaves the sidebar's top block for the header's right slot, so it sits in the same place
+on every page: the full field from `lg` up and the icon-only trigger below it, which keeps the
+library's "Open Search" accessible name. The trigger is a full-round pill (a circle when
+icon-only), the shape ADR 0004's flat shell allows beside its 4px and 6px corners, with a 1px hairline, the muted text role, and the shared frame's 2px focus ring at a 4px
+offset. The sidebar's top block keeps only the Tab dropdown and, in the drawer, the close button;
+a phone reaches search in the header, never behind the drawer.

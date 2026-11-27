@@ -2,13 +2,18 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the menus and the brand mark it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 
-import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
-import { decorativeMark } from "@trajectonomics/brand/mark"
+import LanguageMenu from "@trajectonomics/site-header/LanguageMenu.astro"
+import SiteHeader from "@trajectonomics/site-header/SiteHeader.astro"
 import type { Dictionary } from "../lib/language/dictionary"
+import { currentLanguageName } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
-import { CLEAN_URL } from "../lib/language/languages"
+import {
+	CLEAN_URL,
+	languageChoiceLink,
+	languageEntry,
+	otherLanguages,
+} from "../lib/language/languages"
 import { BLOG_PATH, DATA_PATH, DOCS_PATH, OPENJOT_PATH, SITE_NAME } from "../lib/site"
-import LanguageMenu from "./LanguageMenu.astro"
 import RepoLink from "./RepoLink.astro"
 
 interface Props {
@@ -23,123 +28,41 @@ interface Props {
 }
 
 const { language, dictionary, markCurrent, address, openjotCurrent } = Astro.props
-// The link names itself, so the artwork is decoration, and the brand package strips its role,
-// label and title so every static site hides it the same way.
-const artwork = decorativeMark(mark)
+// The Site's sections live in the centre; the reading Language and the repository are its tools.
+const choices = [languageEntry(language), ...otherLanguages(language)].map((entry) => ({
+	href: languageChoiceLink(entry.language, address),
+	lang: entry.language,
+	label: entry.dictionary.languageName,
+	current: entry.language === language && markCurrent,
+	ariaLabel: entry.language === language ? currentLanguageName(dictionary) : undefined,
+}))
 ---
 
-<header class="site-header ds-header fixed inset-x-0 top-0">
-	<nav class="header-bar ds-header-inner">
-		<a class="brand ds-brand" href={CLEAN_URL} aria-label={SITE_NAME}>
-			<span class="ds-brand-tile"><Fragment set:html={artwork} /></span>
+<SiteHeader
+	homeHref={CLEAN_URL}
+	homeLabel={SITE_NAME}
+	class="site-header fixed inset-x-0 top-0"
+	navLabel="Main"
+>
+	<Fragment slot="nav">
+		<a
+			class="ds-nav-link"
+			href={OPENJOT_PATH}
+			aria-current={openjotCurrent ? "page" : undefined}
+		>
+			{dictionary.openjotLink}
 		</a>
-		<div class="header-nav">
-			<a
-				class="ds-nav-link"
-				href={OPENJOT_PATH}
-				aria-current={openjotCurrent ? "page" : undefined}
-			>
-				{dictionary.openjotLink}
-			</a>
-			<a class="ds-nav-link" href={DATA_PATH}>{dictionary.dataLink}</a>
-			<a class="ds-nav-link" href={BLOG_PATH}>{dictionary.blogLink}</a>
-			<a class="ds-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
-		</div>
-		<div class="header-end">
-			<RepoLink dictionary={dictionary} />
-			<span class="header-sep" aria-hidden="true"></span>
-			<LanguageMenu
-				language={language}
-				dictionary={dictionary}
-				markCurrent={markCurrent}
-				address={address}
-			/>
-		</div>
-	</nav>
-</header>
-
-{/*
-	The Language menu: native <details> for click and keyboard, with hover as an enhancement on a fine
-	pointer. The notes live here rather than inside the script because every byte of an inline script
-	ships against the page's 10,000 (ADR 0005): the pointer may sit outside a disclosure for
-	CLOSE_DELAY_MS before its menu closes, so a crossing between the summary and the panel is not a
-	dismissal; only one menu is open at a time; the panel's own 8 px bridge keeps the pointer inside the
-	disclosure across the gap; a click while hover holds the menu open never toggles it shut; tabbing out
-	closes it, so no visitor is left behind a panel; and a touch screen, which has no pointerleave, is
-	dismissed by an outside tap.
-*/}
-<script is:inline>
-	;(() => {
-		const menus = [...document.querySelectorAll("details[data-header-menu]")]
-		if (menus.length === 0) return
-
-		const CLOSE_DELAY_MS = 150
-		const fine = window.matchMedia("(pointer: fine)").matches
-
-		const closeOthers = (open) => {
-			for (const menu of menus) if (menu !== open) menu.open = false
-		}
-
-		for (const menu of menus) {
-			if (!(menu instanceof HTMLDetailsElement)) continue
-			const summary = menu.querySelector("summary")
-			let hoverOpened = false
-			let closing = null
-			const cancelClose = () => {
-				if (closing !== null) clearTimeout(closing)
-				closing = null
-			}
-
-			menu.addEventListener("toggle", () => {
-				if (menu.open) closeOthers(menu)
-			})
-
-			if (fine) {
-				menu.addEventListener("pointerenter", () => {
-					cancelClose()
-					if (menu.open) return
-					hoverOpened = true
-					closeOthers(menu)
-					menu.open = true
-				})
-				menu.addEventListener("pointerleave", () => {
-					cancelClose()
-					closing = setTimeout(() => {
-						menu.open = false
-						hoverOpened = false
-						closing = null
-					}, CLOSE_DELAY_MS)
-				})
-				menu.addEventListener("click", (event) => {
-					if (!(event.target instanceof Element)) return
-					if (event.target.closest("summary") === null) return
-					cancelClose()
-					if (!hoverOpened || !menu.open) return
-					event.preventDefault()
-				})
-
-				menu.addEventListener("focusout", (event) => {
-					if (!menu.open) return
-					const next = event.relatedTarget
-					if (next instanceof Node && menu.contains(next)) return
-					menu.open = false
-					hoverOpened = false
-				})
-			}
-
-			menu.addEventListener("keydown", (event) => {
-				if (event.key !== "Escape" || !menu.open) return
-				menu.open = false
-				hoverOpened = false
-				if (summary instanceof HTMLElement) summary.focus()
-			})
-
-			document.addEventListener("pointerdown", (event) => {
-				if (!menu.open) return
-				if (event.target instanceof Node && menu.contains(event.target)) return
-				menu.open = false
-				hoverOpened = false
-			})
-		}
-	})()
-</script>
+		<a class="ds-nav-link" href={DATA_PATH}>{dictionary.dataLink}</a>
+		<a class="ds-nav-link" href={BLOG_PATH}>{dictionary.blogLink}</a>
+		<a class="ds-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
+	</Fragment>
+	<Fragment slot="end">
+		<RepoLink dictionary={dictionary} />
+		<span class="header-sep" aria-hidden="true"></span>
+		<LanguageMenu
+			summaryLabel={dictionary.languageSwitchLabel}
+			currentLabel={dictionary.languageSwitchLabel}
+			choices={choices}
+		/>
+	</Fragment>
+</SiteHeader>

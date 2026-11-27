@@ -90,10 +90,30 @@
 	--color-fd-overlay: hsla(0, 0%, 0%, 0.2);
 }
 
-/* The search trigger keeps neutral chrome on hover; the flat fill is the affordance. */
-:where(#nd-sidebar, #nd-sidebar-mobile) [data-search-full]:is(:hover, :focus-visible) {
+/*
+ * The header's search trigger: a hairline and the muted role instead of Fumadocs' filled field. Its
+ * shape is a full-round pill (`rounded-full` in docs-shell.tsx), which ADR 0004's flat shell allows
+ * as a shape, so the seam declares no corner for it. It keeps neutral chrome on hover; the flat fill is the affordance.
+ */
+#nd-nav :is([data-search], [data-search-full]),
+#nd-subnav :is([data-search], [data-search-full]) {
+	border: 1px solid var(--ds-color-border);
+	background-color: transparent;
+	color: var(--ds-color-muted-foreground);
+	font-size: var(--ds-font-size-sm);
+}
+
+#nd-nav :is([data-search], [data-search-full]):is(:hover, :focus-visible),
+#nd-subnav :is([data-search], [data-search-full]):is(:hover, :focus-visible) {
 	background-color: var(--ds-color-secondary);
 	color: var(--ds-color-foreground);
+}
+
+/* The shared frame's focus ring, at its 4px offset, on both layouts. */
+#nd-nav :is([data-search], [data-search-full]):focus-visible,
+#nd-subnav :is([data-search], [data-search-full]):focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
 }
 
 /*

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { TABS, type TabDefinition, tabUrl } from "../tabs"
 import type { BuiltFile } from "./built-files"
 import { checkHeaderTabs } from "./header-tabs"
+import { LANDING_PAGE_FILE } from "./landing-page"
 
 const OPERATOR = TABS[0]
 const BUILDER = TABS[1]
@@ -19,6 +20,14 @@ function page(path: string, current: TabDefinition | undefined): BuiltFile {
 	return {
 		path,
 		content: `<header id="nd-subnav">${tabLink(OPERATOR, current)}${tabLink(BUILDER, current)}</header>`,
+	}
+}
+
+/** The Landing Page's home-layout header with both Tabs, `current` marked when one is. */
+function landingPage(current?: TabDefinition): BuiltFile {
+	return {
+		path: LANDING_PAGE_FILE,
+		content: `<header id="nd-nav">${tabLink(OPERATOR, current)}${tabLink(BUILDER, current)}</header>`,
 	}
 }
 
@@ -68,5 +77,31 @@ describe("header Tabs of a built Tab page", () => {
 
 	test("a Tab page the build did not produce is left to the required-page check", () => {
 		expect(codesOf([page(OPERATOR_PAGE, OPERATOR)])).toEqual([])
+	})
+})
+
+describe("header Tabs of the built Landing Page", () => {
+	test("both Tabs with neither current report no failure", () => {
+		expect(codesOf([landingPage()])).toEqual([])
+	})
+
+	test("a header without a link to a Tab is reported as HEADER_TAB_LINK_MISSING", () => {
+		const content = `<header id="nd-nav">${tabLink(OPERATOR, undefined)}</header>`
+		expect(codesOf([{ path: LANDING_PAGE_FILE, content }])).toEqual(["HEADER_TAB_LINK_MISSING"])
+	})
+
+	test("a Tab marked current on the Landing Page is reported as HEADER_TAB_OTHER_CURRENT", () => {
+		expect(codesOf([landingPage(OPERATOR)])).toEqual(["HEADER_TAB_OTHER_CURRENT"])
+	})
+
+	test("Tab links outside the header do not count as header Tabs", () => {
+		const content = [
+			'<header id="nd-nav"></header>',
+			`<main id="nd-home-layout">${tabLink(OPERATOR, undefined)}${tabLink(BUILDER, undefined)}</main>`,
+		].join("")
+		expect(codesOf([{ path: LANDING_PAGE_FILE, content }])).toEqual([
+			"HEADER_TAB_LINK_MISSING",
+			"HEADER_TAB_LINK_MISSING",
+		])
 	})
 })
