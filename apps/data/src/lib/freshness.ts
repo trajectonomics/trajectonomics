@@ -1,7 +1,7 @@
 import type { Health } from "./types"
 
 /** The note shown when uploads are paused. */
-const STALE_NOTE = "Uploads are paused, so the figures stop at the last update."
+const STALE_NOTE = "Uploads paused"
 
 /** The freshness line, its absolute time, and its neutral note when the pipeline is stale. */
 export type Freshness = {

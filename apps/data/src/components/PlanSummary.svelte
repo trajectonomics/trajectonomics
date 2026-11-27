@@ -1,7 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import { compactCount } from "../lib/format"
+import { compactCount, displayCount } from "../lib/format"
 import { grandTotal } from "../lib/grand-total"
 import { IN_USE_DAYS, type PlanTotal } from "../lib/plan-totals"
 import { WINDOW_DAYS } from "../lib/window"
@@ -10,37 +10,18 @@ import PlanMark from "./PlanMark.svelte"
 let { totals }: { totals: PlanTotal[] } = $props()
 
 const grand = $derived(grandTotal(totals))
-const inUse = $derived(totals.filter((total) => total.inUse).length)
-const top = $derived(totals[0] ?? null)
-const topRate = $derived(top?.tokensPerActiveDay ?? 0)
+const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 </script>
 
 <div class="plan-summary">
-	<dl class="kpi-row">
-		<div class="kpi">
-			<dt class="kpi-label">Plans in use</dt>
-			<dd class="kpi-value">{inUse} of {totals.length}</dd>
-		</div>
-		<div class="kpi">
-			<dt class="kpi-label">Tokens in the last {WINDOW_DAYS} days</dt>
-			<dd class="kpi-value">{compactCount(grand.tokensTotal)}</dd>
-		</div>
-		<div class="kpi">
-			<dt class="kpi-label">Highest tokens a day</dt>
-			<dd class="kpi-value kpi-name">
-				{#if top !== null && topRate > 0}
-					<PlanMark plan={top.plan} name={top.planName} size={24} />
-					<span>{top.planName}</span>
-				{:else}
-					–
-				{/if}
-			</dd>
-		</div>
-	</dl>
-
-	<p class="use-key">
-		<span class="use-dot" aria-hidden="true"></span>in use in the last {IN_USE_DAYS} days
-	</p>
+	<div class="summary-key">
+		<p class="use-key">
+			<span class="use-dot" aria-hidden="true"></span>in use in the last {IN_USE_DAYS} days
+		</p>
+		<p class="use-key" title={`${displayCount(grand.tokensTotal)} tokens`}>
+			{compactCount(grand.tokensTotal)} tokens · {WINDOW_DAYS} days
+		</p>
+	</div>
 
 	<ol class="meter-list">
 		{#each totals as total}
@@ -63,7 +44,7 @@ const topRate = $derived(top?.tokensPerActiveDay ?? 0)
 				<div class="meter-track" aria-hidden="true">
 					<div class="meter-bar" style={`width: ${width}%`}></div>
 				</div>
-				<span class="meter-figure">
+				<span class="meter-figure" title={`${displayCount(Math.floor(total.tokensPerActiveDay))} tokens a day`}>
 					<span aria-hidden="true">
 						{compactCount(total.tokensPerActiveDay)}<span class="meter-unit">/day</span>
 					</span>

@@ -28,4 +28,11 @@ describe("a chart axis label", () => {
 		expect(compactCount(3_000_000_000)).toBe("3B")
 		expect(compactCount(4_000_000_000_000)).toBe("4T")
 	})
+
+	test("cuts the decimal toward zero instead of rounding up", () => {
+		expect(compactCount(1_999)).toBe("1.9K")
+		expect(compactCount(999_999)).toBe("999.9K")
+		expect(compactCount(251_599_999)).toBe("251.5M")
+		expect(compactCount(12.99)).toBe("12.9")
+	})
 })

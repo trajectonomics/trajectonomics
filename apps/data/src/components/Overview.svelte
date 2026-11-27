@@ -34,12 +34,13 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 	<header class="masthead">
 		<p class="meta-label">Measured by us</p>
 		<h1 id="overview-title" class="masthead-title">Trajectonomics Data</h1>
-		<p class="overview-lede">Tokens we used on each AI subscription plan, measured by us.</p>
 	</header>
 
 	{#if fresh !== null}
-		<p class="freshness-line">
-			<span>{fresh.label}{#if fresh.at !== null}{` (${fresh.at})`}{/if}</span>
+		<p class="freshness-line" title={fresh.at ?? undefined}>
+			<span class="freshness-dot" class:freshness-stale={fresh.note !== null} aria-hidden="true"></span>
+			<span>{fresh.label}</span>
+			{#if fresh.at !== null}<span class="visually-hidden">({fresh.at})</span>{/if}
 			{#if fresh.note !== null}<span class="freshness-note">{fresh.note}</span>{/if}
 		</p>
 	{/if}

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { freshness } from "./freshness"
 
-const STALE_NOTE = "Uploads are paused, so the figures stop at the last update."
+const STALE_NOTE = "Uploads paused"
 
 function health(minutesSinceIngest: number | null, stale = false) {
 	return {
