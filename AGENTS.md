@@ -34,6 +34,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 9. Resource limits: run turbo with `--concurrency=2`, and wrap heavy builds in a memory cap, for example `systemd-run --user --scope -q -p MemoryMax=6G <command>`.
 10. UI frameworks: an app with a client-side interface is written in Svelte 5 (`apps/web`). React is allowed only in `apps/docs`, and there only because Fumadocs needs it; do not add React to another package. `apps/site` ships static HTML with no UI framework.
 11. One host: every static site is served under `trajectonomics.com` (owner, 2026-11-27). A product's landing page is built in `apps/site`; the docs, the blog and the data site keep their own Workers and are mounted at `/docs`, `/blog` and `/data` by zone routes, with no router Worker. Only a single-page app gets a subdomain of its own. A retired subdomain stays attached to redirect to its new path, and keeps answering, without a redirect, any endpoint that clients already shipped still call (the data site's `/api/*` and `/ingest`, OpenJot's `/ingest`), because a redirect would turn their POST into a GET.
+12. Show, don't tell: anything a person looks at (a screen, a chart, a landing page, a doc page, a pull request or a reply to the owner) follows [`DESIGN_PRINCIPLES.md`](DESIGN_PRINCIPLES.md). Read it before you build, change or review one.
 
 ## Organisation goals
 
@@ -82,6 +83,7 @@ On 2026-11-25 the owner subscribed to OpenCode Go and made `opencode-go/deepseek
 |---|---|---|---|
 | [`mattpocock/skills`](https://github.com/mattpocock/skills) (external) | `.agents/skills/<name>/` (real copy) | `skills-lock.json` | every agent |
 | `RefoundAI/lenny-skills` (external, `goal-setting-okrs`) | `.agents/skills/goal-setting-okrs/` (real copy) | `skills-lock.json` | every agent |
+| `aref-vc/tufte-claude-skill` (external, `tufte`) and `ibelick/ui-skills` (external, `fixing-accessibility`) | `.agents/skills/<name>/` (real copy) | `skills-lock.json` | every agent; [`DESIGN_PRINCIPLES.md`](DESIGN_PRINCIPLES.md) says where they yield to this repository's rules |
 | `trajectonomics/internal-skills` (internal) | `skills/internal/skills/<name>/`, linked from `.agents/skills/<name>` | not in the lock | every agent |
 | First-party customer skills | `skills/customer/skills/<name>/` | `skills.manifest.json` | the product; never installed here |
 
