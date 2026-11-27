@@ -5,8 +5,8 @@ import { NOW_ISO, NOW_MS, usageRow } from "./support/fixtures"
 import { get, harness, ingestRequest } from "./support/http"
 import { silenceConsoleError } from "./support/log"
 
-async function seed(context: ReturnType<typeof harness>): Promise<void> {
-	const response = await handleRequest(ingestRequest({ usage: [usageRow()] }), context.env, {
+async function seed(context: ReturnType<typeof harness>, rows = [usageRow()]): Promise<void> {
+	const response = await handleRequest(ingestRequest({ usage: rows }), context.env, {
 		nowMs: NOW_MS,
 		cache: context.cache,
 	})
@@ -26,6 +26,8 @@ describe("GET /api/health", () => {
 			lastIngestAt: null,
 			minutesSinceIngest: null,
 			stale: true,
+			collectingSince: null,
+			planSince: {},
 		})
 	})
 
@@ -33,7 +35,31 @@ describe("GET /api/health", () => {
 		const context = harness()
 		await seed(context)
 		const body = (await (await read(context)).json()) as Record<string, unknown>
-		expect(body).toEqual({ lastIngestAt: NOW_ISO, minutesSinceIngest: 0, stale: false })
+		expect(body).toEqual({
+			lastIngestAt: NOW_ISO,
+			minutesSinceIngest: 0,
+			stale: false,
+			collectingSince: "2026-11-24",
+			planSince: { claude: "2026-11-24" },
+		})
+	})
+
+	test("reports the earliest collected day per plan", async () => {
+		const context = harness()
+		await seed(context, [
+			usageRow(),
+			usageRow({
+				plan: "cursor",
+				model: "composer-1",
+				hourUtc: "2026-11-25T09:00:00.000Z",
+			}),
+		])
+		const body = (await (await read(context)).json()) as {
+			collectingSince: string
+			planSince: Record<string, string>
+		}
+		expect(body.collectingSince).toBe("2026-11-24")
+		expect(body.planSince).toEqual({ claude: "2026-11-24", cursor: "2026-11-25" })
 	})
 
 	test("turns stale after 180 minutes", async () => {

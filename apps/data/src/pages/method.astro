@@ -6,6 +6,7 @@ import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 
 const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estimated-tiers-scale-a-measured-floor-by-a-stated-multiplier.md`
 const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md`
+const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data-starts-when-collecting-starts.md`
 ---
 
 <Layout
@@ -137,6 +138,12 @@ const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-cou
 			Every row here belongs to the <code>measured-by-us</code> series: our collector counted it
 			from our own usage records. It is not a vendor invoice and not a plan's own meter. Meta rows
 			are marked best-effort. Mistral rows come from its daily console export.
+		</p>
+		<p>
+			Collection starts at the first hour a collector runs, and the site shows only usage the
+			collector measured live, never a backfilled history. A window longer than what we have
+			collected shows its days so far instead of a figure. The reasoning is in
+			<a href={COLLECTING_ADR_URL}>ADR 0010</a>.
 		</p>
 
 		<h2>The asOf view</h2>

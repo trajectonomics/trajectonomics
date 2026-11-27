@@ -2,12 +2,14 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import type { PlanCatalog } from "@trajectonomics/data-collector/tier-catalog"
+import { peakCellChoice } from "../lib/collecting"
 import { compactCount, displayCount } from "../lib/format"
 import { PEAK_COLUMNS, type PeakColumn, peakNote, peakSpoken } from "../lib/peak-words"
 import { defaultTier, planCatalog } from "../lib/plan-catalog"
 import { MONTH_FROM_WEEK } from "../lib/plan-month"
 import { figureShare, type PeakTableRow, peakTableRows } from "../lib/plan-peaks"
 import {
+	cellTokens,
 	factorLabel,
 	figuresColumnMax,
 	type TierFigures,
@@ -22,6 +24,7 @@ let {
 	plans,
 	ranked,
 	day,
+	planSince = {},
 }: {
 	/** The peaks API's plans. */
 	plans: PlanPeak[]
@@ -29,6 +32,8 @@ let {
 	ranked: { plan: string; cacheRead?: number | null }[]
 	/** The window's last day, whose tier each plan's name carries. */
 	day: string
+	/** The first collected UTC day per plan; absent on an old health body. */
+	planSince?: Record<string, string>
 } = $props()
 
 type RowView = {
@@ -131,7 +136,30 @@ function choose(plan: string, tier: string): void {
 		</div>
 	{:else}
 		{@const current = figures.cells[column.key]}
-		{#if current.kind === "not-stated"}
+		{@const waiting = peakCellChoice(
+			column.key,
+			cellTokens(current) !== null,
+			planSince[view.row.plan],
+			day,
+			MONTH_FROM_WEEK.has(view.row.plan),
+		)}
+		{#if waiting.kind === "collecting"}
+			<div class="peaks-cell">
+				<span class="peaks-collecting" aria-hidden="true">{waiting.seen} of {waiting.of} days</span>
+				{#if waiting.note !== null}
+					<span class="peaks-meta" aria-hidden="true">{waiting.note}</span>
+				{/if}
+				<span class="peaks-track" aria-hidden="true">
+					<span
+						class="peaks-bar peaks-bar-collecting"
+						style={`width: ${figureShare(waiting.seen, waiting.of)}%`}
+					></span>
+				</span>
+				<span class="visually-hidden">
+					Still collecting: {waiting.seen} of {waiting.of} days seen{#if waiting.note !== null}, {waiting.note}{/if}
+				</span>
+			</div>
+		{:else if current.kind === "not-stated"}
 			<div class="peaks-cell" title={`${view.row.planName} states no multiplier for this window`}>
 				<span class="peaks-figure peaks-figure-empty" aria-hidden="true">–</span>
 				<span class="visually-hidden">{view.row.planName} states no multiplier for this window</span>
@@ -269,7 +297,7 @@ function choose(plan: string, tier: string): void {
 	</table>
 
 	<p class="peaks-note">
-		Most we used in a window, or <span aria-hidden="true">≈</span> estimated from a tier we measured
-		— never the plan's limit
+		Most we used in a window once it is full, or <span aria-hidden="true">≈</span> estimated from a
+		tier we measured — never the plan's limit
 	</p>
 </div>

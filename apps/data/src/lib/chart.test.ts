@@ -62,6 +62,13 @@ describe("the chart geometry", () => {
 		expect(chart?.yTicks[0]?.value).toBe(100)
 		expect(chart?.yTicks[4]?.value).toBe(0)
 	})
+
+	test("draws a single day in the middle of the plot", () => {
+		const chart = chartGeometry([line({ points: [{ day: "2026-11-27", tokens: 120 }] })])
+		// The plot runs from x=64 to x=704, so one day sits at its centre.
+		expect(chart?.lines[0]?.points[0]?.x).toBe(384)
+		expect(chart?.xTicks).toEqual([{ day: "2026-11-27", x: 384 }])
+	})
 })
 
 describe("the chart's description", () => {
@@ -74,6 +81,18 @@ describe("the chart's description", () => {
 			),
 		).toBe(
 			"Line chart of total tokens per UTC day for 3 days, 2026-11-24 to 2026-11-26. Plans: Claude, Cursor.",
+		)
+	})
+
+	test("says one day in the singular", () => {
+		expect(
+			chartAriaLabel(
+				[line({ points: [{ day: "2026-11-27", tokens: 120 }] })],
+				"2026-11-27",
+				"2026-11-27",
+			),
+		).toBe(
+			"Line chart of total tokens per UTC day for 1 day, 2026-11-27 to 2026-11-27. Plans: Claude.",
 		)
 	})
 })

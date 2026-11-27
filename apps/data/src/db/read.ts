@@ -1,7 +1,9 @@
 import type { D1Database } from "@cloudflare/workers-types"
 import type { Granularity } from "@trajectonomics/data-collector/types"
+import type { CollectingDays } from "../core/health"
 import type { UsageFilter } from "../core/query"
 import { nextDay } from "../core/rules"
+import type { Series } from "../core/types"
 
 /** The rollup columns the public API serves; no machine, contributor or hour. */
 export type RollupDbRow = {
@@ -90,4 +92,27 @@ export async function readLastIngest(db: D1Database): Promise<string | null> {
 		.prepare("SELECT received_at FROM ingest_log ORDER BY received_at DESC LIMIT 1")
 		.first<{ received_at: string }>()
 	return row?.received_at ?? null
+}
+
+/**
+ * The first UTC day each plan holds a rollup for, and the earliest of them. One query over the
+ * series' days: the public answer is a day, never an hour, a machine or a contributor.
+ */
+export async function readCollectingDays(
+	db: D1Database,
+	series: Series = "measured-by-us",
+): Promise<CollectingDays> {
+	const result = await db
+		.prepare("SELECT plan, MIN(day) AS first_day FROM rollup_daily WHERE series = ? GROUP BY plan")
+		.bind(series)
+		.all<{ plan: string; first_day: string }>()
+	const planSince: Record<string, string> = {}
+	let collectingSince: string | null = null
+	for (const row of result.results) {
+		planSince[row.plan] = row.first_day
+		if (collectingSince === null || row.first_day < collectingSince) {
+			collectingSince = row.first_day
+		}
+	}
+	return { collectingSince, planSince }
 }
