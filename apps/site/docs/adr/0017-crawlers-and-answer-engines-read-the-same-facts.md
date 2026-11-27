@@ -21,9 +21,12 @@ every decision below. Nothing here changes what a visitor sees or what a crawler
   ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot
   and Bytespider. The behaviour is identical to the wildcard group; the groups state the intent,
   because the project is free and open source and wants the answers it publishes to be read. The file
-  still carries no `Disallow:`, because it is read at the host root and would speak for `/docs` too,
-  which another repository serves. The rule checks each named group, so a group that disappears or
-  opens no path fails the build.
+  still carries no `Disallow:`, because it is read at the host root and speaks for the whole host:
+  `/docs`, `/blog` and `/data` are zone routes to other Workers ([ADR 0033](./0033-one-host-serves-the-site-docs-blog-and-data.md)),
+  so a `Disallow:` would shut their pages out too. The file names the Site's Sitemap and, since
+  2026-11-27, the Docs Portal's and the blog's beside it, so a crawler finds all three from one file.
+  The rule checks each named group and each Sitemap, so a group or a Sitemap line that disappears
+  fails the build.
 - **The two Answer engine files are generated from the dictionaries.** `scripts/llms-txt.ts` writes
   `/llms.txt` and `/llms-full.txt` into `public/` before every build, the way
   `scripts/hero-ground.ts` writes the hero's tile, and they are gitignored for the same reason: the

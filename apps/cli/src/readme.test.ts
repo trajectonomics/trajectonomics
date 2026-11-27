@@ -124,15 +124,14 @@ describe("the README first screen", () => {
 	})
 
 	it("links the landing page and the docs page, and no other site host", () => {
-		// A trajectonomics.com link is allowed only for the landing page and the docs host.
+		// A trajectonomics.com link is allowed only for the landing page and the docs path.
 		const siteUrls = [
 			"https://trajectonomics.com/",
-			"https://docs.trajectonomics.com/",
+			"https://trajectonomics.com/docs/",
 			// The `tx` page of the Docs Portal, which documents `traj tx import` (cli#96).
-			"https://docs.trajectonomics.com/cli/commands/tx/",
+			"https://trajectonomics.com/docs/cli/commands/tx/",
 		]
-		const linked =
-			beforeDevelopment.match(/https?:\/\/(?:docs\.)?trajectonomics\.com[^\s)\]]*/g) ?? []
+		const linked = beforeDevelopment.match(/https?:\/\/trajectonomics\.com[^\s)\]]*/g) ?? []
 		expect(linked.length).toBeGreaterThan(0)
 		for (const url of linked) {
 			expect(siteUrls).toContain(url)
@@ -205,7 +204,7 @@ ${header}
 	})
 
 	it("links the docs page for tx, and sample rows stay out of it", () => {
-		expect(importSection).toContain("https://docs.trajectonomics.com/cli/commands/tx/")
+		expect(importSection).toContain("https://trajectonomics.com/docs/cli/commands/tx/")
 		// ADR-0025: the template prints no sample row, so the README copies none.
 		expect(importSection).not.toMatch(/^\d{4}-\d{2}-\d{2},/m)
 	})

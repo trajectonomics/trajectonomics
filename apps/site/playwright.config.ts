@@ -31,7 +31,9 @@ export default defineConfig({
 	},
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 	webServer: {
-		command: `./node_modules/.bin/wrangler dev --ip 127.0.0.1 --port ${PORT} --inspector-port ${PORT + 1} --show-interactive-dev-session=false`,
+		// The apex route would otherwise make the Worker see trajectonomics.com and set the production
+		// cookie Domain, which a browser on 127.0.0.1 refuses (ADR 0033).
+		command: `./node_modules/.bin/wrangler dev --ip 127.0.0.1 --port ${PORT} --inspector-port ${PORT + 1} --infer-origin-from-routes=false --show-interactive-dev-session=false`,
 		url: `${BASE_URL}/`,
 		reuseExistingServer: false,
 		timeout: 120_000,

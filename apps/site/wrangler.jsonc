@@ -2,12 +2,13 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "site",
 	"compatibility_date": "2026-11-01",
-	// The custom domain serves the Site; the *.workers.dev copy stays off (trajectonomics/infra#82).
+	// The apex is this Worker's Custom Domain; the *.workers.dev copy stays off (trajectonomics/infra#82).
 	"workers_dev": false,
+	// This record states the Custom Domain already attached by hand, so a deploy changes nothing (ADR 0033).
+	"routes": [{ "pattern": "trajectonomics.com", "custom_domain": true }],
 	// The one script the Site has: each page address in the resolved Language, the choice link, the old
 	// prefixes (ADR 0020). OpenJot's address is answered by the same script (ADR 0032).
 	"main": "src/worker/index.ts",
-	// No "routes": the router attaches the public route, not this repository.
 	// No "env": there is no staging Worker yet, so deployment is a later change.
 	"assets": {
 		"directory": "./dist",

@@ -1,11 +1,11 @@
 # Site
 
-The public pages at the root of trajectonomics.com, in Thai and English: the home at `/` and OpenJot's page at `/openjot/`. The router mounts the Site at `/`. The Docs Portal is `docs.trajectonomics.com`; `trajectonomics.com/docs` redirects there.
+The public pages at the root of trajectonomics.com, in Thai and English: the home at `/` and OpenJot's page at `/openjot/`, served by the `site` Worker's apex Custom Domain. The Docs Portal is `/docs/`, the blog `/blog/` and the data site `/data/`, each mounted by a zone route on another Worker ([ADR 0033](docs/adr/0033-one-host-serves-the-site-docs-blog-and-data.md)).
 
 ## Language
 
 **Site**:
-This repository's static microfrontend, mounted at `/` of trajectonomics.com.
+This repository's static microfrontend, the page at `/` of trajectonomics.com.
 _Avoid_: Landing page, home page, marketing site
 
 **Language**:
@@ -98,8 +98,12 @@ The built page served with HTTP status 404 when a path is not in the Site. There
 _Avoid_: soft 404, error page
 
 **Reserved preload path**:
-The path `/__mf-preload.js`, owned by the router and never built by the Site.
+The path `/__mf-preload.js`, which no Worker on the host serves and the Site never builds.
 _Avoid_: preload script, client router
+
+**Reserved mount path**:
+A path a zone route gives another Worker on the Site's host (`/docs`, `/blog`, `/data`), so the Site never builds a file there ([ADR 0033](docs/adr/0033-one-host-serves-the-site-docs-blog-and-data.md)).
+_Avoid_: excluded directory, ignored path
 
 ## Consent
 
@@ -150,11 +154,12 @@ _Avoid_: SEO file, metadata file, static asset
 **Sitemap**:
 The Crawler file at `/sitemap.xml`: one `<url>` per page address, each naming `x-default` at that
 same address, which is also what the IndexNow payload submits. It lists only the Site's addresses.
-The Docs Portal publishes its own sitemap on `docs.trajectonomics.com`.
+The Docs Portal publishes its own at `https://trajectonomics.com/docs/sitemap.xml` and the blog at
+`https://trajectonomics.com/blog/sitemap.xml`, and the Robots file names all three.
 _Avoid_: URL list, page index
 
 **Robots file**:
-The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /`, one `Allow: /` group per named answer engine, and the absolute `Sitemap:` line, with no `Disallow:`. It describes this host only. `/docs` stays allowed because that path redirects to the Docs Portal, which publishes its own file on `docs.trajectonomics.com` ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
+The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /`, one `Allow: /` group per named answer engine, and the absolute `Sitemap:` lines for the Site, the Docs Portal and the blog, with no `Disallow:`. It describes the whole host. `/docs`, `/blog` and `/data` stay allowed because zone routes mount other Workers there, and the file cannot speak for one path without naming the others too ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md), [ADR 0033](docs/adr/0033-one-host-serves-the-site-docs-blog-and-data.md)).
 _Avoid_: Crawl rules, allowlist
 
 **Answer engine file**:
@@ -186,10 +191,11 @@ counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.m
 _Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:
-The JSON-LD block a page carries, naming the `WebSite`, the `Organization` that publishes it with its
-`logo` and `sameAs`, and traj as a free `SoftwareApplication` on the home or OpenJot as a
-`MobileApplication`. It states only what the page or the repository states, and never a rating, so it
-is data and outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md),
+The JSON-LD block a page carries, naming the `WebSite` (the brand's name, with `traj` as its
+alternate name), the `Organization` that publishes it with its `logo` and `sameAs`, and traj as a
+free `SoftwareApplication` on the home or OpenJot as a `MobileApplication`. It states only what the
+page or the repository states, and never a rating, so it is data and outside the Program JavaScript
+budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md),
 [ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
 _Avoid_: Schema, schema.org markup, metadata blob
 

@@ -4,9 +4,10 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 
 ## Repository map
 
-- [`apps/site`](apps/site/AGENTS.md): the Site at trajectonomics.com (Worker `site`, static HTML).
-- [`apps/docs`](apps/docs/AGENTS.md): the docs portal (Worker `docs`, `@trajectonomics/docs`).
-- [`apps/blog`](apps/blog/AGENTS.md): the blog at blog.trajectonomics.com (Worker `blog`, static Astro).
+- [`apps/site`](apps/site/AGENTS.md): the Site at trajectonomics.com (Worker `site`, static HTML), which hosts every product's landing page (traj at `/`, OpenJot at `/openjot/`).
+- [`apps/docs`](apps/docs/AGENTS.md): the docs portal at trajectonomics.com/docs (Worker `docs`, `@trajectonomics/docs`).
+- [`apps/blog`](apps/blog/AGENTS.md): the blog at trajectonomics.com/blog (Worker `blog`, static Astro).
+- [`apps/data`](apps/data/AGENTS.md): the data site at trajectonomics.com/data (Worker `data`, D1 `traj-data`, the usage collector in `apps/data/collector`).
 - [`apps/web`](apps/web/AGENTS.md): the Dashboard, a read-only static web app in Svelte 5 that renders a Snapshot of `traj --json` results on `127.0.0.1` (`@trajectonomics/web`, never published; its hosted Demo build is served as static pages by the Site).
 - [`apps/openjot`](apps/openjot/AGENTS.md): OpenJot (formerly MooJot), the Android app: Tauri 2, a SvelteKit 2 frontend, Rust for the engine and Kotlin for the Android-native parts.
 - [`apps/cli`](apps/cli/AGENTS.md): `@trajectonomics/cli`, the `traj` command line.
@@ -32,6 +33,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 8. Temporary files and scratch clones: `/tmp` is a shared, nearly full tmpfs. Never use fixed `/tmp` filenames (use `mktemp`, or `--body-file -` for `gh` bodies), and never install `node_modules` or clone scratch repositories under `/tmp`. Verification clones go under `~/.cache/<slug>`. Remove only the directory your own `mktemp -d` returned (`d=$(mktemp -d -p ~/.cache)`, then `rm -rf "$d"`), never an inherited `$TMPDIR` you did not create and never a glob such as `~/.cache/tmp.*`: other sessions' directories match it and vanish mid-run. A test makes its temporary directory through the package's helper (`makeTempDir` in `apps/cli`, `makeScratch` in `apps/web`) or removes it itself, and `tooling/guards` fails on a `mkdtemp` call with no removal in the same file, ignoring one that appears only in a line comment and exempting the files named in its short allow-list, each with the helper that removes their directory.
 9. Resource limits: run turbo with `--concurrency=2`, and wrap heavy builds in a memory cap, for example `systemd-run --user --scope -q -p MemoryMax=6G <command>`.
 10. UI frameworks: an app with a client-side interface is written in Svelte 5 (`apps/web`). React is allowed only in `apps/docs`, and there only because Fumadocs needs it; do not add React to another package. `apps/site` ships static HTML with no UI framework.
+11. One host: every static site is served under `trajectonomics.com` (owner, 2026-11-27). A product's landing page is built in `apps/site`; the docs, the blog and the data site keep their own Workers and are mounted at `/docs`, `/blog` and `/data` by zone routes, with no router Worker. Only a single-page app gets a subdomain of its own. A retired subdomain stays attached only to redirect to its new path.
 
 ## Organisation goals
 

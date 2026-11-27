@@ -1,6 +1,6 @@
 import type { Language } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
-import { SITE_NAME } from "../site"
+import { CLI_NAME, SITE_BRAND_NAME } from "../site"
 import { type SoftwareApplicationNode, softwareApplication } from "./structured-data-application"
 import { type FaqPageNode, faqPage } from "./structured-data-faq"
 import {
@@ -18,6 +18,7 @@ export interface WebSiteNode {
 	readonly "@id": string
 	readonly url: string
 	readonly name: string
+	readonly alternateName: string
 	readonly description: string
 	readonly inLanguage: Language
 	readonly publisher: { readonly "@id": string }
@@ -35,7 +36,8 @@ function website(language: Language, url: string): WebSiteNode {
 		"@type": "WebSite",
 		"@id": `${url}#website`,
 		url,
-		name: SITE_NAME,
+		name: SITE_BRAND_NAME,
+		alternateName: CLI_NAME,
 		description: dictionaryFor(language).description,
 		inLanguage: language,
 		publisher: Object.freeze({ "@id": ORGANIZATION_ID }),
