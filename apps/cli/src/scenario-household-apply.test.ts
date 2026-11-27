@@ -14,7 +14,7 @@ import { capture } from "./test-support"
 
 /** The conditional hint the document form gives at every anchorable path (cli ADR-0048). */
 const ANCHOR_HINT =
-	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write any date here and the household sets it; otherwise write the real date.'
+	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write the date that command prints at this path, because any other date is refused; otherwise write the real date.'
 
 describe("scenario household, and the writes that keep it", () => {
 	it("refuses an apply that changes an anchored date, and names the anchor", async () => {
@@ -77,6 +77,25 @@ describe("scenario household, and the writes that keep it", () => {
 		expect(errorOf(res).hint).not.toContain("This date is anchored by the household")
 	})
 
+	it("takes the anchored date the hint points to, and refuses any other", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, {
+			...HOUSEHOLD,
+			anchors: [{ path: "flows.salary.start", person: "me", age: 36 }],
+		})
+		const document = (await shown(home)).document
+		const salary = document.flows[0] as Record<string, unknown>
+		const same = await applyScenario(home, "base", document)
+		expect(same.code).toBe(0)
+		const other = await applyScenario(home, "base", {
+			...document,
+			flows: [{ ...salary, start: "1999-01-01" }, document.flows[1]],
+		})
+		expect(other.code).toBe(2)
+		expect(errorOf(other).path).toBe("document.flows.0.start")
+	})
+
 	it("gives the same conditional anchor hint on a plan with no household", async () => {
 		const home = scenarioHome()
 		await seedBase(home)
@@ -127,7 +146,7 @@ describe("scenario household, and the writes that keep it", () => {
 			"base",
 			"early",
 			"--set",
-			'flows.salary.start="2030-01-01"',
+			'flows.salary.end="2030-01-01"',
 		])
 		expect(res.code).toBe(5)
 		expect(errorOf(res)).toMatchObject({

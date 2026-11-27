@@ -132,6 +132,21 @@ describe("scenario household", () => {
 		}
 	})
 
+	it("names the YYYY-MM rule at a malformed join month", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		const res = await setHousehold(home, {
+			...HOUSEHOLD,
+			people: [HOLDER, { ...PARTNER, joins: "2026-6" }],
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "document.people.1.joins",
+		})
+		expect(errorOf(res).hint).toContain("YYYY-MM")
+	})
+
 	it("names the 0001-9998 rule at an anchored date outside it", async () => {
 		const home = scenarioHome()
 		await seedBase(home)

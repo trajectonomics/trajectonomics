@@ -55,7 +55,7 @@ export function checkPeople(value: Household, ctx: Ctx): void {
 				ctx,
 				`people.${index}.born: the year must be 0001 or later`,
 				["people", index, "born"],
-				"Keep the birth year between 0001 and 9998.",
+				"Use a birth year of 0001 or later.",
 			)
 		}
 	}
