@@ -1,0 +1,19 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import Device from "../../components/Device.svelte"
+import Layout from "../../layouts/Layout.astro"
+import { dictionaryFor } from "../../lib/language"
+
+const language = "th"
+const words = dictionaryFor(language)
+---
+
+<Layout
+	language={language}
+	page="device"
+	title={`${words.deviceTitle} — Trajectonomics`}
+	description={words.deviceDescription}
+>
+	<Device client:load language={language} />
+</Layout>

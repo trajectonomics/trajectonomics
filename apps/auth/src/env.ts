@@ -1,11 +1,13 @@
-import type { D1Database } from "@cloudflare/workers-types"
+import type { D1Database, Fetcher } from "@cloudflare/workers-types"
 
 /**
  * The bindings and vars `wrangler.jsonc` gives the auth Worker. The four OAuth secrets and the
- * Better Auth secret are Worker secrets, never `vars`.
+ * Better Auth secret are Worker secrets, never `vars`. `DATA` is optional: a local Worker or a
+ * self-hosted deployment without the data service still deletes the account and queues the call.
  */
 export type Env = {
 	DB: D1Database
+	DATA?: Fetcher
 	BETTER_AUTH_SECRET: string
 	BETTER_AUTH_URL: string
 	ENVIRONMENT?: string

@@ -15,6 +15,12 @@
 		"ENVIRONMENT": "production",
 		"BETTER_AUTH_URL": "https://auth.trajectonomics.com"
 	},
+	// The person-facing pages: Astro's static build. Only the auth endpoints, the public key alias
+	// and the OAuth discovery documents reach the Worker first (ADR 0003).
+	"assets": {
+		"directory": "./dist-site",
+		"run_worker_first": ["/api/*", "/jwks", "/.well-known/*"]
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -23,5 +29,11 @@
 			"database_id": "6b94f059-3d46-4c6f-85d4-385a8acc3668",
 			"migrations_dir": "migrations"
 		}
-	]
+	],
+	// Optional at runtime: a deployment without the data service queues every notice and retries it
+	// with the hourly cron below. The data Worker's endpoint arrives with #601.
+	"services": [{ "binding": "DATA", "service": "data" }],
+	"triggers": {
+		"crons": ["43 * * * *"]
+	}
 }
