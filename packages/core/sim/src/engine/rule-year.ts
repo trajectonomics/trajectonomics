@@ -1,5 +1,5 @@
 import { roundedDivide } from "../levy/scale"
-import { grow } from "../money/growth"
+import { type Inflation, inflateBy } from "../money/inflation"
 import type {
 	BasisPoints,
 	CurrentRateRule,
@@ -15,7 +15,7 @@ export interface YearInput {
 	readonly date: DateString
 	/** Whole years of the Flow's `start` at the year's first Occurrence, which a floor or ceiling grows by. */
 	readonly years: number
-	readonly inflation: BasisPoints
+	readonly inflation: Inflation
 	/** The portfolio's value `P` on `date`. */
 	readonly portfolio: bigint
 	/** Rule years already begun: 0 for the first. */
@@ -41,7 +41,10 @@ function share(rule: SpendingRule, portfolio: bigint, bps: BasisPoints): bigint 
 export function initialYear(rule: SpendingRule, input: YearInput): Fixed {
 	if (input.index === 0)
 		return { amount: share(rule, input.portfolio, rule.rateBps), action: "none" }
-	return { amount: grow(input.first, input.inflation, input.index * 365), action: "none" }
+	return {
+		amount: inflateBy(input.first, input.inflation, input.index, input.date),
+		action: "none",
+	}
 }
 
 /** The rate in force on a day: the last step whose `from` is on or before it, else `rateBps`. */
@@ -58,7 +61,7 @@ export function currentYear(rule: CurrentRateRule, input: YearInput): Fixed {
 	const grown = (bound: typeof floor) =>
 		bound === undefined
 			? undefined
-			: grownAmount(bound.amount, bound.growth, input.years, input.inflation)
+			: grownAmount(bound.amount, bound.growth, input.years, input.inflation, input.date)
 	const low = grown(floor)
 	const high = grown(ceiling)
 	const lifted = low !== undefined && raw < low ? low : raw
@@ -71,7 +74,7 @@ export function currentYear(rule: CurrentRateRule, input: YearInput): Fixed {
 /** Last year's amount grown a year, cut when the rate rose past `upper` and raised when it fell past `lower`. */
 export function guardrailsYear(rule: GuardrailsRule, input: YearInput): Fixed {
 	if (input.index === 0) return initialYear(rule, input)
-	const grown = grow(input.previous, input.inflation, 365)
+	const grown = inflateBy(input.previous, input.inflation, 1, input.date)
 	const rate = input.portfolio * BigInt(rule.rateBps)
 	const scaled = grown * SCALE * SCALE
 	const { upper, lower } = rule

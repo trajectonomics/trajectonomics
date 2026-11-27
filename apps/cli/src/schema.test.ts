@@ -17,6 +17,7 @@ describe("schema", () => {
 			"account value",
 			"backup",
 			"balance",
+			"baseline rates",
 			"baseline show",
 			"dashboard",
 			"data remove",

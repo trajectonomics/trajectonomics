@@ -1,4 +1,5 @@
 import { growthYears } from "../calendar/arith"
+import type { Inflation } from "../money/inflation"
 import type { AccountId, DateString, RoutedAmount, WithdrawEntry } from "../types"
 import { grownAmount } from "./amount"
 import { isSafeInteger } from "./overflow"
@@ -13,11 +14,11 @@ export function routedValue(
 	target: RoutedAmount,
 	timelineStart: DateString,
 	date: DateString,
-	inflation: number,
+	inflation: Inflation,
 ): bigint {
 	if (typeof target === "number") return BigInt(target)
 	const years = growthYears(timelineStart, date)
-	return grownAmount(target.amount, target.growth, years, inflation)
+	return grownAmount(target.amount, target.growth, years, inflation, date)
 }
 
 /**
@@ -41,7 +42,7 @@ export function routedAt(
 	target: RoutedAmount,
 	state: AccountState,
 	date: DateString,
-	inflation: number,
+	inflation: Inflation,
 ): bigint {
 	return routedValue(target, state.opened, date, inflation)
 }

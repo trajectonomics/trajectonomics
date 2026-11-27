@@ -2,6 +2,7 @@ import type { DocumentSpec, RequiredDocumentField } from "../command"
 import { type AppError, fail } from "../errors"
 import { decimalDocument } from "./decimal-schema"
 import { scenarioDocument } from "./document-form"
+import { historyRefusal } from "./history-flags"
 import { WHAT_IF_FLAG_FORM } from "./what-if-form"
 
 /** The input fields `scenario apply` reads; the forms share one input schema. */
@@ -10,6 +11,8 @@ export type ApplyFlags = {
 	file?: string | undefined
 	template?: boolean | undefined
 	asOf?: string | undefined
+	fromHistory?: boolean | undefined
+	months?: number | undefined
 	dryRun?: boolean | undefined
 	decimal?: boolean | undefined
 	ifHash?: string | undefined
@@ -67,13 +70,6 @@ function templateWritesRefusal(input: ApplyFlags): AppError | undefined {
 			message: "dryRun: --template takes no --dry-run",
 		})
 	}
-	if (input.decimal === true) {
-		return fail("invalid_input", {
-			path: "decimal",
-			message: "decimal: --template prints minor units, so it takes no --decimal",
-			hint: 'Run "traj scenario apply <name> --file <path> --decimal" to apply a document in decimal form.',
-		})
-	}
 	if (input.ifHash !== undefined) {
 		return fail("invalid_input", {
 			path: "ifHash",
@@ -104,6 +100,8 @@ function templateRefusal(input: ApplyFlags): AppError | undefined {
 }
 
 export function exclusive(input: ApplyFlags): AppError | undefined {
+	const history = historyRefusal(input)
+	if (history !== undefined) return history
 	const template = templateRefusal(input)
 	if (template !== undefined) return template
 	if (input.asOf !== undefined && input.template !== true) {
