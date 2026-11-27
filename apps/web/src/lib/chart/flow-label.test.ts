@@ -112,3 +112,16 @@ describe("fittedLabel", () => {
 		expect(FLOW_MARGIN).toBe(8)
 	})
 })
+
+describe("the gap between a name and its amount", () => {
+	test("fits a name that needs every unit of the three-unit gap", () => {
+		// The name is 77 units and the amount 20; the room is 100, so the 3-unit gap is exactly what fits.
+		const measure = (text: string) => (text === "amount" ? 20 : text.length * 7)
+		const drawn = fittedLabel(
+			{ labelX: 692, anchor: "start", label: "abcdefghijk" },
+			"amount",
+			measure,
+		)
+		expect(drawn.label).toBe("abcdefghijk")
+	})
+})

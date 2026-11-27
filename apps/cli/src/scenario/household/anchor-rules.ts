@@ -1,7 +1,7 @@
 import type { z } from "zod"
 import { parsePath } from "../set-parse"
+import { anchorableHint, anchorableSegments } from "./anchorable"
 import { type Anchor, anchorDate, byId, type Household, type Person } from "./model"
-import { anchorableHint, anchorableSegments } from "./paths"
 import { issue } from "./rules"
 
 /** The rules a household's anchors cannot state alone (cli ADR-0048), as `rules.ts` states the rest. */
@@ -31,6 +31,13 @@ function checkTarget(people: readonly Person[], entry: Anchor, index: number, ct
 		return false
 	}
 	return true
+}
+
+/** The rule the anchor broke, worded for its kind: a join month has no age or life expectancy. */
+function rangeHint(entry: Anchor): string {
+	return "at" in entry && entry.at === "joins"
+		? "A join month lands in the year it states; keep that year between 0001 and 9998."
+		: "An age lands in the year born + age, and a life end in the year born + lifeExpectancy; keep that year between 0001 and 9998."
 }
 
 /** The path is a dotted path naming an anchorable date field, and no path is anchored twice. */
@@ -67,7 +74,12 @@ export function checkAnchors(value: Household, ctx: Ctx): void {
 		checkPath(entry, index, seen, ctx)
 		if (!checkTarget(value.people, entry, index, ctx)) continue
 		if (anchorDate(value.people, entry) === null) {
-			issue(ctx, `anchors.${index}: the date falls outside 0001-9998`, ["anchors", index])
+			issue(
+				ctx,
+				`anchors.${index}: the date falls outside 0001-9998`,
+				["anchors", index],
+				rangeHint(entry),
+			)
 		}
 	}
 }

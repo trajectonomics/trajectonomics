@@ -1,5 +1,6 @@
 import { type AppError, fail, isAppError } from "../errors"
 import { scenarioChanged } from "../scenario/errors"
+import { applyConflictHint } from "../scenario/household/conflict-hint"
 import { contentHash } from "./canonical"
 import { liveOnly, SCENARIO_COLUMNS, SCENARIO_ORDER } from "./columns"
 import type { Ctx } from "./context"
@@ -41,7 +42,7 @@ export function saveScenario(
 			const current = liveScenario(ctx, "name", input.name)
 			const stale = staleRefusal(current, input.name, input.expectedHash)
 			if (stale !== undefined) return stale
-			const resolved = anchorsFor(current, input.document, input.name)
+			const resolved = anchorsFor(current, input.document, applyConflictHint(input.name))
 			if (isAppError(resolved)) return resolved
 			const document = canonicalDocument(resolved.document)
 			if (!current) {
