@@ -8,6 +8,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 - [`apps/docs`](apps/docs/AGENTS.md): the docs portal at trajectonomics.com/docs (Worker `docs`, `@trajectonomics/docs`).
 - [`apps/blog`](apps/blog/AGENTS.md): the blog at trajectonomics.com/blog (Worker `blog`, static Astro).
 - [`apps/data`](apps/data/AGENTS.md): the data site at trajectonomics.com/data (Worker `data`, D1 `traj-data`, the usage collector in `apps/data/collector`).
+- [`apps/auth`](apps/auth/AGENTS.md): the account platform at auth.trajectonomics.com (Worker `auth`, D1 `traj-auth`, Better Auth with Google, GitHub, passkeys, device authorization and Ed25519 JWTs).
 - [`apps/web`](apps/web/AGENTS.md): the Dashboard, a read-only static web app in Svelte 5 that renders a Snapshot of `traj --json` results on `127.0.0.1` (`@trajectonomics/web`, never published; its hosted Demo build is served as static pages by the Site).
 - [`apps/openjot`](apps/openjot/AGENTS.md): OpenJot (formerly MooJot), the Android app: Tauri 2, a SvelteKit 2 frontend, Rust for the engine and Kotlin for the Android-native parts.
 - [`apps/cli`](apps/cli/AGENTS.md): `@trajectonomics/cli`, the `traj` command line.
