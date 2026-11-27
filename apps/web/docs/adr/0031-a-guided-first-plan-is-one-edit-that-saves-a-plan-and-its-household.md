@@ -28,6 +28,7 @@ status: accepted
 
 - The Edit's answers live only in the tab (`src/client/guided-plan.svelte.ts`, in the next change). A reload starts the questions over, and Cancel writes nothing.
 - The plan and its household are two writes, so the CLI's writer lock is taken twice and the `.traj` ledger sees a moment with the plan and no household. The removal closes it, and `guided_plan_half_saved` names the one case it cannot.
+- A plan of the same name made by a terminal between the dry and the real apply is already overwritten by the real apply, and `traj` has no restore. So a refused household still runs `scenario rm`, rather than leave this Edit's document without its household.
 - A ledger that changes between the Snapshot's read and the save answers `guided_ledger_changed`, and the page offers the existing Reload (`POST /reread`).
 - The hosted Demo has no edit client (ADR 0028), so it shows the steps with saving off; nothing of this path reaches it.
 - The view models, components and route are later work: this change makes the Edit runnable and tested against the real `traj`, and adds no page.

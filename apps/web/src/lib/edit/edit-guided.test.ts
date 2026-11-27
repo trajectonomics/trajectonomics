@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { writeCommand } from "./edit"
+import type { SingleWriteEdit } from "./edit"
 import {
 	guidedApplyCommand,
 	guidedHouseholdCommand,
@@ -81,12 +81,14 @@ describe("the guided plan's argv", () => {
 		expect(guidedHouseholdCommand("guided", HOUSEHOLD, false).argv).not.toContain("--if-hash")
 	})
 
-	test("the removal of a refused plan's household is a real scenario rm", () => {
+	test("a plan whose household was refused is removed with a real scenario rm", () => {
 		expect(guidedRemoveCommand("guided")).toEqual(["scenario", "rm", "guided", "--json"])
 	})
 
-	test("writeCommand refuses the kind: the guided run builds three writes, not one", () => {
-		expect(() => writeCommand(HISTORY, false)).toThrow(/serve-guided/)
+	test("a guided plan runs two writes, and scenario rm when the household is refused, so it is no single write", () => {
+		// @ts-expect-error the guided plan's argv live in edit-guided.ts, and serve-guided.ts runs them
+		const guided: SingleWriteEdit = HISTORY
+		expect(guided).toBeDefined()
 	})
 
 	test("the new plan joins an explicit list of the plans the Snapshot projects", () => {

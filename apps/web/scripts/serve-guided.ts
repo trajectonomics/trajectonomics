@@ -1,4 +1,4 @@
-// The guided plan's run: one Edit that runs two writes, the plan and then its household
+// The guided plan's run: one Edit that runs two writes, and `scenario rm` when the household is refused
 // ([web ADR 0031](../docs/adr/0031-a-guided-first-plan-is-one-edit-that-saves-a-plan-and-its-household.md)).
 // The template is read first, the document is built from the answers, and each write runs dry before it runs for
 // real. A refused household removes the plan this Edit just made, so a plan without its household is never left.
