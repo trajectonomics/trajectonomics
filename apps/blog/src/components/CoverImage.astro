@@ -1,0 +1,26 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Translation } from "../content/read-posts"
+
+interface Props {
+	/** The Post Translation's cover image, rendered decoratively beside its linked title. */
+	readonly cover: Translation["cover"]
+	/** Off-screen grid covers load lazily; the featured cover loads eagerly. */
+	readonly lazy?: boolean
+}
+
+const { cover, lazy = false } = Astro.props
+/** Wide banner covers (wider than 3:2) are contained inside the square frame so edges never clip. */
+const wide = cover.width / cover.height > 1.5
+---
+
+<div class="cover-frame">
+	<img
+		class:list={["cover-image", wide && "cover-image-wide"]}
+		src={cover.src}
+		alt=""
+		width={cover.width}
+		height={cover.height}
+		loading={lazy ? "lazy" : undefined}
+	/>
+</div>

@@ -25,7 +25,7 @@ describe("the Dictionaries", () => {
 	})
 
 	test("Thai is never the English word", () => {
-		expect(dictionaryFor("th").mastheadTitle).not.toBe(dictionaryFor("en").mastheadTitle)
+		expect(dictionaryFor("th").frontHeading).not.toBe(dictionaryFor("en").frontHeading)
 		expect(dictionaryFor("th").byline).not.toBe(dictionaryFor("en").byline)
 	})
 
