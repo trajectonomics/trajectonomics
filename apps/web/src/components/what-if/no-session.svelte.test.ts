@@ -7,8 +7,11 @@ import { replaceSnapshot } from "../../client/snapshot.svelte"
 import { useSessionHooks } from "../../client/what-if.test-support"
 import type { ProjectionRun } from "../../lib/contract"
 import { parseTerms } from "../../lib/view/compare"
+import { healthWarning } from "../../lib/view/health/warning"
+import { householdOf, personNames } from "../../lib/view/item-names"
 import { netWorthPageView } from "../../lib/view/net-worth/page"
-import { heroOf } from "../../lib/view/overview/hero"
+import { focusOf } from "../../lib/view/overview/focus"
+import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { LOADING } from "../../lib/view/state"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
@@ -16,8 +19,9 @@ import ComparePanel from "../compare/ComparePanel.svelte"
 import MilestonesBody from "../milestones/MilestonesBody.svelte"
 import MilestonesView from "../milestones/MilestonesView.svelte"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
+import PnlCard from "../net-worth/PnlCard.svelte"
+import OverviewFocus from "../overview/OverviewFocus.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
-import OverviewHero from "../overview/OverviewHero.svelte"
 import ComparePage from "../pages/ComparePage.svelte"
 import NetWorthPage from "../pages/NetWorthPage.svelte"
 import OverviewPage from "../pages/OverviewPage.svelte"
@@ -82,7 +86,8 @@ describe("with no session, a page is its content and nothing more", () => {
 	})
 
 	test("Net worth", () => {
-		const content = `<div class="space-y-8">${bodyOf(RecordValues, { snapshot: DEMO })}${bodyOf(NetWorthContent, { view: netWorthPageView(DEMO) })}</div>`
+		const view = netWorthPageView(DEMO)
+		const content = `<div class="space-y-8">${bodyOf(PnlCard, { pnl: view.pnl })}${bodyOf(RecordValues, { snapshot: DEMO })}${bodyOf(NetWorthContent, { view })}</div>`
 		const page = bodyOf(NetWorthPage, { scenario: "base" })
 		expect(shown(page)).toBe(framed("Net worth", content))
 	})
@@ -99,9 +104,13 @@ describe("with no session, a page is its content and nothing more", () => {
 	})
 
 	test("Home", () => {
-		const hero = heroOf(DEMO, "")
-		if (hero === null) throw new Error("the Demo has no hero")
-		const content = `<div class="space-y-4">${bodyOf(OverviewHero, { hero })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
+		const plan = homePlan(DEMO, "")
+		const projection = plan === null ? undefined : DEMO.reads.projections[plan]
+		const focus = focusOf(DEMO, "")
+		const run = projection?.ok === true ? projection.data : null
+		const people = personNames(householdOf(DEMO, plan))
+		const warning = healthWarning(DEMO)
+		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warning })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
 		expect(shown(page)).toBe(framed("Overview", content))
 	})

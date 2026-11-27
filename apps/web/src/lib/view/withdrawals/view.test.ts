@@ -55,11 +55,11 @@ describe("what the rule pays, year by year", () => {
 		expect(withdrawalsView(copy, null).rules[0]?.rows[0]?.share).toBeNull()
 	})
 
-	test("the Home card states the first Rule year's amount and its share", () => {
+	test("the Home card states the first Rule year's amount, its month and its share", () => {
 		expect(withdrawalsSummaryOf(run)).toEqual({
 			amount: "862256.24",
 			share: "3.99%",
-			from: "1 Jun 2050",
+			month: "Jun 2050",
 			currency: "THB",
 		})
 	})

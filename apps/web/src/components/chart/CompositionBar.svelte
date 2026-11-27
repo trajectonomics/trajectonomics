@@ -16,7 +16,13 @@ interface Props {
 }
 
 let { label, segments, currency, hidden, compact = false }: Props = $props()
-const SWATCHES = ["bg-primary", "bg-accent", "bg-muted-foreground", "bg-ring"]
+// The bars print in greys of the page's ink, so an accent or a ring never prints as a different colour from the two themes.
+const SWATCHES = [
+	"bg-primary print:bg-foreground",
+	"bg-accent print:bg-foreground/20",
+	"bg-muted-foreground print:bg-foreground/40",
+	"bg-ring print:bg-foreground/60",
+]
 const parts = $derived(shares(segments.map((segment) => segment.value)))
 const rows = $derived(
 	segments.map((segment, index) => ({

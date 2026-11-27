@@ -7,7 +7,9 @@ type SpendingTable = Extract<ProjectionTables[number], { name: "spendingRules" }
 /** One Rule year of one rule Flow, every figure the CLI's text. `share` is the withdrawal rate as the CLI states it. */
 export interface RuleYearRow {
 	readonly key: string
-	/** The Rule year's first date, as the CLI states it, then written out. */
+	/** The Rule year's first date, as the CLI states it, before it is written out. */
+	readonly date: string
+	/** The Rule year's first date, written out. */
 	readonly from: string
 	readonly portfolio: string
 	readonly amount: string
@@ -40,6 +42,7 @@ export function ruleYearsOf(run: ProjectionRun): RuleYears[] {
 		const rows = groups.get(row.flow) ?? []
 		rows.push({
 			key: `${row.flow}-${row.date}`,
+			date: row.date,
 			from: formatDate(row.date),
 			portfolio: row.portfolio,
 			amount: row.amount,

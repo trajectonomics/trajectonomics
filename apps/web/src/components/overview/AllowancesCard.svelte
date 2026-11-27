@@ -23,23 +23,23 @@ const single = $derived(
 </script>
 
 {#if shown}
-	<ScenarioCard title="Tax you could still save this year" href="/optimize/allowances/" label="tax allowances" {scenario}>
+	<ScenarioCard title="Tax you could save" href="/optimize/allowances/" label="tax allowances" {scenario}>
 		{#snippet body(view: AllowancesSummary | null)}
 			{#if view !== null}
-				<div class="space-y-2">
+				<div class="space-y-1">
 					{#if single !== undefined && single.name === null}
-						<p class="text-2xl font-semibold tracking-tight"><Money amount={single.saving} currency={view.currency} compact /></p>
+						<p class="text-lg font-semibold tracking-tight"><Money amount={single.saving} currency={view.currency} compact /></p>
 					{:else}
 						<dl class="space-y-1">
 							{#each view.savings as one (one.key)}
 								<div class="flex items-baseline justify-between gap-3">
 									<dt class="text-sm text-muted-foreground">{#if typeof one.name === "string"}{one.name}{:else if one.name !== null}<ItemWords label={one.name} />{/if}</dt>
-									<dd class="text-xl font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} compact /></dd>
+									<dd class="text-lg font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} compact /></dd>
 								</div>
 							{/each}
 						</dl>
 					{/if}
-					<p class="text-sm text-muted-foreground">By taking more of your allowances in {view.period}.</p>
+					<p class="text-sm text-muted-foreground">With more allowances this year.</p>
 				</div>
 			{/if}
 		{/snippet}

@@ -10,25 +10,17 @@ describe("overviewView", () => {
 	test("reads the primary Scenario: the first side of the comparison", () => {
 		const view = overviewView(DEMO)
 		const primary = DEMO.params.compare?.a
-		expect(view.fi).toMatchObject({ status: "ready", name: primary })
 		expect(view.projection).toMatchObject({ status: "ready", name: primary })
 		expect(view.tax).toMatchObject({ status: "ready", name: primary })
 	})
 
-	test("gives the net worth card one sparkline point per month-end read that succeeded", () => {
+	test("reads the net worth total and the CLI's as-of date", () => {
 		const view = overviewView(DEMO)
 		expect(view.netWorth.ok).toBe(true)
-		const expected = DEMO.reads.netWorthHistory.filter((read) => read.ok).length
-		expect(view.netWorth.ok && view.netWorth.data.sparkline).toHaveLength(expected)
-	})
-
-	test("shows at most three largest P&L rows, drawn from the CLI's rows", () => {
-		const view = overviewView(DEMO)
-		expect(view.pnl.ok).toBe(true)
-		if (!view.pnl.ok) return
-		const rows = DEMO.reads.pnl.ok ? DEMO.reads.pnl.data.rows : []
-		expect(view.pnl.data.largest).toHaveLength(Math.min(3, rows.length))
-		for (const item of view.pnl.data.largest) expect(rows).toContainEqual(item)
+		if (!view.netWorth.ok) return
+		if (!DEMO.reads.netWorth.ok) throw new Error("the Demo reads its net worth")
+		expect(view.netWorth.data.totals).toEqual(DEMO.reads.netWorth.data.totals ?? [])
+		expect(view.netWorth.data.asOf).toContain("2026")
 	})
 
 	test("names a departed Return on the allowances card through the plan's stored claimsHolder", () => {
@@ -62,6 +54,6 @@ describe("overviewView", () => {
 
 	test("names no Scenario when the Snapshot has none", () => {
 		const bare: Snapshot = { ...DEMO, params: { ...DEMO.params, scenarios: [], compare: null } }
-		expect(overviewView(bare).fi).toEqual({ status: "none" })
+		expect(overviewView(bare).projection).toEqual({ status: "none" })
 	})
 })

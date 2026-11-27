@@ -7,19 +7,25 @@ import Card from "../ui/Card.svelte"
 import ReadView from "../ui/ReadView.svelte"
 
 interface Props {
-	assets: Read<NetWorthView>
+	netWorth: Read<NetWorthView>
 }
 
-let { assets }: Props = $props()
+let { netWorth }: Props = $props()
 </script>
 
-<!-- Assets and liabilities: the assets as a bar by account, and the liabilities listed under it. -->
-<Card title="Assets and liabilities" href="/net-worth/" argv={assets.argv}>
-	<ReadView read={assets} label="Net worth">
+<!-- Accounts: the assets as a share bar and legend rows, and the loans under it, every amount compact. -->
+<Card
+	quiet
+	className="col-span-2"
+	title="Accounts"
+	href={netWorth.ok ? "/assets-and-debts/" : undefined}
+	argv={netWorth.argv}
+>
+	<ReadView read={netWorth} label="Net worth">
 		{#snippet children(view)}
-			<div class="space-y-5">
+			<div class="grid gap-5 md:grid-cols-2">
 				<CompositionBars bars={view.bars} compact />
-				<LiabilityList rows={view.liabilities} />
+				<LiabilityList rows={view.liabilities} compact />
 			</div>
 		{/snippet}
 	</ReadView>

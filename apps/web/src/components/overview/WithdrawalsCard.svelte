@@ -16,12 +16,12 @@ const shown = $derived(
 </script>
 
 {#if shown}
-	<ScenarioCard title="You could spend" href="/optimize/withdrawals/" label="withdrawals" {scenario}>
+	<ScenarioCard title="Spending in retirement" href="/optimize/withdrawals/" label="withdrawals" {scenario}>
 		{#snippet body(view: WithdrawalsSummary | null)}
 			{#if view !== null}
-				<div class="space-y-2">
-					<p class="text-2xl font-semibold tracking-tight"><Money amount={view.amount} currency={view.currency} compact /></p>
-					<p class="text-sm text-muted-foreground">In the first year, from {view.from}{#if view.share !== null}, {view.share} of your savings{/if}.</p>
+				<div class="space-y-1">
+					<p class="text-lg font-semibold tracking-tight"><Money amount={view.amount} currency={view.currency} compact /><span class="text-sm font-normal text-muted-foreground">/yr</span></p>
+					<p class="text-sm text-muted-foreground">From {view.month}{#if view.share !== null}, {view.share} of savings{/if}.</p>
 				</div>
 			{/if}
 		{/snippet}

@@ -50,12 +50,12 @@ describe("the form", () => {
 })
 
 describe("the Home card: your heirs would receive", () => {
-	test("states what heirs receive on the default date, says why that date, and links to the page", () => {
+	test("states what heirs receive on the default date, and links to the page", () => {
 		const body = render(EstateCard, { props: { scenario: overviewView(DEMO).estate } }).body
 		expect(body).toContain("Your heirs would receive")
 		expect(body).toContain("15.6M")
 		expect(body).toContain('title="15,671,500.52"')
-		expect(body).toContain("the plan's last year")
+		expect(body).toContain("In 2053, after debts, costs and gifts.")
 		expect(body).toContain('href="/estate/')
 		expect(render(OverviewGrid, { props: { view: overviewView(DEMO) } }).body).toContain("/estate/")
 	})
@@ -66,7 +66,7 @@ describe("the Home card: your heirs would receive", () => {
 			params: { ...DEMO.params, compare: null, scenarios: ["retire-early"] },
 		})
 		expect(render(EstateCard, { props: { scenario: other.estate } }).body).toContain(
-			"No settlement cost is set",
+			"with no settlement cost set",
 		)
 		preferences.hidden = true
 		expect(

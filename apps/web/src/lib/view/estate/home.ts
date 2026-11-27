@@ -1,5 +1,5 @@
 import type { HouseholdDocument, ProjectionRun, ScenarioDocument } from "../../contract"
-import { type EstateDates, estateDates } from "./dates"
+import { estateDates } from "./dates"
 import { figuresAt } from "./figures"
 import { noCostNote } from "./notes"
 
@@ -10,15 +10,7 @@ export interface EstateSummary {
 	readonly currency: string
 	/** The plan states no settlement cost, so the figure is everything owned less debts, which the card says. */
 	readonly noCost: boolean
-	/** Which date this is: the later life expectancy, the plan's last year because that falls after it, the plan's last year because the household names no adult, or the plan's last year with no plan document to say more. */
-	readonly basis: "life" | "beyond" | "no-adult" | "end"
 	readonly short: boolean
-}
-
-/** Which of the three dates the default is. */
-function basisOf(dates: EstateDates | null): EstateSummary["basis"] {
-	if (dates?.chosen.value === "life") return dates.beyond ? "beyond" : "life"
-	return dates?.beyond ? "no-adult" : "end"
 }
 
 /** The card's figures for the default date, or null when the run states no estate. */
@@ -36,7 +28,6 @@ export function estateSummaryOf(
 		date: figures.date,
 		currency: figures.currency,
 		noCost: doc === null || noCostNote(doc) !== null,
-		basis: basisOf(dates),
 		short: figures.shortfall !== null,
 	}
 }
