@@ -21,7 +21,7 @@ describe("the Landing Page's Markdown twin", () => {
 	test("states one entry per Tab's Markdown, then the ways an Agent reads the Portal", () => {
 		expect(buildLandingTwin(ORIGIN)).toContain(
 			[
-				"## For Operators: install and run the CLI",
+				"## Use traj: install it and get your first answer",
 				"",
 				`- [CLI & Quickstart](${PORTAL_ORIGIN}/cli.md): Install traj, then record your first transaction and read your balance.`,
 				"",
