@@ -13,7 +13,7 @@
 		"predev": "bun scripts/copy-brand-assets.ts && astro build",
 		"dev": "wrangler dev",
 		"prebuild": "bun scripts/copy-brand-assets.ts",
-		"build": "astro build && wrangler deploy --dry-run --outdir dist",
+		"build": "astro build && bun scripts/build-headers.ts && wrangler deploy --dry-run --outdir dist",
 		"test": "bun test ./src",
 		"test:e2e": "bun run build && bun e2e/prepare.ts && playwright test",
 		"typecheck": "astro sync && tsc -p tsconfig.worker.json && tsc -p tsconfig.json && astro check && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",

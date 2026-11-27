@@ -14,7 +14,6 @@ export interface PageWords {
 
 	readonly welcomeTitle: string
 	readonly welcomeDescription: string
-	readonly welcomeCheckbox: string
 	readonly welcomeContinue: string
 	readonly welcomeError: string
 	readonly welcomePrivacy: string
@@ -22,6 +21,8 @@ export interface PageWords {
 	readonly deviceTitle: string
 	readonly deviceDescription: string
 	readonly deviceCodeLabel: string
+	readonly deviceSignedInAs: string
+	readonly deviceConfirmWarning: string
 	readonly deviceContinue: string
 	readonly deviceWants: string
 	readonly deviceApprove: string
@@ -34,6 +35,7 @@ export interface PageWords {
 	readonly deviceLoading: string
 	readonly deviceUnknownApp: string
 
+	readonly consentTitle: string
 	readonly consentHeading: (app: string) => string
 	readonly consentDescription: string
 	readonly consentWants: string
@@ -42,6 +44,12 @@ export interface PageWords {
 	readonly consentInvalid: string
 	readonly consentError: string
 	readonly consentUnknownApp: string
+
+	/** A signed flow handed to this page has expired, so the page cannot continue it. */
+	readonly flowExpired: string
+	/** A page's data did not load, and the page offers one retry. */
+	readonly loadError: string
+	readonly loadRetry: string
 
 	readonly scopeOpenId: string
 	readonly scopeProfile: string

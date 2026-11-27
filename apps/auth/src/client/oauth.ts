@@ -17,6 +17,15 @@ export async function getPublicClient(clientId: string): Promise<PublicClient> {
 	return request<PublicClient>("/oauth2/public-client", { query: { client_id: clientId } })
 }
 
+/** The app's display name, or undefined when the client cannot be read. */
+export async function clientNameOf(clientId: string): Promise<string | undefined> {
+	try {
+		return (await getPublicClient(clientId)).client_name
+	} catch {
+		return undefined
+	}
+}
+
 export async function sendConsent(accept: boolean): Promise<ConsentResult> {
 	return request<ConsentResult>("/oauth2/consent", { method: "POST", body: { accept } })
 }

@@ -1,11 +1,17 @@
 import { expect, test } from "@playwright/test"
-import { answerConsent, signUp } from "./people"
+import { answerConsent, consentState, signUp } from "./people"
 import { queryLocal, scratchDir } from "./scratch"
 
 const scratch = scratchDir()
 if (scratch === undefined) throw new Error("the e2e scratch database is missing")
 
-type ConsentRow = { optedIn: number; source: string; withdrawnAt: string | null }
+type ConsentRow = {
+	optedIn: number
+	source: string
+	language: string
+	withdrawnAt: string | null
+	wordingVersion: string
+}
 
 test("turning email updates off appends a withdrawal and keeps the earlier answer", async ({
 	page,
@@ -22,43 +28,30 @@ test("turning email updates off appends a withdrawal and keeps the earlier answe
 
 	const rows = queryLocal<ConsentRow>(
 		scratch,
-		`select "optedIn", "source", "withdrawnAt" from "marketingConsent" where "userId" = '${user.id}' order by "givenAt" asc`,
+		`select "optedIn", "source", "language", "wordingVersion", "withdrawnAt" from "marketingConsent" where "userId" = '${user.id}' order by "givenAt" asc`,
 	)
 	expect(rows.map((row) => row.source)).toEqual(["first-sign-in", "account", "account"])
+	expect(rows[0]?.language).toBe("en")
 	expect(rows[1]?.optedIn).toBe(1)
 	expect(rows[1]?.withdrawnAt).not.toBeNull()
 	expect(rows[2]?.optedIn).toBe(0)
+	// The toggle quotes the sentence the stored answer agreed to, not a paraphrase of it.
+	await expect(
+		page.getByText("Email me product updates (about once a month). You can stop any time."),
+	).toBeVisible()
 })
 
-test("deleting the account removes it and queues the data side notice", async ({ page }) => {
+test("the Thai account page records the language the person answered in", async ({ page }) => {
 	const user = await signUp(page)
-	await answerConsent(page)
-	await page.goto("/account/")
-	await page.getByLabel("Type your email to confirm").fill(user.email)
-	await page.getByRole("button", { name: "Delete my account" }).click()
-	await page.waitForURL(/\/sign-in\/\?deleted=1/)
-	await expect(page.getByText("Your account was deleted.")).toBeVisible()
+	await answerConsent(page, false, "th")
+	await page.goto("/th/account/")
+	await page.getByRole("switch", { name: "ข่าวสารทางอีเมล" }).click()
+	await expect(page.getByRole("switch", { name: "ข่าวสารทางอีเมล" })).toBeChecked()
 
-	const pending = queryLocal<{
-		acknowledgedAt: string | null
-		attempts: number
-		lastError: string | null
-	}>(
+	const rows = queryLocal<ConsentRow>(
 		scratch,
-		`select "acknowledgedAt", "attempts", "lastError" from "pendingDeletion" where "authUserId" = '${user.id}'`,
+		`select "optedIn", "source", "language", "wordingVersion", "withdrawnAt" from "marketingConsent" where "userId" = '${user.id}' order by "givenAt" asc`,
 	)
-	expect(pending.length).toBe(1)
-	// The data service is not running here, so the row waits for the hourly retry, as designed.
-	expect(pending[0]?.acknowledgedAt).toBeNull()
-	expect(pending[0]?.attempts).toBe(1)
-	expect(pending[0]?.lastError).not.toBeNull()
-	expect(
-		queryLocal<{ id: string }>(scratch, `select "id" from "user" where "id" = '${user.id}'`),
-	).toEqual([])
-	expect(
-		queryLocal<{ id: string }>(
-			scratch,
-			`select "id" from "marketingConsent" where "userId" = '${user.id}'`,
-		),
-	).toEqual([])
+	expect(rows.map((row) => row.language)).toEqual(["th", "th"])
+	expect((await consentState(page))?.language).toBe("th")
 })

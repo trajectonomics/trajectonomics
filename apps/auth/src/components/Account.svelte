@@ -11,6 +11,8 @@ import AccountIdentity from "./AccountIdentity.svelte"
 import DeleteAccount from "./DeleteAccount.svelte"
 import EmailUpdates from "./EmailUpdates.svelte"
 import Grants from "./Grants.svelte"
+import LoadFailure from "./LoadFailure.svelte"
+import Loading from "./Loading.svelte"
 import Passkeys from "./Passkeys.svelte"
 
 let { language }: { language: Language } = $props()
@@ -19,31 +21,31 @@ let user = $state<SessionUser | null>(null)
 let consent = $state<MarketingConsent | null>(null)
 let grants = $state<readonly Grant[]>([])
 let passkeys = $state<readonly Passkey[]>([])
-let loading = $state(true)
-let message = $state("")
+let view = $state<"loading" | "ready" | "failed">("loading")
 
 onMount(() => {
 	void load()
 })
 
 async function load(): Promise<void> {
-	const session = await ensureSignedIn(language)
-	if (session === null) return
-	if (!(await ensureConsent(language))) return
-	user = session.user
+	view = "loading"
 	try {
+		const session = await ensureSignedIn(language)
+		if (session === null) return
+		if (!(await ensureConsent(language))) return
 		const [state, grantList, passkeyList] = await Promise.all([
 			getConsent(),
 			listGrants(),
 			listPasskeys(),
 		])
+		user = session.user
 		consent = state
 		grants = grantList.grants
 		passkeys = passkeyList
+		view = "ready"
 	} catch {
-		message = words.accountLoadError
-	} finally {
-		loading = false
+		// Nothing on the page is painted from a half-read answer: a failed read is its own state.
+		view = "failed"
 	}
 }
 
@@ -56,14 +58,13 @@ async function out(): Promise<void> {
 }
 </script>
 
-{#if loading}
-	<p class="muted" aria-live="polite">{words.accountLoading}</p>
-{:else if user !== null}
+{#if view === "failed"}
+	<LoadFailure message={words.accountLoadError} retryLabel={words.loadRetry} onretry={load} />
+{:else if view === "loading" || user === null}
+	<Loading title={words.accountTitle} text={words.loading} />
+{:else}
 	<div class="account">
 		<AccountIdentity {user} />
-		{#if message !== ""}
-			<p class="form-message" role="alert">{message}</p>
-		{/if}
 		<EmailUpdates {language} initial={consent} />
 		<Grants {language} initial={grants} />
 		<Passkeys {language} initial={passkeys} />
@@ -72,6 +73,4 @@ async function out(): Promise<void> {
 		</div>
 		<DeleteAccount {language} email={user.email} />
 	</div>
-{:else}
-	<p class="muted" aria-live="polite">{words.accountLoading}</p>
 {/if}

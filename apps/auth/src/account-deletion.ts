@@ -1,96 +1,82 @@
 /**
- * Telling the data Worker that an account is gone. The auth side deletes the person immediately;
- * the data side's copy of the anonymous id is removed by one call, and a failed call is retried by
- * the hourly cron (`pending-deletion-retry.ts`).
+ * What happens to an account that is being deleted, on the auth side: the queue row is inserted
+ * before the person's row is removed, and the rows that can still name the id are deleted after.
+ *
+ * The order is the point. Better Auth runs `beforeDelete` first, so a database that cannot queue
+ * the notice aborts the deletion: a person's account is never removed while the data site would
+ * never be told. Only once the user row is gone does the data side hear about it.
  */
+
 import type { D1Database, Fetcher } from "@cloudflare/workers-types"
+import type { BetterAuthOptions } from "better-auth"
+import {
+	deliverPendingDeletion,
+	findPendingDeletion,
+	queuePendingDeletion,
+} from "./pending-deletion-store"
 
-/** The private address the service binding answers; the data Worker owns this route. */
-export const DATA_DELETE_URL = "https://data.internal/internal/contributors/delete"
-
-/** A call that hangs must not keep a sign-out waiting for long. */
-const NOTIFY_TIMEOUT_MS = 5_000
-
-/** The most error text one row keeps. */
-const LAST_ERROR_LIMIT = 500
-
-export type DeleteOutcome = { readonly ok: true } | { readonly ok: false; readonly error: string }
-
-/** Rejects after `ms` unless the call has already settled, and can release its timer. */
-function timeoutAfter(ms: number): { promise: Promise<never>; cancel: () => void } {
-	let timer: ReturnType<typeof setTimeout> | undefined
-	const promise = new Promise<never>((_resolve, reject) => {
-		timer = setTimeout(() => reject(new Error(`data Worker did not answer in ${ms} ms`)), ms)
-	})
-	return {
-		promise,
-		cancel: () => {
-			if (timer !== undefined) clearTimeout(timer)
-		},
-	}
+/**
+ * Deletes the rows that can still name the deleted person. Better Auth removes the user, the
+ * sessions, the accounts and everything a foreign key cascades, but `deviceCode` and `verification`
+ * (where an authorization code lives) have no foreign key on purpose, so a leftover row would keep
+ * the user id after the account is gone.
+ */
+export async function deleteUserLeftovers(db: D1Database, authUserId: string): Promise<void> {
+	// The verification value is the provider's own JSON, which names the user as `"userId":"<id>"`.
+	const authorizationCodeValue = `%"userId":"${authUserId}"%`
+	await db.batch([
+		db.prepare('delete from "deviceCode" where "userId" = ?').bind(authUserId),
+		db.prepare('delete from "verification" where "value" like ?').bind(authorizationCodeValue),
+	])
 }
 
-/** Posts one user id to the data Worker; a missing binding is a failure, never a silent success. */
-export async function notifyDataWorker(
-	data: Fetcher | undefined,
-	authUserId: string,
-): Promise<DeleteOutcome> {
-	if (data === undefined) return { ok: false, error: "DATA service binding is not configured" }
-	const timeout = timeoutAfter(NOTIFY_TIMEOUT_MS)
-	try {
-		const response = await Promise.race([
-			data.fetch(DATA_DELETE_URL, {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ authUserId }),
-			}),
-			timeout.promise,
-		])
-		if (response.ok) return { ok: true }
-		return { ok: false, error: `data Worker responded ${response.status}` }
-	} catch (error) {
-		return { ok: false, error: capErrorText(messageOf(error)) }
-	} finally {
-		timeout.cancel()
-	}
-}
-
-/** Inserts the queue row and tries the notification once, before the person's request returns. */
-export async function recordPendingDeletion(input: {
+/**
+ * `afterDelete`: clean the leftovers, then tell the data Worker once. A failure here is recorded on
+ * the row and retried by the cron, so the sign-out never waits on the data side.
+ */
+export async function finishAccountDeletion(input: {
 	db: D1Database
 	data: Fetcher | undefined
 	authUserId: string
-}): Promise<DeleteOutcome> {
-	const id = crypto.randomUUID()
-	const requestedAt = new Date().toISOString()
-	await input.db
-		.prepare(
-			'insert into "pendingDeletion" ("id", "authUserId", "requestedAt", "acknowledgedAt", "attempts", "lastError") values (?, ?, ?, null, 0, null)',
-		)
-		.bind(id, input.authUserId, requestedAt)
-		.run()
-	const outcome = await notifyDataWorker(input.data, input.authUserId)
-	if (outcome.ok) {
-		await input.db
-			.prepare('update "pendingDeletion" set "acknowledgedAt" = ? where "id" = ?')
-			.bind(new Date().toISOString(), id)
-			.run()
-	} else {
-		await input.db
-			.prepare('update "pendingDeletion" set "attempts" = ?, "lastError" = ? where "id" = ?')
-			.bind(1, outcome.error, id)
-			.run()
+	nowMs?: number
+}): Promise<void> {
+	try {
+		await deleteUserLeftovers(input.db, input.authUserId)
+	} catch {
+		// A leftover row is not worth failing the response for; the id is no longer a live account.
 	}
-	return outcome
+	const row = await findPendingDeletion(input.db, input.authUserId)
+	if (row === undefined || row.acknowledgedAt !== null) return
+	await deliverPendingDeletion({
+		db: input.db,
+		data: input.data,
+		row,
+		...(input.nowMs === undefined ? {} : { nowMs: input.nowMs }),
+	})
 }
 
-/** The message one thrown value carries, as text. */
-export function messageOf(error: unknown): string {
-	if (error instanceof Error) return error.message
-	return String(error)
-}
-
-/** Truncates error text so one broken response cannot fill the table. */
-export function capErrorText(value: string): string {
-	return value.slice(0, LAST_ERROR_LIMIT)
+/** The `deleteUser` options: queue first, then delete, then tell the data side. */
+export function deleteUserOptions(env: {
+	DB: D1Database
+	DATA?: Fetcher | undefined
+}): NonNullable<NonNullable<BetterAuthOptions["user"]>["deleteUser"]> {
+	return {
+		enabled: true,
+		// The notice is queued *before* the person's row is removed, so a database that cannot queue
+		// it aborts the deletion. The insert throws, and Better Auth stops there.
+		beforeDelete: async (user) => {
+			await queuePendingDeletion({ db: env.DB, authUserId: user.id })
+		},
+		// The person's marketing consent rows go with the user row (the schema cascades on `userId`).
+		// The rows that can still name the id (`deviceCode`, the `verification` rows that hold an
+		// authorization code) have no foreign key, so they are deleted here too. Only then is the
+		// data side told, once; a failed call is recorded on the row and retried by the cron.
+		afterDelete: async (user) => {
+			try {
+				await finishAccountDeletion({ db: env.DB, data: env.DATA, authUserId: user.id })
+			} catch {
+				// The account is already gone; the queued row is the cron's to retry.
+			}
+		},
+	}
 }

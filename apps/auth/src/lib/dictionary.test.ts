@@ -43,11 +43,14 @@ describe("the dictionary of every language", () => {
 		expect(dictionaryFor("th").scopeDataIngest).not.toBe(dictionaryFor("en").scopeDataIngest)
 	})
 
-	it("keeps the first-sign-in sentence exact, in both languages", () => {
-		expect(dictionaryFor("en").welcomeCheckbox).toBe(
-			"Email me product updates (about once a month). You can stop any time.",
-		)
-		expect(dictionaryFor("th").welcomeCheckbox).toContain("เดือนละครั้ง")
+	it("says what openid really shows, in both languages", () => {
+		expect(dictionaryFor("en").scopeOpenId).toBe("See your name and email")
+		expect(dictionaryFor("th").scopeOpenId).toBe("ดูชื่อและอีเมลของคุณ")
+	})
+
+	it("offers the same retry in both languages", () => {
+		expect(dictionaryFor("en").loadRetry).toBe("Try again")
+		expect(dictionaryFor("th").loadRetry).toBe("ลองอีกครั้ง")
 	})
 
 	it("gives every page a title and a description", () => {

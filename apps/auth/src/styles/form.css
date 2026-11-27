@@ -24,6 +24,7 @@
 
 .field-input {
 	width: 100%;
+	max-width: 100%;
 	min-height: 2.75rem;
 	padding: var(--ds-space-2) var(--ds-space-3);
 	border: 1px solid var(--ds-color-input);

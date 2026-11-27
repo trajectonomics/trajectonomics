@@ -5,14 +5,23 @@ import { answerConsent, redeemDeviceCode, requestDeviceCode, signUp } from "./pe
 test("the device page approves a code, and the CLI poll gets tokens and a revocable grant", async ({
 	page,
 }) => {
-	await signUp(page)
+	const user = await signUp(page)
 	await answerConsent(page)
 	const code = await requestDeviceCode(page)
 	await page.goto(`/device/?user_code=${encodeURIComponent(code.userCode)}`)
 	await expect(page.getByText("traj data collector")).toBeVisible()
 	await expect(page.getByText("Send your AI usage numbers to the data site")).toBeVisible()
+	// RFC 8628 §3.3.1 and §5.4: the person must be able to match the code against the app's screen,
+	// and must see which account is about to be linked.
+	await expect(page.locator(".device-code")).toHaveText(code.userCode)
+	await expect(page.getByText(user.email)).toBeVisible()
+	await expect(
+		page.getByText("Only approve if this code is shown on your own device."),
+	).toBeVisible()
 	await page.getByRole("button", { name: "Approve" }).click()
 	await expect(page.getByText("Approved. You can close this page.")).toBeVisible()
+	// The decision is the end of the page, so it takes the focus and is read out.
+	await expect(page.getByRole("status")).toBeFocused()
 	await page.waitForTimeout(code.interval * 1_000 + 250)
 	const token = await redeemDeviceCode(page, code.deviceCode)
 	expect(token.access_token.length).toBeGreaterThan(0)
@@ -20,7 +29,12 @@ test("the device page approves a code, and the CLI poll gets tokens and a revoca
 	await page.goto("/account/")
 	await expect(page.getByText("traj data collector")).toBeVisible()
 	await page.getByRole("button", { name: "Revoke: traj data collector" }).click()
+	// Revoking asks once, in the row, before it removes anything.
+	await expect(page.getByText("Revoke access?")).toBeVisible()
+	await page.locator(".confirm-row").getByRole("button", { name: "Revoke" }).click()
 	await expect(page.getByText("No app is connected.")).toBeVisible()
+	// The row that held the button is gone; the section title holds the reader's place.
+	await expect(page.getByRole("heading", { name: "Devices and apps" })).toBeFocused()
 })
 
 test("a first OAuth sign-in asks the marketing question before the consent page", async ({

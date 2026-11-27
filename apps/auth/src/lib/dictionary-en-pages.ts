@@ -10,6 +10,8 @@ export const ENGLISH_PAGES = {
 	homeLabel: "Trajectonomics home",
 	accountMarker: "Account",
 	languageMenuLabel: "Language",
+	siteName: "Trajectonomics",
+	loading: "Loading…",
 
 	signInTitle: "Sign in",
 	signInDescription: "Sign in to Trajectonomics with Google, GitHub or a passkey.",
@@ -25,7 +27,6 @@ export const ENGLISH_PAGES = {
 
 	welcomeTitle: "Email updates",
 	welcomeDescription: "One question before you continue.",
-	welcomeCheckbox: "Email me product updates (about once a month). You can stop any time.",
 	welcomeContinue: "Continue",
 	welcomeError: "That answer was not saved. Try again.",
 	welcomePrivacy: "Privacy",
@@ -33,6 +34,8 @@ export const ENGLISH_PAGES = {
 	deviceTitle: "Connect a device",
 	deviceDescription: "Approve or deny an app that is asking to connect.",
 	deviceCodeLabel: "Code from your app",
+	deviceSignedInAs: "Signed in as",
+	deviceConfirmWarning: "Only approve if this code is shown on your own device.",
 	deviceContinue: "Continue",
 	deviceWants: "This app wants to:",
 	deviceApprove: "Approve",
@@ -45,6 +48,7 @@ export const ENGLISH_PAGES = {
 	deviceLoading: "Checking the code…",
 	deviceUnknownApp: "Unknown app",
 
+	consentTitle: "Allow an app",
 	consentHeading: (app: string) => `Allow ${app} to use your account?`,
 	consentDescription: "An app is asking for access to your Trajectonomics account.",
 	consentWants: "This app wants to:",
@@ -54,7 +58,11 @@ export const ENGLISH_PAGES = {
 	consentError: "That did not work. Try again.",
 	consentUnknownApp: "Unknown app",
 
-	scopeOpenId: "Confirm it is you",
+	flowExpired: "This sign-in took too long. Go back to the app and start again.",
+	loadError: "That did not load.",
+	loadRetry: "Try again",
+
+	scopeOpenId: "See your name and email",
 	scopeProfile: "See your name and picture",
 	scopeEmail: "See your email address",
 	scopeOffline: "Stay connected after you close the app",

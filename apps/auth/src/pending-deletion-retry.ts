@@ -1,54 +1,32 @@
-/** The hourly cron's half of the pending deletion queue: read the due rows, retry each once. */
+/** The hourly cron's half of the pending deletion queue: read the due rows, retry each once, purge old ones. */
 import type { D1Database, Fetcher } from "@cloudflare/workers-types"
-import { capErrorText, type DeleteOutcome, notifyDataWorker } from "./account-deletion"
-import { DELETION_BATCH_LIMIT, isRetryDue, nextAttempts, retryCutoffMs } from "./core/deletion"
+import { DELETION_BATCH_LIMIT, purgeCutoffMs } from "./core/deletion"
+import { deliverPendingDeletion, type PendingDeletionRow } from "./pending-deletion-store"
 
-type PendingRow = {
-	readonly id: string
-	readonly authUserId: string
-	readonly requestedAt: string
-	readonly attempts: number
-}
-
-/** One cron tick: at most `DELETION_BATCH_LIMIT` due rows, each retried once. */
+/**
+ * One cron tick: at most `DELETION_BATCH_LIMIT` due rows, oldest attempt first, each retried once,
+ * then the notices the data site confirmed more than thirty days ago are deleted.
+ */
 export async function retryPendingDeletions(input: {
 	db: D1Database
 	data: Fetcher | undefined
 	nowMs: number
 }): Promise<number> {
-	const cutoff = new Date(retryCutoffMs(input.nowMs)).toISOString()
+	const now = new Date(input.nowMs).toISOString()
 	const { results } = await input.db
 		.prepare(
-			'select "id", "authUserId", "requestedAt", "attempts" from "pendingDeletion" where "acknowledgedAt" is null and "requestedAt" <= ? order by "requestedAt" asc limit ?',
+			'select "id", "authUserId", "requestedAt", "acknowledgedAt", "nextAttemptAt", "attempts" from "pendingDeletion" where "acknowledgedAt" is null and "nextAttemptAt" <= ? order by "nextAttemptAt" asc limit ?',
 		)
-		.bind(cutoff, DELETION_BATCH_LIMIT)
-		.all<PendingRow>()
-	let retried = 0
+		.bind(now, DELETION_BATCH_LIMIT)
+		.all<PendingDeletionRow>()
 	for (const row of results) {
-		if (!isRetryDue(input.nowMs, Date.parse(row.requestedAt), row.attempts)) continue
-		retried += 1
-		const outcome = await notifyDataWorker(input.data, row.authUserId)
-		await recordOutcome(input, row, outcome)
-	}
-	return retried
-}
-
-async function recordOutcome(
-	input: { db: D1Database; nowMs: number },
-	row: PendingRow,
-	outcome: DeleteOutcome,
-): Promise<void> {
-	if (outcome.ok) {
-		await input.db
-			.prepare(
-				'update "pendingDeletion" set "acknowledgedAt" = ?, "lastError" = null where "id" = ?',
-			)
-			.bind(new Date(input.nowMs).toISOString(), row.id)
-			.run()
-		return
+		await deliverPendingDeletion({ db: input.db, data: input.data, row, nowMs: input.nowMs })
 	}
 	await input.db
-		.prepare('update "pendingDeletion" set "attempts" = ?, "lastError" = ? where "id" = ?')
-		.bind(nextAttempts(row.attempts), capErrorText(outcome.error), row.id)
+		.prepare(
+			'delete from "pendingDeletion" where "acknowledgedAt" is not null and "acknowledgedAt" <= ?',
+		)
+		.bind(new Date(purgeCutoffMs(input.nowMs)).toISOString())
 		.run()
+	return results.length
 }

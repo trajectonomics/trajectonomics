@@ -56,3 +56,28 @@ export function pageFile(language: Language, page: Page): string {
 export function dictionaryFor(language: Language): Dictionary {
 	return DICTIONARIES[language]
 }
+
+/**
+ * The header marker's words: the page's own name, so the bar never calls every page "Account".
+ * The marker points at the page it names, which is where the person already is.
+ */
+export function pageLabel(page: Page, words: Dictionary): string {
+	switch (page) {
+		case "sign-in":
+			return words.signInTitle
+		case "welcome":
+			return words.welcomeTitle
+		case "device":
+			return words.deviceTitle
+		case "consent":
+			return words.consentTitle
+		case "account":
+			return words.accountTitle
+		case "privacy":
+			return words.privacyTitle
+		case "terms":
+			return words.termsTitle
+		case "home":
+			return words.accountMarker
+	}
+}

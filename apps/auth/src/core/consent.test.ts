@@ -1,84 +1,64 @@
 import { describe, expect, it } from "bun:test"
 import {
+	CONSENT_LANGUAGES,
 	CONSENT_WORDING_VERSION,
 	consentView,
-	currentConsent,
-	isConsentSource,
+	isConsentLanguage,
 	parseConsentAnswer,
-	withdrawalTarget,
 } from "./consent"
 
-const given = { id: "one", optedIn: true, source: "account", withdrawnAt: null }
-
 describe("parsing a consent answer", () => {
-	it("accepts a boolean with either source", () => {
-		expect(parseConsentAnswer({ optedIn: false, source: "first-sign-in" })).toEqual({
-			answer: { optedIn: false, source: "first-sign-in" },
-		})
-		expect(parseConsentAnswer({ optedIn: true, source: "account" })).toEqual({
-			answer: { optedIn: true, source: "account" },
+	it("accepts a boolean with either source and language", () => {
+		expect(parseConsentAnswer({ optedIn: false, source: "first-sign-in", language: "en" })).toEqual(
+			{
+				answer: { optedIn: false, source: "first-sign-in", language: "en" },
+			},
+		)
+		expect(parseConsentAnswer({ optedIn: true, source: "account", language: "th" })).toEqual({
+			answer: { optedIn: true, source: "account", language: "th" },
 		})
 	})
 
 	it("rejects an optedIn that is not a boolean", () => {
-		expect(parseConsentAnswer({ optedIn: "no", source: "account" })).toEqual({
+		expect(parseConsentAnswer({ optedIn: "no", source: "account", language: "en" })).toEqual({
 			error: "invalid_opted_in",
 		})
 		expect(parseConsentAnswer(null)).toEqual({ error: "invalid_opted_in" })
 	})
 
 	it("rejects a source the record does not know, under its own code", () => {
-		expect(parseConsentAnswer({ optedIn: true, source: "newsletter" })).toEqual({
+		expect(parseConsentAnswer({ optedIn: true, source: "newsletter", language: "en" })).toEqual({
 			error: "invalid_source",
 		})
-		expect(parseConsentAnswer({ optedIn: true })).toEqual({ error: "invalid_source" })
+		expect(parseConsentAnswer({ optedIn: true, language: "en" })).toEqual({
+			error: "invalid_source",
+		})
 	})
 
-	it("names only the two sources that exist", () => {
-		expect(isConsentSource("first-sign-in")).toBe(true)
-		expect(isConsentSource("account")).toBe(true)
-		expect(isConsentSource("Account")).toBe(false)
-	})
-})
-
-describe("the current consent", () => {
-	it("is the last row of a history given oldest first", () => {
-		const latest = currentConsent([
-			{ id: "one", optedIn: false, source: "first-sign-in" },
-			{ id: "two", optedIn: true, source: "account" },
-		])
-		expect(latest?.id).toBe("two")
+	it("rejects a language the pages do not speak, under its own code", () => {
+		expect(parseConsentAnswer({ optedIn: true, source: "account", language: "fr" })).toEqual({
+			error: "invalid_language",
+		})
+		expect(parseConsentAnswer({ optedIn: true, source: "account" })).toEqual({
+			error: "invalid_language",
+		})
 	})
 
-	it("is nothing when the person has never answered", () => {
-		expect(currentConsent([])).toBeNull()
-	})
-})
-
-describe("closing a consent", () => {
-	it("closes the true row a withdrawal turns off", () => {
-		expect(withdrawalTarget(given, false)).toBe("one")
-	})
-
-	it("does not close a row for an opt-in", () => {
-		expect(withdrawalTarget(given, true)).toBeNull()
-	})
-
-	it("does not close a false row or an already withdrawn row", () => {
-		expect(withdrawalTarget({ ...given, optedIn: false }, false)).toBeNull()
-		expect(
-			withdrawalTarget({ ...given, withdrawnAt: "2026-11-28T00:00:00.000Z" }, false),
-		).toBeNull()
+	it("names only the two languages that exist", () => {
+		expect(CONSENT_LANGUAGES).toEqual(["en", "th"])
+		expect(isConsentLanguage("th")).toBe(true)
+		expect(isConsentLanguage("TH")).toBe(false)
 	})
 })
 
 describe("the view a page renders", () => {
-	it("carries the wording version, source and ISO dates", () => {
+	it("carries the wording version, source, language and ISO dates", () => {
 		expect(
 			consentView({
 				id: "one",
 				optedIn: true,
 				source: "account",
+				language: "th",
 				wordingVersion: CONSENT_WORDING_VERSION,
 				givenAt: new Date("2026-11-27T10:00:00.000Z"),
 				withdrawnAt: null,
@@ -87,9 +67,17 @@ describe("the view a page renders", () => {
 			optedIn: true,
 			wordingVersion: CONSENT_WORDING_VERSION,
 			source: "account",
+			language: "th",
 			givenAt: "2026-11-27T10:00:00.000Z",
 			withdrawnAt: null,
 		})
+	})
+
+	it("reads a row written before the language column as English", () => {
+		expect(
+			consentView({ id: "one", optedIn: true, source: "account", wordingVersion: "2026-11-27" })
+				?.language,
+		).toBe("en")
 	})
 
 	it("is nothing when the row cannot be read", () => {

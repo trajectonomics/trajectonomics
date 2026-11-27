@@ -8,6 +8,8 @@ export interface FrameWords {
 	readonly homeLabel: string
 	readonly accountMarker: string
 	readonly languageMenuLabel: string
+	readonly siteName: string
+	readonly loading: string
 
 	readonly footerPrivacy: string
 	readonly footerTerms: string

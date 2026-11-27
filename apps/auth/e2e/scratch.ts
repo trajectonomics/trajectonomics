@@ -60,6 +60,14 @@ export function removeMarker(): void {
 
 /** Rows one local D1 query returns; the database is the scratch one, never a remote one. */
 export function queryLocal<T>(directory: string, sql: string): T[] {
+	return queryLocalMany<T>(directory, sql)[0] ?? []
+}
+
+/**
+ * One `wrangler d1 execute` for several statements, one result list per statement. Spawning the
+ * local D1 client is the slow part, so a check that reads every table reads them at once.
+ */
+export function queryLocalMany<T>(directory: string, sql: string): T[][] {
 	const output = execFileSync(
 		wrangler,
 		[
@@ -76,5 +84,5 @@ export function queryLocal<T>(directory: string, sql: string): T[] {
 		{ cwd: packageRoot, encoding: "utf8" },
 	)
 	const parsed = JSON.parse(output) as Array<{ results?: T[] }>
-	return parsed.flatMap((entry) => entry.results ?? [])
+	return parsed.map((entry) => entry.results ?? [])
 }

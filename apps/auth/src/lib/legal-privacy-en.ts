@@ -16,12 +16,13 @@ export const PRIVACY_EN: LegalContent = Object.freeze({
 				"Each item exists for the reason beside it. We do not sell it, and we do not use it for advertising.",
 			],
 			items: [
-				"Your account id: the anonymous id that ties your data together.",
+				"Your account id: the pseudonymous id that ties your data together. The data site receives this id and nothing else that names you.",
 				"Your email address, name and profile picture from Google or GitHub: to sign you in, and to show you who is signed in.",
 				"Passkey public keys: to sign you in with your device. The private key never leaves your device.",
-				"Sessions: to keep you signed in until the session expires.",
+				"Sessions: to keep you signed in until the session expires. Each session records the IP address and the browser user agent it was created from.",
+				"Sign-in tokens from Google and GitHub: an access token and a refresh token in the account table, used only to sign you in and to read your name, email and picture from the provider.",
 				"App connections (OAuth grants): which app you allowed, which permissions it received, and when you approved it.",
-				"Marketing consent history: every answer you gave about email updates, the wording you saw and when. Withdrawing adds a record of the withdrawal; it does not delete the earlier answer.",
+				"Marketing consent history: every answer you gave about email updates, the wording you saw, the language you read it in and when. Withdrawing adds a record of the withdrawal; it does not delete the earlier answer.",
 				"Short-lived rate-limit counters keyed on your IP address: to stop abuse of the sign-in endpoints. They expire within minutes.",
 			],
 		},
@@ -34,14 +35,15 @@ export const PRIVACY_EN: LegalContent = Object.freeze({
 		{
 			heading: "The data site",
 			body: [
-				"The data site at trajectonomics.com/data stores AI usage numbers with only your anonymous auth user id. It never receives your email address or your name.",
+				"The data site at trajectonomics.com/data stores AI usage numbers with only your pseudonymous auth user id. It never receives your email address or your name.",
 			],
 		},
 		{
 			heading: "How long we keep it",
 			body: [
 				"We keep your account data until you delete your account. Rate-limit counters expire within minutes.",
-				"When you delete your account, your account, sessions, passkeys, app connections and marketing consent history are deleted. The data site is told to remove your anonymous id, and that notice is retried until the data site confirms it.",
+				"When you delete your account, your account, sessions, passkeys, app connections and marketing consent history are deleted. The data site is told to remove your pseudonymous id, and that notice is retried until the data site confirms it.",
+				"Each deletion notice is kept for 30 days after the data site confirms it, then deleted. A notice the data site has not confirmed is retried for as long as it takes.",
 			],
 		},
 		{

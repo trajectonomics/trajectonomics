@@ -9,12 +9,12 @@ import {
 import { passkeyClient } from "@better-auth/passkey/client"
 import { createAuthClient } from "better-auth/svelte"
 import type {
+	ConsentLanguage,
 	ConsentSource,
 	ConsentState,
 	MarketingConsent,
 	SessionResponse,
 } from "../lib/api-types"
-import { isSignedOAuthSearch } from "../lib/oauth-search"
 import { AuthRequestError } from "./errors"
 
 function makeClient() {
@@ -56,9 +56,13 @@ export async function getConsent(): Promise<MarketingConsent | null> {
 export async function saveConsent(
 	optedIn: boolean,
 	source: ConsentSource,
+	language: ConsentLanguage,
 ): Promise<MarketingConsent | null> {
 	return (
-		await request<ConsentState>("/marketing-consent", { method: "POST", body: { optedIn, source } })
+		await request<ConsentState>("/marketing-consent", {
+			method: "POST",
+			body: { optedIn, source, language },
+		})
 	).consent
 }
 
@@ -75,17 +79,17 @@ export async function startSocial(
 	if (error) throw new AuthRequestError(error)
 }
 
-/** The passkey POST carries no OAuth query, so the page can resume the flow itself afterwards. */
-export async function startPasskey(): Promise<void> {
-	const search = window.location.search
-	const stripped = isSignedOAuthSearch(search)
-	if (stripped) window.history.replaceState(null, "", window.location.pathname)
-	try {
-		const { error } = await auth().signIn.passkey()
-		if (error) throw new AuthRequestError(error)
-	} finally {
-		if (stripped) window.history.replaceState(null, "", `${window.location.pathname}${search}`)
-	}
+/**
+ * Signs in with a passkey. The provider's client plugin puts the page's signed query on the POST,
+ * so the provider's after-hook resumes an interrupted `prompt=login` or `max_age=0` flow on its own
+ * and answers with the address to continue to. The page navigates there when it gets one, and
+ * otherwise continues to its own `next`.
+ */
+export async function startPasskey(): Promise<string | null> {
+	const { data, error } = await auth().signIn.passkey()
+	if (error) throw new AuthRequestError(error)
+	const resumed = data as { readonly url?: unknown } | null
+	return typeof resumed?.url === "string" ? resumed.url : null
 }
 
 export async function signOut(): Promise<void> {

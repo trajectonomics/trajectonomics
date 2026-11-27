@@ -5,7 +5,14 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import LanguageMenu from "@trajectonomics/site-header/LanguageMenu.astro"
 import SiteHeader from "@trajectonomics/site-header/SiteHeader.astro"
-import { dictionaryFor, LANGUAGES, type Language, type Page, pagePath } from "../lib/language"
+import {
+	dictionaryFor,
+	LANGUAGES,
+	type Language,
+	type Page,
+	pageLabel,
+	pagePath,
+} from "../lib/language"
 import { SITE_HOME_URL } from "../lib/site"
 
 interface Props {
@@ -16,7 +23,8 @@ interface Props {
 const { language, page } = Astro.props
 const words = dictionaryFor(language)
 // A page reached from an app carries its signed query; the other language keeps it, so switching
-// never drops the flow the person is in the middle of.
+// never drops the flow the person is in the middle of. A static build cannot read a query, so the
+// hrefs below carry the path and the script at the end completes them in the browser.
 const search = Astro.url.search
 const choices = LANGUAGES.map((code) => ({
 	href: `${pagePath(code, page)}${search}`,
@@ -25,14 +33,21 @@ const choices = LANGUAGES.map((code) => ({
 	label: dictionaryFor(code).languageName,
 	current: code === language,
 }))
+// The marker names the page it is on, so the bar never calls every page "Account". The root is a
+// redirect, so its marker points at the account page it is about to open.
+const marker = {
+	href: page === "home" ? pagePath(language, "account") : pagePath(language, page),
+	label: pageLabel(page, words),
+	current: true,
+}
 ---
 
 <SiteHeader
 	homeHref={SITE_HOME_URL}
 	homeLabel={words.homeLabel}
-	marker={{ href: pagePath(language, "account"), label: words.accountMarker, current: page === "account" }}
+	marker={marker}
 	class="auth-header"
-	navLabel={words.accountMarker}
+	navLabel={words.siteName}
 >
 	<Fragment slot="end">
 		<LanguageMenu
@@ -42,3 +57,20 @@ const choices = LANGUAGES.map((code) => ({
 		/>
 	</Fragment>
 </SiteHeader>
+
+<script is:inline>
+	// The built page has no query of its own, so the other language's address is completed here: the
+	// signed OAuth query, a device code or `?next=` survives the switch. Without JavaScript the
+	// links still change the language and the flow is restarted from the app, never half-kept.
+	;(() => {
+		const search = window.location.search
+		const hash = window.location.hash
+		if (search === "" && hash === "") return
+		for (const link of document.querySelectorAll(".auth-header .header-menu-link")) {
+			const url = new URL(link.getAttribute("href") ?? "/", window.location.origin)
+			url.search = search
+			url.hash = hash
+			link.setAttribute("href", `${url.pathname}${url.search}${url.hash}`)
+		}
+	})()
+</script>

@@ -13,9 +13,25 @@
 @import "./form.css";
 @import "./device.css";
 @import "./account.css";
+@import "./confirm.css";
 @import "./switch.css";
 @import "./danger.css";
 @import "./legal.css";
+
+/* Every box includes its padding and border, so a 100% panel or field never overflows its column. */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+}
 
 [data-theme="light"] {
 	color-scheme: light;

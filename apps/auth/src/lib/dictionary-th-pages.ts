@@ -10,6 +10,8 @@ export const THAI_PAGES = {
 	homeLabel: "หน้าหลัก Trajectonomics",
 	accountMarker: "บัญชี",
 	languageMenuLabel: "ภาษา",
+	siteName: "Trajectonomics",
+	loading: "กำลังโหลด…",
 
 	signInTitle: "เข้าสู่ระบบ",
 	signInDescription: "เข้าสู่ระบบ Trajectonomics ด้วย Google, GitHub หรือพาสคีย์",
@@ -25,7 +27,6 @@ export const THAI_PAGES = {
 
 	welcomeTitle: "ข่าวสารทางอีเมล",
 	welcomeDescription: "อีกหนึ่งคำถามก่อนไปต่อ",
-	welcomeCheckbox: "ส่งข่าวผลิตภัณฑ์ให้ฉันทางอีเมล (ประมาณเดือนละครั้ง) ยกเลิกได้ทุกเมื่อ",
 	welcomeContinue: "ดำเนินการต่อ",
 	welcomeError: "บันทึกคำตอบไม่สำเร็จ ลองอีกครั้ง",
 	welcomePrivacy: "ความเป็นส่วนตัว",
@@ -33,6 +34,8 @@ export const THAI_PAGES = {
 	deviceTitle: "เชื่อมต่ออุปกรณ์",
 	deviceDescription: "อนุมัติหรือปฏิเสธแอปที่ขอเชื่อมต่อ",
 	deviceCodeLabel: "รหัสจากแอปของคุณ",
+	deviceSignedInAs: "เข้าสู่ระบบในชื่อ",
+	deviceConfirmWarning: "อนุมัติเฉพาะเมื่อรหัสนี้แสดงอยู่บนอุปกรณ์ของคุณเอง",
 	deviceContinue: "ดำเนินการต่อ",
 	deviceWants: "แอปนี้ต้องการ:",
 	deviceApprove: "อนุมัติ",
@@ -45,6 +48,7 @@ export const THAI_PAGES = {
 	deviceLoading: "กำลังตรวจสอบรหัส…",
 	deviceUnknownApp: "แอปที่ไม่รู้จัก",
 
+	consentTitle: "อนุญาตแอป",
 	consentHeading: (app: string) => `อนุญาตให้ ${app} ใช้บัญชีของคุณหรือไม่`,
 	consentDescription: "มีแอปขอเข้าถึงบัญชี Trajectonomics ของคุณ",
 	consentWants: "แอปนี้ต้องการ:",
@@ -52,9 +56,13 @@ export const THAI_PAGES = {
 	consentDeny: "ปฏิเสธ",
 	consentInvalid: "หน้านี้ใช้ได้เฉพาะเมื่อมาจากแอปเท่านั้น",
 	consentError: "ดำเนินการไม่สำเร็จ ลองอีกครั้ง",
-	consentUnknownApp: "แอปที่ยังไม่ลงทะเบียน",
+	consentUnknownApp: "แอปที่ไม่รู้จัก",
 
-	scopeOpenId: "ยืนยันว่าคุณคือใคร",
+	flowExpired: "การเข้าสู่ระบบนี้ใช้เวลานานเกินไป กลับไปที่แอปแล้วเริ่มใหม่",
+	loadError: "โหลดไม่สำเร็จ",
+	loadRetry: "ลองอีกครั้ง",
+
+	scopeOpenId: "ดูชื่อและอีเมลของคุณ",
 	scopeProfile: "ดูชื่อและรูปของคุณ",
 	scopeEmail: "ดูอีเมลของคุณ",
 	scopeOffline: "เชื่อมต่อไว้ได้แม้ปิดแอป",

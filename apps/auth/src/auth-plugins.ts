@@ -1,5 +1,6 @@
 import { oauthDeviceAuthorization, oauthProvider } from "@better-auth/oauth-provider"
 import { passkey } from "@better-auth/passkey"
+import type { D1Database } from "@cloudflare/workers-types"
 import type { BetterAuthOptions } from "better-auth"
 import { jwt } from "better-auth/plugins"
 import {
@@ -19,6 +20,8 @@ export const POST_LOGIN_PAGE = "/welcome"
 /** The plugin list, split out so `auth-options.ts` stays readable. */
 export function buildPlugins(input: {
 	baseURL: string
+	/** The database the consent record's withdrawal and answer are written to in one batch. */
+	db: D1Database | undefined
 	passkeyRpID: string
 	passkeyOrigin: string
 	/** True when this person has never answered the marketing question. */
@@ -72,7 +75,7 @@ export function buildPlugins(input: {
 		// built address, so the person never goes through a redirect.
 		oauthDeviceAuthorization({ verificationUri: "/device/" }),
 		grantManagement(),
-		marketingConsent(),
+		marketingConsent({ db: input.db }),
 		pendingDeletion(),
 	]
 }

@@ -18,13 +18,13 @@ function clientIp(): string {
 }
 
 /** Signs up through the dev-only email path; the response's cookie is now in the browser context. */
-export async function signUp(page: Page): Promise<TestUser> {
+export async function signUp(page: Page, name = "E2E Person"): Promise<TestUser> {
 	const ip = clientIp()
 	// The page's own API calls carry this address too, so no check's lookups share a rate limit.
 	await page.setExtraHTTPHeaders({ "cf-connecting-ip": ip })
 	const email = `e2e-${Date.now()}-${counter}@example.test`
 	const response = await page.request.post(`${BASE_URL}/api/auth/sign-up/email`, {
-		data: { name: "E2E Person", email, password: "e2e-password-1234" },
+		data: { name, email, password: "e2e-password-1234" },
 		headers: { origin: BASE_URL, "cf-connecting-ip": ip },
 	})
 	const text = await response.text()
@@ -34,9 +34,13 @@ export async function signUp(page: Page): Promise<TestUser> {
 }
 
 /** Answers the first-sign-in question through the API, before a page that requires the answer. */
-export async function answerConsent(page: Page, optedIn = false): Promise<void> {
+export async function answerConsent(
+	page: Page,
+	optedIn = false,
+	language: "en" | "th" = "en",
+): Promise<void> {
 	const response = await page.request.post(`${BASE_URL}/api/auth/marketing-consent`, {
-		data: { optedIn, source: "first-sign-in" },
+		data: { optedIn, source: "first-sign-in", language },
 		headers: { origin: BASE_URL, "cf-connecting-ip": clientIp() },
 	})
 	expect(response.ok(), await response.text()).toBe(true)
@@ -81,15 +85,19 @@ export async function redeemDeviceCode(
 /** The consent the API holds for the signed-in person. */
 export async function consentState(
 	page: Page,
-): Promise<{ optedIn: boolean; source: string } | null> {
+): Promise<{ optedIn: boolean; source: string; language: string } | null> {
 	const response = await page.request.get(`${BASE_URL}/api/auth/marketing-consent`, {
 		headers: { origin: BASE_URL },
 	})
 	expect(response.ok()).toBe(true)
 	const body = (await response.json()) as {
-		consent: { optedIn: boolean; source: string } | null
+		consent: { optedIn: boolean; source: string; language: string } | null
 	}
 	return body.consent === null
 		? null
-		: { optedIn: body.consent.optedIn, source: body.consent.source }
+		: {
+				optedIn: body.consent.optedIn,
+				source: body.consent.source,
+				language: body.consent.language,
+			}
 }

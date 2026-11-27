@@ -11,10 +11,14 @@ export type SessionResponse = { readonly user: SessionUser }
 
 export type ConsentSource = "first-sign-in" | "account"
 
+/** The interface language the person answered in. */
+export type ConsentLanguage = "en" | "th"
+
 export type MarketingConsent = {
 	readonly optedIn: boolean
 	readonly wordingVersion: string
 	readonly source: ConsentSource
+	readonly language: ConsentLanguage
 	readonly givenAt: string | null
 	readonly withdrawnAt: string | null
 }

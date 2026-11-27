@@ -53,6 +53,14 @@
 	opacity: 0.9;
 }
 
+/* A danger button that cannot act reads as off, not as a slightly faded red. */
+.button-danger:disabled {
+	border-color: var(--ds-color-border);
+	background: var(--ds-color-muted);
+	color: var(--ds-color-muted-foreground);
+	opacity: 1;
+}
+
 .button-small {
 	min-height: 2.25rem;
 	padding: var(--ds-space-2) var(--ds-space-3);

@@ -1,6 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
+import { tick } from "svelte"
 import { deleteAccount } from "../client/auth"
 import { AuthRequestError } from "../client/errors"
 import { dictionaryFor, type Language, pagePath } from "../lib/language"
@@ -10,6 +11,7 @@ const words = $derived(dictionaryFor(language))
 let typed = $state("")
 let busy = $state(false)
 let message = $state("")
+let alert: HTMLParagraphElement | undefined = $state()
 const matches = $derived(
 	typed.trim() !== "" && typed.trim().toLowerCase() === email.trim().toLowerCase(),
 )
@@ -28,6 +30,8 @@ async function remove(event: SubmitEvent): Promise<void> {
 				? words.accountDeleteExpired
 				: words.accountDeleteError
 		busy = false
+		await tick()
+		alert?.focus()
 	}
 }
 </script>
@@ -50,6 +54,6 @@ async function remove(event: SubmitEvent): Promise<void> {
 		</button>
 	</form>
 	{#if message !== ""}
-		<p class="form-message" role="alert">{message}</p>
+		<p class="form-message" role="alert" tabindex="-1" bind:this={alert}>{message}</p>
 	{/if}
 </section>

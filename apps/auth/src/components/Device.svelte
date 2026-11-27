@@ -2,81 +2,65 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { onMount } from "svelte"
-import { ensureConsent, ensureSignedIn } from "../client/guard"
-import { approveDevice, denyDevice, getPublicClient, lookupDevice } from "../client/oauth"
+import { type DeviceLookup, enterDevice, lookUpDevice } from "../client/device"
+import { approveDevice, denyDevice } from "../client/oauth"
 import { dictionaryFor, type Language } from "../lib/language"
-import { type ScopeLine, scopeLines, scopeText } from "../lib/scopes"
-import { normalizeUserCode } from "../lib/user-code"
+import { type ScopeLine } from "../lib/scopes"
+import DeviceCodeForm from "./DeviceCodeForm.svelte"
+import DeviceReview from "./DeviceReview.svelte"
+import DeviceStatus from "./DeviceStatus.svelte"
+import LoadFailure from "./LoadFailure.svelte"
+import Loading from "./Loading.svelte"
 
 let { language }: { language: Language } = $props()
 const words = $derived(dictionaryFor(language))
-type View = "loading" | "enter" | "review" | "approved" | "denied"
+type View = "loading" | "enter" | "review" | "approved" | "denied" | "failed"
+type Review = {
+	code: string
+	shown: string
+	email: string
+	clientName: string
+	lines: readonly ScopeLine[]
+}
 let view = $state<View>("loading")
 let code = $state("")
-let clientName = $state("")
-let lines = $state<readonly ScopeLine[]>([])
 let message = $state("")
 let busy = $state(false)
+let review = $state<Review>({ code: "", shown: "", email: "", clientName: "", lines: [] })
 
-onMount(async () => {
-	const session = await ensureSignedIn(language)
-	if (session === null) return
-	if (!(await ensureConsent(language))) return
-	const fromQuery = new URLSearchParams(window.location.search).get("user_code")?.trim() ?? ""
-	if (fromQuery === "") {
-		view = "enter"
-		return
-	}
-	code = fromQuery
-	await check(fromQuery)
+onMount(() => {
+	void load()
 })
 
-async function check(value: string): Promise<void> {
-	const normalized = normalizeUserCode(value)
-	if (normalized === "") {
-		view = "enter"
-		message = words.deviceInvalid
-		return
-	}
-	busy = true
+function showReview(lookup: DeviceLookup & { kind: "review" }, address: string): void {
+	review = { ...lookup, email: address }
+	code = lookup.code
 	message = ""
-	try {
-		const result = await lookupDevice(normalized)
-		if (result.status === "approved" || result.status === "denied") {
-			view = result.status
-			return
-		}
-		if (result.client_id === undefined) {
-			view = "enter"
-			message = words.deviceInvalid
-			return
-		}
-		code = normalized
-		lines = scopeLines(result.scope)
-		clientName = (await nameOf(result.client_id)) ?? ""
-		view = "review"
-	} catch (error) {
-		view = "enter"
-		message =
-			error instanceof Error && /expired/i.test(error.message)
-				? words.deviceExpired
-				: words.deviceInvalid
-	} finally {
-		busy = false
-	}
+	view = "review"
 }
 
-async function nameOf(clientId: string): Promise<string | undefined> {
-	try {
-		return (await getPublicClient(clientId)).client_name
-	} catch {
-		return undefined
-	}
+async function load(): Promise<void> {
+	view = "loading"
+	const entry = await enterDevice(language)
+	if (entry.kind === "stop") return
+	if (entry.kind === "failed") view = "failed"
+	else if (entry.kind === "enter") view = "enter"
+	else if (entry.kind === "status") view = entry.status
+	else showReview(entry, entry.email)
 }
 
 async function submit(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	await check(code)
+	busy = true
+	const outcome = await lookUpDevice(code)
+	busy = false
+	if (outcome.kind === "review") showReview(outcome, review.email)
+	else if (outcome.kind === "failed") view = "failed"
+	else if (outcome.kind === "status") view = outcome.status
+	else {
+		view = "enter"
+		message = outcome.reason === "expired" ? words.deviceExpired : words.deviceInvalid
+	}
 }
 
 async function decide(approve: boolean): Promise<void> {
@@ -94,46 +78,24 @@ async function decide(approve: boolean): Promise<void> {
 }
 </script>
 
-<div class="panel">
-	<h1 class="page-title">{words.deviceTitle}</h1>
-	{#if view === "loading"}
-		<p class="muted" aria-live="polite">{words.deviceLoading}</p>
-	{:else if view === "enter"}
-		<form class="form" onsubmit={submit}>
-			<label class="field-label" for="device-code">{words.deviceCodeLabel}</label>
-			<input
-				id="device-code"
-				class="field-input"
-				bind:value={code}
-				autocomplete="one-time-code"
-				autocapitalize="characters"
-				spellcheck={false}
-				disabled={busy}
-			/>
-			<button class="button button-primary" type="submit" disabled={busy}>{words.deviceContinue}</button>
-		</form>
-	{:else if view === "review"}
-		<p class="device-app">{clientName === "" ? words.deviceUnknownApp : clientName}</p>
-		<p class="device-wants">{words.deviceWants}</p>
-		<ul class="scope-list">
-			{#each lines as line (line.scope)}
-				<li>{scopeText(line, words)}</li>
-			{/each}
-		</ul>
-		<div class="button-row">
-			<button class="button button-primary" type="button" onclick={() => decide(true)} disabled={busy}>
-				{words.deviceApprove}
-			</button>
-			<button class="button button-secondary" type="button" onclick={() => decide(false)} disabled={busy}>
-				{words.deviceDeny}
-			</button>
-		</div>
-	{:else if view === "approved"}
-		<p class="status status-done" role="status"><span aria-hidden="true">✓</span> {words.deviceApproved}</p>
-	{:else}
-		<p class="status status-denied" role="status"><span aria-hidden="true">×</span> {words.deviceDenied}</p>
-	{/if}
-	{#if message !== ""}
-		<p class="form-message" role="alert">{message}</p>
-	{/if}
-</div>
+{#if view === "failed"}
+	<LoadFailure message={words.deviceError} retryLabel={words.loadRetry} onretry={load} />
+{:else if view === "loading"}
+	<Loading title={words.deviceTitle} text={words.deviceLoading} />
+{:else if view === "enter"}
+	<DeviceCodeForm {language} bind:code {busy} {message} onsubmit={submit} />
+{:else if view === "review"}
+	<DeviceReview
+		{language}
+		code={review.shown}
+		email={review.email}
+		clientName={review.clientName}
+		lines={review.lines}
+		{busy}
+		{message}
+		onapprove={() => decide(true)}
+		ondeny={() => decide(false)}
+	/>
+{:else}
+	<DeviceStatus {language} approved={view === "approved"} />
+{/if}

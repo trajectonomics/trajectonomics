@@ -15,6 +15,9 @@ export function marketingConsentSchema() {
 				optedIn: { type: "boolean" as const, required: true },
 				wordingVersion: { type: "string" as const, required: true },
 				source: { type: "string" as const, required: true },
+				// The interface language the person answered in, so the account page can show the
+				// sentence in the language they read it in.
+				language: { type: "string" as const, required: true },
 				givenAt: { type: "date" as const, required: true },
 				withdrawnAt: { type: "date" as const, required: false },
 			},
