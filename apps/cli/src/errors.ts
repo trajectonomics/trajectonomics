@@ -13,6 +13,8 @@ export type FailOptions = {
 	path?: string
 	hint?: string
 	details?: unknown
+	/** The error beneath this failure, when one is known; `TRAJ_DEBUG=1` prints its stack. */
+	cause?: unknown
 }
 
 /** The `error` object of the JSON envelope. */
@@ -29,11 +31,17 @@ export type ErrorBody = {
 // makes the type nominal, so a hand-written `{ code, exitCode }` is not assignable to it.
 class AppErrorImpl {
 	readonly #body: ErrorBody
-	constructor(body: ErrorBody) {
+	readonly #cause: unknown
+	constructor(body: ErrorBody, cause: unknown) {
 		this.#body = body
+		this.#cause = cause
 	}
 	get body(): ErrorBody {
 		return this.#body
+	}
+	/** The error beneath this failure, when one is known; it never reaches a format's output. */
+	get cause(): unknown {
+		return this.#cause
 	}
 }
 
@@ -56,7 +64,7 @@ export function fail(code: ErrorCode, options: FailOptions = {}): AppError {
 	const hint = options.hint ?? (code === "internal" ? INTERNAL_HINT : undefined)
 	if (hint !== undefined) body.hint = hint
 	if (options.details !== undefined) body.details = options.details
-	return new AppErrorImpl(body)
+	return new AppErrorImpl(body, options.cause)
 }
 
 export function isAppError(value: unknown): value is AppError {

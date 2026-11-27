@@ -80,7 +80,9 @@ export function reply(
 	if (isAppError(outcome)) return outcome
 	if (outcome.status === "not_found") return scenarioNotFound(name)
 	const rendered = view(outcome.scenario)
-	const scenario = { ...rendered, household: householdOf(outcome.scenario) }
+	const household = householdOf(outcome.scenario)
+	if (isAppError(household)) return household
+	const scenario = { ...rendered, household }
 	return ok({
 		dryRun,
 		status: outcome.status,

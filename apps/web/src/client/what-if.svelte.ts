@@ -42,11 +42,12 @@ class WhatIfSession extends WhatIfGroups {
 
 	/**
 	 * After a refused apply over a plan that moved on: reads the Snapshot again and takes its hash for the plan,
-	 * so the session applies over the new plan. The changes are kept.
+	 * so the session applies over the new plan. The changes are kept. A read that fails again keeps the notice,
+	 * so Reload can be tried again.
 	 */
 	async reload(): Promise<void> {
 		const plan = this.whatIf?.plan
-		await editSession.reread()
+		if (!(await editSession.reread())) return
 		const read = plan === undefined ? undefined : documentRead(currentSnapshot(), plan)
 		if (this.whatIf !== null && read?.ok) {
 			this.whatIf = { ...this.whatIf, contentHash: read.data.scenario.contentHash }

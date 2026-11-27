@@ -1,5 +1,6 @@
 import type { Context, Env, Group } from "./command"
 import { root as defaultRoot } from "./commands"
+import { debugDetail } from "./debug"
 import { type AppError, fail, isAppError } from "./errors"
 import { dispatchFailure } from "./invalid"
 import { type Format, renderResult, resolveFormat } from "./render"
@@ -69,15 +70,16 @@ async function execute(
 		if (invalid !== undefined) return badFormat(invalid, io.err)
 		const afterSuccess: string[] = []
 		const outcome = await dispatch(argv, env, root, stdin, io.err, seen, afterSuccess, source)
-		if (isAppError(outcome)) return failureOf(outcome, format, io.err)
+		if (isAppError(outcome)) {
+			debugDetail(outcome.cause, env, io.err)
+			return failureOf(outcome, format, io.err)
+		}
 		io.out(renderResult(outcome.data, format, outcome.hint))
 		for (const line of afterSuccess) io.err(line)
 		return { exitCode: 0 }
 	} catch (error) {
-		// The message is fixed text; diagnostics go to stderr only when TRAJ_DEBUG asks for them.
-		if (env["TRAJ_DEBUG"] === "1") {
-			io.err(error instanceof Error ? (error.stack ?? error.message) : String(error))
-		}
+		// The message is fixed text; only TRAJ_DEBUG adds the stack above it.
+		debugDetail(error, env, io.err)
 		return failureOf(fail("internal"), format, io.err)
 	}
 }
