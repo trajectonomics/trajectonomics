@@ -3,7 +3,6 @@ import { render } from "svelte/server"
 import { editSession } from "../../client/edit.svelte.js"
 import { routing } from "../../client/routing.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { WRITTEN_REREAD_FAILED, WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
 import { sessionWith } from "../../lib/view/routing/change"
 import { moved } from "../../lib/view/routing/order"
 import { shownPlan } from "../../lib/what-if/routing"
@@ -34,6 +33,7 @@ afterEach(() => {
 	whatIfSession.end()
 	whatIfSession.answer = null
 	editSession.clear()
+	editSession.savedUnread = false
 	editSession.source = "form"
 })
 
@@ -118,16 +118,17 @@ describe("a refusal's source", () => {
 		expect(routing.messageFromCli).toBe(true)
 	})
 
-	test("leaves a write that landed and could not be read again to the stale notice, not the form", () => {
+	test("a landed write leaves no routing message, and a CLI refusal after it still sets one", () => {
 		editSession.source = "routing"
-		editSession.failure = {
-			code: WRITTEN_REREAD_FAILED,
-			exitCode: 1,
-			message: WRITTEN_REREAD_FAILED_MESSAGE,
-		}
-		expect(editSession.savedUnread).toBe(true)
+		editSession.savedUnread = true
 		expect(routing.message).toBeNull()
-		expect(routing.messageFromCli).toBe(false)
+		editSession.failure = {
+			code: "invalid_input",
+			exitCode: 2,
+			message: "WITHDRAW_FLOOR_ORDER: a floor after a plain entry",
+		}
+		expect(routing.message).toBe("WITHDRAW_FLOOR_ORDER: a floor after a plain entry")
+		expect(routing.messageFromCli).toBe(true)
 	})
 })
 

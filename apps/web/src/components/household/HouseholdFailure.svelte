@@ -7,5 +7,5 @@ import StaleNotice from "../ui/StaleNotice.svelte"
 <!-- What a save from the card itself (Remove household, an anchor's Remove) answered when the CLI refused it. -->
 {#if editSession.source === "household"}
 	{#if editSession.error}<FormAlert message={editSession.error} />{/if}
-	<StaleNotice />
+	<StaleNotice shows="stale" />
 {/if}

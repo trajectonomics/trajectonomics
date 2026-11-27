@@ -1,4 +1,5 @@
 <script lang="ts">
+import { editSession } from "../../client/edit.svelte.js"
 import { importSession as session } from "../../client/import-values.svelte.js"
 import { targetsOf } from "../../lib/view/import-values/match"
 import { parseImport } from "../../lib/view/import-values/parse"
@@ -6,6 +7,7 @@ import { importPlan } from "../../lib/view/import-values/plan"
 import { stepLine } from "../../lib/view/import-values/steps"
 import type { ValueSheet } from "../../lib/view/record-values/types"
 import Drawer from "../ui/Drawer.svelte"
+import StaleNotice from "../ui/StaleNotice.svelte"
 import ImportDone from "./ImportDone.svelte"
 import LoadStep from "./LoadStep.svelte"
 import MatchStep from "./MatchStep.svelte"
@@ -24,6 +26,7 @@ const plan = $derived(importPlan(parsed, session.matches))
 <!-- Three steps in one drawer: Load, Match, Review. Cancel, the close button and Escape all discard the draft. -->
 <Drawer open={session.open} title="Import a balance history" onClose={() => session.cancel()} locked={session.committing} backdropCloses={session.text.trim() === ""}>
 	<div class="min-w-0 space-y-6">
+		{#if editSession.savedUnread}<StaleNotice shows="landed" />{/if}
 		{#if session.step !== "done"}
 			<p class="text-sm text-muted-foreground">{stepLine(session.step)}</p>
 		{/if}
