@@ -26,18 +26,19 @@
 	border-radius: 2px;
 }
 
-/* Emphasis, not a rainbow: one strong role for input, the text role for output, quiet cache
-   read, and an accent-striped cache write so identity never rests on colour alone. */
+/* Four parts from four roles: primary input, accent output, a quiet grey cache read, and an
+   accent-striped cache write, so output and cache write differ by texture as well as colour. */
 .swatch-input {
-	background: color-mix(in srgb, var(--ds-color-primary) 60%, var(--ds-color-background));
+	background: var(--ds-color-primary);
 }
 
 .swatch-output {
-	background: var(--ds-color-foreground);
+	background: var(--ds-color-accent);
 }
 
 .swatch-cacheRead {
-	background: var(--ds-color-border);
+	/* The ring grey clears 3:1 on the page in both Themes, so the largest part never reads as empty. */
+	background: var(--ds-color-ring);
 }
 
 .swatch-cacheWrite {

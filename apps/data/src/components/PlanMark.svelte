@@ -12,7 +12,7 @@ const box = $derived(`--plan-mark-size: ${size}px`)
 
 {#if logo !== null}
 	<span class="plan-mark" style={box}>
-		<svg viewBox="0 0 24 24" role="img" aria-label={name} fill="currentColor">
+		<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
 			<path d={logo.path} />
 		</svg>
 	</span>

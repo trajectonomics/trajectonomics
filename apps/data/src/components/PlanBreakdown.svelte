@@ -30,7 +30,7 @@ let { totals, from, to }: { totals: PlanTotal[]; from: string; to: string } = $p
 						<span
 							class="share-segment swatch-{segment.key}"
 							style={`flex: ${segment.share} 1 0`}
-							title={`${segment.label} · ${compactCount(segment.tokens)} · ${Math.round(segment.share * 100)}%`}
+							title={`${segment.label} · ${compactCount(segment.tokens)} · ${segment.share < 0.005 ? "<1" : Math.round(segment.share * 100)}%`}
 						></span>
 					{/each}
 					{#if segments.length === 0}
