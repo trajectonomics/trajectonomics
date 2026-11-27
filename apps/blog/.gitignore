@@ -7,6 +7,7 @@ node_modules/
 # the brand package is the source of truth and this folder commits no copies of them.
 public/fonts/
 public/favicon/
+public/_redirects
 coverage/
 *.tgz
 .scratch/
