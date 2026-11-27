@@ -23,7 +23,8 @@ export function planTakeaway(bars: readonly PlanBar[], window: PeakWindowKey): s
 export function valueTakeaway(points: readonly ValuePoint[]): string {
 	const leader = rankBy(points, (point) => point.x)[0]
 	if (leader === undefined) return "No plan has both a weekly figure and a price yet."
-	return `${leader.label} gives the most API value per dollar: ${usdLabel(leader.x)} for every $1.`
+	const lower = leader.hollow === true ? ", counting only the most we used" : ""
+	return `${leader.label} gives the most API value per dollar: ${usdLabel(leader.x)} for every $1${lower}.`
 }
 
 /** The tokens section's sentence: the plan that serves the largest share from cache. */

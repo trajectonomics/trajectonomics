@@ -21,8 +21,8 @@ export function modelCost(row: TableRow, price: ModelPrice): number {
 
 /**
  * A plan's blended API price per token: its own usage priced at each model's list price, divided
- * by those rows' tokens without cache reads. Models with no price are left out; a plan whose
- * models all lack one gets null.
+ * by those rows' tokens without cache reads. Models with no price, and rows with no input/output
+ * split, are left out; a plan with no row left gets null.
  */
 export function blendedApiCost(rows: readonly TableRow[]): number | null {
 	let cost = 0
@@ -30,6 +30,9 @@ export function blendedApiCost(rows: readonly TableRow[]): number | null {
 	for (const row of rows) {
 		const price = modelPriceOn(row.model)
 		if (price === null) continue
+		// A row with no input/output split (a daily export) has no cost to price, so its tokens
+		// would only dilute the blend.
+		if (row.tokensIn === null && row.tokensOut === null) continue
 		cost += modelCost(row, price)
 		tokens += uncachedTokens(row)
 	}

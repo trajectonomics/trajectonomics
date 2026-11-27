@@ -51,5 +51,6 @@ export function planPriceOn(plan: string, tier: string | null): PlanPrice | null
 
 /** The catalogue entry for a model id, provider prefix or not; null when no page prices it. */
 export function modelPriceOn(model: string): ModelPrice | null {
-	return MODEL_PRICES[modelKey(model)] ?? null
+	const key = modelKey(model)
+	return Object.hasOwn(MODEL_PRICES, key) ? (MODEL_PRICES[key] ?? null) : null
 }

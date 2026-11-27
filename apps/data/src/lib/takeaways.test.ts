@@ -85,6 +85,12 @@ describe("valueTakeaway", () => {
 		)
 	})
 
+	test("says when the leader's figure is only the most we used", () => {
+		expect(valueTakeaway([point({ hollow: true })])).toBe(
+			"Claude gives the most API value per dollar: $2.10 for every $1, counting only the most we used.",
+		)
+	})
+
 	test("says so when no plan has a dot", () => {
 		expect(valueTakeaway([])).toBe("No plan has both a weekly figure and a price yet.")
 	})

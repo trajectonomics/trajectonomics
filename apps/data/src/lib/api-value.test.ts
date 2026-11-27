@@ -62,6 +62,30 @@ describe("modelCost", () => {
 })
 
 describe("blendedApiCost", () => {
+	test("leaves out a row with no input/output split", () => {
+		const split = row({
+			model: "claude-opus-5-5",
+			tokensIn: 1_000_000,
+			tokensOut: 0,
+			cacheRead: 0,
+			cacheWrite: 0,
+			tokensTotal: 1_000_000,
+		})
+		const daily = row({
+			model: "claude-opus-5-5",
+			tokensIn: null,
+			tokensOut: null,
+			cacheRead: null,
+			cacheWrite: null,
+			tokensTotal: 9_000_000,
+		})
+		expect(blendedApiCost([split, daily])).toBe(blendedApiCost([split]))
+	})
+
+	test("prices no model named after an object member", () => {
+		expect(blendedApiCost([row({ model: "constructor" })])).toBeNull()
+	})
+
 	test("divides the priced rows' cost by their uncached tokens", () => {
 		const cost = blendedApiCost([
 			row({
