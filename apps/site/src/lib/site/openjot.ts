@@ -13,6 +13,21 @@ export const ABSOLUTE_OPENJOT_URL = `https://trajectonomics.com${OPENJOT_PATH}`
  */
 export const OPENJOT_DOWNLOAD_URL = "https://trajectonomics.com/openjot/download"
 
+/**
+ * The paths under the OpenJot page that the OpenJot Worker's zone routes take from the Site: its short
+ * links, its API and analytics proxy, and the comparison page with MeowJot (`apps/openjot/site`).
+ */
+export const OPENJOT_WORKER_PATHS: readonly string[] = Object.freeze([
+	`${OPENJOT_PATH}download`,
+	`${OPENJOT_PATH}go`,
+	`${OPENJOT_PATH}api`,
+	`${OPENJOT_PATH}ingest`,
+	`${OPENJOT_PATH}meowjot-alternative`,
+])
+
+/** The comparison page's own Sitemap, which the Robots file names beside the Site's. */
+export const OPENJOT_COMPARISON_SITEMAP_URL = `${ABSOLUTE_OPENJOT_URL}meowjot-alternative/sitemap.xml`
+
 /** The same lookup's checksum file: the release's `SHA256SUMS`. */
 export const OPENJOT_CHECKSUMS_URL = "https://trajectonomics.com/openjot/download/checksums"
 

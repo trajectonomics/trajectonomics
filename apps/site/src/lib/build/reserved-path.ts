@@ -1,4 +1,5 @@
 import { BLOG_PATH, DATA_PATH, DOCS_PATH } from "../site"
+import { OPENJOT_WORKER_PATHS } from "../site/openjot"
 import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
@@ -8,12 +9,18 @@ import { buildFailure } from "./failures"
 const RESERVED_PRELOAD_PATH = "__mf-preload.js"
 
 /**
- * The mount points zone routes give other Workers on the Site's host: the Docs Portal, the blog and
- * the data site. Each route pattern is `trajectonomics.com/<name>*`, which takes every path that
- * starts with the name, `/blogroll` as well as `/blog/`. A file the Site built there would be
- * hidden by that route in production while a local run still served it, so the build fails instead.
+ * The mount points zone routes give other Workers on the Site's host: the Docs Portal, the blog, the
+ * data site, and the OpenJot Worker's paths under `/openjot/`. Each route pattern is
+ * `trajectonomics.com/<name>*`, which takes every path that starts with the name, `/blogroll` as well
+ * as `/blog/`. A file the Site built there would be hidden by that route in production while a local
+ * run still served it, so the build fails instead.
  */
-const RESERVED_MOUNT_PATHS: readonly string[] = Object.freeze([DOCS_PATH, BLOG_PATH, DATA_PATH])
+const RESERVED_MOUNT_PATHS: readonly string[] = Object.freeze([
+	DOCS_PATH,
+	BLOG_PATH,
+	DATA_PATH,
+	...OPENJOT_WORKER_PATHS,
+])
 
 /** The directory a mount path names, without its leading and trailing slashes. */
 function mountDirectory(mount: string): string {
