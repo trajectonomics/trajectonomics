@@ -1,3 +1,10 @@
+/**
+ * The Landing Page's hand-off to an Agent: the prompt a reader copies into the Agent they run, and
+ * the three ways an Agent reads the Docs Portal on its own. Pure, so the page, its Markdown twin and
+ * a test read the same words. The prompt names no install command: it sends the Agent to the
+ * Installation page's twin, where the command is authored (ADR 0010, the skill requirement).
+ */
+
 import { twinUrl } from "./agent/twin-url"
 import { DOCS_BASE_PATH, DOCS_INDEX_PATH, OPERATOR_TAB_CONTENT } from "./tabs"
 
@@ -49,7 +56,8 @@ export function agentRoutes(origin: string): readonly [AgentRoute, AgentRoute, A
 		},
 		{
 			title: "Any page as Markdown",
-			description: "Put .md in place of a page's trailing slash. The Landing Page is /index.md.",
+			description:
+				"Put .md in place of a page's trailing slash. The Landing Page is /docs/index.md.",
 			snippet: twinUrl(origin, INSTALLATION_PAGE_PATH),
 		},
 		{

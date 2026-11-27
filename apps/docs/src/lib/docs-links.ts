@@ -4,6 +4,11 @@ import { DOCS_BASE_PATH } from "./tabs"
 /** Paths on the Site, outside the Portal, that a root-relative link may name. */
 const SITE_PATHS = ["/blog", "/data"] as const
 
+/** Whether a root-relative `href` names a Site path outside the Portal: the blog or the data site. */
+export function namesSitePath(href: string): boolean {
+	return SITE_PATHS.some((path) => names(href, path))
+}
+
 /** Whether `href` already names `path` or something under it, query or fragment included. */
 function names(href: string, path: string): boolean {
 	return (

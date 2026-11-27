@@ -51,7 +51,7 @@ export interface TabAlias {
 
 /**
  * The audience names a reader may type, and the Tab each one means. They are not a front-door
- * redirect: `/` stays on the Landing Page, which sends each audience to its own Tab.
+ * redirect: `/docs/` stays on the Landing Page, which sends each audience to its own Tab.
  */
 export const TAB_ALIASES: readonly [TabAlias, TabAlias, TabAlias] = [
 	{ path: "/operators", tab: TABS[0] },
