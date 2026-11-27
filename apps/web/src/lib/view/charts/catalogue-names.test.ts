@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { buildCatalogue } from "./catalogue"
 import { planNames, withExpenseFlows } from "./flow-fixtures.test-support"
-import { cashflowFigures } from "./resolve-flows"
 import { seriesLabelId } from "./series-names"
 
 /** The visible names of the picker's entries, in order. */
@@ -37,11 +36,5 @@ describe("the item a series names", () => {
 		expect(seriesLabelId('cash:["expense","rent",null,null]')).toBe("rent")
 		expect(seriesLabelId('cash:["category",null,null,null]')).toBe("no category")
 		expect(seriesLabelId("net-worth")).toBe("net-worth")
-	})
-
-	test("an uncategorised line beside a category named Uncategorised reads words, not a key", () => {
-		const run = withExpenseFlows(["a"])
-		const named = cashflowFigures(run).map((item) => item.name)
-		expect(named.join("\n")).not.toContain("cash:[")
 	})
 })

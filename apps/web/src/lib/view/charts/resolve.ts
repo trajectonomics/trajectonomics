@@ -1,15 +1,17 @@
 import type { ProjectionRun } from "../../contract"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
-import { distinctNames, rawSeries } from "./series-names"
+import { distinctNames } from "./series-apart"
+import { rawSeries } from "./series-names"
 import type { Resolved } from "./types"
 
 /**
  * Every yearly series a projection states, by id. The ids are the same on every plan, so a chart works
  * on all of them. Each point carries the CLI's own string and the period it covers; nothing here adds,
- * subtracts or divides money. Two series that would read alike take their item's id (web ADR 0029).
+ * subtracts or divides money. Two series that would read alike take their item, category and Account,
+ * never a key (web ADR 0029).
  */
 export function resolveSeries(run: ProjectionRun, names: ItemNames = NO_ITEM_NAMES): Resolved[] {
-	return distinctNames(rawSeries(run, names))
+	return distinctNames(rawSeries(run, names), names.accounts)
 }
 
 /** Every series of one run by id. */

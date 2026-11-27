@@ -3,15 +3,25 @@ import { itemNames } from "../item-names"
 import { buildCatalogue, defaultNameIndex } from "./catalogue"
 import { withAccountValues, withCashLines } from "./flow-fixtures.test-support"
 import { resolveSeries } from "./resolve"
-import { seriesNames } from "./series-names"
+import { seriesNames, seriesWords } from "./series-names"
 import type { ChartDef } from "./types"
 import { chartView } from "./view"
 
 const NO_NAMES = itemNames(new Map(), null)
 
+/** The cash-flow series id of one line, as `resolve-flows.ts` keys it. */
+function cashSeries(
+	group: string,
+	id: string | null,
+	account: string | null,
+	category: string | null,
+): string {
+	return `cash:${JSON.stringify([group, id, account, category])}`
+}
+
 /** The cash-flow series id of the expense Flow `rent` in a category, or in none. */
 function rent(category: string | null): string {
-	return `cash:${JSON.stringify(["expense", "rent", null, category])}`
+	return cashSeries("expense", "rent", null, category)
 }
 
 function byId(run: ReturnType<typeof withCashLines>) {
@@ -91,5 +101,115 @@ describe("one id reads one name", () => {
 		)
 		expect(listed).toEqual(expect.arrayContaining(["Value of Savings (a)", "Value of Savings (b)"]))
 		expect(listed.join("\n")).not.toContain("account:")
+	})
+})
+
+describe("a series name is never a series key", () => {
+	/** The picker's name for each id, by id. */
+	function pickerNames(
+		runs: ReturnType<typeof withCashLines>[],
+		selected: ReturnType<typeof withCashLines>,
+		names = NO_NAMES,
+	): ReadonlyMap<string, string> {
+		return new Map(
+			buildCatalogue(runs, selected, names)
+				.flatMap((group) => group.entries)
+				.map((entry) => [entry.id, entry.name]),
+		)
+	}
+
+	test("a real category named like none reads apart from none on every plan", () => {
+		const real = withCashLines([{ group: "expense", id: "rent", category: "no category" }])
+		const none = withCashLines([{ group: "expense", id: "rent" }])
+		const selected = withCashLines([{ group: "expense", id: "food" }])
+		const ids = [rent("no category"), rent(null)]
+		const expected = ['Expense: rent (rent, "no category")', "Expense: rent (rent, no category)"]
+		const runs = [real, none, selected]
+		const listed = pickerNames(runs, selected)
+		expect(ids.map((id) => listed.get(id) ?? "")).toEqual(expected)
+		const defaults = defaultNameIndex(runs, NO_NAMES)
+		expect(ids.map((id) => defaults.get(id) ?? "")).toEqual(expected)
+		expect(ids.map((id) => defaultNameIndex([...runs].reverse(), NO_NAMES).get(id) ?? "")).toEqual(
+			expected,
+		)
+		expect(expected.join("\n")).not.toContain("cash:")
+		expect(expected.join("\n")).not.toContain("[")
+	})
+
+	test("two Accounts named cash under one Flow are told apart without a key", () => {
+		const first = withCashLines([
+			{ group: "contribution", id: "save", account: "a" },
+			{ group: "withdrawal", id: "save", account: "a" },
+		])
+		const second = withCashLines([
+			{ group: "contribution", id: "save", account: "b" },
+			{ group: "withdrawal", id: "save", account: "b" },
+		])
+		const selected = withCashLines([{ group: "expense", id: "food" }])
+		const accounts = itemNames(
+			new Map([
+				["a", "cash"],
+				["b", "cash"],
+			]),
+			null,
+		)
+		const listed = pickerNames([first, second, selected], selected, accounts)
+		const reversed = pickerNames([second, first, selected], selected, accounts)
+		const words = [
+			["contribution", "Saving: save into cash"],
+			["withdrawal", "Withdrawal: save from cash"],
+		] as const
+		for (const [group, word] of words) {
+			const a = listed.get(cashSeries(group, "save", "a", null)) ?? ""
+			const b = listed.get(cashSeries(group, "save", "b", null)) ?? ""
+			expect(a.startsWith(word)).toBe(true)
+			expect(b.startsWith(word)).toBe(true)
+			expect(a).not.toBe(b)
+			expect(b.endsWith(" (2)")).toBe(true)
+			expect(`${a}\n${b}`).not.toContain("cash:")
+			expect(`${a}\n${b}`).not.toContain("account:")
+			expect(reversed.get(cashSeries(group, "save", "a", null))).toBe(a)
+			expect(reversed.get(cashSeries(group, "save", "b", null))).toBe(b)
+		}
+	})
+
+	test("a tie no step tells apart takes numbers in sorted-id order", () => {
+		const one = withCashLines([
+			{ group: "contribution", id: "save", account: "a" },
+			{ group: "contribution", id: "save", account: "c" },
+		])
+		const two = withCashLines([{ group: "contribution", id: "save", account: "b" }])
+		const selected = withCashLines([{ group: "expense", id: "food" }])
+		const accounts = itemNames(
+			new Map([
+				["a", "cash"],
+				["b", "cash"],
+				["c", "cash"],
+			]),
+			null,
+		)
+		const named = seriesNames([one, two, selected], selected, accounts)
+		const names = ["a", "b", "c"].map(
+			(account) => named.get(cashSeries("contribution", "save", account, null)) ?? "",
+		)
+		expect(new Set(names).size).toBe(3)
+		expect(names[0]?.endsWith(" (2)")).toBe(false)
+		expect(names[1]?.endsWith(" (2)")).toBe(true)
+		expect(names[2]?.endsWith(" (3)")).toBe(true)
+		expect(names.join("\n")).not.toContain("cash:")
+	})
+
+	test("a saved chart naming a removed Flow lists it in words, not its key", () => {
+		const selected = withCashLines([{ group: "expense", id: "food" }])
+		const gone = cashSeries("expense", "gone", null, null)
+		const chart: ChartDef = { id: "gone", name: "Gone", kind: "line", series: [gone] }
+		const view = chartView(
+			chart,
+			byId(selected),
+			seriesNames([selected], selected, NO_NAMES),
+			"nominal",
+		)
+		expect(view.missing.map((item) => item.name)).toEqual(["gone (no category)"])
+		expect(seriesWords(gone)).toBe("gone (no category)")
 	})
 })

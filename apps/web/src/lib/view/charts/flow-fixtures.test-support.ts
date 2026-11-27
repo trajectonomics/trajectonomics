@@ -4,8 +4,9 @@ import { ANNUAL_ROWS, projectionRunFixture } from "../projection/fixtures.test-s
 
 /** One cash-flow line of a fixture, in the first year, so a chart can name it. */
 interface FixtureLine {
-	readonly group: "expense" | "category"
+	readonly group: "expense" | "category" | "contribution" | "withdrawal"
 	readonly id: string | null
+	readonly account?: string | null
 	readonly category?: string | null
 }
 
@@ -23,7 +24,7 @@ export function withCashLines(lines: readonly FixtureLine[]): ProjectionRun {
 					to: "2027-10-30",
 					group: line.group,
 					id: line.id,
-					account: null,
+					account: line.account ?? null,
 					category: line.category ?? null,
 					amount: "100.00",
 				})),
