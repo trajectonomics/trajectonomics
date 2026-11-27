@@ -51,11 +51,6 @@
 	padding-bottom: 96px;
 }
 
-.posts-title {
-	padding-bottom: 12px;
-	border-bottom: 1px solid var(--ds-color-border);
-}
-
 /* A section with nothing in it says so in one line, instead of disappearing. */
 .empty-state {
 	margin: 0;
@@ -109,9 +104,10 @@
  * in Thai take a line between the two.
  */
 [data-theme] .masthead-title:lang(th),
+[data-theme] .front-title:lang(th),
 [data-theme] .post-title:lang(th),
 [data-theme] .featured-title:lang(th),
-[data-theme] .post-row-title:lang(th),
+[data-theme] .post-card-title:lang(th),
 [data-theme] .post-body h2:lang(th),
 [data-theme] .post-body h3:lang(th) {
 	line-height: 1.35;

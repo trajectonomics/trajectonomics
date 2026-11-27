@@ -32,8 +32,9 @@ redirects its pages (ADR 0006).
 
 1. `traj-data` never holds an email or a name. It holds contributor ids, plan and model ids, UTC
    buckets, numbers, and the auth user id on `contributor`.
-2. The public API serves `rollup_daily` only. No response carries a machine, a contributor or an
-   hourly bucket.
+2. The public API serves aggregates, never a stored row: `rollup_daily` for the usage read, and
+   `usage_hourly` summed per plan and bucket for the peaks (ADR 0007). No response carries a
+   machine, a contributor or an hourly bucket.
 3. `/data/ingest` (and the old host's `/ingest`) authenticates with the temporary
    `INGEST_BOOTSTRAP_KEY` secret. The contributor comes from the key, never from the body; a row
    that names another contributor is rejected.
