@@ -8,6 +8,7 @@ import { readAsOf } from "../lib/query"
 import { chartSeries } from "../lib/series"
 import { DATA_PATH } from "../lib/site"
 import { usageTable } from "../lib/table"
+import PlanBreakdown from "./PlanBreakdown.svelte"
 import PlanSummary from "./PlanSummary.svelte"
 import UsageChart from "./UsageChart.svelte"
 import UsageTable from "./UsageTable.svelte"
@@ -23,7 +24,9 @@ const series = $derived(
 	state.usage === null || days === null ? [] : chartSeries(state.usage.rows, days.days),
 )
 const rows = $derived(state.usage === null ? [] : usageTable(state.usage.rows))
-const totals = $derived(state.usage === null ? [] : planTotals(state.usage.rows))
+const totals = $derived(
+	state.usage === null || days === null ? [] : planTotals(state.usage.rows, days.to),
+)
 const fresh = $derived(state.health === null ? null : freshness(state.health))
 </script>
 
@@ -36,7 +39,7 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 
 	{#if fresh !== null}
 		<p class="freshness-line">
-			<span>{fresh.label}</span>
+			<span>{fresh.label}{#if fresh.at !== null}{` (${fresh.at})`}{/if}</span>
 			{#if fresh.note !== null}<span class="freshness-note">{fresh.note}</span>{/if}
 		</p>
 	{/if}
@@ -64,16 +67,24 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 		</div>
 	{:else if days !== null}
 		<section class="section-block" aria-labelledby="plans-title">
-			<h2 id="plans-title" class="meta-label section-title">Tokens per plan</h2>
-			<PlanSummary {totals} from={days.from} to={days.to} />
+			<h2 id="plans-title" class="meta-label section-title">Tokens we got from each plan</h2>
+			<PlanSummary {totals} />
 		</section>
-		<section class="section-block" aria-labelledby="chart-title">
-			<h2 id="chart-title" class="meta-label section-title">Tokens per day</h2>
-			<UsageChart {series} from={days.from} to={days.to} />
-		</section>
-		<section class="section-block" aria-labelledby="table-title">
-			<h2 id="table-title" class="meta-label section-title">Tokens per plan and model</h2>
-			<UsageTable {rows} from={days.from} to={days.to} />
+
+		<section class="section-block" aria-labelledby="details-title">
+			<h2 id="details-title" class="meta-label section-title">Details</h2>
+			<section class="detail-block" aria-labelledby="chart-title">
+				<h3 id="chart-title" class="meta-label detail-title">Tokens per day</h3>
+				<UsageChart {series} from={days.from} to={days.to} />
+			</section>
+			<section class="detail-block" aria-labelledby="breakdown-title">
+				<h3 id="breakdown-title" class="meta-label detail-title">Where the tokens went</h3>
+				<PlanBreakdown {totals} from={days.from} to={days.to} />
+			</section>
+			<section class="detail-block" aria-labelledby="table-title">
+				<h3 id="table-title" class="meta-label detail-title">Tokens per plan and model</h3>
+				<UsageTable {rows} from={days.from} to={days.to} />
+			</section>
 		</section>
 	{/if}
 </section>

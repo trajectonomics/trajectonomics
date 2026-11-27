@@ -1,57 +1,69 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import { displayCount, displayShare } from "../lib/format"
-import { grandTotal, type PlanTotal, planNote } from "../lib/plan-totals"
+import { compactCount } from "../lib/format"
+import { grandTotal } from "../lib/grand-total"
+import { type PlanTotal, planNote } from "../lib/plan-totals"
 
-let { totals, from, to }: { totals: PlanTotal[]; from: string; to: string } = $props()
+let { totals }: { totals: PlanTotal[] } = $props()
 
 const grand = $derived(grandTotal(totals))
-const count = $derived(totals.length === 1 ? "1 plan" : `${totals.length} plans`)
+const inUse = $derived(totals.filter((total) => total.inUse).length)
+const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
+const mostUsed = $derived(topRate === 0 ? "–" : (totals[0]?.planName ?? "–"))
 </script>
 
-<div class="table-block">
-	<p class="totals-caption">Totals from {from} to {to}. {count}.</p>
-	<p class="scroll-hint">Scroll the table sideways to see every column.</p>
-	<div class="table-frame">
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex: a scrollable region is focusable so the keyboard can pan the table. -->
-		<div class="table-scroll" role="region" aria-label="Token totals per plan" tabindex="0">
-			<table class="usage-table summary-table">
-				<caption class="visually-hidden">Token totals per plan from {from} to {to}, {count}.</caption>
-				<thead>
-					<tr>
-						<th scope="col">Plan</th>
-						<th scope="col" class="number">Total tokens</th>
-						<th scope="col" class="number">Share</th>
-						<th scope="col" class="number">Requests</th>
-						<th scope="col" class="number">Models</th>
-						<th scope="col">Source</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each totals as total}
-						{@const note = planNote(total)}
-						<tr>
-							<th scope="row">{total.planName}</th>
-							<td class="number">{displayCount(total.tokensTotal)}</td>
-							<td class="number">{displayShare(total.share)}</td>
-							<td class="number">{displayCount(total.requests)}</td>
-							<td class="number">{displayCount(total.models)}</td>
-							<td>{#if note !== null}<span class="row-note">{note}</span>{/if}</td>
-						</tr>
-					{/each}
-				</tbody>
-				<tfoot>
-					<tr>
-						<th scope="row">All plans</th>
-						<td class="number">{displayCount(grand.tokensTotal)}</td>
-						<td class="number">{displayShare(grand.share)}</td>
-						<td class="number">{displayCount(grand.requests)}</td>
-						<td class="number"><span aria-hidden="true">–</span><span class="visually-hidden">not totalled</span></td>
-						<td></td>
-					</tr>
-				</tfoot>
-			</table>
+<div class="plan-summary">
+	<dl class="kpi-row">
+		<div class="kpi">
+			<dt class="kpi-label">Plans in use</dt>
+			<dd class="kpi-value">{inUse} of {totals.length}</dd>
 		</div>
-	</div>
+		<div class="kpi">
+			<dt class="kpi-label">Tokens in the last 30 days</dt>
+			<dd class="kpi-value">{compactCount(grand.tokensTotal)}</dd>
+		</div>
+		<div class="kpi">
+			<dt class="kpi-label">Most used plan</dt>
+			<dd class="kpi-value kpi-name">{mostUsed}</dd>
+		</div>
+	</dl>
+
+	<ol class="meter-list">
+		{#each totals as total}
+			{@const note = planNote(total)}
+			<li class="meter-row">
+				<div class="meter-identity">
+					<span class="meter-name">{total.planName}</span>
+					{#if total.inUse}
+						<span class="use-tag">In use</span>
+					{:else}
+						<span class="meter-last">Last used {total.lastDay ?? "–"}</span>
+					{/if}
+				</div>
+				<div class="meter-track" aria-hidden="true">
+					<div
+						class="meter-bar"
+						style={`width: ${topRate === 0 ? 0 : Math.round((total.tokensPerActiveDay / topRate) * 100)}%`}
+					></div>
+				</div>
+				<span class="meter-figure">{compactCount(total.tokensPerActiveDay)} tokens a day</span>
+				<p class="meter-detail">
+					{compactCount(total.tokensTotal)} in {total.activeDays} active day{total.activeDays === 1
+						? ""
+						: "s"}
+					{#if total.busiestDay !== null}
+						· busiest day {compactCount(total.busiestDay.tokens)} on {total.busiestDay.day}
+					{/if}
+					· {compactCount(total.requests)} requests
+					{#if note !== null} · {note}{/if}
+				</p>
+			</li>
+		{/each}
+	</ol>
+
+	<p class="summary-note">
+		"A day" means a day we used the plan. These are tokens we used, not the plan's limit. Most
+		tokens are cache reads: context the model re-reads, which plans count cheaply.
+	</p>
 </div>

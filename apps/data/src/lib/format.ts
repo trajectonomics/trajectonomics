@@ -1,19 +1,9 @@
 const WHOLE = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 })
 const SHORT = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 })
-const SHARE = new Intl.NumberFormat("en-US", {
-	style: "percent",
-	minimumFractionDigits: 1,
-	maximumFractionDigits: 1,
-})
 
 /** A table cell for a token or request count; a missing number is `n/a`. */
 export function displayCount(value: number | null): string {
 	return value === null ? "n/a" : WHOLE.format(value)
-}
-
-/** A plan's share of every plan's total, as a percentage with one decimal. */
-export function displayShare(value: number): string {
-	return SHARE.format(value)
 }
 
 /**
