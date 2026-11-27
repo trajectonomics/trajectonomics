@@ -166,7 +166,7 @@ describe("runHourly", () => {
 				: { exitCode: 0, stdout: JSON.stringify(alphaRow) },
 		)
 		const send = async (rows: readonly IngestRow[]): Promise<SendReport> => {
-			const ok = rows.includes(betaRow)
+			const ok = rows.some((row) => "model" in row && row.model === "claude-beta")
 			return { ok, batches: [{ rows: [...rows], ok }] }
 		}
 		const cursors = makeCursors()
