@@ -121,7 +121,7 @@ class EditSession {
 			return false
 		}
 		this.result = answer.result ?? null
-		showDropped(plan, answer.droppedAnchors ?? [], answer.droppedOwners ?? [])
+		showDropped(plan, answer)
 		replaceSnapshot(answer.snapshot)
 		return true
 	}
