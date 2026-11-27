@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { ANCHORABLE } from "./household/paths"
+import { ANCHORABLE } from "./household/anchorable"
 import { PUBLISHED } from "./money-fields"
 import { BEGINNABLE_BLOCKS } from "./set-begin"
 

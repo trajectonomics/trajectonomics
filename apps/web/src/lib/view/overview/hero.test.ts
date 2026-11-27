@@ -199,7 +199,7 @@ describe("the warnings", () => {
 		"The Scenario had 125000.00 unmet on 2027-03-31. Anything the day's income cannot cover is paid only from the Accounts in cashflow.withdraw.",
 		"No tax is applied; figures are before tax.",
 		'Tax is applied: Thailand 2026 personal income tax, from the Scenario\'s Levy "th-2026-pit".',
-		"FI is not reachable, so taxYears describes the plan as written, with earned income running to the horizon.",
+		"FI is not reachable, so taxYears describes the plan as written.",
 	]
 
 	test("counts the unfunded, unmet and tax notes, and links each to its own anchor", () => {

@@ -1,6 +1,6 @@
 /*
- * The curated screenshot set `design/portal-shell.md` requires and commits under
- * `screenshots/`: the built Docs Portal at 1280, 2000 and 390px in light and dark, plus the
+ * The curated screenshot set `design/portal-shell.md` requires, committed under
+ * `docs/screenshots/`: the built Docs Portal at 1280, 2000 and 390px in light and dark, plus the
  * surfaces no plain page load opens. `scripts/screenshots.ts` captures it.
  */
 import { join } from "node:path"

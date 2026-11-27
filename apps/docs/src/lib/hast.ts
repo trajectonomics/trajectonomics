@@ -4,6 +4,8 @@ export interface HastNode {
 	readonly tagName?: string
 	readonly properties?: Record<string, unknown>
 	readonly children?: HastNode[]
+	/** The text of a `text` node. */
+	readonly value?: string
 }
 
 /** The part of the hast visitor API a plugin uses to replace a node. */

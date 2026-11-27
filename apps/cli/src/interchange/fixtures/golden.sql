@@ -79,3 +79,8 @@ INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from, 
 -- The main plan, with notes: they are outside the document, so its hash is unchanged (cli ADR-0071).
 UPDATE scenario SET notes = 'แผนหลัก: เกษียณอายุ 55 ปี', main = 1
 WHERE id = '0194c000-0002-7000-8000-000000000002';
+
+-- The main plan's household. Its one anchor writes the salary's start from the partner's join
+-- month, which is the date the document already states (cli ADR-0048).
+UPDATE scenario SET household = '{"anchors":[{"at":"joins","path":"flows.salary.start","person":"partner"}],"people":[{"born":"1990-06","id":"me","lifeExpectancy":90,"role":"holder"},{"born":"1992-02","id":"partner","joins":"2026-01","lifeExpectancy":90,"role":"partner"}],"schemaVersion":1}'
+WHERE id = '0194c000-0002-7000-8000-000000000002';
