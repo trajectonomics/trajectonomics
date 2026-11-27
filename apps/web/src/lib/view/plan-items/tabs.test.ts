@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { DEMO } from "../what-if/fixtures.test-support"
 import { planDocument } from "./fixtures.test-support"
 import { planTabs, tabIndexFor, tabOf } from "./tabs"
 
@@ -29,6 +30,13 @@ describe("the Plan's tab strip", () => {
 		expect(tabOf("milestones")).toBe("milestones")
 		expect(tabOf("")).toBe("income")
 		expect(tabOf("nonsense")).toBe("income")
+	})
+
+	test("counts a home's loan once, on the home's card, as the tab draws it", () => {
+		const read = DEMO.reads.documents.base
+		if (read?.ok !== true) throw new Error("the Demo reads its base plan")
+		// Bank, Fund, the condo (with its loan on its card) and the car loan.
+		expect(planTabs(read.data.scenario.document).find((tab) => tab.id === "assets")?.count).toBe(4)
 	})
 
 	test("counts nothing without a document", () => {

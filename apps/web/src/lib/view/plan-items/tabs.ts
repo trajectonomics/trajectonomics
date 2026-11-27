@@ -49,10 +49,15 @@ function flowCount(doc: ScenarioDocument | null, kind: "income" | "expense"): nu
 	return doc.flows.filter((flow) => flow.kind === kind && !grouped.has(flow.id)).length
 }
 
-/** The Accounts and debts of the Assets and debts page: its plain Accounts, its homes and cars, and its loans. */
+/**
+ * The cards of the Assets and debts tab: its plain Accounts, its homes and cars, and its loans. A loan that is
+ * part of a home or car is on that card, so it is not counted again.
+ */
 function assetCount(doc: ScenarioDocument | null): number {
 	if (doc === null) return 0
-	return plainAccounts(doc).length + realAssetsOf(doc).length + loanPartsOf(doc).length
+	const grouped = groupedIds(doc)
+	const loans = loanPartsOf(doc).filter((loan) => !grouped.has(loan.account.id))
+	return plainAccounts(doc).length + realAssetsOf(doc).length + loans.length
 }
 
 /** The tabs with their counts, read from the plan's document. Every count is 0 without one. */

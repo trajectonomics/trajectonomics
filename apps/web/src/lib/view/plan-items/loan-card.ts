@@ -21,7 +21,7 @@ export interface LoanCardView {
 	readonly paymentId: string
 	/** The amount borrowed, as the document states it: the level payment's principal. */
 	readonly principal: string
-	/** The Baseline's amount for the liability Account, which the CLI states as a negative figure; null when it has none. */
+	/** The Baseline's amount for the liability Account, which the CLI states as a positive figure, the debt owed; null when it has none. */
 	readonly balance: string | null
 	/** The loan's terms as text rows: its rate, when it borrows, its payments, its first payment and rounding. */
 	readonly rows: readonly LoanRow[]
