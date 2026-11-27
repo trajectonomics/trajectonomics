@@ -6,7 +6,7 @@ must check by reading the diff. A package's `AGENTS.md` adds the conventions tha
 
 Decisions behind the API live in the package's `docs/adr/`; vocabulary lives in its `GLOSSARY.md`.
 
-A diff that changes what a person sees (a screen, a chart, a page or user-facing words) is also reviewed against [`DESIGN_PRINCIPLES.md`](DESIGN_PRINCIPLES.md).
+A diff that changes what a person sees (a screen, a chart, a page or the words on it) is also reviewed against [`DESIGN_PRINCIPLES.md`](DESIGN_PRINCIPLES.md), and its pull request shows that screen before and after.
 
 ## Public API
 
