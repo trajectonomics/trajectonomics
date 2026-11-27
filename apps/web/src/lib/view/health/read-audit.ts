@@ -10,7 +10,6 @@ export interface AuditRow {
 	/** The CLI's error code and message, when the Read failed. */
 	readonly error: {
 		readonly code: string
-		readonly exitCode: number
 		readonly message: string
 		readonly hint: string | null
 	} | null
@@ -54,14 +53,14 @@ export function readAudit(snapshot: Snapshot): AuditRow[] {
 function auditRow({ question, read }: Entry, key: string): AuditRow {
 	const command = formatArgv(read.argv)
 	if (read.ok) return { key, question, command, failed: false, error: null, note: null }
-	const { code, exitCode, message, hint } = read.error
+	const { code, message, hint } = read.error
 	const note = isBaselineRead(read.argv) && code === "NEGATIVE_AMOUNT" ? BASELINE_NOTE : null
 	return {
 		key,
 		question,
 		command,
 		failed: true,
-		error: { code, exitCode, message, hint: hint ?? null },
+		error: { code, message, hint: hint ?? null },
 		note,
 	}
 }

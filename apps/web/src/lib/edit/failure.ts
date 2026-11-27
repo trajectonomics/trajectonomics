@@ -50,15 +50,12 @@ export const SERVER_CODES: ReadonlySet<string> = new Set([
 	"invalid_seed",
 ])
 
-/** What `isCliError` reads of an error: its words, whatever else an answer carries beside them. */
-type ErrorWords = Pick<ErrorBody, "code" | "exitCode" | "message" | "path">
-
 /**
  * Whether an error is the CLI's own, so a page may mark it as the CLI's text. Null is no error.
  * `scenario_name_taken` is both: the CLI names its `path` as `name`, and the server's own refusal of a
  * new plan (`serve-apply.ts`) names none.
  */
-export function isCliError(error: ErrorWords | null): boolean {
+export function isCliError(error: Pick<ErrorBody, "code" | "path"> | null): boolean {
 	if (error === null) return false
 	if (error.code === "scenario_name_taken") return error.path === "name"
 	return !SERVER_CODES.has(error.code)
