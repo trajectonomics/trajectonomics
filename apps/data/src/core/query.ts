@@ -28,7 +28,8 @@ export type UsageQuery = {
 /** The result of reading the usage query parameters. */
 export type QueryResult = { ok: true; query: UsageQuery } | { ok: false; error: QueryError }
 
-type Check = { ok: true; value: string | null } | { ok: false; error: QueryError }
+/** One validated query parameter: its value, or why it is not one. */
+export type Check = { ok: true; value: string | null } | { ok: false; error: QueryError }
 
 /** A model id as the collector names one: lowercase, 64 characters at most. */
 const MODEL = /^[a-z0-9][a-z0-9.\-_/]{0,63}$/
@@ -37,7 +38,8 @@ function invalid(code: QueryErrorCode, message: string): { ok: false; error: Que
 	return { ok: false, error: { code, message } }
 }
 
-function checkDate(params: URLSearchParams, name: string, maxDay: string): Check {
+/** Validates one YYYY-MM-DD parameter against the calendar and the query floor. */
+export function checkDate(params: URLSearchParams, name: string, maxDay: string): Check {
 	const value = params.get(name)
 	if (value === null) return { ok: true, value }
 	if (!isDateString(value)) {

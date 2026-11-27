@@ -28,6 +28,29 @@ export function formatDate(date: string): string {
 	return `${parts.day} ${MONTHS[parts.month - 1]} ${parts.year}`
 }
 
+/**
+ * A period as a page names it: a whole calendar year is its year ("2026"), and any other period is its range
+ * ("1 Apr 2026 – 31 Mar 2027"). The dates are compared as the CLI wrote them; nothing is worked out.
+ */
+export function periodWords(start: string, end: string): string {
+	const from = DATE.exec(start)
+	const to = DATE.exec(end)
+	const wholeYear =
+		from !== null &&
+		to !== null &&
+		from[1] === to[1] &&
+		from[2] === "01" &&
+		from[3] === "01" &&
+		to[2] === "12" &&
+		to[3] === "31"
+	return wholeYear ? (from[1] ?? start) : `${formatDate(start)} – ${formatDate(end)}`
+}
+
+/** The year of a date, read as text: "2053-12-31" becomes "2053". The CLI's date, not a calendar computation. */
+export function yearOf(date: string): string {
+	return date.slice(0, 4)
+}
+
 /** The month of a calendar date or a month: "2026-10-31" and "1990-06" become "Oct 2026" and "Jun 1990". */
 export function formatMonth(date: string): string {
 	const parts = parseDate(date)

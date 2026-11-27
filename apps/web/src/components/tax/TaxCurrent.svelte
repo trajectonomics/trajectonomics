@@ -16,7 +16,7 @@ let { year, currency }: Props = $props()
 <section aria-labelledby="tax-current-title" class="space-y-6">
 	<div>
 		<h2 id="tax-current-title" class="text-base font-semibold">This tax year</h2>
-		<p class="text-sm text-muted-foreground">{year.levy}, {year.period}</p>
+		<p class="text-sm text-muted-foreground">Tax for {year.period}</p>
 	</div>
 	{#each year.notes as note, index (index)}
 		<p role="note" class="rounded-md bg-muted p-3 text-sm" data-cli>{note}</p>

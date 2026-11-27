@@ -22,7 +22,7 @@ function itemName(drawer: PlanDrawer, names: ItemNames, kind: ItemKind): string 
 	return itemText(names, kind, drawer.id ?? "")
 }
 
-/** The heading of a form that edits one item: "Add" without an id, "Try a value for" or "Edit" with one. */
+/** The heading of a form that edits one item: "Add" without an id, "What if…" or "Edit" with one. */
 function itemTitle(
 	drawer: PlanDrawer,
 	adding: string,
@@ -32,7 +32,7 @@ function itemTitle(
 ): string {
 	if (drawer.id === undefined) return adding
 	return drawer.tryValue === true
-		? `Try a value for ${thing}${itemName(drawer, names, kind)}`
+		? `What if… ${thing}${itemName(drawer, names, kind)}`
 		: `Edit ${thing}${itemName(drawer, names, kind)}`
 }
 

@@ -20,10 +20,7 @@ export interface Dictionary {
 	readonly languageMenuLabel: string
 	readonly frontTitle: string
 	readonly frontDescription: string
-	readonly mastheadLabel: string
-	readonly mastheadTitle: string
-	readonly mastheadLede: string
-	readonly latest: string
+	readonly frontHeading: string
 	readonly noPosts: string
 	readonly postTitleSuffix: string
 	readonly typeLabels: Readonly<Record<PostType, string>>

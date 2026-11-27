@@ -1,8 +1,13 @@
 import { MONEY_GROUP } from "./nav-money"
-import { OPTIMIZE_GROUPS } from "./nav-optimize"
+import { OPTIMIZE_GROUP } from "./nav-optimize"
 import type { NavGroup } from "./routes"
 
-/** The navigation in order: Overview and Net worth, the Plan group, the Optimize group, Cash flow, Chance of success, Tax, then the Records group, then the Settings group. */
+/**
+ * The navigation in order: Overview and Net worth, the Plan group, the money pages (Cash flow, Chance of
+ * success and Tax), the Optimize group, then the Records and Settings groups. The pages that are opened
+ * from another page but are not listed here are still routable; `CHILD_PAGES` in `routes.ts` marks the
+ * entry they belong to.
+ */
 export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		heading: null,
@@ -13,8 +18,10 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 	},
 	{
 		heading: "Plan",
+		collapsible: true,
+		defaultOpen: true,
 		routes: [
-			{ path: "/projection/", label: "Projection", page: "ProjectionPage", icon: "chart-line" },
+			{ path: "/projection/", label: "Plan", page: "ProjectionPage", icon: "chart-line" },
 			{
 				path: "/milestones/",
 				label: "Milestones",
@@ -22,44 +29,16 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 				icon: "milestone",
 				needsMilestones: true,
 			},
-			{
-				path: "/income/",
-				label: "Income",
-				page: "IncomePage",
-				icon: "trending-up",
-				needsDocument: true,
-			},
-			{
-				path: "/expenses/",
-				label: "Expenses",
-				page: "ExpensesPage",
-				icon: "trending-down",
-				needsDocument: true,
-			},
-			{
-				path: "/assets-and-debts/",
-				label: "Assets and debts",
-				page: "AssetsDebtsPage",
-				icon: "landmark",
-				needsDocument: true,
-			},
-			{ path: "/fi/", label: "FI date", page: "FiPage", icon: "calendar" },
-			{ path: "/compare/", label: "Compare", page: "ComparePage", icon: "git-compare" },
+			{ path: "/compare/", label: "Compare plans", page: "ComparePage", icon: "git-compare" },
 			{ path: "/reports/", label: "Reports", page: "ReportsPage", icon: "file-text" },
 		],
 	},
-	...OPTIMIZE_GROUPS,
 	MONEY_GROUP,
-	{
-		heading: null,
-		routes: [{ path: "/chance/", label: "Chance of success", page: "ChancePage", icon: "target" }],
-	},
-	{
-		heading: null,
-		routes: [{ path: "/tax/", label: "Tax", page: "TaxPage", icon: "receipt" }],
-	},
+	OPTIMIZE_GROUP,
 	{
 		heading: "Records",
+		collapsible: true,
+		defaultOpen: false,
 		routes: [
 			{ path: "/ledger/", label: "Ledger", page: "LedgerPage", icon: "book-open" },
 			{ path: "/health/", label: "Health", page: "HealthPage", icon: "activity" },
@@ -67,6 +46,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 	},
 	{
 		heading: "Settings",
+		collapsible: true,
+		defaultOpen: false,
 		routes: [
 			{
 				path: "/settings/tax/",

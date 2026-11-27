@@ -13,7 +13,7 @@ const FIGURES = [
 	{ key: "expense", label: "Expense", words: ["more", "less"] },
 	{ key: "contributions", label: "Contributions", words: ["more", "less"] },
 	{ key: "interest", label: "Interest", words: ["more", "less"] },
-	{ key: "levy", label: "Levy", words: ["more", "less"] },
+	{ key: "levy", label: "Tax", words: ["more", "less"] },
 ] as const
 
 /** The figure keys a page may ask for. */

@@ -1,16 +1,17 @@
 import type { ProjectionRun } from "../../contract"
-import { formatDate } from "../../format"
+import { formatDate, yearOf } from "../../format"
 
 /** The projection's headline: its closing net worth at the last annual row, and whether it runs out. */
 export interface ProjectionView {
 	readonly currency: string
 	readonly endDate: string
-	/** The CLI's nominal closing net worth, shown as stated. */
+	/** The CLI's future-money closing net worth, shown as stated. */
 	readonly nominal: string
-	/** The CLI's real figure at the same row, shown beside the nominal one as in As-of terms. */
+	/** The CLI's today's-money figure at the same row. */
 	readonly real: string
 	readonly runsOut: { readonly date: string; readonly unmet: string } | null
-	readonly horizon: string
+	/** The last year of the plan, read as text from the CLI's horizon: "2053". */
+	readonly horizonYear: string
 }
 
 /** The headline of one projection run, or null when the run holds no annual rows. */
@@ -27,6 +28,6 @@ export function projectionView(run: ProjectionRun): ProjectionView | null {
 			run.runsOut === null
 				? null
 				: { date: formatDate(run.runsOut.date), unmet: run.runsOut.unmet },
-		horizon: formatDate(run.horizon),
+		horizonYear: yearOf(run.horizon),
 	}
 }

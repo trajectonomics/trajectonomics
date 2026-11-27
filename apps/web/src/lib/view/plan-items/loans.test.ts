@@ -18,6 +18,8 @@ describe("loanCards", () => {
 		expect(draw?.amount).toBe("500000.00")
 		expect(draw?.rows).toContainEqual({ label: "Borrows from", value: "loan", account: true })
 		expect(draw?.rows).toContainEqual({ label: "Growth", value: "0.00% a year" })
+		expect(draw?.frequency).toBe("once")
+		expect(draw?.rows.map((row) => row.label)).not.toContain("How often")
 	})
 
 	test("a level loan leads with its principal, and states its payments, not an amount", () => {
@@ -27,6 +29,7 @@ describe("loanCards", () => {
 		expect(loan?.amount).toBe("500000.00")
 		expect(loan?.rows).toContainEqual({ label: "Repays", value: "loan", account: true })
 		expect(loan?.rows).toContainEqual({ label: "Payments", value: "60 equal payments" })
+		expect(loan?.frequency).toBe("monthly")
 	})
 
 	test("a once withdrawal reads On its date, with no Ends row", () => {

@@ -1,9 +1,28 @@
-/* The front page's list: one featured Post with its cover, then newest-first rows under hairlines. */
+/* The front page's featured Post, cover framing, and shared Post meta line. */
+
+.cover-frame {
+	overflow: hidden;
+	aspect-ratio: 1 / 1;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-secondary);
+}
+
+.cover-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cover-image-wide {
+	object-fit: contain;
+}
 
 .featured {
 	display: grid;
 	gap: 24px;
-	padding: 32px 0;
+	padding: 28px 0 36px;
 	border-bottom: 1px solid var(--ds-color-border);
 	color: var(--ds-color-foreground);
 	text-decoration: none;
@@ -11,16 +30,11 @@
 
 @media (min-width: 48rem) {
 	.featured {
-		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+		grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
 		align-items: center;
-		gap: 48px;
+		gap: 44px;
+		padding: 32px 0 40px;
 	}
-}
-
-.featured-image {
-	width: 100%;
-	height: auto;
-	border-radius: var(--ds-radius-md);
 }
 
 .featured-text {
@@ -30,37 +44,17 @@
 }
 
 .featured-title {
+	margin: 0;
 	font-family: var(--font-display);
-	font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+	font-size: clamp(1.625rem, 3vw, 2.25rem);
 	font-weight: 300;
 	letter-spacing: -0.02em;
-	line-height: 1.1;
+	line-height: 1.12;
 }
 
 .featured-description {
-	color: var(--ds-color-muted-foreground);
-}
-
-.post-rows {
 	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.post-row {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	padding: 20px 0;
-	border-bottom: 1px solid var(--ds-color-border);
-	color: var(--ds-color-foreground);
-	text-decoration: none;
-}
-
-.post-row-title {
-	font-family: var(--font-display);
-	font-size: 22px;
-	font-weight: 300;
+	color: var(--ds-color-muted-foreground);
 }
 
 /* The meta line's parts sit on one baseline with a little air around the dots. */
@@ -80,17 +74,28 @@
 	text-decoration: none;
 }
 
-/* Hover underlines the title; keyboard focus rings the whole entry. */
+/* Hover underlines the title and gently lifts standard covers; keyboard focus rings the whole entry. */
 .featured:hover .featured-title,
-.post-row:hover .post-row-title {
+.post-card:hover .post-card-title {
 	text-decoration: underline;
 	text-decoration-thickness: 1px;
 	text-underline-offset: 6px;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+	.cover-image {
+		transition: transform 220ms ease;
+	}
+
+	.featured:hover .cover-image:not(.cover-image-wide),
+	.post-card:hover .cover-image:not(.cover-image-wide) {
+		transform: scale(1.02);
+	}
+}
+
 .featured:focus-visible,
-.post-row:focus-visible {
-	border-radius: var(--ds-radius-sm);
+.post-card:focus-visible {
+	border-radius: var(--ds-radius-md);
 	outline: 2px solid var(--ds-color-ring);
 	outline-offset: 4px;
 }

@@ -1,10 +1,12 @@
 import { type ChanceOfSuccess, chanceOfSuccess } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
 import type { Placed } from "./carryin-apply"
+import { milestonesOf } from "./chance-milestones"
 import { modelHashOf } from "./chance-model"
 import { outcomesOf } from "./chance-outcomes"
 import { type ModelSource, type PlanModel, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
+import { shareText } from "./chance-share"
 import { percentilesOf, shownRows, spendingOf } from "./chance-spending"
 import { type ChanceBandView, type ChanceView, SUCCESS_NOTE_PREFIX } from "./chance-view"
 import { echoOf } from "./echo"
@@ -14,7 +16,12 @@ import { moneyOf } from "./money"
  * The two numbers the caller states beside the Return model: the path count and the seed. With `outcomes`
  * the result also lists each path's outcome (cli ADR-0069).
  */
-export type ChanceOptions = { seed: string; paths: number; outcomes?: boolean }
+export type ChanceOptions = {
+	seed: string
+	paths: number
+	outcomes?: boolean
+	milestoneDates?: boolean
+}
 
 /**
  * `traj projection chance`: the engine's chance of success in the CLI's money. The engine reports
@@ -38,14 +45,10 @@ export function chanceOf(
 		paths: options.paths,
 		// Asked for only by its flag, so a run without it keeps the engine's old result.
 		...(options.outcomes === true ? { outcomes: true } : {}),
+		...(options.milestoneDates === true ? { milestoneDates: true } : {}),
 	})
 	if (!result.ok) return chanceRefusal(result.problems)
 	return viewOf(placed, result.chance, built, hash)
-}
-
-/** The success share as a decimal percentage, from the floored basis points with no float. */
-function shareOf(bps: number): string {
-	return `${Math.floor(bps / 100)}.${String(bps % 100).padStart(2, "0")}%`
 }
 
 function viewOf(
@@ -69,7 +72,7 @@ function viewOf(
 		...echo,
 		notes: [
 			...echo.notes,
-			`${SUCCESS_NOTE_PREFIX}${placed.timeline.horizon} on ${chance.succeeded} of ${chance.paths} seeded Market paths: a success share of ${shareOf(chance.successBps)}.`,
+			`${SUCCESS_NOTE_PREFIX}${placed.timeline.horizon} on ${chance.succeeded} of ${chance.paths} seeded Market paths: a success share of ${shareText(chance.successBps)}.`,
 			`The chance is over the Return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal.`,
 			...(plan === undefined ? [] : planNotes(plan)),
 			...spending.notes,
@@ -86,6 +89,7 @@ function viewOf(
 		runsOut: chance.runsOut.map((row) => ({ index: row.index, to: row.to, paths: row.paths })),
 		...spending.fields,
 		...outcomes,
+		...(chance.milestones === undefined ? {} : { milestones: milestonesOf(chance, placed) }),
 		tables: [{ name: "bands", count: rows.length, rows }, ...spending.tables],
 	}
 }

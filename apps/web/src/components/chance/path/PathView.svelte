@@ -59,7 +59,7 @@ $effect(() => {
 {:else if state.kind === "unavailable"}
 	<EmptyState title="A live dashboard can open this future">
 		<p>
-			This Snapshot holds only the futures it read in advance. Start the Dashboard with <code>traj dashboard</code> to open any future
+			These figures hold only the futures read in advance. Start the Dashboard with <code>traj dashboard</code> to open any future
 			year by year. <a href={chanceHref(currentSearch(), plan ?? "")} class="text-accent underline-offset-4 hover:underline">Back to Chance of success</a>
 		</p>
 	</EmptyState>

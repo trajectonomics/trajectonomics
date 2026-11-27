@@ -39,7 +39,7 @@ export const OPENJOT_RELEASES_URL =
 export const OPENJOT_SOURCE_URL =
 	"https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot"
 
-/** The app's MIT licence. */
+/** The app's AGPL-3.0-only licence. */
 export const OPENJOT_LICENCE_URL =
 	"https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/LICENSE"
 

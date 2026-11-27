@@ -2,6 +2,10 @@
 status: accepted
 ---
 
+> **Amended on 2026-11-27.** The owner relicensed the repository under AGPL-3.0-only, so the
+> footer's licence link and the `SoftwareApplication` licence now name AGPL-3.0-only. The Decision
+> below records the licence as it stood when this ADR was accepted.
+
 # Crawlers and answer engines read the same facts the page states
 
 The Site answers a search engine today with a Sitemap, a Robots file, a Social card and one Structured

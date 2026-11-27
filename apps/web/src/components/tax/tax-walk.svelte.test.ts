@@ -51,13 +51,13 @@ describe("the Tax page when the CLI walked the tax", () => {
 		expect(body).toContain('href="/optimize/allowances/"')
 	})
 
-	test("charts every year by bracket, labelled nominal, and tables each year's rates", () => {
+	test("charts every year by bracket, labelled future money, and tables each year's rates", () => {
 		const body = page()
 		expect(body).toContain('id="tax-bracket-chart-title"')
-		expect(body).toContain("Nominal figures")
+		expect(body).toContain("Future money")
 		expect(body).toContain("Share of income paid")
 		expect(body).toContain("Income, tax and rates by tax year")
-		expect(body).toContain(">1 Jan 2027 to 31 Dec 2027<")
+		expect(body).toContain(">2027<")
 	})
 
 	test("leaves out the room to the next rate in the highest bracket", () => {
@@ -73,7 +73,7 @@ describe("the Tax page when the CLI walked the tax", () => {
 	})
 })
 
-describe("the Tax page for a hand-written Levy", () => {
+describe("the Tax page for hand-written tax rules", () => {
 	test("shows the page as it was, with no new section and no error", () => {
 		const body = page([plainYear(), plainYear(NEXT)])
 		for (const text of [

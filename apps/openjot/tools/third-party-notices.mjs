@@ -661,7 +661,7 @@ async function modelComponents(cacheDir, warnings) {
 
 function appComponent() {
   const pkg = JSON.parse(read("package.json"));
-  return { eco: "app", name: "OpenJot", version: pkg.version, license: "MIT", url: "https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot", texts: [{ text: read("LICENSE") }], fallback: null };
+  return { eco: "app", name: "OpenJot", version: pkg.version, license: "AGPL-3.0-only", url: "https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot", texts: [{ text: read("LICENSE") }], fallback: null };
 }
 
 // --- rendering ----------------------------------------------------------------------------------
@@ -743,9 +743,9 @@ export function render(components, warnings = []) {
     "OPENJOT THIRD-PARTY NOTICES",
     RULE,
     "",
-    wrap("OpenJot is free software under the MIT License (the first entry below). It also contains software from other projects. This file lists each component with its version and license, and reproduces the copyright notices and license texts that those licenses ask us to pass on."),
+    wrap("OpenJot is free software under the GNU Affero General Public License v3.0 only (AGPL-3.0-only), and it is the first entry below. It also contains software from other projects. This file lists each component with its version and license, and reproduces the copyright notices and license texts that those licenses ask us to pass on."),
     "",
-    wrap("Google ML Kit (on-device text recognition) and the Google Play services libraries it uses are NOT open source. Google provides them under the ML Kit Terms of Service (https://developers.google.com/ml-kit/terms) and the Android Software Development Kit License (https://developer.android.com/studio/terms). OpenJot's MIT License covers OpenJot's own source code, not those libraries."),
+    wrap("Google ML Kit (on-device text recognition) and the Google Play services libraries it uses are NOT open source. Google provides them under the ML Kit Terms of Service (https://developers.google.com/ml-kit/terms) and the Android Software Development Kit License (https://developer.android.com/studio/terms). OpenJot's AGPL-3.0-only license covers OpenJot's own source code, not those libraries."),
     "",
     wrap("Where several components share one license text, the text is printed once and each component is listed with its own copyright notice(s). Licenses written as \"A OR B\" let the recipient choose; every text shipped with the component is included. The standard (SPDX) license text is used only where a component's package ships none, and the copyright holder then comes from the package metadata."),
     "",

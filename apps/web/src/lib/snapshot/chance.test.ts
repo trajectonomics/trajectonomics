@@ -81,6 +81,16 @@ describe("the chance reads the Plan emits", () => {
 		expect(plan.chance["base"]?.carryInFor).toEqual([])
 	})
 
+	test("asks for Milestone dates only on a plan that declares Milestones (cli ADR-0081)", () => {
+		const params = checkParams({ ...base, ...CHANCE, scenarios: ["base", "retire-early"] })
+		if (!params.ok) throw new Error(params.error.message)
+		const one = stageOne("2026-10-31", ["base", "retire-early"])
+		if (one.scenarios.ok) one.scenarios.data.scenarios[0]!.hasMilestones = true
+		const plan = planStageTwo(params.params, one)
+		expect(plan.chance["base"]?.argv).toContain("--milestone-dates")
+		expect(plan.chance["retire-early"]?.argv).not.toContain("--milestone-dates")
+	})
+
 	test("asks for the outcomes of every path, unless the parameters leave the futures out, as the Demo snapshot's do", () => {
 		const left = checkParams({ ...base, ...CHANCE, futures: false, scenarios: ["base"] })
 		if (!left.ok) throw new Error(left.error.message)

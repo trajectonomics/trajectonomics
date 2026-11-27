@@ -15,11 +15,11 @@ function renderResult(run: ReturnType<typeof projectionRunFixture>): string {
 }
 
 describe("ProjectionResult", () => {
-	test("states the closing net worth nominal and the real figure in As-of terms, dated", () => {
+	test("states the closing net worth in future money and the today's-money figure, dated", () => {
 		const body = renderResult(projectionRunFixture())
 		expect(body).toContain("Closing net worth")
 		expect(body).toContain("1,550,000.00")
-		expect(body).toContain("Real net worth, in As-of terms")
+		expect(body).toContain("Net worth in today's money")
 		expect(body).toContain("1,420,000.00")
 	})
 
@@ -32,10 +32,9 @@ describe("ProjectionResult", () => {
 		expect(body).toContain("unmet")
 	})
 
-	test("says the money does not run out before the horizon when it does not", () => {
+	test("says the money lasts to the end of the plan when it does not run out", () => {
 		const body = renderResult(projectionRunFixture({ runsOut: null }))
-		expect(body).toContain("Does not run out before")
-		expect(body).toContain('<span class="whitespace-nowrap">31 Dec 2028</span>')
+		expect(body).toContain("To the end of the plan, 2028")
 	})
 
 	test("marks the year the projection ended in part", () => {

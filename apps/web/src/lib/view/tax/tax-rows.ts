@@ -1,5 +1,5 @@
 import type { TaxYear } from "../../contract"
-import { formatDate } from "../../format"
+import { formatDate, periodWords } from "../../format"
 
 /** One Levy settlement period as the table shows it: its dates, its figures and its two marks. */
 export interface TaxRow {
@@ -34,9 +34,9 @@ export function isRefund(owed: string): boolean {
 	return owed.startsWith("-") && !ZERO.test(owed)
 }
 
-/** The period of a tax year as a date range, such as "1 Jan 2026 to 31 Dec 2026". */
+/** The period of a tax year: "2026" for a calendar year, else "1 Apr 2026 – 31 Mar 2027". */
 export function periodOf(year: TaxYear): string {
-	return `${formatDate(year.from)} to ${formatDate(year.to)}`
+	return periodWords(year.from, year.to)
 }
 
 /** One row per tax year, in the order the CLI states them. */
