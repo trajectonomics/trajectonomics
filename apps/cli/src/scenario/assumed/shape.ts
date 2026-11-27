@@ -2,7 +2,7 @@ import { z } from "zod"
 
 /**
  * The kinds of Assumed value this build publishes, in the order `assumedOf` lists them (cli ADR-0083).
- * `template-default` joins them with the stored column in cli ADR-0084, and `run-rate` waits for #687.
+ * `template-default` joins them with the stored column in #689 part 2, and `run-rate` waits for #687.
  */
 export const ASSUMED_KINDS = ["unlabelled-income", "unstated-allowance", "tax-figure"] as const
 
@@ -38,7 +38,7 @@ export type AssumedItem = UnlabelledIncome | UnstatedAllowance | TaxFigure
 const unlabelledIncome = z.strictObject({
 	kind: z
 		.literal("unlabelled-income")
-		.describe("An income Flow with no string `label`, in a plan that holds a Levy."),
+		.describe("An income Flow with no string `label`, in a plan that holds a Levy (cli ADR-0083)."),
 	path: z.string().describe("The Flow's label path in the Override grammar: `flows.<id>.label`."),
 	value: z.null().describe("Null: a label is missing, not a figure."),
 	hint: z.string().describe("The command that states a Section 40 label for the Flow."),
@@ -47,7 +47,9 @@ const unlabelledIncome = z.strictObject({
 const unstatedAllowance = z.strictObject({
 	kind: z
 		.literal("unstated-allowance")
-		.describe("A deduction class this build supports that the plan leaves out (cli ADR-0073)."),
+		.describe(
+			"A deduction class this build supports that the plan leaves out (cli ADR-0073, ADR-0083).",
+		),
 	path: z.string().describe("The class's path in the Override grammar: `taxAllowances.<class>`."),
 	value: z.null().describe("Null: the allowance is missing, not a figure."),
 	hint: z.string().describe("The command that states the allowance class."),
@@ -57,7 +59,7 @@ const taxFigure = z.strictObject({
 	kind: z
 		.literal("tax-figure")
 		.describe(
-			"A tax figure the stored Levy uses whose source is not yet confirmed (cli ADR-0042).",
+			"A tax figure the stored Levy uses whose source is not yet confirmed (cli ADR-0042, ADR-0083).",
 		),
 	path: z.string().describe("The figure's path in the tax core's parameters for the year."),
 	value: z
@@ -83,5 +85,5 @@ export const assumedItem: z.ZodType<AssumedItem> = z.discriminatedUnion("kind", 
 export const assumedField: z.ZodType<AssumedItem[]> = z
 	.array(assumedItem)
 	.describe(
-		"The values this plan assumes that nobody stated, in the fixed kind order; empty when there are none (cli ADR-0083). `template-default` joins them with the stored column in cli ADR-0084, and `run-rate` waits for #687.",
+		"The values this plan assumes that nobody stated, in the fixed kind order; empty when there are none (cli ADR-0083). `template-default` joins them with the stored column in #689 part 2, and `run-rate` waits for #687.",
 	)

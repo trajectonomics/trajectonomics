@@ -51,7 +51,7 @@ export const show: Leaf = defineCommand({
 			if (isAppError(household)) return household
 			const tax = taxOf(row)
 			const taxAllowances = taxAllowancesOf(tax, plain.document)
-			const assumed = assumedOf(row, plain.document, shown.document, taxAllowances)
+			const assumed = assumedOf(row, plain.document, shown.document, taxAllowances, household)
 			return ok({
 				scenario: {
 					...shown,

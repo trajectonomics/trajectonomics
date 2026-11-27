@@ -1,5 +1,5 @@
+import { printedCommand } from "../hint-command"
 import { formatPath } from "../path"
-import { quotedName } from "../quoted-name"
 import type { TaxProfileView } from "../tax/profile"
 import type { UnstatedAllowance } from "./shape"
 
@@ -9,9 +9,11 @@ const CONTRIBUTION_CLASSES: ReadonlySet<string> = new Set(["retirementContributi
 /** The command that states one class, chosen by how the class arrives (cli ADR-0083). */
 function hintOf(name: string, className: string): string {
 	if (CONTRIBUTION_CLASSES.has(className)) {
-		return `Add a contribution Flow with its label: run "traj scenario apply ${quotedName(name)} --add flows=<json>"; "traj schema scenario apply" shows the shape.`
+		const command = printedCommand("traj scenario apply", [name], ["--add", "flows=<json>"])
+		return `Add a contribution Flow with its label: run "${command}"; "traj schema scenario apply" shows the shape, and its target must be in cashflow.contribute.`
 	}
-	return `Run "traj scenario tax ${quotedName(name)} --merge" with this allowance's flag to state it; "traj schema scenario tax" lists the flags.`
+	const command = printedCommand("traj scenario tax", [name], ["--merge"])
+	return `Run "${command}" with this allowance's flag to state it; "traj schema scenario tax" lists the flags. --merge needs every income Flow labelled first.`
 }
 
 /**

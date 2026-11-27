@@ -23,7 +23,7 @@ export function wordsAt(schema: unknown, path: string): string[] | null {
 	return node.every((word) => typeof word === "string") ? (node as string[]) : null
 }
 
-/** A union branch's discriminator word: its `kind` published as a `const` (or a one-word `enum`). */
+/** A union branch's discriminator word: its `kind` published as a `const`. */
 function discriminatorWord(branch: unknown): string | null {
 	if (typeof branch !== "object" || branch === null) return null
 	const properties = (branch as Record<string, unknown>)["properties"]

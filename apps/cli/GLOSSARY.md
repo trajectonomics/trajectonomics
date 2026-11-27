@@ -189,7 +189,7 @@ Plain text a person keeps on a Scenario in `scenario.notes`: what the plan assum
 _Avoid_: Description, comment, memo (a `tx` has a memo)
 
 **Assumed value**:
-A value a plan rests on that nobody stated: an income Flow with no tax label, a deduction class the plan leaves out, or a tax figure whose source is not yet confirmed. `scenario show` lists them in its `assumed` field in a fixed kind order, and its human form prints them after the body with the command that states each one (ADR-0083). A value the template wrote and no edit has touched joins them with the stored column (ADR-0084), and a Stream built from history with #687. It is not a **Tax assumption**, which is one of its kinds.
+A value a plan rests on that nobody stated: an income Flow with no tax label, a deduction class the plan leaves out, or a tax figure whose source is not yet confirmed. `scenario show` lists them in its `assumed` field in a fixed kind order, and its human form prints them after the body with the command that states each one (ADR-0083). A value the template wrote and no edit has touched joins them with the stored column (#689 part 2), and a Stream built from history with #687. It is not a **Tax assumption**, which is one of its kinds.
 _Avoid_: Assumption (the tax figures alone), default (a template default is one kind, not the whole)
 
 **Main plan**:

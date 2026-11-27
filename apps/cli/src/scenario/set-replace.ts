@@ -38,7 +38,7 @@ function replaceInObject(
 		rest === ctx.segments.length &&
 		beginsKey(node, segment, prefix)
 	) {
-		// The keys a Set adds to an item: an asset Account's volatility (cli ADR-0068), a surplus step's share or cap (cli ADR-0070).
+		// The keys a Set adds to an item: an asset Account's volatility (cli ADR-0068), a Flow's label (cli ADR-0083), a surplus step's share or cap (cli ADR-0070).
 		return { ...node, [segment]: ctx.value }
 	}
 	if (!Object.hasOwn(node, segment)) {

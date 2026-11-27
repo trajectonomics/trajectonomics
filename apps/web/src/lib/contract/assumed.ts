@@ -2,7 +2,7 @@ import { z } from "zod"
 
 /**
  * The kinds of Assumed value a `scenario show` states (cli ADR-0083), the closed list the page
- * branches on. `template-default` joins it with the stored column in cli ADR-0084.
+ * branches on. `template-default` joins it with the stored column in #689 part 2.
  */
 export const ASSUMED_KINDS = ["unlabelled-income", "unstated-allowance", "tax-figure"] as const
 

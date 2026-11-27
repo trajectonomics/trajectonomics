@@ -94,7 +94,7 @@ export const scenarioShow = z.strictObject({
 		...taxShown,
 		/**
 		 * The values the plan assumes that nobody stated, in kind order (cli ADR-0083), empty when it
-		 * assumes none. `template-default` arrives with cli ADR-0084, and the field is absent in an
+		 * assumes none. `template-default` arrives with #689 part 2, and the field is absent in an
 		 * older Snapshot.
 		 */
 		assumed: z.array(assumedItem).optional(),

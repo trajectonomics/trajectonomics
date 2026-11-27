@@ -20,13 +20,13 @@ The **Assumed values** of a plan are exactly these four kinds, in this order:
 
 | # | `kind` | What it is | Where it comes from |
 |---|---|---|---|
-| 1 | `template-default` | A value `traj` wrote into the document that no edit has touched since. | The new `scenario.unstated` column (ADR-0084). |
+| 1 | `template-default` | A value `traj` wrote into the document that no edit has touched since. | The new `scenario.unstated` column (#689 part 2). |
 | 2 | `unlabelled-income` | An `income` Flow with no string `label`, in a plan that holds any Levy (`isTaxed`). | The document. |
 | 3 | `unstated-allowance` | Each class in `taxAllowances.notStated`. | ADR-0073's own function. |
 | 4 | `tax-figure` | Each figure `taxAssumptionsOf(document)` names for the stored Levy. | Tax-core. |
 
 This change publishes and produces the three derived kinds, 2 to 4. `template-default` arrives with
-its stored column in ADR-0084, and `run-rate` waits for #687, which adds a `history` source to the
+its stored column in #689 part 2, and `run-rate` waits for #687, which adds a `history` source to the
 same mechanism.
 
 Within a kind the order is fixed too: `unlabelled-income` in document order, `unstated-allowance` in

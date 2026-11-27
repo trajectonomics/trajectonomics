@@ -78,10 +78,10 @@ describe("scenario show states what a plan assumes", () => {
 			notStated.map((className) => `taxAllowances.${className}`),
 		)
 		expect(items.find((item) => item.path === "taxAllowances.retirementContributions")?.hint).toBe(
-			'Add a contribution Flow with its label: run "traj scenario apply base --add flows=<json>"; "traj schema scenario apply" shows the shape.',
+			'Add a contribution Flow with its label: run "traj scenario apply base --add flows=<json>"; "traj schema scenario apply" shows the shape, and its target must be in cashflow.contribute.',
 		)
 		expect(items.find((item) => item.path === "taxAllowances.lifeInsurance")?.hint).toBe(
-			'Run "traj scenario tax base --merge" with this allowance\'s flag to state it; "traj schema scenario tax" lists the flags.',
+			'Run "traj scenario tax base --merge" with this allowance\'s flag to state it; "traj schema scenario tax" lists the flags. --merge needs every income Flow labelled first.',
 		)
 	})
 
