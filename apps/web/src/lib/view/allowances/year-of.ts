@@ -37,7 +37,7 @@ export function yearOf(year: AllowanceYear, rows: readonly AllowanceRow[]): Year
 	const placeable = flows.filter((flow) => flow.target !== undefined)
 	const unplaced = lines.flatMap((line) =>
 		line.flow !== undefined && line.flow.target === undefined
-			? [{ name: line.name, hint: line.hint ?? "" }]
+			? [{ name: line.name, hint: line.hint ?? "", filer: line.filer }]
 			: [],
 	)
 	return {

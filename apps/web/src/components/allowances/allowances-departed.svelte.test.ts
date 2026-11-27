@@ -98,17 +98,60 @@ describe("a departed Filer on the Tax allowances page reads as the Tax profile t
 		expect(body).toContain('aria-label="me"')
 		expect(body).toContain('aria-label="partner"')
 		expect(body).not.toContain("Another person")
+		expect(body).toMatch(/<code[^>]*data-unnamed[^>]*>me<\/code>/)
+		expect(body).toMatch(/<code[^>]*data-unnamed[^>]*>partner<\/code>/)
 	})
 
 	test("a joint Return over departed spouses groups each line under the same words", () => {
 		const jointBody = (people: PersonNames, claimsHolder: string | null = null) =>
 			render(AllowancesResult, { props: { data: joint(), plan: null, people, claimsHolder } }).body
-		expect(jointBody(personNames(GONE), "me")).toContain(">The earlier holder</li>")
-		expect(jointBody(personNames(GONE), "me")).toContain(">You</li>")
-		expect(jointBody(personNames(RENAMED))).toContain(">Another person</li>")
-		expect(jointBody(personNames(BOTH_GONE))).toContain(">Another person (me)</li>")
-		expect(jointBody(personNames(BOTH_GONE))).toContain(">Another person (partner)</li>")
-		expect(jointBody(personNames(null))).toContain(">me</li>")
-		expect(jointBody(personNames(null))).toContain(">partner</li>")
+		expect(jointBody(personNames(GONE), "me")).toMatch(/>The earlier holder<\/span>/)
+		expect(jointBody(personNames(GONE), "me")).toMatch(/>You<\/span>/)
+		expect(jointBody(personNames(RENAMED))).toMatch(/>Another person<\/span>/)
+		expect(jointBody(personNames(BOTH_GONE))).toMatch(/>Another person \(me\)<\/span>/)
+		expect(jointBody(personNames(BOTH_GONE))).toMatch(/>Another person \(partner\)<\/span>/)
+		expect(jointBody(personNames(null))).toMatch(/<code[^>]*data-unnamed[^>]*>me<\/code>/)
+		expect(jointBody(personNames(null))).toMatch(/<code[^>]*data-unnamed[^>]*>partner<\/code>/)
+	})
+})
+
+/** The joint Return with both spouses' RMF suggestions left without an Account, as a joint plan reads them. */
+function jointWithoutRmfTarget(): ProjectionAllowances {
+	const data = joint()
+	return {
+		...data,
+		allowances: data.allowances.map((row) => {
+			if (!row.label.startsWith("allowance.retirement.rmf")) return row
+			const changed = structuredClone(row)
+			if (changed.flow !== undefined) delete changed.flow.target
+			changed.hint = "Pick the asset Account."
+			return changed
+		}),
+	}
+}
+
+const PLAN = {
+	name: "base",
+	contentHash: `jcs1:sha256:${"ab".repeat(32)}`,
+	doc: { currency: "THB", flows: [], accounts: [] },
+}
+
+describe("a joint Return with an unplaced RMF for each Filer", () => {
+	test("renders and says whose each RMF is", () => {
+		const body = render(AllowancesResult, {
+			props: {
+				data: jointWithoutRmfTarget(),
+				plan: PLAN,
+				people: personNames(GONE),
+				claimsHolder: "me",
+			},
+		}).body
+		expect(body.match(/RMF(?:<!--.*?-->)*\(/g)).toHaveLength(2)
+		expect(body).toMatch(
+			/RMF(?:<!--.*?-->)*\((?:<!--.*?-->)*<span[^>]*data-item="me"[^>]*>The earlier holder<\/span>/,
+		)
+		expect(body).toMatch(
+			/RMF(?:<!--.*?-->)*\((?:<!--.*?-->)*<span[^>]*data-item="partner"[^>]*>You<\/span>/,
+		)
 	})
 })

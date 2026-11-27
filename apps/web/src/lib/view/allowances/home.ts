@@ -1,14 +1,14 @@
 import type { ProjectionAllowances } from "../../contract"
 import { isAboveZero } from "../../format"
-import { NO_PEOPLE, type PersonNames } from "../item-names"
-import { returnLabel } from "../tax-settings/return-name"
+import { type ItemLabel, NO_PEOPLE, type PersonNames } from "../item-names"
+import { JOINT_RETURN, returnLabel } from "../tax-settings/return-name"
 import { allowancesView } from "./years"
 
 /** One Return's saving on the Home card: the CLI's own figure, and the words the household gives its Filer. */
 export interface AllowancesSaving {
 	readonly key: string
 	/** "You", "Your partner", or the label the household states; null when the read states one Return. */
-	readonly name: string | null
+	readonly name: ItemLabel | null
 	readonly saving: string
 }
 
@@ -42,8 +42,8 @@ export function allowancesSummaryOf(
 								key: one.key,
 								name:
 									one.filer === null
-										? "Your joint Return"
-										: returnLabel(one.filer, people, claimsHolder, filers).text,
+										? JOINT_RETURN
+										: returnLabel(one.filer, people, claimsHolder, filers),
 								year: one.current,
 							},
 						],

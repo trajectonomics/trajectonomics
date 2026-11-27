@@ -18,13 +18,13 @@ interface Props {
 	/** The people of each Scenario's household, so a Return is named by role ("You", "Your partner"). */
 	people: Readonly<Record<string, PersonNames>>
 	/** The recorded `claimsHolder` of each Scenario's stored profile, so a departed Return reads as the profile does. */
-	holders?: Readonly<Record<string, string | null>>
+	holders: Readonly<Record<string, string | null>>
 	/** The Scenario the address bar asks for; empty or unknown falls back to the first one. */
 	requested: string
 	onScenario: (name: string) => unknown
 }
 
-let { names, projections, people, holders = {}, requested, onScenario }: Props = $props()
+let { names, projections, people, holders, requested, onScenario }: Props = $props()
 const options = $derived(names.map((value) => ({ value, label: value })))
 const name = $derived(chooseScenario(names, requested))
 /** The name the address bar asks for that is not one of the plans, said above the picker; none otherwise. */

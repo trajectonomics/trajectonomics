@@ -13,10 +13,10 @@ interface Props {
 	/** The household's people, so a Return is named by the role the CLI states ("You", "Your partner"). */
 	people?: PersonNames
 	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
-	claimsHolder?: string | null
+	claimsHolder: string | null
 }
 
-let { data, plan, people = NO_PEOPLE, claimsHolder = null }: Props = $props()
+let { data, plan, people = NO_PEOPLE, claimsHolder }: Props = $props()
 const view = $derived(allowancesView(data))
 /** Every Filer the page shows, so two departed Returns that would read alike take their ids. */
 const filers = $derived(view.returns.flatMap((one) => (one.filer === null ? [] : [one.filer])))

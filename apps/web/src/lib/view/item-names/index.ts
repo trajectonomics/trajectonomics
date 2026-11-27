@@ -17,5 +17,5 @@ export {
 	itemText,
 	NO_ITEM_NAMES,
 } from "./names"
-export { NO_PEOPLE, type PersonName, type PersonNames, personNames, personText } from "./people"
+export { NO_PEOPLE, type PersonName, type PersonNames, personNames } from "./people"
 export { documentOf, householdOf, snapshotItemNames, snapshotPeople } from "./snapshot"

@@ -23,10 +23,10 @@ interface Props {
 	run: ProjectionRun
 	/** The household's people, so a Return is named by the role the CLI states ("You", "Your partner"), never by id. */
 	people: PersonNames
-	claimsHolder?: string | null
+	claimsHolder: string | null
 }
 
-let { name, run, people, claimsHolder = null }: Props = $props()
+let { name, run, people, claimsHolder }: Props = $props()
 /** The Filer the person chose; empty opens on the first Return, the holder's (cli ADR-0075). */
 let chosen = $state("")
 const body = $derived(taxBody(run))

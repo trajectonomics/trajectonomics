@@ -54,7 +54,7 @@ describe("overviewView", () => {
 		const view = overviewView(changed, "separate")
 		expect(view.allowances.status).toBe("ready")
 		if (view.allowances.status !== "ready" || !view.allowances.read.ok) return
-		expect(view.allowances.read.data?.savings.map((one) => one.name)).toEqual([
+		expect(view.allowances.read.data?.savings.map((one) => one.name?.text)).toEqual([
 			"The earlier holder",
 			"Another person",
 		])

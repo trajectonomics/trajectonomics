@@ -15,12 +15,12 @@ interface Props {
 	/** The household's people, so a joint Return names each spouse's allowances. */
 	people?: PersonNames
 	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
-	claimsHolder?: string | null
+	claimsHolder: string | null
 	/** The Return this card sits in, when the page shows one section per Return: it names the region and steps the heading down. */
 	region?: string
 }
 
-let { year, currency, plan, people = NO_PEOPLE, claimsHolder = null, region }: Props = $props()
+let { year, currency, plan, people = NO_PEOPLE, claimsHolder, region }: Props = $props()
 const label = $derived(region === undefined ? "This tax year" : `${region}: this tax year`)
 </script>
 
@@ -40,5 +40,5 @@ const label = $derived(region === undefined ? "This tax year" : `${region}: this
 		<Stat label="Tax saved">{#snippet value()}<Money amount={year.saving} {currency} />{/snippet}</Stat>
 	</div>
 	<LineList lines={year.lines} {currency} {people} {claimsHolder} />
-	{#if plan !== null}<YearActions {year} {plan} />{/if}
+	{#if plan !== null}<YearActions {year} {plan} {people} {claimsHolder} />{/if}
 </section>
