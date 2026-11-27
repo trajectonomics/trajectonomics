@@ -9,6 +9,9 @@ export const DATA_PATH = `${BASE_PATH}/`
 /** The method page. */
 export const METHOD_PATH = `${BASE_PATH}/method/`
 
+/** The log page: the raw tokens-per-plan-and-model table and the daily chart. */
+export const LOG_PATH = `${BASE_PATH}/log/`
+
 /** The public path of a file the build emits at the root of the data site. */
 export function assetPath(path: string): string {
 	if (!path.startsWith("/")) {
