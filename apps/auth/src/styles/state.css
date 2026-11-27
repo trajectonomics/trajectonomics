@@ -1,0 +1,49 @@
+/* A state is a shape and an icon, never a colour alone: approved, denied, or the root redirect. */
+
+.status {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--ds-space-2);
+	margin: 0 0 var(--ds-space-4);
+	padding: var(--ds-space-3) var(--ds-space-4);
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+	font-weight: 600;
+}
+
+.status-done {
+	border-inline-start: 3px solid var(--ds-color-accent);
+}
+
+.status-denied {
+	border-inline-start: 3px solid var(--ds-color-muted-foreground);
+}
+
+.redirect {
+	margin: 0;
+	text-align: center;
+}
+
+.redirect a {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 0.2em;
+}
+
+.redirect a:hover {
+	color: var(--ds-color-accent);
+}
+
+.skip-link {
+	position: absolute;
+	top: -100px;
+	left: 1rem;
+	z-index: 60;
+	padding: 8px 12px;
+	border-radius: var(--ds-radius-sm);
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.skip-link:focus {
+	top: 1rem;
+}

@@ -1,0 +1,48 @@
+/*
+ * The auth origin's pages, in the brand's documented order: the light and dark Theme CSS, the type
+ * and the shared header frame, then the page's own styles. Every colour is a --ds-* role.
+ */
+@import "@trajectonomics/brand/current/light.css";
+@import "@trajectonomics/brand/current/dark.css";
+@import "@trajectonomics/brand/typography.css";
+@import "@trajectonomics/brand/header.css";
+@import "./fonts.css";
+@import "./page.css";
+@import "./state.css";
+@import "./button.css";
+@import "./form.css";
+@import "./device.css";
+@import "./account.css";
+@import "./confirm.css";
+@import "./switch.css";
+@import "./danger.css";
+@import "./legal.css";
+
+/* Every box includes its padding and border, so a 100% panel or field never overflows its column. */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+}
+
+[data-theme="light"] {
+	color-scheme: light;
+}
+
+[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+:root {
+	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
+	--font-meta:
+		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
+}

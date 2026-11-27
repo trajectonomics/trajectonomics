@@ -1,0 +1,72 @@
+/* Forms: one column, 44 px controls, a visible focus ring and a message that says what to do. */
+
+.form {
+	display: grid;
+	gap: var(--ds-space-4);
+}
+
+.button-stack {
+	display: grid;
+	gap: var(--ds-space-3);
+}
+
+.button-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ds-space-3);
+}
+
+.field-label {
+	display: block;
+	margin-bottom: var(--ds-space-2);
+	font-weight: 600;
+}
+
+.field-input {
+	width: 100%;
+	max-width: 100%;
+	min-height: 2.75rem;
+	padding: var(--ds-space-2) var(--ds-space-3);
+	border: 1px solid var(--ds-color-input);
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+	font: inherit;
+}
+
+.field-input:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 1px;
+}
+
+.check {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--ds-space-3);
+	cursor: pointer;
+}
+
+.check input {
+	flex: none;
+	inline-size: 1.25rem;
+	block-size: 1.25rem;
+	margin: 0.25rem 0 0;
+	accent-color: var(--ds-color-primary);
+}
+
+.form-message {
+	margin: var(--ds-space-4) 0 0;
+	padding-inline-start: var(--ds-space-3);
+	border-inline-start: 3px solid var(--ds-color-destructive);
+	color: var(--ds-color-destructive);
+	font-weight: 600;
+}
+
+.legal-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ds-space-2);
+	margin: var(--ds-space-6) 0 0;
+	font-size: var(--ds-font-size-sm);
+	color: var(--ds-color-muted-foreground);
+}

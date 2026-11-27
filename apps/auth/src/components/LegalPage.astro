@@ -1,0 +1,49 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { dictionaryFor, type Language } from "../lib/language"
+import type { LegalContent } from "../lib/legal"
+
+interface Props {
+	readonly language: Language
+	readonly title: string
+	readonly content: LegalContent
+}
+
+const { language, title, content } = Astro.props
+const words = dictionaryFor(language)
+---
+
+<article class="legal">
+	<h1 class="page-title">{title}</h1>
+	<p class="legal-updated">{words.legalUpdated}: {content.updated}</p>
+	{
+		language === "th" && (
+			<p class="legal-note">
+				{words.legalOfficialNote}
+			</p>
+		)
+	}
+	{
+		content.sections.map((section) => (
+			<section class="legal-section">
+				<h2 class="section-title">{section.heading}</h2>
+				{section.body.map((paragraph) => (
+					<p>{paragraph}</p>
+				))}
+				{section.items !== undefined && (
+					<ul class="legal-items">
+						{section.items.map((item) => (
+							<li>{item}</li>
+						))}
+					</ul>
+				)}
+				{section.link !== undefined && (
+					<p class="legal-link">
+						<a href={section.link.href}>{section.link.text}</a>
+					</p>
+				)}
+			</section>
+		))
+	}
+</article>
