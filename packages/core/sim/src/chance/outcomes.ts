@@ -2,13 +2,16 @@ import type { DateString } from "../types"
 import type { ChancePathOutcome } from "../types/path"
 import type { PathOutcome } from "./path"
 
-/** The Milestones that fired on one path, by id, in the order the run reported them. */
+/**
+ * The Milestones that fired on one path, by id, in the order the run reported them. Built with
+ * `Object.fromEntries`, so an id such as `__proto__` is an ordinary key and never sets the prototype.
+ */
 function firedDates(outcome: PathOutcome): Readonly<Record<string, DateString>> {
-	const fired: Record<string, DateString> = {}
-	for (const result of outcome.milestones ?? []) {
-		if (result.reached) fired[result.id] = result.date
-	}
-	return fired
+	return Object.fromEntries(
+		(outcome.milestones ?? [])
+			.filter((result) => result.reached)
+			.map((result) => [result.id, result.date]),
+	)
 }
 
 /** Each Market path's outcome in index order, read from the figures the Bands were read from. */

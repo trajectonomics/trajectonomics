@@ -390,7 +390,7 @@ What one Market path of a Chance of success came to, reported per path with the 
 _Avoid_: Trial, scenario, run
 
 **Milestone fire dates**:
-The `milestones` report a Chance of success adds with the `milestoneDates` option (ADR 0011): one `{ id, reached, dates, byYear }` per Milestone in Scenario order, from the same engine run that feeds the Bands. `reached` is the number of Market paths that fired it before the horizon. `dates` holds the five Percentiles at levels 10, 25, 50, 75 and 90 and by nearest rank over the paths that fired it, on the month grid: each Fire date is reduced to its calendar month and reported as that month's first day, so no day is shown and no date is interpolated; `dates` is empty when no path fired it. `byYear` counts the fired paths per calendar year, ascending, and lists only years that hold one.
+The `milestones` report a Chance of success adds with the `milestoneDates` option (ADR 0011): one `{ id, reached, dates, byYear }` per Milestone in Scenario order, from the same engine run that feeds the Bands. `reached` is the number of Market paths that fired it on or before the run's end: the horizon, or the day the path ran out. `dates` holds the five Percentiles at levels 10, 25, 50, 75 and 90 and by nearest rank over the paths that fired it, on the month grid: each Fire date is reduced to its calendar month and reported as that month's first day, so no day is shown and no date is interpolated; `dates` is empty when no path fired it. `byYear` counts the fired paths per calendar year, ascending, and lists only years that hold one.
 _Avoid_: Milestone histogram, trigger dates
 
 **Spending Band**:

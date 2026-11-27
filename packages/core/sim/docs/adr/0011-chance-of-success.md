@@ -115,7 +115,7 @@ hand. An option reports it, and changes no figure of the entry.
 - **`milestoneDates: true`.** `chanceOfSuccess` adds `milestones`: one `{ id, reached, dates, byYear }`
   per Milestone of the Scenario, in Scenario order (the order ADR 0012 reports), read from the same
   engine run that feeds the Bands. `reached` is the number of Market paths on which the Milestone
-  fired before the horizon; a path that ran out early cannot fire a later Milestone, so it counts
+  fired on or before the run's end (the horizon, or the day the path ran out); a path that ran out early cannot fire a later Milestone, so it counts
   only where the path lived to fire it. `dates` holds the 10th, 25th, 50th, 75th and 90th Percentile
   fire dates over the paths that fired it, with the nearest-rank rule the Bands use, on the month
   grid: each fire date is reduced to its calendar month (`year × 12 + month − 1`), ranked there, and
