@@ -5,6 +5,7 @@
 // The Dashboard draws them as SVG elements, never as HTML.
 
 import type { IconName } from "../../lib/view/routes"
+import { EYE_ICON_NODES } from "./nav-icons-eye"
 import { PLAN_ICON_NODES, type PlanIconName } from "./nav-icons-plan"
 
 /** One element of an icon: its SVG tag and the attributes it is drawn with. */
@@ -13,6 +14,7 @@ export type IconElement = readonly [tag: string, attrs: Readonly<Record<string, 
 /** The elements of each icon the navigation draws, by name. */
 /** The icons the navigation draws, except the planner pages' three (in `nav-icons-plan.ts`). */
 const BASE_ICON_NODES: Omit<Readonly<Record<IconName, readonly IconElement[]>>, PlanIconName> = {
+	...EYE_ICON_NODES,
 	activity: [
 		[
 			"path",
