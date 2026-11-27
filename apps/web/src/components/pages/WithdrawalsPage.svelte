@@ -14,7 +14,6 @@ let { scenario, terms, onTerms }: Props = $props()
 
 <PageShell
 	title="Withdrawals"
-	intro="How much a rule pays each year from your savings in retirement, and what it pays in good and bad markets."
 >
 	{#snippet children(snapshot)}
 		<WithdrawalsBody {snapshot} {scenario} {terms} {onTerms} />

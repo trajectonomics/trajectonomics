@@ -69,14 +69,14 @@ export function checkEtag(response: ProbeResponse): readonly ProbeFailure[] {
 	]
 }
 
-/** The Site sets no content security policy, which the router's own inline script would break. */
+/** The Site sets no content security policy on its own pages; ADR 0033 records that it now may. */
 export function checkContentSecurityPolicy(response: ProbeResponse): readonly ProbeFailure[] {
 	if (response.contentSecurityPolicy === null) return []
 	return [
 		probeFailure(
 			"CONTENT_SECURITY_POLICY_PRESENT",
 			response.probe.path,
-			"sets Content-Security-Policy. The router injects an inline style and script that it would block.",
+			"sets Content-Security-Policy, which no page of the Site carries yet.",
 		),
 	]
 }

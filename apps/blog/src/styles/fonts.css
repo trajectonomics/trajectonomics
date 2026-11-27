@@ -1,7 +1,7 @@
 /*
  * The Brand Typeface: the three latin woff2 files the blog draws with, copied from
  * `@trajectonomics/brand/current/fonts/` into `public/fonts/` by `scripts/copy-brand-assets.ts`, so the
- * Worker serves them under /fonts/. Thai falls through to the system Thai face.
+ * Worker serves them under /blog/fonts/. Thai falls through to the system Thai face.
  */
 
 @font-face {

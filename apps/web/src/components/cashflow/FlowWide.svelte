@@ -1,6 +1,7 @@
 <script lang="ts">
+import { flowMeasure } from "../../client/flow-text.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { FLOW_NODE_WIDTH, type FlowLayout } from "../../lib/chart/flow"
+import { FLOW_NODE_WIDTH, type FlowLayout, LABEL_HALF } from "../../lib/chart/flow"
 import { fittedLabel } from "../../lib/chart/flow-label"
 import { formatMoney, maskMoney } from "../../lib/format"
 import { cx } from "../ui/cx"
@@ -22,7 +23,12 @@ interface Props {
 /** The wide flow diagram of one year, from a medium screen up. Each band is a control: a click, or Enter or Space, picks its table row. */
 let { layout, picked, onPick, label, stacked = false }: Props = $props()
 
-/** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
+const uid = $props.id()
+
+/** The page's own font, read from the drawing, so each name is fitted at the size it is drawn. */
+let diagram = $state<SVGSVGElement | null>(null)
+const measure = $derived(flowMeasure(diagram))
+
 const shown = (amount: string): string =>
 	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
 </script>
@@ -30,11 +36,14 @@ const shown = (amount: string): string =>
 <!-- The figures are the CLI's strings. A band is drawn by its share of the taller column; the table below repeats each one. -->
 <div class={cx("max-w-full overflow-x-auto rounded-lg border border-border", stacked && "hidden md:block")}>
 	<svg
+		bind:this={diagram}
 		viewBox={`0 0 ${layout.width} ${layout.height}`}
 		role="group"
 		aria-label={label}
+		text-rendering="geometricPrecision"
 		class="h-auto min-w-[640px] w-full text-xs"
 	>
+		<text data-flow-probe visibility="hidden" aria-hidden="true" class="fill-foreground"></text>
 		{#each layout.links as link (link.key)}
 			<path
 				d={link.d}
@@ -58,7 +67,8 @@ const shown = (amount: string): string =>
 			height={layout.cash.height}
 			class="fill-foreground"
 		/>
-		{#each layout.nodes as node (node.key)}
+		{#each layout.nodes as node, index (node.key)}
+			{@const words = fittedLabel(node, shown(node.amount), measure)}
 			<rect
 				x={node.x}
 				y={node.y}
@@ -66,16 +76,31 @@ const shown = (amount: string): string =>
 				height={node.height}
 				class="fill-foreground/70"
 			/>
+			<clipPath id={`${uid}-${index}`}>
+				<rect
+					x={words.clipX}
+					y={node.labelY - 2 * LABEL_HALF}
+					width={words.clipWidth}
+					height={4 * LABEL_HALF}
+				/>
+			</clipPath>
 			<text
-				x={node.labelX}
+				x={words.labelX}
 				y={node.labelY}
 				text-anchor={node.anchor}
 				dominant-baseline="middle"
 				aria-hidden="true"
 				class="fill-foreground"
-			>
-				{fittedLabel(node, shown(node.amount))}
-			</text>
+				clip-path={`url(#${uid}-${index})`}
+			><tspan data-flow-label>{words.label}</tspan></text>
+			<text
+				x={words.amountX}
+				y={node.labelY}
+				text-anchor="end"
+				dominant-baseline="middle"
+				aria-hidden="true"
+				class="fill-foreground"
+			><tspan data-flow-amount>{words.amount}</tspan></text>
 		{/each}
 	</svg>
 </div>

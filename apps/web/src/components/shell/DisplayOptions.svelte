@@ -1,12 +1,14 @@
 <script lang="ts">
 import { shellPanels } from "../../client/shell.svelte.js"
+import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import NavIcon from "./NavIcon.svelte"
 import PreferenceControls from "./PreferenceControls.svelte"
 
+const snapshotState = $derived(currentSnapshot())
 let dialog: HTMLDialogElement | undefined = $state()
 
 function close(): void {
-	shellPanels.options = false
+	shellPanels.closeOptions()
 }
 
 // The drawer is a modal dialog: showModal traps focus, and Escape closes it through the dialog's own event.
@@ -40,5 +42,8 @@ $effect(() => {
 			</button>
 		</div>
 		<PreferenceControls />
+		{#if snapshotState.status === "ready"}
+			<p class="mt-auto text-xs text-muted-foreground">Read by traj {snapshotState.snapshot.cliVersion}</p>
+		{/if}
 	</div>
 </dialog>

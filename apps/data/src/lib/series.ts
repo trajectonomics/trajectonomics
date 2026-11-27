@@ -1,4 +1,4 @@
-import { planName, planRank } from "./plans"
+import { comparePlans, planName } from "./plans"
 import type { ChartSeries, UsageRow } from "./types"
 
 /**
@@ -21,5 +21,5 @@ export function chartSeries(rows: readonly UsageRow[], days: readonly string[]):
 			total: days.reduce((sum, day) => sum + (byDay.get(day) ?? 0), 0),
 			points: days.map((day) => ({ day, tokens: byDay.get(day) ?? 0 })),
 		}))
-		.sort((a, b) => planRank(a.plan) - planRank(b.plan) || a.plan.localeCompare(b.plan))
+		.sort(comparePlans)
 }

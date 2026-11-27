@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { AGENT_START_HEADING, agentPrompt } from "../agent-start"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN, SITE_ORIGIN } from "../site"
 import { indexReference } from "./index-reference"
 import { buildLandingTwin } from "./landing-twin"
 
@@ -23,15 +23,15 @@ describe("the Landing Page's Markdown twin", () => {
 			[
 				"## For Operators: install and run the CLI",
 				"",
-				"- [CLI & Quickstart](https://docs.trajectonomics.com/cli.md): Install traj, then record your first transaction and read your balance.",
+				`- [CLI & Quickstart](${PORTAL_ORIGIN}/cli.md): Install traj, then record your first transaction and read your balance.`,
 				"",
 				"## For Contributors: help make the tax rules right",
 				"",
-				"- [Contribute](https://docs.trajectonomics.com/contribute.md): Report a wrong figure, add a tax year or a country, and check your change.",
+				`- [Contribute](${PORTAL_ORIGIN}/contribute.md): Report a wrong figure, add a tax year or a country, and check your change.`,
 				"",
 				"## Every page reads as Markdown",
 				"",
-				"- The Docs index: Every page once, in Tab order, with its description and Markdown URL. `https://docs.trajectonomics.com/llms.txt`",
+				`- The Docs index: Every page once, in Tab order, with its description and Markdown URL. \`${PORTAL_ORIGIN}/llms.txt\``,
 			].join("\n"),
 		)
 	})

@@ -1,8 +1,9 @@
 import { SITE_ORIGIN } from "../site"
 import { DOCS_BASE_PATH, DOCS_INDEX_PATH } from "../tabs"
+import { portalAsset } from "./built-files"
 
-/** Path of the Docs index in the build output, one segment below the assets root. */
-export const DOCS_INDEX_FILE = DOCS_INDEX_PATH.slice(1)
+/** Path of the Docs index in the build output, at the assets root. */
+export const DOCS_INDEX_FILE = portalAsset(DOCS_INDEX_PATH)
 
 /** One bullet of the built Docs index: the title it gives a page and the twin URL it links. */
 export interface DocsIndexEntry {

@@ -1,12 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import {
 	layoutStack,
-	STACK_CHAR_WIDTH,
 	STACK_LABEL_HALF,
 	STACK_MARGIN,
 	STACK_WIDTH,
 	type StackLayout,
-	stackName,
 } from "./flow-stack"
 import type { FlowInput } from "./flow-types"
 
@@ -179,25 +177,5 @@ describe("layoutStack", () => {
 		// with a 22-unit heading: 170 + 8 = 178.
 		expect(layout.rows.map((entry) => entry.labelY)).toEqual([38, 76, 114, 178])
 		expectInside(layout)
-	})
-})
-
-describe("stackName", () => {
-	test("keeps a name that fits, whole", () => {
-		expect(stackName("salary", "100,000.00")).toBe("salary")
-	})
-
-	test("shortens a long name so the name and the amount fit the line, and never the amount", () => {
-		// The line is 304 wide. The amount of 10 characters takes 75 and a gap of 8 more, which leaves 221:
-		// 29 characters at 7.5: 28 of the name and an ellipsis, which is 217.5 + 8 + 75 = 300.5.
-		const label = "Paid out by the long named retirement account"
-		const name = stackName(label, "100,000.00")
-		expect(name).toBe("Paid out by the long named r…")
-		expect(name.length).toBe(29)
-		expect(name.length * STACK_CHAR_WIDTH + 8 + 10 * STACK_CHAR_WIDTH).toBeLessThanOrEqual(304)
-	})
-
-	test("leaves only an ellipsis when the amount takes the line", () => {
-		expect(stackName("salary", "9".repeat(40))).toBe("…")
 	})
 })

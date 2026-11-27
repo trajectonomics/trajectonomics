@@ -1,8 +1,8 @@
 import { SITE_ORIGIN } from "./site"
 
 /**
- * The absolute canonical URL of a built page: the site origin plus the page's path, which always
- * ends in a slash because the build uses `trailingSlash: "always"`.
+ * The absolute canonical URL of a built page: the Site's origin plus the page's public path under
+ * `BLOG_BASE`, which always ends in a slash because the build uses `trailingSlash: "always"`.
  */
 export function canonicalUrl(pathname: string): string {
 	if (!pathname.startsWith("/")) {

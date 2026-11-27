@@ -14,7 +14,6 @@ let { scenario, editable }: Props = $props()
 
 <PageShell
 	title="Tax profile"
-	intro="What your plan assumes about you when it works out Thai personal income tax: your filing status, your family and what you paid in the tax year."
 >
 	{#snippet children(snapshot)}
 		<TaxSettingsBody {snapshot} {scenario} {editable} />

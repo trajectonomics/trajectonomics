@@ -2,6 +2,8 @@
 
 ## Status
 
+Superseded by [ADR 0004](0004-the-blog-is-served-under-the-sites-host.md), 2026-11-27.
+
 Accepted, 2026-11-22. Replaces the first version of this ADR (2026-11-21), which mounted the blog
 at `trajectonomics.com/blog` behind the router.
 

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test"
+import { DOCS_BASE_PATH } from "./src/lib/tabs"
 
 const PORT = 8787
 const BASE_URL = `http://127.0.0.1:${PORT}`
@@ -20,7 +21,7 @@ export default defineConfig({
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 	webServer: {
 		command: `bunx wrangler dev --ip 127.0.0.1 --port ${PORT}`,
-		url: `${BASE_URL}/cli/`,
+		url: `${BASE_URL}${DOCS_BASE_PATH}/cli/`,
 		reuseExistingServer: false,
 		timeout: 120_000,
 	},

@@ -7,7 +7,8 @@ import {
 	SHARE_IMAGE_URL,
 	SHARE_IMAGE_WIDTH,
 } from "../head-tags"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN, SITE_ORIGIN } from "../site"
+import { DOCS_BASE_PATH } from "../tabs"
 import type { BuiltFile } from "./built-files"
 import { checkBuild } from "./index"
 
@@ -21,7 +22,7 @@ function page(
 
 /** The pointer line every page with a twin carries before its content. */
 function pointer(twin: string): string {
-	return `<p>For AI agents: <a href="${twin}">Markdown</a> · <a href="/llms.txt">Docs index</a></p>`
+	return `<p>For AI agents: <a href="${twin}">Markdown</a> · <a href="${DOCS_BASE_PATH}/llms.txt">Docs index</a></p>`
 }
 
 /** The canonical link and share tags a built page's head states for its path and title. */
@@ -51,15 +52,15 @@ function alternate(twin: string): string {
 const OPERATOR_TAB_PAGE = [
 	'<html data-theme="dark"><head>',
 	`<title>CLI &amp; Quickstart</title>`,
-	shareTags("/cli/", "CLI &amp; Quickstart"),
-	alternate("/cli.md"),
+	shareTags(`${DOCS_BASE_PATH}/cli/`, "CLI &amp; Quickstart"),
+	alternate(`${DOCS_BASE_PATH}/cli.md`),
 	"</head><body>",
 	'<header id="nd-subnav">',
-	'<a href="/" aria-label="Trajectonomics Docs"><svg aria-hidden="true"></svg></a>',
-	'<a href="/cli/" aria-current="page">CLI &amp; Quickstart</a>',
-	'<a href="/contribute/">Contribute</a>',
+	`<a href="${DOCS_BASE_PATH}/" aria-label="Trajectonomics Docs"><svg aria-hidden="true"></svg></a>`,
+	`<a href="${DOCS_BASE_PATH}/cli/" aria-current="page">CLI &amp; Quickstart</a>`,
+	`<a href="${DOCS_BASE_PATH}/contribute/">Contribute</a>`,
 	"</header>",
-	`<aside id="nd-sidebar">${pointer("/cli.md")}<a href="/cli/">Quickstart</a></aside>`,
+	`<aside id="nd-sidebar">${pointer(`${DOCS_BASE_PATH}/cli.md`)}<a href="${DOCS_BASE_PATH}/cli/">Quickstart</a></aside>`,
 	"<main><h1>CLI &amp; Quickstart</h1></main>",
 	"</body></html>",
 ].join("")
@@ -69,14 +70,14 @@ const RELEASE_LINE = "Docs for traj 0.4.0"
 const LANDING_PAGE = [
 	'<html data-theme="dark"><head>',
 	"<title>Trajectonomics Docs</title>",
-	shareTags("/", "Trajectonomics Docs"),
-	alternate("/index.md"),
+	shareTags(`${DOCS_BASE_PATH}/`, "Trajectonomics Docs"),
+	alternate(`${DOCS_BASE_PATH}/index.md`),
 	"</head><body>",
-	'<header id="nd-nav"><a href="/" aria-label="Trajectonomics Docs"><svg></svg></a>',
-	'<a href="/llms.txt">Docs index</a></header>',
+	`<header id="nd-nav"><a href="${DOCS_BASE_PATH}/" aria-label="Trajectonomics Docs"><svg></svg></a>`,
+	`<a href="${DOCS_BASE_PATH}/llms.txt">Docs index</a></header>`,
 	"<main>",
-	'<a href="/cli/">For Operators: install and run the CLI</a>',
-	'<a href="/contribute/">For Contributors: help make the tax rules right</a>',
+	`<a href="${DOCS_BASE_PATH}/cli/">For Operators: install and run the CLI</a>`,
+	`<a href="${DOCS_BASE_PATH}/contribute/">For Contributors: help make the tax rules right</a>`,
 	`<p>${RELEASE_LINE}</p>`,
 	"<h1>Trajectonomics Docs</h1>",
 	"</main>",
@@ -86,10 +87,10 @@ const LANDING_PAGE = [
 const NOT_FOUND_PAGE = [
 	'<html data-theme="dark">',
 	'<header id="nd-nav">',
-	'<a href="/" aria-label="Trajectonomics Docs"><svg></svg></a>',
+	`<a href="${DOCS_BASE_PATH}/" aria-label="Trajectonomics Docs"><svg></svg></a>`,
 	'<button data-search-full=""></button>',
 	"</header>",
-	'<div id="portal-not-found"><h1>Page not found</h1><a href="/">Docs Portal</a></div>',
+	`<div id="portal-not-found"><h1>Page not found</h1><a href="${DOCS_BASE_PATH}/">Docs Portal</a></div>`,
 	"</html>",
 ].join("")
 
@@ -104,9 +105,9 @@ function alias(path: string, target: string): BuiltFile {
 const SITEMAP = [
 	'<?xml version="1.0" encoding="UTF-8"?>',
 	'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-	`  <url><loc>${SITE_ORIGIN}/</loc></url>`,
-	`  <url><loc>${SITE_ORIGIN}/cli/</loc></url>`,
-	`  <url><loc>${SITE_ORIGIN}/cli/commands/tx/</loc></url>`,
+	`  <url><loc>${PORTAL_ORIGIN}/</loc></url>`,
+	`  <url><loc>${PORTAL_ORIGIN}/cli/</loc></url>`,
+	`  <url><loc>${PORTAL_ORIGIN}/cli/commands/tx/</loc></url>`,
 	"</urlset>",
 ].join("\n")
 
@@ -116,9 +117,9 @@ const DOCS_INDEX: BuiltFile = {
 	content: [
 		"# Trajectonomics Docs",
 		"",
-		`- [Trajectonomics Docs](${SITE_ORIGIN}/index.md): Documentation for running the CLI.`,
-		`- [CLI & Quickstart](${SITE_ORIGIN}/cli.md): Install traj.`,
-		`- [tx](${SITE_ORIGIN}/cli/commands/tx.md): Manage ledger transactions.`,
+		`- [Trajectonomics Docs](${PORTAL_ORIGIN}/index.md): Documentation for running the CLI.`,
+		`- [CLI & Quickstart](${PORTAL_ORIGIN}/cli.md): Install traj.`,
+		`- [tx](${PORTAL_ORIGIN}/cli/commands/tx.md): Manage ledger transactions.`,
 		"",
 	].join("\n"),
 }
@@ -135,9 +136,9 @@ function twin(path: string, title: string): BuiltFile {
 
 const COMPLETE_BUILD: readonly BuiltFile[] = [
 	page("404.html", NOT_FOUND_PAGE),
-	alias("operators/index.html", "/cli/"),
-	alias("contributors/index.html", "/contribute/"),
-	alias("builders/index.html", "/contribute/"),
+	alias("operators/index.html", "/docs/cli/"),
+	alias("contributors/index.html", "/docs/contribute/"),
+	alias("builders/index.html", "/docs/contribute/"),
 	page("index.html", LANDING_PAGE),
 	page("cli/index.html", OPERATOR_TAB_PAGE),
 	page(
@@ -145,11 +146,11 @@ const COMPLETE_BUILD: readonly BuiltFile[] = [
 		[
 			'<html data-theme="dark"><head>',
 			"<title>tx</title>",
-			shareTags("/cli/commands/tx/", "tx"),
-			alternate("/cli/commands/tx.md"),
+			shareTags(`${DOCS_BASE_PATH}/cli/commands/tx/`, "tx"),
+			alternate(`${DOCS_BASE_PATH}/cli/commands/tx.md`),
 			"</head><body>",
-			'<header id="nd-subnav"><a href="/" aria-label="Trajectonomics Docs"><svg></svg></a></header>',
-			pointer("/cli/commands/tx.md"),
+			`<header id="nd-subnav"><a href="${DOCS_BASE_PATH}/" aria-label="Trajectonomics Docs"><svg></svg></a></header>`,
+			pointer(`${DOCS_BASE_PATH}/cli/commands/tx.md`),
 			"<main><h1>tx</h1>",
 			"<pre><code>date,from,to,amount,memo,external_ref,project</code></pre>",
 			"</main>",
@@ -166,12 +167,12 @@ const COMPLETE_BUILD: readonly BuiltFile[] = [
 		content: JSON.stringify({
 			type: "advanced",
 			internalDocumentIDStore: {
-				internalIdToId: ["/cli", "/cli/commands/tx"],
+				internalIdToId: ["/docs/cli", "/docs/cli/commands/tx"],
 			},
 			docs: {
 				docs: {
-					"1": { page_id: "/cli", type: "page" },
-					"2": { page_id: "/cli/commands/tx", type: "page" },
+					"1": { page_id: "/docs/cli", type: "page" },
+					"2": { page_id: "/docs/cli/commands/tx", type: "page" },
 				},
 			},
 		}),
@@ -196,7 +197,7 @@ describe("the check of the built Docs Portal", () => {
 	})
 
 	test("a build that breaks several rules reports every failed rule, not only the first", () => {
-		const stale: BuiltFile = { path: "_redirects", content: "/docs /cli/ 302\n" }
+		const stale: BuiltFile = { path: "_redirects", content: "/docs /docs/cli/ 302\n" }
 
 		expect(checkBuild([stale], RELEASE_LINE).map((failure) => failure.code)).toEqual([
 			"NOT_FOUND_PAGE_MISSING",

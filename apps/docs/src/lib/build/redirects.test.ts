@@ -20,19 +20,19 @@ describe("the built redirect rules", () => {
 	})
 
 	test("comments and blank lines are not rules", () => {
-		expect(codesOf("# /old /cli/ 302\n\n")).toEqual([])
+		expect(codesOf("# /old /docs/cli/ 302\n\n")).toEqual([])
 	})
 
 	test("a rule that sends readers to the Operator tab is reported as REDIRECT_TO_OPERATOR_TAB", () => {
-		expect(codesOf("/old /cli/ 302\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
+		expect(codesOf("/old /docs/cli/ 302\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
 	})
 
 	test("the Operator tab without its trailing slash is the same target", () => {
-		expect(codesOf("/ /cli 301\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
+		expect(codesOf("/ /docs/cli 301\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
 	})
 
 	test("every rule that targets the Operator tab is reported, not only the first", () => {
-		expect(codesOf("/old /cli/ 302\n/also /cli/ 302\n")).toEqual([
+		expect(codesOf("/old /docs/cli/ 302\n/also /docs/cli/ 302\n")).toEqual([
 			"REDIRECT_TO_OPERATOR_TAB",
 			"REDIRECT_TO_OPERATOR_TAB",
 		])

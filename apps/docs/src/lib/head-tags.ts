@@ -4,10 +4,10 @@
  */
 
 import { PORTAL_NAME, PORTAL_PURPOSE } from "./portal"
-import { APEX_ORIGIN, pageUrl } from "./site"
+import { pageUrl, SITE_ORIGIN } from "./site"
 
-/** The Site's social image, shared with the Docs Portal so a share looks the same on both hosts. */
-export const SHARE_IMAGE_URL = `${APEX_ORIGIN}/og/en.png`
+/** The Site's social image, shared with the Docs Portal so a share looks the same on both surfaces. */
+export const SHARE_IMAGE_URL = `${SITE_ORIGIN}/og/en.png`
 
 /** The share image's size and type, as the Site's own share image declares them. */
 export const SHARE_IMAGE_WIDTH = 1200

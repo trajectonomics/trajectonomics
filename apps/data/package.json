@@ -1,7 +1,7 @@
 {
 	"name": "@trajectonomics/data",
 	"version": "0.0.0-development",
-	"description": "The data site at data.trajectonomics.com: static Astro pages with Svelte islands, an hourly usage ingest into D1, and cached daily rollups. Never published to npm.",
+	"description": "The data site at trajectonomics.com/data/: static Astro pages with Svelte islands, an hourly usage ingest into D1, and cached daily rollups. Never published to npm.",
 	"license": "MIT",
 	"type": "module",
 	"private": true,

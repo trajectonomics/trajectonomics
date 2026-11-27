@@ -3,9 +3,12 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { OverviewState } from "../client/overview.svelte"
 import { freshness } from "../lib/freshness"
+import { planTotals } from "../lib/plan-totals"
 import { readAsOf } from "../lib/query"
 import { chartSeries } from "../lib/series"
+import { DATA_PATH } from "../lib/site"
 import { usageTable } from "../lib/table"
+import PlanSummary from "./PlanSummary.svelte"
 import UsageChart from "./UsageChart.svelte"
 import UsageTable from "./UsageTable.svelte"
 
@@ -20,6 +23,7 @@ const series = $derived(
 	state.usage === null || days === null ? [] : chartSeries(state.usage.rows, days.days),
 )
 const rows = $derived(state.usage === null ? [] : usageTable(state.usage.rows))
+const totals = $derived(state.usage === null ? [] : planTotals(state.usage.rows))
 const fresh = $derived(state.health === null ? null : freshness(state.health))
 </script>
 
@@ -40,7 +44,7 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 	{#if state.requestedAsOf !== null && state.usage !== null}
 		<p class="as-of">
 			<span>As of {state.requestedAsOf} · method v{state.usage.methodVersion}</span>
-			<a href="/">Live view</a>
+			<a href={DATA_PATH}>Live view</a>
 		</p>
 	{/if}
 
@@ -59,6 +63,10 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 			<button class="retry-button" type="button" onclick={() => void state.load()}>Retry</button>
 		</div>
 	{:else if days !== null}
+		<section class="section-block" aria-labelledby="plans-title">
+			<h2 id="plans-title" class="meta-label section-title">Tokens per plan</h2>
+			<PlanSummary {totals} from={days.from} to={days.to} />
+		</section>
 		<section class="section-block" aria-labelledby="chart-title">
 			<h2 id="chart-title" class="meta-label section-title">Tokens per day</h2>
 			<UsageChart {series} from={days.from} to={days.to} />

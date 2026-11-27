@@ -2,14 +2,14 @@ import { SITE_ORIGIN } from "../site"
 import { sitemapLocations } from "../sitemap"
 import { SITEMAP_PATH } from "../tabs"
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import { duplicates } from "./duplicates"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { readerPages } from "./reader-pages"
 
-/** Path of the Sitemap in the build output, one segment below the assets root. */
-export const SITEMAP_FILE = SITEMAP_PATH.slice(1)
+/** Path of the Sitemap in the build output, at the assets root under /docs (ADR 0017). */
+export const SITEMAP_FILE = portalAsset(SITEMAP_PATH)
 
 /** One `<loc>` of the built Sitemap: the URL as written, and the page path it names when on the origin. */
 interface ListedUrl {

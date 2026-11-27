@@ -147,16 +147,16 @@ describe("the Dictionary of every Language", () => {
 
 	it("keeps the document title and the description the owner approved, in every Language", () => {
 		expect(dictionaryFor("en").documentTitle).toBe(
-			"traj — free, open-source financial simulation for AI agents",
+			"Trajectonomics — traj: financial simulation for AI agents",
 		)
 		expect(dictionaryFor("en").description).toBe(
-			"traj is a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement and project your finances with no account.",
+			"Trajectonomics makes traj, a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement with no account.",
 		)
 		expect(dictionaryFor("th").documentTitle).toBe(
-			"traj — เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent",
+			"Trajectonomics — traj เครื่องมือจำลองการเงินสำหรับ AI agent",
 		)
 		expect(dictionaryFor("th").description).toBe(
-			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
+			"Trajectonomics สร้าง traj เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
 		)
 	})
 
@@ -171,6 +171,20 @@ describe("the Dictionary of every Language", () => {
 				language: entry.language,
 				description: true,
 			})
+		}
+	})
+
+	it("names Trajectonomics first in the document title and the description of every Language", () => {
+		for (const entry of LANGUAGES) {
+			const { documentTitle, description } = entry.dictionary
+			expect({
+				language: entry.language,
+				title: documentTitle.startsWith("Trajectonomics — "),
+			}).toEqual({ language: entry.language, title: true })
+			expect({
+				language: entry.language,
+				description: description.startsWith("Trajectonomics "),
+			}).toEqual({ language: entry.language, description: true })
 		}
 	})
 

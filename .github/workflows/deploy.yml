@@ -3,10 +3,12 @@ name: Deploy
 # Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs), the
 # blog (worker "blog", apps/blog), the data Worker (worker "data", apps/data) and OpenJot's download
 # and comparison Worker (worker "moojot-site", apps/openjot/site) to Cloudflare Workers from main.
-# The docs Worker attaches docs.trajectonomics.com, the blog Worker attaches
-# blog.trajectonomics.com, the data Worker attaches data.trajectonomics.com, and the OpenJot Worker
-# attaches openjot.trajectonomics.com (and redirects moojot.trajectonomics.com to it). The router
-# still forwards trajectonomics.com/docs so the docs Worker can redirect it.
+# Every static site is served under one host: the Site at trajectonomics.com (with OpenJot's page at
+# /openjot), the docs at /docs, the blog at /blog and the data site at /data. The Site owns the apex
+# as a Custom Domain; the docs, blog and data Workers declare zone routes for their paths and keep
+# their old subdomains for redirects. The OpenJot Worker declares zone routes for its short links,
+# API, analytics proxy and comparison page under /openjot, and keeps openjot.trajectonomics.com and
+# moojot.trajectonomics.com only to redirect (and to relay /ingest). There is no router.
 # docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared

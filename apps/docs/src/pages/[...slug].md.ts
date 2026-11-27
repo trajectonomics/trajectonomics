@@ -1,5 +1,5 @@
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from "astro"
-import { buildMarkdownTwin, pageWords, portalOrigin, runBuildStep } from "../lib/agent"
+import { buildMarkdownTwin, pageWords, runBuildStep, siteOrigin } from "../lib/agent"
 import { source } from "../lib/source"
 
 export const prerender = true
@@ -26,7 +26,7 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>
 /** One page's Markdown twin at `<page>.md`, from its authored source. */
 export const GET: APIRoute = async ({ props, site }) => {
 	const { page } = props as Props
-	const twin = await runBuildStep(() => twinOf(page, portalOrigin(site)))
+	const twin = await runBuildStep(() => twinOf(page, siteOrigin(site)))
 	return new Response(twin, {
 		headers: { "content-type": "text/markdown; charset=utf-8" },
 	})

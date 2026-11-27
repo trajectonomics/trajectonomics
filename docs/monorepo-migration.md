@@ -5,6 +5,8 @@ Bun workspace, keeping each repo's git history, its npm package names, and its C
 
 Status: **done on 2026-11-21.** The 12 repos are in this repository (PRs #1–#15), `traj` 0.4.0 shipped from here, the site and the docs deploy from CI (`docs/runbooks/deploy.md`), the old install commands forward here, and the old repositories are archived, each pointing at its folder. Follow-ups: publishing the customer skills from here (#16) and the site's star menu (#17).
 
+On 2026-11-27 `web-router` was retired and its Worker is not deployed: every static site is served under `trajectonomics.com` ([ADR 0033](../apps/site/docs/adr/0033-one-host-serves-the-site-docs-blog-and-data.md)). The router references below describe the migration as it was.
+
 ## 0. Why this is cheaper than it looks
 
 Every repo already uses the same stack: `bun@1.4.4`, Biome 2.6.3, TypeScript 7, tsdown, the

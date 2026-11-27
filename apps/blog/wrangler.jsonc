@@ -1,13 +1,21 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "blog",
+	"main": "src/worker.ts",
 	"compatibility_date": "2026-11-01",
 	"workers_dev": false,
-	// Static Assets only: no "main", so no script runs (ADR 0002). One Worker serves every collection.
-	// The Worker owns blog.trajectonomics.com and attaches it on deploy, as the Docs Portal does.
-	"routes": [{ "pattern": "blog.trajectonomics.com", "custom_domain": true }],
+	// The Site's /blog/ path wins over its apex Custom Domain (Workers > Routes), and the old host
+	// stays attached as a Custom Domain so its requests reach the Worker and get the 301 (ADR 0004).
+	"routes": [
+		{ "pattern": "trajectonomics.com/blog*", "zone_name": "trajectonomics.com" },
+		{ "pattern": "blog.trajectonomics.com", "custom_domain": true }
+	],
 	"assets": {
+		// The build stays at ./dist; base_path serves its root under /blog/. Only requests outside it
+		// (the old host) run the Worker; a miss inside it gets the 404 page (ADR 0004).
 		"directory": "./dist",
+		"binding": "ASSETS",
+		"base_path": "/blog",
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"
 	}
