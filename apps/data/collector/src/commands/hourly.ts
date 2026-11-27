@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import { parseHostsConfig } from "../hourly/config"
@@ -58,7 +58,10 @@ function readCursor(stateDir: string, name: string): string | null {
 
 function writeCursor(stateDir: string, name: string, iso: string): void {
 	mkdirSync(stateDir, { recursive: true })
-	writeFileSync(cursorPath(stateDir, name), `${iso}\n`, { mode: 0o600 })
+	const path = cursorPath(stateDir, name)
+	const temporary = `${path}.${process.pid}.tmp`
+	writeFileSync(temporary, `${iso}\n`, { mode: 0o600 })
+	renameSync(temporary, path)
 }
 
 /** Runs every host's collector, sends the rows, and advances the accepted cursors. */

@@ -92,12 +92,9 @@ describe("runHourly", () => {
 		expect(cursors.writes).toEqual([{ name: "beta", iso: "2026-11-27T10:00:00.000Z" }])
 		expect(logs.some((line) => line.includes("alpha") && line.includes("exited"))).toBe(true)
 		const betaCall = calls.find((argv) => argv[0] === "ssh")
-		expect(betaCall?.slice(0, 6)).toEqual([
-			"ssh",
-			"-o",
-			"BatchMode=yes",
-			"-o",
-			"ConnectTimeout=10",
+		expect(betaCall?.slice(0, 2)).toEqual(["ssh", "-o"])
+		expect(betaCall?.slice(betaCall.indexOf("--"), betaCall.indexOf("--") + 2)).toEqual([
+			"--",
 			"beta-synthetic",
 		])
 		expect(betaCall).toContain(new Date(NOW - 7 * DAY_MS).toISOString())
@@ -120,8 +117,7 @@ describe("runHourly", () => {
 		const report = await runHourly({ hosts: [ALPHA, BETA] }, deps)
 
 		expect(report).toEqual({ ok: true, failedHosts: [], sendOk: true })
-		expect(sent[0]).toHaveLength(3)
-		expect(sent[0]?.[1]).toEqual(quota)
+		expect(sent).toEqual([[alphaRow, quota], [betaRow]])
 		expect(cursors.writes).toEqual([
 			{ name: "alpha", iso: "2026-11-27T09:00:00.000Z" },
 			{ name: "beta", iso: "2026-11-27T11:00:00.000Z" },
@@ -156,8 +152,48 @@ describe("runHourly", () => {
 		const report = await runHourly({ hosts: [ALPHA] }, deps)
 
 		expect(report).toEqual({ ok: false, failedHosts: ["alpha"], sendOk: true })
-		expect(sent).toEqual([[]])
+		expect(sent).toEqual([])
 		expect(cursors.writes).toEqual([])
 		expect(logs.some((line) => line.includes("could not run"))).toBe(true)
+	})
+
+	test("a rejected host does not hold back another host", async () => {
+		const alphaRow = usageRow({ hourUtc: "2026-11-27T09:00:00.000Z" })
+		const betaRow = usageRow({ model: "claude-beta", hourUtc: "2026-11-27T11:00:00.000Z" })
+		const { spawn } = makeSpawner((argv) =>
+			argv[0] === "ssh"
+				? { exitCode: 0, stdout: JSON.stringify(betaRow) }
+				: { exitCode: 0, stdout: JSON.stringify(alphaRow) },
+		)
+		const send = async (rows: readonly IngestRow[]): Promise<SendReport> => {
+			const ok = rows.includes(betaRow)
+			return { ok, batches: [{ rows: [...rows], ok }] }
+		}
+		const cursors = makeCursors()
+		const { deps } = makeDeps(spawn, send, cursors)
+		const report = await runHourly({ hosts: [{ ...ALPHA, quota: false }, BETA] }, deps)
+
+		expect(report.sendOk).toBe(false)
+		expect(cursors.writes).toEqual([{ name: "beta", iso: "2026-11-27T11:00:00.000Z" }])
+	})
+
+	test("marks a host failed when its cursor cannot be written", async () => {
+		const betaRow = usageRow({ hourUtc: "2026-11-27T10:00:00.000Z" })
+		const { spawn } = makeSpawner(() => ({ exitCode: 0, stdout: JSON.stringify(betaRow) }))
+		const { send } = acceptingSend()
+		const cursors = makeCursors()
+		const { deps, logs } = makeDeps(spawn, send, cursors)
+		const report = await runHourly(
+			{ hosts: [BETA] },
+			{
+				...deps,
+				writeCursor: () => {
+					throw new Error("synthetic disk full")
+				},
+			},
+		)
+
+		expect(report).toEqual({ ok: false, failedHosts: ["beta"], sendOk: true })
+		expect(logs.some((line) => line.includes("cursor not written"))).toBe(true)
 	})
 })

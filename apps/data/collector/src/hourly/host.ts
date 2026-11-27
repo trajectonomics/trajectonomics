@@ -12,7 +12,20 @@ function cliPath(host: HostConfig): string {
 export function hostArgv(host: HostConfig, args: readonly string[]): string[] {
 	const command = [host.bun, cliPath(host), ...args]
 	if (host.ssh === null) return command
-	return ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", host.ssh, ...command]
+	return [
+		"ssh",
+		"-o",
+		"BatchMode=yes",
+		"-o",
+		"ConnectTimeout=10",
+		"-o",
+		"ServerAliveInterval=15",
+		"-o",
+		"ServerAliveCountMax=3",
+		"--",
+		host.ssh,
+		...command,
+	]
 }
 
 /** The argv that reads a host's usage since the cursor overlap. */

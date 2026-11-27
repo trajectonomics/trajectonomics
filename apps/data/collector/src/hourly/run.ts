@@ -64,36 +64,40 @@ function acceptedRows(report: SendReport): Set<IngestRow> {
 	return accepted
 }
 
+/** Advances a host's cursor when all its rows were accepted; false when the write failed. */
 function advanceHost(
 	host: HostConfig,
 	rows: readonly IngestRow[],
 	accepted: ReadonlySet<IngestRow>,
 	deps: HourlyDeps,
-): void {
+): boolean {
 	if (!rows.every((row) => accepted.has(row))) {
 		deps.log(`hourly: ${host.name}: rows were not accepted, cursor unchanged`)
-		return
+		return true
 	}
 	const latest = latestUsageHour(rows)
-	if (latest !== null) deps.writeCursor(host.name, latest)
+	if (latest === null) return true
+	try {
+		deps.writeCursor(host.name, latest)
+		return true
+	} catch (error) {
+		deps.log(`hourly: ${host.name}: cursor not written: ${errorMessage(error)}`)
+		return false
+	}
 }
 
-function advanceCursors(
-	collected: readonly Collected[],
-	report: SendReport,
-	deps: HourlyDeps,
-): void {
-	const accepted = acceptedRows(report)
-	for (const { host, rows } of collected) advanceHost(host, rows, accepted, deps)
-}
-
-/** Collects every host, sends all rows, and advances only the accepted hosts' cursors. */
+/**
+ * Collects every host, then sends each host's rows on their own, so a row the Worker rejects only
+ * holds back the host it came from. Only a host whose rows were all accepted moves its cursor.
+ */
 export async function runHourly(config: HourlyConfig, deps: HourlyDeps): Promise<HourlyReport> {
 	const { collected, failed } = await collectAll(config, deps)
-	const report = await sendAll(
-		collected.flatMap((entry) => entry.rows),
-		deps,
-	)
-	advanceCursors(collected, report, deps)
-	return { ok: failed.length === 0 && report.ok, failedHosts: failed, sendOk: report.ok }
+	let sendOk = true
+	for (const { host, rows } of collected) {
+		if (rows.length === 0) continue
+		const report = await sendAll(rows, deps)
+		if (!report.ok) sendOk = false
+		if (!advanceHost(host, rows, acceptedRows(report), deps)) failed.push(host.name)
+	}
+	return { ok: failed.length === 0 && sendOk, failedHosts: failed, sendOk }
 }
