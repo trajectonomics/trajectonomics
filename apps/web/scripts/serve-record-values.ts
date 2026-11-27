@@ -5,7 +5,8 @@ import { accountValues, type Snapshot } from "../src/lib/contract"
 import { writeCommand } from "../src/lib/edit/edit"
 import { type RecordValuesEdit, unknownAccountIds } from "../src/lib/edit/record-values"
 import { type RunContext, runTraj } from "./run-traj"
-import { answerOf, answerPreview, failure } from "./serve-edit-answer"
+import { answerPreview, failure } from "./serve-edit-answer"
+import { answerOf } from "./serve-snapshot-answer"
 import type { SnapshotRun } from "./snapshot-run"
 
 /** What the run needs: how to run traj, the Snapshot the page reads, and how to read it again. */
@@ -44,5 +45,5 @@ export async function recordValues(
 	if (edit.preview) return answerPreview(dry.data)
 	const real = await write(run, edit, false)
 	if (!real.ok) return failure(200, real.error)
-	return answerOf(await run.refresh(), real.data)
+	return answerOf(await run.refresh(), { result: real.data })
 }

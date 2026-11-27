@@ -32,9 +32,9 @@ type Dropped = {
 	readonly droppedOwners: readonly string[]
 }
 
-/** What one Edit's run came to: it ran (with what the write dropped), or the error that stopped it. */
+/** What one Edit's run came to: it ran (with what the write dropped and whether it replaced a plan of its name), or the error that stopped it. */
 export type EditRun =
-	| ({ readonly ok: true } & Dropped)
+	| ({ readonly ok: true; readonly replaced: boolean } & Dropped)
 	| { readonly ok: false; readonly error: ErrorBody }
 
 /** The exit code `traj` gives a taken name (cli ADR-0021: a conflict with what the ledger holds). */
@@ -97,10 +97,10 @@ export async function runEdit(context: RunContext, edit: Edit): Promise<EditRun>
 	if (startsPlan(edit) && !wasCreated(dry.data)) return stopped(nameTaken(edit.name))
 	const real = await run(false)
 	if (!real.ok) return stopped(real.error)
-	// A plan of the name made between the dry run and this write (a window of milliseconds) is replaced: say so, as the write is done.
-	if (startsPlan(edit) && !wasCreated(real.data)) {
-		const message = `A plan named ${edit.name} was made while this ran, and this write replaced it.`
-		return stopped({ ...nameTaken(edit.name), message })
+	// A plan of the name made between the dry run and this write (a window of milliseconds) is replaced: the write is done, so it ran, and says so.
+	return {
+		ok: true,
+		replaced: startsPlan(edit) && !wasCreated(real.data),
+		...droppedOf(real.data),
 	}
-	return { ok: true, ...droppedOf(real.data) }
 }

@@ -5,7 +5,7 @@ import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import type { PlanParams } from "../src/lib/snapshot"
 import { handDocument } from "./allowances-document.test-support"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
@@ -56,7 +56,7 @@ export function storedPlan(name = PLAN): { hash: string; document: ScenarioDocum
 export async function setupAllowances(): Promise<Editor> {
 	scratch = await makeScratch("traj-web-allowances-")
 	home = join(scratch, "traj-home")
-	await buildDemoLedger({ binary: BINARY, home, scratch })
+	await copyDemoLedger({ binary: BINARY, home, scratch })
 	const document = handDocument(storedPlan("base").document, AS_OF)
 	traj(["scenario", "apply", PLAN, "--file", "-", "--decimal", "--json"], document)
 	traj([

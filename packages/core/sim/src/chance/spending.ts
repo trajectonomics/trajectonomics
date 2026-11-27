@@ -2,7 +2,7 @@ import type { Period } from "../output/periods"
 import type { MinorUnits } from "../types"
 import type { ChanceLowestYear, ChanceSpending, ChanceSpendingBand } from "../types/chance"
 import { percentiles } from "./band"
-import type { PathOutcome } from "./path"
+import type { PathOutcome } from "./path-outcome"
 import { ascending } from "./rank"
 
 /** The nearest-rank Percentiles of what the rule Flows paid across every Market path in one roll-up. */

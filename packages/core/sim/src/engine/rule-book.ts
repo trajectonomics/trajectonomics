@@ -1,4 +1,5 @@
-import type { BasisPoints, DateString, Flow, RuleAction, RuledAmount, Scenario } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { DateString, Flow, RuleAction, RuledAmount, Scenario } from "../types"
 import { isRuled } from "../types"
 import { isSafeInteger } from "./overflow"
 import { currentYear, type Fixed, guardrailsYear, initialYear, type YearInput } from "./rule-year"
@@ -73,7 +74,7 @@ function fix(flow: RuledFlow, input: YearInput): Fixed {
 
 /** The Account reader and inflation a Rule year is fixed with. */
 export interface RuleReads {
-	readonly inflation: BasisPoints
+	readonly inflation: Inflation
 	readonly readAccount: (accountId: string) => bigint
 }
 

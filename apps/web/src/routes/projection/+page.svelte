@@ -17,4 +17,6 @@ import { editsShown } from "../../lib/edit/shown"
 	onTerms={(value) => setQueryParam("terms", value)}
 	chart={queryParam("chart", "")}
 	onChart={(id) => setQueryParam("chart", id)}
+	items={queryParam("items", "income")}
+	onItems={(value) => setQueryParam("items", value)}
 />

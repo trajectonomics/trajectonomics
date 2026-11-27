@@ -5,7 +5,7 @@ import { writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
 import { AS_OF, handDocument } from "./withdrawals-document.test-support"
@@ -58,7 +58,7 @@ export function accountIds(): { bank: string; fund: string } {
 export async function setupWithdrawals(): Promise<Editor> {
 	scratch = await makeScratch("traj-web-withdrawals-")
 	home = join(scratch, "traj-home")
-	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
+	const demo = await copyDemoLedger({ binary: BINARY, home, scratch })
 	const base = storedPlan("base").document
 	const [bank, fund] = base.accounts
 	if (bank === undefined || fund === undefined) throw new Error("the demo plan has its accounts")
