@@ -7,6 +7,7 @@ import type {
 	TaxProfile,
 	TaxYear,
 } from "../../lib/contract"
+import { householdHashOf } from "../../lib/contract/household-hash.test-support"
 import { personNames } from "../../lib/view/item-names"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { plainYear } from "../../lib/view/tax/brackets.test-support"
@@ -88,7 +89,7 @@ function show(
 		id: "id",
 		name: "base",
 		contentHash: HASH,
-		householdHash: HASH,
+		householdHash: householdHashOf(HASH),
 		forkedFrom: null,
 		version: 1,
 		createdAt: "2026-11-01T00:00:00Z",

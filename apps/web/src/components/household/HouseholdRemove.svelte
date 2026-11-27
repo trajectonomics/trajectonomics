@@ -1,12 +1,15 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { removeHousehold as removeHouseholdEdit } from "../../client/household-save.js"
+import {
+	type HouseholdHash,
+	removeHousehold as removeHouseholdEdit,
+} from "../../client/household-save.js"
 
 interface Props {
 	/** The Scenario whose household is removed. */
 	name: string
 	/** The hash of the document and household the page read (cli ADR 0055). */
-	householdHash: string
+	householdHash: HouseholdHash
 }
 
 let { name, householdHash }: Props = $props()

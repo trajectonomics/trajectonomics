@@ -2,10 +2,11 @@ import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:tes
 import { render } from "svelte/server"
 import { snapshotLoader } from "../../client/browser"
 import { editSession } from "../../client/edit.svelte.js"
-import { saveHousehold } from "../../client/household-save.js"
+import { removeHousehold, saveHousehold } from "../../client/household-save.js"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
 import { RAN } from "../../client/what-if.test-support"
 import type { HouseholdDocument, ScenarioShow, Snapshot } from "../../lib/contract"
+import { householdHashOf } from "../../lib/contract/household-hash.test-support"
 import { householdWithPerson } from "../../lib/view/household/document"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { LOADING } from "../../lib/view/state"
@@ -41,7 +42,6 @@ beforeEach(() => replaceSnapshot(withHousehold(household)))
 afterAll(() => snapshotLoader.replace(LOADING))
 
 const HOUSEHOLD_HASH = `jcs1:sha256:${"01".repeat(32)}`
-const CONTENT_HASH = `jcs1:sha256:${"02".repeat(32)}`
 
 /** The Demo's base read with the hashes apart, and a contentHash the household UI must not read (cli ADR 0055). */
 function splitHashes(): { snapshot: Snapshot; read: ScenarioShow["scenario"] } {
@@ -50,7 +50,7 @@ function splitHashes(): { snapshot: Snapshot; read: ScenarioShow["scenario"] } {
 	const scenario: ScenarioShow["scenario"] = {
 		...read.data.scenario,
 		household,
-		householdHash: HOUSEHOLD_HASH,
+		householdHash: householdHashOf(HOUSEHOLD_HASH),
 	}
 	Object.defineProperty(scenario, "contentHash", {
 		get() {
@@ -67,7 +67,9 @@ function card(options: { household?: HouseholdDocument | null; editable?: boolea
 			name: "base",
 			doc: planDocument(),
 			household: options.household === undefined ? household : options.household,
-			householdHash: "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			householdHash: householdHashOf(
+				"jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			),
 			editable: options.editable ?? true,
 		},
 	}).body
@@ -174,6 +176,11 @@ describe("the household card", () => {
 				household: next,
 			},
 		])
-		expect((sent[0] as { householdHash: string }).householdHash).not.toBe(CONTENT_HASH)
+		await removeHousehold("base", read.householdHash)
+		expect(sent[1]).toEqual({
+			kind: "remove-household",
+			name: "base",
+			householdHash: read.householdHash,
+		})
 	})
 })

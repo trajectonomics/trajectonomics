@@ -4,6 +4,7 @@ import { editSession } from "../../client/edit.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { fakeServer, HASH, useSessionHooks } from "../../client/what-if.test-support"
 import type { ScenarioDocument, ScenarioShow, TaxProfile } from "../../lib/contract"
+import { householdHashOf } from "../../lib/contract/household-hash.test-support"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import TaxDrawer from "./TaxDrawer.svelte"
@@ -39,7 +40,7 @@ const show = (document: ScenarioDocument): ScenarioShow["scenario"] => ({
 	id: "id",
 	name: "base",
 	contentHash: HASH,
-	householdHash: HASH,
+	householdHash: householdHashOf(HASH),
 	forkedFrom: null,
 	version: 1,
 	createdAt: "2026-11-01T00:00:00Z",

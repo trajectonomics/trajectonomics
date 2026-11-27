@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { HASH } from "../../client/what-if.test-support"
 import type { ScenarioShow } from "../../lib/contract"
+import { householdHashOf } from "../../lib/contract/household-hash.test-support"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import TaxProfileCard from "./TaxProfileCard.svelte"
 import { NOT_STATED } from "./tax-not-stated.test-support"
@@ -12,7 +13,7 @@ const show = (
 	id: "id",
 	name: "base",
 	contentHash: HASH,
-	householdHash: HASH,
+	householdHash: householdHashOf(HASH),
 	forkedFrom: null,
 	version: 1,
 	createdAt: "2026-11-01T00:00:00Z",

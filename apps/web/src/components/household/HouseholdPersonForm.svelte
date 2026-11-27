@@ -1,6 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { saveHousehold } from "../../client/household-save.js"
+import { type HouseholdHash, saveHousehold } from "../../client/household-save.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, HouseholdPerson } from "../../lib/contract"
 import { householdWithoutPerson, householdWithPerson } from "../../lib/view/household/document"
@@ -18,7 +18,7 @@ interface Props {
 	/** The household as it is now, or null when there is none yet. */
 	household: HouseholdDocument | null
 	/** The hash of the document and household the page read, which every Edit to it names (cli ADR 0055). */
-	householdHash: string
+	householdHash: HouseholdHash
 	/** The person to edit; absent for a new one. */
 	existing?: HouseholdPerson | undefined
 	/** Runs once the Edit has run, so the drawer closes. */

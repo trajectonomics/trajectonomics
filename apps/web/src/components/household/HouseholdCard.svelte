@@ -1,6 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { saveHousehold } from "../../client/household-save.js"
+import { type HouseholdHash, saveHousehold } from "../../client/household-save.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, ScenarioDocument } from "../../lib/contract"
 import { householdWithoutAnchor } from "../../lib/view/household/document"
@@ -21,7 +21,7 @@ interface Props {
 	doc: ScenarioDocument
 	household: HouseholdDocument | null
 	/** The hash of the document and household the page read, which every Edit to them names (cli ADR 0055). */
-	householdHash: string
+	householdHash: HouseholdHash
 	/** Whether the controls show: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
 }
