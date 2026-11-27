@@ -8,10 +8,11 @@
  */
 import { getSessionFromCtx } from "better-auth/api"
 import { grantLifetimeRejection } from "../core/resource-request"
-import { deleteConsentRow, deletePendingAuthorizationCodes, deleteTokenFamily } from "./family"
+import { deleteConsentRow, deleteTokenFamily } from "./family"
 import { hookNow, type OAuthHookOptions } from "./request"
 import { findConsents, type StoredConsent } from "./store"
 import { asDate } from "./values"
+import { deletePendingAuthorizationCodes } from "./verification-sql"
 
 /** True when the consent is past the grant's absolute lifetime, or has no readable approval. */
 export function consentExpired(
@@ -77,5 +78,5 @@ async function expireSignedInConsent(
 	if (live.length > 0) return
 	if (rows.length === 0 && !cleanupWhenAbsent) return
 	await deleteTokenFamily(ctx, owner)
-	await deletePendingAuthorizationCodes(ctx, owner)
+	await deletePendingAuthorizationCodes(options.database, owner)
 }

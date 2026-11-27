@@ -9,6 +9,7 @@ import {
 	checkConsentScopesAreUnionOnApproval,
 	checkDeviceConsentExistsBeforeRedeem,
 } from "./security-device-consent"
+import { checkDeleteConsentDisabled, checkUpdateConsentDisabled } from "./security-disabled"
 import { checkRevokeRemovesDuplicateConsents } from "./security-duplicates"
 import { checkReapprovalAfterExpiry, checkRevokeKillsPendingAuthCode } from "./security-expiry"
 import { checkExpiredConsentNeverIssuesCode } from "./security-expiry-followup"
@@ -18,7 +19,11 @@ import {
 	checkEmptyScopeDeviceRequestRejected,
 	checkPostAuthorizeRejected,
 } from "./security-request-shape"
-import { checkDeleteConsentDisabled, checkSmuggledJsonResource } from "./security-web"
+import {
+	checkRevokeHoldsUnderConcurrentVerificationDeletes,
+	checkRevokeIsConstantQueryCount,
+} from "./security-verification"
+import { checkSmuggledJsonResource } from "./security-web"
 import type { SecurityEvidence } from "./types"
 
 /** Every case the two independent security reviews reproduced against `wrangler dev --local`. */
@@ -40,6 +45,10 @@ export async function runSecurityChecks(
 			session,
 			scratch,
 		),
+		revokeHoldsUnderConcurrentVerificationDeletes:
+			await checkRevokeHoldsUnderConcurrentVerificationDeletes(session, scratch),
+		revokeIsConstantQueryCount: await checkRevokeIsConstantQueryCount(session, scratch),
+		updateConsentPathDisabled: await checkUpdateConsentDisabled(session, scratch),
 		deviceCodeContentTypeSmugglingRejected: await checkDeviceCodeContentTypeSmugglingRejected(
 			session,
 			scratch,

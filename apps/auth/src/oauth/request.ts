@@ -1,3 +1,4 @@
+import type { D1Database } from "@cloudflare/workers-types"
 import { APIError } from "better-auth/api"
 import { mergeResourceSources, resourceValues } from "../core/resource-request"
 import { readField } from "./values"
@@ -10,6 +11,8 @@ export type OAuthHookOptions = {
 	 * `ENVIRONMENT=development`, `DEV_ONLY=true` and a loopback `BETTER_AUTH_URL`.
 	 */
 	testClock: boolean
+	/** The D1 binding, for the grant clean-up that is one SQL statement rather than a scan. */
+	database: D1Database
 }
 
 /** True only when a dev sign-in deployment may read the spike's test clock header. */

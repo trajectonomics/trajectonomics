@@ -4,6 +4,7 @@ import {
 	deviceScopeRejection,
 	formMediaTypeRejection,
 } from "../core/oauth-request"
+import { settleDeviceApproval } from "./approval-settlement"
 import { recordDeviceApprovalConsent } from "./consent"
 import { expireConsentForSession } from "./expiry"
 import { prepareInteractiveConsent } from "./interactive"
@@ -48,6 +49,14 @@ export function oauthBeforeHook(options: OAuthHookOptions): AuthMiddleware {
 			default:
 				return
 		}
+	})
+}
+
+/** `/device/approve` only: take back an approval whose endpoint did not finish it. */
+export function oauthAfterHook(): AuthMiddleware {
+	return createAuthMiddleware(async (ctx) => {
+		if (ctx.path !== "/device/approve") return
+		await settleDeviceApproval(ctx)
 	})
 }
 

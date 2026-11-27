@@ -78,10 +78,11 @@ describe("authOptions", () => {
 		expect(requireSecret("x".repeat(32))).toBe("x".repeat(32))
 	})
 
-	it("trusts only its own origin in production and disables /token and delete-consent", () => {
+	it("trusts only its own origin in production and disables /token, delete-consent and update-consent", () => {
 		const options = authOptions({ env: env() })
 		expect(options.trustedOrigins).toEqual(["https://auth.example.test"])
 		expect(options.disabledPaths).toContain("/token")
 		expect(options.disabledPaths).toContain("/oauth2/delete-consent")
+		expect(options.disabledPaths).toContain("/oauth2/update-consent")
 	})
 })

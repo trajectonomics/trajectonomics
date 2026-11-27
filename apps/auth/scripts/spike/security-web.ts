@@ -43,15 +43,6 @@ export async function authorizeCode(session: Session, verifier: string): Promise
 	return url === null ? null : new URL(url).searchParams.get("code")
 }
 
-export async function checkDeleteConsentDisabled(session: Session): Promise<boolean> {
-	const result = await requestResult(
-		session,
-		"/api/auth/oauth2/delete-consent",
-		json({ id: "not-a-grant" }),
-	)
-	return result.status === 404
-}
-
 export async function checkSmuggledJsonResource(
 	session: Session,
 	scratch: string,

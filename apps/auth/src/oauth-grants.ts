@@ -10,15 +10,12 @@
  * keyed. Revoking it deletes every consent row for that user and client, so a duplicate cannot
  * outlive the revoke, and then the codes and the token family.
  */
+
+import type { D1Database } from "@cloudflare/workers-types"
 import { APIError, createAuthEndpoint, sessionMiddleware } from "better-auth/api"
 import { findAllPages } from "./oauth/adapter"
-import {
-	deleteConsentsForGrant,
-	deleteDeviceCodes,
-	deletePendingAuthorizationCodes,
-	deleteTokenFamily,
-} from "./oauth/family"
 import { asIsoString, stringArray } from "./oauth/format"
+import { revokeGrantFamily } from "./oauth/revoke"
 
 type StoredConsent = {
 	id: string
@@ -34,7 +31,7 @@ type StoredClient = {
 	name?: string | null
 }
 
-export function grantManagement() {
+export function grantManagement(input: { database: D1Database }) {
 	return {
 		id: "grant-management",
 		endpoints: {
@@ -92,13 +89,15 @@ export function grantManagement() {
 						})
 					}
 					const owner = { userId, clientId: consent.clientId }
-					// Consents first (every row for the user and client, not only the named one), then
-					// the pending codes, then the tokens. A concurrent rotation that slips through
-					// lands on a grant with no approval record, and its next refresh fails closed.
-					await deleteConsentsForGrant(ctx, owner)
-					await deleteDeviceCodes(ctx, owner)
-					await deletePendingAuthorizationCodes(ctx, owner)
-					await deleteTokenFamily(ctx, owner)
+					// Every step is tried before the error: a failed step must not leave the rest of
+					// the family alive. See `revoke.ts` for the order and why it is that order.
+					const complete = await revokeGrantFamily(ctx, input.database, owner)
+					if (!complete) {
+						throw new APIError("INTERNAL_SERVER_ERROR", {
+							error: "server_error",
+							error_description: "the grant could not be fully revoked",
+						})
+					}
 					return ctx.json({ revoked: true })
 				},
 			),

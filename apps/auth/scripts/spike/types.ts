@@ -61,6 +61,9 @@ export type SecurityEvidence = {
 	reapprovalAfterExpiryWorks: boolean
 	revokeKillsPendingAuthCode: boolean
 	revokeHoldsWithManyVerificationRows: boolean
+	revokeHoldsUnderConcurrentVerificationDeletes: boolean
+	revokeIsConstantQueryCount: boolean
+	updateConsentPathDisabled: boolean
 	deviceCodeContentTypeSmugglingRejected: boolean
 	postAuthorizeRejected: boolean
 	expiredConsentNeverIssuesCode: boolean

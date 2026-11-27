@@ -7,7 +7,12 @@ import { REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS } from "./core/resources"
 import { requireSecret } from "./core/secret"
 import type { Env } from "./env"
 import { hasMarketingConsent } from "./marketing-consent-store"
-import { type OAuthHookOptions, oauthBeforeHook, testClockEnabled } from "./oauth-hooks"
+import {
+	type OAuthHookOptions,
+	oauthAfterHook,
+	oauthBeforeHook,
+	testClockEnabled,
+} from "./oauth-hooks"
 
 export type CreateAuthInput = {
 	env: Env
@@ -27,6 +32,7 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 	const hookOptions: OAuthHookOptions = {
 		absoluteLifetimeSeconds: REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS,
 		testClock: testClockEnabled(devSignIn),
+		database: input.env.DB,
 	}
 	return {
 		appName: "Trajectonomics",
@@ -40,7 +46,9 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		// `/token` mints a JWT with the name and email for auth's own origin; nothing needs it.
 		// `/oauth2/delete-consent` deletes the consent but leaves the grant's tokens alive, and a
 		// later approval would revive them. `/oauth2/grants/revoke` is the only revocation path.
-		disabledPaths: ["/token", "/oauth2/delete-consent"],
+		// `/oauth2/update-consent` raises a consent's scopes without the hooks or the consent page,
+		// so the next authorize would issue a code for scopes the person never saw.
+		disabledPaths: ["/token", "/oauth2/delete-consent", "/oauth2/update-consent"],
 		emailAndPassword: {
 			enabled: devSignIn,
 			minPasswordLength: 12,
@@ -79,10 +87,11 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		},
 		hooks: {
 			before: oauthBeforeHook(hookOptions),
+			after: oauthAfterHook(),
 		},
 		plugins: buildPlugins({
 			baseURL,
-			db: input.env.DB,
+			database: input.env.DB,
 			passkeyRpID: input.env.PASSKEY_RP_ID ?? new URL(baseURL).hostname,
 			passkeyOrigin: input.env.PASSKEY_ORIGIN ?? new URL(baseURL).origin,
 			requiresMarketingConsent: async (userId) =>

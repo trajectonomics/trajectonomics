@@ -13,6 +13,10 @@ export function securityChecks(gates: SecurityEvidence): Record<string, boolean>
 		reapprovalAfterExpiryWorks: gates.reapprovalAfterExpiryWorks,
 		revokeKillsPendingAuthCode: gates.revokeKillsPendingAuthCode,
 		revokeHoldsWithManyVerificationRows: gates.revokeHoldsWithManyVerificationRows,
+		revokeHoldsUnderConcurrentVerificationDeletes:
+			gates.revokeHoldsUnderConcurrentVerificationDeletes,
+		revokeIsConstantQueryCount: gates.revokeIsConstantQueryCount,
+		updateConsentPathDisabled: gates.updateConsentPathDisabled,
 		deviceCodeContentTypeSmugglingRejected: gates.deviceCodeContentTypeSmugglingRejected,
 		postAuthorizeRejected: gates.postAuthorizeRejected,
 		expiredConsentNeverIssuesCode: gates.expiredConsentNeverIssuesCode,

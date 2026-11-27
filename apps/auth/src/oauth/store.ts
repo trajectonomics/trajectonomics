@@ -15,6 +15,7 @@ export type StoredConsent = {
 	resources?: unknown
 	referenceId?: string | null
 	createdAt?: unknown
+	updatedAt?: unknown
 }
 export type StoredDeviceCode = {
 	clientId?: string | null

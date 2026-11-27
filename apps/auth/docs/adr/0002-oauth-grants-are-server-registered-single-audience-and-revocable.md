@@ -77,6 +77,23 @@ consent exists. The token exchange never creates a consent: an approved code lef
 after a revoke fails closed. The authorization-code flow creates its consent on `/oauth2/consent`.
 The consent's `createdAt` is the original approval and is never moved by rotation.
 
+The before-hook and the endpoint must not disagree about the outcome. A signed-in user who does
+not own the code is refused in the before-hook with `403 access_denied`, rather than skipped: a
+skipped hook that still recorded a consent would approve a grant for a code the person cannot
+approve. The before-hook also remembers what its write changed (a created row, or
+the previous values of the row it merged into). An **after**-hook on `/device/approve` reads the
+final device-code status; when the endpoint returned an error or the code is no longer `approved`
+for that user, it deletes the row it created or restores the merged row, but only while that row
+still carries the `updatedAt` its write stamped. A revoke that deleted the row, or a later
+approval that bumped it, therefore wins and is never undone by the compensation.
+
+A revoke concurrent with an approval still has a window that no hook can close: a poll that read
+the approved `deviceCode` row just before the revoke deleted it can insert its token rows just
+after the revoke deleted the token family, so that response can carry live tokens for up to their
+fifteen-minute lifetime. The revoke deletes consents first and tokens before authorization codes,
+so the next refresh and the next authorize fail closed; only that one in-flight issuance remains.
+
+
 One user may approve the same client from several machines. The consent is keyed by user and
 client, and 1.7.28 has no unique constraint on that pair, so the hooks merge instead of relying
 on the database: the oldest row is kept so `createdAt` never moves forward, the scopes and
@@ -110,17 +127,22 @@ client are deleted first, so an old token can never attach to the new approval.
 - `GET /oauth2/grants` lists the signed-in user's consents with the client id and name, the
   approval time, the scopes and the resources;
 - `POST /oauth2/grants/revoke` takes `{ id }`, verifies the consent belongs to the session user,
-  and deletes every consent row for that user and client, then the pending `deviceCode` rows and
-  authorization codes, then the user+client access and refresh tokens.
+  and deletes, in this order, every consent row for that user and client, the pending `deviceCode`
+  rows, the user+client access and refresh tokens, and the pending authorization codes.
 
 Authorization codes are not a table of their own in 1.7.28: each lives in `verification` under the
-hashed code, with the user id and `query.client_id` in its JSON value. The revoke scans that table
-for the grant's user and client and deletes the matches, so a code issued before the revoke cannot
-be exchanged afterwards. The scan pages with an explicit limit and offset: `findMany` defaults to
-100 rows, and anonymous requests (passkey options, social sign-in state) fill `verification`, so a
-pending code can sit past the first page. The same paged scan serves consent preparation and
-expiry. The consents are deleted first to narrow the concurrent-rotation window: a rotation that
-slips through lands on a grant with no approval record and fails closed next time.
+hashed code, with the user id and `query.client_id` in its JSON value. The revoke deletes the
+grant's codes with **one** D1 statement (a prepared `delete` filtered with `json_valid` and
+`json_extract` on `$.type`, `$.userId` and `$.query.client_id`), so the query count does not grow
+with the table. Anonymous requests (passkey options, social sign-in state) fill `verification`, so
+a scan would cost one query per hundred rows, would hit D1's per-invocation query budget on a
+large table, and would skip a row whenever a concurrent delete shrinks the table between pages.
+The same statement serves consent preparation and expiry. Any other paged read, such as the
+consent list, steps on `id > lastId` for the same reason, never on an offset. Rows are deleted in
+the order above and every step is tried even when one fails; the endpoint returns a 500 only after
+the last step, and the token family is deleted before `verification` so a failure there cannot
+leave a live token. The consents are deleted first to narrow the concurrent-rotation window: a
+rotation that slips through lands on a grant with no approval record and fails closed next time.
 
 POST `/oauth2/authorize` is rejected with `invalid_request`: no first-party client posts the
 authorization request, and the library parses a POST body before the before-hook runs, so a
@@ -134,9 +156,11 @@ the hook cannot read fails closed rather than counting as no resource.
 
 The provider's `/oauth2/delete-consent` is in `disabledPaths`. It deletes the consent but leaves
 the tokens alive, and a later approval would revive them. `/oauth2/grants/revoke` is the only
-revocation path. A JWT access token already issued stays valid for at most its fifteen minutes
-after a revoke; that is by design, and resource servers rely on the short lifetime rather than an
-introspection call per request.
+revocation path. `/oauth2/update-consent` is disabled too: it updates the consent's scopes behind
+the hooks, so a signed-in user could raise them and the next authorize would issue a code without
+the consent page for scopes they never approved. A JWT access token already issued stays valid for
+at most its fifteen minutes after a revoke; that is by design, and resource servers rely on the
+short lifetime rather than an introspection call per request.
 
 `refreshTokenReuseInterval` is **60 seconds**. A lost refresh response can be retried inside the
 minute and receives the same token response; outside it, reusing a rotated token is treated as
