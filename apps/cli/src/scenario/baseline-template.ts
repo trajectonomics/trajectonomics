@@ -6,6 +6,7 @@ import { type AppError, fail, isAppError } from "../errors"
 import { firstTransactionDateOf } from "../report/record"
 import type { AccountRow, Ledger } from "../store"
 import { acceptedScenarioSchemaVersion } from "./document"
+import { templateFlowsOf } from "./history-flows"
 
 /**
  * The schema field a refusal names. The dispatch step rewrites it to `--as-of`, the flag the caller
@@ -82,17 +83,25 @@ function refusalOf(ledger: Ledger, asOf: string, assets: readonly AccountRow[]):
 
 /**
  * The Scenario document `scenario apply --template --as-of` prints: every asset and liability leaf
- * declared at a zero rate, the zero Streams, and the surplus, contribution and withdrawal order
- * over the assets. The Baseline's own checks run first, so a template is never printed for a
- * Ledger the Baseline refuses, and nothing is read from the clock or written to the store.
+ * declared at a zero rate, the two zero Streams or one per row the rates carry, and the surplus,
+ * contribution and withdrawal order over the assets. The Baseline's own checks run first, so a
+ * template is never printed for a Ledger the Baseline refuses, and nothing is read from the clock
+ * or written to the store.
  */
-export function baselineTemplateOf(ledger: Ledger, asOf: string): string | AppError {
+export function baselineTemplateOf(
+	ledger: Ledger,
+	asOf: string,
+	history?: { months: number },
+): string | AppError {
 	const mapping = baselineOf(ledger, asOf)
 	if (isAppError(mapping)) return mapping
 	const accounts = declaredAccounts(ledger)
 	const assets = accounts.filter((account) => CROSSING[account.type] === "asset")
 	const refused = refusalOf(ledger, asOf, assets)
 	if (refused !== null) return refused
+	const flows =
+		history === undefined ? placeholderFlows(asOf) : templateFlowsOf(ledger, asOf, history)
+	if (isAppError(flows)) return flows
 	const version = acceptedScenarioSchemaVersion()
 	if (version === undefined) return fail("internal")
 	const live = assets.find((account) => account.archivedAt === null) ?? assets[0]
@@ -106,7 +115,7 @@ export function baselineTemplateOf(ledger: Ledger, asOf: string): string | AppEr
 			kind: CROSSING[account.type],
 			rate: 0,
 		})),
-		flows: placeholderFlows(asOf),
+		flows,
 		cashflow: {
 			surplus: live === undefined ? [] : [{ account: live.id }],
 			contribute: assetIds,

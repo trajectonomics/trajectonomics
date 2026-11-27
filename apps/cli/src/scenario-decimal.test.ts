@@ -191,14 +191,15 @@ describe("scenario apply --decimal", () => {
 		expect(errorOf(res).code).toBe("invalid_input")
 	})
 
-	it("refuses --template beside --decimal, and names the form that takes it", async () => {
+	it("prints the template in decimal form with --decimal", async () => {
 		const home = scenarioHome()
 		const res = await capture(["scenario", "apply", "--template", "--decimal", "--json"], {
 			TRAJ_HOME: home,
 		})
-		expect(res.code).toBe(2)
-		// The refusal names the flag as the caller typed it (ADR-0013).
-		expect(errorOf(res).path).toBe("--decimal")
-		expect(errorOf(res).hint).toContain("--file <path> --decimal")
+		expect(res.code).toBe(0)
+		const document = JSON.parse(JSON.parse(res.out)) as Doc
+		expect(document["flows"]).toEqual([
+			expect.objectContaining({ id: "salary", amount: "1000.00" }),
+		])
 	})
 })
