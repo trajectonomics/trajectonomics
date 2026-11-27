@@ -16,7 +16,6 @@ let { scenario, index, terms, onTerms }: Props = $props()
 
 <PageShell
 	title="One future, year by year"
-	intro="One seeded Market path of the chance of success, replayed exactly: the returns it drew and what they did to net worth."
 >
 	{#snippet children(snapshot)}
 		<PathView {snapshot} {scenario} {index} {terms} {onTerms} />

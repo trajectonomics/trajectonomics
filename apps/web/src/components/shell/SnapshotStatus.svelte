@@ -1,23 +1,12 @@
 <script lang="ts">
-import { currentSearch } from "../../client/location.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
-import { isDemo } from "../../lib/view/snapshot-url"
-import Badge from "../ui/Badge.svelte"
-import { statusLine } from "./status-line"
 
 const state = $derived(currentSnapshot())
 </script>
 
-<!-- The As-of, the currency and the traj version of the Snapshot, and a badge when it is the Demo. -->
-<div class="flex flex-wrap items-center gap-x-3 gap-y-2 py-2 text-sm text-muted-foreground">
-	{#if state.status === "loading"}
-		<span>Loading the Snapshot.</span>
-	{:else if state.status !== "ready"}
-		<span>No Snapshot is loaded.</span>
-	{:else}
-		<span>{statusLine(state.snapshot)}</span>
-	{/if}
-	{#if isDemo(currentSearch())}
-		<Badge tone="accent">Demo data</Badge>
-	{/if}
-</div>
+<!-- The top bar's warning while the Snapshot is not ready; a ready one says nothing, its date is the chip. -->
+{#if state.status !== "ready"}
+	<div class="mx-auto w-full max-w-6xl px-4 pb-2 text-sm text-muted-foreground sm:px-6">
+		<span>{state.status === "loading" ? "Loading the Snapshot." : "No Snapshot is loaded."}</span>
+	</div>
+{/if}

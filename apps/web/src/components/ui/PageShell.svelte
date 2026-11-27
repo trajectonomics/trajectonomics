@@ -8,13 +8,11 @@ import PageFrame from "./PageFrame.svelte"
 interface Props {
 	/** The page's heading, such as "Net worth". */
 	title: string
-	/** One sentence under the heading, on what the page shows. */
-	intro?: string | undefined
 	/** Renders the page from the ready Snapshot. */
 	children: Snippet<[Snapshot]>
 }
 
-let { title, intro, children }: Props = $props()
+let { title, children }: Props = $props()
 </script>
 
-<PageFrame {title} {intro} state={currentSnapshot()} pathname={currentPathname()} {children} />
+<PageFrame {title} state={currentSnapshot()} pathname={currentPathname()} {children} />

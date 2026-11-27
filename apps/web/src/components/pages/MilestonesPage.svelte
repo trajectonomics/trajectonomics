@@ -16,7 +16,6 @@ let { scenario, terms, onTerms }: Props = $props()
 
 <PageShell
 	title="Milestones"
-	intro="When the selected plan reaches each of its targets, and the ones it does not reach."
 >
 	{#snippet children(snapshot)}
 		<MilestonesView

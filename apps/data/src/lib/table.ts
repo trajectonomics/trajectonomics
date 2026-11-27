@@ -1,4 +1,4 @@
-import { planName, planRank } from "./plans"
+import { comparePlans, planName } from "./plans"
 import type { UsageRow } from "./types"
 
 /** One plan and model's totals over the window. */
@@ -56,12 +56,7 @@ export function usageTable(rows: readonly UsageRow[]): TableRow[] {
 				bestEffort: group.some((row) => row.bestEffort),
 			}
 		})
-		.sort(
-			(a, b) =>
-				planRank(a.plan) - planRank(b.plan) ||
-				a.plan.localeCompare(b.plan) ||
-				a.model.localeCompare(b.model),
-		)
+		.sort((a, b) => comparePlans(a, b) || a.model.localeCompare(b.model))
 }
 
 /** The source note a row carries, or null when it needs none. */
