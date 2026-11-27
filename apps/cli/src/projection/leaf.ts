@@ -21,6 +21,11 @@ export type ScenarioRequest = {
 	add?: readonly string[] | undefined
 	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
 	decimal?: boolean | undefined
+	/**
+	 * Whether the leaf reads household ages: `false` skips parsing the stored household, for a
+	 * command such as `compare` whose result never states one (cli ADR-0048).
+	 */
+	readHousehold?: boolean | undefined
 }
 
 /**
@@ -86,6 +91,7 @@ export function withProjection<T>(
 				without: request.without,
 				add: request.add,
 				decimal: request.decimal,
+				readHousehold: request.readHousehold,
 			})
 		const outcome = work(prepare)
 		return isAppError(outcome) ? outcome : ok(outcome)

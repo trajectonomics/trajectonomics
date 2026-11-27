@@ -1,0 +1,104 @@
+/* What each plan gives: one row per plan, its three at-least figures over thin bars. */
+
+.plan-peaks {
+	padding: 24px 0 8px;
+}
+
+.peaks-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.peaks-table th,
+.peaks-table td {
+	padding: 10px 0;
+	text-align: left;
+	vertical-align: middle;
+}
+
+/* The window labels: the same mono meta layer as the other table headings. */
+.peaks-table thead th {
+	padding-bottom: 8px;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.peaks-identity {
+	display: flex;
+	min-width: 0;
+	align-items: center;
+	gap: 8px;
+}
+
+.peaks-name {
+	overflow: hidden;
+	font-weight: 500;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
+}
+
+.peaks-figure {
+	display: block;
+	font-family: var(--font-meta);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	text-wrap: nowrap;
+}
+
+.peaks-figure-empty {
+	font-weight: 400;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The bar is drawn against the column's largest figure, so the widest one fills its track. */
+.peaks-track {
+	display: block;
+	height: 4px;
+	margin-top: 6px;
+	overflow: hidden;
+	border-radius: 999px;
+	background: var(--ds-color-secondary);
+}
+
+.peaks-bar {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--ds-color-primary);
+}
+
+.peaks-note {
+	max-width: 44rem;
+	margin: 20px 0 0;
+	font-size: 13px;
+	line-height: 1.7;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* Wider than a phone: the name holds a column of its own, the three windows sit beside it. */
+.peaks-table-wide {
+	table-layout: fixed;
+}
+
+.peaks-table-wide thead th:not(:first-child),
+.peaks-table-wide tbody td {
+	width: 22%;
+	padding-left: 16px;
+}
+
+.peaks-table-wide tbody th,
+.peaks-table-wide tbody td {
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.peaks-table-phone {
+	display: none;
+}

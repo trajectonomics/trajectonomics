@@ -14,11 +14,7 @@ export const EN: Dictionary = Object.freeze({
 	frontTitle: "Blog · Trajectonomics",
 	frontDescription:
 		"Comparisons, guides and news about traj, the free, open-source financial simulation tool for AI agents.",
-	mastheadLabel: "Trajectonomics blog",
-	mastheadTitle: "Comparisons, guides and news",
-	mastheadLede:
-		"How traj compares with what you would otherwise do, with every number from a test you can rerun.",
-	latest: "Latest",
+	frontHeading: "Comparisons, guides and news",
 	noPosts: "No posts yet.",
 	postTitleSuffix: "Trajectonomics Blog",
 	typeLabels: Object.freeze({ compare: "Compare", guide: "Guide", news: "News" }),
