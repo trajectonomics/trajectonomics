@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
 import { band, bandsTable, runsOut } from "./chance-band-view"
+import { type ChanceMilestoneView, milestonesField } from "./chance-milestones-view"
 import {
 	type ChanceOutcomeView,
 	type ChanceRepresentativeView,
@@ -74,6 +75,8 @@ export type ChanceView = Echo & {
 	outcomes?: ChanceOutcomeView[] | undefined
 	/** Present only with `--outcomes`: the paths worth opening first. */
 	representative?: ChanceRepresentativeView | undefined
+	/** Present only with `--milestone-dates`: when each Milestone fired across the paths. */
+	milestones?: ChanceMilestoneView[] | undefined
 	tables: ChanceTable[]
 }
 
@@ -113,5 +116,6 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	lowestYearSpending: lowestYearField,
 	outcomes: outcomesField,
 	representative: representativeField,
+	milestones: milestonesField,
 	tables: z.array(bandsTable).describe("The Bands the human form prints."),
 })

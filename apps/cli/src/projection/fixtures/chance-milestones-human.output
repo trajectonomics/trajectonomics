@@ -1,0 +1,15 @@
+The plan holds to 2032-03-30 on 20 of 20 seeded Market paths: a success share of 100.00%.
+
+bands (3 rows)
+index  to                 p10         p50         p90
+    0  2027-03-30  1582749.55  1592621.93  1596619.98
+    4  2031-03-30  4128845.50  4202900.86  4272170.19
+    5  2032-03-30  4776093.01  4849675.66  4907392.03
+
+No tax is applied; figures are before tax.
+The chance is over the Return model "illustrative-four-months" with seed 0123456789abcdef, and every figure is nominal.
+
+stop work: reached in 20 of 20 futures; median Sep 2026 (age 36), 10-90%: Sep 2026 (age 36) to Sep 2026 (age 36)
+retire: reached in 20 of 20 futures; median Jun 2027 (age 36), 10-90%: Jun 2027 (age 36) to Jun 2027 (age 36)
+rich: reached in 20 of 20 futures; median Oct 2031 (me 41, partner 39), 10-90%: Sep 2031 (me 41, partner 39) to Nov 2031 (me 41, partner 39)
+never: never reached in 20 futures
