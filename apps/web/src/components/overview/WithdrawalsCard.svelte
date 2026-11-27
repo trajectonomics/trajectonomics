@@ -20,7 +20,7 @@ const shown = $derived(
 		{#snippet body(view: WithdrawalsSummary | null)}
 			{#if view !== null}
 				<div class="space-y-2">
-					<p class="text-2xl font-semibold tracking-tight"><Money amount={view.amount} currency={view.currency} /></p>
+					<p class="text-2xl font-semibold tracking-tight"><Money amount={view.amount} currency={view.currency} compact /></p>
 					<p class="text-sm text-muted-foreground">In the first year, from {view.from}{#if view.share !== null}, {view.share} of your savings{/if}.</p>
 				</div>
 			{/if}

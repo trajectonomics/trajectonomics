@@ -31,6 +31,7 @@ export const HOUSEHOLD: Household = {
 /** The Scenario a show prints: its row, its document, and its household, or null. */
 export type Shown = ScenarioBody & {
 	household: Record<string, unknown> | null
+	householdHash: string
 	document: Record<string, unknown> & { flows: Record<string, unknown>[] }
 }
 

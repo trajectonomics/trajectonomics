@@ -68,10 +68,7 @@ describe("a card", () => {
 	test("draws one point for each yearly row, with a rule for each Milestone reached", () => {
 		expect(base.series).toHaveLength(1)
 		expect(base.series[0]?.points).toHaveLength(28)
-		expect(base.markers.map((marker) => marker.label)).toEqual([
-			"car-paid-off",
-			"net-worth-ten-million",
-		])
+		expect(base.markers.map((marker) => marker.label)).toEqual(["Car paid off", "10M net worth"])
 		expect(base.milestones.map((milestone) => milestone.label.id)).toEqual([
 			"car-paid-off",
 			"net-worth-ten-million",
@@ -110,7 +107,7 @@ describe("a card", () => {
 		expect(ten.series[0]?.points.map((point) => point.x)).toEqual(
 			base.series[0]?.points.slice(0, 10).map((point) => point.x),
 		)
-		expect(ten.markers.map((marker) => marker.label)).toEqual(["car-paid-off"])
+		expect(ten.markers.map((marker) => marker.label)).toEqual(["Car paid off"])
 		expect(ten.milestones.map((milestone) => milestone.label.id)).toEqual(["car-paid-off"])
 		// The figures on the card are the plan's, whatever the range.
 		expect(ten.netWorth).toEqual(base.netWorth)

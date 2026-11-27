@@ -10,9 +10,12 @@ import {
 	summariesOf,
 } from "./scenario-test-support"
 import { PERSONAL_ENTITY_ID } from "./store"
+import { canonicalJson, householdHash } from "./store/canonical"
 import { mustOpen, SCENARIO_DOCUMENT } from "./store/testing"
 
 const BASE = SCENARIO_DOCUMENT
+/** A show of a plan with no household: the hash of its document and null household (cli ADR-0055). */
+const NO_HOUSEHOLD_HASH = householdHash(canonicalJson(BASE), null)
 
 /** A v1 row written before the pin bump to Scenario v4 (ADR-0031): stored, never migrated. */
 const V1_DOCUMENT =
@@ -57,6 +60,7 @@ describe("scenario list and show", () => {
 		expect<unknown>(byName).toEqual({
 			...created,
 			household: null,
+			householdHash: NO_HOUSEHOLD_HASH,
 			tax: null,
 			taxed: false,
 			notes: null,
@@ -65,6 +69,7 @@ describe("scenario list and show", () => {
 		expect<unknown>(byId).toEqual({
 			...created,
 			household: null,
+			householdHash: NO_HOUSEHOLD_HASH,
 			tax: null,
 			taxed: false,
 			notes: null,

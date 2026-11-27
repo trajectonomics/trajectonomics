@@ -9,7 +9,8 @@ import { whatIfSession } from "../client/what-if.svelte"
 import { HASH, useSessionHooks } from "../client/what-if.test-support"
 import FigureChart from "../components/routing/FigureChart.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
-import { type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
+import { milestoneLabel, type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
+import { scenarioNames } from "../lib/view/plan"
 import { ROUTES } from "../lib/view/routes"
 import { LOADING } from "../lib/view/state"
 import { startWhatIf, withSet } from "../lib/what-if/session"
@@ -35,6 +36,28 @@ function pageAttributes(body: string): string {
 /** Everything a page says to a person, in its text or in an attribute. */
 function visible(body: string): string {
 	return `${pageText(body)} ${pageAttributes(body)}`
+}
+
+/** Every Flow and Milestone id a Demo plan states, so a page that prints one in code fails. */
+function demoItemIds(snapshot: Snapshot): ReadonlySet<string> {
+	const scenarios = Object.values(snapshot.reads.documents).flatMap((read) =>
+		read.ok ? [read.data.scenario] : [],
+	)
+	const flows = scenarios.flatMap((scenario) => scenario.document.flows.map((flow) => flow.id))
+	const milestones = scenarios.flatMap((scenario) =>
+		(scenario.document.milestones ?? []).flatMap((one) => {
+			const parsed = milestoneLabel.safeParse(one)
+			return parsed.success ? [parsed.data.id] : []
+		}),
+	)
+	return new Set([...flows, ...milestones])
+}
+
+/** The text of every `<code>` element in a page's body. */
+function codeTexts(body: string): string[] {
+	return [...body.matchAll(/<code\b[^>]*>([\s\S]*?)<\/code>/g)].map((match) =>
+		(match[1] ?? "").replace(/<[^>]+>/g, "").trim(),
+	)
 }
 
 /** What the guard forbids in one page: the CLI's word for a Plan, and an ISO date, each outside code or CLI text. */
@@ -89,6 +112,17 @@ describe("a page of the Demo Snapshot", () => {
 		}
 	})
 
+	test("prints its title once, with no intro paragraph under it", () => {
+		for (const page of PAGES) {
+			setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=base`)
+			const body = render(page.page).body
+			expect(body.match(/<h1\b/g) ?? [], page.path).toHaveLength(1)
+			const header = body.match(/<header\b[^>]*>([\s\S]*?)<\/header>/)?.[1] ?? ""
+			expect(header, page.path).toContain("<h1")
+			expect(header, page.path).not.toMatch(/<\/h1>(?:\s|<!--[\s\S]*?-->)*<p\b/)
+		}
+	})
+
 	test("calls a Scenario a plan: the word appears nowhere outside code or the CLI's own text", () => {
 		for (const page of PAGES) {
 			setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=base&index=0`)
@@ -118,6 +152,20 @@ describe("a page of the Demo Snapshot", () => {
 		expect(body).toContain("30 Jun 2031")
 		expect(body).not.toContain("2031-06-30")
 		expect(problemsOf(body)).toEqual([])
+	})
+
+	test("shows no Flow or Milestone id in code on any plan, because the Demo states a label for each", () => {
+		const ids = demoItemIds(DEMO)
+		expect(ids.size).toBeGreaterThan(0)
+		const plans = scenarioNames({ status: "ready", url: "/demo/snapshot.json", snapshot: DEMO })
+		expect(plans.length).toBeGreaterThan(1)
+		for (const plan of plans) {
+			for (const page of PAGES) {
+				setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=${plan}&index=0`)
+				const shown = codeTexts(render(page.page).body).filter((text) => ids.has(text))
+				expect(shown, `${page.path} on ${plan}`).toEqual([])
+			}
+		}
 	})
 
 	test("links a page of the navigation with words that name it", () => {

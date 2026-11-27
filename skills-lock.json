@@ -43,6 +43,13 @@
       "skillPath": "skills/engineering/domain-modeling/SKILL.md",
       "computedHash": "b3eb40152b81f0c98fd2095a023c019452dbdce56f7540cc67fece2972db8369"
     },
+    "fixing-accessibility": {
+      "source": "ibelick/ui-skills",
+      "commit": "1a2f2bf91b18365abc102b67400f48ab1046b449",
+      "sourceType": "github",
+      "skillPath": "skills/fixing-accessibility/SKILL.md",
+      "computedHash": "50fe52aae0661c5aef2d1ed868bbfcda877ce96a6ec16ffa1c8a77dc83ea9695"
+    },
     "git-guardrails-claude-code": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -192,6 +199,13 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/triage/SKILL.md",
       "computedHash": "a683e69163e23630f39c05a50fb9d83a3795a6a6fbd317357669e082cd43a158"
+    },
+    "tufte": {
+      "source": "aref-vc/tufte-claude-skill",
+      "commit": "a145acf0c158f822d70ccdc2590164abb83b39cb",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "9824aeb0910b39d93eec0f3f9407407db4cf8d83eb870c01eff21792f7ebd0bc"
     },
     "wait-what": {
       "source": "mattpocock/skills",

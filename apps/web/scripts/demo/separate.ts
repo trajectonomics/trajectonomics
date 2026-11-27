@@ -8,6 +8,7 @@ import { BASE_SALARY_END, DEMO_HOUSEHOLD } from "./scenario"
  */
 export const PARTNER_SALARY_FLOW: Record<string, unknown> = {
 	id: "partner-salary",
+	displayLabel: "Partner's salary",
 	kind: "income",
 	earned: true,
 	frequency: "monthly",

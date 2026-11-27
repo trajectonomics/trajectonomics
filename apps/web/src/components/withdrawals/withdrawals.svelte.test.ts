@@ -40,7 +40,7 @@ describe("the Withdrawals page", () => {
 	test("states each Rule year with its share and what the rule did, in words", () => {
 		const body = page()
 		expect(body).toMatch(
-			/Year by year: (<!--.*?-->)*<code[^>]*data-item="retirement-spending"[^>]*>retirement-spending<\/code>/,
+			/Year by year: (<!--.*?-->)*<span[^>]*data-item="retirement-spending"[^>]*>Spending in retirement<\/span>/,
 		)
 		expect(body).toContain("862,256.24")
 		expect(body).toContain("3.99%")
@@ -177,7 +177,7 @@ describe("the Home card: you could spend", () => {
 		const view = overviewView(DEMO)
 		const body = render(WithdrawalsCard, { props: { scenario: view.withdrawals } }).body
 		expect(body).toContain("You could spend")
-		expect(body).toContain("862,256.24")
+		expect(body).toMatch(/title="862,256\.24"><span aria-hidden="true">862k</)
 		expect(body).toContain("3.99% of your savings")
 		expect(body).toContain("/optimize/withdrawals/")
 	})

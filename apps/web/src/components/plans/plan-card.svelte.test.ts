@@ -3,7 +3,7 @@ import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../../client/browser"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
-import { milestoneLabel } from "../../lib/contract"
+import { milestoneLabel, type Snapshot } from "../../lib/contract"
 import { formatDate } from "../../lib/format"
 import { type PlanCard, planCard } from "../../lib/view/plans/card"
 import { ledgerWith } from "../../lib/view/plans/fixtures.test-support"
@@ -72,5 +72,39 @@ describe("PlanCard's Milestones", () => {
 		const body = cardBody({ ...BASE, markers: [], milestones: [] })
 		expect(body).not.toContain('aria-label="Milestones reached"')
 		expect(body).not.toContain("<time")
+	})
+})
+
+/** The Demo's base snapshot with its projection failed with this code, as a Read keeps it. */
+function failedBase(code: string): Snapshot {
+	const next = structuredClone(SNAPSHOT)
+	next.reads.projections["base"] = {
+		argv: ["projection", "run", "--json", "--", "base"],
+		ok: false,
+		error: { code, exitCode: 1, message: `The projection failed: ${code}` },
+	}
+	return next
+}
+
+function failedCard(code: string): PlanCard {
+	const snapshot = failedBase(code)
+	return planCard(snapshot, planRows(snapshot)[0]!, parseRange("all"))
+}
+
+describe("PlanCard's problem", () => {
+	test("marks the CLI's own message as the CLI's text", () => {
+		const card = failedCard("invalid_input")
+		expect(card.problemFromCli).toBe(true)
+		expect(cardBody(card)).toContain("data-cli")
+	})
+
+	test("shows the Dashboard's own failure as the page's words", () => {
+		for (const code of ["contract_mismatch", "traj_unavailable", "unparsed_error"]) {
+			const card = failedCard(code)
+			expect(card.problemFromCli).toBe(false)
+			const body = cardBody(card)
+			expect(body).toContain(`The projection failed: ${code}`)
+			expect(body).not.toContain("data-cli")
+		}
 	})
 })

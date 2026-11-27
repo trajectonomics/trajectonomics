@@ -124,6 +124,16 @@ describe("a plan whose projection read failed", () => {
 		})
 	})
 
+	test("does not call the Dashboard's own Read errors the CLI's", () => {
+		for (const code of ["traj_unavailable", "contract_mismatch"]) {
+			const failed = { projections: { base: failedRead<ProjectionRun>(ARGV, code) } }
+			expect(noProjectionReason(failed, "base")).toEqual({
+				text: `${code} message`,
+				fromCli: false,
+			})
+		}
+	})
+
 	test("still has an everything file, with the other reads and the failed one as the Snapshot holds them", () => {
 		const file = everythingFile(
 			{

@@ -7,8 +7,8 @@ export function displayCount(value: number | null): string {
 }
 
 /**
- * A compact axis label: plain below a thousand, then K, M, B or T with one decimal under ten.
- * It states the same count as the table, in less room.
+ * A compact count: plain below a thousand, then K, M, B or T with at most one decimal. The
+ * decimal is cut, never rounded up, so the compact figure never claims more than the exact one.
  */
 export function compactCount(value: number): string {
 	const units: readonly (readonly [number, string])[] = [
@@ -18,7 +18,7 @@ export function compactCount(value: number): string {
 		[1_000, "K"],
 	]
 	for (const [size, suffix] of units) {
-		if (value >= size) return `${SHORT.format(value / size)}${suffix}`
+		if (value >= size) return `${SHORT.format(Math.floor((value * 10) / size) / 10)}${suffix}`
 	}
-	return SHORT.format(value)
+	return SHORT.format(Math.floor(value * 10) / 10)
 }

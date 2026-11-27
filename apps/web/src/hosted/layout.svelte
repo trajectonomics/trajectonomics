@@ -4,15 +4,15 @@ import HostedFence from "../components/hosted/HostedFence.svelte"
 import HostedNotice from "../components/hosted/HostedNotice.svelte"
 import Layout from "../routes/+layout.svelte"
 
-// The hosted build's root layout: the loopback layout, with the notice above each page and the fence around the whole.
+// The hosted build's root layout: the notice above the page, and the loopback layout with the fence around the whole.
 let { children }: { children: Snippet } = $props()
 </script>
 
 {#snippet page()}
-	<HostedNotice />
 	{@render children()}
 {/snippet}
 
 <HostedFence>
+	<HostedNotice />
 	<Layout children={page} />
 </HostedFence>

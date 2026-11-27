@@ -14,7 +14,6 @@ let { scenario, editable }: Props = $props()
 
 <PageShell
 	title="Where money goes"
-	intro="The order your plan saves what is left over and draws savings when money is short, and the moves you plan between your own accounts."
 >
 	{#snippet children(snapshot)}
 		<RoutingBody {snapshot} {scenario} {editable} />

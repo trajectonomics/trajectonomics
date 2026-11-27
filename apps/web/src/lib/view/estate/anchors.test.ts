@@ -22,6 +22,10 @@ describe("the estate anchor choices name the Flow a household pins", () => {
 	})
 
 	test("an unlabelled Flow keeps its id", () => {
-		expect(choice()?.label).toMatch(/^When fund ends, at /)
+		const doc = structuredClone(base.doc)
+		const flow = doc.flows.find((one) => one.id === "fund")
+		if (flow === undefined) throw new Error("the Demo moves money to fund")
+		delete flow.displayLabel
+		expect(choice(doc)?.label).toMatch(/^When fund ends, at /)
 	})
 })

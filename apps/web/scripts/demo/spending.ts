@@ -10,6 +10,7 @@ export function demoSpendingFlows(ids: DemoAccountIds): Record<string, unknown>[
 	return [
 		{
 			id: "retirement-spending",
+			displayLabel: "Spending in retirement",
 			kind: "expense",
 			frequency: "monthly",
 			start: "2050-06-01",

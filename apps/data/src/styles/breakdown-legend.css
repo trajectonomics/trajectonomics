@@ -1,0 +1,51 @@
+/* The breakdown key: four swatches, one per part of a plan's tokens. */
+
+.share-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 20px;
+	margin: 0;
+	padding: 0 0 14px;
+	list-style: none;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	color: var(--ds-color-muted-foreground);
+}
+
+.share-legend li {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.share-swatch {
+	width: 10px;
+	height: 10px;
+	flex: none;
+	border-radius: 2px;
+}
+
+/* Four parts from four roles: primary input, accent output, a quiet grey cache read, and an
+   accent-striped cache write, so output and cache write differ by texture as well as colour. */
+.swatch-input {
+	background: var(--ds-color-primary);
+}
+
+.swatch-output {
+	background: var(--ds-color-accent);
+}
+
+.swatch-cacheRead {
+	/* The ring grey clears 3:1 on the page in both Themes, so the largest part never reads as empty. */
+	background: var(--ds-color-ring);
+}
+
+.swatch-cacheWrite {
+	background-color: var(--ds-color-accent);
+	background-image: repeating-linear-gradient(
+		135deg,
+		var(--ds-color-background) 0 2px,
+		var(--ds-color-accent) 2px 6px
+	);
+}

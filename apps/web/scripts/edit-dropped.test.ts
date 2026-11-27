@@ -1,7 +1,7 @@
 import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import {
 	disposeEditor,
-	hashOf,
+	householdHashOf,
 	ledgerShow,
 	postEdit,
 	SLOW_MS,
@@ -32,7 +32,7 @@ describe("an Edit that drops household anchors, against the real traj", () => {
 				JSON.stringify({
 					kind: "set-household",
 					name: "base",
-					contentHash: hashOf("base"),
+					householdHash: householdHashOf("base"),
 					household: HOUSEHOLD,
 				}),
 			)
@@ -67,7 +67,7 @@ describe("an Edit that drops household Owners, against the real traj", () => {
 				JSON.stringify({
 					kind: "set-household",
 					name: "base",
-					contentHash: hashOf("base"),
+					householdHash: householdHashOf("base"),
 					household: OWNED,
 				}),
 			)
