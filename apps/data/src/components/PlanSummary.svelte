@@ -23,7 +23,9 @@ const grand = $derived(grandTotal(totals))
 const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 /** How many UTC days collection covers, or null on a health body that does not say. */
 const collected = $derived(since === null ? null : daysCollected(since, day))
-const short = $derived(since !== null && collected !== null && collected < WINDOW_DAYS)
+const short = $derived(
+	since !== null && collected !== null && collected >= 1 && collected < WINDOW_DAYS,
+)
 const onlyDay = $derived(collected === 1)
 </script>
 
@@ -72,15 +74,15 @@ const onlyDay = $derived(collected === 1)
 				<span
 					class="meter-figure"
 					title={onlyDay
-						? `${displayCount(total.tokensUncached)} tokens so far today without cache reads`
+						? `${displayCount(total.tokensUncached)} tokens so far without cache reads`
 						: `${displayCount(Math.floor(total.tokensPerActiveDay))} tokens a day without cache reads`}
 				>
 					{#if onlyDay}
 						<span aria-hidden="true">
-							{compactCount(total.tokensUncached)}<span class="meter-unit"> so far today</span>
+							{compactCount(total.tokensUncached)}<span class="meter-unit"> so far</span>
 						</span>
 						<span class="visually-hidden">
-							{compactCount(total.tokensUncached)} tokens so far today without cache reads
+							{compactCount(total.tokensUncached)} tokens so far without cache reads
 						</span>
 					{:else}
 						<span aria-hidden="true">

@@ -30,7 +30,7 @@ showed a daily rate, a 30-day peak and 29 leading zero days as if they were meas
   incomplete window waits the same way.
 - The freshness line says "Collecting since 27 Nov · day N" when the first day is known. The
   summary's total says "since 27 Nov" instead of "· 30 days", and on day one a plan shows its total
-  "so far today" instead of a daily rate, because a partial day is not a rate.
+  "so far" instead of a daily rate, because a partial day is not a rate.
 - The chart starts at the first collected day, so it never leads with zeros from before collection.
   The table and breakdown name the same first day.
 - The collector's first run on a host with no cursor starts at the start of the current UTC hour.
