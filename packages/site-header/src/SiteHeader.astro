@@ -1,0 +1,56 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the mark it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
+import { decorativeMark } from "@trajectonomics/brand/mark"
+
+/** The section marker beside the tile: the part of the site this page belongs to. */
+interface Marker {
+	readonly href: string
+	readonly label: string
+	/** Whether this is the marker's own page, which underlines it and marks `aria-current`. */
+	readonly current: boolean
+}
+
+interface Props {
+	/** Where the tile goes: the Site Home, so every site's tile returns to the same place. */
+	readonly homeHref: string
+	/** The tile link's accessible name. */
+	readonly homeLabel: string
+	/** The site's marker ("Blog", "Data", "Docs"); the Site has none. */
+	readonly marker?: Marker | undefined
+	/** Extra classes on the `<header>`, so a site keeps its own position (fixed, sticky). */
+	readonly class?: string | undefined
+	/** The bar's accessible name. */
+	readonly navLabel?: string
+}
+
+const { homeHref, homeLabel, marker, class: className, navLabel = "Main" } = Astro.props
+// The link names itself, so the artwork is decoration: the brand package hides it the same way on
+// every static site.
+const artwork = decorativeMark(mark)
+const headerClass = className === undefined ? "ds-header" : `ds-header ${className}`
+---
+
+<header class={headerClass}>
+	<nav class="ds-header-inner" aria-label={navLabel}>
+		<div class="ds-header-start">
+			<a class="ds-brand" href={homeHref} aria-label={homeLabel}>
+				<span class="ds-brand-tile"><Fragment set:html={artwork} /></span>
+			</a>
+			{
+				marker && (
+					<a
+						class="ds-marker"
+						href={marker.href}
+						aria-current={marker.current ? "page" : undefined}
+					>
+						{marker.label}
+					</a>
+				)
+			}
+		</div>
+		<div class="ds-header-nav"><slot name="nav" /></div>
+		<div class="ds-header-end"><slot name="end" /></div>
+	</nav>
+</header>

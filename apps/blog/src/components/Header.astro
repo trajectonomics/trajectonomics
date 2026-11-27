@@ -1,40 +1,47 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
-import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
+
+import LanguageMenu from "@trajectonomics/site-header/LanguageMenu.astro"
+import SiteHeader from "@trajectonomics/site-header/SiteHeader.astro"
 import { dictionaryFor } from "../lib/dictionary"
-import { type Language, treePath } from "../lib/languages"
-import { decorativeMark } from "../lib/mark"
-import { BLOG_PATH, DOCS_PATH, SITE_HOME_PATH, SITE_NAME } from "../lib/site"
-import LanguageMenu from "./LanguageMenu.astro"
+import { LANGUAGES, type Language, treePath } from "../lib/languages"
+import { BLOG_PATH, SITE_HOME_PATH, SITE_NAME } from "../lib/site"
 
 interface Props {
 	/** The Interface Language the header's words are in. */
 	readonly language: Language
 	/** Where the Language menu takes a reader for each Interface Language. */
 	readonly languagePaths: Readonly<Record<Language, string>>
-	/** The blog's front page marks its own link as the current page. */
+	/** The blog's front page marks its own marker as the current page. */
 	readonly current: boolean
 }
 
 const { language, languagePaths, current } = Astro.props
 const words = dictionaryFor(language)
-const artwork = decorativeMark(mark)
+// The blog's centre stays empty until a second Post Type has posts and type pages exist: a single
+// "Guides" link would repeat the marker's own list (docs/design/blog.md).
+const choices = LANGUAGES.map((entry) => ({
+	href: languagePaths[entry],
+	lang: entry,
+	hreflang: entry,
+	label: dictionaryFor(entry).nativeName,
+	current: entry === language,
+}))
 ---
 
-<header class="blog-header">
-	<nav class="blog-header-inner" aria-label="Main">
-		<div class="blog-header-brand">
-			<a class="brand" href={SITE_HOME_PATH} aria-label={words.homeLabel(SITE_NAME)}>
-				<span class="brand-tile"><Fragment set:html={artwork} /></span>
-			</a>
-			<a class="blog-marker" href={treePath(language, BLOG_PATH)} aria-current={current ? "page" : undefined}>
-				{words.blogMarker}
-			</a>
-		</div>
-		<div class="blog-header-end">
-			<LanguageMenu language={language} languagePaths={languagePaths} />
-			<a class="header-nav-link" href={DOCS_PATH}>{words.docsLink}</a>
-		</div>
-	</nav>
-</header>
+<SiteHeader
+	homeHref={SITE_HOME_PATH}
+	homeLabel={words.homeLabel(SITE_NAME)}
+	marker={{ href: treePath(language, BLOG_PATH), label: words.blogMarker, current }}
+	class="blog-header"
+	navLabel="Main"
+>
+	<Fragment slot="end">
+		<LanguageMenu
+			summaryLabel={`${words.languageMenuLabel}: ${words.languageSwitchLabel}`}
+			currentLabel={words.languageSwitchLabel}
+			choices={choices}
+		/>
+	</Fragment>
+</SiteHeader>

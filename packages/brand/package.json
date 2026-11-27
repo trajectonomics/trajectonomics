@@ -21,6 +21,11 @@
 		"./current/*": "./dist/current/*",
 		"./tailwind.css": "./dist/tailwind.css",
 		"./typography.css": "./dist/typography.css",
+		"./header.css": "./dist/header.css",
+		"./mark": {
+			"types": "./dist/mark.d.mts",
+			"default": "./dist/mark.mjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"scripts": {

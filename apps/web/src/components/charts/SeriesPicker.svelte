@@ -10,7 +10,7 @@ interface Props {
 	chosen: readonly string[]
 	/** The name of a chosen id the plan does not list, so it can still be taken off. */
 	names: ReadonlyMap<string, string>
-	/** The ledger's Account names, so a removed series reads its Account's name. */
+	/** The ledger's Account names: a removed cash-flow line reads the Account it names, and a removed Account reads its name. */
 	accounts: AccountNames
 	onToggle: (id: string) => void
 }
@@ -18,7 +18,8 @@ interface Props {
 let { groups, chosen, names, accounts, onToggle }: Props = $props()
 const listed = $derived(new Set(groups.flatMap((group) => group.entries.map((entry) => entry.id))))
 const unlisted = $derived(chosen.filter((id) => !listed.has(id)))
-const unlistedNames = $derived(missingNames(unlisted, names, accounts))
+const listedNames = $derived(groups.flatMap((group) => group.entries.map((entry) => entry.name)))
+const unlistedNames = $derived(missingNames(unlisted, names, accounts, listedNames))
 const full = $derived(chosen.length >= MAX_SERIES)
 </script>
 

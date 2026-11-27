@@ -1,0 +1,185 @@
+/*
+ * The one header frame for every static site on trajectonomics.com: the Site, the blog, the data
+ * site and the docs portal. The bar, the brand tile, the marker and the three columns are the same
+ * size and in the same place on all four, so a visitor moving between them does not see the frame
+ * move: where you are at the start, the site's own sections in the centre, and its tools at the
+ * end. Only what each app puts in those columns differs. A framework-free stylesheet: it reads the
+ * brand's --ds-* roles and the app's --font-display and --font-meta, and writes no colour and no
+ * position of its own. Position stays with each app (the Site is fixed, the others sticky at the
+ * top).
+ */
+
+.ds-header {
+	z-index: 50;
+	height: 4rem;
+	border-bottom: 1px solid var(--ds-color-border);
+	background: var(--ds-color-background);
+}
+
+/*
+ * Three columns on every site: where you are at the start, this site's own sections in the centre,
+ * and the tools at the end. The side columns take the spare width so the centre stays on the page's
+ * centre whatever each side holds.
+ */
+.ds-header-inner {
+	display: grid;
+	grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+	height: 100%;
+	max-width: 94.5rem;
+	align-items: center;
+	margin-inline: auto;
+	padding-inline: 1rem;
+	column-gap: 1rem;
+}
+
+@media (min-width: 40rem) {
+	.ds-header-inner {
+		padding-inline: 2.5rem;
+		column-gap: 1.25rem;
+	}
+}
+
+/*
+ * The Site draws 12 px of inset on a 360 px phone, and every site keeps that edge. On the narrowest
+ * phones the centre column takes what is left, so its items stay on the row.
+ */
+@media (max-width: 30rem) {
+	.ds-header-inner {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		padding-inline: 0.75rem;
+		column-gap: 0.5rem;
+	}
+}
+
+/* Where you are: the mark's tile, then this site's marker when it has one. */
+.ds-header-start {
+	display: flex;
+	align-items: center;
+	justify-self: start;
+	gap: 12px;
+}
+
+/* This site's own sections, centred on the page. */
+.ds-header-nav {
+	display: flex;
+	align-items: center;
+	justify-self: center;
+	gap: 1rem;
+}
+
+@media (min-width: 40rem) {
+	.ds-header-nav {
+		gap: 2rem;
+	}
+}
+
+/* The tools: the repository link, the Language menu, search. No navigation lives here. */
+.ds-header-end {
+	display: flex;
+	align-items: center;
+	justify-self: end;
+	gap: 1rem;
+}
+
+@media (min-width: 40rem) {
+	.ds-header-end {
+		gap: 1.25rem;
+	}
+}
+
+@media (max-width: 30rem) {
+	.ds-header-nav {
+		gap: 0.625rem;
+	}
+
+	.ds-header-end {
+		gap: 0.5rem;
+	}
+}
+
+/* The link around the mark: it names itself, so the tile is the artwork and the ring shows focus. */
+.ds-brand {
+	display: inline-flex;
+	align-items: center;
+	border-radius: var(--ds-radius-sm);
+	text-decoration: none;
+}
+
+.ds-brand:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* The mark on its tile: 40 px at every width, painted from the primary roles. */
+.ds-brand-tile {
+	display: flex;
+	width: 2.5rem;
+	height: 2.5rem;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--ds-radius-sm);
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.ds-brand-tile > svg {
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+/* The section marker: the display face, so the header says which part of the site this is. */
+.ds-marker {
+	font-family: var(--font-display);
+	font-size: 20px;
+	font-weight: 300;
+	letter-spacing: -0.01em;
+	color: var(--ds-color-foreground);
+	text-decoration: none;
+}
+
+.ds-marker:hover {
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.ds-marker:focus-visible {
+	border-radius: var(--ds-radius-sm);
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* The nav's items: the meta face, uppercase, 12 px, with the current page underlined. */
+.ds-nav-link {
+	display: inline-flex;
+	min-height: 2rem;
+	align-items: center;
+	gap: 6px;
+	padding: 0 2px;
+	font-family: var(--font-meta);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: uppercase;
+	color: var(--ds-color-foreground);
+	text-decoration: none;
+}
+
+@media (max-width: 30rem) {
+	.ds-nav-link {
+		font-size: 11px;
+	}
+}
+
+.ds-nav-link:hover,
+.ds-nav-link[aria-current="page"] {
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+/* Every control the keyboard reaches paints the Theme's ring, so focus is never invisible. */
+.ds-nav-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

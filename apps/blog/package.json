@@ -36,6 +36,7 @@
 		"wrangler": "^4.158.0"
 	},
 	"dependencies": {
-		"@trajectonomics/brand": "workspace:*"
+		"@trajectonomics/brand": "workspace:*",
+		"@trajectonomics/site-header": "workspace:*"
 	}
 }

@@ -105,14 +105,18 @@ describe("theme seam", () => {
 		expect(declarationValue(declarationsOf(css, ":root"), "--spacing")).toBe("var(--ds-space-1)")
 	})
 
-	test("the search trigger keeps neutral chrome on hover", async () => {
+	test("the header's search trigger keeps neutral chrome on hover", async () => {
 		const css = await Bun.file(SEAM_PATH).text()
-		const declarations = declarationsOf(
-			css,
-			":where(#nd-sidebar, #nd-sidebar-mobile) [data-search-full]:is(:hover, :focus-visible)",
-		)
-		expect(declarationValue(declarations, "background-color")).toBe("var(--ds-color-secondary)")
-		expect(declarationValue(declarations, "color")).toBe("var(--ds-color-foreground)")
+		for (const header of ["#nd-nav", "#nd-subnav"]) {
+			const declarations = declarationsOf(
+				css,
+				`${header} :is([data-search], [data-search-full]):is(:hover, :focus-visible)`,
+			)
+			expect(declarationValue(declarations, "background-color"), header).toBe(
+				"var(--ds-color-secondary)",
+			)
+			expect(declarationValue(declarations, "color"), header).toBe("var(--ds-color-foreground)")
+		}
 	})
 
 	test("the seam states the dark rendering mode for a reader with JavaScript off", async () => {

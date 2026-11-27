@@ -2,11 +2,9 @@ import { type SerializedPageTree, useFumadocsLoader } from "fumadocs-core/source
 import type { TOCItemType } from "fumadocs-core/toc"
 import { DocsLayout } from "fumadocs-ui/layouts/notebook"
 import { DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/notebook/page"
-import type { LayoutTab } from "fumadocs-ui/layouts/shared"
 import { baseOptions } from "../lib/layout.shared"
 import type { PageMascotPose } from "../lib/mascot"
-import { isTabPath, TABS, tabUrl } from "../lib/tabs"
-import { DocsSidebarBanner, HeaderTabs, noHeaderSearchTrigger } from "./docs-shell"
+import { DocsSidebarBanner, HeaderTabs, headerSearchTrigger, headerTabs } from "./docs-shell"
 import { Mascot } from "./mascot"
 import { Provider, type ProviderProps } from "./provider"
 
@@ -33,15 +31,6 @@ const SHELL_GRID = [
 	"/ 0 var(--fd-sidebar-col) minmax(0, 1fr) var(--fd-toc-col) 0",
 ].join("\n")
 
-/** The header Tabs of one page, marking the current Tab for assistive technology. */
-function headerTabs(pathname: string): LayoutTab[] {
-	return TABS.map((tab) => ({
-		title: tab.title,
-		url: tabUrl(tab),
-		...(isTabPath(tab, pathname) ? { props: { "aria-current": "page" } } : {}),
-	}))
-}
-
 /** React island for a Docs Portal page; the page content is passed as children. */
 export function Docs({ tree, title, description, toc, mascot, children, ...props }: DocsProps) {
 	const data = useFumadocsLoader({ tree })
@@ -61,7 +50,7 @@ export function Docs({ tree, title, description, toc, mascot, children, ...props
 					collapsible: false,
 					banner: (bannerProps) => <DocsSidebarBanner {...bannerProps} />,
 				}}
-				slots={{ searchTrigger: noHeaderSearchTrigger }}
+				slots={{ searchTrigger: headerSearchTrigger }}
 				containerProps={{ style: { gridTemplate: SHELL_GRID } }}
 			>
 				<DocsPage toc={toc} tableOfContent={{ enabled: toc.length > 0 }}>

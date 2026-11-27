@@ -3,7 +3,7 @@ import type { BuiltFile } from "./built-files"
 import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
-import { anchors } from "./html"
+import { anchors, elementContent } from "./html"
 import { isRedirectPage } from "./redirect-page"
 import { indexedPageIds, parseSearchIndex, SEARCH_INDEX_FILE } from "./search-index"
 
@@ -18,7 +18,9 @@ function pageFailures(page: BuiltFile, releaseLine: string | undefined): readonl
 		return [buildFailure("LANDING_PAGE_REDIRECT", page.path, "the Landing Page is a meta refresh")]
 	}
 	const failures: BuildFailure[] = []
-	const links = anchors(page.content)
+	// The page body's audience entries are the only links into a Tab there; the header's Tabs are
+	// the shell's own and are checked by `checkHeaderTabs`.
+	const links = anchors(elementContent(page.content, "landing-body") ?? "")
 		.map((link) => link.href)
 		.filter(
 			(href): href is string => href !== undefined && TABS.some((tab) => isTabPath(tab, href)),
@@ -30,7 +32,7 @@ function pageFailures(page: BuiltFile, releaseLine: string | undefined): readonl
 			buildFailure(
 				"LANDING_PAGE_LINKS",
 				page.path,
-				`the Landing Page links to ${found} in the Tabs, expected exactly ${expected.join(", ")}`,
+				`the Landing Page's body links to ${found} in the Tabs, expected exactly ${expected.join(", ")}`,
 			),
 		)
 	}

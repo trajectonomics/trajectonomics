@@ -9,6 +9,7 @@
 			"dependsOn": [
 				"@trajectonomics/brand#build",
 				"@trajectonomics/brand#check",
+				"@trajectonomics/site-header#check",
 				"@trajectonomics/web#build:hosted"
 			]
 		},
