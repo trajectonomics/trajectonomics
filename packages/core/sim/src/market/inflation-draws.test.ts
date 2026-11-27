@@ -60,9 +60,16 @@ describe("the inflation draws of a Market path", () => {
 			return factor.buckets[bucketOf(Number(word >> 32n))]!.rateBps
 		})
 		const priced = marketPath(model(factor), seed, 0, timeline, 300)
+		expect(priced.prices?.ratesBps).toHaveLength(4)
 		expect(priced.prices?.ratesBps).toEqual(expected)
 		expect(priced.prices?.start).toBe(start)
 		expect(priced.prices?.outsideBps).toBe(300)
+	})
+
+	it("draws one rate per growth year plus the year holding the horizon", () => {
+		const offAnniversary = { ...timeline, horizon: "2028-12-31" } as const
+		expect(marketPath(model(factor), seed, 0, timeline, 300).prices?.ratesBps).toHaveLength(4)
+		expect(marketPath(model(factor), seed, 0, offAnniversary, 300).prices?.ratesBps).toHaveLength(3)
 	})
 
 	it("takes each path's rates from its own words after the market rows", () => {

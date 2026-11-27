@@ -96,7 +96,7 @@ describe("checkReturnModel on an inflation factor", () => {
 		])
 	})
 
-	it("accepts the model `planReturnModel` builds", () => {
+	it("accepts a model in the shape `planReturnModel` builds", () => {
 		const built = model(buckets({ rateBps: 300, weight: FULL })) as ReturnModel
 		expect(checkReturnModel(built, ["fund"], timeline)).toEqual([])
 	})

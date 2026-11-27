@@ -20,8 +20,8 @@ volatility keeps every figure it has today, byte for byte.
   bucket, over the same standard normal table and the same `2^32 / buckets` weight as the markets. The rate is
   `mean + z_b x volatility`, rounded to whole basis points by largest remainder, then clamped to
   `[-9999, 10000]`; `inflationClamped` counts the clamps and is present only when it is above 0. Because the
-  table is odd-symmetric and the weights are equal, the rates sum to exactly `buckets x mean`: a plan's stated
-  inflation is the factor's exact mean, not an approximation. A model with no factor has no `inflation` key.
+  table is odd-symmetric and the weights are equal, the rates sum to exactly `buckets x mean` unless a clamp
+  applies (`inflationClamped`): a plan's stated inflation is then the factor's exact mean, not an approximation. A model with no factor has no `inflation` key.
 - **The draw order.** The inflation draws come after the market draws, on the same path stream. A path consumes
   `dates.length` words from `pathSeed(seed, index)` for its Market rows, exactly as it did before, then `Y + 1`
   more, where `Y = growthYears(timeline.start, timeline.horizon)` and the extra one covers the year holding the
@@ -74,8 +74,11 @@ volatility keeps every figure it has today, byte for byte.
 
 The freelancer fixture, 1,000 Market paths at the seed `0123456789abcdef`, a 256-bucket plan model, three runs
 each, under Bun: inflation off took 6,546 ms and volatility 150 took 9,505 ms, a ratio of 1.45. The stop rule
-was 1.5x, and the run stays inside it. The extra time is the 26 roll-ups' real figures, which a plan with no
-volatility does not compute at all; the draws themselves cost one word per growth year. A larger Timeline costs
+was 1.5x, and the run stays inside it; the review re-measured 7,132 ms against 10,101 ms, 1.42. A profile of
+300 paths puts about half the extra time in rebuilding each path's events, because the per-path Scenario
+(`{ ...scenario, prices }`) misses `buildEvents`' per-Scenario cache, and about 15% in `growthYears` inside
+`inflateBy`; the real figures are about 4%, and the draws themselves cost one word per growth year. Both larger
+costs can be removed without changing a figure (issue #815). A larger Timeline costs
 the same words, and a plan with no volatility draws none of them.
 
 ## Tests
@@ -84,7 +87,8 @@ Each check has a test that fails on the previous engine except the three guards:
 file, the zero-volatility model, and the unchanged old parity hashes. `market/plan-inflation.test.ts` pins the
 exact sum, the odd symmetry, the variance and a clamp; `market/inflation-draws.test.ts` pins the draw order
 against `golden/oracle-prng.ts`; `chance/two-bucket-inflation.test.ts` is the issue's hand check over three
-years; `chance/real-bands.test.ts` pins the 364-day real value at 909,317; `chance/levy-across-paths.test.ts`
-pins the Levy; `engine/project-path-inflation.test.ts` pins the 50-path identity, the one-path real Bands and
+years; `chance/real-bands.test.ts` pins the 364-day real value at 909,317; `engine/prices-seam.test.ts`
+guards that a Levy stays nominal under a path, and `chance/levy-across-paths.test.ts` checks every path's Levy
+against the deterministic one; `engine/project-path-inflation.test.ts` pins the 50-path identity, the one-path real Bands and
 a flat 300-bps path; `market/inflation-distribution.test.ts` pins the 1,000-path mean. The new parity cases are
 `freelancer-plan-chance-inflation` and `freelancer-path-inflation`.

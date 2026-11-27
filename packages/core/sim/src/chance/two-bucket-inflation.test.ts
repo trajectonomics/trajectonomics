@@ -62,14 +62,6 @@ function oracleRates(): readonly number[] {
 	})
 }
 
-/** `amount` compounded by whole years of `rates`, rounded half up: the rule written out. */
-function grown(amount: bigint, rates: readonly number[]): bigint {
-	const scale = 10_000n ** BigInt(rates.length)
-	let num = 1n
-	for (const rate of rates) num *= 10_000n + BigInt(rate)
-	return (2n * amount * num + scale) / (2n * scale)
-}
-
 describe("a chance of success with two inflation buckets", () => {
 	it("draws [500, 100, 500, 500] for path 0 of this seed", () => {
 		expect(oracleRates()).toEqual([500, 100, 500, 500])
@@ -85,11 +77,10 @@ describe("a chance of success with two inflation buckets", () => {
 			{},
 		)
 		if (!result.ok) throw new Error(JSON.stringify(result.problems))
+		// By hand from the draws [500, 100, 500]: 1,000,000 x 1.05, then x 1.01, then x 1.05.
+		expect(rates.slice(0, 3)).toEqual([500, 100, 500])
 		expect(result.projection.annual.map((rollup) => rollup.income)).toEqual([
-			1_000_000,
-			Number(grown(1_000_000n, rates.slice(0, 1))),
-			Number(grown(1_000_000n, rates.slice(0, 2))),
-			Number(grown(1_000_000n, rates.slice(0, 3))),
+			1_000_000, 1_050_000, 1_060_500, 1_113_525,
 		])
 	})
 

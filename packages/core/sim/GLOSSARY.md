@@ -346,7 +346,7 @@ The Return model `planReturnModel` builds from a Scenario: each Account with a V
 _Avoid_: Monte Carlo settings
 
 **Inflation factor**:
-One year's inflation per Market bucket, with an integer weight, carried as `inflation` on a Return model; the weights total exactly 2^32, as a Market bucket's do (ADR 0033). It is built from the Scenario's `economy.inflation` (the mean) and `economy.inflationVolatility` (the yearly standard deviation), and its rates sum to exactly `buckets × mean`. It is present only when a plan states a volatility above 0; without it, every Market path's inflation stays at `economy.inflation`.
+One year's inflation per Market bucket, with an integer weight, carried as `inflation` on a Return model; the weights total exactly 2^32, as a Market bucket's do (ADR 0033). It is built from the Scenario's `economy.inflation` (the mean) and `economy.inflationVolatility` (the yearly standard deviation), and its rates sum to exactly `buckets × mean` unless a clamp applies (`inflationClamped`). It is present only when a plan states a volatility above 0; without it, every Market path's inflation stays at `economy.inflation`.
 _Avoid_: Inflation model, CPI series, inflation scenario
 
 **Price path**:
