@@ -4,18 +4,18 @@ import { editSession } from "../../client/edit.svelte.js"
 interface Props {
 	/** The Scenario whose household is removed. */
 	name: string
-	/** The content hash of the Scenario the page read (cli ADR 0055). */
-	contentHash: string
+	/** The hash of the document and household the page read (cli ADR 0055). */
+	householdHash: string
 }
 
-let { name, contentHash }: Props = $props()
+let { name, householdHash }: Props = $props()
 let removing = $state(false)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
 /** Removes the household; the dates it pinned stay as they are. */
 async function removeHousehold(): Promise<void> {
-	if (await editSession.run({ kind: "remove-household", name, contentHash }, "household"))
+	if (await editSession.run({ kind: "remove-household", name, householdHash }, "household"))
 		removing = false
 }
 </script>

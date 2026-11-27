@@ -114,6 +114,25 @@ describe("ReadsSection", () => {
 		)
 		expect(body).toContain("traj report pnl --since 2026-01-01 --until 2026-10-31 --json")
 	})
+
+	test("marks a failed Read's words as the CLI's only when the CLI wrote them", () => {
+		const withCode = (code: string): Snapshot => ({
+			...demo,
+			reads: {
+				...demo.reads,
+				pnl: {
+					argv: ["report", "pnl", "--json"],
+					ok: false,
+					error: { code, exitCode: 1, message: "Some words." },
+				},
+			},
+		})
+		const shown = (code: string) =>
+			render(ReadsSection, { props: { snapshot: withCode(code) } }).body
+		expect(shown("LEDGER_EMPTY")).toContain("data-cli")
+		for (const code of ["traj_unavailable", "contract_mismatch"])
+			expect(shown(code)).not.toContain("data-cli")
+	})
 })
 
 describe("SnapshotSection", () => {

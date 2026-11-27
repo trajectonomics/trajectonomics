@@ -34,7 +34,7 @@ const household = () =>
 			name: "base",
 			doc: base.document,
 			household: base.household,
-			contentHash: base.contentHash,
+			householdHash: base.householdHash,
 			editable: true,
 		},
 	}).body
@@ -90,7 +90,7 @@ describe("the household's people are called by role, never by id", () => {
 			props: {
 				name: "base",
 				household: base.household!,
-				contentHash: base.contentHash,
+				householdHash: base.householdHash,
 				flows: base.document.flows,
 				onDone: () => {},
 			},

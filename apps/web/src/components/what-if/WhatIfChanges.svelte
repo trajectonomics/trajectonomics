@@ -3,6 +3,7 @@ import { editSession } from "../../client/edit.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
+import { isCliError } from "../../lib/edit/failure"
 import { maskMoney } from "../../lib/format/mask"
 import { itemText, NO_ITEM_NAMES, snapshotItemNames } from "../../lib/view/item-names"
 import { tryWords } from "../../lib/view/withdrawals/try-words"
@@ -17,14 +18,14 @@ const refusals = $derived(
 		: failedReads(whatIfSession.answer).map((failed) => ({
 				path: pathNamed(failed.error),
 				message: failed.error.message,
+				fromCli: isCliError(failed.error),
 			})),
 )
 
 /** The refusal that names a change, or a part of the loan or asset it groups, if one does. */
-function refusalOf(change: Change): string | null {
+function refusalOf(change: Change) {
 	return (
-		refusals.find((refusal) => refusal.path !== null && namesChange(change, refusal.path))
-			?.message ?? null
+		refusals.find((refusal) => refusal.path !== null && namesChange(change, refusal.path)) ?? null
 	)
 }
 
@@ -40,11 +41,11 @@ const names = $derived.by(() => {
 		: snapshotItemNames(state.snapshot, plan)
 })
 
-/** Whether a Set changes a figure, which hiding amounts masks. A Milestone's id or a date is not a figure. */
+/** Whether a Set changes a figure, which hiding amounts masks. A Milestone's id, a date or an income word is not a figure. */
 function isFigure(change: Change): change is Extract<Change, { kind: "set" }> {
 	if (change.kind !== "set") return false
 	const field = change.path.slice(change.path.lastIndexOf(".") + 1)
-	return field !== "startAt" && field !== "endAt" && !isDatePath(change.path)
+	return field !== "startAt" && field !== "endAt" && field !== "earned" && !isDatePath(change.path)
 }
 
 /** A change's words as the bar shows them: a Set of a figure is masked when the person hides amounts. */
@@ -64,10 +65,11 @@ function wordsOf(change: Change): string {
 <!-- The changes of the session, one per line: a remove control each, and a refusal at the change it names. -->
 <ul class="space-y-1.5 text-sm">
 	{#each whatIfSession.changes as change (change.path + change.kind)}
+		{@const refusal = refusalOf(change)}
 		<li class="flex flex-wrap items-center gap-2">
 			<span class="min-w-0 wrap-anywhere" title={change.kind === "add" ? change.title : undefined}>{wordsOf(change)}</span>
-			{#if refusalOf(change) !== null}
-				<span role="alert" class="text-destructive" data-cli>{refusalOf(change)}</span>
+			{#if refusal !== null}
+				<span role="alert" class="text-destructive" data-cli={refusal.fromCli ? "" : undefined}>{refusal.message}</span>
 			{/if}
 			<button
 				type="button"
