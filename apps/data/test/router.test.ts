@@ -25,6 +25,7 @@ function at(
 describe("routeRequest on the apex", () => {
 	test("sends /data/api/* and /data/ingest to their handlers", () => {
 		expect(at(APEX, "/data/api/usage")).toEqual({ kind: "usage" })
+		expect(at(APEX, "/data/api/peaks")).toEqual({ kind: "peaks" })
 		expect(at(APEX, "/data/api/health")).toEqual({ kind: "health" })
 		expect(at(APEX, "/data/ingest", { method: "POST" })).toEqual({ kind: "ingest" })
 	})
@@ -43,6 +44,7 @@ describe("routeRequest on the apex", () => {
 describe("routeRequest on the old host", () => {
 	test("keeps the API and ingest, without redirecting", () => {
 		expect(at(OLD, "/api/usage")).toEqual({ kind: "usage" })
+		expect(at(OLD, "/api/peaks")).toEqual({ kind: "peaks" })
 		expect(at(OLD, "/api/health")).toEqual({ kind: "health" })
 		expect(at(OLD, "/api/nope")).toEqual({ kind: "not_found" })
 		expect(at(OLD, "/ingest", { method: "POST" })).toEqual({ kind: "ingest" })
@@ -50,6 +52,7 @@ describe("routeRequest on the old host", () => {
 
 	test("answers the API and ingest under the base too, which a page served there calls", () => {
 		expect(at(OLD, "/data/api/usage")).toEqual({ kind: "usage" })
+		expect(at(OLD, "/data/api/peaks")).toEqual({ kind: "peaks" })
 		expect(at(OLD, "/data/api/health")).toEqual({ kind: "health" })
 		expect(at(OLD, "/data/ingest", { method: "POST" })).toEqual({ kind: "ingest" })
 	})
@@ -109,6 +112,7 @@ describe("routeRequest on localhost", () => {
 		expect(at("localhost", "/data/")).toEqual({ kind: "not_found" })
 		expect(at("localhost", "/data/api/health")).toEqual({ kind: "health" })
 		expect(at("127.0.0.1", "/data/api/usage")).toEqual({ kind: "usage" })
+		expect(at("127.0.0.1", "/data/api/peaks")).toEqual({ kind: "peaks" })
 	})
 })
 

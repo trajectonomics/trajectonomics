@@ -3,11 +3,12 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { compactCount, displayCount } from "../lib/format"
 import { grandTotal } from "../lib/grand-total"
+import { planTier } from "../lib/plan-tier"
 import { IN_USE_DAYS, type PlanTotal } from "../lib/plan-totals"
 import { WINDOW_DAYS } from "../lib/window"
 import PlanMark from "./PlanMark.svelte"
 
-let { totals }: { totals: PlanTotal[] } = $props()
+let { totals, day }: { totals: PlanTotal[]; day: string } = $props()
 
 const grand = $derived(grandTotal(totals))
 const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
@@ -26,6 +27,7 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 	<ol class="meter-list">
 		{#each totals as total}
 			{@const width = topRate === 0 ? 0 : Math.round((total.tokensPerActiveDay / topRate) * 100)}
+			{@const tier = planTier(total.plan, day)}
 			<li
 				class="meter-row"
 				class:meter-dim={!total.inUse}
@@ -34,6 +36,9 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 				<div class="meter-identity">
 					<PlanMark plan={total.plan} name={total.planName} />
 					<span class="meter-name">{total.planName}</span>
+					{#if tier !== null}
+						<span class="plan-tier" title={tier.note ?? undefined}>{tier.name}</span>
+					{/if}
 					{#if total.inUse}
 						<span class="use-dot" aria-hidden="true"></span>
 						<span class="visually-hidden">In use</span>
