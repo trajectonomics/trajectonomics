@@ -32,7 +32,7 @@ const collecting = $derived(
 		<span>{fresh.label}</span>
 		{#if fresh.at !== null}<span class="visually-hidden">({fresh.at})</span>{/if}
 		{#if fresh.note !== null}<span class="freshness-note">{fresh.note}</span>{/if}
-		{#if collecting !== null}<span class="freshness-collecting">{collecting}</span>{/if}
+		{#if collecting !== null}<span class="freshness-collecting"><span aria-hidden="true">· </span>{collecting}</span>{/if}
 	</p>
 {/if}
 
