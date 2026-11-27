@@ -14,7 +14,7 @@ function twinLabelOf(id: string, accounts: AccountNames): string | undefined {
 /**
  * The names of the series a plan does not state, built from their ids and then told apart exactly as the drawn
  * names are: a tie takes its group, item, category and Account, then " (2)", " (3)" in sorted-id order (web ADR
- * 0029). No two lines of a "Not in this Snapshot" or "Not on this plan" list ever read alike, and a missing name
+ * 0029). No two lines of a "Not in this plan" or "Not on this plan" list ever read alike, and a missing name
  * never repeats a name already `taken` by a listed or drawn series.
  */
 export function missingNames(

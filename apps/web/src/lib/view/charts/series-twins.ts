@@ -62,11 +62,18 @@ function suffixesAt(
 	})
 }
 
-/** Whether a step tells a group apart: a suffix adds a word, or the suffixes left tied differ. */
-function splits(name: string, suffixes: readonly string[]): { moves: boolean[]; split: boolean } {
+/**
+ * Whether a step tells a group apart: a suffix adds a word, or the suffixes left tied differ from each other or from
+ * those a kept series (`held`, one whose name is fixed) would take, so a lone moving series still states its category.
+ */
+function splits(
+	name: string,
+	suffixes: readonly string[],
+	held: readonly string[],
+): { moves: boolean[]; split: boolean } {
 	const moves = suffixes.map((suffix) => informs(name, suffix))
 	const stay = suffixes.filter((_, at) => moves[at] !== true)
-	return { moves, split: new Set(stay).size > 1 }
+	return { moves, split: stay.length > 0 && new Set([...stay, ...held]).size > 1 }
 }
 
 /** The level a group's items take at a step: a splitting or word-adding item moves, the rest stay where they are. */
@@ -96,9 +103,15 @@ export function tellGroup(
 	from: number,
 	category: readonly boolean[],
 	accounts: AccountNames,
+	held: readonly number[] = [],
 ): Map<number, number> {
 	for (let step = from + 1; step <= TWIN_STEPS; step += 1) {
-		const { moves, split } = splits(name, suffixesAt(items, indexes, step, category, accounts))
+		const suffixes = suffixesAt(items, indexes, step, category, accounts)
+		const { moves, split } = splits(
+			name,
+			suffixes,
+			suffixesAt(items, held, step, category, accounts),
+		)
 		if (split || moves.some(Boolean)) return levelsOf(indexes, moves, split, step, from)
 	}
 	return levelsOf(indexes, [], false, from, from)

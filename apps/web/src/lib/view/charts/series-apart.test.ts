@@ -58,3 +58,16 @@ describe("Thai is read as whole words", () => {
 		expect(nameOf("ก้น")).toBe("Expense: กิน (กิน, ก้น)")
 	})
 })
+
+describe("a kept series' category counts when a step is judged", () => {
+	test("the line left beside the selected plan's still states its category", () => {
+		const categories = ["home", "loan"]
+		const runs = categories.map((category) =>
+			withCashLines([{ group: "expense", id: "home-loan", category }]),
+		)
+		const named = seriesNames(runs, runs[0] ?? null, NO_NAMES)
+		expect(named.get(cashSeries("expense", "home-loan", null, "loan"))).toBe(
+			"Expense: home-loan (home-loan, loan)",
+		)
+	})
+})

@@ -13,10 +13,13 @@ function raiseLevels<T extends Series>(
 	fixed: ReadonlySet<string>,
 	accounts: AccountNames,
 ): void {
-	const moving = indexes.filter((index) => !fixed.has(items[index]?.id ?? ""))
+	const isFixed = (index: number) => fixed.has(items[index]?.id ?? "")
+	const moving = indexes.filter((index) => !isFixed(index))
 	if (moving.length === 0) return
+	// A kept series with a category counts when a step is judged, so the series left to move still states its own.
+	const held = indexes.filter((index) => isFixed(index) && category[index] === true)
 	const from = Math.max(...moving.map((index) => levels[index] ?? 0))
-	for (const [index, level] of tellGroup(name, items, moving, from, category, accounts))
+	for (const [index, level] of tellGroup(name, items, moving, from, category, accounts, held))
 		levels[index] = level
 }
 
