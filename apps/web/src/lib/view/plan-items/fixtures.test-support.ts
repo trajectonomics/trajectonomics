@@ -5,6 +5,7 @@ import {
 	type ScenarioShow,
 	scenarioDocument,
 } from "../../contract"
+import { brandHouseholdHash } from "../../contract/household-hash.test-support"
 
 /**
  * A Scenario document in the decimal form, parsed by the contract so the fixture is one the contract
@@ -73,7 +74,7 @@ export function documentRead(document: ScenarioDocument = planDocument()): Read<
 				id: "01a2",
 				name: "base",
 				contentHash: "jcs1:sha256:abc",
-				householdHash: "hash-household",
+				householdHash: brandHouseholdHash("hash-household"),
 				forkedFrom: null,
 				version: 2,
 				createdAt: "2026-11-22T17:25:38.908Z",
