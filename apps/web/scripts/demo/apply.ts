@@ -1,7 +1,8 @@
 import { writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { DEMO_ESTATE } from "./estate"
-import { HOME_ACCOUNTS, HOME_FLOWS } from "./home"
+import { HOME_ACCOUNTS } from "./home"
+import { HOME_FLOWS } from "./home-flows"
 import { applyJointScenario } from "./joint"
 import {
 	baseScenarioDocument,
