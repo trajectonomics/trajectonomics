@@ -51,16 +51,16 @@ We split the work into three small, independently revertible pull requests so ea
 - **Uncoupled `lint` from `^build`:** Dropped `"dependsOn": ["^build"]` from `lint` in [`turbo.json`](https://github.com/trajectonomics/trajectonomics/blob/main/turbo.json) and [`apps/site/turbo.json`](https://github.com/trajectonomics/trajectonomics/blob/main/apps/site/turbo.json), and wired root `bun run format` through Turbo. An uncached root `turbo run lint --force --concurrency=4` dropped from **20.44s** (27 tasks) to **3.26s** (18 tasks)—**6.3× faster**.
 - **Buffered parallel step runner:** Added [`tooling/scripts/run-parallel.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/scripts/run-parallel.ts), a small Bun script that runs independent commands concurrently, buffers each command's output so logs never interleave, prints failure banners deterministically, and forwards `SIGINT`/`SIGTERM` to children.
 - **Parallel compilers and checks:** Ran `tsc`, `svelte-check`, and `astro check` in parallel inside `typecheck` (cutting `apps/web` `typecheck` from `55.96s` to `23.00s` and `apps/data` `typecheck` from `33.51s` to `10.39s`), and ran `lint`, `typecheck` and `test` in parallel inside `check` before the build and verify steps.
-- **Fast archived-link guard:** Switched [`tooling/guards/archived-links.test.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/guards/archived-links.test.ts) from reading every tracked file (including binary images and fonts) twice sequentially to prefiltering text candidates with `git grep -I -l -F -z` and memoizing results—turning a 5-second timeout flake under load into **44.5ms**.
+- **Fast archived-link guard:** Switched [`tooling/guards/archived-links.test.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/guards/archived-links.test.ts) from reading every tracked file (including binary images and fonts) twice sequentially to prefiltering text candidates with `git grep -I -l -F -z` and memoizing results—turning a `>7s` full-repo scan (which hit Bun's 5-second timeout under load) into **44.5ms**.
 
 ## Four real bugs concurrency surfaced
 
 Speeding up checks is only useful if determinism stays rock-solid. Running tasks concurrently surfaced four subtle bugs that sequential execution had hidden:
 
 1. **`FORCE_COLOR=1` leaked ANSI escapes into JSON stderr.** Under Turbo's PTY, Bun's `console.error` wrapped error envelopes in ANSI red, breaking CLI JSON tests when run under `--parallel`. Writing stderr directly with `writeSync(2, ...)` in [`apps/cli/src/index.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/apps/cli/src/index.ts) fixed it cleanly.
-2. **Never swap `console.log` for `process.stdout.write` right before `process.exit()`.** While fixing stderr, we briefly tried `process.stdout.write` on stdout too—and immediately truncated >64 KB `traj projection run --json` payloads on pipe exit. Keeping `console.log` for stdout (and setting `process.exitCode` instead of `process.exit()`) prevented truncated JSON.
+2. **Never swap `console.log` for `process.stdout.write` right before `process.exit()`.** While fixing stderr, we briefly tried `process.stdout.write` on stdout too—and immediately truncated >64 KB `traj projection run --json` payloads on pipe exit. Keeping `console.log` for CLI stdout (and setting `process.exitCode` instead of `process.exit()` in [`tooling/scripts/run-parallel.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/scripts/run-parallel.ts)) prevented truncated output.
 3. **`astro check --no-sync` still ran `astro sync`.** Astro 7.4's `mri` CLI parser turns `--no-sync` into `{ sync: false }`, whereas `astro check` inspects `flags.noSync`! That meant `astro check` was still rewriting `.astro/types.d.ts` right while `tsc` read it. Passing `--noSync` (camelCase) after a single upfront `astro sync` eliminated both the race and 2–6 seconds of duplicate work per Astro app.
-4. **Slow tests hide until CPU contention rises.** Reading thousands of tracked files twice in `archived-links.test.ts` barely passed when `Check packages` ran at `--concurrency=2`, then hit Bun's 5-second timeout once 4 packages ran together. Prefiltering with `git grep -I` made the guard >150× faster.
+4. **Slow tests hide until CPU contention rises.** Reading thousands of tracked files twice in `archived-links.test.ts` (`>7s` across the two assertions) barely slipped under Bun's 5-second per-test timeout when `Check packages` ran at `--concurrency=2`, then timed out once 4 packages ran together. Prefiltering with `git grep -I` and memoizing made the guard >150× faster.
 
 ## Measured results
 
@@ -73,15 +73,15 @@ Speeding up checks is only useful if determinism stays rock-solid. Running tasks
 | `apps/cli` `dump.test.ts` | 27.6s | **3.69s** | **7.5×** | [PR #804](https://github.com/trajectonomics/trajectonomics/pull/804) |
 | `tooling/guards` `archived-links.test.ts` | >7s (timeout) | **44.5ms** | **>150×** | [PR #811](https://github.com/trajectonomics/trajectonomics/pull/811) |
 | CI `Check packages` (warm cache) | 171s | **81s** | **2.1×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
-| CI `Check web` | 57s | **27–31s** | **~2.0×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
-| CI `Check web scripts` (slowest shard) | 341s | **166–168s** | **2.0×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46046018982](https://github.com/trajectonomics/trajectonomics/actions/runs/46046018982) |
+| CI `Check web` | 57s | **27–31s** | **1.8–2.1×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
+| CI `Check web scripts` (slowest shard) | 341s | **166–168s** | **2.0–2.1×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46046018982](https://github.com/trajectonomics/trajectonomics/actions/runs/46046018982) |
 | CI `Check web browser` (slowest shard) | 387s | **249–250s** | **1.55×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46046018982](https://github.com/trajectonomics/trajectonomics/actions/runs/46046018982) |
 | CI `Browser checks (site)` | 273s | **160–168s** | **1.6–1.7×** | [#46036536078](https://github.com/trajectonomics/trajectonomics/actions/runs/46036536078) → [#46052307647](https://github.com/trajectonomics/trajectonomics/actions/runs/46052307647) |
 | CI total wall time (`ci.yml`) | 425s (7m 05s) | **279–280s (4m 40s)** | **1.52×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
 
 ## Check it yourself
 
-You can repeat the local timings on any checkout of [`trajectonomics/trajectonomics`](https://github.com/trajectonomics/trajectonomics):
+On a checkout of [`trajectonomics/trajectonomics`](https://github.com/trajectonomics/trajectonomics), after `bun install && bun run build`, you can repeat the local timings directly:
 
 ```sh
 DO_NOT_TRACK=1 bunx turbo run lint --force --concurrency=4

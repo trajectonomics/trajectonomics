@@ -51,16 +51,16 @@ cover:
 - **ปลด `lint` ออกจาก `^build`:** ถอด `"dependsOn": ["^build"]` ออกจาก `lint` ใน [`turbo.json`](https://github.com/trajectonomics/trajectonomics/blob/main/turbo.json) และ [`apps/site/turbo.json`](https://github.com/trajectonomics/trajectonomics/blob/main/apps/site/turbo.json) พร้อมผูกคำสั่ง `bun run format` ที่ root ผ่าน Turbo ทำให้การรัน `turbo run lint --force --concurrency=4` แบบไม่ใช้ cache ลดจาก **20.44 วินาที** (27 task) เหลือ **3.26 วินาที** (18 task) หรือเร็วขึ้น **6.3 เท่า**
 - **ตัวรันคำสั่งขนานแบบ buffer log:** เขียน [`tooling/scripts/run-parallel.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/scripts/run-parallel.ts) เพื่อรันคำสั่งอิสระพร้อมกัน เก็บ stdout/stderr ของแต่ละตัวไว้พิมพ์เรียงลำดับไม่ให้ปนกัน แสดงแบนเนอร์เมื่อมีตัวใดพัง และส่งต่อ `SIGINT`/`SIGTERM` ไปยัง child process
 - **รัน compiler และขั้นตรวจพร้อมกัน:** รัน `tsc`, `svelte-check` และ `astro check` ขนานกันใน `typecheck` (ลด `apps/web` จาก `55.96` เหลือ `23.00` วินาที และ `apps/data` จาก `33.51` เหลือ `10.39` วินาที) และรัน `lint`, `typecheck` กับ `test` พร้อมกันใน `check` ก่อนเข้าสู่ขั้น build และ verify
-- **เร่ง guard ตรวจลิงก์ repo เก่า:** เปลี่ยน [`tooling/guards/archived-links.test.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/guards/archived-links.test.ts) จากเดิมที่อ่านไฟล์ที่ git track ทุกไฟล์ (รวมรูปและฟอนต์) ซ้ำสองรอบเรียงกัน มาเป็นการคัดไฟล์ข้อความที่เข้าข่ายด้วย `git grep -I -l -F -z` แล้ว memoize ผลลัพธ์ เปลี่ยน test ที่เคย timeout 5 วินาทีตอนโหลดสูงให้เหลือ **44.5 มิลลิวินาที**
+- **เร่ง guard ตรวจลิงก์ repo เก่า:** เปลี่ยน [`tooling/guards/archived-links.test.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/guards/archived-links.test.ts) จากเดิมที่อ่านไฟล์ที่ git track ทุกไฟล์ (รวมรูปและฟอนต์) ซ้ำสองรอบเรียงกัน มาเป็นการคัดไฟล์ข้อความที่เข้าข่ายด้วย `git grep -I -l -F -z` แล้ว memoize ผลลัพธ์ เปลี่ยนการสแกนทั้ง repo ที่กินเวลากว่า 7 วินาที (จนชน timeout 5 วินาทีของ Bun ตอนโหลดสูง) ให้เหลือ **44.5 มิลลิวินาที**
 
 ## 4 ปัญหาจริงที่โผล่เมื่อเปิดรันแบบขนาน
 
 การเร่งความเร็วจะมีประโยชน์ก็ต่อเมื่อผลลัพธ์ยังนิ่งและทำซ้ำได้เหมือนเดิม พอเราเปิดรันขนานจริง มี bug ซ่อนอยู่ 4 ตัวที่การรันทีละขั้นตอนเคยกลบไว้:
 
 1. **`FORCE_COLOR=1` พ่นรหัสสี ANSI ปนลง JSON ใน stderr:** เมื่อ Turbo รันใน PTY, `console.error` ของ Bun จะใส่รหัสสีแดงครอบ error envelope ทำให้ test ที่ parse JSON จาก stderr พังเมื่อรัน `--parallel` แก้ด้วยการเขียน stderr ตรงผ่าน `writeSync(2, ...)` ใน [`apps/cli/src/index.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/apps/cli/src/index.ts)
-2. **ห้ามแทน `console.log` ด้วย `process.stdout.write` ก่อน `process.exit()`:** ตอนแก้ stderr เราเผลอเปลี่ยน stdout ไปด้วย และเจอทันทีว่า JSON ที่ใหญ่กว่า 64 KB จาก `traj projection run --json` ถูกตัดขาดกลางทางเมื่อ pipe ปิด การเก็บ `console.log` ไว้กับ stdout (และใช้ `process.exitCode` แทน `process.exit()`) ปิดปัญหานี้สนิท
+2. **ห้ามแทน `console.log` ด้วย `process.stdout.write` ก่อน `process.exit()`:** ตอนแก้ stderr เราเผลอเปลี่ยน stdout ไปด้วย และเจอทันทีว่า JSON ที่ใหญ่กว่า 64 KB จาก `traj projection run --json` ถูกตัดขาดกลางทางเมื่อ pipe ปิด การเก็บ `console.log` ไว้กับ stdout ของ CLI (และใช้ `process.exitCode` แทน `process.exit()` ใน [`tooling/scripts/run-parallel.ts`](https://github.com/trajectonomics/trajectonomics/blob/main/tooling/scripts/run-parallel.ts)) ปิดปัญหานี้สนิท
 3. **`astro check --no-sync` ไม่ได้ปิด sync จริง:** ตัว parse flag `mri` ใน Astro 7.4 แปลง `--no-sync` เป็น `{ sync: false }` แต่โค้ดของ `astro check` ดันเช็ก `flags.noSync` ทำให้ `astro check` ยังเขียนทับ `.astro/types.d.ts` กลางคันระหว่างที่ `tsc` กำลังอ่านอยู่ พอเปลี่ยนเป็น `--noSync` (camelCase) หลังสั่ง `astro sync` รอบเดียวล่วงหน้า ทั้ง race condition และเวลา sync ซ้ำ 2–6 วินาทีต่อแอปก็หายไปพร้อมกัน
-4. **test ที่ช้าจะแอบซ่อนจนกว่าจะแย่ง CPU กัน:** การอ่านไฟล์ทั้ง repo สองรอบใน `archived-links.test.ts` เคยรอดฉิวเฉียดตอน `--concurrency=2` แต่พอรัน 4 แพ็กเกจพร้อมกันก็ชนเพดาน timeout 5 วินาทีของ Bun ทันที การคัดกรองด้วย `git grep -I` ทำให้ guard นี้เร็วขึ้นกว่า 150 เท่า
+4. **test ที่ช้าจะแอบซ่อนจนกว่าจะแย่ง CPU กัน:** การอ่านไฟล์ทั้ง repo สองรอบใน `archived-links.test.ts` (รวมกว่า 7 วินาทีในสองเคส) เคยรอดฉิวเฉียดจากเพดาน timeout 5 วินาทีต่อเคสตอน `--concurrency=2` แต่พอรัน 4 แพ็กเกจพร้อมกันก็ timeout ทันที การคัดกรองด้วย `git grep -I` และ memoize ทำให้ guard นี้เร็วขึ้นกว่า 150 เท่า
 
 ## สรุปตัวเลขที่วัดได้จริง
 
@@ -73,15 +73,15 @@ cover:
 | `apps/cli` `dump.test.ts` | 27.6 วิ | **3.69 วิ** | **7.5×** | [PR #804](https://github.com/trajectonomics/trajectonomics/pull/804) |
 | `tooling/guards` `archived-links.test.ts` | >7 วิ (timeout) | **44.5 มิลลิวินาที** | **>150×** | [PR #811](https://github.com/trajectonomics/trajectonomics/pull/811) |
 | CI `Check packages` (warm cache) | 171 วิ | **81 วิ** | **2.1×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
-| CI `Check web` | 57 วิ | **27–31 วิ** | **~2.0×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
-| CI `Check web scripts` (shard ช้าสุด) | 341 วิ | **166–168 วิ** | **2.0×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46046018982](https://github.com/trajectonomics/trajectonomics/actions/runs/46046018982) |
+| CI `Check web` | 57 วิ | **27–31 วิ** | **1.8–2.1×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
+| CI `Check web scripts` (shard ช้าสุด) | 341 วิ | **166–168 วิ** | **2.0–2.1×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46046018982](https://github.com/trajectonomics/trajectonomics/actions/runs/46046018982) |
 | CI `Check web browser` (shard ช้าสุด) | 387 วิ | **249–250 วิ** | **1.55×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46046018982](https://github.com/trajectonomics/trajectonomics/actions/runs/46046018982) |
 | CI `Browser checks (site)` | 273 วิ | **160–168 วิ** | **1.6–1.7×** | [#46036536078](https://github.com/trajectonomics/trajectonomics/actions/runs/46036536078) → [#46052307647](https://github.com/trajectonomics/trajectonomics/actions/runs/46052307647) |
 | เวลา CI รวม (`ci.yml`) | 425 วิ (7 นาที 05 วิ) | **279–280 วิ (4 นาที 40 วิ)** | **1.52×** | [#46028422046](https://github.com/trajectonomics/trajectonomics/actions/runs/46028422046) → [#46041970596](https://github.com/trajectonomics/trajectonomics/actions/runs/46041970596) |
 
 ## ลองรันวัดด้วยตัวเอง
 
-ใครอยากลองจับเวลาบนเครื่อง สามารถรันคำสั่งชุดนี้บน [`trajectonomics/trajectonomics`](https://github.com/trajectonomics/trajectonomics) ได้เลย:
+บนโค้ดของ [`trajectonomics/trajectonomics`](https://github.com/trajectonomics/trajectonomics) หลังรัน `bun install && bun run build` แล้ว สามารถลองจับเวลาคำสั่งชุดนี้บนเครื่องได้ทันที:
 
 ```sh
 DO_NOT_TRACK=1 bunx turbo run lint --force --concurrency=4
