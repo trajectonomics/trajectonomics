@@ -5,7 +5,11 @@ import { NOW_MS } from "./support/fixtures"
 const SERIES = "measured-by-us"
 
 function parse(search: string) {
-	return parseUsageQuery(new URL(`https://data.test/api/usage${search}`), NOW_MS, SERIES)
+	return parseUsageQuery(
+		new URL(`https://trajectonomics.com/data/api/usage${search}`),
+		NOW_MS,
+		SERIES,
+	)
 }
 
 describe("parseUsageQuery", () => {

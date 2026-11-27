@@ -9,3 +9,8 @@ export function json(body: unknown, init: ResponseInit = {}): Response {
 export function methodNotAllowed(allow: string): Response {
 	return json({ error: "method_not_allowed" }, { status: 405, headers: { allow } })
 }
+
+/** A permanent redirect to a canonical address. */
+export function permanentRedirect(location: string): Response {
+	return new Response(null, { status: 301, headers: { location } })
+}

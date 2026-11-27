@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted, 2026-11-25. Slice 2a of issue #592.
+Accepted, 2026-11-25. Slice 2a of issue #592. The read path moved to `/data/api/usage`
+([ADR 0006](0006-the-data-site-is-served-under-the-sites-host.md)); the old host keeps
+`/api/usage`.
 
 ## Context
 
