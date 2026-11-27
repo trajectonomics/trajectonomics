@@ -30,4 +30,15 @@
 		padding-bottom: 12px;
 		border-bottom: 1px solid var(--ds-color-border);
 	}
+
+	/* The select drops under the plan's name, where the tier label had the row to itself. */
+	.peaks-name-line {
+		flex-wrap: wrap;
+	}
+
+	.peaks-tier-picker {
+		width: fit-content;
+		flex-basis: 100%;
+		margin-top: 2px;
+	}
 }

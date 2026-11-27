@@ -22,6 +22,7 @@ function plan(planId: string, overrides: Partial<Omit<PlanPeak, "plan">> = {}): 
 		fiveHours: peak(100),
 		sevenDays: peak(1_000),
 		thirtyDays: peak(10_000),
+		measured: [],
 		...overrides,
 	}
 }

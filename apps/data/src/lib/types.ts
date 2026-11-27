@@ -34,13 +34,25 @@ export type Peak = {
 	fromDay: string
 }
 
-/** One plan's three peaks; a five-hour peak is null when the plan reports days only. */
+/** The three windows, as the peaks API names them. */
+export type PeakWindowKey = "fiveHours" | "sevenDays" | "thirtyDays"
+
+/** One tier's peaks, as the peaks API measured them. */
+export type MeasuredTier = {
+	tier: string | null
+	fiveHours: Peak | null
+	sevenDays: Peak | null
+	thirtyDays: Peak | null
+}
+
+/** One plan's three peaks, the tier they belong to, and every tier we measured. */
 export type PlanPeak = {
 	plan: string
 	tier: string | null
 	fiveHours: Peak | null
 	sevenDays: Peak | null
 	thirtyDays: Peak | null
+	measured: MeasuredTier[]
 }
 
 /** The body of the peaks API. */
