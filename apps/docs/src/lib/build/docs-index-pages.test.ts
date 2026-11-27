@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN } from "../site"
 import type { BuiltFile } from "./built-files"
 import { DOCS_INDEX_FILE } from "./docs-index-file"
 import { checkDocsIndexPages } from "./docs-index-pages"
@@ -9,9 +9,9 @@ const PAGES = ["index.html", "cli/index.html", "cli/commands/tx/index.html"]
 const TWINS = ["index.md", "cli.md", "cli/commands/tx.md"]
 
 const ENTRIES = [
-	["Trajectonomics Docs", `${SITE_ORIGIN}/index.md`],
-	["Quickstart", `${SITE_ORIGIN}/cli.md`],
-	["tx", `${SITE_ORIGIN}/cli/commands/tx.md`],
+	["Trajectonomics Docs", `${PORTAL_ORIGIN}/index.md`],
+	["Quickstart", `${PORTAL_ORIGIN}/cli.md`],
+	["tx", `${PORTAL_ORIGIN}/cli/commands/tx.md`],
 ] as const
 
 function page(path: string): BuiltFile {
@@ -54,7 +54,7 @@ describe("the Docs index's coverage of the built pages", () => {
 
 		const failures = checkDocsIndexPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["DOCS_INDEX_PAGE_MISSING"])
-		expect(failures[0]?.message).toContain("/cli/")
+		expect(failures[0]?.message).toContain("/docs/cli/")
 	})
 
 	test("the Landing Page is covered by the same rule as every content page", () => {
@@ -142,7 +142,7 @@ describe("the Docs index's coverage of the built pages", () => {
 			page("404.html"),
 			{
 				path: "operators/index.html",
-				content: '<html><meta http-equiv="refresh" content="0;url=/cli/"></html>',
+				content: '<html><meta http-equiv="refresh" content="0;url=/docs/cli/"></html>',
 			},
 		]
 

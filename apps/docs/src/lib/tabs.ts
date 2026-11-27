@@ -1,8 +1,8 @@
 /**
- * URL path the Docs Portal is served under. Empty when the portal is the whole host
- * (`docs.trajectonomics.com`), so a page is `/cli/` and not `/docs/cli/` (ADR 0013).
+ * URL path the Docs Portal is served under: the Site's `/docs` mount (ADR 0017), so a page is
+ * `/docs/cli/`.
  */
-export const DOCS_BASE_PATH = ""
+export const DOCS_BASE_PATH = "/docs"
 
 /** A top-level Tab of the Docs Portal, addressed to exactly one audience. */
 export interface TabDefinition {

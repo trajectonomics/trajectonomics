@@ -1,15 +1,8 @@
-/**
- * The Landing Page's hand-off to an Agent: the prompt a reader copies into the Agent they run, and
- * the three ways an Agent reads the Docs Portal on its own. Pure, so the page, its Markdown twin and
- * a test read the same words. The prompt names no install command: it sends the Agent to the
- * Installation page's twin, where the command is authored (ADR 0010, the skill requirement).
- */
-
 import { twinUrl } from "./agent/twin-url"
-import { DOCS_INDEX_PATH, OPERATOR_TAB_CONTENT } from "./tabs"
+import { DOCS_BASE_PATH, DOCS_INDEX_PATH, OPERATOR_TAB_CONTENT } from "./tabs"
 
 /** The Operator tab page that carries the skill and install commands the prompt sends an Agent to. */
-export const INSTALLATION_PAGE_PATH = `/${OPERATOR_TAB_CONTENT}/installation/`
+export const INSTALLATION_PAGE_PATH = `${DOCS_BASE_PATH}/${OPERATOR_TAB_CONTENT}/installation/`
 
 /** The heading of the Landing Page section that hands the Docs Portal to an Agent. */
 export const AGENT_START_HEADING = "Start with your Agent"

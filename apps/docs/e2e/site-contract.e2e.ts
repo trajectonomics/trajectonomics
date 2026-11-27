@@ -13,7 +13,7 @@ for (const tab of TABS) {
 }
 
 test("an unknown path shows the Docs Portal 404 page with a way back", async ({ page }) => {
-	const response = await page.goto("/no-such-page/")
+	const response = await page.goto(`${DOCS_BASE_PATH}/no-such-page/`)
 
 	expect(response?.status()).toBe(404)
 	await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible()
