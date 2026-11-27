@@ -124,7 +124,7 @@
 #nd-nav :is(a, button):focus-visible,
 #nd-notebook-layout :is(#nd-subnav, #nd-sidebar, #nd-sidebar-mobile) :is(a, button):focus-visible {
 	outline: 2px solid var(--ds-color-ring);
-	outline-offset: 2px;
+	outline-offset: 4px;
 }
 
 /*

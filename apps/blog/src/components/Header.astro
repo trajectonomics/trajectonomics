@@ -1,10 +1,11 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+
+import { decorativeMark } from "@trajectonomics/brand/mark"
 import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import { dictionaryFor } from "../lib/dictionary"
 import { type Language, treePath } from "../lib/languages"
-import { decorativeMark } from "../lib/mark"
 import { BLOG_PATH, DOCS_PATH, SITE_HOME_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
 
@@ -22,19 +23,19 @@ const words = dictionaryFor(language)
 const artwork = decorativeMark(mark)
 ---
 
-<header class="blog-header">
-	<nav class="blog-header-inner" aria-label="Main">
+<header class="blog-header ds-header">
+	<nav class="blog-header-inner ds-header-inner" aria-label="Main">
 		<div class="blog-header-brand">
-			<a class="brand" href={SITE_HOME_PATH} aria-label={words.homeLabel(SITE_NAME)}>
-				<span class="brand-tile"><Fragment set:html={artwork} /></span>
+			<a class="ds-brand" href={SITE_HOME_PATH} aria-label={words.homeLabel(SITE_NAME)}>
+				<span class="ds-brand-tile"><Fragment set:html={artwork} /></span>
 			</a>
-			<a class="blog-marker" href={treePath(language, BLOG_PATH)} aria-current={current ? "page" : undefined}>
+			<a class="ds-marker" href={treePath(language, BLOG_PATH)} aria-current={current ? "page" : undefined}>
 				{words.blogMarker}
 			</a>
 		</div>
 		<div class="blog-header-end">
 			<LanguageMenu language={language} languagePaths={languagePaths} />
-			<a class="header-nav-link" href={DOCS_PATH}>{words.docsLink}</a>
+			<a class="ds-nav-link" href={DOCS_PATH}>{words.docsLink}</a>
 		</div>
 	</nav>
 </header>

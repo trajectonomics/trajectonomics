@@ -3,15 +3,10 @@
 	.header-bar {
 		grid-template-columns: auto minmax(0, 1fr) auto;
 		column-gap: 0.5rem;
-		padding-inline: 0.75rem;
 	}
 
 	.header-nav {
 		gap: 0.625rem;
-	}
-
-	.header-nav-link {
-		font-size: 11px;
 	}
 
 	.header-end {

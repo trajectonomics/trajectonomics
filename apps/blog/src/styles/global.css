@@ -9,6 +9,8 @@
 @import "@trajectonomics/brand/tailwind.css";
 /* The Theme's own type: the sans stack with its Thai fallback, and Thai's taller line. */
 @import "@trajectonomics/brand/typography.css";
+/* The one header frame every static site draws: the bar, the 40 px tile and the nav-link type. */
+@import "@trajectonomics/brand/header.css";
 /* The Brand Typeface's @font-face rules; scripts/copy-brand-assets.ts puts the files in public/fonts/. */
 @import "./fonts.css";
 @import "./header.css";

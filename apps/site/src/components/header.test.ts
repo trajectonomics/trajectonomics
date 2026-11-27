@@ -121,9 +121,9 @@ describe("the Header component in every Language, current or not", () => {
 				const header = headerOf(page)
 				expect(header.tag).toBe("header")
 				const classes = (header.attributes["class"] ?? "").split(/\s+/)
-				// The header is fixed, and keeps bg-background for the no-scroll-timeline fallback.
+				// The header is fixed, and takes the shared frame every static site draws.
 				expect(classes).toContain("fixed")
-				expect(classes).toContain("bg-background")
+				expect(classes).toContain("ds-header")
 				const nav = elementsByTag(page, "nav")[0]
 				if (nav === undefined) throw new Error("no nav rendered")
 				expect(nav.ancestors.includes(header)).toBe(true)

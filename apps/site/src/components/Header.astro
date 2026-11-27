@@ -1,6 +1,8 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the menus and the brand mark it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+
+import { decorativeMark } from "@trajectonomics/brand/mark"
 import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import type { Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
@@ -21,35 +23,27 @@ interface Props {
 }
 
 const { language, dictionary, markCurrent, address, openjotCurrent } = Astro.props
-// The link names itself, so the artwork is decoration: the mark's own role and title go with it, and
-// its viewBox and xmlns stay, because that is what draws it.
-const artwork = mark
-	.replace(' role="img"', "")
-	.replace(/ aria-label="[^"]*"/, "")
-	.replace(/<title>[\s\S]*?<\/title>/, "")
-	.replace("<svg ", '<svg aria-hidden="true" focusable="false" ')
+// The link names itself, so the artwork is decoration, and the brand package strips its role,
+// label and title so every static site hides it the same way.
+const artwork = decorativeMark(mark)
 ---
 
-<header class="site-header fixed inset-x-0 top-0 z-50 h-16 border-b border-border bg-background">
-	<nav class="header-bar">
-		<a
-			class="brand shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-			href={CLEAN_URL}
-			aria-label={SITE_NAME}
-		>
-			<span class="brand-tile"><Fragment set:html={artwork} /></span>
+<header class="site-header ds-header fixed inset-x-0 top-0">
+	<nav class="header-bar ds-header-inner">
+		<a class="brand ds-brand" href={CLEAN_URL} aria-label={SITE_NAME}>
+			<span class="ds-brand-tile"><Fragment set:html={artwork} /></span>
 		</a>
 		<div class="header-nav">
 			<a
-				class="header-nav-link"
+				class="ds-nav-link"
 				href={OPENJOT_PATH}
 				aria-current={openjotCurrent ? "page" : undefined}
 			>
 				{dictionary.openjotLink}
 			</a>
-			<a class="header-nav-link" href={DATA_PATH}>{dictionary.dataLink}</a>
-			<a class="header-nav-link" href={BLOG_PATH}>{dictionary.blogLink}</a>
-			<a class="header-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
+			<a class="ds-nav-link" href={DATA_PATH}>{dictionary.dataLink}</a>
+			<a class="ds-nav-link" href={BLOG_PATH}>{dictionary.blogLink}</a>
+			<a class="ds-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
 		</div>
 		<div class="header-end">
 			<RepoLink dictionary={dictionary} />

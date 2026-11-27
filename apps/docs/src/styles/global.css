@@ -4,6 +4,8 @@
 @import "@trajectonomics/brand/current/light.css";
 @import "@trajectonomics/brand/current/dark.css";
 @import "@trajectonomics/brand/current/fonts/brand.css";
+/* The one header frame every static site draws: the bar, the 40 px tile and the nav-link type. */
+@import "@trajectonomics/brand/header.css";
 @import "./shell-layout.css";
 @import "./motion.css";
 @import "./theme-seam.css";

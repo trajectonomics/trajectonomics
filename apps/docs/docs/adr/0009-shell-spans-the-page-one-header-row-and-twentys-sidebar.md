@@ -70,3 +70,12 @@ The docs#77 amendment above put a visible agent line in the sidebar's top block 
 The owner asked for the Portal's logo and its way back to the Site Home to work as the blog's do. The header's brand is now the blog's: the Site's glyph on a tile, 32 px and 40 px from `sm` up, links to the Site Home (`https://trajectonomics.com/`, full document load, no prefetch) under the name "Trajectonomics home", and a `Docs` marker in the brand's display face (Aleo, light) beside it links to the Landing Page under the accessible name "Trajectonomics Docs", which the built-page check still reads. This supersedes the docs#75 amendment's single tile linking to the Landing Page.
 
 The tile is the way back, so the sidebar's bordered `trajectonomics.com ↗` button and the home layout's header link go: the sidebar's top block is the search above the hairline, and the home layout carries no header link items. Its phone menu would then open an empty panel, so the menu's trigger is not drawn. A phone reaches the Site Home from the header at every width, as on the blog.
+
+## Amendment (2026-11-27): the header row is 64px on the shared frame
+
+The header row grows from 56px to 64px so the bar does not move when a visitor travels between the
+Site, the blog, the data site and the Portal. The brand is the shared 40px tile and `Docs` the
+shared display-face marker from `@trajectonomics/brand/header.css`; inside the full-width header the
+bar is capped at 94.5rem and centred, with the shared 1rem and 2.5rem inset, while the header's
+hairline and background still span the page. The Tabs stay centred on the page and no sidebar offset
+changes: the one row still sets the sidebar's top.
