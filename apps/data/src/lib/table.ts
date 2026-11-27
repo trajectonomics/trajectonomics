@@ -16,7 +16,8 @@ export type TableRow = {
 	bestEffort: boolean
 }
 
-function sumNullable(values: readonly (number | null)[]): number | null {
+/** Adds the parts that exist; a part is null only when every contributing row has no value. */
+export function sumNullable(values: readonly (number | null)[]): number | null {
 	let sum = 0
 	let seen = false
 	for (const value of values) {
@@ -65,7 +66,7 @@ export function usageTable(rows: readonly UsageRow[]): TableRow[] {
 }
 
 /** The source note a row carries, or null when it needs none. */
-export function rowNote(row: TableRow): string | null {
+export function rowNote(row: Pick<TableRow, "daily" | "bestEffort">): string | null {
 	const notes: string[] = []
 	if (row.daily) notes.push("daily export, no in/out split")
 	if (row.bestEffort) notes.push("best-effort source")
