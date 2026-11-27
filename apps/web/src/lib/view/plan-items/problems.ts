@@ -13,16 +13,19 @@ export interface Shown {
 }
 
 /**
- * What a form shows. A refusal that names one of `fields` is shown at that field; any other refusal, or
- * a message that is not a refusal at all (the server was not reached), is shown for the whole form.
+ * What a form shows. A refusal at the whole path of the item the form edits (`item`), and at one of `fields`, is shown at
+ * that field; a refusal at another item or at a path no field owns, or a message that is not a refusal at all (the server
+ * was not reached), is shown for the whole form. `employer` is the whole path of the employer Flow a salary form writes.
  */
 export function shownProblems(
 	problems: Problems,
 	refusal: ErrorBody | null,
 	message: string | null,
 	fields: readonly string[],
+	item: string,
+	employer?: string,
 ): Shown {
-	const refused = fieldOfRefusal(refusal, fields)
+	const refused = fieldOfRefusal(refusal, fields, item, employer)
 	const text = message ?? undefined
 	return {
 		at: (field) => problems[field] ?? (refused === field ? text : undefined),

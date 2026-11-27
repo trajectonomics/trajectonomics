@@ -5,11 +5,13 @@ import { currentItemText } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
-import { employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
+import { employerIdOf, employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
+import { FLOW_FIELDS } from "../../lib/view/plan-items/fields"
 import { flowFormStart } from "../../lib/view/plan-items/flow-try-draft"
 import { categoriesOf, type FlowKind } from "../../lib/view/plan-items/flows"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { namedRefusal } from "../../lib/view/plan-items/refusal"
+import { newIncomeTaxNote } from "../../lib/view/plan-items/tax-label"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import TryNotice from "./TryNotice.svelte"
@@ -52,26 +54,19 @@ let cleared: string[] = $state([])
 const keptOff = $derived(
 	cleared.length > 0 && whatIfSession.isOffIn(name, `flows.${existing?.id ?? ""}`),
 )
-const FIELDS = [
-	"name",
-	"displayLabel",
-	"amount",
-	"frequency",
-	"start",
-	"end",
-	"growth",
-	"rate",
-	"earned",
-	"category",
-	"employerAccount",
-	"employerShare",
-	"employerRounding",
-]
 /** The ids of the Flows of the document the last save sent, in order, which a refusal's position in its path names. */
 let sent: string[] = $state([])
-/** The refusal with the Flow's position in its path named by id, so one on the employer's Flow lands in its section. */
+/** The Flow the form edits: its stored id, or the one the last save added. */
+const savedId = $derived(
+	existing?.id ?? sent.find((id) => !doc.flows.some((flow) => flow.id === id)),
+)
+const item = $derived(`flows.${savedId ?? ""}`)
+const employerPath = $derived(`flows.${employerIdOf(savedId ?? "")}`)
 const refusal = $derived(namedRefusal(editSession.failure, sent))
-const shown = $derived(shownProblems(problems, refusal, editSession.error, FIELDS))
+const shown = $derived(
+	shownProblems(problems, refusal, editSession.error, FLOW_FIELDS, item, employerPath),
+)
+const note = $derived(newIncomeTaxNote(name, doc, kind, existing, draft.name))
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
@@ -97,7 +92,7 @@ async function remove(): Promise<void> {
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : `Add ${kind}`}>
-	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
+	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} {note} />
 	<TryNotice fields={cleared} others={!keptOff} />
 	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
 </form>

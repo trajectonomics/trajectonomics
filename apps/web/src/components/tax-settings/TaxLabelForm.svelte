@@ -5,6 +5,7 @@ import { LABEL_CHOICES } from "../../lib/view/tax-settings/label-choices"
 import { labelEdit, labelShown } from "../../lib/view/tax-settings/label-edit"
 import { unlabelledIncome } from "../../lib/view/tax-settings/labels"
 import Field from "../plan-items/Field.svelte"
+import FormAlert from "../ui/FormAlert.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 
 interface Props {
@@ -24,8 +25,15 @@ const flows = $derived([
 	...unlabelledIncome(show.document).map((id) => ({ value: id, label: id })),
 ])
 const mine = $derived(editSession.source === "tax-label")
+const plan = $derived(show.document)
 const shown = $derived(
-	labelShown(problems, mine ? editSession.failure : null, mine ? editSession.error : null),
+	labelShown(
+		problems,
+		mine ? editSession.failure : null,
+		mine ? editSession.error : null,
+		flow,
+		plan.flows.map((one) => one.id),
+	),
 )
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
@@ -51,7 +59,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	<p class="text-sm text-muted-foreground">The tax rules read an income Flow only when it has a tax label, and these Flows have none. Label them one at a time; then the tax profile can be set here.</p>
 	<Field id="tax-label-flow" label="Income Flow" options={flows} bind:value={flow} problem={shown.at("flow")} {disabled} />
 	<Field id="tax-label-label" label="Tax label" options={LABEL_CHOICES} bind:value={label} problem={shown.at("label")} {disabled} />
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 	{#if mine}<StaleNotice />{/if}
 	<button type="submit" {disabled} class={button}>Save the tax label</button>
 </form>

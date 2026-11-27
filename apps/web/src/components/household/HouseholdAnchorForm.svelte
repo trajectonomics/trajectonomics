@@ -11,6 +11,7 @@ import { householdWithAnchor } from "../../lib/view/household/document"
 import { EDGE_CHOICES, WHEN_CHOICES } from "../../lib/view/plan-items/options"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
+import FormAlert from "../ui/FormAlert.svelte"
 
 interface Props {
 	/** The Scenario the household belongs to: the Edit saves its household under this name. */
@@ -32,7 +33,11 @@ const people = $derived(household.people.map((person) => person.id))
 let draft: AnchorDraft = $state(anchorDraftOf())
 let problems: Problems = $state({})
 const FIELDS = ["flow", "edge", "person", "when", "age"]
-const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
+/** The whole path of the anchor the form writes, so a refusal at another anchor is the form's own problem. */
+let item = $state("anchors.")
+const shown = $derived(
+	shownProblems(problems, editSession.failure, editSession.error, FIELDS, item),
+)
 const flowChoices = $derived([
 	BLANK,
 	...flows.map((flow) => ({ value: flow.id, label: currentItemText("flow", flow.id) })),
@@ -53,6 +58,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
+	item = `anchors.${next.anchors.findIndex((anchor) => anchor.path === result.anchor.path)}`
 	if (
 		await editSession.run(
 			{ kind: "set-household", name, householdHash, household: next },
@@ -71,6 +77,6 @@ async function save(event: SubmitEvent): Promise<void> {
 	{#if draft.when === "age"}
 		<Field id="anchor-age" label="Age" inputmode="decimal" hint="The age in whole years. The date is the last day of that person's birth month in that year." bind:value={draft.age} problem={shown.at("age")} />
 	{/if}
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 	<button type="submit" disabled={editSession.busy} class="rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50">Pin the date</button>
 </form>

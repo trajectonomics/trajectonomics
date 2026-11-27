@@ -14,9 +14,10 @@ Money types stay strings in the contract. A Scenario document holds integer mino
 
 The planner pages (Income, Expenses, and Assets and debts) list a plan's Flows and Accounts and save one change as one Edit. The page does three things with the decimal document, and no arithmetic:
 
-- **Money is text.** A typed amount has its commas and spaces removed, is checked for shape only, and is sent as the decimal string the person typed. `traj` accepts or refuses it, and a refusal is shown at the field its path names.
+- **Money is text.** A typed amount has its commas and spaces removed, is checked for shape only, and is sent as the decimal string the person typed. A comma groups thousands and is never a decimal point. `traj` accepts or refuses it, and a refusal is shown at the field its path names.
 - **A change is object editing.** An item is replaced, added or removed by its `id`, and every field the form does not show is kept as it came, so a save that changed nothing leaves the plan `unchanged`.
 - **A rate is a percent by moving the decimal point.** A rate stays an integer of basis points in the document. `formatBps` and `parseBps` in `src/lib/format/bps.ts` move the point in the text, refuse more than two places, and never make a float. A rate is not money, so this is not a figure the page computes.
+- **A date the household sets is the household's.** A form shows it read-only, with the household's label and a link to the household, and says that it cannot be cleared there. The household fills it on save, and a change that leaves it out is refused rather than guessed.
 
 ## Amendment (2026-11-27): a multiple is a ratio, truncated to one decimal
 

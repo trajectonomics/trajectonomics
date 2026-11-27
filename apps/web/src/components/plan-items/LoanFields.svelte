@@ -8,6 +8,7 @@ import {
 } from "../../lib/view/plan-items/loan-owed"
 import { ARRIVAL_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
+import FormAlert from "../ui/FormAlert.svelte"
 import Money from "../ui/Money.svelte"
 import Field from "./Field.svelte"
 import LoanTermsFields from "./LoanTermsFields.svelte"
@@ -51,5 +52,5 @@ const debt = $derived(owedChoiceOf(choices, draft.owedAccount))
 	{#if draft.arrival === "date"}
 		<Field id="loan-arrival-date" label="Borrowed on" hint="YYYY-MM-DD" bind:value={draft.arrivalDate} problem={shown.at("arrivalDate")} />
 	{/if}
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 </div>

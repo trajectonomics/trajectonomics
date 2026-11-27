@@ -113,7 +113,9 @@ describe("the employer's 5% of a salary", () => {
 				answer.error,
 				flows.map((flow) => flow.id),
 			)
-			expect(fieldOfRefusal(named, fields)).toBe("employerAccount")
+			expect(fieldOfRefusal(named, fields, "flows.salary", "flows.salary-employer")).toBe(
+				"employerAccount",
+			)
 		},
 	)
 })

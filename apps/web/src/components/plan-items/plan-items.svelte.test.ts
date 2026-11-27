@@ -67,6 +67,7 @@ describe("the household's anchored dates on the planner pages", () => {
 		}).body
 		expect(body).toMatch(/<input[^>]*id="flow-end"[^>]*disabled/)
 		expect(body).not.toMatch(/<input[^>]*id="flow-start"[^>]*disabled/)
+		expect(body).toContain("The household sets this date, so it cannot be cleared here.")
 		expect(body).toContain('href="/projection/?scenario=base#household"')
 	})
 
@@ -155,6 +156,7 @@ describe("the form in the drawer", () => {
 			},
 			"Too many decimal places.",
 			["amount"],
+			"flows.salary",
 		)
 		const body = render(FlowFields, {
 			props: {
