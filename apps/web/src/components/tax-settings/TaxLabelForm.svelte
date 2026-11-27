@@ -33,7 +33,7 @@ const shown = $derived(
 		problems,
 		mine ? editSession.failure : null,
 		mine ? editSession.error : null,
-		sent,
+		{ flow, sent },
 		plan.flows.map((one) => one.id),
 	),
 )

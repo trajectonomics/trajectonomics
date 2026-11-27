@@ -5,6 +5,7 @@ import type { PlanKind } from "../../lib/view/plan-items/kinds"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"
+import TaxLabelNotice from "./TaxLabelNotice.svelte"
 
 interface Props {
 	snapshot: Snapshot
@@ -28,6 +29,7 @@ const projection = $derived(name === null ? undefined : snapshot.reads.projectio
 {:else}
 	<ReadView {read} label={`The plan of ${name}`}>
 		{#snippet children(data)}
+			{#if kind === "income"}<TaxLabelNotice />{/if}
 			<PlanItemsList
 				{kind}
 				{name}

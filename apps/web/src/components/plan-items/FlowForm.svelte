@@ -27,8 +27,9 @@ interface Props {
 	household: HouseholdDocument | null
 	/** The Flow to edit; absent for a new one. */
 	existing?: ScenarioFlow | undefined
-	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
-	onDone: () => void
+	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. A saved new income in a
+	 * taxed plan also hands over the Tax labels page its label goes on. */
+	onDone: (taxLabelHref?: string) => void
 	/** True when the drawer tries values in the What-if session, instead of saving them. */
 	tryValue?: boolean
 }
@@ -67,6 +68,8 @@ const shown = $derived(
 	shownProblems(problems, refusal, editSession.error, FLOW_FIELDS, item, employerPath),
 )
 const note = $derived(newIncomeTaxNote(name, doc, kind, existing))
+/** True while the form shows the note for a new income in a taxed plan, so the fields say what the save leaves undone. */
+const needsTaxLabel = $derived(note !== null)
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
@@ -83,7 +86,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	problems = saved.problems
 	cleared = saved.cleared
 	sent = saved.sent
-	if (saved.done) onDone()
+	if (saved.done) onDone(tryValue ? undefined : (note ?? undefined))
 }
 
 async function remove(): Promise<void> {
@@ -92,7 +95,7 @@ async function remove(): Promise<void> {
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : `Add ${kind}`}>
-	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} {note} />
+	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} {needsTaxLabel} />
 	<TryNotice fields={cleared} others={!keptOff} />
 	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
 </form>

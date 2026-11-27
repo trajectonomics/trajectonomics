@@ -1,7 +1,7 @@
 <script lang="ts">
-import { maskedFocus } from "../../client/masked-focus.js"
+import { lostWindow, maskedFocus } from "../../client/masked-focus.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { maskMoney } from "../../lib/format"
+import { draftAfterInput, maskMoney } from "../../lib/format"
 import type { Choice } from "../../lib/view/plan-items/options"
 
 interface Props {
@@ -47,6 +47,14 @@ let focused = $state(false)
 const masked = $derived(money && preferences.hidden && !focused && value.trim() !== "")
 const shown = $derived(masked ? maskMoney(value) : value)
 
+/** The draft a typed value makes. Undo can put the mask back, which is no amount, so it keeps the draft and the field. */
+function onInput(event: Event & { currentTarget: HTMLInputElement }): void {
+	const typed = event.currentTarget.value
+	const next = money ? draftAfterInput(value, typed) : typed
+	if (next !== typed) event.currentTarget.value = next
+	value = next
+}
+
 /** Every text the field is described by, so a hint and a problem are both there. */
 const described = $derived(
 	[
@@ -79,9 +87,12 @@ const described = $derived(
 			{id}
 			{disabled}
 			value={shown}
-			oninput={(event) => (value = event.currentTarget.value)}
+			oninput={onInput}
 			onfocus={() => (focused = true)}
-			onblur={() => (focused = false)}
+			onblur={(event) => {
+				// A blur while the field is still active is the window losing focus, so the digits stay shown.
+				if (!lostWindow(event.currentTarget)) focused = false
+			}}
 			use:maskedFocus={() => money && preferences.hidden && value.trim() !== ""}
 			{inputmode}
 			autocomplete="off"

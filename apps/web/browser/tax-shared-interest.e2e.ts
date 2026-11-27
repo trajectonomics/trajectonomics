@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
 import { maskedAmountEdit } from "./masked-amount"
+import { maskedAmountTabSwitch, maskedAmountTabThenClick } from "./masked-focus"
 import { SLOW, setsAndClears } from "./shared-interest"
 import { taxLabelAlert } from "./tax-label-alert"
 
@@ -84,6 +85,18 @@ test("typing into a masked amount replaces it, and a click selects the whole val
 }) => {
 	test.setTimeout(180_000)
 	await maskedAmountEdit(page)
+})
+
+// A tab switch in the middle of typing must not drop the digits typed before it (web #783).
+test("a tab switch mid-typing keeps the digits typed before it", async ({ page }) => {
+	test.setTimeout(180_000)
+	await maskedAmountTabSwitch(page)
+})
+
+// A click after a keyboard focus moves the caret, so typing appends rather than replacing (web #783).
+test("a click after keyboard focus moves the caret, so typing appends", async ({ page }) => {
+	test.setTimeout(180_000)
+	await maskedAmountTabThenClick(page)
 })
 
 test("a refusal keeps its message and never takes focus again when the Flow select moves", async ({
