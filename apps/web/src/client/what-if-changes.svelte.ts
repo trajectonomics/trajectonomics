@@ -91,6 +91,9 @@ export class WhatIfChanges extends WhatIfState {
 		this.asking = null
 	}
 
+	/** How many switches were refused so far. A request for the same plan again changes it, so the question comes back into view. */
+	asks = $state(0)
+
 	/** Asks the person to settle the pending changes first, and counts the request, so a repeat of it is a new request. */
 	private ask(plan: string): void {
 		this.asking = plan

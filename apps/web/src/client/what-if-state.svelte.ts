@@ -25,8 +25,6 @@ export class WhatIfState {
 	error = $state<string | null>(null)
 	/** The plan a person asked to switch to while changes were pending; null when none is asked. */
 	asking = $state<string | null>(null)
-	/** How many switches were refused so far. A request for the same plan again changes it, so the question comes back into view. */
-	asks = $state(0)
 	/** True from a change until its read has been answered: the debounce, then the read in flight. */
 	private waiting = $state(false)
 	private inFlight = $state(false)
