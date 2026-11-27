@@ -3,9 +3,16 @@ title: Your data
 description: Where the Trajectonomics CLI keeps the ledger, what is safe to delete, and how to back it up.
 ---
 
-`traj` is a local tool. It keeps one SQLite database on your machine, uploads nothing, and has no
-account to cancel. This page says where that database is, what else lives beside it, and which of
-the two is safe to delete.
+```tree
+~/.traj/
+  traj.db  # the ledger — keep it
+  bin/  # npm launcher cache — safe to delete
+~/.config/traj/  # $XDG_CONFIG_HOME/traj; %APPDATA%\traj on Windows
+  telemetry.json  # anonymous usage id — safe to delete
+```
+
+`traj` keeps one SQLite ledger on your machine and uploads nothing; this page says what sits beside
+it and what is safe to delete.
 
 ## The data directory
 

@@ -1,7 +1,8 @@
 import { HomeLayout } from "fumadocs-ui/layouts/home"
 import { baseOptions } from "../lib/layout.shared"
 import { LandingEnding } from "./landing/ending"
-import { AgentPrompt, Hero } from "./landing/hero"
+import { Hero } from "./landing/hero"
+import { AgentPrompt } from "./landing/prompt"
 import { AgentRoutes, AudienceEntries } from "./landing/sections"
 import { Provider, type ProviderProps } from "./provider"
 
