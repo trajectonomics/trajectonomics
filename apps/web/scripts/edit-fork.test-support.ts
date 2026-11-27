@@ -1,5 +1,5 @@
 import { writeCommand } from "../src/lib/edit/command"
-import { editSchema } from "../src/lib/edit/edit"
+import { singleWriteEditSchema } from "../src/lib/edit/edit"
 import { BINARY, ledgerHome, setupEditor } from "./edit-fixture.test-support"
 
 /**
@@ -8,7 +8,10 @@ import { BINARY, ledgerHome, setupEditor } from "./edit-fixture.test-support"
  */
 export async function forkInTerminal(name: string, from = "base"): Promise<void> {
 	await setupEditor()
-	const { argv } = writeCommand(editSchema.parse({ kind: "copy-plan", from, name }), false)
+	const { argv } = writeCommand(
+		singleWriteEditSchema.parse({ kind: "copy-plan", from, name }),
+		false,
+	)
 	const run = Bun.spawnSync([BINARY, ...argv], { env: { ...process.env, TRAJ_HOME: ledgerHome() } })
 	if (run.exitCode !== 0) throw new Error(run.stderr.toString() || run.stdout.toString())
 }

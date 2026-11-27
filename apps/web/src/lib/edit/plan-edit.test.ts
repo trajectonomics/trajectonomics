@@ -1,10 +1,21 @@
 import { describe, expect, test } from "bun:test"
-import { type Edit, editSchema, writeCommand } from "./edit"
+import {
+	type Edit,
+	editSchema,
+	type SingleWriteEdit,
+	singleWriteEditSchema,
+	writeCommand,
+} from "./edit"
 import { followCompare, followPlan } from "./follow"
 import { rereadSchema } from "./reread"
 
 const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
-const rename: Edit = { kind: "rename-plan", name: "early", newName: "later", contentHash: HASH }
+const rename: SingleWriteEdit = {
+	kind: "rename-plan",
+	name: "early",
+	newName: "later",
+	contentHash: HASH,
+}
 
 describe("each plan Edit is one scenario write", () => {
 	test.each([
@@ -13,7 +24,7 @@ describe("each plan Edit is one scenario write", () => {
 		{ kind: "set-main-plan", name: "early" },
 		{ kind: "apply-plan", name: "fresh", template: { asOf: "2026-11-25" } },
 	])("%o", (edit) => {
-		const parsed = editSchema.parse(edit)
+		const parsed = singleWriteEditSchema.parse(edit)
 		expect(writeCommand(parsed, false, "{}").argv[0]).toBe("scenario")
 		expect(writeCommand(parsed, true, "{}").argv).toContain("--dry-run")
 	})
