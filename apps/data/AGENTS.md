@@ -15,8 +15,10 @@ redirects its pages (ADR 0006).
    `src/collect.ts` and `src/stores/`.
 3. Every test fixture is synthetic and hand-written. Never copy a line from a real store into a
    test, a doc, a commit message or a pull request.
-4. No prices in slice 1. A price enters the plan table only with a dated public source, in a later
-   slice.
+4. Prices live in the collector's price catalogue (`collector/src/price-catalog.ts`), beside the
+   tier catalogue. A price enters only with a dated public source: a URL, the day it was read and
+   an exact quote, or `null` when the vendor states no price. A price is never inferred from a
+   neighbouring tier or from a multiplier.
 5. A multiplier for a plan tier enters the catalogue only with a dated public source: a URL, the day
    it was read, and an exact quote. The catalogue lives in `collector/src/tier-catalog.ts`; a
    multiplier is never inferred from a price or a neighbouring tier.

@@ -3,11 +3,11 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 
 import SiteHeader from "@trajectonomics/site-header/SiteHeader.astro"
-import { DATA_PATH, METHOD_PATH, SITE_HOME_URL, SITE_NAME } from "../lib/site"
+import { DATA_PATH, LOG_PATH, METHOD_PATH, SITE_HOME_URL, SITE_NAME } from "../lib/site"
 
 interface Props {
 	/** Which header link is the current page. */
-	readonly current: "overview" | "method"
+	readonly current: "overview" | "method" | "log"
 }
 
 const { current } = Astro.props
@@ -25,6 +25,11 @@ const { current } = Astro.props
 			class="ds-nav-link"
 			href={DATA_PATH}
 			aria-current={current === "overview" ? "page" : undefined}>Overview</a
+		>
+		<a
+			class="ds-nav-link"
+			href={LOG_PATH}
+			aria-current={current === "log" ? "page" : undefined}>Log</a
 		>
 		<a
 			class="ds-nav-link"

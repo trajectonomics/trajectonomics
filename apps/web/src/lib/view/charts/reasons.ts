@@ -15,7 +15,9 @@ export function reasonFor(id: string, has: ReadonlySet<string> = new Set()): str
 	return "this plan does not state it"
 }
 
-/** The Levy a tax series id names: `tax:<levy>:due`. */
+/** The Levy a tax series id names: `tax:<levy>:due`, or the rest of the id when it names no kind. */
 function levyOf(id: string): string {
-	return id.slice("tax:".length, id.lastIndexOf(":"))
+	const rest = id.slice("tax:".length)
+	const cut = rest.lastIndexOf(":")
+	return cut < 0 ? rest : rest.slice(0, cut)
 }

@@ -16,6 +16,15 @@
 @import "./header.css";
 @import "./footer.css";
 @import "./overview.css";
+@import "./data-layout.css";
+@import "./sections.css";
+@import "./bars.css";
+@import "./bars-phone.css";
+@import "./scatter.css";
+@import "./cache.css";
+@import "./section-notes.css";
+@import "./prices.css";
+@import "./log.css";
 @import "./plan-mark.css";
 @import "./summary.css";
 @import "./meter.css";
