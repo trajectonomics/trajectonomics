@@ -6,7 +6,7 @@ import { editSession } from "./edit-session.svelte"
 import { withBase, withSearch } from "./links"
 import { postReread } from "./reread"
 import { navPath, pageTitle } from "./routes"
-import { editsShown } from "./shown"
+import { drawerEditsShown, editsShown } from "./shown"
 import { DEMO_SNAPSHOT_PATH, isDemo, snapshotUrl } from "./snapshot-url"
 import { readWhatIf } from "./what-if-remote"
 
@@ -38,6 +38,7 @@ describe("the hosted twins", () => {
 
 	test("draw the Edit controls, and refuse every Edit with no request", async () => {
 		expect(editsShown(null, "")).toBe(true)
+		expect(drawerEditsShown()).toBe(false)
 		expect(editSession.token).toBeNull()
 		expect(await editSession.run({ kind: "delete-plan", name: "base" })).toBe(false)
 		expect(await editSession.preview({ kind: "delete-plan", name: "base" })).toBeNull()

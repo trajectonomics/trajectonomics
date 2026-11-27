@@ -80,7 +80,10 @@ hand-written model file.
   issue names is the quantiles themselves.
 - **Inflation stays fixed.** A Return model is per Account, and the Scenario's inflation drives Flow growth
   and the real view, not an Account's return. Letting inflation vary per path is a later decision, so a path's
-  inflation is the Scenario's.
+  inflation is the Scenario's. [ADR 0033](0033-inflation-is-drawn-per-market-path-from-an-inflation-factor.md)
+  amends this bullet: a plan that states `economy.inflationVolatility` draws one yearly rate per Market path
+  from the model's `inflation` factor, so a path's inflation is its own Price path. Absent or 0, this bullet
+  holds exactly as written, and no extra word is drawn.
 - **The check.** `INVALID_BUCKETS` is new in `ERROR_CODES`. `checkReturnModel` now allows up to 1024 buckets
   (it capped them at 512), so a built model passes it. The raised cap also applies to the FI probability
   method (ADR 0005), which runs the same check. The CLI refuses it at `--buckets`.

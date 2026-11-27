@@ -4,6 +4,7 @@ import type { AssetCardView } from "../../lib/view/plan-items/asset-card"
 import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
 import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
 import type { LoanCard } from "../../lib/view/plan-items/loans"
+import type { PlanDensity } from "../../lib/view/plan-items/tabs"
 import type { MarkMap } from "../../lib/view/what-if/items"
 import type { LoanMarks } from "../../lib/view/what-if/loan-items"
 import EmptyState from "../ui/EmptyState.svelte"
@@ -14,21 +15,17 @@ import ReadOnlyLoans from "./ReadOnlyLoans.svelte"
 
 interface Props {
 	accounts: readonly AccountCard[]
-	/** What the What-if session changes in each Account card, by id. */
 	marks?: MarkMap
-	/** The real assets (homes and cars) of the plan, each with its value and its terms. */
 	assets?: readonly AssetCardView[]
 	loans: readonly LoanCardView[]
-	/** What the What-if session changes in each loan card, by loan id. */
 	loanMarks?: Readonly<Record<string, LoanMarks>>
-	/** The loan Flows no loan card places, which are shown read-only. */
 	other: readonly LoanCard[]
 	currency: string
 	editable: boolean
-	/** The plan and the content hash the page read for it: the what-if switches name both. */
+	actions?: boolean
+	density?: PlanDensity
 	plan: string
 	contentHash: string
-	/** Opens the planner's drawer on an item, in the form it names. */
 	open: (drawer: PlanDrawer) => void
 }
 
@@ -41,46 +38,61 @@ let {
 	other,
 	currency,
 	editable,
+	actions = true,
+	density = "full",
 	plan,
 	contentHash,
 	open,
 }: Props = $props()
+const compact = $derived(density === "compact")
 </script>
 
-{#if accounts.length === 0}
-	{#if loans.length === 0 && assets.length === 0}<EmptyState title="No accounts in this plan" />{/if}
-{:else}
+{#if compact || accounts.length > 0}
 	<AccountCards
 		cards={accounts}
 		{marks}
 		{currency}
 		{editable}
+		{actions}
+		{density}
+		addNoun={compact ? "account" : undefined}
+		onAdd={() => open({})}
 		{plan}
 		{contentHash}
-		onEdit={(id) => open({ id })}
+		onEdit={(id) => open({ id, ...(compact ? { details: true } : {}) })}
 		onTry={(id) => open({ id, tryValue: true })}
 	/>
+{:else if loans.length === 0 && assets.length === 0}
+	<EmptyState title="No accounts in this plan" />
 {/if}
-{#if assets.length > 0}
+{#if compact || assets.length > 0}
 	<AssetCards
 		cards={assets}
 		{currency}
 		{editable}
+		{actions}
+		{density}
+		addNoun={compact ? "a home or car" : undefined}
+		onAdd={() => open({ asset: true })}
 		{plan}
 		{contentHash}
-		onEdit={(id) => open({ id, asset: true })}
+		onEdit={(id) => open({ id, asset: true, ...(compact ? { details: true } : {}) })}
 		onTry={(id) => open({ id, asset: true, tryValue: true })}
 	/>
 {/if}
-{#if loans.length > 0}
+{#if compact || loans.length > 0}
 	<LoanCards
 		cards={loans}
 		marks={loanMarks}
 		{currency}
 		{editable}
+		{actions}
+		{density}
+		addNoun={compact ? "loan" : undefined}
+		onAdd={() => open({ loan: true })}
 		{plan}
 		{contentHash}
-		onEdit={(id) => open({ id, loan: true })}
+		onEdit={(id) => open({ id, loan: true, ...(compact ? { details: true } : {}) })}
 		onPay={(id) => open({ id, extra: true })}
 		onTry={(id) => open({ id, loan: true, tryValue: true })}
 	/>

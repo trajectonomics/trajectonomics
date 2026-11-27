@@ -9,17 +9,18 @@ import type {
 	Read,
 	ScenarioDocument,
 } from "../../lib/contract"
+import { drawerEditsShown } from "../../lib/edit/shown"
 import { assetCardsOf } from "../../lib/view/plan-items/asset-card"
 import { assetsWithFlows } from "../../lib/view/plan-items/asset-link"
-import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
+import { canEdit, type PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
+import type { PlanDensity } from "../../lib/view/plan-items/tabs"
 import { loanPage } from "../../lib/view/what-if/loan-items"
 import { accountItems, flowItems } from "../../lib/view/what-if/plan-items"
-import EmptyState from "../ui/EmptyState.svelte"
-import AssetItems from "./AssetItems.svelte"
 import AssetsNote from "./AssetsNote.svelte"
-import FlowCards from "./FlowCards.svelte"
 import PlanItemDrawer from "./PlanItemDrawer.svelte"
+import PlanItemFace from "./PlanItemFace.svelte"
+import PlanItemsCards from "./PlanItemsCards.svelte"
 import PlanToolbar from "./PlanToolbar.svelte"
 
 interface Props {
@@ -35,9 +36,21 @@ interface Props {
 	editable: boolean
 	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
+	/** The page's full cards, or the Plan's compact grid. */
+	density?: PlanDensity
 }
 
-let { kind, name, doc, household, baseline, run, editable, contentHash }: Props = $props()
+let {
+	kind,
+	name,
+	doc,
+	household,
+	baseline,
+	run,
+	editable,
+	contentHash,
+	density = "full",
+}: Props = $props()
 /** The drawer: null when it is shut, else what it is open on (an item, a form, a what-if try). */
 let drawer = $state<PlanDrawer | null>(null)
 
@@ -46,6 +59,7 @@ function setDrawer(next: PlanDrawer | null): void {
 	editSession.clear()
 	drawer = next
 }
+const compact = $derived(density === "compact")
 const noun = $derived(PLAN_PAGES[kind].noun)
 const changes = $derived(whatIfSession.changesFor(name))
 const flows = $derived(flowItems(doc, kind, household, changes, currentItemNames()))
@@ -53,51 +67,35 @@ const tried = $derived(whatIfSession.lensFor(name)?.run ?? undefined)
 const accounts = $derived(accountItems(doc, baseline, changes, { run, tried }, currentItemNames()))
 const assets = $derived(kind === "assets" ? assetCardsOf(doc, baseline, run) : [])
 const loans = $derived(loanPage(kind, doc, { run, baseline }, changes))
+const lists = $derived({ flows, accounts, assets, loans })
+/** The open item can be edited here: the page edits, a drawer may show a form, and the card states the item is editable. */
+const formShown = $derived(
+	drawer === null ||
+		drawer.details !== true ||
+		(editable && drawerEditsShown() && canEdit(kind, drawer, lists)),
+)
+/** A compact card opens the item's full card first; a full page's Edit opens the form. */
+const onEdit = (id: string) => setDrawer(compact ? { id, details: true } : { id })
+const onTry = (id: string) => setDrawer({ id, tryValue: true })
+/** A face's "What if…" keeps the form the face states: a loan's terms or a home or car's values. */
+const onTryFace = (next: PlanDrawer) => setDrawer(next)
+/** A loan's "Pay extra" opens the payment's own form. */
+const onPay = (id: string) => setDrawer({ id, extra: true })
 </script>
 
-<div class="space-y-4">
-	<div class="flex flex-wrap items-center justify-between gap-3">
-		{#if editable}
-			<PlanToolbar {kind} {noun} open={setDrawer} />
-		{/if}
-	</div>
-	{#if kind === "assets"}
-		<AssetItems
-			accounts={accounts.cards}
-			marks={accounts.marks}
-			{assets}
-			loans={loans.cards}
-			loanMarks={loans.marks}
-			other={loans.other}
-			currency={doc.currency}
-			{editable}
-			plan={name}
-			{contentHash}
-			open={setDrawer}
-		/>
-	{:else if flows.cards.length === 0}
-		<EmptyState title="No {noun} in this plan" />
-	{:else}
-		<FlowCards
-			cards={flows.cards}
-			marks={flows.marks}
-			currency={doc.currency}
-			{editable}
-			plan={name}
-			{contentHash}
-			onEdit={(id) => setDrawer({ id })}
-			onTry={(id) => setDrawer({ id, tryValue: true })}
-		/>
+{#snippet face()}
+	{#if drawer !== null}
+		<PlanItemFace {kind} {drawer} {lists} currency={doc.currency} editable={editable && drawerEditsShown()} plan={name} {contentHash} onTry={onTryFace} {onPay} />
 	{/if}
+{/snippet}
+
+<div class="space-y-4">
+	{#if editable && !compact}
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<PlanToolbar {kind} {noun} open={setDrawer} />
+		</div>
+	{/if}
+	<PlanItemsCards {kind} {flows} {accounts} {assets} {loans} currency={doc.currency} {editable} {density} plan={name} {contentHash} open={setDrawer} {onEdit} {onTry} onAdd={() => setDrawer({})} {noun} />
 	<AssetsNote assets={kind === "assets" ? [] : assetsWithFlows(doc, kind)} plan={name} />
-	<PlanItemDrawer
-		{drawer}
-		{kind}
-		{name}
-		{doc}
-		{household}
-		{baseline}
-		{contentHash}
-		onClose={() => setDrawer(null)}
-	/>
+	<PlanItemDrawer {drawer} {kind} {name} {doc} {household} {baseline} {contentHash} onClose={() => setDrawer(null)} form={formShown} face={drawer?.details === true ? face : undefined} />
 </div>

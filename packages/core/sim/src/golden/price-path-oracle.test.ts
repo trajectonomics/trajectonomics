@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { addMonthsClamped } from "../calendar/arith"
+import { addDays, addMonthsClamped } from "../calendar/arith"
 import { countedDays } from "../calendar/counted"
 import { deflateBy, inflateBy, type PricePath } from "../money/inflation"
 import { priceChangeBps } from "../money/price-path"
@@ -16,11 +16,11 @@ function ratesOf(seed: number): readonly number[] {
 	})
 }
 
-const PATHS: readonly PricePath[] = [1, 7, 2026].map((seed) => ({
-	start: START,
-	ratesBps: ratesOf(seed),
-	outsideBps: OUTSIDE,
-}))
+const PATHS: readonly PricePath[] = [
+	...[1, 7, 2026].map((seed) => ({ start: START, ratesBps: ratesOf(seed), outsideBps: OUTSIDE })),
+	// The ends of the range a price path may state, so no product is ever near zero by accident.
+	{ start: START, ratesBps: [-9999, 10_000, -9999, 10_000], outsideBps: -9999 },
+]
 
 describe("a Price path against an exact-rational oracle", () => {
 	it("inflates by whole years before, through and past the drawn years", () => {
@@ -43,6 +43,31 @@ describe("a Price path against an exact-rational oracle", () => {
 			for (const days of [0, 1, 364, 365, 731, 3650, 3650 + 364]) {
 				expect(deflateBy(amount, path, days)).toBe(
 					oracleDeflate(amount, path.ratesBps, path.outsideBps, days),
+				)
+			}
+		}
+	})
+
+	it("inflates to a mid-year date the engine counts as that year", () => {
+		const amount = 10n ** 15n + 7n
+		const mid = addDays(addMonthsClamped(START, 12), 200)
+		for (const path of PATHS) {
+			for (let n = 0; n <= 5; n++) {
+				expect(inflateBy(amount, path, n, mid)).toBe(
+					oracleInflate(amount, path.ratesBps, path.outsideBps, n, 1),
+				)
+			}
+		}
+	})
+
+	it("inflates a date before the path's start from year 0, so only the outside rate applies", () => {
+		const amount = 10n ** 15n + 7n
+		const before = addDays(START, -1)
+		for (const path of PATHS) {
+			expect(inflateBy(amount, path, 0, before)).toBe(amount)
+			for (const n of [1, 2, 5]) {
+				expect(inflateBy(amount, path, n, before)).toBe(
+					oracleInflate(amount, path.ratesBps, path.outsideBps, n, 0),
 				)
 			}
 		}
