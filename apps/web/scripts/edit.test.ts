@@ -7,6 +7,7 @@ import {
 	disposeEditor,
 	drop,
 	hashOf,
+	householdHashOf,
 	ledgerShow,
 	postEdit,
 	SLOW_MS,
@@ -95,7 +96,7 @@ describe("an Edit against the real traj", () => {
 				JSON.stringify({
 					kind: "set-household",
 					name: "base",
-					contentHash: hashOf("base"),
+					householdHash: householdHashOf("base"),
 					household,
 				}),
 			)
@@ -125,7 +126,7 @@ describe("an Edit against the real traj", () => {
 				JSON.stringify({
 					kind: "set-household",
 					name: "base",
-					contentHash: hashOf("base"),
+					householdHash: householdHashOf("base"),
 					household,
 				}),
 			)
@@ -142,7 +143,11 @@ describe("an Edit against the real traj", () => {
 		"removing the household keeps the dates it pinned, and the Snapshot no longer shows ages",
 		async () => {
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "remove-household", name: "base", contentHash: hashOf("base") }),
+				JSON.stringify({
+					kind: "remove-household",
+					name: "base",
+					householdHash: householdHashOf("base"),
+				}),
 			)
 			expect(status).toBe(200)
 			if (!answer.ok) throw new Error(answer.error.message)

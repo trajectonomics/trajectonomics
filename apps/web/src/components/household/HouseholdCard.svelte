@@ -19,13 +19,13 @@ interface Props {
 	name: string
 	doc: ScenarioDocument
 	household: HouseholdDocument | null
-	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0055). */
-	contentHash: string
+	/** The hash of the document and household the page read, which every Edit to them names (cli ADR 0055). */
+	householdHash: string
 	/** Whether the controls show: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
 }
 
-let { name, doc, household, editable, contentHash }: Props = $props()
+let { name, doc, household, editable, householdHash }: Props = $props()
 
 /** The drawer: the person form (for a new person, or the one of that id) or the anchor form; null when shut. */
 type Form = { form: "person"; id?: string } | { form: "anchor" }
@@ -55,7 +55,7 @@ async function unpin(path: string): Promise<void> {
 		{
 			kind: "set-household",
 			name,
-			contentHash,
+			householdHash,
 			household: householdWithoutAnchor(household, path),
 		},
 		"household",
@@ -79,7 +79,7 @@ async function unpin(path: string): Promise<void> {
 		<HouseholdPeople {people} {editable} onEdit={(id) => open({ form: "person", id })} />
 		<HouseholdAnchors anchors={household.anchors} {editable} onRemove={unpin} />
 		{#if editable}
-			<HouseholdRemove {name} {contentHash} />
+			<HouseholdRemove {name} {householdHash} />
 		{/if}
 	{/if}
 	<!-- A refusal shows beside the control that sent it; while the drawer is open its form shows the refusal instead. -->
@@ -87,9 +87,9 @@ async function unpin(path: string): Promise<void> {
 	<Drawer open={shown !== null} {title} onClose={() => open(null)}>
 		{#if editSession.source === "household"}<StaleNotice />{/if}
 		{#if shown?.form === "anchor" && household !== null}
-			<HouseholdAnchorForm {name} {household} {contentHash} flows={doc.flows} onDone={() => open(null)} />
+			<HouseholdAnchorForm {name} {household} {householdHash} flows={doc.flows} onDone={() => open(null)} />
 		{:else if shown?.form === "person"}
-			<HouseholdPersonForm {name} {household} {contentHash} existing={existing} onDone={() => open(null)} />
+			<HouseholdPersonForm {name} {household} {householdHash} existing={existing} onDone={() => open(null)} />
 		{/if}
 	</Drawer>
 </section>
