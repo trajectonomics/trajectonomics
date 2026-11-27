@@ -39,7 +39,7 @@
       for (var i = 0; i < links.length; i++) links[i].setAttribute("href", "#coming-soon");
       return;
     }
-    if (!release) return; // unknown: keep the plain /download link
+    if (!release) return; // unknown: keep the plain /openjot/download link
     root.setAttribute("data-release", "ready");
     var android = root.lang === "th" ? "Android 7.0 ขึ้นไป (64 บิต)" : "Android 7.0+, 64-bit";
     var meta = document.querySelector(".js-release-meta");
@@ -54,15 +54,15 @@
       meta.appendChild(document.createTextNode(" · " + rest.join(" · ")));
     }
     if (release.checksumsUrl) {
-      // The worker's /download/checksums route resolves the same release, so the
+      // The worker's /openjot/download/checksums route resolves the same release, so the
       // link stays on this domain and keeps working when a release has no SHA256SUMS.
       var sums = document.querySelectorAll(".js-checksums");
-      for (var j = 0; j < sums.length; j++) sums[j].setAttribute("href", "/download/checksums");
+      for (var j = 0; j < sums.length; j++) sums[j].setAttribute("href", "/openjot/download/checksums");
     }
   }
 
   if (window.fetch) {
-    fetch("/api/release", { headers: { accept: "application/json" } })
+    fetch("/openjot/api/release", { headers: { accept: "application/json" } })
       .then(function (res) { return res.ok ? res.json() : { release: undefined }; })
       .then(function (data) { renderRelease(data.release); })
       .catch(function () {});

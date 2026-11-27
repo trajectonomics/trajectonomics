@@ -6,7 +6,7 @@ import PreferenceControls from "./PreferenceControls.svelte"
 let dialog: HTMLDialogElement | undefined = $state()
 
 function close(): void {
-	shellPanels.options = false
+	shellPanels.closeOptions()
 }
 
 // The drawer is a modal dialog: showModal traps focus, and Escape closes it through the dialog's own event.
