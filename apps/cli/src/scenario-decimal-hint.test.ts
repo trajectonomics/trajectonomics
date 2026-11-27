@@ -137,6 +137,16 @@ describe("scenario apply of a decimal document without --decimal", () => {
 		expect(errorOf(refused).hint).toBe(SCHEMA_HINT)
 	})
 
+	it("carries no decimal hint when another money field is a quoted whole amount", async () => {
+		const flows = [...SCENARIO_DOCUMENT.flows].map((flow, index) =>
+			index === 0 ? { ...flow, amount: "9000.50" } : { ...flow, amount: "5000" },
+		)
+		const res = await applyScenario(scenarioHome(), "base", { ...SCENARIO_DOCUMENT, flows })
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).path).toBe("document.flows.0.amount")
+		expect(errorOf(res).hint).toBe(SCHEMA_HINT)
+	})
+
 	it("carries no decimal hint in a currency --decimal does not read", async () => {
 		const document = { ...withFirstAmount(SCENARIO_DOCUMENT as Doc, "9000.50"), currency: "USD" }
 		const res = await applyScenario(scenarioHome(), "base", document)
