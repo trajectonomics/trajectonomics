@@ -6,7 +6,7 @@
 	// Better Auth imports node:async_hooks and node:crypto, and the passkey plugin uses Web Crypto.
 	"compatibility_flags": ["nodejs_compat"],
 	// auth.trajectonomics.com is its own origin on purpose: an XSS on a site sharing this origin
-	// could make credentialed requests to the auth endpoints. The owner attaches this route.
+	// could make credentialed requests to the auth endpoints. The first deploy attaches this domain.
 	"workers_dev": false,
 	"routes": [{ "pattern": "auth.trajectonomics.com", "custom_domain": true }],
 	"vars": {
@@ -19,9 +19,8 @@
 		{
 			"binding": "DB",
 			"database_name": "traj-auth",
-			// PLACEHOLDER: the owner creates the database with `wrangler d1 create traj-auth` and
-			// replaces this id. Local `wrangler dev --local` works with the placeholder.
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			// Created by the owner on 2026-11-27 in APAC (`wrangler d1 create traj-auth --location apac`).
+			"database_id": "6b94f059-3d46-4c6f-85d4-385a8acc3668",
 			"migrations_dir": "migrations"
 		}
 	]
