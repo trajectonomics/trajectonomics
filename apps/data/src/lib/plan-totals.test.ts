@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { grandTotal, planTotals } from "./plan-totals"
+import { grandTotal, planNote, planTotals } from "./plan-totals"
 import type { UsageRow } from "./types"
 
 function row(overrides: Partial<UsageRow> = {}): UsageRow {
@@ -29,37 +29,10 @@ describe("the plan totals", () => {
 		const claude = totals.find((entry) => entry.plan === "claude")
 		expect(claude).toMatchObject({
 			planName: "Claude",
-			tokensIn: 20,
-			tokensOut: 40,
-			cacheRead: 60,
-			cacheWrite: 80,
 			tokensTotal: 150,
 			requests: 3,
 			models: 2,
 		})
-	})
-
-	test("keeps a part null when every contributing row has no value", () => {
-		const totals = planTotals([
-			row({ plan: "mistral", model: "mistral-large", tokensIn: null, tokensOut: null }),
-			row({
-				day: "2026-11-25",
-				plan: "mistral",
-				model: "mistral-large",
-				tokensIn: null,
-				tokensOut: null,
-			}),
-		])
-		expect(totals[0]?.tokensIn).toBeNull()
-		expect(totals[0]?.tokensOut).toBeNull()
-	})
-
-	test("sums the parts that exist when a group mixes null and numbers", () => {
-		const totals = planTotals([
-			row({ plan: "mistral", model: "mistral-large", cacheRead: null }),
-			row({ day: "2026-11-25", plan: "mistral", model: "mistral-large", cacheRead: 5 }),
-		])
-		expect(totals[0]?.cacheRead).toBe(5)
 	})
 
 	test("counts distinct models", () => {
@@ -122,10 +95,38 @@ describe("the grand total", () => {
 			row({ plan: "claude", tokensTotal: 75, requests: 3 }),
 			row({ plan: "mistral", model: "mistral-large", tokensTotal: 25, requests: 2 }),
 		])
-		expect(grandTotal(totals)).toEqual({ tokensTotal: 100, requests: 5 })
+		expect(grandTotal(totals)).toEqual({ tokensTotal: 100, requests: 5, share: 1 })
 	})
 
-	test("is zero for no plans", () => {
-		expect(grandTotal([])).toEqual({ tokensTotal: 0, requests: 0 })
+	test("is zero, with a zero share, for no plans", () => {
+		expect(grandTotal([])).toEqual({ tokensTotal: 0, requests: 0, share: 0 })
+	})
+
+	test("has a zero share when every plan has zero tokens", () => {
+		expect(grandTotal(planTotals([row({ tokensTotal: 0, requests: 2 })]))).toEqual({
+			tokensTotal: 0,
+			requests: 2,
+			share: 0,
+		})
+	})
+})
+
+describe("a plan's source note", () => {
+	test("is absent for hourly, exact rows", () => {
+		expect(planNote({ daily: false, bestEffort: false })).toBeNull()
+	})
+
+	test("says the plan includes a daily export when one row is daily and another hourly", () => {
+		const [mistral] = planTotals([
+			row({ plan: "mistral", model: "mistral-large", granularity: "day" }),
+			row({ day: "2026-11-25", plan: "mistral", model: "mistral-large", granularity: "hour" }),
+		])
+		expect(mistral === undefined ? null : planNote(mistral)).toBe("includes a daily export")
+	})
+
+	test("names both sources when both apply", () => {
+		expect(planNote({ daily: true, bestEffort: true })).toBe(
+			"includes a daily export · includes a best-effort source",
+		)
 	})
 })

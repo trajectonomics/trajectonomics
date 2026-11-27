@@ -1,4 +1,4 @@
-import { planName, planRank } from "./plans"
+import { comparePlans, planName } from "./plans"
 import type { UsageRow } from "./types"
 
 /** One plan and model's totals over the window. */
@@ -16,8 +16,7 @@ export type TableRow = {
 	bestEffort: boolean
 }
 
-/** Adds the parts that exist; a part is null only when every contributing row has no value. */
-export function sumNullable(values: readonly (number | null)[]): number | null {
+function sumNullable(values: readonly (number | null)[]): number | null {
 	let sum = 0
 	let seen = false
 	for (const value of values) {
@@ -57,16 +56,11 @@ export function usageTable(rows: readonly UsageRow[]): TableRow[] {
 				bestEffort: group.some((row) => row.bestEffort),
 			}
 		})
-		.sort(
-			(a, b) =>
-				planRank(a.plan) - planRank(b.plan) ||
-				a.plan.localeCompare(b.plan) ||
-				a.model.localeCompare(b.model),
-		)
+		.sort((a, b) => comparePlans(a, b) || a.model.localeCompare(b.model))
 }
 
 /** The source note a row carries, or null when it needs none. */
-export function rowNote(row: Pick<TableRow, "daily" | "bestEffort">): string | null {
+export function rowNote(row: TableRow): string | null {
 	const notes: string[] = []
 	if (row.daily) notes.push("daily export, no in/out split")
 	if (row.bestEffort) notes.push("best-effort source")
