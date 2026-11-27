@@ -34,6 +34,12 @@ const employerDerive = z.looseObject({
 	result: z.literal("share"),
 })
 
+/** The basis points an employer's `derive` states, or null for another shape: only the form's own two measures count. */
+export function employerShareBps(derive: unknown): number | null {
+	const parsed = employerDerive.safeParse(derive)
+	return parsed.success ? parsed.data.measures[1].num : null
+}
+
 /** An employer's share as the document states it: the Flow, the Account it lands in, the percent and the rounding. */
 export interface EmployerShare {
 	readonly flow: ScenarioFlow
@@ -57,6 +63,19 @@ export function employerOf(flows: readonly ScenarioFlow[], salaryId: string): Em
 /** The sentence of a salary's card: "Employer adds 5% to Provident fund". */
 export function employerWords(share: EmployerShare, names: AccountNames = NO_NAMES): string {
 	return `Employer adds ${percentWords(share.percent)}% to ${nameOf(names, share.account)}`
+}
+
+/** The ids of the Flows that are a salary's employer share, read as `employerOf` reads the shape (web ADR 0017). */
+export function employerShareIds(flows: readonly ScenarioFlow[]): ReadonlySet<string> {
+	return new Set(
+		flows.flatMap((flow) => {
+			const suffix = "-employer"
+			if (!flow.id.endsWith(suffix)) return []
+			const salaryId = flow.id.slice(0, flow.id.length - suffix.length)
+			const share = employerOf(flows, salaryId)
+			return share?.flow.id === flow.id ? [flow.id] : []
+		}),
+	)
 }
 
 /** The Accounts an employer's share may go to: assets that are not illiquid (a liability or a `liquid: false` asset is refused). */
