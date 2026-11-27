@@ -44,6 +44,21 @@ const code = (kind: string, id: string) =>
 		`<code[^>]*data-item="${id}"[^>]*data-kind="${kind}"[^>]*data-unnamed[^>]*>${id}</code>`,
 	)
 
+/** A Demo copy without a label on the base plan's Flows or Milestones, put in the store; its snapshot and that plan. */
+function unlabelled() {
+	const snapshot = structuredClone(DEMO)
+	const read = snapshot.reads.documents["base"]
+	if (read?.ok !== true) throw new Error("the Demo reads its base plan")
+	const scenario = read.data.scenario
+	for (const flow of scenario.document.flows) delete flow.displayLabel
+	type Milestone = { id: string; displayLabel?: string }
+	for (const milestone of (scenario.document.milestones as Milestone[] | undefined) ?? []) {
+		delete milestone.displayLabel
+	}
+	replaceSnapshot(snapshot)
+	return { snapshot, scenario }
+}
+
 describe("the household's people are called by role, never by id", () => {
 	test("a card heads with You, Your partner or Child, keeps the id in a row, and Edit says the name", () => {
 		const body = household()
@@ -142,5 +157,64 @@ describe("a label the plan states is shown in place of the id", () => {
 		expect(milestone.body).toContain(">Car paid off</span>")
 		const bare = render(ItemName, { props: { kind: "milestone", id: "sabbatical" } }).body
 		expect(bare).toMatch(code("milestone", "sabbatical"))
+	})
+})
+
+describe("a Flow and a Milestone the plan states no label for show the id in code", () => {
+	test("a Flow card heads with its id in code, and Edit says it", () => {
+		const { snapshot } = unlabelled()
+		const body = render(PlanItemsBody, {
+			props: { snapshot, kind: "income", scenario: "base", editable: true },
+		}).body
+		expect(body).toMatch(code("flow", "salary"))
+		expect(body).toContain('aria-label="Edit salary"')
+	})
+
+	test("an anchor is its item's id in code, the date it pins and the person's words", () => {
+		const { scenario } = unlabelled()
+		const body = render(HouseholdCard, {
+			props: {
+				name: "base",
+				doc: scenario.document,
+				household: scenario.household,
+				contentHash: scenario.contentHash,
+				editable: true,
+			},
+		}).body
+		expect(body).toMatch(code("flow", "fund"))
+		expect(body).toContain("at you, age 60")
+		expect(body).toContain('aria-label="Remove the anchor of fund ends"')
+	})
+
+	test("the anchor form's pickers show the id as the option's words", () => {
+		const { scenario } = unlabelled()
+		const body = render(HouseholdAnchorForm, {
+			props: {
+				name: "base",
+				household: scenario.household!,
+				contentHash: scenario.contentHash,
+				flows: scenario.document.flows,
+				onDone: () => {},
+			},
+		}).body
+		expect(body).toContain('<option value="salary">salary</option>')
+	})
+
+	test("the Milestones page lists each id in code and sets the chart's marks in code", () => {
+		unlabelled()
+		const body = render(MilestonesBody, {
+			props: { run, argv: [], terms: "both", onTerms: () => {} },
+		}).body
+		expect(body).toMatch(code("milestone", "car-paid-off"))
+		expect(body).toMatch(code("milestone", "sabbatical"))
+		expect(body).toMatch(/class="[^"]*font-mono[^"]*">net-worth-ten-million<\/text>/)
+	})
+
+	test("the Plans page's markers carry the id and are marked as code", () => {
+		const [card] = planCards(unlabelled().snapshot, parseRange("all"))
+		expect(card?.markers.map((marker) => [marker.label, marker.code ?? false])).toEqual([
+			["car-paid-off", true],
+			["net-worth-ten-million", true],
+		])
 	})
 })

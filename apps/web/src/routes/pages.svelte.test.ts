@@ -10,6 +10,7 @@ import { HASH, useSessionHooks } from "../client/what-if.test-support"
 import FigureChart from "../components/routing/FigureChart.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { milestoneLabel, type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
+import { scenarioNames } from "../lib/view/plan"
 import { ROUTES } from "../lib/view/routes"
 import { LOADING } from "../lib/view/state"
 import { startWhatIf, withSet } from "../lib/what-if/session"
@@ -153,13 +154,17 @@ describe("a page of the Demo Snapshot", () => {
 		expect(problemsOf(body)).toEqual([])
 	})
 
-	test("shows no Flow or Milestone id in code, because the Demo's plan states a label for each", () => {
+	test("shows no Flow or Milestone id in code on any plan, because the Demo states a label for each", () => {
 		const ids = demoItemIds(DEMO)
 		expect(ids.size).toBeGreaterThan(0)
-		for (const page of PAGES) {
-			setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=base&index=0`)
-			const shown = codeTexts(render(page.page).body).filter((text) => ids.has(text))
-			expect(shown, page.path).toEqual([])
+		const plans = scenarioNames({ status: "ready", url: "/demo/snapshot.json", snapshot: DEMO })
+		expect(plans.length).toBeGreaterThan(1)
+		for (const plan of plans) {
+			for (const page of PAGES) {
+				setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=${plan}&index=0`)
+				const shown = codeTexts(render(page.page).body).filter((text) => ids.has(text))
+				expect(shown, `${page.path} on ${plan}`).toEqual([])
+			}
 		}
 	})
 
