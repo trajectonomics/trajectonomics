@@ -1,5 +1,4 @@
-import { type AppError, isAppError } from "../../errors"
-import { storedHousehold } from "../household/stored"
+import type { Household } from "../household/model"
 import { exampleFlagsOf } from "./example-flag"
 import type { ReturnClaims, TaxRequest } from "./flags"
 
@@ -14,11 +13,9 @@ import type { ReturnClaims, TaxRequest } from "./flags"
  * `kept` keeps a set for a person with no Return only when it claims something. A plan with no
  * household to judge by gives none.
  */
-export function departedClaimants(kept: TaxRequest, household: string | null): string[] | AppError {
+export function departedClaimants(kept: TaxRequest, household: Household | null): string[] {
 	if (household === null) return []
-	const stored = storedHousehold(household)
-	if (isAppError(stored)) return stored
-	const present = new Set(stored.people.map((person) => person.id))
+	const present = new Set(household.people.map((person) => person.id))
 	return Object.keys(kept.returns ?? {})
 		.filter((id) => !present.has(id))
 		.sort()
