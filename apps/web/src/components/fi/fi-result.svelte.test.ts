@@ -137,6 +137,8 @@ describe("FiResult: the Tax page pointer of a reachable answer", () => {
 		const body = renderFi(fi)
 		expect(body).toContain(`href="/tax/?scenario=${encodeURIComponent(fi.scenario.name)}"`)
 		expect(body).toContain("shows the plan as written, without stopping work at the FI date.")
-		expect(body).toMatch(/class="[^"]*\bunderline\b[^"]*"[^>]*>(<!---->)?Tax page</)
+		// The class list holds `underline` itself, not only `underline-offset-4` or `hover:underline`.
+		const classes = /class="([^"]*)"[^>]*>(?:<!---->)?Tax page</.exec(body)?.[1]?.split(/\s+/)
+		expect(classes).toContain("underline")
 	})
 })
