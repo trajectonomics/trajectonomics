@@ -42,7 +42,7 @@ Each line: name, version, license, and the numbers of the license texts in Part 
 ------------------------------------------------------------------------------
 OpenJot - 1
 ------------------------------------------------------------------------------
-OpenJot 1.6.0 - AGPL-3.0-only [L355]
+OpenJot 1.7.0 - AGPL-3.0-only [L355]
 
 ------------------------------------------------------------------------------
 Rust crates (compiled into libmoojot_lib.so) - 548

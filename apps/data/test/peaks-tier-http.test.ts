@@ -6,6 +6,8 @@ import { read, seed } from "./support/usage"
 
 type Peak = { tokens: number; fromDay: string; cacheRead: number }
 
+type Limits = { fiveHours: null; sevenDays: null; thirtyDays: null }
+
 type PeaksBody = {
 	plans: {
 		plan: string
@@ -13,11 +15,13 @@ type PeaksBody = {
 		fiveHours: Peak | null
 		sevenDays: Peak | null
 		thirtyDays: Peak | null
+		limits: Limits
 		measured: {
 			tier: string | null
 			fiveHours: Peak | null
 			sevenDays: Peak | null
 			thirtyDays: Peak | null
+			limits: Limits | null
 		}[]
 	}[]
 }
@@ -48,18 +52,21 @@ describe("GET /api/peaks by tier", () => {
 			fiveHours: { tokens: 200, fromDay: "2026-10-17", cacheRead: 0 },
 			sevenDays: { tokens: 200, fromDay: "2026-10-17", cacheRead: 0 },
 			thirtyDays: { tokens: 200, fromDay: "2026-10-17", cacheRead: 0 },
+			limits: { fiveHours: null, sevenDays: null, thirtyDays: null },
 			measured: [
 				{
 					tier: "Max",
 					fiveHours: { tokens: 200, fromDay: "2026-10-17", cacheRead: 0 },
 					sevenDays: { tokens: 200, fromDay: "2026-10-17", cacheRead: 0 },
 					thirtyDays: { tokens: 200, fromDay: "2026-10-17", cacheRead: 0 },
+					limits: { fiveHours: null, sevenDays: null, thirtyDays: null },
 				},
 				{
 					tier: "Pro",
 					fiveHours: { tokens: 100, fromDay: "2026-10-16", cacheRead: 0 },
 					sevenDays: { tokens: 100, fromDay: "2026-10-16", cacheRead: 0 },
 					thirtyDays: { tokens: 100, fromDay: "2026-10-16", cacheRead: 0 },
+					limits: null,
 				},
 			],
 		})

@@ -47,12 +47,35 @@ export type Peak = {
 /** The three windows, as the peaks API names them. */
 export type PeakWindowKey = "fiveHours" | "sevenDays" | "thirtyDays"
 
+/**
+ * One window's estimated 100% from the plan's usage meter. `rough` marks fewer than three points
+ * of meter movement, and `derived` marks a 30-day figure that is the week × 30/7.
+ */
+export type Limit = {
+	tokens: number
+	low: number
+	high: number | null
+	points: number
+	readings: number
+	rough: boolean
+	derived?: boolean
+}
+
+/** A plan's three limit estimates; a window with no meter movement has none. */
+export type Limits = {
+	fiveHours: Limit | null
+	sevenDays: Limit | null
+	thirtyDays: Limit | null
+}
+
 /** One tier's peaks, as the peaks API measured them. */
 export type MeasuredTier = {
 	tier: string | null
 	fiveHours: Peak | null
 	sevenDays: Peak | null
 	thirtyDays: Peak | null
+	/** The current tier's meter estimates; null on every other tier and on an old body. */
+	limits?: Limits | null
 }
 
 /** One plan's three peaks, the tier they belong to, and every tier we measured. */
@@ -62,6 +85,7 @@ export type PlanPeak = {
 	fiveHours: Peak | null
 	sevenDays: Peak | null
 	thirtyDays: Peak | null
+	limits?: Limits | null
 	measured: MeasuredTier[]
 }
 
