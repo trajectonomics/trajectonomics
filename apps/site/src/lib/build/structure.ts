@@ -11,7 +11,7 @@ const CODES_WITHOUT_A_PATH: ReadonlySet<string> = new Set(
 	LANGUAGES.filter((entry) => entry.buildPath !== entry.language).map((entry) => entry.language),
 )
 
-/** The elements a page carries exactly one of: the router injects onto the landmarks, and a page has one title. */
+/** The elements a page carries exactly one of: one head, one body, and one set of landmarks. */
 const SINGLE_ELEMENTS = [
 	{ tag: "head", code: "HEAD_NOT_SINGLE" },
 	{ tag: "body", code: "BODY_NOT_SINGLE" },

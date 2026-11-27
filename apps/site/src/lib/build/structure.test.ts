@@ -22,7 +22,7 @@ describe("the structure of the built pages", () => {
 		expect(codes(build())).toEqual([])
 	})
 
-	it("passes a Not-found page too, because the router injects onto it as well", () => {
+	it("passes a Not-found page too, because it carries the same landmarks", () => {
 		expect(codes([...build(), { path: "404.html", content: complete }])).toEqual([])
 	})
 

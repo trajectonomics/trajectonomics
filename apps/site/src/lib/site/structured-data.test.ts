@@ -6,7 +6,7 @@ import {
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
-	SITE_NAME,
+	SITE_BRAND_NAME,
 	SITE_ORIGIN,
 	SKILLS_LICENCE_URL,
 } from "../site"
@@ -90,15 +90,16 @@ describe("the Structured data a Language home carries", () => {
 		expect(website("en").url).toBe(ABSOLUTE_CLEAN_URL)
 	})
 
-	it("gives the page the Site's name and the summary the Dictionary states", () => {
-		expect(website("en").name).toBe(SITE_NAME)
+	it("gives the page the brand's name, traj as its alternate name, and the Dictionary's summary", () => {
+		expect(website("en").name).toBe(SITE_BRAND_NAME)
+		expect(website("en").alternateName).toBe(CLI_NAME)
 		expect(website("th").description).toBe(dictionaryFor("th").description)
 	})
 
 	it("points the WebSite's publisher at the Organization's own id", () => {
 		expect(website("th").publisher).toEqual({ "@id": organization("th")["@id"] })
 		expect(organization("th").url).toBe(SITE_ORIGIN)
-		expect(organization("th").name).toBe(SITE_NAME)
+		expect(organization("th").name).toBe(SITE_BRAND_NAME)
 	})
 
 	it("names the Organization's mark and the three places it publishes", () => {

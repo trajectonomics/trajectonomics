@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { dictionaryFor } from "../language/languages"
-import { SITE_NAME } from "../site"
+import { SITE_BRAND_NAME } from "../site"
 import { LOCKUP_HEIGHT, SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "./layout"
 import type { ShareLockup } from "./lockup"
 import { absoluteShareImageUrl, shareImageAlt, shareImagePath } from "./share-advert"
@@ -88,7 +88,7 @@ describe("one Language's share image", () => {
 describe("what the share image shows, for a reader who cannot see it", () => {
 	it("names the wordmark and the Language's value statement", () => {
 		const dictionary = dictionaryFor("en")
-		expect(shareImageAlt(dictionary)).toBe(`${SITE_NAME} — ${dictionary.description}`)
+		expect(shareImageAlt(dictionary)).toBe(`${SITE_BRAND_NAME} — ${dictionary.description}`)
 	})
 
 	it("speaks each Language's own words", () => {

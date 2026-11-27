@@ -15,9 +15,9 @@ export const THAI: LanguageEntry = Object.freeze({
 	dictionary: Object.freeze({
 		...THAI_SECTIONS,
 		...THAI_CONSENT,
-		documentTitle: "traj — เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent",
+		documentTitle: "Trajectonomics — traj เครื่องมือจำลองการเงินสำหรับ AI agent",
 		description:
-			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
+			"Trajectonomics สร้าง traj เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
 		languageName: "ไทย",
 		languageSwitchLabel: "ไทย",
 		heroHeadingPrefix: "ชุดเครื่องมือสำหรับ",
