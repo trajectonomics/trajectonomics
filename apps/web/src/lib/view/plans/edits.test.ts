@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { editSchema, writeCommand } from "../../edit/edit"
+import { singleWriteEditSchema, writeCommand } from "../../edit/edit"
 import {
 	ACTION_LABELS,
 	mainEdit,
@@ -20,8 +20,8 @@ const row = (name: string, main = false): PlanRow => ({
 	hasNotes: false,
 	projected: true,
 })
-const argv = (edit: Parameters<typeof editSchema.parse>[0], dryRun = false) =>
-	writeCommand(editSchema.parse(edit), dryRun, "TEMPLATE")
+const argv = (edit: Parameters<typeof singleWriteEditSchema.parse>[0], dryRun = false) =>
+	writeCommand(singleWriteEditSchema.parse(edit), dryRun, "TEMPLATE")
 
 describe("a plan's menu", () => {
 	test("lists rename, notes, make main, copy and delete, and not make main on the main plan", () => {

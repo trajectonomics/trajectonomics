@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { lstatSync } from "node:fs"
+import { lstatSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import {
 	type Allowance,
@@ -13,20 +13,32 @@ import allowlist from "./archived-links.allowlist.json"
 
 const ROOT = join(import.meta.dir, "..", "..")
 
-/** Every tracked regular file of the repository, in git's order. Symlinks are links, not content. */
-const trackedFiles = Bun.spawnSync(["git", "ls-files", "-z"], { cwd: ROOT })
-	.stdout.toString()
-	.split("\0")
-	.filter((path) => path.length > 0 && lstatSync(join(ROOT, path)).isFile())
+/** Every tracked text-candidate regular file that mentions `trajectonomics/`. Symlinks are links, not content. */
+const candidateFiles = (() => {
+	const proc = Bun.spawnSync(["git", "grep", "-I", "-l", "-F", "-z", "trajectonomics/"], {
+		cwd: ROOT,
+	})
+	if (proc.exitCode !== 0 && proc.exitCode !== 1) {
+		throw new Error(`git grep failed (${proc.exitCode}): ${proc.stderr.toString()}`)
+	}
+	return proc.stdout
+		.toString()
+		.split("\0")
+		.filter((path) => path.length > 0 && lstatSync(join(ROOT, path)).isFile())
+})()
+
+let cachedHits: Hit[] | undefined
 
 /** Every hit in the checked, text-only tracked files. */
-async function allHits(): Promise<Hit[]> {
+function allHits(): Hit[] {
+	if (cachedHits !== undefined) return cachedHits
 	const hits: Hit[] = []
-	for (const path of trackedFiles.filter(isChecked)) {
-		const text = await Bun.file(join(ROOT, path)).text()
-		if (text.includes("\0")) continue
-		hits.push(...hitsIn(path, text))
+	for (const path of candidateFiles.filter(isChecked)) {
+		const bytes = readFileSync(join(ROOT, path))
+		if (bytes.includes(0)) continue
+		hits.push(...hitsIn(path, bytes.toString("utf8")))
 	}
+	cachedHits = hits
 	return hits
 }
 
@@ -54,13 +66,13 @@ describe("links to archived repositories", () => {
 		}
 	})
 
-	it("links to no archived repository outside a docs/adr folder, unless an allowance names the hit", async () => {
-		const unlisted = (await allHits()).filter((hit) => !isAllowed(hit, allowlist))
+	it("links to no archived repository outside a docs/adr folder, unless an allowance names the hit", () => {
+		const unlisted = allHits().filter((hit) => !isAllowed(hit, allowlist))
 		expect(unlisted.map(show)).toEqual([])
 	})
 
-	it("keeps each allowance tied to a hit that still exists, so a fixed link leaves no stale entry", async () => {
-		const hits = await allHits()
+	it("keeps each allowance tied to a hit that still exists, so a fixed link leaves no stale entry", () => {
+		const hits = allHits()
 		const stale = allowlist.filter(
 			(allowance: Allowance) =>
 				!hits.some((hit) => hit.path === allowance.path && hit.text.includes(allowance.match)),

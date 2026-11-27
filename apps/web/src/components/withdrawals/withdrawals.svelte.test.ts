@@ -6,12 +6,9 @@ import { whatIfSession } from "../../client/what-if.svelte.js"
 import { fakeServer, HASH, held, settle, useSessionHooks } from "../../client/what-if.test-support"
 import { scenarioFlow } from "../../lib/contract"
 import { NO_ITEM_NAMES } from "../../lib/view/item-names"
-import { overviewView } from "../../lib/view/overview/view"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import { withdrawalsView } from "../../lib/view/withdrawals"
 import { CTX } from "../../lib/view/withdrawals/fixtures.test-support"
-import OverviewGrid from "../overview/OverviewGrid.svelte"
-import WithdrawalsCard from "../overview/WithdrawalsCard.svelte"
 import SpendingForm from "./SpendingForm.svelte"
 import WithdrawalsBody from "./WithdrawalsBody.svelte"
 import WithdrawalsResult from "./WithdrawalsResult.svelte"
@@ -169,25 +166,6 @@ describe("the form", () => {
 			/Stop (<!--.*?-->)*<code[^>]*data-item="rent"[^>]*>rent<\/code>(<!--.*?-->)* when this starts/,
 		)
 		expect(body).not.toMatch(/value="rent"[^>]*checked/)
-	})
-})
-
-describe("the Home card: you could spend", () => {
-	test("states the first Rule year's amount and share, and links to the page", () => {
-		const view = overviewView(DEMO)
-		const body = render(WithdrawalsCard, { props: { scenario: view.withdrawals } }).body
-		expect(body).toContain("You could spend")
-		expect(body).toMatch(/title="862,256\.24"><span aria-hidden="true">862k</)
-		expect(body).toContain("3.99% of your savings")
-		expect(body).toContain("/optimize/withdrawals/")
-	})
-
-	test("is not shown for a plan with no rule", () => {
-		const other = overviewView({
-			...DEMO,
-			params: { ...DEMO.params, compare: null, scenarios: ["retire-early"] },
-		})
-		expect(render(OverviewGrid, { props: { view: other } }).body).not.toContain("You could spend")
 	})
 })
 

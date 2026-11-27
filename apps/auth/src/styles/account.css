@@ -1,0 +1,98 @@
+/* The account page: the person first, then each thing they can change. */
+
+.account {
+	display: grid;
+	width: 100%;
+	max-width: 44rem;
+	gap: var(--ds-space-8);
+}
+
+.identity {
+	display: flex;
+	align-items: center;
+	gap: var(--ds-space-4);
+}
+
+.identity-avatar {
+	flex: none;
+	inline-size: 4rem;
+	block-size: 4rem;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.identity-initial {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--ds-color-secondary);
+	color: var(--ds-color-secondary-foreground);
+	font-family: var(--font-display);
+	font-size: var(--ds-font-size-2xl);
+}
+
+.identity .page-title {
+	margin-bottom: var(--ds-space-1);
+}
+
+.identity-email {
+	margin: 0;
+	color: var(--ds-color-muted-foreground);
+	overflow-wrap: anywhere;
+}
+
+.account-section {
+	border-top: 1px solid var(--ds-color-border);
+	padding-top: var(--ds-space-6);
+}
+
+.section-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--ds-space-3);
+}
+
+.grant-list,
+.passkey-list {
+	display: grid;
+	gap: var(--ds-space-3);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.grant,
+.passkey {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--ds-space-3);
+	padding: var(--ds-space-3);
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+}
+
+.grant-name,
+.passkey-name {
+	margin: 0;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.grant-date,
+.passkey-date {
+	margin: 0;
+	font-size: var(--ds-font-size-sm);
+	color: var(--ds-color-muted-foreground);
+}
+
+.account-note {
+	min-height: 1.5rem;
+	margin: var(--ds-space-2) 0 0;
+	font-size: var(--ds-font-size-sm);
+	color: var(--ds-color-muted-foreground);
+}

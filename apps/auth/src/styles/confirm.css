@@ -1,0 +1,35 @@
+/* The one confirmation inside a row, and the sentence a stored consent answer agreed to. */
+
+.confirm-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--ds-space-2);
+	/* The question takes the row, so the two buttons never squeeze into an unreadable line. */
+	flex: 1 1 100%;
+}
+
+.confirm-question {
+	flex: 1 1 12rem;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.account-wording {
+	margin: var(--ds-space-3) 0 0;
+	font-size: var(--ds-font-size-sm);
+	color: var(--ds-color-muted-foreground);
+	overflow-wrap: anywhere;
+}
+
+.account-wording-label {
+	color: var(--ds-color-foreground);
+	font-weight: 600;
+}
+
+/* The shared failed-load state: a message and the one retry under it. */
+.load-failure {
+	display: grid;
+	gap: var(--ds-space-4);
+	justify-items: start;
+}

@@ -1,0 +1,20 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import SignIn from "../components/SignIn.svelte"
+import Layout from "../layouts/Layout.astro"
+import { dictionaryFor } from "../lib/language"
+
+const language = "en"
+const words = dictionaryFor(language)
+---
+
+<Layout
+	language={language}
+	page="sign-in"
+	title={`${words.signInTitle} — Trajectonomics`}
+	description={words.signInDescription}
+>
+	<SignIn client:load language={language} />
+	<noscript><p class="form-message">{words.signInNoScript}</p></noscript>
+</Layout>

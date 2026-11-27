@@ -1,18 +1,13 @@
 import { treeOf, treePath } from "../languages"
-import { BLOG_BASE, SITE_HOME_PATH, SITE_ORIGIN } from "../site"
+import type { Redirect } from "../moved-posts"
+import { SITE_HOME_PATH, SITE_ORIGIN } from "../site"
 import { checkLlmsFile, checkPostStructuredData } from "./answer-engines"
 import { type BuiltFile, type Failure, failure } from "./failures"
 import { alternatesOf, canonicalOf, images, isNoindex, linkTargets, titleOf } from "./html"
+import { buildPathOf, checkRedirects } from "./redirects"
 
 /** The blog's own Not-found Page, which the Worker's `404-page` handling finds for a miss. */
 const NOT_FOUND_PAGE = "404.html"
-
-/** The build path a public path under the blog's base names, or `undefined` when it is outside it. */
-function buildPathOf(pathname: string): string | undefined {
-	if (pathname === BLOG_BASE) return ""
-	if (!pathname.startsWith(`${BLOG_BASE}/`)) return undefined
-	return pathname.slice(BLOG_BASE.length + 1)
-}
 
 /** Every image the page shows is a built file, and says what it shows. */
 function checkImages(path: string, html: string, built: ReadonlySet<string>): Failure[] {
@@ -93,9 +88,12 @@ function checkPage(path: string, html: string): Failure[] {
 }
 
 /** Every rule the built blog breaks, in file order; an empty list means the build may deploy. */
-export function checkBuild(files: readonly BuiltFile[]): readonly Failure[] {
+export function checkBuild(
+	files: readonly BuiltFile[],
+	expectedRedirects: readonly Redirect[] = [],
+): readonly Failure[] {
 	const built = new Set(files.map((file) => file.path))
-	const failures = files
+	const pageFailures = files
 		.filter((file) => file.path.endsWith(".html"))
 		.flatMap((file) => [
 			...checkPage(file.path, file.text ?? ""),
@@ -103,11 +101,13 @@ export function checkBuild(files: readonly BuiltFile[]): readonly Failure[] {
 			...checkLinkedPages(file.path, file.text ?? "", built),
 			...checkPostStructuredData(file.path, file.text ?? ""),
 		])
-	if (!built.has(NOT_FOUND_PAGE)) {
-		failures.push(
-			failure("not-found-page-missing", NOT_FOUND_PAGE, "is missing, so a miss is bare"),
-		)
-	}
-	failures.push(...checkLlmsFile(built))
-	return Object.freeze(failures)
+	const notFound = built.has(NOT_FOUND_PAGE)
+		? []
+		: [failure("not-found-page-missing", NOT_FOUND_PAGE, "is missing, so a miss is bare")]
+	return Object.freeze([
+		...pageFailures,
+		...notFound,
+		...checkLlmsFile(built),
+		...checkRedirects(files, built, expectedRedirects),
+	])
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { authOptions, requireSecret } from "./auth"
+import { oauthHookOptions } from "./auth-options"
 import type { Env } from "./env"
 
 function env(overrides: Partial<Env> = {}): Env {
@@ -18,6 +19,25 @@ describe("authOptions", () => {
 		expect(options.emailAndPassword?.enabled).toBe(false)
 	})
 
+	it("never honours the spike's hold or clock headers in production, even with DEV_ONLY set", () => {
+		const production = oauthHookOptions({ env: env({ DEV_ONLY: "true" }) })
+		const loopback = oauthHookOptions({
+			env: env({ DEV_ONLY: "true", BETTER_AUTH_URL: "http://localhost:8787" }),
+		})
+		const development = oauthHookOptions({
+			env: env({
+				ENVIRONMENT: "development",
+				DEV_ONLY: "true",
+				BETTER_AUTH_URL: "http://localhost:8787",
+			}),
+		})
+		for (const options of [production, loopback]) {
+			expect(options).toMatchObject({ testClock: false, spikeHold: false })
+		}
+		// The control: the same assertion would pass for a gate that is never on.
+		expect(development).toMatchObject({ testClock: true, spikeHold: true })
+	})
+
 	it("enables email and password only for a loopback development origin", () => {
 		const options = authOptions({
 			env: env({
@@ -29,7 +49,7 @@ describe("authOptions", () => {
 		expect(options.emailAndPassword?.enabled).toBe(true)
 	})
 
-	it("installs the JWT, passkey, OAuth provider, device and grant plugins exactly once", () => {
+	it("installs the JWT, passkey, OAuth provider, device, grant and account plugins once", () => {
 		const ids = authOptions({ env: env() })
 			.plugins?.map((plugin) => plugin.id)
 			.sort()
@@ -37,8 +57,10 @@ describe("authOptions", () => {
 			"device-authorization",
 			"grant-management",
 			"jwt",
+			"marketing-consent",
 			"oauth-provider",
 			"passkey",
+			"pending-deletion",
 		])
 	})
 
@@ -76,10 +98,11 @@ describe("authOptions", () => {
 		expect(requireSecret("x".repeat(32))).toBe("x".repeat(32))
 	})
 
-	it("trusts only its own origin in production and disables /token and delete-consent", () => {
+	it("trusts only its own origin in production and disables /token, delete-consent and update-consent", () => {
 		const options = authOptions({ env: env() })
 		expect(options.trustedOrigins).toEqual(["https://auth.example.test"])
 		expect(options.disabledPaths).toContain("/token")
 		expect(options.disabledPaths).toContain("/oauth2/delete-consent")
+		expect(options.disabledPaths).toContain("/oauth2/update-consent")
 	})
 })

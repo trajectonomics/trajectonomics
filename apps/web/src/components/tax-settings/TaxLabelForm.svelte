@@ -63,6 +63,6 @@ async function save(event: SubmitEvent): Promise<void> {
 	<Field id="tax-label-flow" label="Income Flow" options={flows} bind:value={flow} problem={shown.at("flow")} {disabled} />
 	<Field id="tax-label-label" label="Tax label" options={LABEL_CHOICES} bind:value={label} problem={shown.at("label")} {disabled} />
 	{#if shown.general}<FormAlert message={shown.general} />{/if}
-	{#if mine}<StaleNotice />{/if}
+	{#if mine}<StaleNotice shows="stale" />{/if}
 	<button type="submit" {disabled} class={button}>Save the tax label</button>
 </form>

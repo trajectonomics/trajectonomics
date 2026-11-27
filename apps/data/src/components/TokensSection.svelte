@@ -30,9 +30,9 @@ const takeaway = $derived(cacheTakeaway(cacheRows))
 
 <DataSection
 	id="tokens"
-	title="Where the tokens went"
+	title="Cache"
 	href={`${METHOD_PATH}#tokens`}
-	direction="A higher cache rate is cheaper: more of the tokens come from cache."
+	direction="More cache is cheaper."
 	{takeaway}
 >
 	{#snippet chart()}
@@ -42,11 +42,11 @@ const takeaway = $derived(cacheTakeaway(cacheRows))
 			<ScatterChart
 				points={cacheDots}
 				xTitle="Cache rate"
-				yTitle="Tokens per $1"
+				yTitle="Tokens/$"
 				xKind="percent"
 				yKind="tokens"
 				xDomain={[0, 100]}
-				caption="Tokens per $1 against cache rate, one dot per priced plan with a cache split. A hollow dot is the most we used, not an estimate."
+				caption="One dot per priced plan with a cache split; a hollow dot is the most we used."
 			/>
 		{/if}
 	{/snippet}
@@ -58,7 +58,7 @@ const takeaway = $derived(cacheTakeaway(cacheRows))
 			its plan has no dot in the chart.
 		</p>
 		<p>
-			Tokens per $1 is calculated as in <a href="#value">Value for money</a>. Prices were read on
+			Tokens/$ is calculated as in <a href="#value">Value</a>. Prices were read on
 			2026-11-27; every one and its source is in
 			<a href={`${METHOD_PATH}#prices`}>Prices</a>.
 		</p>

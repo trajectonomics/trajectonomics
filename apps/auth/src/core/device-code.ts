@@ -2,7 +2,7 @@
  * The device flow's user code, normalized exactly as Better Auth 1.7.28 does. The library's
  * `findDeviceCodeByUserCode` first looks up the value as typed, then (when it normalizes to the
  * default alphabet) the stripped, upper-cased form: `abcd-efgh` finds `ABCDEFGH`. The consent
- * after-hook must use the same candidates, or approving a dashed or lower-case code updates the
+ * before-hook must use the same candidates, or approving a dashed or lower-case code updates the
  * device row while no `oauthConsent` row is created.
  *
  * This module is pure: no I/O, no clock, no environment.

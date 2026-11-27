@@ -1,7 +1,10 @@
 import type { Language } from "./languages"
 
-/** What kind of Post it is; the front page filters by it. */
-export const POST_TYPES = Object.freeze(["compare", "guide", "news"] as const)
+/**
+ * What kind of Post it is; the front page filters by it, in this order: what a reader most often
+ * comes for first.
+ */
+export const POST_TYPES = Object.freeze(["compare", "release", "guide", "essay", "news"] as const)
 
 /** One Post Type. */
 export type PostType = (typeof POST_TYPES)[number]
@@ -9,7 +12,9 @@ export type PostType = (typeof POST_TYPES)[number]
 /** The folder each Post Type's addresses live under. */
 const TYPE_FOLDERS: Readonly<Record<PostType, string>> = Object.freeze({
 	compare: "compare",
+	release: "releases",
 	guide: "guides",
+	essay: "essays",
 	news: "news",
 })
 

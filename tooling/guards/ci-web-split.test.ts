@@ -36,9 +36,9 @@ describe("the CI split of the web check", () => {
 	})
 
 	it("keeps `test` equal to the `./src` half and the `./scripts` half CI runs apart", () => {
-		expect(web.scripts["test"]).toBe("bun test ./src ./scripts")
+		expect(web.scripts["test"]).toBe("bun test --parallel=2 --no-isolate ./src ./scripts")
 		expect(web.scripts["test:src"]).toBe("bun test ./src")
-		expect(web.scripts["test:scripts"]).toBe("bun test ./scripts")
+		expect(web.scripts["test:scripts"]).toBe("bun test --parallel=2 --no-isolate ./scripts")
 	})
 
 	it("runs lint, typecheck, test:src and build in the web job, and the scripts in shards", () => {
@@ -95,7 +95,7 @@ describe("the CI split of the web check", () => {
 		// apps/web/browser (web ADR 0026): Chromium over the built Demo. It stays out of `bun run check`, so
 		// the deploy-free local check needs no browser, and out of the shards, so it never lengthens them.
 		const job = workflow.jobs["web-browser"] as Job
-		expect(job.name).toBe("Check web browser")
+		expect(job.name).toMatch(/^Check web browser/)
 		expect(job.needs).toBe("plan")
 		expect(job.if).toBe((workflow.jobs["web"] as Job).if)
 		expect(web.scripts["test:browser"]).toBe("playwright test")
@@ -109,6 +109,7 @@ describe("the CI split of the web check", () => {
 		const runs = ((workflow.jobs["web-browser"] as Job).steps ?? []).map((step) => step.run ?? "")
 		const build = runs.find((run) => run.includes("turbo run"))
 		expect(build).toBeDefined()
+		expect(build?.split(/\s+/)).toContain("@trajectonomics/cli#build")
 		expect(build?.split(/\s+/)).toContain("@trajectonomics/web#build")
 		expect(build).not.toMatch(/\s--(\s|$)/)
 		const test = runs.findIndex((run) => run.includes("test:browser"))

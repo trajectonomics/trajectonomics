@@ -34,7 +34,7 @@ OpenCode part cannot be separated, and keeping it would resend a copied database
 | Claude Code | `~/.claude/projects/**/*.jsonl` | `claude` |
 | OpenCode | `~/.local/share/opencode/opencode.db` (read-only) | `opencode-go`, `opencode-free` |
 | Pi | `~/.pi/**/*.jsonl` | matched from the provider id |
-| Antigravity | `~/.gemini/**/transcript.jsonl` | `antigravity` |
+| Antigravity | `~/.gemini/**/transcript.jsonl`, `~/.t3/userdata/providers/antigravity/**/transcript.jsonl` | `antigravity` |
 | Cursor | `~/.cursor/projects/*/sdk-agent-store/*/index.db` (read-only) | `cursor` |
 | T3 Code (Muse) | `~/.t3/userdata/logs/provider/*.log` | `meta` |
 | Mistral console CSV | `--mistral-csv <path>` | `mistral` |
@@ -44,9 +44,11 @@ Claude streaming repeats one request's usage several times, so one row is kept p
 skipped. OpenCode has two schemas in the wild (`message` and the newer `session_message`); both are
 read when present, only assistant rows are selected in SQL, and a message id seen in both counts
 once. With `--since`, Claude, Pi and Antigravity files whose mtime is older than the cutoff are not
-opened. Antigravity's `transcript_full.jsonl` duplicates the same steps and is skipped; a step with
-no model borrows its conversation's only model, else it is `unknown-gemini`. T3's `claudeAgent`
-lines are ignored because Claude Code's own logs are the Claude source.
+opened. Antigravity is read from `~/.gemini` and from T3 Code's own
+`~/.t3/userdata/providers/antigravity` tree; `transcript_full.jsonl` duplicates the same steps and
+is skipped, a conversation present under both roots counts once (and its model inference spans
+both), and a step with no model borrows its conversation's only model, else it is `unknown-gemini`.
+T3's `claudeAgent` lines are ignored because Claude Code's own logs are the Claude source.
 
 Reasoning is part of `tokensOut` only when the source reports it outside its output count.
 OpenCode's `tokens.output` excludes `tokens.reasoning`, so the collector adds it. The other sources

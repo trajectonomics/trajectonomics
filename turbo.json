@@ -14,8 +14,9 @@
 		"test": {
 			"dependsOn": ["^build"]
 		},
-		"lint": {
-			"dependsOn": ["^build"]
+		"lint": {},
+		"format": {
+			"cache": false
 		},
 		"check": {
 			"dependsOn": ["build", "^build", "^check"]

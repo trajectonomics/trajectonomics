@@ -97,14 +97,14 @@ describe("the Estate page", () => {
 		expect(page({ terms: "nominal" })).not.toContain("Future money: the bands")
 	})
 
-	test("a household with no adult says why the plan's last year is shown, on the page and the card", () => {
+	test("a household with no adult says why the plan's last year is shown, on the page", () => {
 		const snapshot = structuredClone(DEMO)
 		const doc = snapshot.reads.documents["base"]
 		if (doc?.ok) doc.data.scenario.household = null
 		expect(page({ snapshot })).toContain("names no adult")
 		expect(
 			render(EstateCard, { props: { scenario: overviewView(snapshot).estate } }).body,
-		).toContain("the household names no adult")
+		).toContain("In 2053, after debts, costs and gifts.")
 	})
 
 	test("a negative net is said plainly: heirs receive nothing, the shortfall is stated, and there is no diagram", () => {

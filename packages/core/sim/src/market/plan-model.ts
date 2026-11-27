@@ -6,10 +6,12 @@ import type {
 	PlanReturnModelNote,
 	PlanReturnModelOptions,
 	PlanReturnModelResult,
+	ReturnModel,
 	Scenario,
 } from "../types"
 import { monthReturn, monthVolatility, spanNumerator } from "./month-return"
 import { normalQuantiles } from "./normal-quantiles"
+import { inflationFactorOf } from "./plan-inflation"
 import { wholeBasisPoints } from "./whole-bps"
 
 /** The least and greatest span return a Return model may state (`checkReturnModel`). */
@@ -66,6 +68,17 @@ export function planReturnModel(
 	const notes: PlanReturnModelNote[] = accounts.flatMap((account, index) =>
 		columns[index]!.clamped > 0 ? [{ account: account.id, clamped: columns[index]!.clamped }] : [],
 	)
-	const model = { id: `plan-${options.buckets}`, accounts: accounts.map((a) => a.id), buckets }
-	return { ok: true, model, notes }
+	const inflation = inflationFactorOf(scenario, z, weight)
+	const model: ReturnModel = {
+		id: `plan-${options.buckets}`,
+		accounts: accounts.map((a) => a.id),
+		buckets,
+		...(inflation.factor === undefined ? {} : { inflation: inflation.factor }),
+	}
+	return {
+		ok: true,
+		model,
+		notes,
+		...(inflation.clamped > 0 ? { inflationClamped: inflation.clamped } : {}),
+	}
 }

@@ -82,6 +82,7 @@ export function useSessionHooks(): void {
 		for (const call of held) call.settle()
 		await settle(10)
 		editSession.token = null
+		editSession.savedUnread = false
 		globalThis.fetch = realFetch
 	})
 }

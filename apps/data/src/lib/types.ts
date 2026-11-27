@@ -47,14 +47,22 @@ export type Peak = {
 /** The three windows, as the peaks API names them. */
 export type PeakWindowKey = "fiveHours" | "sevenDays" | "thirtyDays"
 
+/** One measure's 100% figure and the range its rounded meter readings allow. */
+export type Measure = { value: number; low: number; high: number | null }
+
 /**
- * One window's estimated 100% from the plan's usage meter. `rough` marks fewer than three points
- * of meter movement, and `derived` marks a 30-day figure that is the week × 30/7.
+ * One window's estimated 100% from the plan's usage meter. `tokens` is the uncached measure,
+ * `processed` counts cache reads in full and `usd` prices every kind at its model's list price;
+ * the last two are absent from a body cached before shape 5. `rough` marks fewer than three points
+ * of meter movement or less than a day of it, and `derived` marks a 30-day figure that is the
+ * week × 30/7.
  */
 export type Limit = {
 	tokens: number
 	low: number
 	high: number | null
+	processed?: Measure
+	usd?: Measure | null
 	points: number
 	readings: number
 	rough: boolean

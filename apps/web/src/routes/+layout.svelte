@@ -16,6 +16,7 @@ import PrintHeader from "../components/shell/PrintHeader.svelte"
 import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
 import DroppedAnchorsNotice from "../components/ui/DroppedAnchorsNotice.svelte"
+import StaleNotice from "../components/ui/StaleNotice.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { editsShown } from "../lib/edit/shown"
 import { hasLevy } from "../lib/snapshot"
@@ -82,6 +83,7 @@ $effect(() => {
 	<WhatIfBar />
 	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 print:px-0">
 		<PrintHeader heading={printed} />
+		{#if editSession.savedUnread}<div class="mb-6 print:hidden"><StaleNotice shows="landed" /></div>{/if}
 		<DroppedAnchorsNotice />
 		{@render children()}
 	</main>

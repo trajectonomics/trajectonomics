@@ -3,6 +3,7 @@ import type { Read, Snapshot } from "../../contract"
 import { accountNames } from "../account-names"
 import { mapRead } from "../overview/map-read"
 import { netWorthHistorySeries } from "../overview/net-worth-history"
+import { type PnlView, pnlView } from "../overview/pnl"
 import { historyCut, historyLine, type MonthEndRow, monthEndRows } from "./history"
 import { type NetWorthView, netWorthView } from "./view"
 
@@ -15,9 +16,10 @@ export interface HistoryView {
 	readonly cut: string | null
 }
 
-/** The Net worth page's view of a Snapshot: the headline and composition, and the history. */
+/** The Net worth page's view of a Snapshot: the profit and loss, the headline and composition, and the history. */
 export interface NetWorthPageView {
 	readonly netWorth: Read<NetWorthView>
+	readonly pnl: Read<PnlView>
 	readonly history: HistoryView
 }
 
@@ -27,6 +29,7 @@ export function netWorthPageView(snapshot: Snapshot): NetWorthPageView {
 	const names = accountNames(snapshot.reads.accounts)
 	return {
 		netWorth: mapRead(snapshot.reads.netWorth, (data) => netWorthView(data, names)),
+		pnl: mapRead(snapshot.reads.pnl, pnlView),
 		history: {
 			series: netWorthHistorySeries(reads),
 			rows: monthEndRows(reads),

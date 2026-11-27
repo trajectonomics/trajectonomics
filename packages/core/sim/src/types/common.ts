@@ -23,5 +23,5 @@ export type Resolution = (typeof RESOLUTIONS)[number]
 /** The calendar period at whose end accrued interest is capitalised. */
 export type CompoundingPeriod = (typeof COMPOUNDING_PERIODS)[number]
 
-/** `"inflation"` follows `economy.inflation`; `{ bps }` is a fixed yearly step (may be negative). */
+/** `"inflation"` follows the run's inflation (ADR 0033); `{ bps }` is a fixed yearly step (may be negative). */
 export type Growth = "inflation" | { readonly bps: BasisPoints }

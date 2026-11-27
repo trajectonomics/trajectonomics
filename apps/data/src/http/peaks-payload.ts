@@ -1,24 +1,8 @@
 import { tierOn } from "@trajectonomics/data-collector/plans"
-import { planLimits, type QuotaReadingWindow } from "../core/limits"
+import { planLimits, type QuotaReadingWindow } from "../core/limits-plan"
+import { type MeterHourRow, meterHoursByPlan } from "../core/meter-hours"
 import { peaksByPlanAndTier } from "../core/peaks"
-import { hourKey } from "../core/peaks-window"
 import type { PeakDbRow, QuotaDbRow } from "../db/read"
-
-/** Each plan's hourly uncached tokens, keyed by epoch hour; daily rows never feed a meter. */
-function hourlyByPlan(rows: readonly PeakDbRow[]): Map<string, Map<number, number>> {
-	const plans = new Map<string, Map<number, number>>()
-	for (const row of rows) {
-		if (row.granularity !== "hour") continue
-		let hours = plans.get(row.plan)
-		if (hours === undefined) {
-			hours = new Map()
-			plans.set(row.plan, hours)
-		}
-		const key = hourKey(row.hour_utc)
-		hours.set(key, (hours.get(key) ?? 0) + row.tokens_total)
-	}
-	return plans
-}
 
 /** Each plan's quota readings, with their windows, in the order the read returned them. */
 function readingsByPlan(rows: readonly QuotaDbRow[]): Map<string, QuotaReadingWindow[]> {
@@ -41,16 +25,19 @@ function readingsByPlan(rows: readonly QuotaDbRow[]): Map<string, QuotaReadingWi
  * and its cache reads beside its tokens. `tier` is the tier the plan ran on at `asOf`, and the
  * plan's three figures are that tier's; `measured` keeps every tier's own figures, so the site can
  * estimate another tier from one it measured. `limits` estimates each window's 100% from the
- * plan's own meter, as aggregates only: no reading, hour, reset time or raw percentage.
- * `methodVersion` is 3: the token measure leaves cache reads out, Claude's 5-hour windows are
- * anchored to its first message, and `PEAKS_SHAPE` is 4.
+ * plan's own meter in three measures (uncached tokens, processed tokens and API list dollars), as
+ * aggregates only: no reading, hour, reset time or raw percentage.
+ * `methodVersion` is 4: the token measure leaves cache reads out, the estimate also counts them in
+ * full and prices every kind at list prices, a rough estimate needs three points over at least a
+ * day, Claude's 5-hour windows are anchored to its first message, and `PEAKS_SHAPE` is 5.
  */
 export function peaksPayload(
 	asOf: string,
 	rows: readonly PeakDbRow[],
 	quota: readonly QuotaDbRow[] = [],
+	meter: readonly MeterHourRow[] = [],
 ) {
-	const hourly = hourlyByPlan(rows)
+	const hours = meterHoursByPlan(meter)
 	const readings = readingsByPlan(quota)
 	const plans = peaksByPlanAndTier(
 		rows.map((row) => ({
@@ -70,7 +57,7 @@ export function peaksPayload(
 			(readings.get(entry.plan) ?? []).filter(
 				(reading) => tierOn(entry.plan, reading.sampledAt.slice(0, 10))?.name === tier,
 			),
-			hourly.get(entry.plan) ?? new Map(),
+			hours.get(entry.plan) ?? new Map(),
 		)
 		return {
 			plan: entry.plan,
@@ -85,5 +72,5 @@ export function peaksPayload(
 			})),
 		}
 	})
-	return { asOf, methodVersion: 3, plans }
+	return { asOf, methodVersion: 4, plans }
 }

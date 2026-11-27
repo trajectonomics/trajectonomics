@@ -29,12 +29,12 @@
 	"scripts": {
 		"dev": "bun run src/index.ts",
 		"eval": "bun run evals/adr-0002/run.ts",
-		"test": "bun test",
+		"test": "bun test --parallel=4 --no-isolate",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
 		"build": "bun build src/index.ts --compile --no-compile-autoload-bunfig --no-compile-autoload-dotenv --outfile dist/traj",
-		"check": "bun run lint && bun run typecheck && bun test && bun ../../tooling/scripts/build-unless-turbo.ts"
+		"check": "bun ../../tooling/scripts/run-parallel.ts \"bun run lint\" \"bun run typecheck\" \"bun run test\" && bun ../../tooling/scripts/build-unless-turbo.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.3",

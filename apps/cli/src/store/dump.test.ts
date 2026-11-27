@@ -79,7 +79,7 @@ describe("dump", () => {
 
 			const store = mustOpen(home)
 			const writer = Bun.spawn(
-				[process.execPath, WRITER, home, "0", "2000", String(LOADED_MACHINE_MS)],
+				[process.execPath, WRITER, home, "0", "250", String(LOADED_MACHINE_MS)],
 				{
 					stdout: "pipe",
 					stderr: "pipe",

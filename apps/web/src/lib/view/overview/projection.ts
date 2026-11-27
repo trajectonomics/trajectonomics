@@ -12,6 +12,8 @@ export interface ProjectionView {
 	readonly runsOut: { readonly date: string; readonly unmet: string } | null
 	/** The last year of the plan, read as text from the CLI's horizon: "2053". */
 	readonly horizonYear: string
+	/** The CLI's own sentences about the run. */
+	readonly notes: readonly string[]
 }
 
 /** The headline of one projection run, or null when the run holds no annual rows. */
@@ -29,5 +31,6 @@ export function projectionView(run: ProjectionRun): ProjectionView | null {
 				? null
 				: { date: formatDate(run.runsOut.date), unmet: run.runsOut.unmet },
 		horizonYear: yearOf(run.horizon),
+		notes: run.notes,
 	}
 }

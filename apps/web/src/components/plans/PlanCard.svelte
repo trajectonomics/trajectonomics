@@ -3,7 +3,7 @@ import { formatDate } from "../../lib/format"
 import type { PlanCard } from "../../lib/view/plans/card"
 import LineChart from "../chart/LineChart.svelte"
 import ItemWords from "../ui/ItemWords.svelte"
-import SiteLink from "../ui/SiteLink.svelte"
+import PlanLink from "../ui/PlanLink.svelte"
 import PlanFacts from "./PlanFacts.svelte"
 import PlanMenu from "./PlanMenu.svelte"
 import PlanNotes from "./PlanNotes.svelte"
@@ -48,12 +48,13 @@ const name = $derived(card.row.name)
 		{/if}
 	{/if}
 	<footer class="mt-auto flex flex-wrap items-center gap-3">
-		<SiteLink
+		<PlanLink
 			href={`/projection/?scenario=${encodeURIComponent(name)}`}
+			plan={name}
 			class="text-sm text-accent underline-offset-4 hover:underline"
 		>
 			Open the Plan for {name}
-		</SiteLink>
+		</PlanLink>
 		{#if editable}<PlanMenu row={card.row} />{/if}
 	</footer>
 </article>

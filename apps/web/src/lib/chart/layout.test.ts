@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test"
 import { lineLayout, type Plot } from "./line-layout"
-import { sparklinePath } from "./sparkline"
 
 const PLOT: Plot = { width: 300, height: 200, margin: { top: 10, right: 10, bottom: 20, left: 50 } }
 
@@ -103,19 +102,5 @@ describe("x labels", () => {
 		const series = [{ name: "A", points: [{ x: 0, xLabel: "0", y: 1, display: "1.00" }] }]
 		expect(lineLayout(series, PLOT, [], "wide")?.palette).toBe("wide")
 		expect(lineLayout(series, PLOT)?.palette).toBeUndefined()
-	})
-})
-
-describe("sparklinePath", () => {
-	test("is empty for no values", () => {
-		expect(sparklinePath([], 100, 20)).toBe("")
-	})
-
-	test("draws a flat value as a straight line through the middle", () => {
-		expect(sparklinePath([5, 5], 100, 20)).toBe("M0 10 L100 10")
-	})
-
-	test("scales the values to the box, the largest at the top", () => {
-		expect(sparklinePath([0, 10], 100, 20)).toBe("M0 20 L100 0")
 	})
 })

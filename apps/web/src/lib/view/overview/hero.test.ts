@@ -85,12 +85,10 @@ function snapshotOf(
 	} as unknown as Snapshot
 }
 
-const SUCCESS_NOTE =
-	"The plan holds to 2043-12-31 on 174 of 200 seeded Market paths: a success share of 87.00%."
-const HERO_CHANCE = chanceFixture({ succeeded: 174, paths: 200, notes: [SUCCESS_NOTE] })
+const HERO_CHANCE = chanceFixture({ succeeded: 174, paths: 200, notes: [] })
 
 describe("heroOf", () => {
-	test("answers a reachable plan with its month and the holder's age, and quotes the chance note below", () => {
+	test("answers a reachable plan with its month and the holder's age", () => {
 		const hero = heroOf(
 			snapshotOf(reachable([{ person: "me", age: 54 }]), {
 				chance: HERO_CHANCE,
@@ -98,17 +96,17 @@ describe("heroOf", () => {
 			}),
 		)
 		expect(hero?.sentence).toBe("You could stop working in Mar 2041, when you are 54.")
-		expect(hero?.planNote).toMatchObject({ text: SUCCESS_NOTE, fromCli: true })
 	})
 
-	test("never puts the markets note in the answer's sentence", () => {
+	test("never puts a chance note in the answer's sentence", () => {
+		const chance = chanceFixture({ notes: ["Every figure is nominal."] })
 		const hero = heroOf(
 			snapshotOf(reachable([{ person: "me", age: 54 }]), {
-				chance: HERO_CHANCE,
+				chance,
 				household: HOUSEHOLD,
 			}),
 		)
-		expect(hero?.sentence).not.toContain(SUCCESS_NOTE)
+		expect(hero?.sentence).not.toContain("Every figure is nominal.")
 		expect(hero?.sentence).not.toContain("simulated markets")
 	})
 
@@ -149,7 +147,6 @@ describe("heroOf", () => {
 		expect(hero?.sentence).toBe(
 			"You could not stop working before 31 Dec 2060. The money runs out, and even the locked or unrouted assets are not enough to cover the gap. If earned income stopped in Mar 2030, the money runs out on 1 Aug 2031.",
 		)
-		expect(hero?.planNote).toBeNull()
 	})
 
 	test("leaves the age clause out when the plan states no age", () => {
@@ -163,33 +160,13 @@ describe("heroOf", () => {
 		expect(hero?.sentence).toBe("You could stop working in Mar 2041.")
 	})
 
-	test("states no plan note when there is no chance read", () => {
-		const hero = heroOf(
-			snapshotOf(reachable([{ person: "me", age: 54 }]), { household: HOUSEHOLD }),
-		)
-		expect(hero?.planNote).toBeNull()
-	})
-
-	test("names the chance's own horizon and counts when it states no success note", () => {
-		const hero = heroOf(snapshotOf(reachable(), { chance: chanceFixture({ succeeded: 174 }) }))
-		const text = "Lasts to 2028 in 174 of 200 markets."
-		expect(hero?.planNote).toMatchObject({ text, fromCli: false })
-	})
-
 	test("holds no arithmetic: every number is exactly one of the values it was given", () => {
 		const age = 47
-		const succeeded = 137
-		const paths = 219
-		const horizon = "2058-12-31"
 		const hero = heroOf(
-			snapshotOf(reachable([{ person: "me", age }], "2057-07-01"), {
-				chance: chanceFixture({ succeeded, paths, horizon, notes: ["Every figure is nominal."] }),
-				household: HOUSEHOLD,
-			}),
+			snapshotOf(reachable([{ person: "me", age }], "2057-07-01"), { household: HOUSEHOLD }),
 		)
 		expect(hero?.sentence).toBe("You could stop working in Jul 2057, when you are 47.")
 		expect(hero?.sentence.match(/\d+/g)).toEqual(["2057", "47"])
-		expect(hero?.planNote?.text.match(/\d+/g)).toEqual(["2058", "137", "219"])
 	})
 })
 

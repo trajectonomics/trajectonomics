@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import {
 	displayDate,
+	POST_TYPES,
 	type PostSummary,
 	postPath,
 	publishedNewestFirst,
@@ -13,6 +14,10 @@ function post(slug: string, publishedOn: string, draft = false): PostSummary {
 }
 
 describe("a Post's address", () => {
+	test("Post Types open with compare then release", () => {
+		expect(POST_TYPES).toEqual(["compare", "release", "guide", "essay", "news"])
+	})
+
 	test("a guide lives under /guides/", () => {
 		expect(postPath({ slug: "one-answer-every-time", type: "guide" })).toBe(
 			"/guides/one-answer-every-time/",
@@ -23,6 +28,14 @@ describe("a Post's address", () => {
 		expect(postPath({ slug: "traj-vs-vanilla-agents", type: "compare" })).toBe(
 			"/compare/traj-vs-vanilla-agents/",
 		)
+	})
+
+	test("a release lives under /releases/", () => {
+		expect(postPath({ slug: "v0-12", type: "release" })).toBe("/releases/v0-12/")
+	})
+
+	test("an essay lives under /essays/", () => {
+		expect(postPath({ slug: "software-factory", type: "essay" })).toBe("/essays/software-factory/")
 	})
 
 	test("news lives under /news/", () => {
