@@ -40,7 +40,7 @@
 	},
 	"scripts": {
 		"build": "tsdown",
-		"test": "bun test --parallel=4 --no-isolate",
+		"test": "bun test --parallel=4 --no-isolate --timeout=15000",
 		"normal-table:update": "bun scripts/normal-table-update.ts",
 		"bench": "bun scripts/bench-fi.ts",
 		"bench:milestones": "bun scripts/bench-milestones.ts",

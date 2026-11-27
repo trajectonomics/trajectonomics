@@ -6,6 +6,7 @@
 // only the last attempt's stderr is printed. A refusal is printed as its envelope and sets a non-zero
 // exit code; only src/index.ts calls process.exit. Outside the apply form, the busy timeout is the
 // store's own `busyTimeoutMs` option; omitted, the store's default applies.
+import { writeSync } from "node:fs"
 import { run } from "../cli"
 import { type AppError, isAppError } from "../errors"
 import { openStore, type Store } from "./index"
@@ -15,7 +16,7 @@ const [home = "", writer = "0", count = "0", busy, mode, name, hash, set] = proc
 
 function failed(outcome: unknown): outcome is AppError {
 	if (!isAppError(outcome)) return false
-	process.stderr.write(`${JSON.stringify(outcome.body)}\n`)
+	writeSync(2, `${JSON.stringify(outcome.body)}\n`)
 	process.exitCode = 1
 	return true
 }
@@ -80,7 +81,7 @@ async function applyWhatIf(): Promise<void> {
 		process.exitCode = code
 		if (code !== 5 || !busyEnvelope(errors) || Date.now() - started >= budget) break
 	}
-	for (const line of errors) process.stderr.write(`${line}\n`)
+	for (const line of errors) writeSync(2, `${line}\n`)
 }
 
 if (mode === "apply") {

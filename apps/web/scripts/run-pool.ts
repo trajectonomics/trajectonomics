@@ -1,14 +1,16 @@
 /** Default cap on concurrent read-only `traj` subprocesses during a Snapshot read. */
 export const DEFAULT_READ_CONCURRENCY = 4
 
+export type Pool = <T>(fn: () => Promise<T> | T) => Promise<T>
+
 /**
  * Returns a scheduler that runs at most `concurrency` async tasks at once, preserving each caller's
- * promise result and rejection.
+ * promise result and rejection (including synchronous throws).
  */
-export function createPool(
-	concurrency = DEFAULT_READ_CONCURRENCY,
-): <T>(fn: () => Promise<T>) => Promise<T> {
-	const limit = Math.max(1, concurrency)
+export function createPool(concurrency = DEFAULT_READ_CONCURRENCY): Pool {
+	const limit = Number.isFinite(concurrency)
+		? Math.max(1, Math.floor(concurrency))
+		: DEFAULT_READ_CONCURRENCY
 	let active = 0
 	const queue: (() => void)[] = []
 
@@ -18,44 +20,49 @@ export function createPool(
 		if (next !== undefined) next()
 	}
 
-	return <T>(fn: () => Promise<T>): Promise<T> =>
+	return <T>(fn: () => Promise<T> | T): Promise<T> =>
 		new Promise<T>((resolve, reject) => {
 			const start = () => {
 				active += 1
-				fn().then(
-					(value) => {
-						release()
-						resolve(value)
-					},
-					(error) => {
-						release()
-						reject(error)
-					},
-				)
+				Promise.resolve()
+					.then(fn)
+					.then(
+						(value) => {
+							release()
+							resolve(value)
+						},
+						(error) => {
+							release()
+							reject(error)
+						},
+					)
 			}
 			if (active < limit) start()
 			else queue.push(start)
 		})
 }
 
-/**
- * Runs `items` through `run` with at most `concurrency` calls in flight at once, returning results
- * in the exact order of `items`.
- */
+/** Runs `items` through an existing `pool` scheduler, returning results in exact input order. */
+export function mapWithPool<T, R>(
+	pool: Pool,
+	items: readonly T[],
+	run: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+	return Promise.all(items.map((item, index) => pool(() => run(item, index))))
+}
+
+/** Runs `items` with bounded concurrency, returning results in the exact order of `items`. */
 export function mapPool<T, R>(
 	items: readonly T[],
 	run: (item: T, index: number) => Promise<R>,
 	concurrency = DEFAULT_READ_CONCURRENCY,
 ): Promise<R[]> {
-	const runInPool = createPool(concurrency)
-	return Promise.all(items.map((item, index) => runInPool(() => run(item, index))))
+	return mapWithPool(createPool(concurrency), items, run)
 }
 
-/**
- * Runs every entry of a keyed record through an existing `pool` scheduler, preserving key order.
- */
+/** Runs every entry of a keyed record through an existing `pool` scheduler, preserving key order. */
 export async function recordWithPool<T, R>(
-	pool: <U>(fn: () => Promise<U>) => Promise<U>,
+	pool: Pool,
 	plans: Record<string, T>,
 	run: (item: T, key: string) => Promise<R>,
 ): Promise<Record<string, R>> {
@@ -67,9 +74,7 @@ export async function recordWithPool<T, R>(
 	return Object.fromEntries(entries)
 }
 
-/**
- * Runs every entry of a keyed record with bounded concurrency, preserving the record's key order.
- */
+/** Runs every entry of a keyed record with bounded concurrency, preserving the record's key order. */
 export function recordPool<T, R>(
 	plans: Record<string, T>,
 	run: (item: T, key: string) => Promise<R>,

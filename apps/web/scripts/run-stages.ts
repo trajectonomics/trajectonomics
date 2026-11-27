@@ -75,9 +75,9 @@ export async function runStageTwo(
 	])
 	const [documents, projections, chance] = phaseOne
 	const [paths, allowances, taxNotes] = await Promise.all([
-		runPaths(context, plan, chance, records),
-		runAllowances(context, plan, documents, projections, records),
-		runTaxNotes(context, plan, documents, records),
+		runPaths(context, plan, chance, records, pool),
+		runAllowances(context, plan, documents, projections, records, pool),
+		runTaxNotes(context, plan, documents, records, pool),
 	])
 	return {
 		doctor: phaseOne[3],

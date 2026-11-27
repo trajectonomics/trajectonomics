@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { writeSync } from "node:fs"
 import pkg from "../package.json"
 import { run } from "./cli"
 import { telemetryDecision } from "./telemetry/decide"
@@ -22,14 +23,21 @@ if (pending !== undefined && isUsageBody(pending)) {
 	process.exit(0)
 }
 
+function writeStderr(line: string): void {
+	try {
+		writeSync(2, `${line}\n`)
+	} catch (error) {
+		const code = (error as NodeJS.ErrnoException).code
+		if (code !== "EPIPE" && code !== "EBADF") throw error
+	}
+}
+
 let record: RunRecord | undefined
 const code = await run(
 	Bun.argv.slice(2),
 	{
 		out: (line) => console.log(line),
-		err: (line) => {
-			process.stderr.write(`${line}\n`)
-		},
+		err: writeStderr,
 		observe: (observed) => {
 			record = observed
 		},
@@ -49,11 +57,8 @@ if (record !== undefined) {
 		readState: () => readState(process.env),
 		writeState: (state) => writeState(process.env, state) === undefined,
 		spawnSender,
-		notice: (line) => console.error(line),
+		notice: writeStderr,
 	})
 }
 
-await new Promise<void>((resolve) => {
-	process.stderr.write("", () => resolve())
-})
 process.exit(code)

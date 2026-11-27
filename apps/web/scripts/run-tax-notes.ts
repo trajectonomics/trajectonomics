@@ -2,7 +2,7 @@ import { type Read, type SnapshotReads, scenarioTax, type TaxNotes } from "../sr
 import { hasTaxProfile, type StageTwoPlan } from "../src/lib/snapshot"
 import { taxNotesFrom } from "../src/lib/view/tax-settings/notes"
 import { runPlanned } from "./run-planned"
-import { mapPool } from "./run-pool"
+import { createPool, mapWithPool, type Pool } from "./run-pool"
 import type { RunContext } from "./run-traj"
 
 /**
@@ -14,9 +14,11 @@ export async function runTaxNotes(
 	plan: StageTwoPlan,
 	documents: SnapshotReads["documents"],
 	records: readonly unknown[],
+	pool: Pool = createPool(),
 ): Promise<Record<string, Read<TaxNotes>>> {
 	const eligible = Object.entries(plan.taxNotes).filter(([name]) => hasTaxProfile(documents[name]))
-	const results = await mapPool(
+	const results = await mapWithPool(
+		pool,
 		eligible,
 		async ([name, planned]) =>
 			[name, taxNotesFrom(await runPlanned(context, planned, scenarioTax, records))] as const,

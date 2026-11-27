@@ -8,7 +8,7 @@ import {
 import type { StageTwoPlan } from "../src/lib/snapshot"
 import { pathKey, representativeIndexes } from "../src/lib/snapshot/paths"
 import { runPlanned } from "./run-planned"
-import { mapPool } from "./run-pool"
+import { createPool, mapWithPool, type Pool } from "./run-pool"
 import type { RunContext } from "./run-traj"
 
 /**
@@ -22,6 +22,7 @@ export async function runPaths(
 	plan: StageTwoPlan,
 	chance: Record<string, Read<ProjectionChance>>,
 	records: readonly unknown[],
+	pool: Pool = createPool(),
 ): Promise<SnapshotReads["paths"]> {
 	const paths: Record<string, Record<string, Read<ProjectionPath>>> = {}
 	if (!plan.readPaths) return paths
@@ -36,7 +37,7 @@ export async function runPaths(
 			if (planned !== null) pending.push({ name, key: pathKey(index), planned })
 		}
 	}
-	const reads = await mapPool(pending, ({ planned }) =>
+	const reads = await mapWithPool(pool, pending, ({ planned }) =>
 		runPlanned(context, planned, projectionPath, records),
 	)
 	for (const [i, item] of pending.entries()) {
