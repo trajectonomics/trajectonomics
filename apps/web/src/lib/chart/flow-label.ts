@@ -4,7 +4,7 @@ import type { FlowNode } from "./flow-types"
 import { fitted, type TextMeasure, textWidth } from "./label-width"
 
 /** The least space between a name and its amount, so a measurement that runs a little short cannot join them. */
-const NAME_GAP = 4
+const NAME_GAP = 3
 /** How far a name's clip reaches past the fitted text on each side, for a glyph that paints past the canvas measure. */
 const CLIP_SLACK = 2
 
@@ -43,7 +43,7 @@ export function fittedLabel(
 	measure?: TextMeasure,
 ): FlowLabel {
 	const room = labelRoom(node)
-	const amountWidth = widthOf(amount, measure)
+	const amountWidth = textWidth(amount, false, measure)
 	const nameRoom = Math.max(0, room - amountWidth - NAME_GAP)
 	const name = fitted(node.label, nameRoom, false, measure)
 	const leftwards = node.anchor === "end"
@@ -61,9 +61,4 @@ export function fittedLabel(
 			? node.labelX
 			: node.labelX + name.width + (name.text === "" ? 0 : NAME_GAP) + amountWidth,
 	}
-}
-
-/** One string's width in the diagram's text: measured in the page, or estimated when it cannot measure. */
-function widthOf(text: string, measure?: TextMeasure): number {
-	return measure === undefined ? textWidth(text, false) : measure(text)
 }

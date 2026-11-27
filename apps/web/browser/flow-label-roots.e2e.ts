@@ -45,3 +45,30 @@ test("the diagram text grows with the browser's font size", async ({ page }) => 
 	expect(atDefault).toBeCloseTo(12, 1)
 	expect(atLarge).toBeGreaterThan(atDefault)
 })
+
+/** Changes the root font size the way a person's browser setting would, after the diagram was measured. */
+async function changeRoot(page: Page, pixels: number): Promise<void> {
+	await page.evaluate((size) => {
+		document.documentElement.style.fontSize = `${size}px`
+	}, pixels)
+	// Two frames: one for the observer to hear the change, one for the derived fit to redraw.
+	await page.evaluate(
+		() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+	)
+}
+
+// The measure is taken when the page draws, so a font that grows later must be measured again. After each
+// change, no name may reach its amount or leave the diagram.
+for (const width of [360, 1280] as const) {
+	test(`Cash flow re-fits its names when the browser font grows at ${width}px`, async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width, height: 800 })
+		await serveFlowLabels(page, await longFlowLabels(page))
+		await openDemo(page, "/cash-flow/", { theme: "light" })
+		for (const pixels of [20, 24] as const) {
+			await changeRoot(page, pixels)
+			expect(await measureFlowLabels(page), `a ${pixels}px root`).toEqual([])
+		}
+	})
+}

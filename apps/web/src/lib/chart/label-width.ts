@@ -33,9 +33,9 @@ export function fitted(
 }
 
 /** The label's bare first grapheme, the last thing tried in a crowded place; none when even that does not fit. */
-export function stub(label: string, room: number, code: boolean, measure?: TextMeasure): LabelText {
+export function stub(label: string, room: number, code: boolean): LabelText {
 	const [first] = graphemes(label, code)
-	const width = first === undefined ? 0 : widthOf(first.text, code, measure)
+	const width = first === undefined ? 0 : textWidth(first.text, code)
 	return first !== undefined && width <= room ? { text: first.text, width } : { text: "", width: 0 }
 }
 
@@ -46,18 +46,13 @@ export function textWidth(text: string, code: boolean, measure?: TextMeasure): n
 }
 
 /** The width of the ellipsis the chart draws after a cut label, in the text's own font. */
-export function ellipsisWidth(code: boolean, measure?: TextMeasure): number {
+function ellipsisWidth(code: boolean, measure?: TextMeasure): number {
 	if (measure !== undefined) return measure("…")
 	return code ? CODE_ELLIPSIS_PX : ELLIPSIS_PX
 }
 
-/** One grapheme's width in the chart's text: measured in the page, or the estimate when there is none. */
-export function widthOf(text: string, code: boolean, measure?: TextMeasure): number {
-	return measure === undefined ? textWidth(text, code) : measure(text)
-}
-
 /** The longest prefix of whole graphemes that fits `room` beside the ellipsis. */
-export function prefix(
+function prefix(
 	parts: readonly Grapheme[],
 	room: number,
 	ellipsis: number,

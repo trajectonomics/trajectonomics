@@ -30,12 +30,12 @@ describe("fittedLabel", () => {
 	})
 
 	test("shortens a long name with an ellipsis and keeps the whole amount", () => {
-		// Right: 202 units less the amount's 63 and a 4-unit gap leaves 135, so 17 letters and the ellipsis.
+		// Right: 202 units less the amount's 63 and a 3-unit gap leaves 136, so 17 letters and the ellipsis.
 		// The clip reaches 2 units past the fitted name on each side, so a glyph is not shaved.
 		expect(fittedLabel({ ...RIGHT, label: LONG }, "30,000.00")).toMatchObject({
 			label: "housing, utilitie…",
 			amount: "30,000.00",
-			amountX: 788,
+			amountX: 787,
 			clipX: 588,
 			clipWidth: 135,
 		})
@@ -45,7 +45,7 @@ describe("fittedLabel", () => {
 			amount: "30,000.00",
 			amountX: 222,
 			clipX: 6,
-			clipWidth: 151,
+			clipWidth: 152,
 		})
 	})
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { flowMeasure } from "../../client/flow-text.js"
+import { flowMeasure } from "../../client/flow-text.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { FLOW_NODE_WIDTH, type FlowLayout, LABEL_HALF } from "../../lib/chart/flow"
 import { fittedLabel } from "../../lib/chart/flow-label"
@@ -43,6 +43,7 @@ const shown = (amount: string): string =>
 		text-rendering="geometricPrecision"
 		class="h-auto min-w-[640px] w-full text-xs"
 	>
+		<text data-flow-probe visibility="hidden" aria-hidden="true" class="fill-foreground"></text>
 		{#each layout.links as link (link.key)}
 			<path
 				d={link.d}

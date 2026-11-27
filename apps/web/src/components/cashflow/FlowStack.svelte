@@ -1,5 +1,5 @@
 <script lang="ts">
-import { flowMeasure } from "../../client/flow-text.js"
+import { flowMeasure } from "../../client/flow-text.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import {
 	STACK_CLIP_SLACK,
@@ -47,6 +47,7 @@ const shown = (amount: string): string =>
 		text-rendering="geometricPrecision"
 		class="h-auto w-full text-xs"
 	>
+		<text data-flow-probe visibility="hidden" aria-hidden="true" class="fill-foreground"></text>
 		{#each layout.headings as heading (heading.side)}
 			<text x={heading.x} y={heading.y} dominant-baseline="middle" aria-hidden="true" class="fill-muted-foreground font-medium">
 				{heading.text}

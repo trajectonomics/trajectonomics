@@ -105,7 +105,7 @@ describe("the cash flow diagram's labels", () => {
 		)
 	})
 
-	test("a twin's id stays in the label, whichever words follow it on the line", () => {
+	test("`flowOf` keeps the twin's id in the label", () => {
 		const names = plan({ invest: "Saving", extra: "Saving", borrow: "Drawn" })
 		const rollup = rollupsOf(cashflowRunFixture())[0]
 		if (rollup === undefined) throw new Error("the fixture has a first year")
