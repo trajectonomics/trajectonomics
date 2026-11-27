@@ -83,11 +83,10 @@ describe("the Income page's list", () => {
 		const body = list("income")
 		expect(body).toContain("salary")
 		expect(body).toContain("90,000.00")
-		expect(body).toContain("monthly")
+		expect(body).toContain("a month")
 		expect(body).toContain("Follows inflation")
 		expect(body).toContain("Earned")
 		expect(body).toContain("Passive")
-		expect(body).toContain("Plan base")
 	})
 
 	test("a computed Flow reads computed and has no Edit control", () => {

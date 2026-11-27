@@ -18,7 +18,7 @@ describe("projectionView", () => {
 			nominal: "200.00",
 			real: "150.00",
 			runsOut: null,
-			horizon: "31 Dec 2060",
+			horizonYear: "2060",
 		})
 	})
 

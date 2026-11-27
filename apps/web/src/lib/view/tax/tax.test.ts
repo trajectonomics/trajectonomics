@@ -42,7 +42,7 @@ describe("tax body", () => {
 			levy: "th-2026-pit",
 			owed: "89000.00",
 			refund: false,
-			period: "1 Jan 2026 to 31 Dec 2026",
+			period: "2026",
 			settles: "31 Mar 2027",
 		})
 		expect(body.rows).toHaveLength(2)
@@ -84,7 +84,7 @@ describe("tax rows", () => {
 		expect(partial).toMatchObject({
 			settled: false,
 			partial: true,
-			period: "1 Jan 2060 to 31 Dec 2060",
+			period: "2060",
 			settles: "31 Mar 2061",
 		})
 	})

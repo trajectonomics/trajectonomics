@@ -54,7 +54,7 @@ describe("the Estate page", () => {
 		expect(body).toContain("What heirs would receive, year by year")
 	})
 
-	test("shows nominal and today's money together, or each alone; only the net and heirs have a real figure, the rest say nominal", () => {
+	test("shows future money and today's money together, or each alone; only the net and heirs have a today's-money figure, the rest say future money", () => {
 		expect(page({ terms: "both" })).toContain("In today's money")
 		expect(page({ terms: "both" })).toContain("7,020,371.84")
 		const nominal = page({ terms: "nominal" })
@@ -63,7 +63,7 @@ describe("the Estate page", () => {
 		const real = page({ terms: "real" })
 		expect(real).toContain("7,020,371.84")
 		expect(real).toContain("7,389,865.10")
-		expect(real).toContain("(nominal)")
+		expect(real).toContain("(future money)")
 		expect(real).toContain("16,775,132.11")
 	})
 
@@ -91,10 +91,10 @@ describe("the Estate page", () => {
 		expect(hidden).not.toMatch(/\d,\d{3}\.\d\d/)
 	})
 
-	test("under today's money the diagram says its bands are nominal; under the other terms it does not", () => {
-		expect(page({ terms: "real" })).toContain("Nominal: the bands")
-		expect(page({ terms: "both" })).not.toContain("Nominal: the bands")
-		expect(page({ terms: "nominal" })).not.toContain("Nominal: the bands")
+	test("under today's money the diagram says its bands are in future money; under the other terms it does not", () => {
+		expect(page({ terms: "real" })).toContain("Future money: the bands")
+		expect(page({ terms: "both" })).not.toContain("Future money: the bands")
+		expect(page({ terms: "nominal" })).not.toContain("Future money: the bands")
 	})
 
 	test("a household with no adult says why the plan's last year is shown, on the page and the card", () => {

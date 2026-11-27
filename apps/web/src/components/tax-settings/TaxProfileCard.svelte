@@ -29,10 +29,10 @@ const taxed = $derived(isTaxed(show))
 	</div>
 	{#if profile === null && taxed}
 		<p class="text-sm text-foreground">
-			Plan {name} is taxed, but its tax profile is not stored: it was taxed before profiles were kept, or its tax rules were changed by hand since. Set the profile whole to change it here; that writes the tax rules again from what you state.
+			{name} is taxed, but its tax profile is not stored: it was taxed before profiles were kept, or its tax rules were changed by hand since. Set the profile whole to change it here; that writes the tax rules again from what you state.
 		</p>
 	{:else if profile === null}
-		<p class="text-sm text-foreground">Plan {name} is not taxed, so its figures are before tax.</p>
+		<p class="text-sm text-foreground">{name} is not taxed, so its figures are before tax.</p>
 	{/if}
 	<TaxProfileActions {name} {show} {editable} {notes} {years} />
 </section>

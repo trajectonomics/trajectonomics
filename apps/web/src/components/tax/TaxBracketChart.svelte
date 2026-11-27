@@ -13,10 +13,10 @@ let { chart }: Props = $props()
 <section aria-labelledby="tax-bracket-chart-title" class="space-y-3">
 	<h2 id="tax-bracket-chart-title" class="text-base font-semibold">Taxable income by bracket</h2>
 	<p class="text-sm text-muted-foreground">
-		Nominal figures: a tax year states no figure in today's money. The line is the top rate, read on the right.
+		Future money: a tax year states no figure in today's money. The line is the top rate, read on the right.
 	</p>
 	<LineChart
-		label="Taxable income by bracket, nominal, with the top rate"
+		label="Taxable income by bracket, in future money, with the top rate"
 		series={chart.series}
 		kind="stacked-bars"
 		step={chart.step ?? undefined}

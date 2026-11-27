@@ -13,9 +13,9 @@ interface Props {
 let { rows, currency }: Props = $props()
 
 const columns: readonly Column<TaxRow>[] = [
-	{ key: "levy", header: "Levy", cell: levyCell },
+	{ key: "levy", header: "Tax rules", cell: levyCell },
 	{ key: "period", header: "Period", cell: periodCell },
-	{ key: "settles", header: "Settles", cell: settlesCell },
+	{ key: "settles", header: "Due date", cell: settlesCell },
 	{ key: "due", header: "Due before prepayment", numeric: true, cell: dueCell },
 	{ key: "prepaid", header: "Prepaid", numeric: true, cell: prepaidCell },
 	{ key: "owed", header: "Owed", numeric: true, cell: owedCell },
@@ -23,7 +23,7 @@ const columns: readonly Column<TaxRow>[] = [
 ]
 </script>
 
-{#snippet levyCell(row: TaxRow)}{row.levy}{/snippet}
+{#snippet levyCell(row: TaxRow)}<code class="font-mono text-xs">{row.levy}</code>{/snippet}
 {#snippet periodCell(row: TaxRow)}{row.period}{/snippet}
 {#snippet settlesCell(row: TaxRow)}{row.settles}{/snippet}
 {#snippet dueCell(row: TaxRow)}<Money amount={row.due} />{/snippet}

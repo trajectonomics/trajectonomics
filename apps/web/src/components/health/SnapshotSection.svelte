@@ -12,11 +12,11 @@ let { snapshot }: Props = $props()
 const facts = $derived(snapshotFacts(snapshot))
 </script>
 
-<!-- The parameters the Snapshot was planned from, and the versions that wrote it. -->
+<!-- The parameters these figures were planned from, and the versions that wrote them. -->
 <ReportSection
 	id="this-snapshot"
-	title="This Snapshot"
-	intro="The As-of, horizon and choices this Snapshot was planned from, and the versions that wrote it."
+	title="This plan's figures"
+	intro="The As-of, horizon and choices these figures were planned from, and the versions that wrote them."
 >
 	<FactList {facts} />
 </ReportSection>

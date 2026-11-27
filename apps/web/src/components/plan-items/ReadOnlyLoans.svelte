@@ -1,4 +1,5 @@
 <script lang="ts">
+import { frequencyWords } from "../../lib/view/plan-items/frequency"
 import type { LoanCard } from "../../lib/view/plan-items/loans"
 import AccountName from "../ui/AccountName.svelte"
 import Money from "../ui/Money.svelte"
@@ -25,6 +26,7 @@ let { cards, currency }: Props = $props()
 					{:else}
 						<span class="text-muted-foreground">computed</span>
 					{/if}
+					<span class="ml-1 text-sm text-muted-foreground">{frequencyWords(card.frequency)}</span>
 				</p>
 				<p class="text-xs text-muted-foreground">{card.amountLabel}</p>
 				<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">

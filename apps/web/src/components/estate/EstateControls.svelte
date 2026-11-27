@@ -7,7 +7,7 @@ import type { SegmentedOption } from "../ui/segmented-option"
 
 const TERM_OPTIONS: readonly SegmentedOption<Terms>[] = [
 	{ value: "both", label: "Both" },
-	{ value: "nominal", label: "Nominal" },
+	{ value: "nominal", label: "Future money" },
 	{ value: "real", label: "Today's money" },
 ]
 

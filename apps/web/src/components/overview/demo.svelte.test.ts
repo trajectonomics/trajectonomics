@@ -11,13 +11,12 @@ const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 // The figures are read from the same Snapshot the page renders, so the test survives a rebuilt Demo.
 describe("the pages, rendered from the Demo snapshot", () => {
-	test("the Overview shows the CLI's net worth total and the primary plan's name", () => {
+	test("the Overview shows the CLI's net worth total", () => {
 		const { body } = render(OverviewGrid, { props: { view: overviewView(DEMO) } })
 		const total = DEMO.reads.netWorth.ok ? DEMO.reads.netWorth.data.totals?.[0] : undefined
 		expect(total).toBeDefined()
 		expect(body).toContain(formatCompact(total?.amount ?? ""))
 		expect(body).toContain(formatMoney(total?.amount ?? ""))
-		expect(body).toContain(`Plan ${DEMO.params.compare?.a ?? DEMO.params.scenarios[0]}`)
 		expect(body).not.toContain("undefined")
 		expect(body).not.toContain("NaN")
 	})

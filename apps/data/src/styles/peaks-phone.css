@@ -1,0 +1,44 @@
+/* On a phone each plan's name spans the table, and its three windows share the row below. */
+
+@media (max-width: 30rem) {
+	.peaks-table-wide {
+		display: none;
+	}
+
+	.peaks-table-phone {
+		display: table;
+		table-layout: fixed;
+	}
+
+	.peaks-table-phone thead th,
+	.peaks-table-phone tbody td {
+		width: 33.333%;
+	}
+
+	.peaks-table-phone thead th:not(:last-child),
+	.peaks-table-phone tbody td:not(:last-child) {
+		padding-right: 12px;
+	}
+
+	.peaks-table-phone tbody .peaks-plan-row th {
+		padding-bottom: 4px;
+		border-bottom: 0;
+	}
+
+	.peaks-table-phone tbody .peaks-figures-row td {
+		padding-top: 0;
+		padding-bottom: 12px;
+		border-bottom: 1px solid var(--ds-color-border);
+	}
+
+	/* The select drops under the plan's name, where the tier label had the row to itself. */
+	.peaks-name-line {
+		flex-wrap: wrap;
+	}
+
+	.peaks-tier-picker {
+		width: fit-content;
+		flex-basis: 100%;
+		margin-top: 2px;
+	}
+}

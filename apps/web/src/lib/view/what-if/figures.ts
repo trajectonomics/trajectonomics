@@ -14,6 +14,7 @@ import type { Triple } from "./triple"
 
 const HIGHER_LOWER = ["higher", "lower"] as const
 const EARLIER_LATER = ["earlier", "later"] as const
+const TERMS_WORDS = { nominal: "in future money", real: "in today's money" } as const
 
 /**
  * The headline figures of a what-if, from its compare: side A is the plan as stored (the baseline) and side B
@@ -27,7 +28,7 @@ export function figureTriples(data: ProjectionCompare): readonly Triple[] {
 		(["nominal", "real"] as const).map(
 			(terms): Triple => ({
 				key: `age-${delta.age}-${terms}`,
-				label: `Net worth at age ${delta.age}, ${terms}`,
+				label: `Net worth at age ${delta.age}, ${TERMS_WORDS[terms]}`,
 				whatIf: ageCell(b.netWorth.atAges[index]?.[terms]),
 				baseline: ageCell(a.netWorth.atAges[index]?.[terms]),
 				change: moneyChange(delta[terms], HIGHER_LOWER, AGE_REASON),
@@ -44,14 +45,14 @@ export function figureTriples(data: ProjectionCompare): readonly Triple[] {
 		},
 		{
 			key: "final-nominal",
-			label: "Net worth at the end, nominal",
+			label: "Net worth at the end, in future money",
 			whatIf: endCell(b, "nominal"),
 			baseline: endCell(a, "nominal"),
 			change: moneyChange(deltas.netWorth?.nominal, HIGHER_LOWER, END_REASON),
 		},
 		{
 			key: "final-real",
-			label: "Net worth at the end, real",
+			label: "Net worth at the end, in today's money",
 			whatIf: endCell(b, "real"),
 			baseline: endCell(a, "real"),
 			change: moneyChange(deltas.netWorth?.real, HIGHER_LOWER, END_REASON),
