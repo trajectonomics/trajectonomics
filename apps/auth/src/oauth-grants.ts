@@ -1,13 +1,21 @@
 /**
  * Session-scoped grant management for gate 3. Better Auth 1.7.28 has `/oauth2/get-consents` and
  * `/oauth2/delete-consent`, but deleting a consent does not revoke the refresh tokens issued from
- * it, so this plugin adds one list endpoint and one revoke endpoint that delete the token family
- * as well. Both require the signed-in owner; neither is an admin endpoint.
+ * it. `/oauth2/delete-consent` is therefore disabled in `auth-options.ts`, and this plugin adds one
+ * list endpoint and one revoke endpoint that delete the token family, the pending device codes and
+ * the pending authorization codes as well. Both require the signed-in owner; neither is an admin
+ * endpoint.
  *
  * A grant is one consent per user and client, which is also how 1.7.28's refresh-token family is
  * keyed. Revoking it deletes that family, so the refresh token fails at once.
  */
 import { APIError, createAuthEndpoint, sessionMiddleware } from "better-auth/api"
+import {
+	deleteConsentRow,
+	deleteDeviceCodes,
+	deletePendingAuthorizationCodes,
+	deleteTokenFamily,
+} from "./oauth/family"
 import { asIsoString, stringArray } from "./oauth/format"
 
 type StoredConsent = {
@@ -81,16 +89,12 @@ export function grantManagement() {
 							error_description: "grant not found",
 						})
 					}
-					const where = [
-						{ field: "clientId", value: consent.clientId },
-						{ field: "userId", value: userId },
-					]
-					await ctx.context.adapter.deleteMany({ model: "oauthAccessToken", where })
-					await ctx.context.adapter.deleteMany({ model: "oauthRefreshToken", where })
-					await ctx.context.adapter.delete({
-						model: "oauthConsent",
-						where: [{ field: "id", value: id }],
-					})
+					// Consent first, then the rest: a concurrent rotation that slips through lands on a
+					// grant with no approval record, and its next refresh fails closed (ADR 0002).
+					await deleteConsentRow(ctx, id)
+					await deleteTokenFamily(ctx, { userId, clientId: consent.clientId })
+					await deleteDeviceCodes(ctx, { userId, clientId: consent.clientId })
+					await deletePendingAuthorizationCodes(ctx, { userId, clientId: consent.clientId })
 					return ctx.json({ revoked: true })
 				},
 			),

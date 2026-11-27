@@ -46,8 +46,10 @@ describe("authOptions", () => {
 		const options = authOptions({ env: env() })
 		expect(options.rateLimit?.enabled).toBe(true)
 		expect(options.rateLimit?.storage).toBe("database")
-		expect(options.rateLimit?.customRules?.["/oauth2/token"]).toEqual({ window: 60, max: 60 })
+		// The provider's own token rule is 20/min; the custom rule must not be looser.
+		expect(options.rateLimit?.customRules?.["/oauth2/token"]).toEqual({ window: 60, max: 20 })
 		expect(options.rateLimit?.customRules?.["/device"]).toEqual({ window: 60, max: 5 })
+		expect(options.rateLimit?.customRules?.["/device/deny"]).toEqual({ window: 60, max: 5 })
 		expect(options.advanced?.ipAddress?.ipAddressHeaders).toEqual(["cf-connecting-ip"])
 	})
 
@@ -74,9 +76,10 @@ describe("authOptions", () => {
 		expect(requireSecret("x".repeat(32))).toBe("x".repeat(32))
 	})
 
-	it("trusts only its own origin in production and disables /token", () => {
+	it("trusts only its own origin in production and disables /token and delete-consent", () => {
 		const options = authOptions({ env: env() })
 		expect(options.trustedOrigins).toEqual(["https://auth.example.test"])
 		expect(options.disabledPaths).toContain("/token")
+		expect(options.disabledPaths).toContain("/oauth2/delete-consent")
 	})
 })

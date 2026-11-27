@@ -19,14 +19,18 @@ export async function refreshRequest(
 	session: Session,
 	clientId: string,
 	refreshToken: string,
-	input: { resources?: readonly string[]; now?: string } = {},
+	input: { resources?: readonly string[]; now?: string; grantType?: string } = {},
 ): Promise<RequestResult> {
 	const headers = input.now === undefined ? undefined : { [SPIKE_NOW_HEADER]: input.now }
 	return requestResult(
 		session,
 		"/api/auth/oauth2/token",
 		formWithResources(
-			{ grant_type: "refresh_token", refresh_token: refreshToken, client_id: clientId },
+			{
+				grant_type: input.grantType ?? "refresh_token",
+				refresh_token: refreshToken,
+				client_id: clientId,
+			},
 			input.resources,
 			headers,
 		),

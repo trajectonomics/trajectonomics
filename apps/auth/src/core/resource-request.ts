@@ -59,3 +59,30 @@ export function resourceValues(value: unknown): string[] {
 	}
 	return values
 }
+
+/**
+ * Merges the same parameter seen through several parsers of one request (the raw query, the
+ * parsed query, the raw body and `ctx.body`). A value that appears once in more than one source
+ * is the same parameter seen twice, not two parameters, so it counts once: the count per value
+ * is the maximum over the sources. A value repeated inside one source, or two sources that
+ * disagree, both survive and make the combined count two.
+ *
+ * This is what the request hook needs: the raw body can hide a JSON array from a form parser,
+ * and `ctx.body` can lose an unvalidated field, so reading every source and counting the union
+ * closes the smuggling case without rejecting a normal single-value request.
+ */
+export function mergeResourceSources(sources: readonly (readonly string[])[]): string[] {
+	const counts = new Map<string, number>()
+	for (const source of sources) {
+		const local = new Map<string, number>()
+		for (const value of source) local.set(value, (local.get(value) ?? 0) + 1)
+		for (const [value, count] of local) {
+			counts.set(value, Math.max(counts.get(value) ?? 0, count))
+		}
+	}
+	const merged: string[] = []
+	for (const [value, count] of counts) {
+		for (let index = 0; index < count; index += 1) merged.push(value)
+	}
+	return merged
+}

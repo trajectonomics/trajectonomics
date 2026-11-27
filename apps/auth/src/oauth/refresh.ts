@@ -33,7 +33,7 @@ export async function rejectRefresh(
 		error: "invalid_grant",
 		error_description:
 			rejection === "grant-expired"
-				? "the grant's absolute lifetime has ended; sign in again"
-				: "the grant has no recorded approval; sign in again",
+				? "the grant's absolute lifetime has ended; approve the client again"
+				: "the grant has no recorded approval; approve the client again",
 	})
 }

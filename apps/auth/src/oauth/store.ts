@@ -1,3 +1,4 @@
+import { userCodeCandidates } from "../core/device-code"
 import { hashToken } from "./values"
 
 export type StoredRefreshToken = {
@@ -37,6 +38,14 @@ type Adapter = {
 		where: Array<{ field: string; value: unknown }>
 		update: Record<string, unknown>
 	}) => Promise<unknown>
+	delete: (input: {
+		model: string
+		where: Array<{ field: string; value: unknown }>
+	}) => Promise<unknown>
+	deleteMany: (input: {
+		model: string
+		where: Array<{ field: string; value: unknown }>
+	}) => Promise<unknown>
 }
 
 export function adapterOf(ctx: { context: unknown }): Adapter {
@@ -69,26 +78,24 @@ export async function findConsent(
 	return rows.find(isDefaultConsent) ?? rows[0] ?? null
 }
 
+/**
+ * Finds a device code by the library's own lookup order: the exact code first, then the
+ * normalized (stripped, upper-cased) form when it is a default-alphabet code. The candidates
+ * come from `src/core/device-code.ts`.
+ */
 export async function findDeviceCode(
 	ctx: { context: unknown },
 	userCode: string,
 ): Promise<StoredDeviceCode | null> {
-	const row = await adapterOf(ctx).findOne({
-		model: "deviceCode",
-		where: [{ field: "userCode", value: userCode }],
-	})
-	return row === null ? null : (row as StoredDeviceCode)
-}
-
-export async function findDeviceCodeByCode(
-	ctx: { context: unknown },
-	deviceCode: string,
-): Promise<StoredDeviceCode | null> {
-	const row = await adapterOf(ctx).findOne({
-		model: "deviceCode",
-		where: [{ field: "deviceCode", value: deviceCode }],
-	})
-	return row === null ? null : (row as StoredDeviceCode)
+	const adapter = adapterOf(ctx)
+	for (const candidate of userCodeCandidates(userCode)) {
+		const row = await adapter.findOne({
+			model: "deviceCode",
+			where: [{ field: "userCode", value: candidate }],
+		})
+		if (row !== null) return row as StoredDeviceCode
+	}
+	return null
 }
 
 function isDefaultConsent(consent: StoredConsent): boolean {

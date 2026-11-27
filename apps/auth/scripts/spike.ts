@@ -12,6 +12,7 @@ import {
 import { runGateChecks } from "./spike/gates"
 import { Session } from "./spike/http"
 import { buildReport } from "./spike/report"
+import { runSecurityChecks } from "./spike/security"
 import {
 	applyMigrations,
 	type LocalServer,
@@ -42,7 +43,10 @@ try {
 	const token = await redeemDeviceCode(session, COLLECTOR_CLIENT_ID, device.device_code)
 	const refreshed = await refresh(session, COLLECTOR_CLIENT_ID, token.refresh_token ?? "")
 	const noResourceToken = await runNoResourceGrant(session)
-	const gates = await runGateChecks(session, refreshed.refresh_token ?? "", noResourceToken)
+	const gates = {
+		...(await runGateChecks(session, refreshed.refresh_token ?? "", noResourceToken)),
+		...(await runSecurityChecks(session, scratch)),
+	}
 
 	const jwksResponse = await fetch(`${BASE_URL}/jwks`)
 	if (!jwksResponse.ok) throw new Error(`/jwks -> ${jwksResponse.status}`)

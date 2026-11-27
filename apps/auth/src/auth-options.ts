@@ -41,7 +41,9 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		// would let an XSS there make credentialed requests here (ADR 0001).
 		trustedOrigins: devSignIn ? [baseURL, "http://localhost:8787"] : [baseURL],
 		// `/token` mints a JWT with the name and email for auth's own origin; nothing needs it.
-		disabledPaths: ["/token"],
+		// `/oauth2/delete-consent` deletes the consent but leaves the grant's tokens alive, and a
+		// later approval would revive them. `/oauth2/grants/revoke` is the only revocation path.
+		disabledPaths: ["/token", "/oauth2/delete-consent"],
 		emailAndPassword: {
 			enabled: devSignIn,
 			minPasswordLength: 12,
@@ -60,10 +62,13 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 			window: 60,
 			max: 100,
 			customRules: {
-				"/oauth2/token": { window: 60, max: 60 },
+				// The provider's own rule for this path is 20/min; a looser custom rule would replace
+				// it. Device polling at the advertised five-second interval is 12/min, so 20 fits.
+				"/oauth2/token": { window: 60, max: 20 },
 				"/device/code": { window: 60, max: 10 },
 				"/device": { window: 60, max: 5 },
 				"/device/approve": { window: 60, max: 10 },
+				"/device/deny": { window: 60, max: 5 },
 				"/sign-in": { window: 60, max: 5 },
 				"/sign-in/*": { window: 60, max: 5 },
 				"/sign-up/*": { window: 60, max: 5 },
@@ -76,7 +81,7 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		},
 		hooks: {
 			before: oauthBeforeHook(hookOptions),
-			after: oauthAfterHook(),
+			after: oauthAfterHook(hookOptions),
 		},
 		plugins: buildPlugins({
 			baseURL,

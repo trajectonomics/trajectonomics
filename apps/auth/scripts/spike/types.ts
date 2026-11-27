@@ -48,3 +48,16 @@ export type GateEvidence = {
 	grantListed: boolean
 	grantRevoked: boolean
 }
+
+/** The security-review cases from PR #799's fix round, each one a finished boolean. */
+export type SecurityEvidence = {
+	paddedGrantTypeRejected: boolean
+	revokeBeforeRedemptionHolds: boolean
+	dashedUserCodeCreatesConsent: boolean
+	deleteConsentPathDisabled: boolean
+	oldTokenNotRevivedByNewApproval: boolean
+	expiredDeviceCodePollCreatesNoConsent: boolean
+	smuggledJsonResourceArrayRejected: boolean
+	reapprovalAfterExpiryWorks: boolean
+	revokeKillsPendingAuthCode: boolean
+}

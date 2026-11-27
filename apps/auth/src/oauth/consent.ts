@@ -1,75 +1,84 @@
-/** Creating and updating the `oauthConsent` row that records a grant's approval time. */
-import {
-	adapterOf,
-	findConsent,
-	findDeviceCode,
-	findDeviceCodeByCode,
-	type StoredDeviceCode,
-} from "./store"
+/**
+ * Creating and updating the `oauthConsent` row that records a grant's approval time.
+ *
+ * A consent is created only when the user approves a device code (the after-hook on
+ * `/device/approve`) or when the authorization-code flow writes one on `/oauth2/consent`. The
+ * token before-hook never creates one: an approved code left un-redeemed after a revoke fails closed.
+ */
+import { consentExpired } from "./expiry"
+import { deleteConsentRow, deletePendingAuthorizationCodes, deleteTokenFamily } from "./family"
+import type { OAuthHookOptions } from "./request"
+import { adapterOf, findConsent, findDeviceCode, type StoredDeviceCode } from "./store"
 import { deviceScopes, readField, storedResources } from "./values"
 
-export async function ensureDeviceConsent(ctx: {
-	context: unknown
-	body?: unknown
-}): Promise<void> {
-	const deviceCode = readField(ctx.body, "device_code")
-	if (typeof deviceCode !== "string" || deviceCode === "") return
-	const device = await findDeviceCodeByCode(ctx, deviceCode)
-	if (device === null) return
-	await consentFromDevice(ctx, device)
-}
-
-export async function ensureConsentForApproval(ctx: {
-	context: unknown
-	body?: unknown
-}): Promise<void> {
+export async function ensureConsentForApproval(
+	ctx: { context: unknown; body?: unknown },
+	options: OAuthHookOptions,
+): Promise<void> {
 	const userId = sessionUserId(ctx)
 	const userCode = readField(ctx.body, "userCode")
 	if (userId === undefined || typeof userCode !== "string") return
 	const device = await findDeviceCode(ctx, userCode)
 	if (device === null || device.status !== "approved" || device.userId !== userId) return
-	await consentFromDevice(ctx, device)
+	await consentFromDevice(ctx, device, options)
 }
 
 async function consentFromDevice(
 	ctx: { context: unknown },
 	device: StoredDeviceCode,
+	options: OAuthHookOptions,
 ): Promise<void> {
 	if (device.status !== "approved" || typeof device.userId !== "string") return
 	if (typeof device.clientId !== "string") return
-	await ensureConsent(ctx, {
-		clientId: device.clientId,
-		userId: device.userId,
-		scopes: deviceScopes(device.scope),
-		resources: storedResources(device.resources),
-	})
+	await ensureConsent(
+		ctx,
+		{
+			clientId: device.clientId,
+			userId: device.userId,
+			scopes: deviceScopes(device.scope),
+			resources: storedResources(device.resources),
+		},
+		options,
+	)
 }
 
 export async function ensureConsent(
 	ctx: { context: unknown },
 	input: { clientId: string; userId: string; scopes: string[]; resources: string[] },
+	options: OAuthHookOptions,
 ): Promise<void> {
 	if (input.scopes.length === 0) return
-	const adapter = adapterOf(ctx)
-	const existing = await findConsent(ctx, input.clientId, input.userId)
-	const now = new Date()
-	const resources = input.resources.length > 0 ? input.resources : null
 	try {
-		if (existing !== null) {
-			await adapter.update({
+		const existing = await findConsent(ctx, input.clientId, input.userId)
+		if (existing !== null && !consentExpired(ctx, existing, options)) {
+			await adapterOf(ctx).update({
 				model: "oauthConsent",
 				where: [{ field: "id", value: existing.id }],
-				update: { scopes: input.scopes, resources, updatedAt: now },
+				update: {
+					scopes: input.scopes,
+					resources: input.resources.length > 0 ? input.resources : null,
+					updatedAt: new Date(),
+				},
 			})
 			return
 		}
-		await adapter.create({
+		// A newly created consent never attaches to tokens from an earlier grant. An expired
+		// consent is deleted first, then its token family, so a concurrent rotation cannot keep a
+		// token alive under the fresh approval. Never move `createdAt` without deleting the family.
+		if (existing !== null) await deleteConsentRow(ctx, existing.id)
+		await deleteTokenFamily(ctx, { userId: input.userId, clientId: input.clientId })
+		await deletePendingAuthorizationCodes(ctx, {
+			userId: input.userId,
+			clientId: input.clientId,
+		})
+		const now = new Date()
+		await adapterOf(ctx).create({
 			model: "oauthConsent",
 			data: {
 				clientId: input.clientId,
 				userId: input.userId,
 				scopes: input.scopes,
-				resources,
+				resources: input.resources.length > 0 ? input.resources : null,
 				referenceId: null,
 				createdAt: now,
 				updatedAt: now,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import {
 	grantLifetimeRejection,
+	mergeResourceSources,
 	refreshResourceRejection,
 	resourceParameterRejection,
 	resourceValues,
@@ -112,5 +113,31 @@ describe("resourceValues", () => {
 		expect(resourceValues([1, "", null, "https://relay.trajectonomics.com"])).toEqual([
 			"https://relay.trajectonomics.com",
 		])
+	})
+})
+
+describe("mergeResourceSources", () => {
+	const data = "https://trajectonomics.com/data"
+	const relay = "https://relay.trajectonomics.com"
+
+	it("counts one value seen through the raw and parsed view of the same source once", () => {
+		expect(mergeResourceSources([[data], [data]])).toEqual([data])
+		expect(mergeResourceSources([[], [data], [], [data]])).toEqual([data])
+	})
+
+	it("keeps a value repeated inside one source", () => {
+		expect(mergeResourceSources([[data, data], [data]])).toEqual([data, data])
+		expect(mergeResourceSources([[data], [data, data]])).toEqual([data, data])
+	})
+
+	it("keeps both values when two sources disagree", () => {
+		expect(mergeResourceSources([[data], [], [], [relay]])).toEqual([data, relay])
+		expect(mergeResourceSources([[data], [data], [data, relay], [data]])).toEqual([data, relay])
+	})
+
+	it("leaves a smuggled JSON array above the one-resource limit", () => {
+		expect(resourceParameterRejection(mergeResourceSources([[data], [], [data, relay], []]))).toBe(
+			"multiple-resources",
+		)
 	})
 })

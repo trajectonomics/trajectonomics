@@ -1,7 +1,7 @@
 import type { JSONWebKeySet, JWTPayload } from "jose"
 import { DATA_AUDIENCE, RELAY_AUDIENCE } from "../../src/core/resources"
 import { BASE_URL, COLLECTOR_CLIENT_ID } from "./config"
-import type { GateEvidence, TokenResponse } from "./types"
+import type { GateEvidence, SecurityEvidence, TokenResponse } from "./types"
 
 export function buildChecks(input: {
 	pending: string
@@ -12,7 +12,7 @@ export function buildChecks(input: {
 	verificationOk: boolean
 	wrongAudienceError: string | null
 	wrongAlgorithmOk: boolean
-	gates: GateEvidence
+	gates: GateEvidence & SecurityEvidence
 }): Record<string, boolean> {
 	const { token, gates } = input
 	const audience = input.claims["aud"]

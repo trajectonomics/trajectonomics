@@ -3,7 +3,8 @@ import { DATA_AUDIENCE, RELAY_AUDIENCE } from "../../src/core/resources"
 import { describeClaims, describeJwk, describeTokenResponse } from "../../src/core/token-shape"
 import { buildChecks } from "./checks"
 import { BASE_URL } from "./config"
-import type { DeviceCodeResponse, GateEvidence, TokenResponse } from "./types"
+import { securityChecks } from "./security-checks"
+import type { DeviceCodeResponse, GateEvidence, SecurityEvidence, TokenResponse } from "./types"
 import { verifyJwt } from "./verify"
 
 export type SpikeReport = {
@@ -19,7 +20,7 @@ export async function buildReport(input: {
 	refreshed: TokenResponse
 	jwks: JSONWebKeySet
 	claims: JWTPayload
-	gates: GateEvidence
+	gates: GateEvidence & SecurityEvidence
 }): Promise<SpikeReport> {
 	const { token, jwks } = input
 	const verification = await verifyJwt({
@@ -41,17 +42,20 @@ export async function buildReport(input: {
 		audience: DATA_AUDIENCE,
 		algorithms: ["RS256"],
 	})
-	const checks = buildChecks({
-		pending: input.pending,
-		token,
-		refreshed: input.refreshed,
-		jwks,
-		claims: input.claims,
-		verificationOk: verification.ok,
-		wrongAudienceError: wrongAudience.ok ? null : wrongAudience.error,
-		wrongAlgorithmOk: wrongAlgorithm.ok,
-		gates: input.gates,
-	})
+	const checks = {
+		...buildChecks({
+			pending: input.pending,
+			token,
+			refreshed: input.refreshed,
+			jwks,
+			claims: input.claims,
+			verificationOk: verification.ok,
+			wrongAudienceError: wrongAudience.ok ? null : wrongAudience.error,
+			wrongAlgorithmOk: wrongAlgorithm.ok,
+			gates: input.gates,
+		}),
+		...securityChecks(input.gates),
+	}
 	return {
 		ok: Object.values(checks).every(Boolean),
 		report: {

@@ -181,7 +181,16 @@ The report's `checks` block from a passing run (`bun run spike`, exit 0):
 	"revokedGrantRefreshFails": true,
 	"grantListedAndRevoked": true,
 	"refreshPastAbsoluteLifetimeFails": true,
-	"userCodeGuessesRateLimited": true
+	"userCodeGuessesRateLimited": true,
+	"paddedGrantTypeRejected": true,
+	"revokeBeforeRedemptionHolds": true,
+	"dashedUserCodeCreatesConsent": true,
+	"deleteConsentPathDisabled": true,
+	"oldTokenNotRevivedByNewApproval": true,
+	"expiredDeviceCodePollCreatesNoConsent": true,
+	"smuggledJsonResourceArrayRejected": true,
+	"reapprovalAfterExpiryWorks": true,
+	"revokeKillsPendingAuthCode": true
 }
 ```
 
@@ -205,6 +214,23 @@ How each gate is exercised:
   unit-tested: the relay's `allowedScopes` does not contain `data:ingest`.
 - **Server-side client.** The whole flow uses the seeded `traj-data-collector`; no
   `/oauth2/create-client` call is made, and `clientPrivileges` is closed.
+
+## Security-review round
+
+The independent review of #799 reproduced each hole below against `wrangler dev --local`; every
+case is now a `true` check:
+
+| Check | What it drives |
+|---|---|
+| `paddedGrantTypeRejected` | `refresh_token%20` and `%09refresh_token`, for both the 90-day lifetime rule and the widening rule, answer `400 invalid_request` instead of skipping the hook. |
+| `revokeBeforeRedemptionHolds` | Approve a device code, revoke the grant, then poll: the deleted device code yields no token set and no consent is recreated. |
+| `dashedUserCodeCreatesConsent` | Approving `abcd-efgh` (lower-case, dashed) finds the code with the library's normalized lookup and records the consent. |
+| `deleteConsentPathDisabled` | `POST /oauth2/delete-consent` answers `404`; revoke is the only path. |
+| `oldTokenNotRevivedByNewApproval` | With the old consent deleted out of band, a fresh approval deletes the leftover token family; the old refresh token answers `invalid_grant`. |
+| `expiredDeviceCodePollCreatesNoConsent` | Polling an expired approved code answers `expired_token` and leaves zero consents. |
+| `smuggledJsonResourceArrayRejected` | A JSON body sent as `application/json; x=application/x-www-form-urlencoded`, alone and beside a query resource, is rejected with `invalid_target`. |
+| `reapprovalAfterExpiryWorks` | An expired device grant re-approves into a working first refresh, and an expired web consent is recreated with a fresh `createdAt`. |
+| `revokeKillsPendingAuthCode` | An authorization code issued before a revoke cannot be exchanged afterwards (`invalid_grant`). |
 
 ## Plugins on Workers
 
@@ -230,7 +256,7 @@ cd apps/auth
 bun install
 bun run spike            # random free port; SPIKE_PORT=8787 bun run spike to pin one
 bun run schema -- --out migrations/0002_rate_limit.sql --only rateLimit
-bun run clients:sql      # regenerates migrations/0003_oauth_clients.sql from the manifest
+bun run clients:sql      # writes 0003 once; refuses to overwrite, later changes are new migrations
 bun run check            # Biome, tsc, unit tests, wrangler deploy --dry-run
 ```
 

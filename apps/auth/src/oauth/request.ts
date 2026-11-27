@@ -1,4 +1,4 @@
-import { resourceValues } from "../core/resource-request"
+import { mergeResourceSources, resourceValues } from "../core/resource-request"
 import { readField } from "./values"
 
 export type OAuthHookOptions = {
@@ -24,18 +24,29 @@ export function hookNow(ctx: { headers?: Headers | undefined }, options: OAuthHo
 	return Number.isNaN(parsed.getTime()) ? new Date() : parsed
 }
 
-/** Reads every `resource` value the raw request carried, including repeated form fields. */
+/**
+ * Reads every `resource` value the request carried, from every source that can hold one:
+ *
+ * - the query string (`?resource=`);
+ * - the raw body, parsed as a form or as JSON by its exact media type;
+ * - `ctx.body`, the library's parsed body (a JSON array, or a form value the schema kept).
+ *
+ * Better Auth's endpoint schema can strip an unknown field before the hook sees `ctx.body`, and
+ * a JSON body sent with a misleading `Content-Type` hides its array from the form parser. Reading
+ * all sources and merging them (see `mergeResourceSources`) closes both holes; a value seen in
+ * more than one representation of the same request still counts once.
+ */
 export async function requestResourceValues(ctx: {
 	body?: unknown
 	query?: unknown
 	request?: Request | undefined
 }): Promise<string[]> {
-	const values = [...queryResources(ctx.request), ...(await bodyResources(ctx.request))]
-	if (values.length > 0) return values
-	return [
-		...resourceValues(readField(ctx.query, "resource")),
-		...resourceValues(readField(ctx.body, "resource")),
-	]
+	return mergeResourceSources([
+		queryResources(ctx.request),
+		resourceValues(readField(ctx.query, "resource")),
+		(await rawBodyResources(ctx.request)) ?? [],
+		resourceValues(readField(ctx.body, "resource")),
+	])
 }
 
 function queryResources(request: Request | undefined): string[] {
@@ -43,12 +54,19 @@ function queryResources(request: Request | undefined): string[] {
 	return new URL(request.url).searchParams.getAll("resource")
 }
 
-async function bodyResources(request: Request | undefined): Promise<string[]> {
-	if (request === undefined || request.method === "GET" || request.method === "HEAD") return []
-	const contentType = request.headers.get("content-type")?.toLowerCase() ?? ""
-	if (contentType.includes("application/x-www-form-urlencoded")) return formResources(request)
-	if (contentType.includes("application/json")) return jsonResources(request)
-	return []
+/**
+ * Parses the raw body when its media type is one this hook understands. The media type is
+ * matched exactly up to its first `;`, never with a substring test: a JSON body that claims
+ * `application/json; x=application/x-www-form-urlencoded` is JSON, not a form.
+ */
+async function rawBodyResources(request: Request | undefined): Promise<string[] | null> {
+	if (request === undefined || request.method === "GET" || request.method === "HEAD") return null
+	const mediaType = (request.headers.get("content-type") ?? "").split(";")[0]?.trim().toLowerCase()
+	if (mediaType === "application/x-www-form-urlencoded") return formResources(request)
+	if (mediaType === "application/json" || mediaType?.endsWith("+json") === true) {
+		return jsonResources(request)
+	}
+	return null
 }
 
 async function formResources(request: Request): Promise<string[]> {
