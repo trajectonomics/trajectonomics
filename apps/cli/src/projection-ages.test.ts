@@ -79,6 +79,36 @@ describe("ages on projection rows", () => {
 		])
 	})
 
+	it("gives an annual row ending on a birthday the new age, and the day before the old one", async () => {
+		const home = await projectionHome()
+		const march = {
+			schemaVersion: 1,
+			people: [{ id: "me", role: "holder", born: "1990-03", lifeExpectancy: 90 }],
+			anchors: [],
+		}
+		expect((await setHousehold(home, march)).code).toBe(0)
+		// The roll-up ends on 2027-03-31, the day the holder turns 37.
+		const onBirthday = runBody(
+			await projection(home, [
+				"run",
+				"--scenario",
+				"base",
+				"--as-of",
+				"2026-04-01",
+				"--horizon",
+				"2027-03-31",
+			]),
+		)
+		const [reached] = tableOf(onBirthday, "annual").rows
+		expect(reached?.to).toBe("2027-03-31")
+		expect(reached?.ages).toEqual([{ person: "me", age: 37 }])
+		// A roll-up ending on 2027-03-30, the day before, states the age still held then.
+		const dayBefore = runBody(await projection(home, ["run", ...baseFlags()]))
+		const [before] = tableOf(dayBefore, "annual").rows
+		expect(before?.to).toBe("2027-03-30")
+		expect(before?.ages).toEqual([{ person: "me", age: 36 }])
+	})
+
 	it("includes a dependent born mid-plan from the row of their birth month, and not before", async () => {
 		const home = await withHousehold()
 		const body = runBody(await projection(home, ["run", ...baseFlags(), "--monthly"]))
@@ -114,11 +144,11 @@ describe("ages on projection rows", () => {
 		).toEqual(["me", "partner", "child"])
 	})
 
-	it("shows the Ages column in the human table, empty without a household", async () => {
+	it("shows the ages column in the human table, empty without a household", async () => {
 		const home = await projectionHome()
 		const bare = await capture(["projection", "run", ...baseFlags()], { TRAJ_HOME: home })
 		expect(bare.code).toBe(0)
-		expect(bare.out).toContain("Ages")
+		expect(bare.out).toContain("  ages  ")
 		const withPeople = await withHousehold()
 		const human = await capture(["projection", "run", ...baseFlags()], { TRAJ_HOME: withPeople })
 		expect(human.code).toBe(0)

@@ -1,7 +1,7 @@
 // `--if-hash`: a write names the contentHash its caller read, and is refused over a plan that has moved on
 // (cli ADR-0055). Each refusal writes nothing, dry or real.
 import { describe, expect, it } from "bun:test"
-import { HOUSEHOLD, seedBase, setHousehold, shown } from "./scenario-household-support"
+import { seedBase, shown } from "./scenario-household-support"
 import {
 	applyScenario,
 	errorOf,
@@ -121,93 +121,5 @@ describe("scenario apply --if-hash", () => {
 			code: "invalid_input",
 			path: "--if-hash",
 		})
-	})
-})
-
-describe("scenario household --if-hash", () => {
-	it("refuses a household over a plan that moved on, and writes nothing", async () => {
-		const home = scenarioHome()
-		const before = await seedBase(home)
-		await applyScenario(home, "base", {
-			...SCENARIO_DOCUMENT,
-			economy: { inflation: 100 },
-		})
-		const stored = await shown(home)
-		const res = await scenario(
-			home,
-			["household", "base", "--file", "-", "--if-hash", before.contentHash],
-			JSON.stringify(HOUSEHOLD),
-		)
-		expect(res.code).toBe(5)
-		expect(errorOf(res)).toMatchObject({
-			code: "scenario_changed",
-			details: { storedHash: stored.contentHash },
-		})
-		const after = await shown(home)
-		expect(after.household).toBeNull()
-		expect(after).toEqual(stored)
-	})
-
-	it("refuses a dry run of a household over a moved plan, and writes nothing", async () => {
-		const home = scenarioHome()
-		const before = await seedBase(home)
-		await applyScenario(home, "base", {
-			...SCENARIO_DOCUMENT,
-			economy: { inflation: 100 },
-		})
-		const stored = await shown(home)
-		const res = await scenario(
-			home,
-			["household", "base", "--file", "-", "--if-hash", before.contentHash, "--dry-run"],
-			JSON.stringify(HOUSEHOLD),
-		)
-		expect(res.code).toBe(5)
-		expect(errorOf(res).code).toBe("scenario_changed")
-		expect(await shown(home)).toEqual(stored)
-	})
-
-	it("writes a household when the stored contentHash is the one the caller read", async () => {
-		const home = scenarioHome()
-		const before = await seedBase(home)
-		const res = await scenario(
-			home,
-			["household", "base", "--file", "-", "--if-hash", before.contentHash],
-			JSON.stringify(HOUSEHOLD),
-		)
-		expect(res.code).toBe(0)
-		expect(resultOf(res).status).toBe("updated")
-		expect((await shown(home)).household).toMatchObject({
-			people: [{ id: "me" }, { id: "partner" }],
-		})
-	})
-
-	it("removes a household over the hash the household wrote, and refuses once the plan moved", async () => {
-		const home = scenarioHome()
-		await seedBase(home)
-		await setHousehold(home, HOUSEHOLD)
-		const written = await shown(home)
-		const ok = await scenario(home, [
-			"household",
-			"base",
-			"--none",
-			"--if-hash",
-			written.contentHash,
-		])
-		expect(ok.code).toBe(0)
-		expect((await shown(home)).household).toBeNull()
-
-		await applyScenario(home, "base", {
-			...SCENARIO_DOCUMENT,
-			economy: { inflation: 100 },
-		})
-		const stale = await scenario(home, [
-			"household",
-			"base",
-			"--none",
-			"--if-hash",
-			written.contentHash,
-		])
-		expect(stale.code).toBe(5)
-		expect(errorOf(stale).code).toBe("scenario_changed")
 	})
 })

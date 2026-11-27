@@ -1,0 +1,34 @@
+/* The plan summary: one ranked meter list, its key and total above it, one short note below. */
+
+.plan-summary {
+	padding: 24px 0 8px;
+}
+
+/* The key and the window's total share one line above the list. */
+.summary-key {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 4px 16px;
+}
+
+/* The dot's key: the same 8px element the in-use rows carry after the plan's name. */
+.use-key {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 10px;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+.summary-note {
+	max-width: 44rem;
+	margin: 20px 0 0;
+	font-size: 13px;
+	line-height: 1.7;
+	color: var(--ds-color-muted-foreground);
+}

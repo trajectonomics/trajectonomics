@@ -13,7 +13,7 @@ unchanged (ADR-0024). This ships in 0.8.0.
 
 Nothing lists the money fields by hand. A money field is a node of the published document schema
 whose description is `MINOR_UNITS` (`src/scenario/shape/terms.ts`), and the decimal form is built
-by walking that same schema (`src/scenario/money-fields.ts`). The walk follows `properties` and
+by walking that same schema (`src/scenario/field-paths.ts`). The walk follows `properties` and
 `items`, so a new money field there is converted as soon as it is published; one reached only through
 `anyOf` would be found by `moneyPathsOf` but not converted. The test that names the current money
 fields fails on either, and that test, not the walk, is what makes the author of a new money field

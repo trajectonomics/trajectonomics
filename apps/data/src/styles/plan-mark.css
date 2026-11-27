@@ -1,0 +1,24 @@
+/* A plan's mark: a rounded tile holding its logo or its first letter, at one size in every row. */
+
+.plan-mark {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: var(--plan-mark-size, 28px);
+	height: var(--plan-mark-size, 28px);
+	border-radius: 8px;
+	background: var(--ds-color-secondary);
+	color: var(--ds-color-foreground);
+}
+
+.plan-mark svg {
+	width: 62%;
+	height: 62%;
+}
+
+.plan-mark-initial {
+	font-size: calc(var(--plan-mark-size, 28px) * 0.42);
+	font-weight: 600;
+	line-height: 1;
+}

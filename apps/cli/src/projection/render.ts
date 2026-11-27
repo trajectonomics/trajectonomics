@@ -24,7 +24,7 @@ function agesText(value: unknown): unknown {
 		.join(", ")
 }
 
-const agesColumn: ColumnHint = { key: "ages", label: "Ages", show: agesText }
+const agesColumn: ColumnHint = { key: "ages", label: "ages", show: agesText }
 
 /**
  * `projection run`'s human view: the annual roll-up, the monthly rows when asked, the tax years the

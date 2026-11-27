@@ -74,7 +74,7 @@ export type HouseholdPlanner = (document: ScenarioDocument) => HouseholdPlan | A
 export type HouseholdSet =
 	| { status: "updated" | "unchanged"; scenario: ScenarioRow }
 	| { status: "not_found" }
-/** A household write's options: a dry run, and the content hash the caller read (cli ADR-0055). */
+/** A household write's options: a dry run, and the household hash the caller read (cli ADR-0055). */
 export type HouseholdOptions = WriteOptions & { expectedHash?: string | undefined }
 
 /**
