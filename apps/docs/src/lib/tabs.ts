@@ -10,6 +10,8 @@ export interface TabDefinition {
 	readonly folder: string
 	readonly title: string
 	readonly audience: "Operator" | "Contributor"
+	/** The reader-facing label above the Landing Page entry, in place of the internal `audience`. */
+	readonly label: string
 	/** The Landing Page entry that sends this Tab's audience here. */
 	readonly entry: string
 	/** The Landing Page line under the entry saying what the reader gets and where it starts. */
@@ -25,13 +27,15 @@ export const TABS: readonly [TabDefinition, TabDefinition] = [
 		folder: "cli",
 		title: "CLI & Quickstart",
 		audience: "Operator",
-		entry: "For Operators: install and run the CLI",
+		label: "Most people start here",
+		entry: "Use traj: install it and get your first answer",
 		description: "Install traj, then record your first transaction and read your balance.",
 	},
 	{
 		folder: "contribute",
 		title: "Contribute",
 		audience: "Contributor",
+		label: "Contribute",
 		entry: "For Contributors: help make the tax rules right",
 		description: "Report a wrong figure, add a tax year or a country, and check your change.",
 	},

@@ -1,6 +1,7 @@
 import { Fragment } from "react"
 import { AGENT_START_HEADING, AGENT_START_LEAD, agentPrompt } from "../../lib/agent-start"
 import { SITE_ORIGIN } from "../../lib/site"
+import { Mascot } from "../mascot"
 import { CopyPromptButton } from "./copy"
 import { fade, rise } from "./motion"
 
@@ -34,6 +35,14 @@ function PromptText() {
 export function AgentPrompt() {
 	return (
 		<div {...rise(2)} className="relative isolate min-w-0">
+			{/* The Mascot peeks over the panel's top hairline, its hands on the accent line, the way the
+			    Site's robot rests on its demo window ([site ADR 0026], docs ADR 0018). It sits above the
+			    heading and button, so it never covers a word or a control. */}
+			<Mascot
+				pose="peek"
+				eager
+				className="absolute right-4 bottom-[calc(100%-6px)] z-10 w-14 sm:w-16 lg:w-24"
+			/>
 			<div
 				aria-hidden="true"
 				data-landing-glow=""

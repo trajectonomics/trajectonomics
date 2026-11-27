@@ -16,7 +16,7 @@ const at = (field: string) => shown.at(`${prefix}${field}`)
 </script>
 
 <!-- The terms every loan states: its amount, rate, how interest is added, its payments and their rounding. -->
-<Field id="loan-principal" label="Amount borrowed" inputmode="decimal" hint="A decimal number, such as 500000.00" bind:value={draft.principal} problem={at("principal")} />
+<Field id="loan-principal" label="Amount borrowed" inputmode="decimal" money hint="A decimal number, such as 500000.00" bind:value={draft.principal} problem={at("principal")} />
 <Field id="loan-rate" label="Interest rate a year" inputmode="decimal" hint="Your own estimate: a percent with at most two places, such as 6.25" bind:value={draft.rate} problem={at("rate")} />
 <Field id="loan-compounding" label="Interest is added" options={LOAN_COMPOUNDING_CHOICES} bind:value={draft.compounding} problem={at("compounding")} />
 <Field id="loan-payments" label="Number of payments" inputmode="decimal" hint="One payment each time interest is added" bind:value={draft.payments} problem={at("payments")} />

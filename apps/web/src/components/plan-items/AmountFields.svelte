@@ -25,7 +25,7 @@ let { draft = $bindable(), prefix, label, choices, percentLabel, growing, shown 
 {#if draft.mode === "percent"}
 	<Field id="{prefix}-rate" label={percentLabel} inputmode="decimal" hint="Your own estimate: a percent with at most two places, such as 1.5" bind:value={draft.rate} problem={shown.at(`${prefix}.rate`)} />
 {:else if draft.mode === "amount"}
-	<Field id="{prefix}-amount" label="Amount" inputmode="decimal" hint="A decimal number, such as 9000.50" bind:value={draft.amount} problem={shown.at(`${prefix}.amount`)} />
+	<Field id="{prefix}-amount" label="Amount" inputmode="decimal" money hint="A decimal number, such as 9000.50" bind:value={draft.amount} problem={shown.at(`${prefix}.amount`)} />
 	{#if growing}
 		<Field id="{prefix}-growth" label="Growth" options={GROWTH_CHOICES} bind:value={draft.growth} problem={shown.at(`${prefix}.growth`)} />
 		{#if draft.growth === "fixed"}

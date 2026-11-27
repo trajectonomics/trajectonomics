@@ -1,4 +1,7 @@
 <script lang="ts">
+import { maskedFocus } from "../../client/masked-focus.js"
+import { preferences } from "../../client/preferences.svelte.js"
+import { maskMoney } from "../../lib/format"
 import type { Choice } from "../../lib/view/plan-items/options"
 
 interface Props {
@@ -17,6 +20,8 @@ interface Props {
 	hint?: string | undefined
 	/** Whether the field is read-only here, such as a date a household pins. */
 	disabled?: boolean
+	/** Whether the field holds a money amount, which Hide amounts masks while it is not focused. */
+	money?: boolean
 }
 
 let {
@@ -28,6 +33,7 @@ let {
 	problem,
 	hint,
 	disabled = false,
+	money = false,
 }: Props = $props()
 
 /** The choices the select offers, plus the held value when the list does not name it, so it never opens empty. */
@@ -35,6 +41,21 @@ const choices = $derived(
 	options === undefined || value === "" || options.some((option) => option.value === value)
 		? options
 		: [...options, { value, label: value }],
+)
+let focused = $state(false)
+/** True while the digits show as the mask: a focused field shows the real value, so the person can edit it. */
+const masked = $derived(money && preferences.hidden && !focused && value.trim() !== "")
+const shown = $derived(masked ? maskMoney(value) : value)
+
+/** Every text the field is described by, so a hint and a problem are both there. */
+const described = $derived(
+	[
+		hint === undefined ? undefined : `${id}-hint`,
+		problem === undefined ? undefined : `${id}-problem`,
+		masked ? `${id}-masked` : undefined,
+	]
+		.filter((one) => one !== undefined)
+		.join(" ") || undefined,
 )
 </script>
 
@@ -46,7 +67,7 @@ const choices = $derived(
 			{id}
 			{disabled}
 			bind:value
-			aria-describedby={problem ? `${id}-problem` : undefined}
+			aria-describedby={described}
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 		>
 			{#each choices as option (option.value)}
@@ -57,13 +78,18 @@ const choices = $derived(
 		<input
 			{id}
 			{disabled}
-			bind:value
+			value={shown}
+			oninput={(event) => (value = event.currentTarget.value)}
+			onfocus={() => (focused = true)}
+			onblur={() => (focused = false)}
+			use:maskedFocus={() => money && preferences.hidden && value.trim() !== ""}
 			{inputmode}
 			autocomplete="off"
 			aria-invalid={problem ? "true" : undefined}
-			aria-describedby={problem ? `${id}-problem` : hint ? `${id}-hint` : undefined}
+			aria-describedby={described}
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 		/>
 	{/if}
+	{#if masked}<span id="{id}-masked" class="sr-only">Amount hidden. Select the field to see and edit it.</span>{/if}
 	{#if problem}<p id="{id}-problem" role="alert" class="text-sm text-destructive">{problem}</p>{/if}
 </div>
