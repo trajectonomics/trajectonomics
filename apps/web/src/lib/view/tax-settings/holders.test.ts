@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { Read, ScenarioShow, Snapshot } from "../../contract"
+import { brandHouseholdHash } from "../../contract/household-hash.test-support"
 import { claimsHolderOf, snapshotClaimsHolders } from "./holders"
 
 /** A `scenario show` of one plan, with the tax profile the plan stores or none. */
@@ -15,7 +16,7 @@ function show(tax: ScenarioShow["scenario"]["tax"] = null): ScenarioShow {
 			updatedAt: "2026-01-01T00:00:00.000Z",
 			document: { currency: "THB", flows: [], accounts: [] },
 			household: null,
-			householdHash: "hash",
+			householdHash: brandHouseholdHash("hash"),
 			tax,
 		},
 	}
