@@ -18,6 +18,10 @@ const devVars = {
 	BETTER_AUTH_SECRET: "local-e2e-only-secret-at-least-32-characters",
 	PASSKEY_RP_ID: "localhost",
 	PASSKEY_ORIGIN: BASE_URL,
+	// Not credentials: they make the Worker offer Google, so a check can send its error callback.
+	// The browser's visit to Google is intercepted, and no check reaches the token exchange.
+	GOOGLE_CLIENT_ID: "e2e-placeholder-google-client-id",
+	GOOGLE_CLIENT_SECRET: "e2e-placeholder-google-client-secret",
 }
 const command = [
 	wrangler,

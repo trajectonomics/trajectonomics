@@ -7,13 +7,17 @@
  *
  * The table carries `nextAttemptAt`, so the due rows are read with one ordered query: a row that
  * keeps failing moves into the future and cannot hold the batch, and the tick takes them in
- * `nextAttemptAt` order, fifty at a time.
+ * `nextAttemptAt` order, twenty-five at a time.
  *
  * Pure: `now` and timestamps arrive as arguments, in milliseconds.
  */
 
-/** The most rows one cron tick attempts; the rest wait for the next hour. */
-export const DELETION_BATCH_LIMIT = 50
+/**
+ * The most rows one cron tick attempts; the rest wait for the next hour. Cloudflare allows one
+ * request at most 32 Worker invocations, and each service-binding call to the data Worker is one.
+ * Twenty-five calls plus the tick's three D1 calls stay under that, even counted together.
+ */
+export const DELETION_BATCH_LIMIT = 25
 
 /** The first retry waits five minutes; each later one doubles. */
 export const DELETION_RETRY_BASE_SECONDS = 300

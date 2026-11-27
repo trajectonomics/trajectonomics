@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { DELETION_BATCH_LIMIT } from "../src/core/deletion"
 import { DUE_PENDING_DELETIONS_SQL } from "../src/pending-deletion-retry"
 import { answerConsent, signUp } from "./people"
 import { queryLocal, scratchDir } from "./scratch"
@@ -46,7 +47,9 @@ test("a failed deletion leaves a notice the retry skips while the user exists", 
 				`select "id" from "pendingDeletion" where "authUserId" = '${user.id}'`,
 			),
 		).toHaveLength(1)
-		expect(queryLocal<{ id: string }>(scratch, dueQuery(new Date().toISOString(), 50))).toEqual([])
+		expect(
+			queryLocal<{ id: string }>(scratch, dueQuery(new Date().toISOString(), DELETION_BATCH_LIMIT)),
+		).toEqual([])
 	} finally {
 		queryLocal(scratch, 'drop trigger "block_delete"')
 	}

@@ -63,9 +63,10 @@ export const THAI_PAGES = {
 	loadError: "โหลดไม่สำเร็จ",
 	loadRetry: "ลองอีกครั้ง",
 
-	scopeOpenId: "ดูชื่อและอีเมลของคุณ",
-	scopeProfile: "ดูชื่อและรูปของคุณ",
+	scopeOpenId: "รู้ว่าคุณใช้บัญชีใด",
+	scopeProfile: "ดูชื่อและรูปโปรไฟล์ของคุณ",
 	scopeEmail: "ดูอีเมลของคุณ",
+	scopeIdentity: "ดูชื่อ อีเมล และรูปโปรไฟล์ของคุณ",
 	scopeOffline: "เชื่อมต่อไว้ได้แม้ปิดแอป",
 	scopeDataIngest: "ส่งตัวเลขการใช้งาน AI ของคุณไปยังเว็บไซต์ข้อมูล",
 } satisfies Partial<Dictionary>

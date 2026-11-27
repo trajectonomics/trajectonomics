@@ -11,6 +11,9 @@ test("the device page approves a code, and the CLI poll gets tokens and a revoca
 	await page.goto(`/device/?user_code=${encodeURIComponent(code.userCode)}`)
 	await expect(page.getByText("traj data collector")).toBeVisible()
 	await expect(page.getByText("Send your AI usage numbers to the data site")).toBeVisible()
+	// The collector gets only the account id, so the page never says it sees a name or an email.
+	await expect(page.getByText("Know which account you are")).toBeVisible()
+	await expect(page.getByText(/See your/)).toHaveCount(0)
 	// RFC 8628 §3.3.1 and §5.4: the person must be able to match the code against the app's screen,
 	// and must see which account is about to be linked.
 	await expect(page.locator(".device-code")).toHaveText(
@@ -70,7 +73,7 @@ test("the web client's consent page names the app, then allows the flow", async 
 	await page.goto(authorizePath("e2e-state"))
 	await page.waitForURL(/\/consent\//)
 	await expect(page.getByRole("heading", { name: /Trajectonomics data site/ })).toBeVisible()
-	await expect(page.getByText("See your name and email")).toBeVisible()
+	await expect(page.getByText("See your name, email and profile picture")).toBeVisible()
 	const callback = page.waitForRequest((request) =>
 		request.url().startsWith("https://trajectonomics.com/data/auth/callback?"),
 	)

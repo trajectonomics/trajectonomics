@@ -34,6 +34,9 @@ export const THAI_ACCOUNT = {
 	accountDeleteEmailLabel: "พิมพ์อีเมลของคุณเพื่อยืนยัน",
 	accountDeleteButton: "ลบบัญชีของฉัน",
 	accountDeleteExpired: "คุณเข้าสู่ระบบมานานเกินกำหนดสำหรับการลบบัญชี ออกจากระบบแล้วเข้าสู่ระบบใหม่ก่อนลบ",
-	accountDeleteError: "ลบบัญชีไม่สำเร็จ คุณออกจากระบบแล้ว เข้าสู่ระบบใหม่แล้วลองอีกครั้ง",
+	accountDeleteSignedOut: "ลบบัญชีไม่สำเร็จ คุณออกจากระบบแล้ว เข้าสู่ระบบใหม่แล้วลองอีกครั้ง",
+	accountDeleteRetry: "ลบบัญชีไม่สำเร็จ ลองอีกครั้ง",
+	accountDeleteUnconfirmed: "ยืนยันไม่ได้ว่าบัญชีถูกลบแล้วหรือไม่ โหลดหน้านี้ใหม่เพื่อตรวจสอบ",
+	accountDeleteReload: "โหลดใหม่",
 	accountLoadError: "บางส่วนโหลดไม่สำเร็จ โหลดหน้าใหม่แล้วลองอีกครั้ง",
 } satisfies Partial<Dictionary>

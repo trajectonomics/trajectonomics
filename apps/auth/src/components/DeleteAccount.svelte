@@ -2,7 +2,7 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { tick } from "svelte"
-import { deleteAccount, signOut } from "../client/auth"
+import { deleteAccount, readSession, signOut } from "../client/auth"
 import { AuthRequestError } from "../client/errors"
 import { dictionaryFor, type Language, pagePath } from "../lib/language"
 
@@ -13,7 +13,8 @@ let {
 }: {
 	language: Language
 	email: string
-	onfailed: () => void
+	/** The failures after which the account page offers no more controls. */
+	onfailed: (outcome: "signed-out" | "unconfirmed") => void
 } = $props()
 const words = $derived(dictionaryFor(language))
 let typed = $state("")
@@ -33,22 +34,45 @@ async function remove(event: SubmitEvent): Promise<void> {
 		await deleteAccount()
 		window.location.assign(`${pagePath(language, "sign-in")}?deleted=1`)
 	} catch (error) {
-		// A stale sign-in is recoverable on this page. Any other failure leaves a session that must
-		// not keep acting signed in, so the page signs out and shows only the message.
-		if (error instanceof AuthRequestError && error.code === "SESSION_EXPIRED") {
-			message = words.accountDeleteExpired
-			busy = false
-			await tick()
-			alert?.focus()
+		// Only an answer from the server says the account is still there. Without one (a network
+		// error or a lost response) the page claims neither a deletion nor a sign-out.
+		if (!(error instanceof AuthRequestError)) {
+			onfailed("unconfirmed")
 			return
 		}
-		try {
-			await signOut()
-		} catch {
-			// The session may already be gone; either way the account page is no longer reachable.
+		// A stale sign-in is recoverable on this page.
+		if (error.code === "SESSION_EXPIRED") {
+			await stay(words.accountDeleteExpired)
+			return
 		}
-		onfailed()
+		if (await endSession()) onfailed("signed-out")
+		else await stay(words.accountDeleteRetry)
 	}
+}
+
+/**
+ * Signs out after a refused deletion, then asks the server whether the session is really gone. A
+ * session that remains, or one that cannot be read, is never reported as signed out.
+ */
+async function endSession(): Promise<boolean> {
+	try {
+		await signOut()
+	} catch {
+		// The read below decides what happened.
+	}
+	try {
+		return (await readSession()).session === null
+	} catch {
+		return false
+	}
+}
+
+/** Keeps the account page, with the reason beside the button. */
+async function stay(reason: string): Promise<void> {
+	message = reason
+	busy = false
+	await tick()
+	alert?.focus()
 }
 </script>
 

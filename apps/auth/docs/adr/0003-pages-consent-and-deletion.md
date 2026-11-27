@@ -67,6 +67,12 @@ re-run the prompt.
 relative form, no backslash, no control character, and no path that normalizes to another host. A
 value that fails is ignored and `/account/` is used.
 
+A cancelled or failed social sign-in returns to the page it started on: `errorCallbackURL` is that
+page's own path and search, still holding the signed query or `?next=`, with `error=1` appended
+(`src/lib/sign-in-retry.ts`). The page says the sign-in failed, and a retry continues the same flow.
+When Better Auth cannot read its own state, its error page redirects to `/?error=…` in production;
+`/` forwards that to `/sign-in/?error=1` in the page's language.
+
 ### The first-sign-in question
 
 A person with no `marketingConsent` row answers one screen before continuing: an unticked box,
@@ -92,6 +98,9 @@ page without answering sees it again.
 non-alphanumerics, upper-case), and calls `GET /device`. For the owner, the response carries the
 client id and scopes; the page adds the client's public name and renders each scope through
 `src/lib/scopes.ts` in plain words (`data:ingest` → "Send your AI usage numbers to the data site").
+Each line names exactly what is released: `openid` the account id ("Know which account you are"),
+`profile` the name and profile picture, `email` the address. `profile` and `email` together, with or
+without `openid`, are one line: "See your name, email and profile picture".
 Approve is the primary button and Deny is secondary. Approve, deny and the invalid, expired and
 already-answered states are separate views with an icon and a word, not a colour alone.
 
@@ -109,7 +118,11 @@ A page opened without a `client_id` says it only works from an app.
 - **Email updates:** a switch. Turning it off appends a false record and stamps `withdrawnAt` on the
   true row, so the history keeps both.
 - **Sign out.**
-- **Delete account:** a danger zone. The person types their own email to enable Delete.
+- **Delete account:** a danger zone. The person types their own email to enable Delete. A failure
+  says only what is known. If the server refused, the page signs out and reads the session back:
+  without one it says the person was signed out and links to sign in; with one, or one it cannot
+  read, it says to try again. If no answer arrived, it says the deletion could not be confirmed and
+  offers Reload.
 
 All Better Auth calls live in `src/client/auth.ts`; the account and OAuth flow wrappers in
 `src/client/account.ts` and `src/client/oauth.ts` use the one request helper, so `createAuthClient`
@@ -146,8 +159,8 @@ while the data site would never be told. The account id it names has no live use
 which is the point of the queue.
 
 `afterDelete` then deletes the rows that can still name the id — `deviceCode`, and the
-`verification` rows whose JSON value holds an authorization code for it — because those two tables
-have no foreign key, and tries one `POST https://data.internal/internal/contributors/delete` with
+`verification` rows whose JSON value holds an authorization code or a passkey challenge
+(registration or authentication) for it — because those two tables have no foreign key, and tries one `POST https://data.internal/internal/contributors/delete` with
 `{ "authUserId": "…" }` through the optional `DATA` service binding. A 2xx sets `acknowledgedAt`. A
 missing binding, a non-2xx, a thrown error or a five-second timeout leaves the row pending with
 `lastError`, and the cron retries it.
@@ -158,12 +171,14 @@ session, account, passkey, OAuth token and consent tables all cascade from the u
 consent rows and the grant history go with the person; `deviceCode` and `verification` have no
 foreign key, which is why `afterDelete` deletes those two by hand.
 
-The hourly Cron Trigger (`43 * * * *`) calls `scheduled`, which reads at most fifty rows whose
-`acknowledgedAt` is null, whose `nextAttemptAt` is due and whose user row no longer exists, in
+The hourly Cron Trigger (`43 * * * *`) calls `scheduled`, which reads at most twenty-five rows
+whose `acknowledgedAt` is null, whose `nextAttemptAt` is due and whose user row no longer exists, in
 `nextAttemptAt` order, and retries each once. A row whose user still exists is skipped, so a failed
 deletion can leave its notice behind without the data site ever being told about a live account. A
 failed attempt moves `nextAttemptAt` forward, so failing rows cannot hold the batch. All per-row
 writes of a tick go in one `DB.batch`, so a tick is one select, one write batch and one purge batch.
+Cloudflare allows one request at most 32 Worker invocations, and each service-binding call is one, so
+the batch of twenty-five stays under the limit even with the three D1 calls counted beside it.
 Notices the data site confirmed more than thirty days ago are deleted in that tick, along with
 rate-limit counters whose `lastRequest` is older than an hour. The pure timing rules are in
 `src/core/deletion.ts`: the first retry waits five minutes, each later one doubles, and the delay

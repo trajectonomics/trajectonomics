@@ -63,9 +63,10 @@ export const ENGLISH_PAGES = {
 	loadError: "That did not load.",
 	loadRetry: "Try again",
 
-	scopeOpenId: "See your name and email",
-	scopeProfile: "See your name and picture",
-	scopeEmail: "See your email address",
+	scopeOpenId: "Know which account you are",
+	scopeProfile: "See your name and profile picture",
+	scopeEmail: "See your email",
+	scopeIdentity: "See your name, email and profile picture",
 	scopeOffline: "Stay connected after you close the app",
 	scopeDataIngest: "Send your AI usage numbers to the data site",
 } satisfies Partial<Dictionary>

@@ -37,7 +37,7 @@ describe("the deletion retry delay", () => {
 	})
 
 	it("reads at most the batch limit per tick", () => {
-		expect(DELETION_BATCH_LIMIT).toBe(50)
+		expect(DELETION_BATCH_LIMIT).toBe(25)
 	})
 })
 

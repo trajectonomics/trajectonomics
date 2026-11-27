@@ -45,7 +45,7 @@ test("the consent page keeps its signed query across the language switch", async
 	await expect(page).toHaveURL(new RegExp(`/th/consent/\\?${escapeForRegExp(search.slice(1))}`))
 	// The Thai page still names the app, so the signed flow survived the switch intact.
 	await expect(page.getByRole("heading", { name: /Trajectonomics data site/ })).toBeVisible()
-	await expect(page.getByText("ดูชื่อและอีเมลของคุณ")).toBeVisible()
+	await expect(page.getByText("ดูชื่อ อีเมล และรูปโปรไฟล์ของคุณ")).toBeVisible()
 })
 
 /** The search string, escaped so a signature's `+` and `=` are not read as a pattern. */

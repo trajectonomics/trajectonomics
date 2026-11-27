@@ -23,8 +23,8 @@ let grants = $state<readonly Grant[]>([])
 let passkeys = $state<readonly Passkey[]>([])
 let view = $state<"loading" | "ready" | "failed">("loading")
 let signOutError = $state("")
-/** Set when a deletion failed after the session ended, so no account control is offered again. */
-let ended = $state("")
+/** Set when a failed deletion leaves nothing the account controls could truthfully do. */
+let ended = $state<"signed-out" | "unconfirmed" | null>(null)
 let endedAlert: HTMLParagraphElement | undefined = $state()
 
 onMount(() => {
@@ -65,20 +65,32 @@ async function out(): Promise<void> {
 	window.location.assign(pagePath(language, "sign-in"))
 }
 
-/** A failed deletion ends the session, so only its message is left to show. */
-function deleteFailed(): void {
-	ended = words.accountDeleteError
+/** The session ended, or the outcome is unknown: only the message and one way on are shown. */
+function deleteFailed(outcome: "signed-out" | "unconfirmed"): void {
+	ended = outcome
 	void tick().then(() => endedAlert?.focus())
+}
+
+function reload(): void {
+	window.location.reload()
 }
 </script>
 
 {#if view === "failed"}
 	<LoadFailure message={words.accountLoadError} retryLabel={words.loadRetry} onretry={load} />
-{:else if ended !== ""}
+{:else if ended !== null}
 	<div class="panel">
 		<h1 class="page-title">{words.accountTitle}</h1>
-		<p class="form-message" role="alert" tabindex="-1" bind:this={endedAlert}>{ended}</p>
-		<p class="legal-links"><a href={pagePath(language, "sign-in")}>{words.signInTitle}</a></p>
+		<p class="form-message" role="alert" tabindex="-1" bind:this={endedAlert}>
+			{ended === "signed-out" ? words.accountDeleteSignedOut : words.accountDeleteUnconfirmed}
+		</p>
+		{#if ended === "signed-out"}
+			<p class="legal-links"><a href={pagePath(language, "sign-in")}>{words.signInTitle}</a></p>
+		{:else}
+			<button class="button button-secondary" type="button" onclick={reload}>
+				{words.accountDeleteReload}
+			</button>
+		{/if}
 	</div>
 {:else if view === "loading" || user === null}
 	<Loading title={words.accountTitle} text={words.loading} />

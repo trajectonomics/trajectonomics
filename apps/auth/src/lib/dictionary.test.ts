@@ -43,9 +43,17 @@ describe("the dictionary of every language", () => {
 		expect(dictionaryFor("th").scopeDataIngest).not.toBe(dictionaryFor("en").scopeDataIngest)
 	})
 
-	it("says what openid really shows, in both languages", () => {
-		expect(dictionaryFor("en").scopeOpenId).toBe("See your name and email")
-		expect(dictionaryFor("th").scopeOpenId).toBe("ดูชื่อและอีเมลของคุณ")
+	it("names exactly what each identity scope releases, in both languages", () => {
+		const english = dictionaryFor("en")
+		expect(english.scopeOpenId).toBe("Know which account you are")
+		expect(english.scopeProfile).toBe("See your name and profile picture")
+		expect(english.scopeEmail).toBe("See your email")
+		expect(english.scopeIdentity).toBe("See your name, email and profile picture")
+		const thai = dictionaryFor("th")
+		expect(thai.scopeOpenId).toBe("รู้ว่าคุณใช้บัญชีใด")
+		expect(thai.scopeProfile).toBe("ดูชื่อและรูปโปรไฟล์ของคุณ")
+		expect(thai.scopeEmail).toBe("ดูอีเมลของคุณ")
+		expect(thai.scopeIdentity).toBe("ดูชื่อ อีเมล และรูปโปรไฟล์ของคุณ")
 	})
 
 	it("offers the same retry in both languages", () => {

@@ -36,7 +36,11 @@ export const ENGLISH_ACCOUNT = {
 	accountDeleteButton: "Delete my account",
 	accountDeleteExpired:
 		"Your sign-in is too old for this. Sign out and sign in again, then delete.",
-	accountDeleteError:
+	accountDeleteSignedOut:
 		"The account was not deleted. You were signed out; sign in again to try again.",
+	accountDeleteRetry: "The account was not deleted. Try again.",
+	accountDeleteUnconfirmed:
+		"We couldn't confirm whether the account was deleted. Reload this page to check.",
+	accountDeleteReload: "Reload",
 	accountLoadError: "Some of this did not load. Reload the page.",
 } satisfies Partial<Dictionary>

@@ -2,8 +2,8 @@
  * The hourly cron's half of the pending deletion queue: read the due rows, retry each once, purge
  * old notices and expired rate-limit counters.
  *
- * A tick is select + one batch of per-row writes + one batch of purges, so fifty due rows never cost
- * fifty database calls. A row whose user still exists is skipped, not deleted: a failed deletion
+ * A tick is select + one batch of per-row writes + one batch of purges, so twenty-five due rows never
+ * cost twenty-five database calls. A row whose user still exists is skipped, not deleted: a failed deletion
  * leaves its queued notice behind, and the data side must never be told about a live account.
  */
 import type { D1Database, D1PreparedStatement, Fetcher } from "@cloudflare/workers-types"

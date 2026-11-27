@@ -7,6 +7,7 @@ import { authorizeHref } from "../client/navigation"
 import { dictionaryFor, type Language, pagePath } from "../lib/language"
 import { safeNextPath } from "../lib/next"
 import { isExpiredSignedOAuthSearch } from "../lib/oauth-search"
+import { signInRetryPath } from "../lib/sign-in-retry"
 
 let { language }: { language: Language } = $props()
 const words = $derived(dictionaryFor(language))
@@ -42,7 +43,8 @@ async function social(provider: "google" | "github"): Promise<void> {
 	message = ""
 	busy = true
 	try {
-		await startSocial(provider, next, `${pagePath(language, "sign-in")}?error=1`)
+		const { pathname, search } = window.location
+		await startSocial(provider, next, signInRetryPath(pathname, search))
 	} catch {
 		message = expired ? words.flowExpired : words.signInError
 		busy = false

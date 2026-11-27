@@ -8,6 +8,7 @@ import { Database } from "bun:sqlite"
 import { describe, expect, it } from "bun:test"
 import { readdirSync, readFileSync } from "node:fs"
 import type { D1Database, Fetcher } from "@cloudflare/workers-types"
+import { DELETION_BATCH_LIMIT } from "./core/deletion"
 import { DUE_PENDING_DELETIONS_SQL, retryPendingDeletions } from "./pending-deletion-retry"
 import type { PendingDeletionRow } from "./pending-deletion-store"
 
@@ -87,7 +88,7 @@ const row: PendingDeletionRow = {
 }
 
 describe("one cron tick", () => {
-	it("reads the due rows by nextAttemptAt, oldest first, fifty at a time", async () => {
+	it("reads the due rows by nextAttemptAt, oldest first, twenty-five at a time", async () => {
 		const { db, statements } = stubDatabase([row])
 		await retryPendingDeletions({ db, data: stubData(204), nowMs: now })
 		const select = statements[0]
@@ -98,7 +99,7 @@ describe("one cron tick", () => {
 		)
 		expect(select?.sql).toContain('order by "nextAttemptAt" asc')
 		expect(select?.sql).toContain("limit ?")
-		expect(select?.params).toEqual([new Date(now).toISOString(), 50])
+		expect(select?.params).toEqual([new Date(now).toISOString(), 25])
 	})
 
 	it("acknowledges a row the data Worker accepted, in one batch", async () => {
@@ -150,7 +151,7 @@ describe("the due query against the committed migrations", () => {
 		)
 		const selected = database
 			.query(DUE_PENDING_DELETIONS_SQL)
-			.all(new Date(now).toISOString(), 50) as { id: string }[]
+			.all(new Date(now).toISOString(), DELETION_BATCH_LIMIT) as { id: string }[]
 		expect(selected.map((entry) => entry.id)).toEqual(["gone-row"])
 		// Skipped, not deleted: the notice is still there for when the user really goes.
 		expect(database.query(`select "id" from "pendingDeletion" order by "id"`).all()).toEqual([
@@ -176,7 +177,7 @@ describe("the due query against the committed migrations", () => {
 			.run(new Date(now).toISOString(), new Date(now).toISOString())
 		const selected = database
 			.query(DUE_PENDING_DELETIONS_SQL)
-			.all(new Date(now + 1).toISOString(), 50) as { id: string }[]
+			.all(new Date(now + 1).toISOString(), DELETION_BATCH_LIMIT) as { id: string }[]
 		expect(selected.map((entry) => entry.id)).toEqual(["fresh"])
 	})
 
@@ -196,9 +197,9 @@ describe("the due query against the committed migrations", () => {
 		}
 		const selected = database
 			.query(DUE_PENDING_DELETIONS_SQL)
-			.all(new Date(now + 59_000).toISOString(), 50) as { id: string }[]
-		expect(selected.length).toBe(50)
+			.all(new Date(now + 59_000).toISOString(), DELETION_BATCH_LIMIT) as { id: string }[]
+		expect(selected.length).toBe(25)
 		expect(selected[0]?.id).toBe("0")
-		expect(selected.at(-1)?.id).toBe("49")
+		expect(selected.at(-1)?.id).toBe("24")
 	})
 })

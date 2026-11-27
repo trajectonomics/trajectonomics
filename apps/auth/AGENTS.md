@@ -79,12 +79,14 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    change is a new `wordingVersion`. The rows cascade when the account is deleted.
 7. Account deletion queues its `pendingDeletion` row in `beforeDelete`, so a failed insert aborts the
    deletion instead of losing the notice. `afterDelete` then deletes the rows that can still name the
-   id (`deviceCode`, and the `verification` rows holding an authorization code) and calls the data
-   Worker once; a failure is recorded on the row. The `DATA` service binding is optional on purpose.
-   The cron reads at most fifty rows whose `nextAttemptAt` is due, oldest first, and a failed attempt
-   moves `nextAttemptAt` forward (five minutes, doubling, capped at a day), so no failing row starves
-   a newer one. Acknowledged notices are deleted thirty days after the data site confirms. The timing
-   is pure in `src/core/deletion.ts`. The data endpoint is issue #601's, not this app's.
+   id (`deviceCode`, and the `verification` rows holding an authorization code or a passkey
+   challenge) and calls the data Worker once; a failure is recorded on the row. The `DATA` service
+   binding is optional on purpose. The cron reads at most twenty-five rows whose `nextAttemptAt` is
+   due, oldest first, which keeps one tick under Cloudflare's limit of 32 Worker invocations per
+   request. It skips a row whose user still exists, so a live account is never reported. A failed
+   attempt moves `nextAttemptAt` forward (five minutes, doubling, capped at a day), so no failing row
+   starves a newer one. Acknowledged notices are deleted thirty days after the data site confirms.
+   The timing is pure in `src/core/deletion.ts`. The data endpoint is issue #601's, not this app's.
 8. `bun run test:e2e` builds the pages, migrates a scratch D1 database under `~/.cache`, starts
    `wrangler dev --local` and runs Playwright; it never reaches the owner's Cloudflare account.
    `test:e2e` also runs axe at 360 px and 1280 px, in light and dark, in both languages, checks every

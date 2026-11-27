@@ -55,6 +55,7 @@ export interface PageWords {
 	readonly scopeOpenId: string
 	readonly scopeProfile: string
 	readonly scopeEmail: string
+	readonly scopeIdentity: string
 	readonly scopeOffline: string
 	readonly scopeDataIngest: string
 }

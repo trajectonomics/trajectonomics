@@ -35,7 +35,7 @@ export const PRIVACY_EN: LegalContent = Object.freeze({
 		{
 			heading: "The data site",
 			body: [
-				"The data site at trajectonomics.com/data stores AI usage numbers with only your pseudonymous auth user id. Its web sign-in receives your name and email only when you approve the profile and email permissions on the consent screen for that sign-in. The collector that uploads numbers receives neither.",
+				"The data site at trajectonomics.com/data stores AI usage numbers with only your pseudonymous auth user id. Its web sign-in receives your name, email and profile picture, and only when you approve it on the consent screen for that sign-in. The collector that uploads numbers receives none of them.",
 			],
 		},
 		{

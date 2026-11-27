@@ -25,11 +25,35 @@ describe("the scopes an app asks for", () => {
 		expect(scopeLines("  openid   openid  ").length).toBe(1)
 	})
 
-	it("merges openid, profile and email into the one line the person needs", () => {
-		const lines = scopeLines("openid profile email")
-		expect(lines).toEqual([{ scope: "openid", key: "scopeOpenId" }])
-		expect(scopeText(lines[0]!, dictionaryFor("en"))).toBe("See your name and email")
-	})
+	const combinations: readonly (readonly [string, readonly string[]])[] = [
+		["openid", ["Know which account you are"]],
+		["openid profile email", ["See your name, email and profile picture"]],
+		["email openid profile", ["See your name, email and profile picture"]],
+		["profile email", ["See your name, email and profile picture"]],
+		["profile", ["See your name and profile picture"]],
+		["openid profile", ["Know which account you are", "See your name and profile picture"]],
+		["email", ["See your email"]],
+		["openid email", ["Know which account you are", "See your email"]],
+		[
+			"openid offline_access data:ingest",
+			[
+				"Know which account you are",
+				"Stay connected after you close the app",
+				"Send your AI usage numbers to the data site",
+			],
+		],
+		[
+			"offline_access openid profile email",
+			["Stay connected after you close the app", "See your name, email and profile picture"],
+		],
+	]
+
+	for (const [scope, expected] of combinations) {
+		it(`says exactly what "${scope}" releases`, () => {
+			const words = dictionaryFor("en")
+			expect(scopeLines(scope).map((line) => scopeText(line, words))).toEqual([...expected])
+		})
+	}
 
 	it("has nothing to show when the app asked for nothing", () => {
 		expect(scopeLines(null)).toEqual([])

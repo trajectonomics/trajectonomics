@@ -32,6 +32,9 @@ export interface AccountWords {
 	readonly accountDeleteEmailLabel: string
 	readonly accountDeleteButton: string
 	readonly accountDeleteExpired: string
-	readonly accountDeleteError: string
+	readonly accountDeleteSignedOut: string
+	readonly accountDeleteRetry: string
+	readonly accountDeleteUnconfirmed: string
+	readonly accountDeleteReload: string
 	readonly accountLoadError: string
 }
