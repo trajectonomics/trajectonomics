@@ -1,16 +1,18 @@
 <script lang="ts">
-// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { compactCount } from "../lib/format"
 import { grandTotal } from "../lib/grand-total"
-import { type PlanTotal, planNote } from "../lib/plan-totals"
+import { IN_USE_DAYS, type PlanTotal } from "../lib/plan-totals"
+import { WINDOW_DAYS } from "../lib/window"
+import PlanMark from "./PlanMark.svelte"
 
 let { totals }: { totals: PlanTotal[] } = $props()
 
 const grand = $derived(grandTotal(totals))
 const inUse = $derived(totals.filter((total) => total.inUse).length)
-const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
-const mostUsed = $derived(topRate === 0 ? "–" : (totals[0]?.planName ?? "–"))
+const top = $derived(totals[0] ?? null)
+const topRate = $derived(top?.tokensPerActiveDay ?? 0)
 </script>
 
 <div class="plan-summary">
@@ -20,50 +22,58 @@ const mostUsed = $derived(topRate === 0 ? "–" : (totals[0]?.planName ?? "–")
 			<dd class="kpi-value">{inUse} of {totals.length}</dd>
 		</div>
 		<div class="kpi">
-			<dt class="kpi-label">Tokens in the last 30 days</dt>
+			<dt class="kpi-label">Tokens in the last {WINDOW_DAYS} days</dt>
 			<dd class="kpi-value">{compactCount(grand.tokensTotal)}</dd>
 		</div>
 		<div class="kpi">
-			<dt class="kpi-label">Most used plan</dt>
-			<dd class="kpi-value kpi-name">{mostUsed}</dd>
+			<dt class="kpi-label">Highest tokens a day</dt>
+			<dd class="kpi-value kpi-name">
+				{#if top !== null && topRate > 0}
+					<PlanMark plan={top.plan} name={top.planName} size={24} />
+					<span>{top.planName}</span>
+				{:else}
+					–
+				{/if}
+			</dd>
 		</div>
 	</dl>
 
+	<p class="use-key">
+		<span class="use-dot" aria-hidden="true"></span>in use in the last {IN_USE_DAYS} days
+	</p>
+
 	<ol class="meter-list">
 		{#each totals as total}
-			{@const note = planNote(total)}
-			<li class="meter-row">
+			{@const width = topRate === 0 ? 0 : Math.round((total.tokensPerActiveDay / topRate) * 100)}
+			<li
+				class="meter-row"
+				class:meter-dim={!total.inUse}
+				title={total.inUse ? undefined : `Last used ${total.lastDay ?? "–"}`}
+			>
 				<div class="meter-identity">
+					<PlanMark plan={total.plan} name={total.planName} />
 					<span class="meter-name">{total.planName}</span>
 					{#if total.inUse}
-						<span class="use-tag">In use</span>
+						<span class="use-dot" aria-hidden="true"></span>
+						<span class="visually-hidden">In use</span>
 					{:else}
-						<span class="meter-last">Last used {total.lastDay ?? "–"}</span>
+						<span class="visually-hidden">Last used {total.lastDay ?? "–"}</span>
 					{/if}
 				</div>
 				<div class="meter-track" aria-hidden="true">
-					<div
-						class="meter-bar"
-						style={`width: ${topRate === 0 ? 0 : Math.round((total.tokensPerActiveDay / topRate) * 100)}%`}
-					></div>
+					<div class="meter-bar" style={`width: ${width}%`}></div>
 				</div>
-				<span class="meter-figure">{compactCount(total.tokensPerActiveDay)} tokens a day</span>
-				<p class="meter-detail">
-					{compactCount(total.tokensTotal)} in {total.activeDays} active day{total.activeDays === 1
-						? ""
-						: "s"}
-					{#if total.busiestDay !== null}
-						· busiest day {compactCount(total.busiestDay.tokens)} on {total.busiestDay.day}
-					{/if}
-					· {compactCount(total.requests)} requests
-					{#if note !== null} · {note}{/if}
-				</p>
+				<span class="meter-figure">
+					<span aria-hidden="true">
+						{compactCount(total.tokensPerActiveDay)}<span class="meter-unit">/day</span>
+					</span>
+					<span class="visually-hidden">
+						{compactCount(total.tokensPerActiveDay)} tokens a day
+					</span>
+				</span>
 			</li>
 		{/each}
 	</ol>
 
-	<p class="summary-note">
-		"A day" means a day we used the plan. These are tokens we used, not the plan's limit. Most
-		tokens are cache reads: context the model re-reads, which plans count cheaply.
-	</p>
+	<p class="summary-note">Tokens per day of use · what we used, not the plan's limit</p>
 </div>

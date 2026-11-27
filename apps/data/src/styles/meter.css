@@ -1,4 +1,4 @@
-/* The ranked meter list: one row per plan, all bars sharing one left edge and one colour. */
+/* The ranked meter list: a mark, a name and a big rate over one primary bar per plan. */
 
 .meter-list {
 	margin: 0;
@@ -9,41 +9,38 @@
 
 .meter-row {
 	display: grid;
-	grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) auto;
+	grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) auto;
 	align-items: center;
-	gap: 6px 16px;
-	padding: 16px 0;
+	gap: 8px 16px;
+	padding: 12px 0;
 	border-bottom: 1px solid var(--ds-color-border);
+}
+
+/* A plan we have not used lately stays readable but steps back from the ones in use. */
+.meter-dim {
+	opacity: 0.6;
 }
 
 .meter-identity {
 	display: flex;
 	min-width: 0;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 4px 8px;
+	align-items: center;
+	gap: 10px;
 }
 
 .meter-name {
+	overflow: hidden;
 	font-weight: 500;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
 }
 
-.use-tag {
-	padding: 1px 7px;
+.use-dot {
+	width: 8px;
+	height: 8px;
+	flex: none;
 	border-radius: 999px;
-	background: var(--ds-color-secondary);
-	font-family: var(--font-meta);
-	font-size: 10px;
-	line-height: 1.5;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	color: var(--ds-color-foreground);
-}
-
-.meter-last {
-	font-family: var(--font-meta);
-	font-size: 11px;
-	color: var(--ds-color-muted-foreground);
+	background: var(--ds-color-primary);
 }
 
 .meter-track {
@@ -56,22 +53,22 @@
 .meter-bar {
 	height: 100%;
 	border-radius: inherit;
-	background: var(--ds-color-accent);
+	background: var(--ds-color-primary);
 }
 
 .meter-figure {
 	font-family: var(--font-meta);
-	font-size: 12px;
+	font-size: 1.0625rem;
+	font-weight: 600;
+	line-height: 1.2;
 	font-variant-numeric: tabular-nums;
 	text-wrap: nowrap;
 }
 
-.meter-detail {
-	grid-column: 1 / -1;
-	margin: 0;
-	font-family: var(--font-meta);
+.meter-unit {
+	margin-left: 2px;
 	font-size: 11px;
-	line-height: 1.6;
+	font-weight: 400;
 	color: var(--ds-color-muted-foreground);
 }
 

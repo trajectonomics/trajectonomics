@@ -1,6 +1,6 @@
 import type { Health } from "./types"
 
-/** How long without an upload makes the page explain why the figures stop. */
+/** The note shown when uploads are paused. */
 const STALE_NOTE = "Uploads are paused, so the figures stop at the last update."
 
 /** The freshness line, its absolute time, and its neutral note when the pipeline is stale. */

@@ -50,9 +50,9 @@ describe("the plan totals", () => {
 	test("finds the busiest day by its model sums, the earliest on a tie", () => {
 		const totals = planTotals(
 			[
+				row({ day: "2026-11-25", model: "a", tokensTotal: 100 }),
 				row({ day: "2026-11-24", model: "a", tokensTotal: 60 }),
 				row({ day: "2026-11-24", model: "b", tokensTotal: 40 }),
-				row({ day: "2026-11-25", model: "a", tokensTotal: 100 }),
 				row({ day: "2026-11-23", model: "a", tokensTotal: 90 }),
 			],
 			TO,
@@ -115,19 +115,7 @@ describe("the plan totals", () => {
 			tokensOut: null,
 			cacheRead: null,
 			cacheWrite: null,
-			cacheShare: null,
 		})
-	})
-
-	test("divides cache reads by total tokens over the rows that report them", () => {
-		const totals = planTotals(
-			[
-				row({ tokensTotal: 100, cacheRead: 30 }),
-				row({ day: "2026-11-25", tokensTotal: 100, cacheRead: 20 }),
-			],
-			TO,
-		)
-		expect(find(totals, "claude")?.cacheShare).toBe(0.25)
 	})
 
 	test("ranks plans by tokens per active day, then by the plan table", () => {

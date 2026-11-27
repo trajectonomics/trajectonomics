@@ -67,7 +67,7 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 		</div>
 	{:else if days !== null}
 		<section class="section-block" aria-labelledby="plans-title">
-			<h2 id="plans-title" class="meta-label section-title">Tokens we got from each plan</h2>
+			<h2 id="plans-title" class="meta-label section-title">Tokens we used on each plan</h2>
 			<PlanSummary {totals} />
 		</section>
 

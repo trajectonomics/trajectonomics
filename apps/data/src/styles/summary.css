@@ -24,7 +24,7 @@
 .kpi-label {
 	margin: 0;
 	font-family: var(--font-meta);
-	font-size: 11px;
+	font-size: 10px;
 	line-height: 1.4;
 	letter-spacing: 0.02em;
 	color: var(--ds-color-muted-foreground);
@@ -40,7 +40,23 @@
 }
 
 .kpi-name {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	font-size: clamp(1.25rem, 2.6vw, 1.625rem);
+}
+
+/* The dot's key: the same 8px element the in-use rows carry after the plan's name. */
+.use-key {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 10px;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
 }
 
 .summary-note {
@@ -51,8 +67,23 @@
 	color: var(--ds-color-muted-foreground);
 }
 
+/* On a phone the three tiles stay in one row, smaller, so the ranked list stays near the top. */
 @media (max-width: 40rem) {
 	.kpi-row {
-		grid-template-columns: 1fr;
+		gap: 8px;
+	}
+
+	.kpi {
+		gap: 6px;
+		padding: 12px;
+	}
+
+	.kpi-value,
+	.kpi-name {
+		font-size: 1.125rem;
+	}
+
+	.kpi-name {
+		gap: 6px;
 	}
 }

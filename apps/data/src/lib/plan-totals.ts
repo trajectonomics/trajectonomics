@@ -4,7 +4,7 @@ import type { UsageRow } from "./types"
 import { daysBetween } from "./window"
 
 /** A plan is in use when its last active day is at most this many days before the window end. */
-const IN_USE_DAYS = 7
+export const IN_USE_DAYS = 7
 
 /** One plan's activity over the window, and how its tokens break down. */
 export type PlanTotal = {
@@ -26,8 +26,6 @@ export type PlanTotal = {
 	lastDay: string | null
 	/** Whether the last active day is at most seven days before the window end. */
 	inUse: boolean
-	/** Cache reads as a share of total tokens; null when no row reports a breakdown. */
-	cacheShare: number | null
 	/** At least one of the plan's rows comes from a daily export. */
 	daily: boolean
 	/** At least one of the plan's rows comes from a best-effort source. */
@@ -64,9 +62,6 @@ function summaryOf(plan: string, group: readonly UsageRow[], to: string): PlanTo
 	const active = [...days.entries()].filter(([, tokens]) => tokens > 0)
 	const tokensTotal = sumOf(group, (row) => row.tokensTotal)
 	const cacheRead = sumNullable(group.map((row) => row.cacheRead))
-	const reported = group.some(
-		(row) => row.tokensIn !== null || row.tokensOut !== null || row.cacheRead !== null,
-	)
 	const lastDay = active.reduce<string | null>(
 		(latest, [day]) => (latest === null || day > latest ? day : latest),
 		null,
@@ -85,7 +80,6 @@ function summaryOf(plan: string, group: readonly UsageRow[], to: string): PlanTo
 		busiestDay: busiestOf(active),
 		lastDay,
 		inUse: lastDay !== null && daysBetween(lastDay, to) <= IN_USE_DAYS,
-		cacheShare: reported ? (tokensTotal === 0 ? 0 : (cacheRead ?? 0) / tokensTotal) : null,
 		daily: group.some((row) => row.granularity === "day"),
 		bestEffort: group.some((row) => row.bestEffort),
 	}

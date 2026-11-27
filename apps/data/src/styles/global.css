@@ -14,11 +14,15 @@
 @import "./header.css";
 @import "./footer.css";
 @import "./overview.css";
+@import "./plan-mark.css";
 @import "./summary.css";
 @import "./meter.css";
 @import "./state.css";
 @import "./chart.css";
 @import "./table.css";
+@import "./breakdown-legend.css";
+@import "./breakdown.css";
+@import "./breakdown-numbers.css";
 @import "./method.css";
 
 /* A test fixture spells markup the data site never ships, so it must not become a stylesheet source. */
