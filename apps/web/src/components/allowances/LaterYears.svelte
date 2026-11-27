@@ -14,11 +14,13 @@ interface Props {
 	plan: { name: string; contentHash: string; doc: ScenarioDocument } | null
 	/** The household's people, so a joint Return names each spouse's allowances. */
 	people?: PersonNames
+	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
+	claimsHolder: string | null
 	/** The Return this table sits in, when the page shows one section per Return: it names the region and steps the heading down. */
 	region?: string
 }
 
-let { years, currency, plan, people = NO_PEOPLE, region }: Props = $props()
+let { years, currency, plan, people = NO_PEOPLE, claimsHolder, region }: Props = $props()
 let open: string | null = $state(null)
 const label = $derived(
 	region === undefined ? "Every later tax year" : `${region}: every later tax year`,
@@ -54,8 +56,8 @@ const columns: readonly Column<YearView>[] = [
 	{#if shown}
 		<div class="space-y-3 rounded-lg border border-border p-4">
 			<h3 class="text-sm font-medium">{shown.period}</h3>
-			<LineList lines={shown.lines} {currency} {people} />
-			{#if plan !== null}<YearActions year={shown} {plan} />{/if}
+			<LineList lines={shown.lines} {currency} {people} {claimsHolder} />
+			{#if plan !== null}<YearActions year={shown} {plan} {people} {claimsHolder} />{/if}
 		</div>
 	{/if}
 </section>

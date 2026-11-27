@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { LineView } from "../../lib/view/allowances"
-import { NO_PEOPLE, type PersonNames, personText } from "../../lib/view/item-names"
+import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
+import { returnLabel } from "../../lib/view/tax-settings/return-name"
+import ItemWords from "../ui/ItemWords.svelte"
 import Money from "../ui/Money.svelte"
 
 interface Props {
@@ -8,20 +10,24 @@ interface Props {
 	currency: string
 	/** The household's people, so a Return over two spouses names each one's allowances. */
 	people?: PersonNames
+	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
+	claimsHolder: string | null
 }
 
-let { lines, currency, people = NO_PEOPLE }: Props = $props()
+let { lines, currency, people = NO_PEOPLE, claimsHolder }: Props = $props()
+/** Every Filer these lines name, so two departed Returns that would read alike take their ids. */
+const filers = $derived([
+	...new Set(lines.flatMap((line) => (line.filer === null ? [] : [line.filer]))),
+])
 /** Whether the lines name more than one Filer: a joint Return over both spouses groups them under each name. */
-const grouped = $derived(
-	new Set(lines.flatMap((line) => (line.filer === null ? [] : [line.filer]))).size > 1,
-)
+const grouped = $derived(filers.length > 1)
 </script>
 
 <!-- One allowance per card: what is planned, how much more fits, what it saves, and why it stopped. -->
 <ul class="space-y-3">
 	{#each lines as line, index (line.key)}
 		{#if grouped && line.filer !== null && line.filer !== lines[index - 1]?.filer}
-			<li class="pt-1 text-sm font-medium">{personText(people, line.filer)}</li>
+			<li class="pt-1 text-sm font-medium"><ItemWords label={returnLabel(line.filer, people, claimsHolder, filers)} /></li>
 		{/if}
 		<li class="rounded-md border border-border p-3 text-sm">
 			<p class="font-medium">{line.name}</p>

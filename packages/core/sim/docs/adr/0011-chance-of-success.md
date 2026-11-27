@@ -105,3 +105,34 @@ a number the entry already reported.
   balance. It also covers a different day from the net-worth roll-ups: `closingNetWorth` is read on
   `to`, before that day's growth, so `returns[k]` is one day of growth ahead of it as well as free of
   Flows.
+
+## Amendment: when each Milestone fires across Market paths
+
+A Success probability says how often the plan holds; it does not say when a Milestone fires in the
+futures that reach it. The engine already dates every Milestone on every path, so the answer is in
+hand. An option reports it, and changes no figure of the entry.
+
+- **`milestoneDates: true`.** `chanceOfSuccess` adds `milestones`: one `{ id, reached, dates, byYear }`
+  per Milestone of the Scenario, in Scenario order (the order ADR 0012 reports), read from the same
+  engine run that feeds the Bands. `reached` is the number of Market paths on which the Milestone
+  fired on or before the run's end (the horizon, or the day the path ran out); a path that ran out early cannot fire a later Milestone, so it counts
+  only where the path lived to fire it. `dates` holds the 10th, 25th, 50th, 75th and 90th Percentile
+  fire dates over the paths that fired it, with the nearest-rank rule the Bands use, on the month
+  grid: each fire date is reduced to its calendar month (`year × 12 + month − 1`), ranked there, and
+  reported as the first day of that month. A Percentile is therefore always a month some path fired
+  in, never an interpolated date, and the day a fire landed on is not reported. A Milestone no path
+  fired reports `reached: 0` with `dates: []` and `byYear: []`. `byYear` lists `{ year, paths }` for
+  every calendar year that holds at least one fire, ascending; a year with none is left out.
+- **Percentiles over fired paths only.** Ranking unfired paths last would let a 60th Percentile read
+  as a date when 45 per cent never fired, so unfired paths are not in the sample. `reached` beside
+  the dates says how many paths the Percentiles cover, and no path can report a date it did not make.
+- **One engine run.** `runEngine` already returns each path's `MilestoneResult` list when the
+  Scenario declares Milestones. The path loop keeps that list on the path's own `PathOutcome`, and
+  the report is a pass over those lists, so the paths are never run a second time.
+- **Outcomes.** With `outcomes: true` as well, every Path outcome gains `milestones`: a map from
+  Milestone id to fire date for the ones that fired on it, in the run's order, empty when none did.
+  With `outcomes` alone no Path outcome carries it.
+- **Byte identity.** Without `milestoneDates`, no result key and no Path outcome field is added. The
+  existing `milestone-freelancer-chance` hash is unchanged, and a new
+  `milestone-freelancer-chance-dates` case pins the extended result and the per-path maps under Bun
+  and Node.

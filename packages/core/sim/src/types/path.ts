@@ -14,6 +14,8 @@ export interface ChancePathOutcome {
 	readonly lowestAt: number
 	/** Present only when the path ran out. */
 	readonly runsOut?: RunsOut
+	/** Fire dates by Milestone id; present only with `milestoneDates` and `outcomes` (ADR 0011). */
+	readonly milestones?: Readonly<Record<string, DateString>>
 }
 
 /** Which Market path `projectPath` replays: path `index` of the run `model`, `seed` and `paths` define. */
