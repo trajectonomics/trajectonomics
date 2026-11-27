@@ -75,8 +75,10 @@ export function withTaxLevy(
 	const next = decorated(stated, scope)
 	const others = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	const holder = holderIdOf(household)
+	if (isAppError(holder)) return holder
 	const kept = keptRequest(request, scope, holder)
 	const departed = departedClaimants(kept, household)
+	if (isAppError(departed)) return departed
 	return {
 		document: { ...next, levies: [...others, ...built] },
 		request: kept,

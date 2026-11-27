@@ -7,7 +7,7 @@ interface Props {
 
 let { hasCharts, onExport, onImport }: Props = $props()
 const BUTTON =
-	"rounded-md border border-border px-3 py-1.5 text-sm outline-none hover:bg-muted focus-within:outline-2 focus-within:outline-ring"
+	"rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted focus-within:outline-2 focus-within:outline-ring"
 
 function picked(event: Event & { currentTarget: HTMLInputElement }): void {
 	const file = event.currentTarget.files?.[0]

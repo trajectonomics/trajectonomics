@@ -1,59 +1,81 @@
 <script lang="ts">
 import { currentItemNames } from "../../client/item-names.svelte.js"
-import type { ProjectionRun, Read } from "../../lib/contract"
+import type {
+	Fi,
+	HouseholdDocument,
+	ProjectionChance,
+	ProjectionRun,
+	Read,
+} from "../../lib/contract"
 import { chooseScenario } from "../../lib/view/plan"
+import { firstAges, planPeople, planStats } from "../../lib/view/projection/plan"
+import ProjectionCharts from "../charts/ProjectionCharts.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
-import SegmentedControl from "../ui/SegmentedControl.svelte"
-import ProjectionResult from "./ProjectionResult.svelte"
+import PlanFooter from "./PlanFooter.svelte"
+import PlanPeople from "./PlanPeople.svelte"
+import PlanStats from "./PlanStats.svelte"
 
 interface Props {
-	/** The Scenarios the Snapshot planned, main first; the plan switcher's choices. */
+	/** The Scenarios the Snapshot planned, main first. */
 	names: readonly string[]
 	/** The projection Reads of the Snapshot, by Scenario name. */
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
 	/** The Scenario the address bar asks for. An unknown one shows the first. */
 	scenario: string
-	onScenario: (value: string) => unknown
+	/** The chosen plan's household, for its people row. */
+	household: HouseholdDocument | null
+	/** The chosen plan's FI Read, for the date it states. */
+	fi: Read<Fi> | undefined
+	/** The chosen plan's chance Read, for its percent. */
+	chance: Read<ProjectionChance> | undefined
+	/** Whether the Edit controls show: the server answers, and the page is not the Demo snapshot. */
+	editable: boolean
 	terms: string
 	onTerms: (value: string) => void
 	/** The custom chart the address bar names ("" for none) and its setter. */
-	chart?: string
-	onChart?: (id: string) => void
+	chart: string
+	onChart: (id: string) => void
 }
 
-/** The Scenario picker and the projection of the chosen Scenario. The choice lives in the address bar. */
-let { names, projections, scenario, onScenario, terms, onTerms, chart, onChart }: Props = $props()
+/** The Plan: its people, the three figures, and its chart. The top bar's plan button picks the plan. */
+let {
+	names,
+	projections,
+	scenario,
+	household,
+	fi,
+	chance,
+	editable,
+	terms,
+	onTerms,
+	chart,
+	onChart,
+}: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : projections[name])
-const charts = $derived(
-	onChart === undefined
-		? undefined
-		: {
-				chart: chart ?? "",
-				onChart,
-				runs: Object.values(projections).flatMap((read) => (read.ok ? [read.data] : [])),
-				names: currentItemNames(),
-			},
-)
-const options = $derived(names.map((value) => ({ value, label: value })))
+/** The run a successful projection Read holds; a failed one states no ages, so the row shows the people alone. */
+const run = $derived(read?.ok === true ? read.data : null)
+const ages = $derived(run === null ? [] : firstAges(run))
+const charts = $derived({
+	chart,
+	onChart,
+	runs: Object.values(projections).flatMap((read) => (read.ok ? [read.data] : [])),
+	names: currentItemNames(),
+})
 </script>
 
 {#if name === null || read === undefined}
 	<EmptyState title="No plan to project" />
 {:else}
-	<div class="space-y-6">
-		<SegmentedControl
-			name="scenario"
-			label="Plan"
-			{options}
-			value={name}
-			onChange={onScenario}
-		/>
+	<div class="space-y-8">
+		<PlanPeople people={planPeople(household, ages)} hasHousehold={household !== null} {editable} />
 		<ReadView {read} label={`Projection of ${name}`}>
 			{#snippet children(run)}
-				<ProjectionResult {run} argv={read.argv} {terms} {onTerms} {charts} />
+				<PlanStats stats={planStats(fi, chance, run)} />
+				<ProjectionCharts {run} {terms} {onTerms} {charts} />
 			{/snippet}
 		</ReadView>
+		<PlanFooter />
 	</div>
 {/if}

@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { LineLayout } from "../../lib/chart"
-import { HEIGHT } from "./geometry"
 import LineAxis from "./LineAxis.svelte"
 import LineMarks from "./LineMarks.svelte"
 import LineRules from "./LineRules.svelte"
@@ -10,13 +9,15 @@ interface Props {
 	label: string
 	layout: LineLayout
 	width: number
+	/** The chart's height in pixels. */
+	height: number
 	/** Whether the y labels are money and hidden. */
 	masked: boolean
 	/** The hovered index, or null. */
 	index: number | null
 }
 
-let { label, layout, width, masked, index }: Props = $props()
+let { label, layout, width, height, masked, index }: Props = $props()
 
 /** The room a date label needs on each side of its tick, so the last one is not cut off at the edge. */
 const HALF_LABEL = 36
@@ -36,22 +37,22 @@ function anchorAt(x: number): "start" | "middle" | "end" {
 	role="img"
 	aria-label={label}
 	{width}
-	height={HEIGHT}
-	viewBox="0 0 {width} {HEIGHT}"
+	{height}
+	viewBox="0 0 {width} {height}"
 	class="block h-auto w-full"
 >
 	<LineAxis {layout} {width} {masked} />
 	{#each layout.xTicks as tick (tick.index)}
 		<text
 			x={layout.xPixels[tick.index]}
-			y={stacked ? HEIGHT - 22 : HEIGHT - 8}
+			y={stacked ? height - 22 : height - 8}
 			text-anchor={anchorAt(layout.xPixels[tick.index] ?? 0)}
 			class="fill-muted-foreground text-xs">{tick.label}</text
 		>
 		{#if tick.sub !== undefined}
 			<text
 				x={layout.xPixels[tick.index]}
-				y={HEIGHT - 8}
+				y={height - 8}
 				text-anchor={anchorAt(layout.xPixels[tick.index] ?? 0)}
 				class="fill-muted-foreground text-xs">{tick.sub}</text
 			>
@@ -76,8 +77,8 @@ function anchorAt(x: number): "start" | "middle" | "end" {
 			class={strokeClass(seriesIndex, layout.palette === "wide")}
 		/>
 	{/each}
-	<LineRules {layout} {width} />
+	<LineRules {layout} {width} {height} />
 	{#if index !== null}
-		<LineMarks {layout} {index} />
+		<LineMarks {layout} {index} {height} />
 	{/if}
 </svg>
