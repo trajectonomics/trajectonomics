@@ -5,7 +5,8 @@
 ## Decision
 
 - The survival answer carries the Levy results of the path it describes (sim ADR 0015). `fi` prints those rows when the answer is reachable: earned income as the Scenario states it before the FI date, stopped from the FI date on, built by the same events the scan walked. The CLI holds no stop rule and runs no second Projection for the rows.
-- When FI is unreachable there is no stopped path to describe, so `fi` keeps today's rows, from the Projection of the Scenario as written, and adds one note: `FI is not reachable, so taxYears describes the plan as written, with earned income running to the horizon.`
+- When FI is unreachable there is no stopped path to describe, so `fi` keeps today's rows, from the Projection of the Scenario as written, and adds one note: `FI is not reachable, so taxYears describes the plan as written, with earned income as the plan states it.`
+  - 2026-11-27: a plan can end its own salary, so the old words overclaimed; the note now says what is true for every plan.
 - `traj schema fi` says which path the rows describe, in the description of `taxYears`. No new field is added: the note carries the unreachable case and the description carries the rule.
 - `fi` still projects the Scenario once for its funding and withdrawal notes, which describe the plan as written. No FI date changes.
 - ADR-0036's statement that `fi` runs one Projection over the inputs the survival scan used is superseded for the rows by this decision.
