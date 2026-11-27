@@ -10,9 +10,9 @@
 		"node": ">=22.23.4"
 	},
 	"scripts": {
-		"predev": "bun scripts/copy-brand-assets.ts",
+		"predev": "bun scripts/copy-brand-assets.ts && bun scripts/write-redirects.ts",
 		"dev": "astro dev",
-		"prebuild": "bun scripts/copy-brand-assets.ts",
+		"prebuild": "bun scripts/copy-brand-assets.ts && bun scripts/write-redirects.ts",
 		"build": "astro build",
 		"preview": "bun run build && wrangler dev",
 		"test": "bun test ./src ./scripts",

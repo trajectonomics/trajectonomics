@@ -1,7 +1,7 @@
 ---
 title: 7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory
 description: "ขยายความจากคลิป: คอขวดย้ายจากการเขียนโค้ดไปที่การรีวิว, ทำไม Ticket ต้องเล็ก, ทำไม validation คือหัวใจ, งานแบบไหนที่ยังต้องใช้รสนิยมของคน, ทำไมห้ามให้โมเดลรีวิวงานตัวเอง และทำไมตอนนี้ยังเป็นช่วงที่เริ่มได้เปรียบ"
-type: guide
+type: essay
 publishedOn: 2026-11-23
 cover:
   src: /blog/posts/software-factory-7-things/cover.webp
@@ -12,7 +12,7 @@ cover:
 
 ในคลิปผมพูดสั้น ๆ ไว้ 7 ข้อ ว่าถ้าจะเริ่มทำ Software Factory ควรรู้อะไรบ้าง โพสต์นี้ขยายแต่ละข้อ พร้อมลิงก์ไปที่ที่มาทุกข้อ ตัวอย่างทั้งหมดมาจาก Factory ที่ผมใช้กับโปรเจกต์ Trajectonomics ซึ่งเปิดเป็น open source อยู่ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory)
 
-ถ้ายังไม่รู้ว่า Factory ตัวนี้ทำงานยังไง อ่าน [Software Factory ที่ผมใช้ merge 700+ PR ใน 23 วัน](/blog/th/guides/software-factory/) ก่อนได้ โพสต์นั้นเล่าระบบทั้งตัว ส่วนโพสต์นี้คือบทเรียน
+ถ้ายังไม่รู้ว่า Factory ตัวนี้ทำงานยังไง อ่าน [Software Factory ที่ผมใช้ merge 700+ PR ใน 23 วัน](/blog/th/essays/software-factory/) ก่อนได้ โพสต์นั้นเล่าระบบทั้งตัว ส่วนโพสต์นี้คือบทเรียน
 
 ## 1. คอขวดย้ายจากการเขียนโค้ด ไปที่การรีวิว แล้วกำลังย้ายไปที่ attention
 
@@ -78,6 +78,6 @@ cover:
 
 ## เริ่มตรงไหนดี
 
-ไม่ต้องสร้างทั้งระบบในวันแรก ลำดับที่ผมแนะนำอยู่ในหัวข้อ "ถ้าจะเริ่มจากศูนย์" ของ [โพสต์ก่อนหน้า](/blog/th/guides/software-factory/) สั้น ๆ คือ: agent ตัวเดียวใน repo เดียว, issue ที่เขียนเหมือน spec, คำสั่ง check หนึ่งคำสั่ง, แล้วค่อยเพิ่มโมเดลอื่นมารีวิว
+ไม่ต้องสร้างทั้งระบบในวันแรก ลำดับที่ผมแนะนำอยู่ในหัวข้อ "ถ้าจะเริ่มจากศูนย์" ของ [โพสต์ก่อนหน้า](/blog/th/essays/software-factory/) สั้น ๆ คือ: agent ตัวเดียวใน repo เดียว, issue ที่เขียนเหมือน spec, คำสั่ง check หนึ่งคำสั่ง, แล้วค่อยเพิ่มโมเดลอื่นมารีวิว
 
 อ่านโค้ดและเอกสารทั้งหมดได้ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory) ส่วนงานที่มันสร้างอยู่ที่ [trajectonomics/trajectonomics](https://github.com/trajectonomics/trajectonomics) ถ้ามีประโยชน์ ฝากกดดาวให้ทั้งสอง repo ด้วยนะครับ

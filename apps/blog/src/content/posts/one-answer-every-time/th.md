@@ -1,7 +1,8 @@
 ---
 title: คำตอบเดียว เหมือนเดิมทุกครั้ง
 description: ถามคำถามเรื่องเงินเดิมกับ agent สองรอบ คุณอาจได้ตัวเลขไม่ซ้ำกัน แต่ถ้าถาม traj จะได้คำตอบเดิมทุกครั้ง นี่คือเหตุผล และวิธีลองตรวจด้วยตัวเอง
-type: guide
+type: essay
+products: [traj]
 publishedOn: 2026-11-22
 cover:
   src: /blog/posts/one-answer-every-time/cover.webp

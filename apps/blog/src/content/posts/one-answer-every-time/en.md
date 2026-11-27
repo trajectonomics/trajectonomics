@@ -1,7 +1,8 @@
 ---
 title: One answer, every time
 description: Ask an agent the same money question twice and you can get two different numbers. Ask traj, and you get the same one every time. Here is why, and how to check it yourself.
-type: guide
+type: essay
+products: [traj]
 publishedOn: 2026-11-22
 cover:
   src: /blog/posts/one-answer-every-time/cover.webp

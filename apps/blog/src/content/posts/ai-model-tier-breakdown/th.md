@@ -1,7 +1,7 @@
 ---
 title: "เลือก AI Model ยังไงไม่ให้จ่ายแพงเกิน? 3 Tier ที่ผมใช้ทำงานจริง (อัปเดต 24 พ.ย. 2026)"
 description: "สรุป 3 Tier โมเดล AI (2 ตัวต่อ Tier) ณ วันที่ 24 พ.ย. 2026 อ้างอิงกราฟ Artificial Analysis พร้อมประสบการณ์ใช้งานจริงว่าทำไม Gemini 4 Neon อยู่ Tier 2 และงานรันยาวผมยังเลือก Claude Opus 5.5"
-type: guide
+type: compare
 publishedOn: 2026-11-24
 cover:
   src: /blog/posts/ai-model-tier-breakdown/cover.webp
@@ -36,7 +36,7 @@ cover:
 
 ถ้าดูจากมุมซ้ายล่างของกราฟ (ฝั่งต้นทุนต่ำ) **Muse Ember (max)** ของ Meta ทำตัวเลขได้สวยมาก — อยู่บนเส้น Pareto ที่ต้นทุนราว `~$0.14` ต่อ task กับ Intelligence Index `~36` ซึ่งถือว่าคุ้มถ้าคุณจ่ายค่า API ตามการใช้งานจริง
 
-แต่ในการใช้งานจริงของผมเอง **DeepSeek V4.1 Flash ยังเป็นตัวหลักฝั่งราคาประหยัด** เพราะเมื่อใช้งานผ่านแพ็กเกจเหมาจ่ายแบบ subscription อย่าง [OpenCode Go](https://opencode.ai) หรือ Command Code Go ต้นทุนใช้งานจริงต่อวันคุ้มกว่าการจ่ายราย API มาก ทำให้ปล่อย agent รันงานปริมาณเยอะได้แบบไม่ต้องกังวลบิล และคุณภาพในงานประจำวันก็จบงานได้จริง (ในระบบ [Software Factory](/blog/th/guides/software-factory/) ของเราเองก็ใช้ DeepSeek เป็นตัวเขียนโค้ดหลักคู่กับระบบ cross-review จากอีก 2 โมเดล)
+แต่ในการใช้งานจริงของผมเอง **DeepSeek V4.1 Flash ยังเป็นตัวหลักฝั่งราคาประหยัด** เพราะเมื่อใช้งานผ่านแพ็กเกจเหมาจ่ายแบบ subscription อย่าง [OpenCode Go](https://opencode.ai) หรือ Command Code Go ต้นทุนใช้งานจริงต่อวันคุ้มกว่าการจ่ายราย API มาก ทำให้ปล่อย agent รันงานปริมาณเยอะได้แบบไม่ต้องกังวลบิล และคุณภาพในงานประจำวันก็จบงานได้จริง (ในระบบ [Software Factory](/blog/th/essays/software-factory/) ของเราเองก็ใช้ DeepSeek เป็นตัวเขียนโค้ดหลักคู่กับระบบ cross-review จากอีก 2 โมเดล)
 
 ---
 
@@ -68,6 +68,6 @@ cover:
 
 ---
 
-ถ้าอยากดูว่าผมเชื่อมโมเดลหลายค่ายเหล่านี้มาสั่งงานจากมือถือผ่านคอม 3 เครื่องยังไง อ่านต่อได้ที่ [วิธีเขียนโค้ดจากมือถือด้วย T3 Code + Tailscale + คอม 3 เครื่อง](/blog/th/guides/coding-from-mobile-t3-code/) หรือดูวิธีปล่อยโมเดล Tier 1 ทำงานร่วมกับ Cross-Review Gate ใน [เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR](/blog/th/guides/software-factory/)
+ถ้าอยากดูว่าผมเชื่อมโมเดลหลายค่ายเหล่านี้มาสั่งงานจากมือถือผ่านคอม 3 เครื่องยังไง อ่านต่อได้ที่ [วิธีเขียนโค้ดจากมือถือด้วย T3 Code + Tailscale + คอม 3 เครื่อง](/blog/th/guides/coding-from-mobile-t3-code/) หรือดูวิธีปล่อยโมเดล Tier 1 ทำงานร่วมกับ Cross-Review Gate ใน [เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR](/blog/th/essays/software-factory/)
 
 ดูโค้ด open source ของเราได้ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory) และ [trajectonomics/trajectonomics](https://github.com/trajectonomics/trajectonomics) ถ้ามีประโยชน์ ฝากกดดาวให้ทั้งสอง repo ด้วยนะครับ

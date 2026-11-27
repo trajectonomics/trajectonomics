@@ -3,7 +3,7 @@ import { join } from "node:path"
 import type { BuiltFile } from "../src/lib/build/failures"
 
 /** The files whose text a check reads; everything else is checked by its path alone. */
-const TEXT_FILE = /\.html$/
+const TEXT_FILE = /(?:^|\/)_redirects$|\.html$/
 
 /** Every file under the build root, with its path relative to the root and its text when it is read. */
 export async function readBuiltFiles(root: string): Promise<readonly BuiltFile[]> {
