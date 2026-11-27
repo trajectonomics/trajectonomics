@@ -84,7 +84,7 @@ export function writeWhatIf(ctx: Context, write: WhatIfWrite): Result<WhatIfResu
 			{ name: write.name, document: applied.document, expectedHash: plan.contentHash },
 			{ dryRun: write.dryRun },
 		)
-		if (isAppError(outcome)) return nameTheSet(outcome, write.sets, applied.overrides)
+		if (isAppError(outcome)) return nameTheSet(outcome, applied.overrides)
 		const reply = replyOf(outcome, {
 			decimal: write.decimal,
 			dryRun: write.dryRun,

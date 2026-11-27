@@ -183,6 +183,7 @@ describe("scenario apply --template", () => {
 		])
 		expect(help.out).toContain("--template")
 		expect(help.out).toContain("traj scenario apply --template")
+		expect(help.out.split("\n")).toContain("At least one of --set, --without or --add is required.")
 	})
 })
 

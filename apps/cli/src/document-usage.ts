@@ -45,7 +45,8 @@ export function usageLines(leaf: Leaf, path: readonly string[]): string[] {
 	if (alternate !== undefined && documentOnly(leaf)) return [alternate]
 	const words = leaf.positionals.map((name) => positionalLabel(leaf, name))
 	const flags = leaf.flags.length > 0 ? ["[options]"] : []
-	const forms = [alternate, flagFormUsage(leaf, path)].filter(
+	const flagForm = flagFormUsage(leaf, path)
+	const forms = [alternate, flagForm, leaf.document?.flagForm?.note].filter(
 		(line): line is string => line !== undefined,
 	)
 	return [`Usage: traj ${[...path, ...flags, ...words].join(" ")}`, ...forms]
