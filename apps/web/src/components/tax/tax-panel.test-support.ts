@@ -30,6 +30,7 @@ export function panel(
 		props: {
 			names: Object.keys(projections),
 			projections,
+			allowances: {},
 			people,
 			holders,
 			requested,

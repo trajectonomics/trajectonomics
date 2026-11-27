@@ -22,6 +22,7 @@ let { scenario, onScenario }: Props = $props()
 		<TaxPanel
 			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
+			allowances={snapshot.reads.allowances}
 			people={snapshotPeople(snapshot, snapshot.params.scenarios)}
 			holders={snapshotClaimsHolders(snapshot, snapshot.params.scenarios)}
 			requested={scenario}

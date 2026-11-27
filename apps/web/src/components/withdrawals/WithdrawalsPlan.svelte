@@ -11,10 +11,10 @@ import { withdrawalsView } from "../../lib/view/withdrawals"
 import { milestoneDatesOf } from "../../lib/view/withdrawals/context"
 import { mainFlow } from "../../lib/view/withdrawals/rule"
 import EmptyState from "../ui/EmptyState.svelte"
-import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
 import type { SegmentedOption } from "../ui/segmented-option"
 import WithdrawalsActions from "./WithdrawalsActions.svelte"
+import WithdrawalsFocus from "./WithdrawalsFocus.svelte"
 import WithdrawalsResult from "./WithdrawalsResult.svelte"
 
 const TERM_OPTIONS: readonly SegmentedOption<Terms>[] = [
@@ -57,28 +57,26 @@ const spends = $derived(ctx === null ? true : mainFlow(ctx.doc.flows) !== undefi
 const names = $derived(snapshotItemNames(snapshot, name))
 </script>
 
-<!-- One plan: what its spending rule pays year by year, and in good and bad markets; a what-if shows both ways. -->
+<!-- One plan: its focus point first, then the what-if controls, what its spending rule pays year by year, and in good and bad markets. -->
 <div class="space-y-8">
-	{#if editable && doc?.ok && ctx}
-		<WithdrawalsActions {name} contentHash={doc.data.scenario.contentHash} {ctx} household={doc.data.scenario.household} />
-	{/if}
-	<SegmentedControl name="terms" label="Terms" options={TERM_OPTIONS} value={chosen} onChange={onTerms} />
 	{#if run === undefined}
 		<EmptyState title="No projection for this plan" />
+	{:else if run.ok && none}
+		<EmptyState title="No spending rule in this plan">
+			<p>Set how you spend in retirement: a level amount, or a share of what your savings are worth. No rate is chosen for you; each is your own estimate.</p>
+		</EmptyState>
 	{:else}
-		<ReadView read={run} label={`The projection of ${name}`}>
-			{#snippet children()}
-				{#if none}
-					<EmptyState title="No spending rule in this plan">
-						<p>Set how you spend in retirement: a level amount, or a share of what your savings are worth. No rate is chosen for you; each is your own estimate.</p>
-					</EmptyState>
-				{/if}
-				{#if tried}<WithdrawalsResult view={tried} terms={chosen} title="With your try" {names} />{/if}
-				{#if showSaved}<WithdrawalsResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} {spends} {names} />{/if}
-				{#if saved.rules.length > 0 && saved.bands === null}
-					<p class="text-sm text-muted-foreground">A Return model would show what the rule pays in good and bad markets: pass <code>--return-model FILE</code>, <code>--paths N</code> and <code>--seed HEX</code> to <code>traj dashboard</code>.</p>
-				{/if}
-			{/snippet}
-		</ReadView>
+		<WithdrawalsFocus read={run} {chance} terms={chosen} plan={name} />
+		{#if editable && doc?.ok && ctx}
+			<WithdrawalsActions {name} contentHash={doc.data.scenario.contentHash} {ctx} household={doc.data.scenario.household} />
+		{/if}
+		<SegmentedControl name="terms" label="Terms" options={TERM_OPTIONS} value={chosen} onChange={onTerms} />
+		{#if run.ok && !none}
+			{#if tried}<WithdrawalsResult view={tried} terms={chosen} title="With your try" {names} />{/if}
+			{#if showSaved}<WithdrawalsResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} {spends} {names} />{/if}
+			{#if saved.rules.length > 0 && saved.bands === null}
+				<p class="text-sm text-muted-foreground">A Return model would show what the rule pays in good and bad markets: pass <code>--return-model FILE</code>, <code>--paths N</code> and <code>--seed HEX</code> to <code>traj dashboard</code>.</p>
+			{/if}
+		{/if}
 	{/if}
 </div>

@@ -1,0 +1,45 @@
+import { shares, toChartNumber } from "../../chart"
+import { formatCompact, yearOf } from "../../format"
+import type { EstateFigures } from "./figures"
+
+/** One slice of the estate bar: a deduction, or the net amount the heirs receive at its end. */
+export interface EstateSegment {
+	readonly share: number
+	readonly heirs: boolean
+}
+
+/** The Estate page's focus point: the gross estate walked through its deductions to what heirs receive. */
+export interface EstateFocus {
+	/** The question and the answer, for the sr-only heading. */
+	readonly label: string
+	/** What heirs receive, the CLI's exact string, written compact and masked by Hide amounts. */
+	readonly net: string
+	readonly currency: string
+	/** The estate's year, as a small tick under the bar: "2027". */
+	readonly year: string
+	readonly segments: readonly EstateSegment[]
+}
+
+/**
+ * The focus point of the estate on the date the page reads. Null when the estate is short (the page's own
+ * alert says so) or a line is negative, so the bar never draws a slice it cannot place. The shares are the
+ * CLI's amounts placed for drawing only (web ADR 0002).
+ */
+export function estateFocusView(figures: EstateFigures, hidden: boolean): EstateFocus | null {
+	if (figures.shortfall !== null) return null
+	const row = figures.row
+	const values = [row.debts, row.costs, row.gifts, row.toHeirs].map(toChartNumber)
+	if (values.some((value) => value < 0)) return null
+	const weights = shares(values)
+	const year = yearOf(row.date)
+	const label = hidden
+		? `What would your heirs receive? The amount is hidden. In ${year}.`
+		: `What would your heirs receive? ${formatCompact(row.toHeirs)} ${figures.currency} in ${year}.`
+	return {
+		label,
+		net: row.toHeirs,
+		currency: figures.currency,
+		year,
+		segments: weights.map((share, index) => ({ share, heirs: index === weights.length - 1 })),
+	}
+}

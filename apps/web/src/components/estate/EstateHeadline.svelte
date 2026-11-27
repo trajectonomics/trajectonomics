@@ -19,7 +19,7 @@ const items = $derived(keys.flatMap((key) => figures.items.filter((item) => item
 		{@const shown = shownUnder(item, terms)}
 		<div>
 			<dt class="text-sm text-muted-foreground">{item.label}{#if shown.tag} <span class="text-xs">({shown.tag.toLowerCase()})</span>{/if}</dt>
-			<dd class={item.key === "heirs" ? "mt-1 text-3xl font-semibold tracking-tight tabular-nums" : "mt-1 text-xl font-semibold tabular-nums"}>
+			<dd class="mt-1 text-lg font-semibold tracking-tight tabular-nums">
 				<Money amount={shown.amount} currency={figures.currency} signed />
 			</dd>
 			{#if shown.aside !== null}

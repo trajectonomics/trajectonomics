@@ -15,7 +15,7 @@ let { pnl }: Props = $props()
 </script>
 
 <!-- Profit and loss for the period: the CLI's totals and its three largest rows. -->
-<Card title="Profit and loss, year to date" href="/ledger/" argv={pnl.argv}>
+<Card quiet title="Profit and loss, year to date" href="/ledger/" argv={pnl.argv}>
 	<ReadView read={pnl} label="Profit and loss">
 		{#snippet children(view)}
 			<div class="space-y-4">
@@ -25,7 +25,7 @@ let { pnl }: Props = $props()
 					{#if view.totals.length === 0}
 						<p class="mt-1 text-muted-foreground">No total</p>
 					{:else}
-						<span class="mt-1 flex flex-col gap-1 text-2xl font-semibold tracking-tight">
+						<span class="mt-1 flex flex-col gap-1 text-lg font-semibold tracking-tight">
 							{#each view.totals as total (total.currency)}
 								<DirectedMoney
 									amount={total.amount}

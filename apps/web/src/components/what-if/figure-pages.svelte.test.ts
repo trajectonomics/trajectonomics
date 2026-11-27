@@ -98,6 +98,7 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 			props: {
 				names,
 				projections,
+				allowances: DEMO.reads.allowances,
 				people: {},
 				holders: {},
 				requested: "base",
@@ -131,6 +132,7 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 				props: {
 					names,
 					projections,
+					allowances: DEMO.reads.allowances,
 					people: {},
 					holders: {},
 					requested: "base",

@@ -58,7 +58,7 @@ Words are the right rung when:
 ## How we check
 
 - **Review.** A reviewer reads a diff that changes what a person sees against this file, and the pull request shows that screen before and after.
-- **The Dashboard's checks.** The browser checks run every page at 360px and 1280px in both themes ([web ADR 0026](apps/web/docs/adr/0026-a-headless-browser-checks-the-demo-at-phone-width-and-in-print.md)). Two more are planned and not yet merged: a word guard that keeps engine words off the Demo (#700), and a rule of one display-size element and at most one primary button per page (#707).
+- **The Dashboard's checks.** The browser checks run every page at 360px and 1280px in both themes ([web ADR 0026](apps/web/docs/adr/0026-a-headless-browser-checks-the-demo-at-phone-width-and-in-print.md)). Two rules hold on top of them: a word guard that keeps engine words off the Demo (`src/routes/words.svelte.test.ts`, #700), and one element above 28px inside the page's focus picture with at most one primary action (`browser/focus-point.e2e.ts`, #707). A page that is not there yet is listed in that check's `PENDING_707`, and a page that starts passing fails until it leaves the list.
 
 ## Skills that apply this
 

@@ -8,7 +8,7 @@ import { NO_PEOPLE, snapshotPeople } from "../../lib/view/item-names"
 import { claimsHolderOf } from "../../lib/view/tax-settings/holders"
 import EmptyState from "../ui/EmptyState.svelte"
 import Provenance from "../ui/Provenance.svelte"
-import ReadView from "../ui/ReadView.svelte"
+import AllowancesFocus from "./AllowancesFocus.svelte"
 import AllowancesResult from "./AllowancesResult.svelte"
 import InputForm from "./InputForm.svelte"
 import InputSummary from "./InputSummary.svelte"
@@ -50,10 +50,10 @@ const plan = $derived(
 )
 </script>
 
-<!-- One plan with a Levy: the person's order and limits, then what the CLI says each Return's allowances could take. -->
+<!-- One plan with a Levy: the focus point first, then the person's order and limits and what the CLI says each Return's allowances could take. -->
 <div class="space-y-8">
-	{#if editable}<InputForm {inputs} />{:else}<InputSummary {inputs} />{/if}
 	{#if read === undefined}
+		{#if editable}<InputForm {inputs} />{:else}<InputSummary {inputs} />{/if}
 		{#if why !== null}
 			<EmptyState title="No Return to read">
 				<p>{why.before}<code>{why.command}</code>{why.after}</p>
@@ -64,11 +64,11 @@ const plan = $derived(
 			</EmptyState>
 		{/if}
 	{:else}
-		<ReadView {read} label={`The tax allowances of ${name}`}>
-			{#snippet children(data)}
-				<AllowancesResult {data} {plan} {people} {claimsHolder} />
-			{/snippet}
-		</ReadView>
+		<AllowancesFocus {read} plan={name} />
+		{#if editable}<InputForm {inputs} />{:else}<InputSummary {inputs} />{/if}
+		{#if read.ok}
+			<AllowancesResult data={read.data} {plan} {people} {claimsHolder} />
+		{/if}
 		<Provenance name={`Allowances for ${name}`} commands={[read.argv]} />
 	{/if}
 </div>
