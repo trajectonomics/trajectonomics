@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test"
-import { DOCS_BASE_PATH } from "../src/lib/tabs"
+import { DOCS_BASE_PATH, TABS } from "../src/lib/tabs"
 import { NOT_FOUND_PATH, openPage, pagesUnderTest } from "./built-site"
 import { waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
@@ -57,7 +57,7 @@ test.describe("a device set to light with a stored light preference", () => {
 		await waitForIsland(page)
 		await markDocument(page)
 
-		await page.getByRole("link", { name: /for operators/i }).click()
+		await page.getByRole("link", { name: TABS[0].entry, exact: true }).click()
 		await page.waitForURL(`**${OPERATOR_PATH}`)
 
 		expect(await documentWasKept(page), "the page was swapped in place, not loaded again").toBe(

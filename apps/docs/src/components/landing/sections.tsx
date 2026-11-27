@@ -21,18 +21,25 @@ export function AudienceEntries() {
 	return (
 		<section aria-labelledby="audiences-heading" className="flex flex-col gap-4">
 			<SectionLabel id="audiences-heading">Read it yourself</SectionLabel>
-			<div className="grid gap-4 md:grid-cols-2">
-				{TABS.map((tab) => {
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+				{TABS.map((tab, at) => {
 					const descriptionId = `${tab.folder}-entry-description`
+					const primary = at === 0
 					return (
 						<div
 							key={tab.folder}
-							className="group relative flex flex-col gap-3 rounded-md border bg-fd-card p-6 text-fd-card-foreground transition-[border-color,transform] duration-300 hover:border-fd-accent focus-within:ring-2 focus-within:ring-fd-ring motion-safe:hover:-translate-y-1"
+							className={`group relative flex flex-col gap-3 rounded-md border bg-fd-card p-6 text-fd-card-foreground transition-[border-color,transform] duration-300 hover:border-fd-accent focus-within:ring-2 focus-within:ring-fd-ring motion-safe:hover:-translate-y-1 ${primary ? "border-fd-accent lg:col-span-3" : "lg:col-span-2"}`}
 						>
-							{tab.audience === "Operator" ? <TerminalPicture /> : <ContributionPicture />}
-							<p className="font-mono text-xs uppercase tracking-widest text-fd-muted-foreground">
-								{tab.audience}
-							</p>
+							{primary ? <TerminalPicture /> : <ContributionPicture />}
+							{primary ? (
+								<p className="w-fit rounded-full bg-fd-accent px-3 py-1 font-mono text-xs font-medium tracking-wide text-fd-accent-foreground">
+									{tab.label}
+								</p>
+							) : (
+								<p className="font-mono text-xs uppercase tracking-widest text-fd-muted-foreground">
+									{tab.label}
+								</p>
+							)}
 							<a
 								href={tabUrl(tab)}
 								aria-describedby={descriptionId}
