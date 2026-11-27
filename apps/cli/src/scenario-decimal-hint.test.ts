@@ -1,0 +1,81 @@
+import { describe, expect, it } from "bun:test"
+import {
+	applyScenario,
+	errorOf,
+	resultOf,
+	rowOf,
+	scenario,
+	scenarioHome,
+} from "./scenario-test-support"
+import { SCENARIO_DOCUMENT } from "./store/testing"
+
+type Doc = Record<string, unknown>
+
+/** The hint a minor-unit apply adds when a money field holds the decimal form (issue #227). */
+const DECIMAL_HINT = "This looks like the decimal form: add --decimal."
+
+/** The document's refusal still carries the schema hint every document refusal carries (ADR-0052). */
+const SCHEMA_HINT = 'Run "traj schema scenario apply" to see the document schema.'
+
+/** The stored plan's own document as `scenario show --decimal` prints it: a real decimal document. */
+async function shownDecimal(home: string): Promise<Doc> {
+	await applyScenario(home, "base", SCENARIO_DOCUMENT)
+	return rowOf(resultOf(await scenario(home, ["show", "base", "--decimal"]))).document as Doc
+}
+
+/** A document with its first Flow's amount replaced: the one field these cases vary. */
+function withFirstAmount(document: Doc, amount: unknown): Doc {
+	const flows = document["flows"] as Doc[]
+	return { ...document, flows: [{ ...flows[0], amount }, ...flows.slice(1)] }
+}
+
+describe("scenario apply of a decimal document without --decimal", () => {
+	it("refuses on the money field, and its hint names --decimal before the schema hint", async () => {
+		const home = scenarioHome()
+		const document = await shownDecimal(home)
+		const res = await applyScenario(home, "base", document)
+		expect(res.code).toBe(2)
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).path).toBe("document.flows.0.amount")
+		const details = errorOf(res).details as { code?: string }[]
+		expect(details[0]?.code).toBe("NOT_SAFE_INTEGER")
+		expect(errorOf(res).message).toBe("document.flows.0.amount: NOT_SAFE_INTEGER")
+		expect(errorOf(res).hint).toBe(`${DECIMAL_HINT} ${SCHEMA_HINT}`)
+	})
+
+	it("applies the same document unchanged when --decimal reads it", async () => {
+		const home = scenarioHome()
+		const document = await shownDecimal(home)
+		const res = await applyScenario(home, "base", document, ["--decimal"])
+		expect(res.code).toBe(0)
+		expect(resultOf(res).status).toBe("unchanged")
+	})
+
+	const notDecimal: [string, unknown][] = [
+		["a non-numeric string", "abc"],
+		["a whole number without a dot", "9000"],
+		["a JSON number", 9000.5],
+	]
+	for (const [label, amount] of notDecimal) {
+		it(`carries no decimal hint for ${label}`, async () => {
+			const home = scenarioHome()
+			const document = withFirstAmount(await shownDecimal(home), amount)
+			const res = await applyScenario(home, "base", document)
+			expect(errorOf(res).code).toBe("invalid_input")
+			const details = errorOf(res).details as { code?: string }[]
+			expect(details[0]?.code).toBe("NOT_SAFE_INTEGER")
+			expect(errorOf(res).hint).toBe(SCHEMA_HINT)
+		})
+	}
+
+	it("carries no decimal hint on a field --decimal does not convert, such as inflation", async () => {
+		const home = scenarioHome()
+		const document = { ...SCENARIO_DOCUMENT, economy: { inflation: "3.00" } }
+		const res = await applyScenario(home, "base", document)
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).path).toBe("document.economy.inflation")
+		const details = errorOf(res).details as { code?: string }[]
+		expect(details[0]?.code).toBe("NOT_SAFE_INTEGER")
+		expect(errorOf(res).hint).toBe(SCHEMA_HINT)
+	})
+})

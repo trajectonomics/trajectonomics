@@ -1,6 +1,8 @@
 import { z } from "zod"
 import { version as cliVersion } from "../../package.json"
+import { decimalAmountHint } from "./decimal-amount-hint"
 import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
+import { moneyPathsOf } from "./field-paths"
 import { wordsOf } from "./problem-words"
 import {
 	SCENARIO_SHAPE_REQUIRED,
@@ -17,6 +19,8 @@ import {
  * second validator (ADR-0024), and the tests beside `shape/` probe every path of it against the pin.
  */
 const version = acceptedScenarioSchemaVersion()
+const properties = scenarioShapeProperties(version)
+const moneyPaths = moneyPathsOf({ properties })
 
 export const scenarioDocument: z.ZodType<unknown> = z
 	.unknown()
@@ -25,20 +29,22 @@ export const scenarioDocument: z.ZodType<unknown> = z
 			const refusal = refusalOf(problem, "document")
 			// A code the refusal table words states its sentence and way out, then the schema hint (ADR-0052).
 			const said = wordsOf(problem)
+			// A money field holding the decimal form names the flag that reads it, before the schema hint.
+			const decimal = decimalAmountHint(value, problem, moneyPaths)
 			ctx.addIssue({
 				code: "custom",
 				message: said?.message ?? refusal.message,
 				path: [...problem.segments],
 				params: {
 					code: problem.code,
-					hint: [said?.hint, refusal.hint].filter((part) => part !== undefined).join(" "),
+					hint: [said?.hint, decimal, refusal.hint].filter((part) => part !== undefined).join(" "),
 				},
 			})
 		}
 	})
 	.meta({
 		type: "object",
-		properties: scenarioShapeProperties(version),
+		properties,
 		required: [...SCENARIO_SHAPE_REQUIRED],
 		additionalProperties: false,
 		description: scenarioShapeDescription(cliVersion),
