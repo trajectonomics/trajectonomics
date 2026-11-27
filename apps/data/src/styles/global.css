@@ -9,22 +9,35 @@
 @import "@trajectonomics/brand/tailwind.css";
 /* The Theme's own type: the sans stack with its Thai fallback, and Thai's taller line. */
 @import "@trajectonomics/brand/typography.css";
+/* The one header frame every static site draws: the bar, the 40 px tile and the nav-link type. */
+@import "@trajectonomics/brand/header.css";
 /* The Brand Typeface's @font-face rules; scripts/copy-brand-assets.ts puts the files in public/fonts/. */
 @import "./fonts.css";
 @import "./header.css";
 @import "./footer.css";
 @import "./overview.css";
+@import "./data-layout.css";
+@import "./sections.css";
+@import "./bars.css";
+@import "./bars-phone.css";
+@import "./scatter.css";
+@import "./cache.css";
+@import "./section-notes.css";
+@import "./prices.css";
+@import "./log.css";
 @import "./plan-mark.css";
 @import "./summary.css";
 @import "./meter.css";
 @import "./plan-tier.css";
 @import "./peaks.css";
+@import "./peaks-limits.css";
 @import "./peaks-collecting.css";
 @import "./peaks-info.css";
 @import "./peaks-tier.css";
 @import "./peaks-phone.css";
 @import "./state.css";
 @import "./chart.css";
+@import "./series-ink.css";
 @import "./table.css";
 @import "./breakdown-legend.css";
 @import "./breakdown.css";

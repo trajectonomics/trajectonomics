@@ -11,6 +11,11 @@ export const APPLY_EXAMPLES: Example[] = [
 		description: "Print a Scenario pre-filled from the Baseline at one date, to edit and apply.",
 	},
 	{
+		command: "traj scenario apply --template --as-of 2026-03-31 --from-history",
+		description:
+			"Print a Scenario whose income and spending Streams are what the Ledger ran at, to edit and apply.",
+	},
+	{
 		command: "traj scenario apply base --file base.json",
 		description: "Create a Scenario, or update it when the document changed.",
 	},

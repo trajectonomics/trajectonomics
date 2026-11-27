@@ -23,7 +23,7 @@ OpenJot อ่านสลิปที่แอปธนาคารบันท
 • รู้ว่าเป็นการโอนเข้าบัญชีตัวเอง จึงไม่นับเป็นรายจ่ายซ้ำ
 • สรุปตามหมวดหรือแท็ก เทียบย้อนหลัง 6 เดือน และงบที่บอกว่ายังใช้ได้อีกวันละเท่าไหร่
 • นำเข้า e-Statement บัตรเครดิต (PDF ที่ล็อกรหัส) ของ KBank, SCB, KTC, Krungsri, BBL, ttb, UOB และ AEON
-• ส่งออก CSV หรือ JSON ได้ตลอด ใช้ได้ทั้งไทยและอังกฤษ เลือกธีมชมพูขาวหรือดำส้ม
+• ส่งออก CSV หรือ JSON ได้ตลอด ใช้ได้ทั้งไทยและอังกฤษ เลือกธีมได้ 3 แบบ: ชมพูขาว ดำส้ม หรือธีมเข้ม Trajectonomics
 
 ความเป็นส่วนตัว
 • บัญชีรายรับรายจ่ายเก็บในมือถือคุณ ไม่มีบัญชีผู้ใช้ และไม่มีเซิร์ฟเวอร์ของ OpenJot ที่เก็บรายการของคุณ
@@ -54,7 +54,7 @@ What Moo can do
 • Spots transfers between your own accounts, so they aren't counted as spending
 • Summaries by category or tag, a 6-month comparison, and budgets that show what you can still spend per day
 • Imports password-protected credit card e-statements (PDF) from KBank, SCB, KTC, Krungsri, BBL, ttb, UOB and AEON
-• Export to CSV or JSON any time. Thai or English, pink and white or black and orange
+• Export to CSV or JSON any time. Thai or English, with three themes: pink and white, black and orange, or the dark Trajectonomics theme
 
 Private by design
 • Your ledger is stored on your phone. There's no OpenJot account, and no OpenJot server holds your records
@@ -79,6 +79,7 @@ OpenJot isn't affiliated with any bank or e-wallet. Bank and app names belong to
 | Field | Value |
 |---|---|
 | App or game | App |
+| Package name | com.trajectonomics.openjot |
 | Developer name | Trajectonomics |
 | Category | Finance |
 | Tags | Budgeting, expense tracking (pick the closest ones Play offers) |
@@ -109,4 +110,4 @@ The developer account is a personal account named Trajectonomics. New personal a
 
 Upload `openjot-android-arm64.aab` from the GitHub release.
 
-When Play Console sets up Play App Signing, choose to **use your own app signing key** and upload the existing `moojot-release.jks` key (Play Console shows the export steps, using its PEPK tool). Play then signs with the same certificate as the GitHub APK (`CN=MooJot`, the app's earlier name, which predates the rename and never changes; SHA-256 `be15a0f5…5041a3a1`). The landing page promises that every release is signed with that key, and it lets people move between the GitHub APK and Play without uninstalling. If Play generates its own key instead, a GitHub install has to be uninstalled before the Play version can be installed, and uninstalling deletes the records. This choice can't be undone later.
+When Play Console sets up Play App Signing, choose to **use your own app signing key** and upload the existing `moojot-release.jks` key (Play Console shows the export steps, using its PEPK tool). Play then signs with the same certificate as the GitHub APK (`CN=MooJot`, the app's earlier name, which predates the rename and never changes; SHA-256 `be15a0f5…5041a3a1`). The landing page promises that every release is signed with that key. With the same key, a build installs over another build of the same package, so people can move between the GitHub APK and Play without uninstalling, but only between builds with the new package name `com.trajectonomics.openjot`: versions up to 1.6.0 use `app.moojot.android` and install alongside it. If Play generates its own key instead, a GitHub install has to be uninstalled before the Play version can be installed, and uninstalling deletes the records. This choice can't be undone later.

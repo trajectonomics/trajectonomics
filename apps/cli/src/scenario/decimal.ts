@@ -1,8 +1,8 @@
 import { type AppError, fail, isAppError } from "../errors"
-import { isPlainObject } from "../json"
 import { formatMinorUnits, supportedCurrency } from "../store/money"
 import { hintOf, notDecimal, parseField } from "./decimal-field"
-import { branchOf, type FieldKind, fieldKindOf, isNode, type Node, PUBLISHED } from "./money-fields"
+import { mapDecimalFields } from "./decimal-walk"
+import { isNode, type Node, PUBLISHED } from "./money-fields"
 import { formatPath } from "./path"
 import { formatPercent } from "./percent"
 
@@ -11,12 +11,6 @@ import { formatPercent } from "./percent"
  * written as a decimal string of the Currency's major unit, such as "350.00" for 35000 satang.
  * The money fields are found by walking the published schema (field-paths.ts), never listed here.
  */
-
-/** The element a document path names: a list item's `id` when it has one, otherwise its index. */
-function elementKey(item: unknown, index: number): string {
-	const id = isPlainObject(item) ? item["id"] : undefined
-	return typeof id === "string" ? id : String(index)
-}
 
 /** The document path an error names: `document.` and the Override grammar's dotted path. */
 function at(path: readonly string[]): string {
@@ -35,56 +29,6 @@ export function currencyOf(document: Node): string | AppError {
 		})
 	}
 	return supportedCurrency(raw, path) ?? raw
-}
-
-type Convert = (value: unknown, path: readonly string[], kind: FieldKind) => unknown
-
-/**
- * Walks a value beside its schema and converts each field the schema marks as money or as a rule's
- * rate (cli ADR-0063). Only the keys a
- * value holds are visited, so an absent optional field stays absent. A failure stops the walk and
- * is returned as the value, so the caller checks `isAppError` once.
- */
-export function mapDecimalFields(
-	schema: unknown,
-	value: unknown,
-	path: readonly string[],
-	convert: Convert,
-): unknown {
-	if (!isNode(schema)) return value
-	const kind = fieldKindOf(schema)
-	if (kind !== undefined) return convert(value, path, kind)
-	if (Array.isArray(schema["anyOf"])) {
-		return mapDecimalFields(branchOf(schema["anyOf"], value), value, path, convert)
-	}
-	if (isNode(schema["properties"]) && isPlainObject(value)) {
-		return mapFields(schema["properties"], value, path, convert)
-	}
-	if (schema["items"] !== undefined && Array.isArray(value)) {
-		return mapItems(schema["items"], value, path, convert)
-	}
-	return value
-}
-
-function mapFields(properties: Node, value: Node, path: readonly string[], convert: Convert) {
-	const out: Node = { ...value }
-	for (const [key, child] of Object.entries(properties)) {
-		if (!Object.hasOwn(value, key)) continue
-		const next = mapDecimalFields(child, value[key], [...path, key], convert)
-		if (isAppError(next)) return next
-		out[key] = next
-	}
-	return out
-}
-
-function mapItems(items: unknown, list: unknown[], path: readonly string[], convert: Convert) {
-	const out: unknown[] = []
-	for (const [index, item] of list.entries()) {
-		const next = mapDecimalFields(items, item, [...path, elementKey(item, index)], convert)
-		if (isAppError(next)) return next
-		out.push(next)
-	}
-	return out
 }
 
 /**

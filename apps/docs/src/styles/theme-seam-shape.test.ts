@@ -67,8 +67,15 @@ describe("theme seam shape", () => {
 		for (const corner of findSeamViolations(css).filter(
 			(violation) => violation.rule === "border-radius",
 		)) {
-			expect(lines[corner.line - 1]?.trim(), `line ${corner.line}`).toMatch(/^--radius-[\w-]+:/)
+			const line = lines[corner.line - 1]?.trim()
+			expect(line, `line ${corner.line}`).toMatch(/^--radius-[\w-]+:/)
 		}
+	})
+
+	test("the header's search trigger takes no corner from the seam: its pill is a shape", async () => {
+		const css = await seamCss()
+		const search = declarationsOf(css, "#nd-nav :is([data-search], [data-search-full])")
+		expect(declarationValue(search, "border-radius")).toBeUndefined()
 	})
 
 	test("the seam paints no shadow and keeps no shadow role", async () => {

@@ -1,6 +1,7 @@
 import { addMonthsClamped } from "../calendar/arith"
 import type { DatedEvent } from "../engine/events"
-import type { BasisPoints, DateString, Flow, MilestoneTerms } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { DateString, Flow, MilestoneTerms } from "../types"
 import type { ExpenseCache } from "./expense-cache"
 import { termed } from "./metrics"
 
@@ -12,7 +13,7 @@ export interface TrailEntry {
 
 export interface Money {
 	readonly start: DateString
-	readonly inflation: BasisPoints
+	readonly inflation: Inflation
 }
 
 /** The plan an expense window reads: its events in date order, its Flows and its bounds. */

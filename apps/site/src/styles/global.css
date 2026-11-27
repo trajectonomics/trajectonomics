@@ -10,6 +10,8 @@
 @import "@trajectonomics/brand/tailwind.css";
 /* The Theme's own type: the sans stack with its Thai fallback, line height 1.7 and Thai 1.8. */
 @import "@trajectonomics/brand/typography.css";
+/* The one header frame every static site draws: the bar, the 40 px tile and the nav-link type. */
+@import "@trajectonomics/brand/header.css";
 /* The Brand Typeface's @font-face rules, whose files `scripts/copy-fonts.ts` puts in public/fonts/. */
 @import "./fonts.css";
 @import "./primitives.css";
@@ -40,8 +42,6 @@
 @import "./header.css";
 @import "./header-narrow.css";
 @import "./repo-link.css";
-@import "./menu.css";
-@import "./menu-panel.css";
 @import "./motion.css";
 @import "./replay.css";
 @import "./motion-app.css";
@@ -88,10 +88,4 @@
 /* The header is fixed and 64 px tall, so whatever is scrolled into view, a link's target or a focused control, lands below it. */
 html {
 	scroll-padding-top: 80px;
-}
-
-/* The inlined brand mark carries a viewBox and no intrinsic size, so the header's 40 px tile gives it one. */
-.brand-tile > svg {
-	height: 1.5rem;
-	width: 1.5rem;
 }

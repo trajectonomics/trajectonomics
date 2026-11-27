@@ -37,7 +37,9 @@ Language has to live in the address.
   Post's Translations as an `hreflang` alternate, with `x-default` on the page the default tree
   shows. `verify:build` fails a canonical or an alternate that names a page the build lacks.
 - **No Language detection.** The blog never redirects by browser Language. The Language menu in the
-  header is a set of plain links to the same page in each tree, so it works with JavaScript off.
+  header links to the same page in each tree. Since 2026-11-27 it is the Site's shared disclosure
+  (`@trajectonomics/site-header`), a native `<details>` whose links work with JavaScript off; its
+  small inline script only adds hover and outside-tap closing.
 
 ## Consequences
 

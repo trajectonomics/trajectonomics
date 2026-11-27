@@ -69,7 +69,7 @@ export function scanGrid(
 					calendar,
 				).map((event) => ({
 					...event,
-					amount: fixedAmountAt(event.flow as never, event.years, inflation),
+					amount: fixedAmountAt(event.flow as never, event.years, inflation, event.date),
 				}))
 	return {
 		retirement: retirement !== undefined,

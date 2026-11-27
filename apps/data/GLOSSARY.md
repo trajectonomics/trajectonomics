@@ -31,6 +31,14 @@ identity is machine, plan, model, bucket and source, so replaying it is an upser
 One observation of a plan window's meter: the percentage used and the reset time, at a UTC hour.
 Claude and OpenCode Go are the plans with a readable meter.
 
+## Limit estimate
+
+The tokens a plan window would hold at 100%, estimated from its own usage meter: tokens we used
+between two readings ÷ the percentage points the meter moved × 100. Readings that share a reset
+period form one segment; a reset, a change of reset time or a fall in the meter starts a new one.
+Whole-percent rounding widens the range by one point per segment. Only the estimate, its range and
+its evidence are published, never a reading or its time (ADR 0011).
+
 ## Window
 
 The period a quota percentage covers: `five_hour`, `weekly`, or `monthly`.
@@ -77,5 +85,21 @@ query-time view, not a frozen snapshot (ADR 0003).
 ## Plan Table
 
 The collector's hand-kept list of plans (`collector/src/plans.ts`): stable plan ids, display names,
-active dates and matching rules. No prices in this slice. The Worker accepts a plan id only when it
-exists in that table.
+active dates and matching rules. Prices do not live here; they live in the dated price catalogue
+(`collector/src/price-catalog.ts`). The Worker accepts a plan id only when it exists in that table.
+
+## Tokens per $1
+
+A plan's weekly token figure divided by its weekly subscription price. The weekly price is the
+vendor's monthly USD price × 12 / 52. A free plan has no price to divide by and no figure.
+
+## API value per $1
+
+The week's tokens times the plan's blended API list price per token, divided by the weekly price.
+The blend prices the plan's own usage over the window at each model's list price and divides by the
+tokens without cache reads. Rows for models with no list price are left out.
+
+## Cache rate
+
+Cache reads as a share of all tokens: `cache read ÷ (tokens + cache read)`, the same measure shown
+beside a peak. A source that reports no cache split has no cache rate.

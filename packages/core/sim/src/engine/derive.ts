@@ -1,5 +1,6 @@
 import { evaluateDerive } from "../levy/derive"
-import type { BasisPoints, DateString, Flow } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { DateString, Flow } from "../types"
 import { isFixed } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { fixedAmountAt } from "./amount"
@@ -26,11 +27,11 @@ function occurred(events: readonly DatedEvent[]): Map<string, number> {
 	return counts
 }
 
-function fixedTotals(events: readonly DatedEvent[], inflation: BasisPoints): Map<string, bigint> {
+function fixedTotals(events: readonly DatedEvent[], inflation: Inflation): Map<string, bigint> {
 	const totals = new Map<string, bigint>()
 	for (const event of events) {
 		if (!isFixed(event.flow)) continue
-		const amount = event.amount ?? fixedAmountAt(event.flow, event.years, inflation)
+		const amount = event.amount ?? fixedAmountAt(event.flow, event.years, inflation, event.date)
 		totals.set(event.flow.id, (totals.get(event.flow.id) ?? 0n) + amount)
 	}
 	return totals
@@ -44,7 +45,7 @@ export function plannedAmounts(
 	events: readonly DatedEvent[],
 	flows: readonly Flow[],
 	date: DateString,
-	inflation: BasisPoints,
+	inflation: Inflation,
 	readAccount: (accountId: string) => bigint,
 	rules?: RuleBook,
 ): PlannedOutcome {

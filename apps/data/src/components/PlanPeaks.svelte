@@ -6,8 +6,9 @@ import { peakCellChoice } from "../lib/collecting"
 import { compactCount, displayCount } from "../lib/format"
 import { PEAK_COLUMNS, type PeakColumn, peakNote, peakSpoken } from "../lib/peak-words"
 import { defaultTier, planCatalog } from "../lib/plan-catalog"
+import { limitCell } from "../lib/plan-limits"
 import { MONTH_FROM_WEEK } from "../lib/plan-month"
-import { figureShare, type PeakTableRow, peakTableRows } from "../lib/plan-peaks"
+import { figureShare, limitsOf, type PeakTableRow, peakTableRows } from "../lib/plan-peaks"
 import {
 	cellTokens,
 	factorLabel,
@@ -16,7 +17,7 @@ import {
 	tagFactor,
 	tierFigures,
 } from "../lib/tier-estimate"
-import type { PlanPeak } from "../lib/types"
+import type { Limits, PlanPeak } from "../lib/types"
 import PlanMark from "./PlanMark.svelte"
 import PlanPeaksInfo from "./PlanPeaksInfo.svelte"
 
@@ -25,6 +26,7 @@ let {
 	ranked,
 	day,
 	planSince = {},
+	heading = true,
 }: {
 	/** The peaks API's plans. */
 	plans: PlanPeak[]
@@ -34,6 +36,8 @@ let {
 	day: string
 	/** The first collected UTC day per plan; absent on an old health body. */
 	planSince?: Record<string, string>
+	/** Whether the section's own heading and info control are drawn above the table. */
+	heading?: boolean
 } = $props()
 
 type RowView = {
@@ -41,6 +45,7 @@ type RowView = {
 	catalog: PlanCatalog | null
 	picked: string | null
 	figures: TierFigures
+	limits: Limits | null
 }
 
 /** The tier each plan's picker shows; a plan absent here uses its current tier. */
@@ -68,7 +73,7 @@ function viewOf(row: PeakTableRow): RowView {
 		row.measured,
 		catalog,
 	)
-	return { row, catalog, picked, figures }
+	return { row, catalog, picked, figures, limits: limitsOf(row, picked) }
 }
 
 const views = $derived(rows.map(viewOf))
@@ -143,7 +148,37 @@ function choose(plan: string, tier: string): void {
 			day,
 			MONTH_FROM_WEEK.has(view.row.plan),
 		)}
-		{#if waiting.kind === "collecting"}
+		{@const estimate = limitCell(
+			view.limits?.[column.key],
+			column,
+			cellTokens(current),
+			waiting.kind === "collecting" ? waiting : null,
+		)}
+		{#if estimate !== null}
+			<div class="peaks-cell" title={estimate.spoken}>
+				<span
+					class="peaks-figure"
+					class:peaks-figure-rough={estimate.limit.rough}
+					aria-hidden="true">{estimate.figure}</span
+				>
+				<span class="peaks-meta" aria-hidden="true">{estimate.meta}</span>
+				<span class="peaks-track" aria-hidden="true">
+					<span
+						class="peaks-bar"
+						class:peaks-bar-rough={estimate.limit.rough}
+						style={`width: ${estimate.share}%`}
+					></span>
+				</span>
+				{#if estimate.collecting !== null}
+					<span class="peaks-meta" aria-hidden="true">
+						{estimate.collecting.seen} of {estimate.collecting.of} days
+					</span>
+				{/if}
+				<span class="visually-hidden">
+					{estimate.spoken}{#if estimate.collecting !== null}, {estimate.collecting.seen} of {estimate.collecting.of} days seen{/if}
+				</span>
+			</div>
+		{:else if waiting.kind === "collecting"}
 			<div class="peaks-cell">
 				<span class="peaks-collecting" aria-hidden="true">{waiting.seen} of {waiting.of} days</span>
 				{#if waiting.note !== null}
@@ -224,28 +259,30 @@ function choose(plan: string, tier: string): void {
 {/snippet}
 
 <div class="plan-peaks">
-	<h2 class="meta-label section-title peaks-title">
-		<span id="peaks-title">What each plan gives</span>
-		<button
-			class="peaks-info"
-			type="button"
-			popovertarget="peaks-info-panel"
-			aria-label="How these numbers are worked out"
-		>
-			<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-				<circle cx="8" cy="8" r="6.75" fill="none" stroke="currentColor" stroke-width="1.25" />
-				<path
-					d="M8 7.25v4"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.5"
-					stroke-linecap="round"
-				/>
-				<circle cx="8" cy="4.75" r="1" fill="currentColor" />
-			</svg>
-		</button>
-	</h2>
-	<PlanPeaksInfo />
+	{#if heading}
+		<h2 class="meta-label section-title peaks-title">
+			<span id="peaks-title">What each plan gives</span>
+			<button
+				class="peaks-info"
+				type="button"
+				popovertarget="peaks-info-panel"
+				aria-label="How these numbers are worked out"
+			>
+				<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+					<circle cx="8" cy="8" r="6.75" fill="none" stroke="currentColor" stroke-width="1.25" />
+					<path
+						d="M8 7.25v4"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+					/>
+					<circle cx="8" cy="4.75" r="1" fill="currentColor" />
+				</svg>
+			</button>
+		</h2>
+		<PlanPeaksInfo />
+	{/if}
 
 	<table class="peaks-table peaks-table-wide">
 		<caption class="visually-hidden">
@@ -298,6 +335,7 @@ function choose(plan: string, tier: string): void {
 
 	<p class="peaks-note">
 		Most we used in a window once it is full, or <span aria-hidden="true">≈</span> estimated from a
-		tier we measured — never the plan's limit
+		tier we measured. <span aria-hidden="true">≈</span> at 100%: worked out from the plan's own usage
+		meter, tokens used ÷ points the meter moved × 100.
 	</p>
 </div>

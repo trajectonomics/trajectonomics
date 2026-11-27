@@ -1,12 +1,41 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the layout it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { MODEL_PRICES, PLAN_PRICES, PRICE_READ } from "@trajectonomics/data-collector/price-catalog"
 import Layout from "../layouts/Layout.astro"
+import { planName } from "../lib/plans"
 import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 
 const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estimated-tiers-scale-a-measured-floor-by-a-stated-multiplier.md`
 const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md`
 const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data-starts-when-collecting-starts.md`
+const LIMITS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0011-limits-are-estimated-from-the-usage-meter.md`
+const VALUE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0012-prices-enter-with-a-dated-source.md`
+
+const planPriceRows = Object.entries(PLAN_PRICES).flatMap(([plan, prices]) =>
+	(prices ?? []).map((entry) => ({
+		plan: planName(plan),
+		tier: entry.tier,
+		usd:
+			entry.usdMonth === null
+				? "not stated"
+				: entry.usdMonth === 0
+					? "free"
+					: `$${entry.usdMonth} a month`,
+		read: entry.source?.read ?? null,
+		source: entry.source,
+	})),
+)
+
+const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
+	model,
+	input: `$${price.input}`,
+	output: `$${price.output}`,
+	cacheRead: `$${price.cacheRead}`,
+	cacheWrite: price.cacheWrite === null ? "input price" : `$${price.cacheWrite}`,
+	read: price.source.read,
+	source: price.source,
+}))
 ---
 
 <Layout
@@ -114,7 +143,7 @@ const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data
 			whatever the local clock says.
 		</p>
 
-		<h2>The peaks</h2>
+		<h2 id="plans">What each plan gives</h2>
 		<p>
 			“What each plan gives” shows the most tokens a plan carried in a window, with cache reads
 			counted apart: they cost far less, so they never lift the figure. Missing hours and days
@@ -125,6 +154,18 @@ const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data
 			limit. The reasoning is in <a href={PEAKS_ADR_URL}>ADR 0009</a>.
 		</p>
 
+		<h2>Limits from the meter</h2>
+		<p>
+			Claude and OpenCode Go publish their own usage meter, and the collector reads it every hour.
+			A window's 100% is estimated from how far that meter moved against the tokens we used
+			meanwhile: tokens used ÷ percentage points moved × 100. Consecutive readings that share a
+			reset time form one segment; a reset, a change of reset time or a fall in the percentage
+			starts a new one. Each reading is rounded to a whole percent, so the range widens by one
+			point per segment. Only the estimate, its range and its evidence leave the Worker, never a
+			reading, its time or its reset time. The reasoning is in
+			<a href={LIMITS_ADR_URL}>ADR 0011</a>.
+		</p>
+
 		<h2>Estimated tiers</h2>
 		<p>
 			We measure one tier per plan. Another tier is estimated from a tier we measured times the
@@ -132,6 +173,130 @@ const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data
 			bound, not the plan's limit; a tier whose multiplier the vendor does not state shows “–”.
 			The reasoning is in <a href={ESTIMATE_ADR_URL}>ADR 0008</a>.
 		</p>
+
+		<h2 id="value">Value for money</h2>
+		<p>
+			“Value for money” plots tokens per $1 against API value per $1, one dot per plan with a
+			weekly figure and a price. The weekly price is the monthly USD price × 12 / 52. Tokens per
+			$1 is the week's tokens ÷ the weekly price. API value per $1 is the week's tokens × the
+			blended API list price of the plan's own mix ÷ the weekly price.
+		</p>
+		<p>
+			The blend prices what we used on each model at that model's list price, adds it up, and
+			divides by the tokens without cache reads. A model with no price stays out of the blend; a
+			plan whose models all lack one has no dot. A cache write with no stated price is priced as
+			input. A free plan has no price to divide by, and a plan whose weekly figure is “most we
+			used” rather than an estimate gets a hollow dot. The shaded area is above the median on both
+			axes, or the upper-right third with fewer than three dots.
+		</p>
+
+		<h2 id="tokens">Where the tokens went</h2>
+		<p>
+			The bars split each plan's tokens into input, output, cache read and cache write. Cache rate
+			is cache read ÷ all tokens; a source that reports no cache split says so and has no dot in
+			the cache chart. The cache chart plots tokens per $1 against cache rate from 0 to 100%, one
+			dot per priced plan with a cache split.
+		</p>
+		<p>
+			The reasoning behind per-dollar value is in <a href={VALUE_ADR_URL}>ADR 0012</a>.
+		</p>
+
+		<h2 id="prices">Prices</h2>
+		<p>
+			A price enters only with a dated public source: a URL, the day it was read and the sentence
+			it states. A missing price stays missing and is never inferred from a neighbouring tier or
+			from a multiplier. These were all read on {PRICE_READ}.
+		</p>
+
+		<h3>Plans</h3>
+		<div class="price-table-wrap">
+			<table class="source-table price-table">
+				<thead>
+					<tr>
+						<th scope="col">Plan</th>
+						<th scope="col">Tier</th>
+						<th scope="col">USD</th>
+						<th scope="col">Read</th>
+						<th scope="col">Source</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						planPriceRows.map((row) => (
+							<tr>
+								<td>{row.plan}</td>
+								<td>{row.tier}</td>
+								<td>{row.usd}</td>
+								<td>{row.read ?? "–"}</td>
+								<td>
+									{row.source === null ? (
+										<span>free or not stated</span>
+									) : (
+										<a href={row.source.url} title={row.source.quote}>
+											{row.source.url}
+										</a>
+									)}
+								</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<h3>Models</h3>
+		<p>
+			List prices in US dollars per million tokens. A cache write of “input price” uses the input
+			price.
+		</p>
+		<div class="price-table-wrap">
+			<table class="source-table price-table">
+				<thead>
+					<tr>
+						<th scope="col">Model</th>
+						<th scope="col">Input</th>
+						<th scope="col">Output</th>
+						<th scope="col">Cache read</th>
+						<th scope="col">Cache write</th>
+						<th scope="col">Read</th>
+						<th scope="col">Source</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						modelPriceRows.map((row) => (
+							<tr>
+								<td>
+									<code>{row.model}</code>
+								</td>
+								<td>{row.input}</td>
+								<td>{row.output}</td>
+								<td>{row.cacheRead}</td>
+								<td>{row.cacheWrite}</td>
+								<td>{row.read}</td>
+								<td>
+									<a href={row.source.url} title={row.source.quote}>
+										{row.source.url}
+									</a>
+								</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<h3>Formulas</h3>
+		<ul>
+			<li>Weekly price = monthly USD × 12 / 52.</li>
+			<li>Tokens per $1 = weekly tokens ÷ weekly price.</li>
+			<li>
+				Blended API $ per token = Σ over priced models of the tokens in, out, cache read and
+				cache write at list prices ÷ Σ tokens without cache reads.
+			</li>
+			<li>API value per $1 = weekly tokens × blended API $ per token ÷ weekly price.</li>
+			<li>Cache rate = cache read ÷ all tokens.</li>
+		</ul>
 
 		<h2>What “measured by us” means</h2>
 		<p>
@@ -157,7 +322,8 @@ const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data
 		<h2>Quota numbers</h2>
 		<p>
 			Quota percentages exist only for plans with a readable meter. Claude and OpenCode Go are the
-			plans whose meter we can read. A plan with no meter means no quota number on this site.
+			plans whose meter we can read, so they are the plans whose 100% is estimated. A plan with no
+			meter means no quota number on this site.
 		</p>
 
 		<div class="method-repo">

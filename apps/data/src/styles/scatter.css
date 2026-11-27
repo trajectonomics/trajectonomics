@@ -1,0 +1,113 @@
+/* The value and cache scatters: two axes, one dot per plan, and the best-value area shaded. */
+
+.scatter-figure {
+	position: relative;
+	margin: 32px 0 0;
+	padding: 24px 0 0;
+	border-top: 1px solid var(--ds-color-border);
+}
+
+.scatter-svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.scatter-grid {
+	stroke: var(--ds-color-border);
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+}
+
+.scatter-axis,
+.scatter-title,
+.scatter-best-label,
+.scatter-initial {
+	font-family: var(--font-meta);
+}
+
+.scatter-axis {
+	fill: var(--ds-color-muted-foreground);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+}
+
+.scatter-title {
+	fill: var(--ds-color-foreground);
+	font-size: 10px;
+	letter-spacing: 0.04em;
+}
+
+.scatter-best {
+	fill: var(--ds-color-secondary);
+	opacity: 0.7;
+}
+
+.scatter-best-label {
+	fill: var(--ds-color-muted-foreground);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.scatter-dot {
+	fill: var(--ds-color-secondary);
+	stroke: var(--plan-ink, var(--ds-color-primary));
+	stroke-width: 1.5;
+	vector-effect: non-scaling-stroke;
+}
+
+/* A hollow dot is a lower bound: the most we used, not an estimate. */
+.scatter-dot-open {
+	fill: var(--ds-color-background);
+	stroke: var(--plan-ink, var(--ds-color-primary));
+	stroke-width: 2;
+}
+
+.scatter-logo,
+.scatter-logo-open,
+.scatter-initial {
+	fill: var(--plan-ink, var(--ds-color-foreground));
+}
+
+.scatter-initial {
+	font-size: 10px;
+	font-weight: 600;
+}
+
+.scatter-label {
+	fill: var(--ds-color-foreground);
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.scatter-caption {
+	margin: 14px 0 0;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	line-height: 1.6;
+	color: var(--ds-color-muted-foreground);
+}
+
+@media (max-width: 40rem) {
+	.scatter-axis {
+		font-size: 18px;
+	}
+
+	.scatter-title {
+		font-size: 19px;
+	}
+
+	.scatter-best-label {
+		font-size: 16px;
+	}
+
+	.scatter-label {
+		font-size: 18px;
+	}
+
+	.scatter-initial {
+		font-size: 16px;
+	}
+}

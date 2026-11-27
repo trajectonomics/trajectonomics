@@ -1,0 +1,19 @@
+/* The log page keeps the overview's frame, with a shorter masthead above the raw views. */
+
+.masthead-lite {
+	gap: 12px;
+	padding-top: 48px;
+	padding-bottom: 24px;
+}
+
+.masthead-lite .masthead-title {
+	font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.log-page .section-block:first-of-type {
+	padding-top: 0;
+}
+
+.log-page .chart-figure {
+	padding-bottom: 24px;
+}

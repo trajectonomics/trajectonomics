@@ -1,11 +1,7 @@
+import { MONTH_FROM_WEEK } from "../core/plan-month"
 import type { MeasuredTier, Peak } from "./types"
 
-/**
- * The plans whose vendor states no monthly window, so a measured 30-day figure is meaningless:
- * Claude states 5-hour and weekly limits only, and Antigravity refreshes its quota weekly and every
- * five hours (the notes in `collector/src/tier-catalog/`).
- */
-export const MONTH_FROM_WEEK: ReadonlySet<string> = new Set(["claude", "antigravity"])
+export { MONTH_FROM_WEEK }
 
 const WEEK_DAYS = 7
 const MONTH_DAYS = 30

@@ -260,4 +260,6 @@ cursors in `~/.local/state/traj-data/`. To update, copy `src/`, `deploy/` and `p
 - `src/extract/` and `src/aggregate.ts` are pure: lines or rows in, `UsageRow[]` out, no `fs`,
   SQLite, network or clock. I/O lives in `src/cli.ts`, `src/collect.ts` and `src/stores/`. The quota
   parsers take `sampledAt` as an argument for the same reason.
-- No prices in this slice. A price is added only with a dated, cited source.
+- Prices live in `src/price-catalog.ts`, beside the tier catalogue. A price is added only with a
+  dated, cited source: a URL, the day it was read and an exact quote. A missing price stays `null`,
+  and is never inferred from a neighbouring tier or from a multiplier.

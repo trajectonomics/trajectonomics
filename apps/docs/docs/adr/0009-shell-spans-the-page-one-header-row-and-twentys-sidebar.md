@@ -70,3 +70,28 @@ The docs#77 amendment above put a visible agent line in the sidebar's top block 
 The owner asked for the Portal's logo and its way back to the Site Home to work as the blog's do. The header's brand is now the blog's: the Site's glyph on a tile, 32 px and 40 px from `sm` up, links to the Site Home (`https://trajectonomics.com/`, full document load, no prefetch) under the name "Trajectonomics home", and a `Docs` marker in the brand's display face (Aleo, light) beside it links to the Landing Page under the accessible name "Trajectonomics Docs", which the built-page check still reads. This supersedes the docs#75 amendment's single tile linking to the Landing Page.
 
 The tile is the way back, so the sidebar's bordered `trajectonomics.com ↗` button and the home layout's header link go: the sidebar's top block is the search above the hairline, and the home layout carries no header link items. Its phone menu would then open an empty panel, so the menu's trigger is not drawn. A phone reaches the Site Home from the header at every width, as on the blog.
+
+## Amendment (2026-11-27): the header row is 64px on the shared frame
+
+The header row grows from 56px to 64px so the bar does not move when a visitor travels between the
+Site, the blog, the data site and the Portal. The brand is the shared 40px tile and `Docs` the
+shared display-face marker from `@trajectonomics/brand/header.css`; inside the full-width header the
+bar is capped at 94.5rem and centred, with the shared 1rem and 2.5rem inset, while the header's
+hairline and background still span the page. The Tabs stay centred on the page and no sidebar offset
+changes: the one row still sets the sidebar's top.
+
+## Amendment (2026-11-27): left brand, centre Tabs, right search on every page
+
+The header's layout is now the same on all four static sites: where you are at the left (the glyph
+tile and the `Docs` marker), this site's sections in the centre, and only tools at the right. The
+Tabs take the centre of every Portal page at `lg` and up, the Landing Page's header included; below
+`lg` the notebook's sidebar Tab dropdown and the Landing Page's body links carry them, and the
+Landing Page's header draws none. Neither Tab is current on the Landing Page, which belongs to no
+Tab; a Tab page still marks its own with `aria-current="page"`.
+
+The search leaves the sidebar's top block for the header's right slot, so it sits in the same place
+on every page: the full field from `lg` up and the icon-only trigger below it, which keeps the
+library's "Open Search" accessible name. The trigger is a full-round pill (a circle when
+icon-only), the shape ADR 0004's flat shell allows beside its 4px and 6px corners, with a 1px hairline, the muted text role, and the shared frame's 2px focus ring at a 4px
+offset. The sidebar's top block keeps only the Tab dropdown and, in the drawer, the close button;
+a phone reaches search in the header, never behind the drawer.
