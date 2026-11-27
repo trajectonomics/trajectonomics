@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot as snapshotSchema } from "../../lib/contract"
-import { formatMoney } from "../../lib/format"
+import { formatCompact, formatMoney } from "../../lib/format"
 import { overviewView } from "../../lib/view/overview/view"
 import OverviewGrid from "./OverviewGrid.svelte"
 
@@ -15,6 +15,7 @@ describe("the pages, rendered from the Demo snapshot", () => {
 		const { body } = render(OverviewGrid, { props: { view: overviewView(DEMO) } })
 		const total = DEMO.reads.netWorth.ok ? DEMO.reads.netWorth.data.totals?.[0] : undefined
 		expect(total).toBeDefined()
+		expect(body).toContain(formatCompact(total?.amount ?? ""))
 		expect(body).toContain(formatMoney(total?.amount ?? ""))
 		expect(body).toContain(`Plan ${DEMO.params.compare?.a ?? DEMO.params.scenarios[0]}`)
 		expect(body).not.toContain("undefined")
