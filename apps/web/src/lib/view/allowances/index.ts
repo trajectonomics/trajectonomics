@@ -3,6 +3,7 @@ export { allowancesSummaryOf } from "./home"
 export { DEFAULT_STEP, draftOf, type InputDraft, type InputProblems, planFromDraft } from "./inputs"
 export { chosenLabels, moved, type OrderChoice, orderOf, toggled } from "./order"
 export { filerOfRow, isFilerRead, type ReturnView, returnsView, skippedReadReason } from "./returns"
+export { unplacedOf } from "./unplaced"
 export { ESTIMATE_NOTE, ORDER_NOTE, SSF_WORDS, STOP_WORDS } from "./words"
 export {
 	type AllowancesView,

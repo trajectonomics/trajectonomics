@@ -5,6 +5,7 @@ import { type EstateSummary, estateSummaryOf } from "../estate/home"
 import { NO_PEOPLE, snapshotPeople } from "../item-names"
 import { type FeesOverPlan, feesOverPlan } from "../lifetime"
 import { type NetWorthView, netWorthView } from "../net-worth/view"
+import { claimsHolderOf } from "../tax-settings/holders"
 import { baselineRun } from "../what-if/baseline"
 import { type WithdrawalsSummary, withdrawalsSummaryOf } from "../withdrawals/home"
 import { type FiView, fiView } from "./fi"
@@ -54,6 +55,7 @@ export function overviewView(snapshot: Snapshot, requested = ""): OverviewView {
 	const projections = scenarioView(scenario, snapshot.reads.projections)
 	const planned = scenario === null ? undefined : snapshot.reads.documents[scenario]
 	const shown = planned?.ok ? planned.data.scenario : null
+	const holder = claimsHolderOf(snapshot, scenario)
 	return {
 		netWorth: mapRead(snapshot.reads.netWorth, (data) => ({
 			...netWorthView(data),
@@ -65,7 +67,7 @@ export function overviewView(snapshot: Snapshot, requested = ""): OverviewView {
 		projection: mapScenario(projections, projectionView),
 		chance: mapScenario(scenarioView(scenario, snapshot.reads.chance), chanceSummaryOf),
 		allowances: mapScenario(scenarioView(scenario, snapshot.reads.allowances), (data) =>
-			allowancesSummaryOf(data, people),
+			allowancesSummaryOf(data, people, holder),
 		),
 		withdrawals: mapScenario(projections, withdrawalsSummaryOf),
 		estate: mapScenario(projections, (run) =>
