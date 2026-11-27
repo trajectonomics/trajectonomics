@@ -20,7 +20,8 @@ there, and to keep relaying `/ingest` for installed apps.
 - **Off until switched on.** Nothing runs while the repository variable `DEPLOYS_ENABLED` is not
   `true`.
 - **Push to main.** Each app deploys when its folder changed, or a shared input did:
-  `packages/brand`, `tooling/config`, `bun.lock`, the root `package.json` or `turbo.json`. The
+  `packages/brand`, `packages/site-header`, `tooling/config`, `bun.lock`, the root `package.json` or
+  `turbo.json`. The
   landing site is the exception: it has no build and no workspace imports, so only
   `apps/openjot/site` counts.
 - **By hand.** From main, deploy one app or all of them:
@@ -28,9 +29,9 @@ there, and to keep relaying `/ingest` for installed apps.
   gh workflow run deploy.yml --ref main -f app=all    # or site, docs, blog, data, auth, openjot
   ```
 - **Build.** `bunx turbo run build --filter=@trajectonomics/<app>`, which builds `packages/brand`
-  first (every app imports its `dist/current/`), then `bunx wrangler deploy` in the app folder. The
-  app's turbo `build` outputs are what `wrangler deploy` uploads, including `apps/auth`'s `dist-site`
-  (the static pages) beside its `dist` (the Worker bundle). The landing site has nothing to build: it
+  first (every app imports its `dist/current/`), then `bunx wrangler deploy` in the app folder. For
+  `apps/auth`, `wrangler deploy` bundles `src/worker.ts` again and uploads the built `dist-site` (the
+  static pages) as its assets; its `dist` is only the build's dry run. The landing site has nothing to build: it
   deploys with `bunx wrangler deploy` in `apps/openjot/site`.
 - **Roll back.** Revert the commit on main (a new deploy follows), or in the Cloudflare dashboard
   open the worker → **Deployments** and roll back to an earlier version.
@@ -103,14 +104,21 @@ The `auth` Worker owns `auth.trajectonomics.com` as a Custom Domain (`routes` wi
 in that file). Create the database in Cloudflare before the first deploy, and keep **D1: Edit** on the
 deploy token: the workflow applies `apps/auth/migrations` with
 `bunx wrangler d1 migrations apply traj-auth --remote` before it deploys the Worker, so the schema is
-ahead of the code that reads it.
+ahead of the code that reads it. Reverting a commit does not undo a migration that was applied, so
+every migration must still work with the Worker deployed before it.
 
 The Worker needs five secrets. They live in Cloudflare only, never in this repository (its
 `.dev.vars` is untracked and `.dev.vars.example` holds placeholders); the names are:
 
-- `BETTER_AUTH_SECRET`: signs sessions and the Ed25519 JWTs.
+- `BETTER_AUTH_SECRET`: signs session cookies and encrypts the Ed25519 private key that Better Auth
+  keeps in the `jwks` table. Replacing it signs everyone out, and token signing then fails with
+  `Failed to decrypt private key` until the `jwks` rows are deleted, so a new key pair is made (every
+  access token signed with the old key stops verifying at once).
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: the Google OAuth app.
 - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`: the GitHub OAuth app.
+
+With two Cloudflare accounts on the machine, set `CLOUDFLARE_ACCOUNT_ID` to the Trajectonomics
+account first (`apps/auth/AGENTS.md`), or wrangler stops and asks which one.
 
 ```sh
 cd apps/auth
@@ -125,8 +133,10 @@ All five are set in the Trajectonomics account already; this is what a new accou
 secret repeats. The Google and GitHub apps' redirect URIs point at
 `https://auth.trajectonomics.com/api/auth/callback/<provider>`. Local runs need none of them:
 `bun run test:e2e` starts `wrangler dev --local` with placeholder values and a scratch D1 database
-under `~/.cache`. Then open `https://auth.trajectonomics.com/`: `/api/auth/ok` answering is the
-Worker, and every other path is a static page.
+under `~/.cache`.
+
+After a deploy, open `https://auth.trajectonomics.com/`: `/api/auth/ok` answering is the Worker, and
+every other path is a static page.
 
 ## White-label deploys
 

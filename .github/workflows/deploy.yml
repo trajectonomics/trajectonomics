@@ -77,7 +77,9 @@ jobs:
             if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
               base=$(git rev-parse --verify --quiet "$SHA^" || git hash-object -t tree /dev/null)
             fi
-            shared=(packages/brand tooling/config bun.lock package.json turbo.json)
+            # packages/site-header is the Astro header the Site, the blog, the data site and the auth
+            # pages render, so a header change redeploys them.
+            shared=(packages/brand packages/site-header tooling/config bun.lock package.json turbo.json)
             # The Site serves the Demo, which is built from the Dashboard, the command line and the
             # core engine, so a change there redeploys the Site even though its own folder is unchanged.
             site_shared=(apps/web apps/cli/src packages/core)
