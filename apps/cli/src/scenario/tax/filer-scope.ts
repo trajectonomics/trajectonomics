@@ -1,11 +1,10 @@
 import { thFilerLabel } from "@trajectonomics/core/tax/th"
-import { type AppError, isAppError } from "../../errors"
+import type { AppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
 import type { Household, Owner } from "../household/model"
 import { SHARED } from "../household/model"
 import { resolveOwners } from "../household/owner-held"
 import { ownedSegments } from "../household/owner-rules"
-import { storedHousehold } from "../household/stored"
 import { type Couple, coupleIn } from "./couple"
 import { relabelled, taxSlots } from "./filer-labels"
 import { ownerless, unfitFiler } from "./filer-refusals"
@@ -31,14 +30,12 @@ export type FilerScope = {
 type Decided = { pair: Couple; owners: readonly Owner[]; household: Household }
 
 /** The plan's two people and Owners, or null when it has no partner or no Owners. */
-function decided(household: string | null, document: ScenarioDocument): Decided | AppError | null {
+function decided(household: Household | null, document: ScenarioDocument): Decided | null {
 	if (household === null) return null
-	const stored = storedHousehold(household)
-	if (isAppError(stored)) return stored
-	const pair = coupleIn(stored)
+	const pair = coupleIn(household)
 	if (pair === null) return null
-	const owners = resolveOwners(stored, document).owners ?? []
-	return owners.length === 0 ? null : { pair, owners, household: stored }
+	const owners = resolveOwners(household, document).owners ?? []
+	return owners.length === 0 ? null : { pair, owners, household }
 }
 
 /**
@@ -47,13 +44,12 @@ function decided(household: string | null, document: ScenarioDocument): Decided 
  * taxed item is theirs or `shared`; a taxed item with no Owner is refused.
  */
 export function filerScopeOf(
-	stored: string | null,
+	household: Household | null,
 	document: ScenarioDocument,
 	status: ThFilingStatus,
 ): FilerScope | AppError | null {
 	if (status !== "married_joint" && status !== "married_separate") return null
-	const held = decided(stored, document)
-	if (isAppError(held)) return held
+	const held = decided(household, document)
 	if (held === null) return null
 	const ownerOf = new Map(
 		held.owners.flatMap((owner) => {

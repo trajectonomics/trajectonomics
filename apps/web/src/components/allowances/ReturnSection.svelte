@@ -20,17 +20,17 @@ interface Props {
 }
 
 let { one, currency, plan, people, claimsHolder, filers }: Props = $props()
-/** A separate filing's Return is named by its Filer; a joint Return over both spouses keeps one name. */
+/** A separate filing's Return is named by its Filer; a joint Return over both spouses keeps one plain title. */
 const label = $derived(
-	one.filer === null ? JOINT_RETURN : returnLabel(one.filer, people, claimsHolder, filers),
+	one.filer === null ? null : returnLabel(one.filer, people, claimsHolder, filers),
 )
-/** The words without markup, where only plain text fits (the section's accessible name). */
-const title = $derived(label.text)
+/** The words without markup, where only plain text fits (the section's accessible name and the joint title). */
+const title = $derived(label === null ? JOINT_RETURN : label.text)
 </script>
 
 <!-- One Return: its current tax year, then its later years, each with that Return's own ceilings and headroom. -->
 <section aria-label={title} class="space-y-4">
-	<h2 class="text-lg font-semibold"><ItemWords {label} /></h2>
+	<h2 class="text-lg font-semibold">{#if label === null}{JOINT_RETURN}{:else}<ItemWords {label} />{/if}</h2>
 	{#if one.current}<YearCard year={one.current} {currency} {plan} {people} {claimsHolder} region={title} />{/if}
 	{#if one.later.length > 0}<LaterYears years={one.later} {currency} {plan} {people} {claimsHolder} region={title} />{/if}
 </section>

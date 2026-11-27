@@ -54,10 +54,10 @@ describe("overviewView", () => {
 		const view = overviewView(changed, "separate")
 		expect(view.allowances.status).toBe("ready")
 		if (view.allowances.status !== "ready" || !view.allowances.read.ok) return
-		expect(view.allowances.read.data?.savings.map((one) => one.name?.text)).toEqual([
-			"The earlier holder",
-			"Another person",
-		])
+		const names = view.allowances.read.data?.savings.map((one) =>
+			typeof one.name === "string" ? one.name : one.name?.text,
+		)
+		expect(names).toEqual(["The earlier holder", "Another person"])
 	})
 
 	test("names no Scenario when the Snapshot has none", () => {

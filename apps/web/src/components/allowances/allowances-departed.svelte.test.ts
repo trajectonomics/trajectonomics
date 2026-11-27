@@ -72,6 +72,9 @@ function joint(): ProjectionAllowances {
 describe("a departed Filer on the Tax allowances page reads as the Tax profile tables do", () => {
 	const page = (snapshot: Snapshot) =>
 		render(AllowancesBody, { props: { snapshot, scenario: "separate" } }).body
+	/** The joint Return over both spouses, as these names render it. */
+	const jointBody = (people: PersonNames, claimsHolder: string | null = null) =>
+		render(AllowancesResult, { props: { data: joint(), plan: null, people, claimsHolder } }).body
 
 	test("names the recorded holder the earlier holder", () => {
 		const body = page(separateWith(GONE, "me"))
@@ -103,8 +106,6 @@ describe("a departed Filer on the Tax allowances page reads as the Tax profile t
 	})
 
 	test("a joint Return over departed spouses groups each line under the same words", () => {
-		const jointBody = (people: PersonNames, claimsHolder: string | null = null) =>
-			render(AllowancesResult, { props: { data: joint(), plan: null, people, claimsHolder } }).body
 		expect(jointBody(personNames(GONE), "me")).toMatch(/>The earlier holder<\/span>/)
 		expect(jointBody(personNames(GONE), "me")).toMatch(/>You<\/span>/)
 		expect(jointBody(personNames(RENAMED))).toMatch(/>Another person<\/span>/)
@@ -112,6 +113,12 @@ describe("a departed Filer on the Tax allowances page reads as the Tax profile t
 		expect(jointBody(personNames(BOTH_GONE))).toMatch(/>Another person \(partner\)<\/span>/)
 		expect(jointBody(personNames(null))).toMatch(/<code[^>]*data-unnamed[^>]*>me<\/code>/)
 		expect(jointBody(personNames(null))).toMatch(/<code[^>]*data-unnamed[^>]*>partner<\/code>/)
+	})
+
+	test("a joint Return's title is plain text, naming no item", () => {
+		const body = jointBody(personNames(GONE), "me")
+		expect(body).toContain(">Your joint Return<")
+		expect(body).not.toContain('data-item=""')
 	})
 })
 

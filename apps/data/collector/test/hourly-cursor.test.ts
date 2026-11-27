@@ -5,8 +5,14 @@ import { quotaRow, usageRow } from "./support/rows"
 const NOW = Date.parse("2026-11-27T14:26:00.000Z")
 
 describe("sinceForCursor", () => {
-	test("reads seven days back when a host has no cursor", () => {
-		expect(sinceForCursor(null, NOW)).toBe("2026-11-20T14:26:00.000Z")
+	test("starts at the current hour when a host has no cursor", () => {
+		expect(sinceForCursor(null, NOW)).toBe("2026-11-27T14:00:00.000Z")
+	})
+
+	test("starts at midnight when the clock is inside the first hour of a day", () => {
+		expect(sinceForCursor(null, Date.parse("2026-11-27T00:09:59.000Z"))).toBe(
+			"2026-11-27T00:00:00.000Z",
+		)
 	})
 
 	test("reads six hours before the cursor", () => {

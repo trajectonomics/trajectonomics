@@ -14,7 +14,7 @@ import { capture } from "./test-support"
 
 /** The conditional hint the document form gives at every anchorable path (cli ADR-0048). */
 const ANCHOR_HINT =
-	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write the date that command prints at this path, because any other date is refused; otherwise write the real date.'
+	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write the date that command shows for this item, because any other date is refused; otherwise write the real date.'
 
 describe("scenario household, and the writes that keep it", () => {
 	it("refuses an apply that changes an anchored date, and names the anchor", async () => {
@@ -37,7 +37,9 @@ describe("scenario household, and the writes that keep it", () => {
 				anchored: "2050-06-30",
 			},
 		})
-		expect(error.hint).toContain("traj scenario household base")
+		expect(error.hint).toBe(
+			'Run "traj scenario household base --file <path>" to move the anchor, or remove the value so the anchor fills it.',
+		)
 	})
 
 	it("fills an anchored date an apply leaves out, and drops the anchor of a Flow it removes", async () => {

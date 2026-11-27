@@ -1,11 +1,5 @@
 import { describe, expect, it } from "bun:test"
 import { edited } from "./baseline/testing"
-import { isAppError } from "./errors"
-import { allowancesOf } from "./scenario/tax/allowances"
-import { coupleOf, holderIdOf } from "./scenario/tax/couple"
-import { departedClaimants } from "./scenario/tax/departed-claims"
-import { filerScopeOf } from "./scenario/tax/filer-scope"
-import type { TaxRequest } from "./scenario/tax/flags"
 import { setHousehold, shown } from "./scenario-household-support"
 import { applyScenario, errorOf, scenarioHome } from "./scenario-test-support"
 import { SCENARIO_DOCUMENT } from "./store/testing"
@@ -24,13 +18,17 @@ const HOUSEHOLD = {
 }
 const MESSAGE = "The stored household does not parse as a household."
 const CORRUPT = "{not json"
+const TWO_HOLDERS = JSON.stringify({
+	...HOUSEHOLD,
+	people: [...HOUSEHOLD.people, { id: "you", role: "holder", born: "1991-06", lifeExpectancy: 90 }],
+})
 
 /** A home whose base Scenario held a valid household, then the text a damaged row holds. */
-async function corrupted(): Promise<string> {
+async function corrupted(text: string = CORRUPT): Promise<string> {
 	const home = scenarioHome()
 	expect((await applyScenario(home, "base", SCENARIO_DOCUMENT)).code).toBe(0)
 	expect((await setHousehold(home, HOUSEHOLD)).code).toBe(0)
-	edited(home, `UPDATE scenario SET household = '${CORRUPT}' WHERE name = 'base'`)
+	edited(home, `UPDATE scenario SET household = '${text}' WHERE name = 'base'`)
 	return home
 }
 
@@ -40,6 +38,19 @@ async function answers(home: string, argv: readonly string[]) {
 		human: await capture(["scenario", ...argv], { TRAJ_HOME: home }),
 		json: await capture(["scenario", ...argv, "--json"], { TRAJ_HOME: home }),
 	}
+}
+
+/** Both answers to `scenario tax` over a home whose stored household holds this text. */
+async function taxAnswers(text: string) {
+	return answers(await corrupted(text), [
+		"tax",
+		"base",
+		"--tax",
+		"th-2026",
+		"--filing-status",
+		"single",
+		"--dry-run",
+	])
 }
 
 describe("a stored household that does not parse", () => {
@@ -75,15 +86,7 @@ describe("a stored household that does not parse", () => {
 	})
 
 	it("is the internal failure of scenario tax, in both forms", async () => {
-		const { human, json } = await answers(await corrupted(), [
-			"tax",
-			"base",
-			"--tax",
-			"th-2026",
-			"--filing-status",
-			"single",
-			"--dry-run",
-		])
+		const { human, json } = await taxAnswers(CORRUPT)
 		expect(human.code).toBe(1)
 		expect(human.out).toBe("")
 		expect(human.err).toContain("error: internal: ")
@@ -94,34 +97,17 @@ describe("a stored household that does not parse", () => {
 		expect(body.message).toBe(MESSAGE)
 		expect(body.hint).toContain("Report it at")
 	})
-})
 
-/*
- * A tax write reads the household through `coupleOf` before the Filers or the departed claims, so a
- * corrupt row stops there; these call every reader to pin that each refuses it, not throws.
- */
-describe("the tax readers of a stored household", () => {
-	it("refuse it as the internal failure, not a throw", () => {
-		const kept = {
-			jurisdiction: "th-2026",
-			filingStatus: "single",
-			children: 0,
-			childrenAtHigherRate: 0,
-			allowances: allowancesOf({}),
-		} satisfies TaxRequest
-		const readers = [
-			holderIdOf(CORRUPT),
-			coupleOf(CORRUPT),
-			filerScopeOf(CORRUPT, SCENARIO_DOCUMENT, "married_joint"),
-			departedClaimants(kept, CORRUPT),
-		]
-		for (const reader of readers) {
-			expect(isAppError(reader)).toBe(true)
-			if (isAppError(reader)) {
-				expect(reader.body.code).toBe("internal")
-				expect(reader.body.message).toBe(MESSAGE)
-			}
-		}
+	it("is the internal failure of scenario tax when the row is JSON, but not a household", async () => {
+		const { human, json } = await taxAnswers(TWO_HOLDERS)
+		expect(human.code).toBe(1)
+		expect(human.out).toBe("")
+		expect(human.err).toContain("error: internal: ")
+		expect(human.err).toContain(MESSAGE)
+		expect(json.code).toBe(1)
+		const body = errorOf(json)
+		expect(body.code).toBe("internal")
+		expect(body.message).toBe(MESSAGE)
 	})
 })
 

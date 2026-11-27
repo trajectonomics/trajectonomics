@@ -5,6 +5,8 @@
 Accepted, 2026-11-27. Follow-up to ADR 0007 and ADR 0008. It replaces the figure rules in 0007
 and the estimate's month rule in 0008.
 
+Amended by [ADR 0010](0010-data-starts-when-collecting-starts.md), 2026-11-27: the derived month is shown only once a full week has been collected.
+
 ## Context
 
 The "What each plan gives" section summed every token kind. In Claude's busiest five hours, cache

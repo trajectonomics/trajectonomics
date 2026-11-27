@@ -2,6 +2,7 @@
 import type { AssetDraft } from "../../lib/view/plan-items/asset-draft"
 import type { OwnedChoice } from "../../lib/view/plan-items/asset-owned"
 import type { Shown } from "../../lib/view/plan-items/problems"
+import FormAlert from "../ui/FormAlert.svelte"
 import AssetBasics from "./AssetBasics.svelte"
 import AssetBuying from "./AssetBuying.svelte"
 import AssetIncome from "./AssetIncome.svelte"
@@ -33,5 +34,5 @@ let { draft = $bindable(), editing, choices, routed, shown, anchors, plan }: Pro
 	<AssetKeeping bind:draft {shown} />
 	<AssetIncome bind:draft {shown} />
 	<AssetSelling bind:draft {shown} anchor={anchors.sale} {plan} />
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 </div>

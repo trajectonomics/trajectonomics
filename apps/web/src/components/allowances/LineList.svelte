@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { LineView } from "../../lib/view/allowances"
-import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
+import type { PersonNames } from "../../lib/view/item-names"
 import { returnLabel } from "../../lib/view/tax-settings/return-name"
 import ItemWords from "../ui/ItemWords.svelte"
 import Money from "../ui/Money.svelte"
@@ -9,12 +9,12 @@ interface Props {
 	lines: readonly LineView[]
 	currency: string
 	/** The household's people, so a Return over two spouses names each one's allowances. */
-	people?: PersonNames
+	people: PersonNames
 	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
 	claimsHolder: string | null
 }
 
-let { lines, currency, people = NO_PEOPLE, claimsHolder }: Props = $props()
+let { lines, currency, people, claimsHolder }: Props = $props()
 /** Every Filer these lines name, so two departed Returns that would read alike take their ids. */
 const filers = $derived([
 	...new Set(lines.flatMap((line) => (line.filer === null ? [] : [line.filer]))),

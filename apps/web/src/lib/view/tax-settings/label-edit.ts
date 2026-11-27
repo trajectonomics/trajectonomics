@@ -8,6 +8,7 @@ import type { EditInput } from "../../edit/edit"
 import { INCOME_LABEL_IDS, type TaxLabels } from "../../edit/tax-labels"
 import type { Problems, Shown } from "../plan-items/problems"
 import { shownProblems } from "../plan-items/problems"
+import { namedRefusal } from "../plan-items/refusal"
 import { INCOME_LABELS } from "./label-choices"
 
 /** What the label form holds: the Flow and the label chosen. */
@@ -48,13 +49,19 @@ export function labelEdit(
 	return { ok: true, edit }
 }
 
-/** What the label form shows: its own problems, and a refusal at the field its path ends in (`...flows.<id>.label`). */
+/**
+ * What the label form shows: its own problems, and a refusal at the field its path names. `flows` are the ids of the
+ * document the Edit sent, in order, because `traj` may name the Flow by its position (`flows.2.label`).
+ */
 export function labelShown(
 	problems: Problems,
 	refusal: ErrorBody | null,
 	message: string | null,
+	flow: string,
+	flows: readonly string[],
 ): Shown {
-	return shownProblems(problems, refusal, message, ["label"])
+	const named = namedRefusal(refusal, flows)
+	return shownProblems(problems, named, message, ["label"], ["flows", flow])
 }
 
 /** The key of the problem at one Flow's label in the whole form. */
