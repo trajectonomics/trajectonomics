@@ -88,7 +88,16 @@ export async function waitForSettledPage(page: Page): Promise<void> {
 	// The scroll spy marks the active heading after hydration and the subnav cross-fades to it.
 	await page.waitForFunction((selector: string) => {
 		const progress = document.querySelector(selector)
-		return progress === null || Number(progress.getAttribute("aria-valuenow")) > 0
+		if (progress === null) return true
+		if (Number(progress.getAttribute("aria-valuenow")) > 0) return true
+		// A page whose first heading is below the fold has no active anchor to mark, so waiting for
+		// one would hang. When no heading is 90% in view (Fumadocs' own threshold), nothing is
+		// cross-fading and the row is already settled.
+		return ![...document.querySelectorAll("#nd-page :is(h2, h3, h4)")].some((heading) => {
+			const rect = heading.getBoundingClientRect()
+			const shown = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0)
+			return rect.height > 0 && shown / rect.height >= 0.9
+		})
 	}, SUBNAV_PROGRESS)
 	// A page without the row has no cross-fade, so any transition still running there counts. A
 	// loop never settles by design (the Landing Page's caret and glow), so it is not waited for.
