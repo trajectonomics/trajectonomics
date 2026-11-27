@@ -5,12 +5,12 @@ import { DOCS_URL, SITE_HOME_URL, SOURCE_URL } from "./site"
 const POSTS: readonly LlmsPost[] = [
 	{
 		title: "Newer guide",
-		url: "https://blog.trajectonomics.com/guides/newer/",
+		url: "https://trajectonomics.com/blog/guides/newer/",
 		description: "A guide to the newer thing.",
 	},
 	{
 		title: "Older news",
-		url: "https://blog.trajectonomics.com/news/older/",
+		url: "https://trajectonomics.com/blog/news/older/",
 		description: "A note on the older thing.",
 	},
 ]
@@ -31,8 +31,8 @@ describe("the llms.txt the blog serves", () => {
 		const start = lines.indexOf("## Posts")
 		expect(start).toBeGreaterThan(0)
 		expect(lines.slice(start + 2, start + 4)).toEqual([
-			"- [Newer guide](https://blog.trajectonomics.com/guides/newer/): A guide to the newer thing.",
-			"- [Older news](https://blog.trajectonomics.com/news/older/): A note on the older thing.",
+			"- [Newer guide](https://trajectonomics.com/blog/guides/newer/): A guide to the newer thing.",
+			"- [Older news](https://trajectonomics.com/blog/news/older/): A note on the older thing.",
 		])
 	})
 

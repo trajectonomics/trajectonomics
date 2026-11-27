@@ -51,6 +51,9 @@ User-agent: Bytespider
 Allow: /
 
 Sitemap: ${SITE_ORIGIN}/sitemap.xml
+Sitemap: ${SITE_ORIGIN}/docs/sitemap.xml
+Sitemap: ${SITE_ORIGIN}/blog/sitemap.xml
+Sitemap: ${SITE_ORIGIN}/openjot/meowjot-alternative/sitemap.xml
 `
 
 /** Both Crawler files as the build must write them, with any given file standing in for one. */

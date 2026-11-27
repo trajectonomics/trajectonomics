@@ -53,9 +53,9 @@ export const household: Leaf = defineCommand({
 		},
 		{
 			command:
-				"traj scenario household base --none --if-hash jcs1:sha256:efa36213fb2018bcf7818839e27815bee3be1b5b4b8662b491421ed4c5368510",
+				"traj scenario household base --none --if-hash jcs1:sha256:27da7c42cb1c3811b4562b605e8e62a0e1d6470ef9a04269311fa52a4fc9450c",
 			description:
-				"Remove the household only if base still holds the contentHash the household wrote.",
+				"Remove the household only if base still holds the householdHash the household wrote.",
 		},
 	],
 	errorCodes: [

@@ -2,16 +2,17 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import PostPage from "../../components/PostPage.astro"
-import { type Post, postPagePath, readPosts } from "../../content/read-posts"
+import { type Post, readPosts } from "../../content/read-posts"
 import { DEFAULT_LANGUAGE } from "../../lib/languages"
+import { typeFolder } from "../../lib/posts"
 
 /** Every published Post in the default Language Tree, at its type's folder and its slug. */
 export async function getStaticPaths() {
 	const posts = await readPosts()
-	return posts.map((post) => {
-		const [, type, slug] = postPagePath(post, DEFAULT_LANGUAGE).split("/")
-		return { params: { type, slug }, props: { post } }
-	})
+	return posts.map((post) => ({
+		params: { type: typeFolder(post.type), slug: post.slug },
+		props: { post },
+	}))
 }
 
 interface Props {

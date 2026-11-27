@@ -42,7 +42,10 @@ async function readBody(request: Request): Promise<Uint8Array | null> {
 	return bytes
 }
 
-/** Handles `POST /ingest`: authenticate, validate the whole body, then write it atomically. */
+/**
+ * Handles `POST /data/ingest` (and the old host's `/ingest`): authenticate, validate the whole
+ * body, then write it atomically.
+ */
 export async function handleIngest(
 	request: Request,
 	env: Env,

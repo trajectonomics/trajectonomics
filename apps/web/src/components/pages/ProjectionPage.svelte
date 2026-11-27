@@ -28,7 +28,6 @@ let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = 
 
 <PageShell
 	title="Projection"
-	intro="One plan projected year by year, in future money and today's money, with its notes and tax status."
 >
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}

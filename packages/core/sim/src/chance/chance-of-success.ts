@@ -27,9 +27,14 @@ function outcomesOf(inputs: PathInputs, options: ChanceOfSuccessOptions): Chance
 	const seed = BigInt(`0x${options.seed}`)
 	const outcomes: PathOutcome[] = []
 	for (const returns of marketReturns(options.model, seed, options.paths, inputs.timeline)) {
-		const result = outcomeOf(inputs, returns)
+		const result = outcomeOf(inputs, returns, options.milestoneDates === true)
 		if (!result.ok) return { ok: false, problems: [result.problem] }
 		outcomes.push(result.outcome)
 	}
-	return { ok: true, chance: summarise(options, outcomes, inputs.grid) }
+	return { ok: true, chance: summarise(options, outcomes, inputs.grid, milestoneIds(inputs)) }
+}
+
+/** The Scenario's Milestone ids in order, or none when it declares no Milestones. */
+function milestoneIds(inputs: PathInputs): readonly string[] {
+	return inputs.scenario.milestones?.map((milestone) => milestone.id) ?? []
 }

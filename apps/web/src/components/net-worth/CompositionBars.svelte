@@ -4,9 +4,11 @@ import CompositionBar from "../chart/CompositionBar.svelte"
 
 interface Props {
 	bars: readonly CurrencyBar[]
+	/** A card's short form of each legend amount, truncated toward zero. */
+	compact?: boolean
 }
 
-let { bars }: Props = $props()
+let { bars, compact = false }: Props = $props()
 </script>
 
 <!-- The assets by account, one bar per currency. Empty when no asset account has a row. -->
@@ -19,6 +21,7 @@ let { bars }: Props = $props()
 				label={`Assets by account, ${bar.currency}`}
 				segments={bar.segments}
 				currency={bar.currency}
+				{compact}
 			/>
 		{/each}
 	</div>

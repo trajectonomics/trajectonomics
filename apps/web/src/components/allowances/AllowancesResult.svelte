@@ -12,10 +12,14 @@ interface Props {
 	plan: { name: string; contentHash: string; doc: ScenarioDocument } | null
 	/** The household's people, so a Return is named by the role the CLI states ("You", "Your partner"). */
 	people?: PersonNames
+	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
+	claimsHolder: string | null
 }
 
-let { data, plan, people = NO_PEOPLE }: Props = $props()
+let { data, plan, people = NO_PEOPLE, claimsHolder }: Props = $props()
 const view = $derived(allowancesView(data))
+/** Every Filer the page shows, so two departed Returns that would read alike take their ids. */
+const filers = $derived(view.returns.flatMap((one) => (one.filer === null ? [] : [one.filer])))
 </script>
 
 <!-- The CLI's reading of one plan: one section per Return, this tax year first, the later years, the assumptions and the notes. -->
@@ -27,11 +31,11 @@ const view = $derived(allowancesView(data))
 	{/if}
 	{#if view.returns.length > 0}
 		{#each view.returns as one (one.key)}
-			<ReturnSection {one} currency={view.currency} {plan} {people} />
+			<ReturnSection {one} currency={view.currency} {plan} {people} {claimsHolder} {filers} />
 		{/each}
 	{:else}
-		{#if view.current}<YearCard year={view.current} currency={view.currency} {plan} {people} />{/if}
-		{#if view.later.length > 0}<LaterYears years={view.later} currency={view.currency} {plan} {people} />{/if}
+		{#if view.current}<YearCard year={view.current} currency={view.currency} {plan} {people} {claimsHolder} />{/if}
+		{#if view.later.length > 0}<LaterYears years={view.later} currency={view.currency} {plan} {people} {claimsHolder} />{/if}
 	{/if}
 	{#if view.assumptions.length > 0}
 		<details class="rounded-lg border border-border p-4 text-sm">

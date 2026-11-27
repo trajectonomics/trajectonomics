@@ -8,8 +8,6 @@ import { SNAPSHOT_COMMAND } from "./snapshot-command"
 interface Props {
 	/** The page's heading, such as "Net worth". */
 	title: string
-	/** One sentence under the heading, on what the page shows. */
-	intro?: string | undefined
 	/** The figures' state: whichever state it is in decides the body. */
 	state: SnapshotState
 	/** The page's own path, so "View the demo" stays on the page. */
@@ -18,15 +16,12 @@ interface Props {
 	children: Snippet<[Snapshot]>
 }
 
-let { title, intro, state, pathname, children }: Props = $props()
+let { title, state, pathname, children }: Props = $props()
 </script>
 
 <section aria-labelledby="page-title" class="space-y-6">
 	<header>
-		<h1 id="page-title" class="text-2xl font-semibold tracking-tight">{title}</h1>
-		{#if intro}
-			<p class="mt-2 max-w-prose text-muted-foreground">{intro}</p>
-		{/if}
+		<h1 id="page-title" class="text-xl font-semibold tracking-tight">{title}</h1>
 	</header>
 	{#if state.status === "loading"}
 		<p role="status" class="text-muted-foreground">Loading…</p>

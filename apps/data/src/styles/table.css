@@ -102,3 +102,10 @@
 	letter-spacing: 0.02em;
 	color: var(--ds-color-muted-foreground);
 }
+
+/* The closing row states the grand totals, so it carries the weight of a row header throughout. */
+.usage-table tfoot th,
+.usage-table tfoot td {
+	border-bottom: 0;
+	font-weight: 500;
+}

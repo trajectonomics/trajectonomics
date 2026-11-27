@@ -22,13 +22,13 @@ let { scenario }: Props = $props()
 					<div>
 						<p class="text-sm text-muted-foreground">Net worth at {view.endDate}</p>
 						<p class="mt-1 text-2xl font-semibold tracking-tight">
-							<Money amount={view.nominal} currency={view.currency} />
+							<Money amount={view.nominal} currency={view.currency} compact />
 						</p>
 					</div>
 					<div>
 						<p class="text-sm text-muted-foreground">Today's money</p>
 						<p class="mt-1 text-2xl font-semibold tracking-tight">
-							<Money amount={view.real} currency={view.currency} />
+							<Money amount={view.real} currency={view.currency} compact />
 						</p>
 					</div>
 				</div>

@@ -1,8 +1,11 @@
 /** The origin the Site is served from, so canonical and `hreflang` links can be absolute. */
 export const SITE_ORIGIN = "https://trajectonomics.com"
 
-/** The Site's name: the brand lockup's accessible name, and the name the Organisation goes by. */
+/** The Site's name: the brand lockup's accessible name and the footer's wordmark. */
 export const SITE_NAME = "trajectonomics"
+
+/** The brand as the head names it, capitalised: `og:site_name` and the Structured data's names. */
+export const SITE_BRAND_NAME = "Trajectonomics"
 
 /** The CLI's name: the program the Site is about, and the `name` Structured data gives it. */
 export const CLI_NAME = "traj"
@@ -59,20 +62,32 @@ export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
 	"}",
 ])
 
-/** The Docs Portal's origin. This repository does not build it (ADR 0013 in `apps/docs`). */
-export const DOCS_ORIGIN = "https://docs.trajectonomics.com"
-
-/** The Docs Portal's Landing Page. */
-export const DOCS_PATH = `${DOCS_ORIGIN}/`
+/**
+ * The Docs Portal's mount path on the Site's host: a zone route serves it from the `docs` Worker, so a
+ * link on a page is root-relative like any other (ADR 0033). This repository does not build it.
+ */
+export const DOCS_PATH = "/docs/"
 
 /** The Docs Portal's CLI page, the CLI docs link in the footer. */
-export const DOCS_CLI_PATH = `${DOCS_ORIGIN}/cli/`
+export const DOCS_CLI_PATH = `${DOCS_PATH}cli/`
 
 /**
  * The Docs Portal's CLI installation page: every install channel, release pinning and uninstall. It is the
  * way out under the prompt, for the visitor the skills CLI cannot reach (ADR 0015).
  */
-export const DOCS_CLI_INSTALL_PATH = `${DOCS_ORIGIN}/cli/installation/`
+export const DOCS_CLI_INSTALL_PATH = `${DOCS_PATH}cli/installation/`
+
+/** The Docs Portal on the Site's origin, for the Answer engine files a reader opens away from the Site. */
+export const DOCS_URL = `${SITE_ORIGIN}${DOCS_PATH}`
+
+/** The Docs Portal's CLI page as an absolute URL, for the Answer engine files. */
+export const DOCS_CLI_URL = `${SITE_ORIGIN}${DOCS_CLI_PATH}`
+
+/** The Docs Portal's installation page as an absolute URL, for the Answer engine files. */
+export const DOCS_CLI_INSTALL_URL = `${SITE_ORIGIN}${DOCS_CLI_INSTALL_PATH}`
+
+/** The Docs Portal's Sitemap, which the Robots file names beside the Site's own. */
+export const DOCS_SITEMAP_URL = `${SITE_ORIGIN}${DOCS_PATH}sitemap.xml`
 
 /** The hosted Demo Dashboard's path on the Site: the Dashboard's build, served as static assets (ADR 0031). */
 export const DEMO_PATH = "/demo/"
@@ -84,12 +99,16 @@ export const DEMO_PATH = "/demo/"
 export const OPENJOT_PATH = "/openjot/"
 
 /**
- * The blog's origin. `apps/blog` builds it, and its Worker serves this host (ADR 0002 in `apps/blog`).
+ * The blog's mount path on the Site's host, served by the `blog` Worker's zone route (ADR 0033).
+ * `apps/blog` builds it.
  */
-export const BLOG_ORIGIN = "https://blog.trajectonomics.com"
+export const BLOG_PATH = "/blog/"
 
-/** The blog's front page, the header's Blog link. */
-export const BLOG_PATH = `${BLOG_ORIGIN}/`
+/** The blog's Sitemap, which the Robots file names beside the Site's own. */
+export const BLOG_SITEMAP_URL = `${SITE_ORIGIN}${BLOG_PATH}sitemap.xml`
+
+/** The data site's mount path on the Site's host, served by the `data` Worker's zone route (ADR 0033). */
+export const DATA_PATH = "/data/"
 
 /**
  * The monorepo the CLI is built and released from. Issues and releases live at its root, and it is the

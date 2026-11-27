@@ -69,7 +69,12 @@ describe("Docs Portal content structure", () => {
 		expect(rulesOf(withContent("contribute/index.mdx", link))).toContain("internal-link")
 	})
 
-	test("a link to the Landing Page at / needs no content page", () => {
+	test("a link to the Site Home at / needs no content page", () => {
 		expect(rulesOf(withContent("contribute/index.mdx", "[Home](/)"))).not.toContain("internal-link")
+	})
+
+	test("a link to the blog or the data site needs no content page", () => {
+		const links = "[Blog](/blog/guides/x/) and [Data](/data/)"
+		expect(rulesOf(withContent("contribute/index.mdx", links))).not.toContain("internal-link")
 	})
 })

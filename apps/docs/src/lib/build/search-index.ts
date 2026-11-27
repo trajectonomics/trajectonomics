@@ -1,11 +1,11 @@
 import { SEARCH_INDEX_PATH } from "../tabs"
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 
-/** Path of the static search index in the build output, one segment below the assets root. */
-export const SEARCH_INDEX_FILE = SEARCH_INDEX_PATH.slice(1)
+/** Path of the static search index in the build output, at the assets root under /docs (ADR 0017). */
+export const SEARCH_INDEX_FILE = portalAsset(SEARCH_INDEX_PATH)
 
 /** The part of Fumadocs' exported advanced index that names the pages it answers with. */
 interface AdvancedSearchDocuments {

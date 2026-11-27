@@ -19,7 +19,8 @@ function isUnder(pathname: string, base: string): boolean {
 
 /**
  * The page a retired `/developers` path now answers with a 301, or `null` when the path is not
- * retired. `tax-core` pages go to the tax guide; every other path in the section goes to the Contribute Tab.
+ * retired. `tax-core` pages go to the tax guide; every other path in the section goes to the
+ * Contribute Tab. The section lives under the Portal's `/docs` base like every other page.
  */
 export function retiredPathTarget(pathname: string): string | null {
 	if (isUnder(pathname, RETIRED_TAX_CORE)) return TAX_GUIDE_PATH

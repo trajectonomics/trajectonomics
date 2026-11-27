@@ -1,0 +1,91 @@
+/* The ranked meter list: a mark, a name and a big rate over one primary bar per plan. */
+
+.meter-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid var(--ds-color-border);
+}
+
+.meter-row {
+	display: grid;
+	grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 8px 16px;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+/* A plan we have not used lately stays readable but steps back from the ones in use. */
+.meter-dim {
+	opacity: 0.6;
+}
+
+.meter-identity {
+	display: flex;
+	min-width: 0;
+	align-items: center;
+	gap: 10px;
+}
+
+.meter-name {
+	overflow: hidden;
+	font-weight: 500;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
+}
+
+.use-dot {
+	width: 8px;
+	height: 8px;
+	flex: none;
+	border-radius: 999px;
+	background: var(--ds-color-primary);
+}
+
+.meter-track {
+	height: 8px;
+	overflow: hidden;
+	border-radius: 999px;
+	background: var(--ds-color-secondary);
+}
+
+.meter-bar {
+	height: 100%;
+	border-radius: inherit;
+	background: var(--ds-color-primary);
+}
+
+.meter-figure {
+	font-family: var(--font-meta);
+	font-size: 1.0625rem;
+	font-weight: 600;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	text-wrap: nowrap;
+}
+
+.meter-unit {
+	margin-left: 2px;
+	font-size: 11px;
+	font-weight: 400;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* On a phone the bar drops under the name and its figure, while every bar keeps one left edge. */
+@media (max-width: 30rem) {
+	.meter-row {
+		grid-template-columns: minmax(0, 1fr) auto;
+	}
+
+	.meter-track {
+		grid-row: 2;
+		grid-column: 1 / -1;
+	}
+
+	.meter-figure {
+		grid-row: 1;
+		grid-column: 2;
+		text-align: right;
+	}
+}

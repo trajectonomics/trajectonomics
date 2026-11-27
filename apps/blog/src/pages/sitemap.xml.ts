@@ -12,7 +12,7 @@ export const GET: APIRoute = async () => {
 	const posts = await readPosts()
 	const frontAlternates = [
 		...LANGUAGES.map((language) => ({ hreflang: language, path: treePath(language, BLOG_PATH) })),
-		{ hreflang: "x-default", path: BLOG_PATH },
+		{ hreflang: "x-default", path: treePath(DEFAULT_LANGUAGE, BLOG_PATH) },
 	]
 	const fronts: SitemapEntry[] = LANGUAGES.map((language) => ({
 		path: treePath(language, BLOG_PATH),

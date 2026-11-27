@@ -1,5 +1,5 @@
 // Anonymous, opt-in product analytics for the Android app. Events go to PostHog
-// (EU Cloud) through the website's first-party proxy, openjot.trajectonomics.com/ingest
+// (EU Cloud) through the website's first-party proxy, trajectonomics.com/openjot/ingest
 // (see site/tracking.js). What may be sent is listed in analyticsEvents.ts, and
 // docs/privacy-policy.md tells users about it.
 //
@@ -22,7 +22,7 @@ import {
 
 /** PostHog project API key. It is public by design: it can only write events. */
 export const POSTHOG_KEY = "phc_uNb2thEMk4Rh7HrKRaThNsxSwFGxta4gnV5dxBcH5T9n";
-const API_HOST = "https://openjot.trajectonomics.com/ingest";
+const API_HOST = "https://trajectonomics.com/openjot/ingest";
 const UI_HOST = "https://eu.posthog.com";
 
 const PREF_KEY = "moojot_analytics"; // "on" | "off"; missing means the user hasn't opted in

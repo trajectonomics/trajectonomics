@@ -95,7 +95,14 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 		expect(chance).toMatch(/Chance of success from [\d.]+% to [\d.]+%/)
 
 		const tax = render(TaxPanel, {
-			props: { names, projections, people: {}, requested: "base", onScenario: () => {} },
+			props: {
+				names,
+				projections,
+				people: {},
+				holders: {},
+				requested: "base",
+				onScenario: () => {},
+			},
 		}).body
 		expect(tax).toContain("What-if on base")
 		expect(tax).toContain("Baseline:")
@@ -121,7 +128,14 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 				props: { names, chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
 			}).body,
 			render(TaxPanel, {
-				props: { names, projections, people: {}, requested: "base", onScenario: () => {} },
+				props: {
+					names,
+					projections,
+					people: {},
+					holders: {},
+					requested: "base",
+					onScenario: () => {},
+				},
 			}).body,
 		]) {
 			expect(body).not.toContain("What-if on")

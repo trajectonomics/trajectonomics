@@ -137,7 +137,7 @@ describe("the choice a consent parameter names", () => {
 describe("the cookie domain a host names", () => {
 	it("is the registrable domain on production and its subdomains", () => {
 		expect(cookieDomainFor("trajectonomics.com")).toBe("trajectonomics.com")
-		expect(cookieDomainFor("docs.trajectonomics.com")).toBe("trajectonomics.com")
+		expect(cookieDomainFor("app.trajectonomics.com")).toBe("trajectonomics.com")
 	})
 
 	it("is none on a preview, a lookalike or localhost", () => {

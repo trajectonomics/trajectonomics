@@ -57,6 +57,70 @@ describe("TaxPanel: the Returns of a separate filing", () => {
 		const body = panel({ base: ok(withLevy) })
 		expect(body).not.toContain('name="return"')
 	})
+
+	test("names the recorded holder the earlier holder once the household has departed", () => {
+		const gone: HouseholdDocument = {
+			...household,
+			people: [
+				{ id: "partner", role: "holder", born: "1992-02", lifeExpectancy: 88 },
+				{ id: "bob", role: "partner", born: "1990-06", lifeExpectancy: 90 },
+			],
+		}
+		const body = panel(
+			{ separate: ok(separate) },
+			"separate",
+			{ separate: personNames(gone) },
+			{ separate: "me" },
+		)
+		expect(body).toContain(">The earlier holder<")
+		expect(body).toContain(">You<")
+		expect(body).not.toContain(">me<")
+		expect(body).not.toContain(">partner<")
+	})
+
+	test("names another departed id another person", () => {
+		const renamed: HouseholdDocument = {
+			...household,
+			people: [
+				{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+				{ id: "bob", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+			],
+		}
+		const body = panel(
+			{ separate: ok(separate) },
+			"separate",
+			{ separate: personNames(renamed) },
+			{ separate: null },
+		)
+		expect(body).toContain(">You<")
+		expect(body).toContain(">Another person<")
+		expect(body).not.toContain(">partner<")
+	})
+
+	test("gives two departed Returns that would read alike their ids, apart", () => {
+		const both: HouseholdDocument = {
+			...household,
+			people: [
+				{ id: "ann", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+				{ id: "bob", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+			],
+		}
+		const body = panel(
+			{ separate: ok(separate) },
+			"separate",
+			{ separate: personNames(both) },
+			{ separate: null },
+		)
+		expect(body).toContain(">Another person (me)<")
+		expect(body).toContain(">Another person (partner)<")
+	})
+
+	test("shows the ids when there is no household at all", () => {
+		const body = panel({ separate: ok(separate) }, "separate")
+		expect(body).toMatch(/>me<\/span>/)
+		expect(body).toMatch(/>partner<\/span>/)
+		expect(body).not.toContain("Another person")
+	})
 })
 
 describe("TaxPanel: the tax years", () => {

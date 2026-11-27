@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { escapeXml, STATEMENT_LINE_CHARS, statementLines } from "./statement"
+import { drawableThai, escapeXml, STATEMENT_LINE_CHARS, statementLines } from "./statement"
 
 describe("the lines a share image's statement is set on", () => {
 	it("keeps a statement that fits on one line on one line", () => {
@@ -38,5 +38,20 @@ describe("the characters XML cannot read", () => {
 
 	it("leaves Thai text exactly as the Dictionary writes it", () => {
 		expect(escapeXml("ไม่มีแดชบอร์ด")).toBe("ไม่มีแดชบอร์ด")
+	})
+})
+
+describe("the Thai a share image draws", () => {
+	it("draws SARA AM as NIKHAHIT then SARA AA", () => {
+		expect(drawableThai("จำลอง")).toBe("จ\u0E4D\u0E32ลอง")
+		expect(drawableThai("สำหรับ")).toBe("ส\u0E4D\u0E32หรับ")
+	})
+
+	it("keeps a tone mark between the two parts", () => {
+		expect(drawableThai("น้ำ")).toBe("น\u0E4D\u0E49\u0E32")
+	})
+
+	it("leaves text without SARA AM unchanged", () => {
+		expect(drawableThai("Trajectonomics — traj การเงิน")).toBe("Trajectonomics — traj การเงิน")
 	})
 })

@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN } from "../site"
 import { sitemapDocument, sitemapLocations } from "../sitemap"
 import type { BuiltFile } from "./built-files"
 import { checkSitemapPages, SITEMAP_FILE } from "./sitemap-pages"
 
 const PAGES = ["index.html", "cli/index.html", "cli/commands/tx/index.html"]
 
-const URLS = [`${SITE_ORIGIN}/`, `${SITE_ORIGIN}/cli/`, `${SITE_ORIGIN}/cli/commands/tx/`]
+const URLS = [`${PORTAL_ORIGIN}/`, `${PORTAL_ORIGIN}/cli/`, `${PORTAL_ORIGIN}/cli/commands/tx/`]
 
 function page(path: string): BuiltFile {
 	return { path, content: "<!doctype html><title>A page</title>" }
@@ -27,8 +27,8 @@ function sitemap(locations: readonly string[]): BuiltFile {
 /** Every page a reader can open, beside the two files a Sitemap must not list. */
 const PAGES_A_READER_CAN_OPEN: readonly BuiltFile[] = [
 	...PAGES.map(page),
-	alias("operators/index.html", "/cli/"),
-	alias("builders/index.html", "/contribute/"),
+	alias("operators/index.html", "/docs/cli/"),
+	alias("builders/index.html", "/docs/contribute/"),
 	page("404.html"),
 ]
 
@@ -75,11 +75,11 @@ describe("the Sitemap's coverage of the pages a reader can open", () => {
 
 		const failures = checkSitemapPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["SITEMAP_PAGE_DUPLICATE"])
-		expect(failures[0]?.message).toContain(`${SITE_ORIGIN}/`)
+		expect(failures[0]?.message).toContain(`${PORTAL_ORIGIN}/`)
 	})
 
 	test("a URL that is not a page a reader can open is reported as SITEMAP_PAGE_UNEXPECTED", () => {
-		const listed = [...URLS, `${SITE_ORIGIN}/404.html`, `${SITE_ORIGIN}/operators/`]
+		const listed = [...URLS, `${PORTAL_ORIGIN}/404.html`, `${PORTAL_ORIGIN}/operators/`]
 
 		const failures = checkSitemapPages([...PAGES_A_READER_CAN_OPEN, sitemap(listed)])
 		expect(failures.map((failure) => failure.code)).toEqual([
@@ -101,7 +101,7 @@ describe("the Sitemap's coverage of the pages a reader can open", () => {
 	})
 
 	test("a URL without its trailing slash does not match the page it names", () => {
-		const listed = [`${SITE_ORIGIN}/`, `${SITE_ORIGIN}/cli`, URLS[2]!]
+		const listed = [`${PORTAL_ORIGIN}/`, `${PORTAL_ORIGIN}/cli`, URLS[2]!]
 
 		const failures = checkSitemapPages([...PAGES_A_READER_CAN_OPEN, sitemap(listed)])
 		expect(failures.map((failure) => failure.code)).toEqual([

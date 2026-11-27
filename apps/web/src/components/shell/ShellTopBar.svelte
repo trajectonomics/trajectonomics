@@ -1,15 +1,17 @@
 <script lang="ts">
+import { preferences } from "../../client/preferences.svelte.js"
 import { shellPanels } from "../../client/shell.svelte.js"
+import { currentSnapshot } from "../../client/snapshot.svelte.js"
+import { formatDate } from "../../lib/format"
 import { cx } from "../ui/cx"
 import NavIcon from "./NavIcon.svelte"
 import SnapshotStatus from "./SnapshotStatus.svelte"
 
-interface Props {
-	/** The label of the page being rendered, such as "Net worth". */
-	title: string
-}
+const snapshotState = $derived(currentSnapshot())
+const asOf = $derived(
+	snapshotState.status === "ready" ? formatDate(snapshotState.snapshot.params.asOf) : null,
+)
 
-let { title }: Props = $props()
 let menuButton: HTMLButtonElement | undefined = $state()
 let wasOpen = false
 
@@ -22,37 +24,54 @@ $effect(() => {
 })
 
 const BUTTON = cx(
-	"inline-flex shrink-0 items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm",
-	"text-muted-foreground hover:text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+	"inline-flex size-[34px] shrink-0 items-center justify-center rounded-md border border-border bg-card",
+	"text-muted-foreground hover:text-foreground",
+	"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
 )
 </script>
 
-<!-- The page's label, the menu button (narrow screens only), the Snapshot's status, and Display options. -->
+<!-- The menu button (narrow screens), the plan slot, the As-of date and the display actions. -->
 <header class="print:hidden sticky top-0 z-20 border-b border-border bg-background">
-	<div class="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 pt-3 sm:px-6">
+	<div class="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-2 sm:gap-3 sm:px-6">
 		<button
 			type="button"
 			bind:this={menuButton}
 			class={cx(BUTTON, "lg:hidden")}
 			aria-controls="page-menu"
 			aria-expanded={shellPanels.menu}
-			onclick={() => (shellPanels.menu = true)}
+			aria-label="Open the menu"
+			title="Open the menu"
+			onclick={() => shellPanels.openMenu()}
 		>
 			<NavIcon name="menu" />
-			<span class="sr-only">Open the menu</span>
 		</button>
-		<p class="min-w-0 flex-1 truncate font-semibold">{title}</p>
+		<div class="min-w-0 flex-1"></div>
+		{#if asOf !== null}
+			<span
+				class="hidden h-[34px] items-center rounded-md border border-border bg-card px-3 text-sm text-muted-foreground sm:inline-flex"
+				title={`Figures as of ${asOf}`}><span class="sr-only">Figures as of </span>{asOf}</span
+			>
+		{/if}
+		<button
+			type="button"
+			class={BUTTON}
+			aria-pressed={preferences.hidden}
+			aria-label="Hide amounts"
+			title="Hide amounts"
+			onclick={() => preferences.setHidden(!preferences.hidden)}
+		>
+			<NavIcon name={preferences.hidden ? "eye-off" : "eye"} />
+		</button>
 		<button
 			type="button"
 			class={BUTTON}
 			aria-haspopup="dialog"
-			onclick={() => (shellPanels.options = true)}
+			aria-label="Display options"
+			title="Display options"
+			onclick={() => shellPanels.openOptions()}
 		>
 			<NavIcon name="sliders-horizontal" />
-			Display options
 		</button>
 	</div>
-	<div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
-		<SnapshotStatus />
-	</div>
+	<SnapshotStatus />
 </header>

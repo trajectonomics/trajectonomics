@@ -8,7 +8,7 @@ function codes(files: readonly BuiltFile[]): readonly string[] {
 
 const META = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'">'
 
-describe("the content security policy the router relies on", () => {
+describe("the content security policy the Site ships", () => {
 	it("passes a build that sets no policy", () => {
 		expect(codes([{ path: "index.html", content: "<html><head></head></html>" }])).toEqual([])
 	})

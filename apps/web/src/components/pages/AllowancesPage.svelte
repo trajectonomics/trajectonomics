@@ -12,7 +12,6 @@ let { scenario }: Props = $props()
 
 <PageShell
 	title="Tax allowances"
-	intro="How much more RMF, ThaiESG and the other retirement allowances could take each tax year, and the tax that would save."
 >
 	{#snippet children(snapshot)}
 		<AllowancesBody {snapshot} {scenario} />

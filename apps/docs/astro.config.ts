@@ -2,15 +2,16 @@ import fumadocs from "@fumadocs/astro"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
 import { restoreCodeFences } from "./src/lib/code-fences"
+import { prefixDocsLinks } from "./src/lib/docs-links"
 import { SITE_ORIGIN } from "./src/lib/site"
 import { staleRedirects } from "./src/lib/stale-redirects"
-import { TAB_ALIASES, tabUrl } from "./src/lib/tabs"
+import { DOCS_BASE_PATH, TAB_ALIASES, tabUrl } from "./src/lib/tabs"
 
-// The Docs Portal is the whole host. Workers Static Assets resolves files by request path,
-// so the build lands in dist and the Worker serves ./dist (ADR 0013).
+// The Docs Portal is served under the Site's /docs mount (ADR 0017). The build lands in dist at
+// its root and Workers Static Assets serves that root at /docs through `assets.base_path`.
 export default defineConfig({
 	site: SITE_ORIGIN,
-	base: "/",
+	base: DOCS_BASE_PATH,
 	output: "static",
 	outDir: "./dist",
 	trailingSlash: "always",
@@ -25,7 +26,7 @@ export default defineConfig({
 					// The MDX components render fences as Fumadocs code blocks (copy control,
 					// scroll container); they also need the fence shape src/lib/code-fences.ts restores.
 					components: "./src/components/mdx.tsx",
-					hastPlugins: (plugins) => [restoreCodeFences(), ...plugins],
+					hastPlugins: (plugins) => [restoreCodeFences(), prefixDocsLinks(), ...plugins],
 					// GitHub's current dark palette, not the older `github-dark` Fumadocs defaults to:
 					// that theme's comment colour (#6A737D) fails WCAG AA on the dark code surface
 					// (#171717, 3.7:1), and the accessibility suite fails every page with a fence.

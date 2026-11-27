@@ -23,7 +23,7 @@ import {
 	APPLE_TOUCH_ICON_PATH,
 	BING_SITE_VERIFICATION_TOKEN,
 	GOOGLE_SITE_VERIFICATION_TOKEN,
-	SITE_NAME,
+	SITE_BRAND_NAME,
 } from "../lib/site"
 import { structuredDataJson as homeStructuredDataJson } from "../lib/site/structured-data"
 import { verificationMetas } from "../lib/site/verification"
@@ -107,7 +107,7 @@ const verification = verificationMetas({
 					)}
 					<meta property="og:url" content={canonicalUrl} />
 					<meta property="og:type" content="website" />
-					<meta property="og:site_name" content={SITE_NAME} />
+					<meta property="og:site_name" content={SITE_BRAND_NAME} />
 					{/* The address no longer says which Language a share is in, so the card does. */}
 					<meta property="og:locale" content={languageEntry(language).locale} />
 					{otherLanguages(language).map((entry) => (

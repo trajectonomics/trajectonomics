@@ -10,13 +10,18 @@ function stripComments(text: string): string {
 	return text.replace(JSONC_COMMENT, (_match, string: string | undefined) => string ?? "")
 }
 
+interface WranglerRoute {
+	readonly pattern?: string
+	readonly custom_domain?: boolean
+}
+
 interface WranglerConfig {
 	readonly name?: string
 	readonly compatibility_date?: string
 	readonly workers_dev?: boolean
 	readonly main?: string
 	readonly route?: readonly unknown[]
-	readonly routes?: readonly unknown[]
+	readonly routes?: readonly WranglerRoute[]
 	readonly env?: Readonly<Record<string, unknown>>
 	readonly assets?: {
 		readonly directory?: string
@@ -32,7 +37,7 @@ const config: WranglerConfig = JSON.parse(
 )
 
 describe("the Worker config", () => {
-	it("names the Worker site, the name the router binds", () => {
+	it("names the Worker site, the Worker the apex Custom Domain belongs to", () => {
 		expect(config.name).toBe("site")
 	})
 
@@ -70,9 +75,9 @@ describe("the Worker config", () => {
 		])
 	})
 
-	it("attaches no route or custom domain", () => {
+	it("declares the apex as its Custom Domain, the attachment the deploy must keep", () => {
 		expect(config.route).toBeUndefined()
-		expect(config.routes).toBeUndefined()
+		expect(config.routes).toEqual([{ pattern: "trajectonomics.com", custom_domain: true }])
 	})
 
 	it("has no staging environment", () => {
@@ -89,7 +94,7 @@ describe("the Astro config", () => {
 		expect(astroConfig.outDir).toBe("./dist")
 	})
 
-	it("has no base, because the router mounts the Site at /", () => {
+	it("has no base, because the Site owns / on its own host", () => {
 		expect(astroConfig.base).toBeUndefined()
 	})
 

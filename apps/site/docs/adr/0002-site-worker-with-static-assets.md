@@ -4,6 +4,11 @@ status: accepted
 
 # The Site is static Astro served by a Worker with Static Assets
 
+> **Superseded in part on 2026-11-27.** The router this record names is retired. The Site declares its
+> own apex Custom Domain, nothing injects a view transition, style or script onto its pages, and
+> `/docs`, `/blog` and `/data` are zone routes to other Workers rather than router mounts. See
+> [ADR 0033](./0033-one-host-serves-the-site-docs-blog-and-data.md).
+
 The Site is the page at `/` of trajectonomics.com. The router owns the apex and will bind this Worker by the name `site`. The Docs Portal stays a different Worker, mounted at `/docs`, with its own base. This repository is not published to npm.
 
 The Site is static Astro, built with Bun and Tailwind, with no React and no Fumadocs. Astro has no `base`. The build lands at the assets root. The Worker has no script and no route of its own. It serves that directory with `not_found_handling` set to `404-page` and `html_handling` set to `auto-trailing-slash`, so an unknown path is status 404 and the Not-found page is the body. HTML canonical redirects are not unknown paths.

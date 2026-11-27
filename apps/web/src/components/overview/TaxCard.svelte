@@ -38,7 +38,7 @@ function taxRules(view: ScenarioView<TaxView>): string | null {
 				<div class="space-y-2">
 					<p class="text-sm text-muted-foreground">{view.first.owed.startsWith("-") ? "Refund for" : "Tax for"} {view.first.period}</p>
 					<p class="text-2xl font-semibold tracking-tight">
-						<Money amount={view.first.owed} currency={view.currency} />
+						<Money amount={view.first.owed} currency={view.currency} compact />
 					</p>
 					<p class="text-sm">Due {view.first.settlement}</p>
 					{#if view.first.partial}

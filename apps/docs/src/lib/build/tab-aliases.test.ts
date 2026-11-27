@@ -13,9 +13,9 @@ function stub(path: string, target: string): BuiltFile {
 /** The build output of a site whose audience names redirect to their Tabs. */
 function aliases(): BuiltFile[] {
 	return [
-		stub(aliasFile("/operators"), "/cli/"),
-		stub(aliasFile("/contributors"), "/contribute/"),
-		stub(aliasFile("/builders"), "/contribute/"),
+		stub(aliasFile("/operators"), "/docs/cli/"),
+		stub(aliasFile("/contributors"), "/docs/contribute/"),
+		stub(aliasFile("/builders"), "/docs/contribute/"),
 	]
 }
 

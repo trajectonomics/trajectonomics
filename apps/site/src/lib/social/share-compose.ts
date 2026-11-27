@@ -17,7 +17,7 @@ import {
 } from "./layout"
 import { placedLockup, type ShareLockup } from "./lockup"
 import type { ShareColours } from "./share-colours"
-import { escapeXml, statementLines } from "./statement"
+import { drawableThai, escapeXml, statementLines } from "./statement"
 
 /** The host a visitor types, without its scheme: the line under the statement. */
 export const HOST = SITE_ORIGIN.replace(/^https?:\/\//, "")
@@ -44,7 +44,7 @@ export interface ShareImage {
 /** One line of the statement, at its own baseline, in the face its own script asks for. */
 function lineMarkup(text: string, baseline: number, colour: string): string {
 	const face = faceFor(text, STATEMENT_FACE)
-	return `<text x="${MARGIN}" y="${baseline}" font-family="${face}" font-size="${STATEMENT_SIZE}" fill="${colour}">${escapeXml(text)}</text>`
+	return `<text x="${MARGIN}" y="${baseline}" font-family="${face}" font-size="${STATEMENT_SIZE}" fill="${colour}">${escapeXml(drawableThai(text))}</text>`
 }
 
 /** Every line of the statement, laid out upwards from the last baseline, in the Theme's ink. */
@@ -65,7 +65,7 @@ function metaMarkup(
 ): string {
 	const anchor = end ? ' text-anchor="end"' : ""
 	const face = faceFor(text, META_FACE)
-	return `<text x="${x}" y="${baseline}"${anchor} font-family="${face}" font-size="${META_SIZE}" fill="${colour}">${escapeXml(text)}</text>`
+	return `<text x="${x}" y="${baseline}"${anchor} font-family="${face}" font-size="${META_SIZE}" fill="${colour}">${escapeXml(drawableThai(text))}</text>`
 }
 
 /** One card: the Theme's colours, the brand lockup, a value statement and the host under it. */

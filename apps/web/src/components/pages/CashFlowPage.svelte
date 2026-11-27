@@ -16,7 +16,6 @@ let { scenario, year, onYear }: Props = $props()
 
 <PageShell
 	title="Cash flow"
-	intro="Where each year's money came from, and where it went: income and withdrawals first, then tax, spending, saving and what was left over."
 >
 	{#snippet children(snapshot)}
 		<CashFlowView

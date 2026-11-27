@@ -1,4 +1,4 @@
-/** One row of `GET /api/usage`; it carries no machine, contributor or hour. */
+/** One row of the usage API; it carries no machine, contributor or hour. */
 export type UsageRow = {
 	day: string
 	plan: string
@@ -13,7 +13,7 @@ export type UsageRow = {
 	bestEffort: boolean
 }
 
-/** The body of `GET /api/usage`. */
+/** The body of the usage API. */
 export type UsagePayload = {
 	asOf: string
 	methodVersion: number
@@ -21,7 +21,7 @@ export type UsagePayload = {
 	rows: UsageRow[]
 }
 
-/** The body of `GET /api/health`. */
+/** The body of the health API. */
 export type Health = {
 	lastIngestAt: string | null
 	minutesSinceIngest: number | null

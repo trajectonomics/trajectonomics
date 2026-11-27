@@ -19,9 +19,11 @@ describe("ProjectionCard", () => {
 		const { body } = render(ProjectionCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
-		expect(body).toContain("19,756,836.98")
+		expect(body).toContain("19.7M")
 		expect(body).toContain("Today's money")
-		expect(body).toContain("7,196,252.23")
+		expect(body).toContain("7.19M")
+		expect(body).toContain('title="19,756,836.98"')
+		expect(body).toContain('title="7,196,252.23"')
 		expect(body).toContain("Money lasts to the end of the plan, 2060.")
 	})
 
@@ -60,7 +62,8 @@ describe("TaxCard", () => {
 		const { body } = render(TaxCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
-		expect(body).toContain("89,000.00")
+		expect(body).toContain("89k")
+		expect(body).toContain('title="89,000.00"')
 		expect(body).toContain("Tax for 2026")
 		expect(body).toContain("Due 31 Mar 2027")
 		expect(body).toContain("Tax applied")

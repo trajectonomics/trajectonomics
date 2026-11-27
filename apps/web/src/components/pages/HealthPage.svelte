@@ -8,7 +8,6 @@ import PageShell from "../ui/PageShell.svelte"
 <!-- Health: the doctor's checks and row counts, this Snapshot's parameters, and every Read it holds. -->
 <PageShell
 	title="Health"
-	intro="The checks the CLI ran on your ledger, the parameters these figures were planned from, and every Read it holds."
 >
 	{#snippet children(snapshot)}
 		<div class="space-y-12">

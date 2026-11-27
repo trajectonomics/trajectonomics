@@ -51,12 +51,12 @@ describe("the What-if bar words a change by its session plan", () => {
 		setTestUrl("http://127.0.0.1/overview/?scenario=beta")
 		whatIfSession.whatIf = withSet(
 			withSet(startWhatIf("alpha", HASH), "flows.retirement-spending.rule", RULE),
-			"flows.retirement-spending.rateBps",
+			"flows.retirement-spending.amount",
 			"5.00",
 		)
 		const body = render(WhatIfChanges, { props: {} }).body
 		expect(body).toContain("Alpha spending: spends 4.00%")
-		expect(body).toContain("Alpha spending rateBps set to 5.00")
+		expect(body).toContain("Alpha spending amount set to 5.00")
 		expect(body).not.toContain("Beta spending")
 	})
 })

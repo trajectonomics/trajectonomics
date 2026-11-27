@@ -29,10 +29,10 @@ const doctor: Doctor = {
 const ok = (data: Doctor): Read<Doctor> => ({ argv: ["doctor", "--json"], ok: true, data })
 
 describe("LedgerHealthSection", () => {
-	test("shows OK, the CLI version and the checks when the doctor passes", () => {
+	test("shows OK and the checks when the doctor passes, and leaves the CLI version to Display options", () => {
 		const { body } = render(LedgerHealthSection, { props: { doctor: ok(doctor) } })
 		expect(body).toContain("OK")
-		expect(body).toContain("traj 9.9.9")
+		expect(body).not.toContain("traj 9.9.9")
 		expect(body).toContain("0 transactions validate.")
 		expect(body).toContain("4,096 bytes")
 		expect(body).toContain("The doctor did not check the trial balance.")
@@ -113,6 +113,25 @@ describe("ReadsSection", () => {
 			body.indexOf("Chart of accounts"),
 		)
 		expect(body).toContain("traj report pnl --since 2026-01-01 --until 2026-10-31 --json")
+	})
+
+	test("marks a failed Read's words as the CLI's only when the CLI wrote them", () => {
+		const withCode = (code: string): Snapshot => ({
+			...demo,
+			reads: {
+				...demo.reads,
+				pnl: {
+					argv: ["report", "pnl", "--json"],
+					ok: false,
+					error: { code, exitCode: 1, message: "Some words." },
+				},
+			},
+		})
+		const shown = (code: string) =>
+			render(ReadsSection, { props: { snapshot: withCode(code) } }).body
+		expect(shown("LEDGER_EMPTY")).toContain("data-cli")
+		for (const code of ["traj_unavailable", "contract_mismatch"])
+			expect(shown(code)).not.toContain("data-cli")
 	})
 })
 

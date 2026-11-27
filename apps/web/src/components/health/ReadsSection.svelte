@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
+import { isCliError } from "../../lib/edit/failure"
 import { type AuditRow, readAudit } from "../../lib/view/health/read-audit"
 import ReportSection from "../ledger/ReportSection.svelte"
 import DataTable from "../ui/DataTable.svelte"
@@ -29,14 +30,15 @@ const columns: Column<AuditRow>[] = [
 	{#if row.error === null}
 		<span>ok</span>
 	{:else}
+		{@const fromCli = isCliError(row.error)}
 		<div class="space-y-1">
 			<p class="font-medium text-destructive">{`Failed: ${row.error.code}`}</p>
-			<p data-cli>{row.error.message}</p>
+			<p data-cli={fromCli ? "" : undefined}>{row.error.message}</p>
 			{#if row.note !== null}
 				<p class="text-muted-foreground">{row.note}</p>
 			{/if}
 			{#if row.error.hint !== null}
-				<p class="text-muted-foreground" data-cli>{row.error.hint}</p>
+				<p class="text-muted-foreground" data-cli={fromCli ? "" : undefined}>{row.error.hint}</p>
 			{/if}
 		</div>
 	{/if}

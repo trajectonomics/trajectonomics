@@ -1,5 +1,5 @@
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import { DOCS_INDEX_FILE, parseDocsIndex } from "./docs-index-file"
 import { duplicates } from "./duplicates"
 import type { BuildFailure } from "./failures"
@@ -61,7 +61,7 @@ export function checkDocsIndexPages(files: readonly BuiltFile[]): readonly Build
 				),
 			),
 		...twins
-			.filter((twin) => fileAt(files, twin.slice(1)) === undefined)
+			.filter((twin) => fileAt(files, portalAsset(twin)) === undefined)
 			.map((twin) =>
 				buildFailure(
 					"TWIN_MISSING",
