@@ -20,7 +20,7 @@
 		"test": "bun test ./src ./scripts",
 		"test:e2e": "bun run build && playwright test",
 		"screenshots:curated": "bun run build && bun scripts/screenshots.ts",
-		"typecheck": "bun ../../tooling/scripts/run-parallel.ts \"tsc -p tsconfig.json\" \"astro check\"",
+		"typecheck": "astro sync && bun ../../tooling/scripts/run-parallel.ts \"tsc -p tsconfig.json\" \"astro check --no-sync\"",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
 		"check": "bun ../../tooling/scripts/run-parallel.ts \"bun run lint\" \"bun run typecheck\" \"bun run test\" && bun run build && bun run verify:build",
