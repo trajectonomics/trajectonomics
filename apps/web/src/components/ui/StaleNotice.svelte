@@ -1,20 +1,24 @@
 <script lang="ts">
 import { editSession, STALE_PLAN } from "../../client/edit.svelte.js"
+import { WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
 
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
+const shown = $derived(editSession.stale || editSession.savedUnread)
 let notice: HTMLDivElement | undefined = $state()
 
-// A refusal over a changed plan fills this notice: focus moves to it, so a keyboard reader lands on Reload.
+// A save that could not be answered with a fresh Snapshot fills this notice: focus moves to it, so a keyboard
+// reader lands on Reload.
 $effect(() => {
-	if (editSession.stale) notice?.focus()
+	if (shown) notice?.focus()
 })
 </script>
 
-<!-- Shown when the CLI refused a save over a plan that changed since the page read it. Reload reads it again. -->
-{#if editSession.stale}
+<!-- Shown when a save could not be answered with a fresh Snapshot: the CLI refused it over a plan that changed,
+or the write landed and the Snapshot read that answers it failed. Reload reads the Snapshot again. -->
+{#if shown}
 	<div bind:this={notice} role="alert" tabindex="-1" class="space-y-3 rounded-md border border-border bg-muted p-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
-		<p class="text-sm text-foreground">{STALE_PLAN}</p>
+		<p class="text-sm text-foreground">{editSession.stale ? STALE_PLAN : WRITTEN_REREAD_FAILED_MESSAGE}</p>
 		<button type="button" onclick={() => editSession.reread()} disabled={editSession.busy} class={button}>Reload</button>
 	</div>
 {/if}

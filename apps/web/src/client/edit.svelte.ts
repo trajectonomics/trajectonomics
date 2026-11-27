@@ -1,11 +1,11 @@
 import type { AccountValues, ErrorBody } from "../lib/contract"
-import { type EditAnswer, editAnswer, type PreviewAnswer, sessionAnswer } from "../lib/edit/answer"
+import { type EditAnswer, editAnswer, type PreviewAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
-import { EDIT_SESSION_PATH } from "../lib/edit/guard"
+import { WRITTEN_REREAD_FAILED } from "../lib/edit/failure"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
-import { postEdit, postPreview } from "./edit-post.js"
+import { fetchEditToken, postEdit, postPreview } from "./edit-post.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
@@ -26,6 +26,8 @@ class EditSession {
 	failure = $state<ErrorBody | null>(null)
 	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
 	stale = $state(false)
+	/** True while the last Edit's error says its write landed and the Snapshot after it could not be read. */
+	savedUnread = $derived(this.failure?.code === WRITTEN_REREAD_FAILED)
 	/** What the last Edit that ran stated, as the CLI stated it: the batch of `record-values`. Null for any other. */
 	result = $state<AccountValues | null>(null)
 	private opened: Promise<void> | null = null
@@ -112,9 +114,10 @@ class EditSession {
 		}
 		if (!answer.ok) {
 			this.failure = answer.error
-			// A plan that moved on has its own sentence and a Reload action, so no form repeats the CLI's text.
+			// A plan that moved on, or a write that landed and could not be read again, has its own sentence and a
+			// Reload action; no form repeats either text.
 			if (answer.error.code === "scenario_changed") this.stale = true
-			else this.error = answer.error.message
+			else if (answer.error.code !== WRITTEN_REREAD_FAILED) this.error = answer.error.message
 			return false
 		}
 		this.result = answer.result ?? null
@@ -124,14 +127,7 @@ class EditSession {
 	}
 
 	private async fetchToken(): Promise<void> {
-		try {
-			const response = await fetch(EDIT_SESSION_PATH, { cache: "no-store" })
-			if (!response.ok) return
-			const session = sessionAnswer.safeParse(await response.json())
-			if (session.success) this.token = session.data.token
-		} catch {
-			// No server answers here, so the controls stay hidden.
-		}
+		this.token = await fetchEditToken()
 	}
 }
 

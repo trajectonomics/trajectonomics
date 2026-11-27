@@ -3,6 +3,7 @@ import { editSession, STALE_PLAN } from "../../client/edit.svelte.js"
 import { selectPlan } from "../../client/select-plan.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
+import { WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
 import { planNameError } from "../../lib/edit/name"
 import { scenarioNames } from "../../lib/view/plan"
 
@@ -50,6 +51,11 @@ async function keep(event: SubmitEvent): Promise<void> {
 {#if editSession.stale}
 	<p role="alert" class="text-sm text-destructive">
 		{STALE_PLAN}
+		<button type="button" onclick={() => whatIfSession.reload()} class="underline">Reload</button>
+	</p>
+{:else if editSession.savedUnread}
+	<p role="alert" class="text-sm text-destructive">
+		{WRITTEN_REREAD_FAILED_MESSAGE}
 		<button type="button" onclick={() => whatIfSession.reload()} class="underline">Reload</button>
 	</p>
 {:else if editSession.error !== null}
