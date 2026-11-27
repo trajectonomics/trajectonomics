@@ -1,4 +1,5 @@
 import { type ProjectionRun, scenarioDocument } from "../../contract"
+import type { AccountNames } from "../account-names"
 import { type ItemNames, itemNames } from "../item-names"
 import { ANNUAL_ROWS, projectionRunFixture } from "../projection/fixtures.test-support"
 
@@ -58,7 +59,10 @@ export function withAccountValues(accounts: readonly string[]): ProjectionRun {
 }
 
 /** The names of a plan whose document states the labels `flows` carries, and no others. */
-export function planNames(flows: readonly { id: string; displayLabel?: string }[]): ItemNames {
+export function planNames(
+	flows: readonly { id: string; displayLabel?: string }[],
+	accounts: AccountNames = new Map(),
+): ItemNames {
 	const document = scenarioDocument.parse({
 		currency: "THB",
 		accounts: [],
@@ -70,5 +74,5 @@ export function planNames(flows: readonly { id: string; displayLabel?: string }[
 			...(displayLabel === undefined ? {} : { displayLabel }),
 		})),
 	})
-	return itemNames(new Map(), null, document)
+	return itemNames(accounts, null, document)
 }
