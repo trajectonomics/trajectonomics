@@ -9,7 +9,7 @@ folder per white-label brand. Private to this repo, never published to npm.
 src/            tokens (contract, primitives, contrast), theme (defineTheme, themeToCss), brands()
 brands/<name>/  one folder per brand: light.ts and dark.ts, assets/{svg,webp,fonts}
 scripts/        build.ts and the asset and Tailwind pipelines
-tailwind.css, typography.css   brand-agnostic; they only read the --ds-* variables
+tailwind.css, typography.css, header.css   brand-agnostic; they only read the --ds-* variables
 ```
 
 `brands/trajectonomics/` is the default brand. Each `light.ts` and `dark.ts` default-exports a Theme
@@ -23,7 +23,7 @@ because `themeToCss` scopes them by `data-theme`.
 - `dist/index.mjs`: the JS API.
 - `dist/brands/<name>/`: `light.css`, `dark.css`, `logo/`, `favicon/`, `fonts/`, for every brand.
 - `dist/current/`: a copy of the brand named by `BRAND` (default `trajectonomics`).
-- `dist/tailwind.css`, `dist/typography.css`.
+- `dist/tailwind.css`, `dist/typography.css`, `dist/header.css`.
 
 Apps import only from `current/`, so `BRAND=<name>` builds the same app as another brand:
 

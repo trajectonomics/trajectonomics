@@ -147,6 +147,20 @@ describe("scenario apply of a decimal document without --decimal", () => {
 		expect(errorOf(res).hint).toBe(SCHEMA_HINT)
 	})
 
+	it("carries no decimal hint when a surplus step's upTo is a quoted whole amount", async () => {
+		// `upTo` takes the plain amount through the schema's `anyOf` branch; `--decimal` would read it
+		// as major units, so the walk under the hint must reach it as the converter does.
+		const cashflow = {
+			surplus: [{ account: "cash", upTo: "5000" }],
+			contribute: [],
+			withdraw: ["cash"],
+		}
+		const document = withFirstAmount({ ...SCENARIO_DOCUMENT, cashflow }, "9000.50")
+		const res = await applyScenario(scenarioHome(), "base", document)
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).hint).toBe(SCHEMA_HINT)
+	})
+
 	it("carries no decimal hint in a currency --decimal does not read", async () => {
 		const document = { ...withFirstAmount(SCENARIO_DOCUMENT as Doc, "9000.50"), currency: "USD" }
 		const res = await applyScenario(scenarioHome(), "base", document)

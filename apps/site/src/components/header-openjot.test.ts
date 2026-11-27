@@ -17,7 +17,7 @@ async function linkOn(language: string, openjotCurrent: boolean) {
 			openjotCurrent,
 		}),
 	)
-	const link = withClass(page, "header-nav-link").find(
+	const link = withClass(page, "ds-nav-link").find(
 		(element) => element.attributes["href"] === OPENJOT_PATH,
 	)
 	if (link === undefined) throw new Error("the OpenJot link is missing")
@@ -38,7 +38,7 @@ describe("the header's OpenJot link", () => {
 
 		it(`puts the nav links in the order OpenJot, Data, Blog, Docs (${language})`, async () => {
 			const { page } = await linkOn(language, false)
-			const hrefs = withClass(page, "header-nav-link").map((element) => element.attributes["href"])
+			const hrefs = withClass(page, "ds-nav-link").map((element) => element.attributes["href"])
 			expect(hrefs).toEqual([OPENJOT_PATH, DATA_PATH, BLOG_PATH, DOCS_PATH])
 		})
 

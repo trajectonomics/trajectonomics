@@ -15,9 +15,10 @@ export interface Dictionary {
 	readonly languageNames: Readonly<Record<Language, string>>
 	readonly skipLink: string
 	readonly blogMarker: string
-	readonly docsLink: string
 	readonly homeLabel: (siteName: string) => string
 	readonly languageMenuLabel: string
+	/** The Language menu's short visible label, the Site's own ("EN", "ไทย"). */
+	readonly languageSwitchLabel: string
 	readonly frontTitle: string
 	readonly frontDescription: string
 	readonly frontHeading: string

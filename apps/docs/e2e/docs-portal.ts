@@ -41,25 +41,27 @@ export async function openPageTitle(page: Page): Promise<string> {
 	return title.trim()
 }
 
-/** Open the search dialog from its trigger at the top of the sidebar, which a desktop shows. */
+/**
+ * Open the search dialog from its trigger in the header's right slot, where it sits on every page:
+ * the full field from lg up, the icon below it. The trigger's name shows the keyboard shortcut, so
+ * match on "search".
+ */
 export async function openSearch(page: Page): Promise<void> {
 	await waitForIsland(page)
-	// The trigger's name shows the keyboard shortcut, so match on "search".
 	await page
 		.getByRole("button", { name: /search/i })
+		.filter({ visible: true })
 		.first()
 		.click()
 	await page.locator('[role="dialog"]').waitFor()
 }
 
 /**
- * Open the search dialog on a phone, where the sidebar is a drawer and the search sits at its top:
- * the drawer comes first, then the same trigger.
+ * Open the search dialog on a phone. The header carries the icon trigger there too (ADR 0009's
+ * 2026-11-27 amendment), so the sidebar drawer is no longer part of reaching it.
  */
 export async function openPhoneSearch(page: Page): Promise<void> {
-	await openSidebarDrawer(page)
-	await page.locator("#nd-sidebar-mobile [data-search-full]").click()
-	await page.locator('[role="dialog"]').waitFor()
+	await openSearch(page)
 }
 
 /** Open the notebook layout's sidebar drawer, the sidebar a phone reaches through the header. */

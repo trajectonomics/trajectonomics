@@ -164,6 +164,8 @@ describe("Web Consumer Contract", () => {
 			".",
 			"./brands/*",
 			"./current/*",
+			"./header.css",
+			"./mark",
 			"./package.json",
 			"./tailwind.css",
 			"./typography.css",
