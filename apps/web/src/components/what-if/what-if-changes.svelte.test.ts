@@ -59,6 +59,17 @@ describe("the What-if bar's changes", () => {
 		expect(html).not.toContain("120000.00")
 	})
 
+	test("masks a derive it cannot word when amounts are hidden, so its measures' amounts stay hidden", () => {
+		preferences.hidden = true
+		whatIfSession.whatIf = withSet(startWhatIf("base", HASH), "flows.x.derive", {
+			measures: [{ id: "amount", op: "const", num: "50000.00" }],
+			result: "amount",
+		})
+		const html = body()
+		expect(html).toContain("x share set to •••••")
+		expect(html).not.toContain("50000.00")
+	})
+
 	test("hides only money: a name, how often, a category and an Account stay", () => {
 		preferences.hidden = true
 		const shown: [string, string, string][] = [

@@ -47,6 +47,7 @@ const MONEY_FIELDS: ReadonlySet<string> = new Set(["amount", "level"])
 /** Whether a Set changes a figure, which hiding amounts masks. A name, a date, a percent or an Account's id is not money. */
 function isFigure(change: Change): change is Extract<Change, { kind: "set" }> {
 	if (change.kind !== "set") return false
+	if (change.sensitive === true) return true
 	return MONEY_FIELDS.has(change.path.slice(change.path.lastIndexOf(".") + 1))
 }
 

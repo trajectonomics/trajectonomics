@@ -45,11 +45,19 @@ function deriveWords(value: Json): string | null {
 	return moveWords(value)
 }
 
-/** A Set's value as the field's card shows it: a share or a bps field in its percent, a flag in words, else the text. */
+/** A Growth's words: its `bps` in its percent; `"inflation"` is already a word its card uses. */
+function growthWords(value: Json): string | null {
+	if (typeof value !== "object" || value === null || Array.isArray(value)) return null
+	const bps = (value as { bps?: unknown }).bps
+	return typeof bps === "number" && Number.isInteger(bps) ? `${formatBps(bps)}%` : null
+}
+
+/** A Set's value as the field's card shows it: a share, a growth or a bps field in its percent, a flag in words. */
 function fieldValueWords(field: string, value: Json): string {
 	const flag = flagWords(field, value)
 	if (flag !== null) return flag
-	const words = field === "derive" ? deriveWords(value) : null
+	const words =
+		field === "derive" ? deriveWords(value) : field === "growth" ? growthWords(value) : null
 	if (words !== null) return words
 	if (BPS_FIELDS.has(field) && typeof value === "number" && Number.isInteger(value)) {
 		return `${formatBps(value)}%`
@@ -57,12 +65,17 @@ function fieldValueWords(field: string, value: Json): string {
 	return typeof value === "string" ? value : JSON.stringify(value)
 }
 
+/** Whether a Set's words are the value's own JSON, which may hold an amount the person has hidden. */
+function showsJson(field: string, value: Json): boolean {
+	return field === "derive" && deriveWords(value) === null
+}
+
 /** A Set's words: its item with a capital, the field's words, and its value as the field's card shows it. */
 export function fieldChange(
 	path: string,
 	value: Json,
 	employerShares: ReadonlySet<string>,
-): { label: string; value: string } {
+): { label: string; value: string; sensitive?: boolean } {
 	const parts = path.split(".")
 	const id = parts[1] ?? path
 	const field = path.slice(path.lastIndexOf(".") + 1)
@@ -70,5 +83,9 @@ export function fieldChange(
 	const separator = field === "realise" ? ": " : " set to "
 	const item = id.charAt(0).toUpperCase() + id.slice(1)
 	const name = parts.length > 2 ? ` ${fieldWords(field, employerShares.has(id))}` : ""
-	return { label: `${item}${name}${separator}${words}`, value: words }
+	return {
+		label: `${item}${name}${separator}${words}`,
+		value: words,
+		...(showsJson(field, value) ? { sensitive: true } : {}),
+	}
 }

@@ -78,5 +78,6 @@ describe("the What-if bar's words for a changed field", () => {
 		expect(labels("accounts.x.volatility", 1500)).toEqual(["X swing set to 15.00%"])
 		expect(labels("accounts.fund.rate", 700)).toEqual(["Fund rate set to 7.00%"])
 		expect(labels("economy.inflation", 300)).toEqual(["Inflation set to 3.00%"])
+		expect(labels("flows.x.growth", { bps: 300 })).toEqual(["X growth set to 3.00%"])
 	})
 })

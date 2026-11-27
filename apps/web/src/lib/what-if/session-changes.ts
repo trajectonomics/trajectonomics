@@ -12,7 +12,14 @@ import { routingChange } from "./session-routing"
 export type Change =
 	| { kind: "off"; path: string; label: string }
 	| { kind: "add"; path: string; label: string; title: string }
-	| { kind: "set"; path: string; label: string; value: string }
+	| {
+			kind: "set"
+			path: string
+			label: string
+			value: string
+			/** Whether the value is the person's JSON, which may hold an amount that hiding amounts must mask. */
+			sensitive?: boolean
+	  }
 	/** A Set of a whole Flow (`flows.rent`) or of its rule (`flows.rent.rule`): worded without its JSON, and without a figure. */
 	| { kind: "flow"; path: string; label: string; value: Json }
 	/** A Set of the whole estate block: worded without its lines, which hold the person's own shares and amounts. */

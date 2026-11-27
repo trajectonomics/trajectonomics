@@ -35,7 +35,7 @@ export function movesFrom(derive: unknown): DerivedMoves {
 	return reads ? { how: "share", share: formatBps(share.num) } : null
 }
 
-/** What a transfer's `derive` says in words, as its card reads it: "all of the source", or "10.00% of the source". */
+/** What a transfer's `derive` says in words, as its card reads it: "all of the source", or "10% of the source". */
 export function moveWords(derive: unknown): string | null {
 	const moves = movesFrom(derive)
 	if (moves === null) return null
