@@ -4,6 +4,7 @@ import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, canonicalHousehold, type Household } from "./model"
 import { resolveOwners } from "./owner-held"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
+import { storedHousehold } from "./stored"
 
 /**
  * The resolution of a stored household's anchors onto an incoming Scenario document, for `apply`
@@ -96,7 +97,9 @@ export function resolveHousehold(
 	document: unknown,
 	owner: string,
 ): ResolvedAnchors | AppError {
-	const household = JSON.parse(stored) as Household
+	// A row written by `scenario household` always parses; a corrupt one is the internal failure.
+	const household = storedHousehold(stored)
+	if (isAppError(household)) return household
 	const pinned = anchoredSegments(household.anchors)
 	let current: unknown = document
 	const kept: Anchor[] = []

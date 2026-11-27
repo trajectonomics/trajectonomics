@@ -1,20 +1,10 @@
 import { describe, expect, it } from "bun:test"
+import { agesColumn } from "../projection/render"
 import { type ColumnHint, tableLines } from "./lines"
-
-/** `me 37, partner 35`: the callback `projection run` declares for its `ages` column. */
-function agesText(value: unknown): unknown {
-	if (!Array.isArray(value)) return value
-	return value
-		.map((entry) => {
-			const { person, age } = entry as { person?: unknown; age?: unknown }
-			return `${String(person)} ${String(age)}`
-		})
-		.join(", ")
-}
 
 const columns: readonly ColumnHint[] = [
 	{ key: "index", label: "index", align: "right" },
-	{ key: "ages", label: "ages", show: agesText },
+	agesColumn,
 ]
 
 describe("a column's show callback", () => {
@@ -49,8 +39,8 @@ describe("a column's show callback", () => {
 		const text = tableLines(
 			"rows",
 			1,
-			[{ cell: "a\nb" }],
-			[{ key: "cell", label: "cell", show: (value) => value }],
+			[{ cell: "x" }],
+			[{ key: "cell", label: "cell", show: () => "a\nb" }],
 		)
 		expect(text).toBe("rows (1 row)\ncell\na\\nb")
 	})
