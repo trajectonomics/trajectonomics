@@ -11,14 +11,18 @@ export type PlanTotal = {
 	plan: string
 	planName: string
 	tokensTotal: number
+	/** Tokens without cache reads, which cost far less and are counted apart. */
+	tokensUncached: number
 	requests: number
 	tokensIn: number | null
 	tokensOut: number | null
 	cacheRead: number | null
 	cacheWrite: number | null
+	/** Cache reads as a fraction of the plan's tokens; null when it reports none. */
+	cacheReadShare: number | null
 	/** Days with at least one token. */
 	activeDays: number
-	/** Tokens divided by active days; zero when the plan has no active day. */
+	/** Tokens without cache reads divided by active days; zero when the plan has no active day. */
 	tokensPerActiveDay: number
 	/** The day with the most tokens, the earliest on a tie; null when the plan has none. */
 	busiestDay: { day: string; tokens: number } | null
@@ -61,6 +65,7 @@ function summaryOf(plan: string, group: readonly UsageRow[], to: string): PlanTo
 	for (const row of group) days.set(row.day, (days.get(row.day) ?? 0) + row.tokensTotal)
 	const active = [...days.entries()].filter(([, tokens]) => tokens > 0)
 	const tokensTotal = sumOf(group, (row) => row.tokensTotal)
+	const tokensUncached = sumOf(group, (row) => row.tokensTotal - (row.cacheRead ?? 0))
 	const cacheRead = sumNullable(group.map((row) => row.cacheRead))
 	const lastDay = active.reduce<string | null>(
 		(latest, [day]) => (latest === null || day > latest ? day : latest),
@@ -70,13 +75,15 @@ function summaryOf(plan: string, group: readonly UsageRow[], to: string): PlanTo
 		plan,
 		planName: planName(plan),
 		tokensTotal,
+		tokensUncached,
 		requests: sumOf(group, (row) => row.requests),
 		tokensIn: sumNullable(group.map((row) => row.tokensIn)),
 		tokensOut: sumNullable(group.map((row) => row.tokensOut)),
 		cacheRead,
 		cacheWrite: sumNullable(group.map((row) => row.cacheWrite)),
+		cacheReadShare: cacheRead !== null && tokensTotal > 0 ? cacheRead / tokensTotal : null,
 		activeDays: active.length,
-		tokensPerActiveDay: active.length === 0 ? 0 : tokensTotal / active.length,
+		tokensPerActiveDay: active.length === 0 ? 0 : tokensUncached / active.length,
 		busiestDay: busiestOf(active),
 		lastDay,
 		inUse: lastDay !== null && daysBetween(lastDay, to) <= IN_USE_DAYS,
