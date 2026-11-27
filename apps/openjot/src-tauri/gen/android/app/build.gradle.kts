@@ -48,7 +48,8 @@ android {
     namespace = "app.moojot.android"
     defaultConfig {
         manifestPlaceholders["usesCleartextTraffic"] = "false"
-        applicationId = "app.moojot.android"
+        // The applicationId differs from the namespace on purpose; see apps/openjot/AGENTS.md rule 6.
+        applicationId = "com.trajectonomics.openjot"
         minSdk = 24
         targetSdk = 37
         val resolvedVersionName = tauriProperties.getProperty("tauri.android.versionName", "1.0.0")
