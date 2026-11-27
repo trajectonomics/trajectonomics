@@ -103,14 +103,9 @@
 	color: var(--ds-color-muted-foreground);
 }
 
-/* The plan summary has fewer columns than the plan and model table, so it scrolls later. */
-.usage-table.summary-table {
-	min-width: 36rem;
-}
-
-/* Its closing row states the grand totals, so it carries the weight of a row header throughout. */
-.usage-table.summary-table tfoot th,
-.usage-table.summary-table tfoot td {
+/* The closing row states the grand totals, so it carries the weight of a row header throughout. */
+.usage-table tfoot th,
+.usage-table tfoot td {
 	border-bottom: 0;
 	font-weight: 500;
 }

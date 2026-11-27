@@ -15,7 +15,8 @@ function snapshot(displayLabel?: string) {
 	const milestones = read.data.scenario.document.milestones as Milestone[] | undefined
 	const car = milestones?.find((one) => one.id === "car-paid-off")
 	if (car === undefined) throw new Error("the Demo has no car Milestone")
-	if (displayLabel !== undefined) car.displayLabel = displayLabel
+	if (displayLabel === undefined) delete car.displayLabel
+	else car.displayLabel = displayLabel
 	return next
 }
 

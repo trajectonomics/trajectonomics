@@ -69,14 +69,14 @@ describe("a shortened marker label", () => {
 
 	test("keeps both of Plans' two Demo labels off the rules at 360px", () => {
 		// Plans' card at 360px holds a 294px chart, and the Demo's base plan reaches its two Milestones at
-		// these x. Both ids are drawn in code, whose ellipsis is one monospace cell. The second prefers the
-		// left, but its rule leaves more room right (119px against 61px), so it shortens there.
+		// these x. Both labels are words now, whose ellipsis is a sans-serif cell. The first has 61px of
+		// room right of its 4px gap and shortens; the second has 119px, so it keeps all its words.
 		const marks = [
-			{ x: 89.14581430745815, label: "car-paid-off", code: true },
-			{ x: 154.46412988330798, label: "net-worth-ten-million", code: true },
+			{ x: 89.14581430745815, label: "Car paid off" },
+			{ x: 154.46412988330798, label: "10M net worth" },
 		]
 		const placed = placedLabels(marks, chartArea(294))
-		expect(placed.map((label) => label.text)).toEqual(["car-pai…", "net-worth-ten-mi…"])
+		expect(placed.map((label) => label.text)).toEqual(["Car pa…", "10M net worth"])
 		expect(placed.map((label) => label.leftwards)).toEqual([false, false])
 		expect(placed.map((label) => label.row)).toEqual([0, 0])
 	})

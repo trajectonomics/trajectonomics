@@ -5,6 +5,7 @@ import {
 	BINARY,
 	disposeEditor,
 	hashOf,
+	householdHashOf,
 	ledgerHome,
 	ledgerShow,
 	postEdit,
@@ -35,6 +36,29 @@ function changeSalaryInTerminal(amount: string): void {
 		},
 	)
 	if (run.exitCode !== 0) throw new Error(run.stderr.toString())
+}
+
+/**
+ * A household change made from a terminal: the holder's life expectancy moves, which writes no anchored
+ * date, so the document and its contentHash stay as they were (cli ADR-0055).
+ */
+function changeLifeExpectancyInTerminal(age: number): void {
+	const household = ledgerShow("base", false).scenario.household
+	if (household === null) throw new Error("the scratch ledger has no household")
+	const people = household.people.map((person) =>
+		person.id === "me" ? { ...person, lifeExpectancy: age } : person,
+	)
+	const run = Bun.spawnSync([BINARY, "scenario", "household", "base", "--file", "-", "--json"], {
+		env: { ...process.env, TRAJ_HOME: ledgerHome() },
+		stdin: new TextEncoder().encode(JSON.stringify({ ...household, people })),
+	})
+	if (run.exitCode !== 0) throw new Error(run.stderr.toString())
+}
+
+/** The holder's life expectancy in the stored household. */
+function holderLifeExpectancy(): number | undefined {
+	return ledgerShow("base", false).scenario.household?.people.find((person) => person.id === "me")
+		?.lifeExpectancy
 }
 
 /** The Snapshot the page is serving now, as the server answers it. */
@@ -76,21 +100,58 @@ describe("an Edit over a plan that changed since the page read it", () => {
 	test(
 		"a household save over the same stale hash is refused too, and changes nothing",
 		async () => {
-			const stale = hashOf("base")
+			const stale = householdHashOf("base")
 			changeSalaryInTerminal("8000.00")
-			expect(hashOf("base")).not.toBe(stale)
+			expect(householdHashOf("base")).not.toBe(stale)
 			const before = ledgerShow("base", true)
 			const { status, answer } = await postEdit(
 				JSON.stringify({
 					kind: "remove-household",
 					name: "base",
-					contentHash: stale,
+					householdHash: stale,
 				}),
 			)
 			expect(status).toBe(200)
 			expect(answer.ok).toBe(false)
 			if (!answer.ok) expect(answer.error.code).toBe("scenario_changed")
 			expect(ledgerShow("base", true)).toEqual(before)
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"a household change that moves no anchored date still refuses the page's stale household save",
+		async () => {
+			const editor = await setupEditor()
+			const reread = await editor.reread(editRequest({}, "{}"), 4321)
+			const page = (await reread.json()) as { ok: boolean; snapshot: unknown }
+			if (!page.ok) throw new Error("the page could not read the plan")
+			const read = shownOf({ snapshot: page.snapshot }, "base")
+			const stale = read.scenario.householdHash
+			changeLifeExpectancyInTerminal(95)
+			const stored = ledgerShow("base", true)
+			// The repro: no anchored date moved, so the document's contentHash did not move either.
+			expect(stored.scenario.contentHash).toBe(read.scenario.contentHash)
+			expect(stored.scenario.householdHash).not.toBe(stale)
+			expect(holderLifeExpectancy()).toBe(95)
+
+			const household = read.scenario.household
+			if (household === null) throw new Error("the page's read has no household")
+			const people = household.people.map((person) =>
+				person.id === "me" ? { ...person, lifeExpectancy: 60 } : person,
+			)
+			const { status, answer } = await postEdit(
+				JSON.stringify({
+					kind: "set-household",
+					name: "base",
+					householdHash: stale,
+					household: { ...household, people },
+				}),
+			)
+			expect(status).toBe(200)
+			expect(answer.ok).toBe(false)
+			if (!answer.ok) expect(answer.error.code).toBe("scenario_changed")
+			expect(holderLifeExpectancy()).toBe(95)
 		},
 		SLOW_MS,
 	)

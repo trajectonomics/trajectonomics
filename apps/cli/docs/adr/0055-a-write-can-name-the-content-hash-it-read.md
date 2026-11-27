@@ -35,3 +35,20 @@ The hash is the document's (ADR-0024). A household write can change the stored h
 - The store raises `scenario_changed` itself, so `store/store-triggers.ts` has a trigger for it, and `contract.test.ts` checks the code against a real store path.
 - A write without the flag is unchanged: the last writer wins, as before. The flag is opt-in for each caller, and the Dashboard always sends it (web ADR 0008).
 - Retrying a refused write after a re-read is the caller's choice. The CLI never merges two documents.
+
+## Amendment (2026-11-27): a household write names a hash that covers the household too
+
+The gap named above is closed (issue #313). `traj scenario show` now prints a second hash beside `contentHash`:
+
+- **`householdHash`** is `jcs1:sha256` of the canonical envelope `{"document":<stored canonical document>,"household":<stored canonical household, or null>}`. Both parts are already canonical JSON, so the envelope is canonical, and a change to either the document or the household moves the hash.
+- **`scenario household --if-hash` compares `householdHash`**, not `contentHash`. The check is still inside the same IMMEDIATE transaction, before the household's anchors are resolved, so a stale plan is still reported as stale and not as a household conflict. The refusal, its `scenario_changed` code at exit 5, its envelope and its dry-run behaviour are unchanged; only the value compared, and `storedHash` in `details`, are the household hash.
+- **`contentHash` keeps its meaning.** It stays the hash of the stored document (ADR-0024), what `scenario list` prints, and what `scenario apply`, `scenario rename` and `scenario tax` compare. Nothing about those writes changes.
+
+A household write that moves no anchored date (`lifeExpectancy` raised, a household with no anchors, `--none`) leaves `contentHash` as it was but moves `householdHash`, so a page holding the old read is refused instead of silently writing its stale household over the terminal's change. The Dashboard sends `householdHash` with `set-household` and `remove-household`; every other Edit still sends `contentHash`.
+
+The alternatives were rejected because they change more than the one gap:
+
+- **Make `contentHash` cover the household.** Rejected: it changes what the hash means for `apply`, `rename` and `tax`, and `scenario list` would have to parse a household to state it.
+- **Accept either hash on a household write.** Rejected: a document-only `contentHash` does not move when the household does, so accepting it would keep exactly the stale-save gap this amendment closes.
+
+The household command's note and error codes are unchanged; `traj schema scenario show` publishes `householdHash`, and `traj schema scenario household` describes `--if-hash` as the household hash.

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { isDay, lastDays, utcDay } from "./window"
+import { daysBetween, isDay, lastDays, utcDay } from "./window"
 
 describe("a UTC day", () => {
 	test("is the calendar day of the clock reading", () => {
@@ -38,5 +38,17 @@ describe("the overview window", () => {
 
 	test("rejects a count below one", () => {
 		expect(() => lastDays("2026-11-25", 0)).toThrow()
+	})
+})
+
+describe("the days between two UTC days", () => {
+	test("counts whole calendar days in either direction", () => {
+		expect(daysBetween("2026-11-20", "2026-11-27")).toBe(7)
+		expect(daysBetween("2026-11-27", "2026-11-20")).toBe(-7)
+		expect(daysBetween("2026-02-28", "2026-03-02")).toBe(2)
+	})
+
+	test("rejects a day that is not a UTC day", () => {
+		expect(() => daysBetween("2026-02-30", "2026-03-02")).toThrow()
 	})
 })

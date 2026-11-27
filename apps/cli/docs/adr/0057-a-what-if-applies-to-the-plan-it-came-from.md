@@ -44,5 +44,5 @@ one plan without widening the store's write API.
 
 A caller that races another writer now sees `scenario_changed` in a case it could only have guessed at
 before: the plan moved between the read and the write. Its hint names the stored hash and says to read the
-plan again, as it does for `--if-hash`. The `--if-hash` gap ADR-0055 records for household writes does not
-apply here, because the document is the thing being checked.
+plan again, as it does for `--if-hash`. The `--if-hash` gap ADR-0055 records for household writes (closed by its
+2026-11-27 amendment) did not apply here, because the document is the thing being checked.

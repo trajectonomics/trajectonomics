@@ -36,7 +36,14 @@ const names = $derived(seriesNames(charts.runs, run, charts.names, ALWAYS_NAMES)
 /** The same names with no plan label, so a default chart name reads the ids and fits every plan. */
 const defaultNames = $derived(defaultNameIndex(charts.runs, charts.names))
 const view = $derived(
-	chosen && chartView(chosen, seriesById(run, charts.names), names, parseTerms(terms)),
+	chosen &&
+		chartView(
+			chosen,
+			seriesById(run, charts.names),
+			names,
+			parseTerms(terms),
+			charts.names.accounts,
+		),
 )
 
 /** Gives focus to the picker, which is a new element once the chart changed. */
@@ -89,5 +96,5 @@ function save(draft: { name: string; kind: ChartKind; series: readonly string[] 
 	{/if}
 	<ChartNotices problem={chartStore.problem} unsaved={chartStore.unsaved} notice={chartStore.notice} />
 	<ChartFiles hasCharts={chartStore.charts.length > 0} onExport={() => chartStore.exportFile()} onImport={(file) => chartStore.importFile(file)} />
-	<ChartDrawer open={drawer} {groups} {names} {defaultNames} onSave={save} onClose={close} />
+	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={close} />
 </div>

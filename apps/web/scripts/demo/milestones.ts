@@ -7,11 +7,13 @@
 export const DEMO_MILESTONES = [
 	{
 		id: "car-paid-off",
+		displayLabel: "Car paid off",
 		combine: "all",
 		criteria: [{ id: "date", kind: "date", on: "2031-01-01" }],
 	},
 	{
 		id: "net-worth-ten-million",
+		displayLabel: "10M net worth",
 		combine: "all",
 		criteria: [
 			{
@@ -26,6 +28,7 @@ export const DEMO_MILESTONES = [
 	},
 	{
 		id: "sabbatical",
+		displayLabel: "Sabbatical",
 		combine: "all",
 		criteria: [{ id: "date", kind: "date", on: "2070-01-01" }],
 	},

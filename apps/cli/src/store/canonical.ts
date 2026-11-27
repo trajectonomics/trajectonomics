@@ -40,3 +40,12 @@ export function canonicalJson(value: unknown, path = "document"): string {
 export function contentHash(canonical: string): string {
 	return `jcs1:sha256:${new Bun.CryptoHasher("sha256").update(canonical).digest("hex")}`
 }
+
+/**
+ * The hash of a Scenario's stored document and household together, which a household write names with
+ * `--if-hash` (cli ADR-0055). Both texts are canonical JSON, so the envelope is canonical too, and a
+ * change to either moves it.
+ */
+export function householdHash(document: string, household: string | null): string {
+	return contentHash(`{"document":${document},"household":${household ?? "null"}}`)
+}

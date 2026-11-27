@@ -6,7 +6,7 @@
  */
 import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
-import { contentHash, planName } from "./fields"
+import { contentHash, householdHash, planName } from "./fields"
 import { planEditSchemas, startPlanSchema } from "./plan-edits"
 import { recordValuesSchema } from "./record-values"
 import { taxFlags } from "./tax-flags"
@@ -68,13 +68,13 @@ const savedEdit = z.discriminatedUnion("kind", [
 	z.strictObject({
 		kind: z.literal("set-household"),
 		name: planName,
-		contentHash,
+		householdHash,
 		household: z.record(z.string(), z.unknown()),
 	}),
 	z.strictObject({
 		kind: z.literal("remove-household"),
 		name: planName,
-		contentHash,
+		householdHash,
 	}),
 	// The tax profile (cli ADR 0066): a merge changes the items it names, a set states the whole profile, a remove takes it out.
 	z.strictObject({

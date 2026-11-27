@@ -209,7 +209,7 @@ describe("a series name is never a series key", () => {
 			seriesNames([selected], selected, NO_NAMES),
 			"nominal",
 		)
-		expect(view.missing.map((item) => item.name)).toEqual(["gone (no category)"])
-		expect(seriesWords(gone)).toBe("gone (no category)")
+		expect(view.missing.map((item) => item.name)).toEqual(["Expense: gone (no category)"])
+		expect(seriesWords(gone)).toBe("Expense: gone (no category)")
 	})
 })

@@ -63,7 +63,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - `apply-plan`, `set-household` and `remove-household` carry `contentHash`: the `contentHash` the Snapshot states for that plan (`reads.documents.<name>.scenario.contentHash`), taken from the same read as the document or household the form edits. `writeCommand` adds `--if-hash <contentHash>` to each of their argv, with and without `--dry-run`, and `edit.test.ts` pins it ([cli ADR 0055](../../../cli/docs/adr/0055-a-write-can-name-the-content-hash-it-read.md)). `copy-plan` and `delete-plan` carry no hash.
 - A write the CLI refuses as `scenario_changed` shows "This plan changed since the page read it." with a Reload action, and no form repeats the CLI's text. Reload asks the server to read the Snapshot again (`POST /reread`), and the form keeps what the person typed. The form then saves against the new document and hash. The `/reread` route runs the Edit guards (Host, Origin, token, `application/json`, no Edit running), reads the Snapshot and writes nothing.
 - An Edit to a plan the page did not read is refused, so the page no longer creates a plan through `apply-plan`.
-- Known gap: the hash covers the document only (cli ADR 0055). A household change that moves no anchored date is not seen by a stale household save until the hash covers the household too.
+- Known gap (closed by the 2026-11-27 amendment below): the hash covers the document only (cli ADR 0055). A household change that moves no anchored date is not seen by a stale household save until the hash covers the household too.
 - Tests: `edit-stale.test.ts` runs a terminal change (`traj scenario tax base --none`, then a salary change) against the real binary, then a page save: it is refused and the stored plan is unchanged; after a reread the same Edit succeeds. `serve-edit.test.ts` pins the `/reread` refusals.
 
 ## Amendment (2026-11-23): the what-if Edits
@@ -118,6 +118,12 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 
 - A write of `apply-plan` that removes an item drops the household anchors that pinned its dates ([cli ADR 0048](../../../cli/docs/adr/0048-a-household-is-a-sibling-of-the-scenario-with-anchors-written-on-save.md)), and `traj` states them as `droppedAnchors`. The server keeps that list from the real write and the Edit answer carries it as `droppedAnchors` (absent when none was dropped). The page shows it as a notice above the page until it is dismissed or the next Edit runs.
 - The same write also drops the household Owners whose item it removed ([cli ADR 0076](../../../cli/docs/adr/0076-a-plan-item-names-its-owner-in-the-household-and-the-cli-writes-what-the-engine-reads.md)), stating each as an item path of the document in `droppedOwners`. The server keeps that list too, the Edit answer carries it as `droppedOwners` (absent when none was dropped), and the page shows it in the same notice.
+
+## Amendment (2026-11-27): a household Edit names the household hash
+
+`set-household` and `remove-household` now carry `householdHash`: the `householdHash` the Snapshot states for that plan (`reads.documents.<name>.scenario.householdHash`), the hash of the document and household together. `writeCommand` adds `--if-hash <householdHash>` to both argv, and `edit.test.ts` pins it ([cli ADR 0055](../../../cli/docs/adr/0055-a-write-can-name-the-content-hash-it-read.md)). `apply-plan` and every other plan Edit keep `contentHash`.
+
+This closes the known gap above. A household change that moves no anchored date leaves `contentHash` as it was but moves `householdHash`, so the page's stale household save is refused. `edit-stale.test.ts` runs it against the real binary: a terminal raises a life expectancy, the anchored date and `contentHash` stay, the page's save is refused as `scenario_changed`, and the terminal's 95 stays.
 
 ## Amendment (2026-11-27): a write that lands while the answer is an error
 
