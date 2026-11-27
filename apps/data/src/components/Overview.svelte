@@ -75,7 +75,6 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 
 		{#if state.peaks !== null && state.peaks.plans.length > 0}
 			<section class="section-block" aria-labelledby="peaks-title">
-				<h2 id="peaks-title" class="meta-label section-title">What each plan gives</h2>
 				<PlanPeaks plans={state.peaks.plans} ranked={totals} day={days.to} />
 			</section>
 		{/if}

@@ -6,6 +6,13 @@ Accepted as the design, 2026-11-25. The service ships in a later slice. The inge
 `/data/ingest` ([ADR 0006](0006-the-data-site-is-served-under-the-sites-host.md)); the old host
 keeps `/ingest`.
 
+**2026-11-27:** the owner decisions on #600 define every self-hosted server's two auth modes,
+`platform` and `none`, plus audience-bound tokens and Google, GitHub and passkey sign-in. The auth
+package records them in
+[ADR 0001](../../../auth/docs/adr/0001-better-auth-platform-with-two-server-modes.md); this ADR's
+`/jwks` and separate-service decisions stand, and the `data:ingest` key fallback is not needed
+because the spike issued refresh tokens through the device flow.
+
 ## Context
 
 People will sign in to contribute their own usage, and the collector and future clients need

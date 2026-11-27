@@ -1,7 +1,13 @@
 /* What each plan gives: one row per plan, its three at-least figures over thin bars. */
 
 .plan-peaks {
-	padding: 24px 0 8px;
+	padding: 0 0 8px;
+}
+
+/* The heading sits above the table at the section's edge, so the table keeps the old 24px gap. */
+.peaks-table-wide,
+.peaks-table-phone {
+	margin-top: 24px;
 }
 
 .peaks-table {

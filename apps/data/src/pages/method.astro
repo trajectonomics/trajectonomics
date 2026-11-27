@@ -1,7 +1,10 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the layout it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import Layout from "../layouts/Layout.astro"
 import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
+
+const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estimated-tiers-scale-a-measured-floor-by-a-stated-multiplier.md`
 ---
 
 <Layout
@@ -116,6 +119,14 @@ import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 			calendar-consecutive, not consecutive in the rows. Each figure is <em>at least</em> that
 			much: it is what we used, never the plan's limit, and a quiet window says nothing about the
 			headroom left.
+		</p>
+
+		<h2>Estimated tiers</h2>
+		<p>
+			We measure one tier per plan. Another tier is estimated from a tier we measured times the
+			multiplier its vendor states, and 30 days use the weekly multiplier. An estimate is still
+			an <em>at least</em> figure; a tier whose multiplier the vendor does not state shows “–”.
+			The reasoning is in <a href={ESTIMATE_ADR_URL}>ADR 0008</a>.
 		</p>
 
 		<h2>What “measured by us” means</h2>

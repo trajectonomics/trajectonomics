@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { Granularity } from "@trajectonomics/data-collector/types"
-import { type PeakRow, peaksByPlan } from "../src/core/peaks"
+import { type PeakRow, peaksByPlan, peaksByPlanAndTier } from "../src/core/peaks"
 
 /** One synthetic row of `usage_hourly`, already summed over machines and models. */
 function row(
@@ -99,5 +99,47 @@ describe("peaksByPlan", () => {
 		expect(result.map((peak) => peak.plan)).toEqual(["claude", "opencode-go"])
 		expect(result[0]?.fiveHours?.tokens).toBe(7)
 		expect(result[1]?.fiveHours?.tokens).toBe(5)
+	})
+})
+
+describe("peaksByPlanAndTier", () => {
+	const tierOf = (_plan: string, day: string) => (day < "2026-11-15" ? "Pro" : "Max")
+
+	test("splits a plan's peaks at a tier change and never mixes the tiers in one window", () => {
+		const result = peaksByPlanAndTier(
+			[
+				row("claude", "2026-11-14T23:00:00.000Z", 100),
+				row("claude", "2026-11-15T00:00:00.000Z", 100),
+			],
+			tierOf,
+		)
+		expect(result).toEqual([
+			{
+				plan: "claude",
+				tiers: [
+					{
+						tier: "Max",
+						fiveHours: { tokens: 100, fromDay: "2026-11-15" },
+						sevenDays: { tokens: 100, fromDay: "2026-11-15" },
+						thirtyDays: { tokens: 100, fromDay: "2026-11-15" },
+					},
+					{
+						tier: "Pro",
+						fiveHours: { tokens: 100, fromDay: "2026-11-14" },
+						sevenDays: { tokens: 100, fromDay: "2026-11-14" },
+						thirtyDays: { tokens: 100, fromDay: "2026-11-14" },
+					},
+				],
+			},
+		])
+	})
+
+	test("keeps the tiers of different plans apart", () => {
+		const result = peaksByPlanAndTier(
+			[row("claude", "2026-11-24T10:00:00.000Z", 7), row("cursor", "2026-11-24T10:00:00.000Z", 5)],
+			() => "Max",
+		)
+		expect(result.map((entry) => entry.plan)).toEqual(["claude", "cursor"])
+		expect(result[0]?.tiers[0]?.fiveHours?.tokens).toBe(7)
 	})
 })
