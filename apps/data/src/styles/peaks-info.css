@@ -1,0 +1,74 @@
+/* The info control beside "What each plan gives", and the panel it opens. */
+
+/* The heading keeps its Theme rule and carries the info button beside its words. */
+.peaks-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.peaks-info {
+	display: inline-flex;
+	width: 18px;
+	height: 18px;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 999px;
+	background: none;
+	color: var(--ds-color-muted-foreground);
+	cursor: pointer;
+}
+
+.peaks-info:hover,
+.peaks-info:focus-visible {
+	border-color: var(--ds-color-foreground);
+	color: var(--ds-color-foreground);
+}
+
+.peaks-info:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+.peaks-info svg {
+	width: 12px;
+	height: 12px;
+}
+
+.peaks-info-panel {
+	position: fixed;
+	inset: 4rem 0 auto;
+	width: min(22rem, calc(100vw - 2rem));
+	max-height: calc(100dvh - 6rem);
+	margin-inline: auto;
+	padding: 16px 18px;
+	overflow: auto;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-card);
+	color: var(--ds-color-card-foreground);
+	box-shadow: 0 12px 32px color-mix(in srgb, var(--ds-color-foreground) 18%, transparent);
+	font-size: 13px;
+	line-height: 1.65;
+}
+
+.peaks-info-panel p {
+	margin: 0 0 8px;
+}
+
+.peaks-info-sources {
+	margin: 10px 0 0;
+	padding-left: 18px;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	line-height: 1.6;
+	color: var(--ds-color-muted-foreground);
+}
+
+.peaks-info-sources a {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 3px;
+}

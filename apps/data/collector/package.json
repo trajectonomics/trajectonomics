@@ -11,6 +11,7 @@
 	},
 	"exports": {
 		"./plans": "./src/plans.ts",
+		"./tier-catalog": "./src/tier-catalog.ts",
 		"./types": "./src/types.ts"
 	},
 	"scripts": {

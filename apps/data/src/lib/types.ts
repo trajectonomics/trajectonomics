@@ -28,6 +28,40 @@ export type Health = {
 	stale: boolean
 }
 
+/** The most tokens one plan used in a window, and the UTC day the window starts. */
+export type Peak = {
+	tokens: number
+	fromDay: string
+}
+
+/** The three windows, as the peaks API names them. */
+export type PeakWindowKey = "fiveHours" | "sevenDays" | "thirtyDays"
+
+/** One tier's peaks, as the peaks API measured them. */
+export type MeasuredTier = {
+	tier: string | null
+	fiveHours: Peak | null
+	sevenDays: Peak | null
+	thirtyDays: Peak | null
+}
+
+/** One plan's three peaks, the tier they belong to, and every tier we measured. */
+export type PlanPeak = {
+	plan: string
+	tier: string | null
+	fiveHours: Peak | null
+	sevenDays: Peak | null
+	thirtyDays: Peak | null
+	measured: MeasuredTier[]
+}
+
+/** The body of the peaks API. */
+export type PeaksPayload = {
+	asOf: string
+	methodVersion: number
+	plans: PlanPeak[]
+}
+
 /** A day's token total for one plan, as the chart plots it. */
 export type ChartPoint = {
 	day: string

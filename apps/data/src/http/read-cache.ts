@@ -1,5 +1,5 @@
 import type { QueryError } from "../core/errors"
-import { type CacheLike, FRESH_MAX_AGE, STALE_MAX_AGE, usageStaleCacheKey } from "./cache"
+import { type CacheLike, FRESH_MAX_AGE, STALE_MAX_AGE } from "./cache"
 import { json } from "./responses"
 
 const FRESH_CACHE_CONTROL = `public, max-age=${FRESH_MAX_AGE}, stale-if-error=${STALE_MAX_AGE}`
@@ -46,17 +46,20 @@ export async function cachedInvalid(
 	return response
 }
 
-/** Caches the fresh copy and the long-lived stale copy, then returns the response. */
+/**
+ * Caches the fresh copy under the request's key and the long-lived stale copy under the read's
+ * stale key, then returns the response.
+ */
 export async function cachedFresh(
 	cache: CacheLike | undefined,
 	key: Request,
-	request: Request,
+	staleKey: Request,
 	body: unknown,
 ): Promise<Response> {
 	const response = json(body, { headers: { "cache-control": FRESH_CACHE_CONTROL } })
 	if (cache !== undefined) {
 		await put(cache, key, response.clone())
-		await put(cache, usageStaleCacheKey(request), copyWith(response, STALE_CACHE_CONTROL))
+		await put(cache, staleKey, copyWith(response, STALE_CACHE_CONTROL))
 	}
 	return response
 }
@@ -67,10 +70,10 @@ export async function cachedFresh(
  */
 export async function cachedStale(
 	cache: CacheLike | undefined,
-	request: Request,
+	staleKey: Request,
 ): Promise<Response | undefined> {
 	if (cache === undefined) return undefined
-	const stale = await cache.match(usageStaleCacheKey(request))
+	const stale = await cache.match(staleKey)
 	if (stale === undefined) return undefined
 	return copyWith(stale, "no-store", { "x-data-stale": "1" })
 }

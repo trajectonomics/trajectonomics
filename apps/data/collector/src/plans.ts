@@ -1,3 +1,10 @@
+import { type PlanTier, TIERS } from "./tiers"
+
+// The dated tier history lives in its own module: the plan table plus that history is over the
+// file-length cap. `./plans` still exports everything a reader of the plan table needs.
+export type { PlanTier } from "./tiers"
+export { TIERS, tierOn, tierRangeOn } from "./tiers"
+
 /** A subscription plan the collector recognises. Ids are stable and never renamed. */
 export type PlanId =
 	| "claude"
@@ -18,74 +25,70 @@ export type PlanDefinition = {
 	activeTo: string | null
 	providerIds: readonly string[]
 	modelPrefixes: readonly string[]
+	/** The plan's dated tier history; empty when we do not know its tier. */
+	tiers: readonly PlanTier[]
 }
 
-export const plans: readonly PlanDefinition[] = [
+/** The fields that differ between plans; the rest are filled by `seed`. */
+type PlanSeed = Pick<PlanDefinition, "id" | "name" | "providerIds" | "modelPrefixes">
+
+/** Fills the fields every plan shares today, and reads its tier history from the table. */
+function seed(plan: PlanSeed): PlanDefinition {
+	return { ...plan, activeFrom: null, activeTo: null, tiers: TIERS[plan.id] }
+}
+
+const seeds: readonly PlanSeed[] = [
 	{
 		id: "claude",
 		name: "Claude",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["anthropic", "claude", "claudeagent"],
 		modelPrefixes: ["claude-"],
 	},
 	{
 		id: "opencode-go",
 		name: "OpenCode Go",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["opencode-go"],
 		modelPrefixes: [],
 	},
 	{
 		id: "opencode-free",
 		name: "OpenCode (free)",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["opencode"],
 		modelPrefixes: [],
 	},
 	{
 		id: "command-code",
 		name: "Command Code",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["commandcode", "command-code"],
 		modelPrefixes: [],
 	},
 	{
 		id: "antigravity",
 		name: "Antigravity",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["antigravity", "gemini"],
 		modelPrefixes: ["gemini-"],
 	},
 	{
 		id: "cursor",
 		name: "Cursor",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["cursor"],
 		modelPrefixes: ["composer-", "grok-"],
 	},
 	{
 		id: "meta",
 		name: "Meta (Muse)",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["muse", "meta"],
 		modelPrefixes: ["muse-"],
 	},
 	{
 		id: "mistral",
 		name: "Mistral",
-		activeFrom: null,
-		activeTo: null,
 		providerIds: ["mistral"],
 		modelPrefixes: ["mistral-", "codestral-", "zai-"],
 	},
 ]
+
+export const plans: readonly PlanDefinition[] = seeds.map(seed)
 
 /** Resolves the plan a provider id and model belong to, preferring the provider id. */
 export function matchPlan(providerId: string | null | undefined, model: string): PlanId {
