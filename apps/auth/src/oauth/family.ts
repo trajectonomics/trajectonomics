@@ -3,7 +3,8 @@
  *
  * `revoke.ts` deletes a grant's consents, device codes, tokens and pending authorization codes in
  * one D1 batch, so the whole family goes or none of it does. A consent created for a fresh approval
- * deletes its token family through here first: an old token must never attach to a new approval.
+ * deletes its token family through here first, so an old token does not attach to a new approval
+ * (ADR 0002 names the in-flight exchange that can still slip past).
  * Pending authorization codes live in `verification` and are deleted by `verification-sql.ts`.
  *
  * Both steps cost a constant number of statements however large the family is: one for the

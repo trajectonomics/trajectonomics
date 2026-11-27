@@ -184,11 +184,13 @@ than that read, and a filter on the read's clock would delete a live token. Any 
 did not list survives, and a family of thousands of rotated rows costs the same statements as a family
 of one: no scan, no chunk, a constant well inside D1's fifty-query cap for one invocation.
 
-An in-flight rotation of the old refresh token is the one way a token of the previous grant can still
-attach to a new approval: a refresh whose checks passed a moment before a revoke, or in the narrow
-window around the ninety-day expiry, can insert its rotated row just after the snapshot, and that row
-then survives and is checked against the new consent. The window is one rotation wide, and the next
-re-approval deletes the row.
+A token exchange already in flight when the snapshot is taken can still leave a token of the
+previous grant attached to a new approval. A refresh whose checks passed a moment before a revoke,
+or in the narrow window around the ninety-day expiry, can insert its rotated row just after the
+snapshot; an authorization-code or device-code exchange looks to have the same window. That row
+survives and is checked against the new consent. The window is one exchange wide, but the row lasts:
+a re-approval while the new consent is live takes the merge path, which touches no token, so the row
+stays usable until the grant is revoked or the first approval after the new consent expires.
 
 `src/oauth-grants.ts` adds two session-scoped endpoints:
 

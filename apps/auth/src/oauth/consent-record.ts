@@ -101,7 +101,8 @@ function merge({ ctx, input, options }: Recording, read: Read): Promise<ConsentW
 }
 
 /**
- * A newly created consent never attaches to tokens from an earlier grant. Never move `createdAt`
+ * A newly created consent does not attach to tokens from an earlier grant (ADR 0002 names the
+ * in-flight exchange that can slip past). Never move `createdAt`
  * without deleting the family. Only the tokens the snapshot taken before the second read listed
  * go: a token another approval minted after that snapshot is that approval's, not a leftover, and
  * the snapshot's ids keep it safe from the whole-second `createdAt` the library stores.

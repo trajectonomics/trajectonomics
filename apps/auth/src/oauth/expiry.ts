@@ -48,7 +48,7 @@ export async function expireConsentForSession(
 /**
  * The `/oauth2/consent` preparation: the same expiry as above, plus the leftover token family
  * when no consent exists at all. The library is about to create a fresh approval; a token from
- * the previous one must not attach to it.
+ * the previous one is deleted first (ADR 0002 names the in-flight exchange that can slip past).
  */
 export async function prepareConsentForApproval(
 	ctx: { context: unknown; headers?: Headers | undefined },
