@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { edited } from "./baseline/testing"
 import { baseFlags, dateFlags, errorOf, projection, projectionHome } from "./projection/testing"
 import { setHousehold } from "./scenario-household-support"
+import { capture } from "./test-support"
 
 /*
  * A stored household is parsed by the reads that may use it (run, path, fi and chance; cli ADR-0048):
@@ -39,6 +40,20 @@ describe("a stored household that does not parse", () => {
 		const res = await projection(home, ["run", ...baseFlags()])
 		expect(res.code).toBe(1)
 		expect(errorOf(res).code).toBe("internal")
+	})
+
+	it("keeps the SyntaxError for TRAJ_DEBUG=1, and nothing else without it", async () => {
+		const home = await corrupted("{not json")
+		const quiet = await projection(home, ["run", ...baseFlags()])
+		const loud = await capture(["projection", "run", ...baseFlags(), "--json"], {
+			TRAJ_HOME: home,
+			TRAJ_DEBUG: "1",
+		})
+		expect(quiet.err).not.toContain("SyntaxError")
+		expect(loud.err).toContain("SyntaxError")
+		// The diagnostic sits above the failure, which stays byte-identical.
+		expect(loud.err.endsWith(quiet.err)).toBe(true)
+		expect(loud.code).toBe(1)
 	})
 
 	it("never fails a compare, which does not read the household", async () => {

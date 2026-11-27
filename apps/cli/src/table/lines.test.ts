@@ -1,26 +1,20 @@
 import { describe, expect, it } from "bun:test"
+import { agesColumn } from "../projection/render"
 import { type ColumnHint, tableLines } from "./lines"
-
-/** `me 37, partner 35`: the callback `projection run` declares for its `ages` column. */
-function agesText(value: unknown): unknown {
-	if (!Array.isArray(value)) return value
-	return value
-		.map((entry) => {
-			const { person, age } = entry as { person?: unknown; age?: unknown }
-			return `${String(person)} ${String(age)}`
-		})
-		.join(", ")
-}
 
 const columns: readonly ColumnHint[] = [
 	{ key: "index", label: "index", align: "right" },
-	{ key: "ages", label: "ages", show: agesText },
+	agesColumn,
 ]
 
 describe("a column's show callback", () => {
 	it("prints what it returns in place of the row's value, and still pads the cell", () => {
-		const text = tableLines("annual", 1, [{ index: 0, ages: [{ person: "me", age: 37 }] }], columns)
-		expect(text).toBe("annual (1 row)\nindex  ages\n    0  me 37")
+		const ages = [
+			{ person: "me", age: 37 },
+			{ person: "kid", age: 5 },
+		]
+		const text = tableLines("annual", 1, [{ index: 0, ages }], columns)
+		expect(text).toBe("annual (1 row)\nindex  ages\n    0  me 37, kid 5")
 	})
 
 	it("receives the row's raw value, `undefined` included when the row does not state the key", () => {
@@ -49,8 +43,8 @@ describe("a column's show callback", () => {
 		const text = tableLines(
 			"rows",
 			1,
-			[{ cell: "a\nb" }],
-			[{ key: "cell", label: "cell", show: (value) => value }],
+			[{ cell: "x" }],
+			[{ key: "cell", label: "cell", show: () => "a\nb" }],
 		)
 		expect(text).toBe("rows (1 row)\ncell\na\\nb")
 	})
