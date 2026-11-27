@@ -39,17 +39,11 @@
 	line-height: 1.05;
 }
 
-.overview-lede {
-	max-width: 38rem;
-	margin: 0;
-	font-size: 18px;
-	color: var(--ds-color-muted-foreground);
-}
-
 .freshness-line {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 6px 12px;
+	align-items: center;
+	gap: 6px 8px;
 	margin: 0;
 	padding-bottom: 24px;
 	font-family: var(--font-meta);
@@ -58,7 +52,20 @@
 }
 
 .freshness-note {
-	color: var(--ds-color-muted-foreground);
+	color: var(--ds-color-accent);
+}
+
+/* The state is a shape: a primary dot while uploads arrive, an accent dot once they pause. */
+.freshness-dot {
+	width: 8px;
+	height: 8px;
+	flex: none;
+	border-radius: 999px;
+	background: var(--ds-color-primary);
+}
+
+.freshness-stale {
+	background: var(--ds-color-accent);
 }
 
 .as-of {
@@ -81,7 +88,19 @@
 	padding-top: 8px;
 }
 
+.section-block + .section-block {
+	padding-top: 56px;
+}
+
 .section-title {
 	padding-bottom: 12px;
 	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.detail-block {
+	padding-top: 32px;
+}
+
+.detail-title {
+	padding-bottom: 8px;
 }
