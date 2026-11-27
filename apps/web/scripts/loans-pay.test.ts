@@ -18,7 +18,7 @@ import { type LoanDraft, loanFromDraft } from "../src/lib/view/plan-items/loan-d
 import { loanFieldOfRefusal, loanLayoutOf } from "../src/lib/view/plan-items/loan-refusal"
 import { statementOf } from "../src/lib/view/plan-items/loan-statement"
 import { demoCarryIn } from "./demo/carry-in"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { makeScratch, removeScratch } from "./scratch"
@@ -119,7 +119,7 @@ const LOAN_DRAFT: LoanDraft = {
 beforeAll(async () => {
 	scratch = await makeScratch("traj-web-loans-pay-")
 	home = join(scratch, "traj-home")
-	await buildDemoLedger({ binary: BINARY, home, scratch })
+	await copyDemoLedger({ binary: BINARY, home, scratch })
 	// The plan starts as the demo's base, with no loan of the planner's own.
 	applyInTerminal(PLAN, documentOf("base"))
 	initial = documentOf(PLAN)

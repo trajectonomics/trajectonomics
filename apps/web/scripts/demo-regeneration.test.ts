@@ -9,31 +9,28 @@ import { generateDemo } from "./demo-generate"
 import { demoSnapshotText } from "./demo-snapshot"
 
 // A Demo generation gives the same bytes (#477, cli ADR 0074), so a chart a visitor saved against one
-// deploy still draws on the next. Each generation compiles its own demo `traj` from the CLI's source, so
-// the checks cover the whole generator: the fixed clock and counted ids the CLI writes, and the content
-// hashes that cover those ids. They stay in `test:scripts`, which CI runs after it has built the CLI and
-// the Demo, so there is no job of their own. The file the `demo` task wrote is a third generation.
+// deploy still draws on the next. Compiles a fresh demo `traj` from the CLI's source and generates the
+// Demo again, comparing it byte-for-byte against the file the `demo` task wrote from its own compile and
+// run. That covers the whole generator: the fixed clock and counted ids the CLI writes, and the content
+// hashes that cover those ids.
 
 const sha256 = (text: string) => new Bun.CryptoHasher("sha256").update(text).digest("hex")
 const UUID_V7 = /[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/
 
-/** Generates the Demo and returns its text, or fails the test with the generator's message. */
+/** Generates the Demo from a fresh compile and returns its text, or fails with the generator's message. */
 async function generated(): Promise<string> {
 	const run = await generateDemo()
 	if (!run.ok) throw new Error(run.message)
 	return run.text
 }
 
-// Both generations are made once and read by every test, because each compiles a binary and takes about
-// half a minute.
-const regenerations = Promise.all([generated(), generated()])
+const regenerated = generated()
 
 describe("the Demo snapshot's bytes", () => {
-	it("are equal in two generations, and equal to the file the demo task wrote", async () => {
-		const [first, second] = await regenerations
-		expect(sha256(second)).toBe(sha256(first))
-		expect(second).toBe(first)
-		expect(sha256(await demoSnapshotText())).toBe(sha256(first))
+	it("are equal in a fresh regeneration and the file the demo task wrote", async () => {
+		const [fresh, written] = await Promise.all([regenerated, demoSnapshotText()])
+		expect(sha256(fresh)).toBe(sha256(written))
+		expect(fresh).toBe(written)
 	}, 180_000)
 })
 
@@ -54,9 +51,9 @@ function savedChart(ids: Iterable<string>): ChartDef {
 
 describe("a saved chart across a Demo regeneration", () => {
 	it("keeps every series key, so none is missing from the next generation", async () => {
-		const [regenerated] = await regenerations
+		const fresh = await regenerated
 		const before = planOf(await demoSnapshotText())
-		const after = planOf(regenerated)
+		const after = planOf(fresh)
 		const known = seriesById(before.run, before.names)
 		const chart = savedChart(known.keys())
 		// The ids that matter are the ledger's: an Account's UUIDv7, and a cash-flow line keyed by one.

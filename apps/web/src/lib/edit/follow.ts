@@ -1,3 +1,4 @@
+import type { PlanParams } from "../snapshot"
 import type { Edit } from "./edit"
 
 /** The list with one name put in place of another; a list without the name is as it was. */
@@ -49,4 +50,13 @@ export function followCompare(
 	if (edit.kind !== "rename-plan") return compare
 	const swap = (name: string) => (name === edit.name ? edit.newName : name)
 	return { a: swap(compare.a), b: swap(compare.b) }
+}
+
+/** The Plan's parameters after an Edit: the plan list and the comparison follow its names. */
+export function followEdit(params: PlanParams, edit: Edit): PlanParams {
+	return {
+		...params,
+		scenarios: followPlan(params.scenarios, edit),
+		compare: followCompare(params.compare, edit),
+	}
 }

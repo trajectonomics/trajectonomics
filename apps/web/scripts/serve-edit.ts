@@ -1,17 +1,17 @@
 // The write path of the loopback server: the session token, and POST /edit, which runs one Edit through
 // traj, re-reads the Snapshot and answers it ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 import type { Snapshot } from "../src/lib/contract"
-import { writtenRereadFailed } from "../src/lib/edit/failure"
-import { followCompare, followPlan } from "../src/lib/edit/follow"
+import { followEdit } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
 import { createEditGate } from "./edit-gate"
 import { changedBy, paramsAfter, rereadInputs } from "./run-reread"
 import { runEdit } from "./serve-apply"
-import { answerOf, failure, readEdit, readReread, refused } from "./serve-edit-answer"
+import { failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
 import { answerPath } from "./serve-path"
 import { recordValues } from "./serve-record-values"
 import { json } from "./serve-respond"
+import { answerOf, answerWritten } from "./serve-snapshot-answer"
 import { answerWhatIf } from "./serve-what-if"
 import { runSnapshot, type SnapshotRun } from "./snapshot-run"
 
@@ -47,15 +47,10 @@ export function createEditor(options: EditorOptions): Editor {
 		}
 		const run = await runEdit(options.traj, edit)
 		if (!run.ok) return failure(200, run.error)
-		params = {
-			...params,
-			scenarios: followPlan(params.scenarios, edit),
-			compare: followCompare(params.compare, edit),
-		}
-		// The write is in, and `params` already follows it: a failed read here must not say the Edit did not run.
-		const again = await refresh()
-		if (again.ok) return answerOf(again, undefined, run.droppedAnchors, run.droppedOwners)
-		return failure(200, writtenRereadFailed())
+		// The write is in, so `params` follows it before the read: a failed read still leaves Reload reading what it made.
+		params = followEdit(params, edit)
+		// An EditRun that ran is a Stated (its `ok` is not read).
+		return answerWritten(await refresh(), run)
 	}
 
 	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data; or reads one path. */

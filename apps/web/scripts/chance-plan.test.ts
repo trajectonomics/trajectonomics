@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test
 
 import { join } from "node:path"
 import { DEMO_PATHS, DEMO_SEED } from "./demo/return-model"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded, settle } from "./editor-running.test-support"
@@ -34,7 +34,7 @@ function traj(argv: string[], stdin?: unknown): string {
 async function setup(): Promise<Editor> {
 	scratch = await makeScratch("traj-web-chance-plan-")
 	home = join(scratch, "traj-home")
-	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
+	const demo = await copyDemoLedger({ binary: BINARY, home, scratch })
 	const shown = JSON.parse(traj(["scenario", "show", "--decimal", "--json", "--", "base"])) as {
 		scenario: { document: Parameters<typeof handDocument>[0] }
 	}

@@ -10,6 +10,7 @@ import { filersOf, readForFilers } from "../src/lib/snapshot/allowance-filers"
 import { isFilerPlan } from "../src/lib/snapshot/allowance-params"
 import type { PlannedRead } from "../src/lib/snapshot/planned"
 import { runPlanned } from "./run-planned"
+import { createPool, mapWithPool, type Pool } from "./run-pool"
 import type { RunContext } from "./run-traj"
 
 type ProjectionRead = SnapshotReads["projections"][string] | undefined
@@ -34,7 +35,7 @@ function readOf(
 }
 
 /**
- * The allowance reads of the plans whose document holds a Levy, one at a time; the CLI refuses a plan with none.
+ * The allowance reads of the plans whose document holds a Levy; the CLI refuses a plan with none.
  * A plan with Filers reads each Return's own labels; a plan without them keeps its bare labels and reads as it always has.
  */
 export async function runAllowances(
@@ -43,14 +44,21 @@ export async function runAllowances(
 	documents: SnapshotReads["documents"],
 	projections: SnapshotReads["projections"],
 	records: readonly unknown[],
+	pool: Pool = createPool(),
 ): Promise<Record<string, Read<ProjectionAllowances>>> {
-	const reads: Record<string, Read<ProjectionAllowances>> = {}
+	const eligible: [string, PlannedRead][] = []
 	for (const [name, planned] of Object.entries(plan.allowances)) {
 		const shown = documents[name]
 		if (shown?.ok !== true || !hasLevy(shown)) continue
 		const read = readOf(planned, shown.data.scenario.document, projections[name])
 		if (read === null) continue
-		reads[name] = await runPlanned(context, read, projectionAllowances, records)
+		eligible.push([name, read])
 	}
-	return reads
+	const results = await mapWithPool(
+		pool,
+		eligible,
+		async ([name, read]) =>
+			[name, await runPlanned(context, read, projectionAllowances, records)] as const,
+	)
+	return Object.fromEntries(results)
 }

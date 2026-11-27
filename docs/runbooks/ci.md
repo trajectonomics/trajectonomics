@@ -10,8 +10,8 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 | `Plan` | decides whether the web jobs run | always |
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
 | `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
-| `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/4` | same as `Check web` |
-| `Check web browser` | the browser checks over the built Demo: `turbo run @trajectonomics/web#build`, then `bun run test:browser` in `apps/web` | same as `Check web` |
+| `Check web scripts (1)` ... `(6)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/6` | same as `Check web` |
+| `Check web browser (1)` ... `(2)` | one shard of the browser checks over the built Demo: `turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted`, then `bun run test:browser --shard=N/2` in `apps/web` | same as `Check web` |
 | `Check` | fails unless every job above passed (a skipped web job passes only when `Plan` said to skip it) | always |
 
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the
@@ -84,7 +84,7 @@ differently from `Check packages`, and missed them even when the packages job ha
 45468426958: `Check packages` hit all 16 tasks, including `demo`, and shard 1 missed all 10). A shard
 now builds in its own step, `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, whose
 hashes equal the packages job's, and runs its files with `bun run --cwd apps/web test:scripts
---shard=N/4`, with no turbo around it. That is the whole task graph of `test:scripts` (its
+--shard=N/6`, with no turbo around it. That is the whole task graph of `test:scripts` (its
 `dependsOn` in `apps/web/turbo.json`), and `tooling/guards/ci-web-split.test.ts` pins both steps and
 that the shard carries no `--`.
 
@@ -100,14 +100,14 @@ the shards, which it runs beside.
   A4 landscape (tables fit 1032px, black on white, the same surfaces from either theme). The suite is
   `apps/web/browser/`, and `tooling/guards/ci-web-split.test.ts` pins the job.
 - **The hosted Demo.** The same job also builds `build:hosted` and checks `dist-hosted/` served under `/demo/` (`apps/web/browser/hosted.e2e.ts`, [web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)): every page at 360px and 1280px, no request but a GET of its own files, only the Demo snapshot read, and every Edit control switched off.
-- **Steps.** The build is `bunx turbo run @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=2`, with no arguments after
+- **Steps.** The build is `bunx turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=4`, with no arguments after
   `--` for the reason in the cache section below. Chromium comes from `actions/cache` on `~/.cache/ms-playwright`
   with the same key as `browser.yml` and `docs-browser.yml` (`playwright-<os>-<version>`), so one download serves
   all three; a cache hit still runs `playwright install-deps`, because the system libraries are not cached. The
-  suite is `bun run test:browser` in `apps/web`.
-- **Artifacts.** `web-screenshots` (every page at both widths and both themes, and the three printed pages in
-  both themes) is uploaded on every run, pass or fail, for 7 days: open it to look at what CI checked.
-  `web-playwright-report` (the HTML report and traces) is uploaded on failure only.
+  suite runs sharded across two runners as `bun run test:browser --shard=N/2` in `apps/web`.
+- **Artifacts.** `web-screenshots-1` and `web-screenshots-2` (every page at both widths and both themes, and the three printed pages in
+  both themes) are uploaded on every run, pass or fail, for 7 days: open them to look at what CI checked.
+  `web-playwright-report-1` and `web-playwright-report-2` (the HTML report and traces) are uploaded on failure only.
 - **Budget.** 10 minutes, as the job's `timeout-minutes`. Measured in this pull request's own green run (#497): 102 s for the whole job,
   of which the build step 8 s (turbo cache hit), the browser cache 3 s, Chromium's system libraries 8 s, the
   suite 70 s (144 tests, 2 workers) and the screenshot upload about 3 s (17 MB). The shards take 2m47s to

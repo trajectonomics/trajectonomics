@@ -107,6 +107,24 @@ describe("the household Owners a write dropped", () => {
 	})
 })
 
+describe("a new plan that replaced one made while the Edit ran", () => {
+	test("is said in the notice, and the next Edit that replaced none hides it", async () => {
+		answer({ replaced: true })
+		const edit = { kind: "apply-plan", name: "fresh", template: { asOf: "2026-10-31" } } as const
+		expect(await editSession.run(edit)).toBe(true)
+		expect(dropped.replaced).toBe(true)
+		const body = render(DroppedAnchorsNotice).body
+		expect(body).toContain(
+			"A plan named fresh was made while this change ran, and this change replaced it.",
+		)
+		expect(body).toContain("Dismiss")
+		answer({})
+		await editSession.run(EDIT)
+		expect(dropped.replaced).toBe(false)
+		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
+	})
+})
+
 describe("a write that drops both household anchors and Owners", () => {
 	test("names every item in one notice, and Dismiss clears both lists", async () => {
 		answer({
