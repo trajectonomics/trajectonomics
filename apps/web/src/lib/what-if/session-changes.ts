@@ -1,6 +1,6 @@
 /** The changes of a session as the bar lists them, in the order `traj` applies them. Pure. */
 import { additionId, additionPath, additionWords } from "./additions"
-import { fieldValueWords, fieldWords } from "./field-words"
+import { fieldChange } from "./field-words"
 import type { Json } from "./overrides"
 import type { WhatIf } from "./session"
 import { inGroup } from "./session-group"
@@ -8,11 +8,18 @@ import { groupChanges } from "./session-group-changes"
 import { isHeld } from "./session-overrides"
 import { routingChange } from "./session-routing"
 
-/** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
+/** One change of the session, as the bar lists it: a switch off, or a Set with its value as its field's card shows it. */
 export type Change =
 	| { kind: "off"; path: string; label: string }
 	| { kind: "add"; path: string; label: string; title: string }
-	| { kind: "set"; path: string; label: string; value: string }
+	| {
+			kind: "set"
+			path: string
+			label: string
+			value: string
+			/** Whether the value is the person's JSON, which may hold an amount that hiding amounts must mask. */
+			sensitive?: boolean
+	  }
 	/** A Set of a whole Flow (`flows.rent`) or of its rule (`flows.rent.rule`): worded without its JSON, and without a figure. */
 	| { kind: "flow"; path: string; label: string; value: Json }
 	/** A Set of the whole estate block: worded without its lines, which hold the person's own shares and amounts. */
@@ -51,7 +58,10 @@ function tryWhat(path: string): string {
 }
 
 /** The changes, in the order `traj` applies them: removals first, then Additions, then Sets, and each group as one. */
-export function changesOf(whatIf: WhatIf): Change[] {
+export function changesOf(
+	whatIf: WhatIf,
+	employerShares: ReadonlySet<string> = new Set(),
+): Change[] {
 	const own = (path: string) => !whatIf.groups.some((group) => inGroup(group, path))
 	const hiding = (path: string) => isHeld(whatIf, path)
 	// A Set under a tried group is that group's one change; one under a switched-off group is sent when the plan keeps
@@ -91,14 +101,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 					value: set.value,
 				}
 			}
-			const field = set.path.split(".").slice(2).join(".")
-			const value = fieldValueWords(field, set.value)
-			return {
-				kind: "set",
-				path: set.path,
-				label: `${itemLabel(set.path)} ${fieldWords(field)} set to ${value}`,
-				value,
-			}
+			return { kind: "set", path: set.path, ...fieldChange(set.path, set.value, employerShares) }
 		})
 	return [...removals, ...additions, ...sets, ...groupChanges(whatIf)]
 }

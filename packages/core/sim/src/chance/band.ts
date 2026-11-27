@@ -1,7 +1,7 @@
 import type { Period } from "../output/periods"
 import type { MinorUnits } from "../types"
 import type { ChanceBand, ChancePercentile } from "../types/chance"
-import type { PathOutcome } from "./path"
+import type { PathOutcome } from "./path-outcome"
 import { ascending, nearestRank } from "./rank"
 
 /** The Percentile levels every Band reports. */

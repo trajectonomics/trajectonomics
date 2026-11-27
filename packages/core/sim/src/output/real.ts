@@ -2,8 +2,8 @@ import { countedDays } from "../calendar/counted"
 import { leftOutOfAccessible } from "../engine/accessible"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { EngineSnapshot } from "../engine/snapshot"
-import { deflate } from "../money/growth"
-import type { BasisPoints, DateString } from "../types"
+import { deflateBy, type Inflation } from "../money/inflation"
+import type { DateString } from "../types"
 import type { ProjectionBalance, ProjectionProblem } from "../types/projection"
 import type { RuleMap } from "./rules"
 
@@ -21,11 +21,11 @@ export interface RealOutcome {
 /** One row balance deflated component by component; `amount` is the sum of the two. */
 function deflated(
 	balance: EngineSnapshot["balances"][number],
-	inflation: BasisPoints,
+	inflation: Inflation,
 	days: number,
 ): ProjectionBalance | undefined {
-	const capitalised = deflate(balance.capitalised, inflation, days)
-	const accruedInterest = deflate(balance.accruedInterest, inflation, days)
+	const capitalised = deflateBy(balance.capitalised, inflation, days)
+	const accruedInterest = deflateBy(balance.accruedInterest, inflation, days)
 	const amount = capitalised + accruedInterest
 	if (!isSafeInteger(amount) || !isSafeInteger(capitalised)) return undefined
 	return {
@@ -41,7 +41,7 @@ export function realValues(
 	snapshot: EngineSnapshot,
 	rules: RuleMap,
 	start: DateString,
-	inflation: BasisPoints,
+	inflation: Inflation,
 ): RealOutcome {
 	const days = countedDays(start, snapshot.date)
 	const balances: ProjectionBalance[] = []

@@ -5,12 +5,14 @@ import { collectDates } from "./dates"
 import { buildEvents, flowsAt } from "./events"
 import { finishLevies, planLevies } from "./levy-finish"
 import { allSettlementDates, type LevySet } from "./levy-set"
-import { type OwedTracker, openOwedTracker } from "./owed-tracker"
+import { openOwedTracker } from "./owed-tracker"
 import type { EngineResult } from "./result"
 import { resolveReturns } from "./return-rows"
 import type { Returns } from "./returns"
-import { openRules, type RuleBook } from "./rule-book"
+import { openRules } from "./rule-book"
+import { attachRules, attachTracker } from "./run-attach"
 import type { RunOptions } from "./run-options"
+import { runScenarioOf } from "./run-scenario"
 import { type RunAccumulator, stepDate } from "./run-step"
 import { createStates, type StateMap } from "./state"
 
@@ -39,18 +41,6 @@ function finish(
 	return { ok: true, run: { ...withLevies.run, milestones: gate.results(runEnd) } }
 }
 
-/** Attaches the owed tracker's paid-off dates, when the run tracks liabilities. */
-function attachTracker(result: EngineResult, tracker: OwedTracker | undefined): EngineResult {
-	if (!result.ok || tracker === undefined) return result
-	return { ok: true, run: { ...result.run, paidOff: tracker.paidOff } }
-}
-
-/** Attaches the rule Flows' Rule years, when the Scenario declares one. */
-function attachRules(result: EngineResult, rules: RuleBook | undefined): EngineResult {
-	if (!result.ok || rules === undefined) return result
-	return { ok: true, run: { ...result.run, rules } }
-}
-
 function endDate(result: EngineResult, timeline: Timeline): DateString {
 	if (!result.ok) return timeline.horizon
 	return result.run.runsOut?.date ?? timeline.horizon
@@ -65,13 +55,19 @@ export function runEngine(
 	options: RunOptions = {},
 ): EngineResult {
 	const { tracked = false, breakdown = false, recordRules = false } = options
-	const states = createStates(baseline, scenario, timeline.start, resolveReturns(returns, timeline))
-	const calendar = resolvedCalendar(scenario)
-	const events = buildEvents(scenario, timeline, calendar)
-	const levies = planLevies(scenario, timeline, calendar)
-	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
+	const runScenario = runScenarioOf(scenario, returns)
+	const states = createStates(
+		baseline,
+		runScenario,
+		timeline.start,
+		resolveReturns(returns, timeline),
+	)
+	const calendar = resolvedCalendar(runScenario)
+	const events = buildEvents(runScenario, timeline, calendar)
+	const levies = planLevies(runScenario, timeline, calendar)
+	const gate = MilestoneGate.create(runScenario, timeline, calendar, events)
 	const tracker = tracked ? openOwedTracker(states, timeline.start) : undefined
-	const rules = openRules(scenario, recordRules)
+	const rules = openRules(runScenario, recordRules)
 	const acc: RunAccumulator = {
 		snapshots: [],
 		totals: [],
@@ -88,7 +84,7 @@ export function runEngine(
 	for (const date of dates) {
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
-		const result = stepDate(acc, states, scenario, date, dayEvents)
+		const result = stepDate(acc, states, runScenario, date, dayEvents)
 		if (result !== undefined) {
 			const end = endDate(result, timeline)
 			return attachRules(attachTracker(finish(result, states, levies, gate, end), tracker), rules)

@@ -1,0 +1,96 @@
+/* One section per question: a linked heading, one line each of direction and answer, then a chart. */
+
+.data-section {
+	padding-top: 8px;
+	scroll-margin-top: 5.5rem;
+}
+
+.data-section + .data-section {
+	padding-top: 56px;
+}
+
+.section-heading {
+	margin: 0;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--ds-color-border);
+	font-family: var(--font-display);
+	font-size: clamp(1.5rem, 3.4vw, 2rem);
+	font-weight: 300;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+
+.section-heading a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.section-heading a:hover {
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.section-heading a:focus-visible {
+	border-radius: var(--ds-radius-sm);
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* Which way is better, in the mono layer, and the answer in one plain sentence. */
+.section-direction {
+	margin: 10px 0 0;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	color: var(--ds-color-muted-foreground);
+}
+
+.section-takeaway {
+	margin: 6px 0 0;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.section-empty {
+	margin: 24px 0 0;
+	font-size: 14px;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The window control: three real buttons in one rounded track. */
+.window-tabs {
+	display: inline-flex;
+	gap: 2px;
+	margin: 20px 0 0;
+	padding: 3px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 999px;
+}
+
+.window-tab {
+	min-height: 34px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+	cursor: pointer;
+}
+
+.window-tab[aria-pressed="true"] {
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.window-tab:hover[aria-pressed="false"] {
+	color: var(--ds-color-foreground);
+}
+
+.window-tab:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}

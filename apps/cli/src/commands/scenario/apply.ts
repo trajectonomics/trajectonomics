@@ -8,6 +8,7 @@ import { applyWhatIfFlags, whatIfResult } from "../../scenario/apply-what-if"
 import { applyResult, writeApplied } from "../../scenario/apply-write"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { invalidScenarioName } from "../../scenario/errors"
+import { fromHistoryFlag, monthsFlag } from "../../scenario/history-flags"
 import { IF_HASH } from "../../scenario/if-hash"
 import { addFlag, decimalProblem, setFlag, withoutFlag } from "../../scenario/override-flags"
 import { printTemplate } from "../../scenario/template"
@@ -45,6 +46,8 @@ export const apply: Leaf = defineCommand({
 			.describe(
 				"With --template, pre-fill the document from the Baseline at this date, as YYYY-MM-DD.",
 			),
+		fromHistory: fromHistoryFlag,
+		months: monthsFlag,
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 		decimal: decimalFlag,
 		ifHash: IF_HASH,
@@ -77,7 +80,12 @@ export const apply: Leaf = defineCommand({
 	run: (input, document, ctx) => {
 		const wrong = exclusive(input)
 		if (wrong !== undefined) return wrong
-		if (input.template === true) return printTemplate(ctx, input.asOf)
+		if (input.template === true) {
+			return printTemplate(ctx, input.asOf, {
+				history: input.fromHistory === true ? { months: input.months ?? 12 } : undefined,
+				decimal: input.decimal === true,
+			})
+		}
 		if (input.file === undefined) return decimalProblem(input) ?? applyWhatIfFlags(ctx, input)
 		// The document form checks this before it reads the document; the guard keeps `name` a string.
 		const name = input.name

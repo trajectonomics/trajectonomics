@@ -8,8 +8,12 @@
 	width: var(--plan-mark-size, 28px);
 	height: var(--plan-mark-size, 28px);
 	border-radius: 8px;
-	background: var(--ds-color-secondary);
-	color: var(--ds-color-foreground);
+	background: color-mix(
+		in srgb,
+		var(--plan-ink, var(--ds-color-foreground)) 18%,
+		var(--ds-color-secondary)
+	);
+	color: var(--plan-ink, var(--ds-color-foreground));
 }
 
 .plan-mark svg {

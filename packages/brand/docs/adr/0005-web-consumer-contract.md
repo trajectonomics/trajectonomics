@@ -156,3 +156,13 @@ above.
   pinned by its own tests, not part of the Web Consumer Contract, and adding them is additive (a
   minor release). `typography.css` stays system-only, and consumers keep owning their `--font-*`
   variable assignment.
+
+## Amendment: the shared header frame
+
+- 2026-11-27: the package gains the opt-in `./header.css` export, the one header frame the Site,
+  the blog, the data site and the docs portal draw. It is framework-free and reads only the `--ds-*`
+  roles and the `--font-display` and `--font-meta` families the consuming app assigns, so it adds no
+  Semantic Token Role. The export is additive and pinned by `scripts/web-consumer-contract.test.ts`;
+  it ships with the `./mark` export, `decorativeMark`, a pure entry with no Node import so a browser
+  bundle can take it, which strips the mark's own role, label and title so
+  no app keeps a private copy of that chain.

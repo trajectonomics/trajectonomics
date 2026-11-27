@@ -2,21 +2,40 @@ import type { LayoutTab } from "fumadocs-ui/layouts/shared"
 import {
 	FullSearchTrigger,
 	type FullSearchTriggerProps,
+	SearchTrigger,
 	type SearchTriggerProps,
 } from "fumadocs-ui/layouts/shared/slots/search-trigger"
 import type { FC, ReactNode } from "react"
+import { isTabPath, TABS, tabUrl } from "../lib/tabs"
 
-/** The header's Tab treatment: Fumadocs' own, carried over from the row this change removes. */
-const TAB_CLASS =
-	"inline-flex items-center gap-2 border-b-2 border-transparent pb-1.5 text-sm font-medium text-fd-muted-foreground text-nowrap transition-colors hover:text-fd-accent-foreground"
+/**
+ * The header's Tab treatment: the shared nav-link type every static site's centre uses
+ * (`@trajectonomics/brand/header.css`), which underlines the current Tab through `aria-current`.
+ */
+const TAB_CLASS = "ds-nav-link text-nowrap"
 
-const CURRENT_TAB_CLASS = "border-fd-primary text-fd-primary"
+/** One class list from the library's and this shell's parts, without empty entries. */
+function classNames(...parts: readonly (string | undefined)[]): string {
+	return parts.filter((part) => part !== undefined && part.length > 0).join(" ")
+}
+
+/**
+ * The Tabs of one page, marking the current Tab for assistive technology: the Tab the page belongs
+ * to, and none on a page outside both Tabs (the Landing Page, the 404 page).
+ */
+export function headerTabs(pathname: string): LayoutTab[] {
+	return TABS.map((tab) => ({
+		title: tab.title,
+		url: tabUrl(tab),
+		...(isTabPath(tab, pathname) ? { props: { "aria-current": "page" } } : {}),
+	}))
+}
 
 /**
  * The Tabs as the one header row's links, built from the same Tab definitions the sidebar's
  * dropdown offers. The current Tab keeps `aria-current="page"` for assistive technology and the
- * built-page check (ADR 0009). Below `lg` the sidebar's dropdown carries them instead, so the row
- * hides them.
+ * built-page check (ADR 0009). Below `lg` the notebook layout's sidebar dropdown carries them
+ * instead, and the Landing Page's body links both, so the row hides them.
  */
 export function HeaderTabs({ tabs }: { readonly tabs: readonly LayoutTab[] }) {
 	return (
@@ -29,7 +48,7 @@ export function HeaderTabs({ tabs }: { readonly tabs: readonly LayoutTab[] }) {
 						href={tab.url}
 						data-shell-tab=""
 						aria-current={current ? "page" : undefined}
-						className={current ? `${TAB_CLASS} ${CURRENT_TAB_CLASS}` : TAB_CLASS}
+						className={TAB_CLASS}
 					>
 						{tab.title}
 					</a>
@@ -40,40 +59,56 @@ export function HeaderTabs({ tabs }: { readonly tabs: readonly LayoutTab[] }) {
 }
 
 /**
- * The search leaves the header for the sidebar (ADR 0009), so both of the header's slots render
- * nothing. They stay assigned rather than disabled, because disabling search would remove the
- * sidebar's trigger with it.
+ * The icon-only search trigger: its own accessible name, so a phone keeps a named control. The
+ * geometry stylesheet keeps it on the row from md to lg, where the library would hide it, and the
+ * library hides its wrapper from md up, so it leaves the row at lg with no class of its own.
  */
-export const noHeaderSearchTrigger: {
+function HeaderSearchIcon({ className, ...props }: SearchTriggerProps) {
+	return <SearchTrigger {...props} className={classNames(className, "rounded-full")} />
+}
+
+/**
+ * The full search trigger, in the header's right slot from `lg` up. Fumadocs' notebook row puts its
+ * full trigger between the brand and the right group, so the shell lifts it to the end of the bar in
+ * its geometry stylesheet, where the other static sites put their tools.
+ */
+function HeaderSearchField({ className, ...props }: FullSearchTriggerProps) {
+	return (
+		<FullSearchTrigger {...props} className={classNames(className, "max-lg:hidden rounded-full")} />
+	)
+}
+
+/**
+ * The search trigger on every page of the Portal: the full field from `lg` up, the icon below it.
+ * The sidebar's top block no longer carries search (ADR 0009's 2026-11-27 amendment), so the same
+ * control sits in the same place whatever layout the page uses.
+ */
+export const headerSearchTrigger: {
 	readonly sm: FC<SearchTriggerProps>
 	readonly full: FC<FullSearchTriggerProps>
 } = {
-	sm: () => null,
-	full: () => null,
+	sm: HeaderSearchIcon,
+	full: HeaderSearchField,
 }
 
 export interface DocsSidebarBannerProps {
 	/**
 	 * What Fumadocs draws in a sidebar header: the Tab dropdown at every width, and in the drawer the
-	 * close button beside it. The block places them below its hairline rather than re-creating them.
+	 * close button beside it. The block places them at its top rather than re-creating them.
 	 */
 	readonly children?: ReactNode
 }
 
 /**
- * The sidebar's top block: the search trigger, a hairline under it, then the header children
- * Fumadocs passes a banner — its Tab dropdown, and in the drawer its close button, drawn by the
- * library rather than by this block. The tree follows the block; from `lg` up it follows the
- * hairline, because the dropdown is hidden there (ADR 0009). The way back to the Site Home is the
- * header's glyph tile, not a sidebar control. The Agent's pointer to the page's Markdown twin is
- * not here: no reader meets it (ADR 0010).
+ * The sidebar's top block: the header children Fumadocs passes a banner — its Tab dropdown, and in
+ * the drawer its close button, drawn by the library rather than by this block. The tree follows the
+ * block. Search left this block for the header's right slot (ADR 0009's 2026-11-27 amendment). The
+ * way back to the Site Home is the header's glyph tile, not a sidebar control. The Agent's pointer
+ * to the page's Markdown twin is not here: no reader meets it (ADR 0010).
  */
 export function DocsSidebarBanner({ children }: DocsSidebarBannerProps) {
 	return (
 		<div data-sidebar-top-block="" className="flex flex-col">
-			<div className="flex flex-col gap-2 border-b p-3">
-				<FullSearchTrigger hideIfDisabled />
-			</div>
 			<div data-sidebar-tabs="" className="flex items-center gap-2 p-3 empty:hidden">
 				{children}
 			</div>
