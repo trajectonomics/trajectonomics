@@ -104,6 +104,8 @@ const CHILD_PAGES: Readonly<Record<string, string>> = {
 	"/expenses/": "/projection/",
 	"/assets-and-debts/": "/projection/",
 	"/fi/": "/projection/",
+	"/projection/years/": "/projection/",
+	"/household/": "/projection/",
 	"/routing/": "/cash-flow/",
 }
 
@@ -119,6 +121,8 @@ const OTHER_TITLES: Readonly<Record<string, string>> = {
 	"/expenses/": "Expenses",
 	"/assets-and-debts/": "Assets and debts",
 	"/fi/": "FI date",
+	"/projection/years/": "Year by year",
+	"/household/": "Household",
 	"/routing/": "Where money goes",
 }
 

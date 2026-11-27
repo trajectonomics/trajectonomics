@@ -18,7 +18,11 @@ describe("inspect --json matches the canonical JSONL", () => {
 			)
 			const actual = table.rows.map((row: Record<string, unknown>) =>
 				table.name === "scenario"
-					? { ...row, document: JSON.parse(row["document"] as string) }
+					? {
+							...row,
+							document: JSON.parse(row["document"] as string),
+							household: row["household"] === null ? null : JSON.parse(row["household"] as string),
+						}
 					: row,
 			)
 			expect({ name: table.name, rows: actual }).toEqual({ name: table.name, rows: expected })

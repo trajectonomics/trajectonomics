@@ -1,0 +1,20 @@
+{
+	"hosts": [
+		{
+			"name": "example-local",
+			"ssh": null,
+			"bun": "/home/example/.cache/traj-collector/bun",
+			"collectorDir": "/home/example/.cache/traj-collector",
+			"quota": true,
+			"skipOpenCodeBefore": null
+		},
+		{
+			"name": "example-remote",
+			"ssh": "example-remote",
+			"bun": "/home/example/.cache/traj-collector/bun",
+			"collectorDir": "/home/example/.cache/traj-collector",
+			"quota": true,
+			"skipOpenCodeBefore": "2026-10-23T14:00:00.000Z"
+		}
+	]
+}

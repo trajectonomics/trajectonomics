@@ -96,7 +96,7 @@ the shards, which it runs beside.
 
 - **What it checks.** Every page of the Demo at 360px and 1280px in the light and the dark theme (no
   horizontal page scroll, a wide table inside a scroll box that fits), a screen-reader-only label in the last cell of each
-  table at 360px, with amounts shown and hidden (it must not widen the page), and Reports, Projection and Cash flow in print on
+  table at 360px, with amounts shown and hidden (it must not widen the page), and Reports, Year by year and Cash flow in print on
   A4 landscape (tables fit 1032px, black on white, the same surfaces from either theme). The suite is
   `apps/web/browser/`, and `tooling/guards/ci-web-split.test.ts` pins the job.
 - **The hosted Demo.** The same job also builds `build:hosted` and checks `dist-hosted/` served under `/demo/` (`apps/web/browser/hosted.e2e.ts`, [web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)): every page at 360px and 1280px, no request but a GET of its own files, only the Demo snapshot read, and every Edit control switched off.

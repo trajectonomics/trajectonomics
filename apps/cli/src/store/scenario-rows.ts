@@ -1,5 +1,6 @@
 import type { AppError } from "../errors"
 import { scenarioDocumentError } from "../scenario/document-error"
+import type { ConflictHint } from "../scenario/household/conflict-hint"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
 import { filerLabelRefusal } from "../scenario/tax/filer-label-check"
 import { taxLeviesIn } from "../scenario/tax/holds"
@@ -39,11 +40,11 @@ export function canonicalScenarioDocument(document: unknown, path?: string): str
 export function anchorsFor(
 	stored: ScenarioRow | null,
 	document: unknown,
-	owner: string,
+	hint: ConflictHint,
 ): ResolvedAnchors | AppError {
 	if (stored?.household == null)
 		return { document, household: null, dropped: [], droppedOwners: [] }
-	return resolveHousehold(stored.household, document, owner)
+	return resolveHousehold(stored.household, document, hint)
 }
 
 /**

@@ -14,9 +14,9 @@ const HEIGHT_PX = 800
 const EDIT_PAGES: readonly string[] = [
 	"/assets-and-debts/",
 	"/expenses/",
+	"/household/",
 	"/income/",
 	"/plans/",
-	"/projection/",
 	"/routing/",
 	"/settings/assumptions/",
 	"/settings/tax/",

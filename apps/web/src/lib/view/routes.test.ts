@@ -183,7 +183,14 @@ describe("a page opened from a page in the navigation", () => {
 	})
 
 	test("marks the entry its parent page has, though it is not in the navigation", () => {
-		for (const path of ["/income/", "/expenses/", "/assets-and-debts/", "/fi/"]) {
+		for (const path of [
+			"/income/",
+			"/expenses/",
+			"/assets-and-debts/",
+			"/fi/",
+			"/projection/years/",
+			"/household/",
+		]) {
 			expect(navPath(path)).toBe("/projection/")
 		}
 		expect(navPath("/routing/")).toBe("/cash-flow/")
@@ -195,6 +202,8 @@ describe("a page opened from a page in the navigation", () => {
 		expect(pageTitle("/expenses/")).toBe("Expenses")
 		expect(pageTitle("/assets-and-debts/")).toBe("Assets and debts")
 		expect(pageTitle("/fi/")).toBe("FI date")
+		expect(pageTitle("/projection/years/")).toBe("Year by year")
+		expect(pageTitle("/household/")).toBe("Household")
 		expect(pageTitle("/routing/")).toBe("Where money goes")
 		expect(pageTitle("/plans/")).toBe("Plans")
 		expect(pageTitle("/projection/")).toBe("Plan")

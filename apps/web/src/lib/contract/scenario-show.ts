@@ -84,8 +84,11 @@ export const scenarioShow = z.strictObject({
 		document: scenarioDocument,
 		/** The household's document, or null when no household is set (cli ADR-0048). */
 		household: householdDocument.nullable(),
-		/** The hash of the document and household together: what a household Edit sends with `--if-hash` (cli ADR-0055). */
-		householdHash: z.string(),
+		/**
+		 * The hash of the document and household together: what a household Edit sends with `--if-hash` (cli ADR-0055).
+		 * Branded, so a `contentHash` or any other string cannot be passed where a household write wants this one.
+		 */
+		householdHash: z.string().brand<"HouseholdHash">(),
 		// The stored tax profile, whether the plan is taxed and which deduction classes it states (cli ADR-0066, ADR-0073).
 		...taxShown,
 		/** The notes kept on the plan, or null when it has none (cli ADR-0071); absent in an older Snapshot. */

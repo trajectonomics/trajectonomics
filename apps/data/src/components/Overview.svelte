@@ -28,6 +28,7 @@ const rows = $derived(state.usage === null ? [] : usageTable(state.usage.rows))
 const totals = $derived(
 	state.usage === null || days === null ? [] : planTotals(state.usage.rows, days.to),
 )
+const usageRows = $derived(state.usage?.rows ?? [])
 const fresh = $derived(state.health === null ? null : freshness(state.health))
 </script>
 
@@ -70,7 +71,7 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 	{:else if days !== null}
 		<section class="section-block" aria-labelledby="plans-title">
 			<h2 id="plans-title" class="meta-label section-title">Tokens we used on each plan</h2>
-			<PlanSummary {totals} day={days.to} />
+			<PlanSummary {totals} rows={usageRows} day={days.to} />
 		</section>
 
 		{#if state.peaks !== null && state.peaks.plans.length > 0}

@@ -20,17 +20,17 @@ interface Props {
 	onPick: (key: string) => void
 	/** Names the diagram for a screen reader, such as "Cash flow, 31 Oct 2026 to 30 Oct 2027". */
 	label: string
+	/** The page's one always-drawn probe, so a name is fitted at the size it draws even while this diagram is hidden. */
+	probe: SVGTextElement | null
 }
 
 /** The phone flow diagram of one year: the sources above, the uses below, one bar for each band. Each bar is a control. */
-let { layout, picked, onPick, label }: Props = $props()
+let { layout, picked, onPick, label, probe }: Props = $props()
 
 /** The diagram's one id prefix, so each row's name clip is its own. */
 const uid = $props.id()
 
-/** The page's own font, read from the drawing, so each name is fitted at the size it is drawn. */
-let diagram = $state<SVGSVGElement | null>(null)
-const measure = $derived(flowMeasure(diagram))
+const measure = $derived(flowMeasure(probe))
 
 /** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
 const shown = (amount: string): string =>
@@ -40,14 +40,12 @@ const shown = (amount: string): string =>
 <!-- The figures are the CLI's strings. A bar is drawn by its share of the taller list; the table below repeats each one. -->
 <div class="mx-auto w-full max-w-md rounded-lg border border-border md:hidden">
 	<svg
-		bind:this={diagram}
 		viewBox={`0 0 ${layout.width} ${layout.height}`}
 		role="group"
 		aria-label={label}
 		text-rendering="geometricPrecision"
 		class="h-auto w-full text-xs"
 	>
-		<text data-flow-probe visibility="hidden" aria-hidden="true" class="fill-foreground"></text>
 		{#each layout.headings as heading (heading.side)}
 			<text x={heading.x} y={heading.y} dominant-baseline="middle" aria-hidden="true" class="fill-muted-foreground font-medium">
 				{heading.text}

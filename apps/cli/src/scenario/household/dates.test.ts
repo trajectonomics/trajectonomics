@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
+import { ANCHORABLE, anchorableSegments } from "./anchorable"
 import { ageDate, joinsDate } from "./dates"
-import { ANCHORABLE, anchorableSegments } from "./paths"
 
 describe("age to date", () => {
 	it("puts age N on the last day of the birth month in year born + N", () => {

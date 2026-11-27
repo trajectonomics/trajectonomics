@@ -1,0 +1,10 @@
+[Unit]
+Description=Collect and send traj data usage and quota samples
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+TimeoutStartSec=45min
+Environment=DO_NOT_TRACK=1
+ExecStart=%h/.cache/traj-collector/bun %h/.cache/traj-collector/src/cli.ts hourly
