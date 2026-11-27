@@ -26,8 +26,18 @@ export default defineConfig({
 	projects: [
 		{
 			name: "chromium",
-			testIgnore: "**/hosted*.e2e.ts",
+			testIgnore: ["**/hosted*.e2e.ts", "**/flow-label-min-font.e2e.ts"],
 			use: { ...devices["Desktop Chrome"], baseURL: BASE_URL },
+		},
+		// Chromium's own minimum font size, as a person sets it: the diagram must fit at the size it draws.
+		{
+			name: "min-font",
+			testMatch: "**/flow-label-min-font.e2e.ts",
+			use: {
+				...devices["Desktop Chrome"],
+				baseURL: BASE_URL,
+				launchOptions: { args: ["--blink-settings=minimumFontSize=24"] },
+			},
 		},
 		// The hosted Demo (web ADR 0028), under the base path the Site serves it at.
 		{
