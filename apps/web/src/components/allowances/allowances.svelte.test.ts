@@ -22,7 +22,7 @@ const PLAN = {
 	doc: { currency: "THB", flows: [], accounts: [] },
 }
 const result = (data: ProjectionAllowances, plan: typeof PLAN | null = null) =>
-	render(AllowancesResult, { props: { data, plan } }).body
+	render(AllowancesResult, { props: { data, plan, claimsHolder: null } }).body
 
 /**
  * The Demo's `separate` plan with its Levy tallies made bare and both its per-Filer reads removed: the Filer plan

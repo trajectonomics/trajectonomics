@@ -7,9 +7,10 @@ repository's CI: `.github/workflows/deploy.yml`. Cloudflare's own Git integratio
 not used, so the whole deploy is configured and reviewed here. There is no router: every static site
 is served under `trajectonomics.com`, the Site on its apex Custom Domain (with OpenJot's page at
 `/openjot/`) and the docs, blog and data Workers on zone routes for `/docs`, `/blog` and `/data`. The
-OpenJot Worker `moojot-site` serves the APK short links and the MeowJot comparison page on
-`openjot.trajectonomics.com`, sends `/` to `trajectonomics.com/openjot/`, and redirects
-`moojot.trajectonomics.com` to it.
+OpenJot Worker `moojot-site` serves the APK short links (`/openjot/download`, `/openjot/go/...`), the
+release API, the analytics proxy and the MeowJot comparison page under `trajectonomics.com/openjot/` by
+zone routes. `openjot.trajectonomics.com` and `moojot.trajectonomics.com` stay attached to redirect
+there, and to keep relaying `/ingest` for installed apps.
 
 ## How deploys happen
 
@@ -44,7 +45,7 @@ OpenJot Worker `moojot-site` serves the APK short links and the MeowJot comparis
    `curl -s -H "Authorization: Bearer $TOKEN" https://api.cloudflare.com/client/v4/accounts`.
 3. **First deploy.** `gh workflow run deploy.yml --ref main -f app=all`, then open
    trajectonomics.com, trajectonomics.com/docs/, trajectonomics.com/blog/,
-   trajectonomics.com/data/api/health and openjot.trajectonomics.com. `/contribute/tax/` exists only
+   trajectonomics.com/data/api/health and trajectonomics.com/openjot/. `/contribute/tax/` exists only
    in builds from this repository, so `trajectonomics.com/docs/contribute/tax/` answering 200 proves
    the new deploy is live. The docs Worker declares the zone route `trajectonomics.com/docs*` on
    deploy and keeps `docs.trajectonomics.com` attached only to redirect to the new path. That old

@@ -6,8 +6,9 @@ name: Deploy
 # Every static site is served under one host: the Site at trajectonomics.com (with OpenJot's page at
 # /openjot), the docs at /docs, the blog at /blog and the data site at /data. The Site owns the apex
 # as a Custom Domain; the docs, blog and data Workers declare zone routes for their paths and keep
-# their old subdomains for redirects. The OpenJot Worker attaches openjot.trajectonomics.com (and
-# redirects moojot.trajectonomics.com to it). There is no router.
+# their old subdomains for redirects. The OpenJot Worker declares zone routes for its short links,
+# API, analytics proxy and comparison page under /openjot, and keeps openjot.trajectonomics.com and
+# moojot.trajectonomics.com only to redirect (and to relay /ingest). There is no router.
 # docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared

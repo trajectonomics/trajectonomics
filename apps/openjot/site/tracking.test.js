@@ -1,7 +1,7 @@
 // Run with: node --test site/tracking.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { handle } from "./release.js";
 import { LANDING_URL, landingUrl, parseSourcePath, requestContext, resolveSource, sourceFromReferer } from "./tracking.js";
 
@@ -16,7 +16,7 @@ const PHONE =
 const INSTAGRAM = `${PHONE} Instagram 360.0.0.0.0 Android`;
 
 const req = (path, headers = {}, init = {}) =>
-  new Request(`https://openjot.trajectonomics.com${path}`, { headers: { "user-agent": PHONE, ...headers }, ...init });
+  new Request(`https://trajectonomics.com/openjot${path}`, { headers: { "user-agent": PHONE, ...headers }, ...init });
 
 function memoryCache() {
   const store = new Map();
@@ -69,7 +69,7 @@ test("slugs resolve to a source, aliases included, and anything else valid becom
 test("landing URLs carry utm tags and drop ?lang=, which would cost the Site the tags", () => {
   const link = parseSourcePath("/ig/reel-12");
   assert.equal(
-    landingUrl("https://openjot.trajectonomics.com/go/ig/reel-12?lang=en&x=1", link),
+    landingUrl("https://trajectonomics.com/openjot/go/ig/reel-12?lang=en&x=1", link),
     "https://trajectonomics.com/openjot/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
   );
 });
@@ -158,12 +158,14 @@ test("/download from the Site's OpenJot page counts as a page download even when
 
 test("sourceFromReferer: untagged page, another site, and no referer", () => {
   const from = (referer) => sourceFromReferer(req("/download", referer ? { referer } : {}));
-  assert.equal(from("https://openjot.trajectonomics.com/#install").source, "website");
+  assert.equal(from("https://trajectonomics.com/openjot/#install").source, "website");
+  assert.equal(from("https://trajectonomics.com/openjot/meowjot-alternative/").source, "website");
   assert.equal(from("https://l.instagram.com/").source, "l.instagram.com");
   assert.equal(from("https://l.instagram.com/").medium, "referral");
   assert.equal(from(null).source, "direct");
   assert.equal(from("not a url").source, "direct");
-  assert.equal(from("https://openjot.trajectonomics.com/?utm_source=%3Cb%3E").source, "website");
+  assert.equal(from("https://trajectonomics.com/openjot/?utm_source=%3Cb%3E").source, "website");
+  assert.equal(from("https://trajectonomics.com/").via, "direct");
 });
 
 test("requestContext keeps only coarse labels", () => {
@@ -247,18 +249,39 @@ function wranglerConfig() {
   return JSON.parse(text.replace(JSONC_COMMENT, (_match, string) => string ?? ""));
 }
 
-test("every page runs the Worker first, so the old host can redirect it", () => {
-  const first = wranglerConfig().assets.run_worker_first;
-  for (const path of ["/", "/meowjot-alternative"]) {
+test("the Worker owns the OpenJot paths on the apex and the comparison page's files", () => {
+  const config = wranglerConfig();
+  assert.equal(config.assets.base_path, "/openjot/meowjot-alternative");
+  const patterns = config.routes.map((route) => route.pattern);
+  for (const pattern of [
+    "trajectonomics.com/openjot/download*",
+    "trajectonomics.com/openjot/go*",
+    "trajectonomics.com/openjot/api/*",
+    "trajectonomics.com/openjot/ingest*",
+    "trajectonomics.com/openjot/meowjot-alternative*",
+  ]) {
+    assert.ok(patterns.includes(pattern), `routes include ${pattern}`);
+  }
+  for (const pattern of ["openjot.trajectonomics.com", "moojot.trajectonomics.com"]) {
+    assert.ok(patterns.includes(pattern), `the old host ${pattern} stays attached`);
+  }
+  // The short links and the proxy run the Worker first; the comparison page's files never do.
+  const first = config.assets.run_worker_first;
+  for (const path of [
+    "/openjot/download",
+    "/openjot/download/*",
+    "/openjot/go",
+    "/openjot/go/*",
+    "/openjot/api/*",
+    "/openjot/ingest",
+    "/openjot/ingest/*",
+  ]) {
     assert.ok(first.includes(path), `run_worker_first lists ${path}`);
   }
-  // html_handling "auto-trailing-slash" turns index.html into / and <name>.html into /<name>.
-  const pages = readdirSync(new URL("./public", import.meta.url))
-    .filter((name) => name.endsWith(".html") && name !== "404.html")
-    .map((name) => (name === "index.html" ? "/" : `/${name.slice(0, -".html".length)}`));
-  for (const path of pages) {
-    assert.ok(first.includes(path), `${path} is in run_worker_first, or the old host serves it instead of redirecting`);
-  }
+  assert.ok(
+    first.every((path) => !path.startsWith("/openjot/meowjot-alternative")),
+    "the comparison page is served from assets without the script",
+  );
 });
 
 test("the PostHog key is the same in wrangler.jsonc, the page and the app", () => {
