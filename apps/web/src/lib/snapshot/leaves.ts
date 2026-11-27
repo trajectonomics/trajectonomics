@@ -9,6 +9,7 @@ export const READ_LEAVES = [
 	"report pnl",
 	"tx list",
 	"baseline show",
+	"baseline rates",
 	"scenario list",
 	"scenario show",
 	"projection run",
