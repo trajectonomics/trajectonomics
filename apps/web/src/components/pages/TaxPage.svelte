@@ -1,5 +1,6 @@
 <script lang="ts">
 import { snapshotPeople } from "../../lib/view/item-names"
+import { snapshotClaimsHolders } from "../../lib/view/tax-settings/holders"
 import TaxPanel from "../tax/TaxPanel.svelte"
 import PageShell from "../ui/PageShell.svelte"
 
@@ -22,6 +23,7 @@ let { scenario, onScenario }: Props = $props()
 			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
 			people={snapshotPeople(snapshot, snapshot.params.scenarios)}
+			holders={snapshotClaimsHolders(snapshot, snapshot.params.scenarios)}
 			requested={scenario}
 			{onScenario}
 		/>

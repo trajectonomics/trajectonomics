@@ -24,12 +24,14 @@ export function panel(
 	projections: Readonly<Record<string, Read<ProjectionRun>>>,
 	requested = "",
 	people: Readonly<Record<string, PersonNames>> = {},
+	holders: Readonly<Record<string, string | null>> = {},
 ): string {
 	return render(TaxPanel, {
 		props: {
 			names: Object.keys(projections),
 			projections,
 			people,
+			holders,
 			requested,
 			onScenario: () => {},
 		},
