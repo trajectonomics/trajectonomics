@@ -15,9 +15,9 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 	dictionary: Object.freeze({
 		...ENGLISH_SECTIONS,
 		...ENGLISH_CONSENT,
-		documentTitle: "traj — free, open-source financial simulation for AI agents",
+		documentTitle: "Trajectonomics — traj: financial simulation for AI agents",
 		description:
-			"traj is a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement and project your finances with no account.",
+			"Trajectonomics makes traj, a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement with no account.",
 		languageName: "English",
 		languageSwitchLabel: "EN",
 		heroHeadingPrefix: "Deterministic layers for",

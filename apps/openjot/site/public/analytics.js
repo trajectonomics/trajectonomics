@@ -4,9 +4,9 @@
 // kept in localStorage ("moojot_site_consent" = "granted" | "denied"), which the page
 // needs in order to remember it. "Cookie settings" in the footer reopens the banner.
 //
-// PostHog is loaded from this domain through the Worker's /ingest proxy (site/tracking.js),
-// so the Content-Security-Policy stays 'self'. Source links (/go/...) and downloads are
-// counted by the Worker without cookies either way.
+// PostHog is loaded from this domain through the Worker's /openjot/ingest proxy
+// (site/tracking.js), so the Content-Security-Policy stays 'self'. Source links
+// (/openjot/go/...) and downloads are counted by the Worker without cookies either way.
 (function () {
   // PostHog project API key. Public by design: it can only send events.
   var POSTHOG_KEY = "phc_uNb2thEMk4Rh7HrKRaThNsxSwFGxta4gnV5dxBcH5T9n";
@@ -22,7 +22,7 @@
 
   function loadPostHog() {
     if (window.posthog) return;
-    var host = location.origin + "/ingest";
+    var host = location.origin + "/openjot/ingest";
     // A minimal version of PostHog's snippet: queue calls until array.js takes over.
     var stub = [];
     stub._i = [[POSTHOG_KEY, {

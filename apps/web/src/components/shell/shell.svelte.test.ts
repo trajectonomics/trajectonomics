@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
+import { preferences } from "../../client/preferences.svelte.js"
 import SiteLink from "../ui/SiteLink.svelte"
 import DisplayOptions from "./DisplayOptions.svelte"
 import PlanSwitcher from "./PlanSwitcher.svelte"
@@ -33,7 +34,11 @@ describe("SiteNavLinks", () => {
 
 	test("marks the current page with aria-current, and only that page", () => {
 		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
-		expect(body).toMatch(/href="\/net-worth\/" aria-current="page"/)
+		const anchor = [...body.matchAll(/<a\b[^>]*>/g)]
+			.map((match) => match[0])
+			.find((tag) => tag.includes('href="/net-worth/"'))
+		expect(anchor).toBeDefined()
+		expect(anchor).toContain('aria-current="page"')
 		expect(body.match(/aria-current="page"/g)?.length).toBe(1)
 	})
 
@@ -94,12 +99,34 @@ describe("PlanSwitcher", () => {
 })
 
 describe("DisplayOptions", () => {
-	test("is a dialog that holds both switches, named and with their state", () => {
+	const switchState = (body: string, label: string) =>
+		body.match(new RegExp(`<button[^>]*aria-pressed="(true|false)"[^>]*>\\s*${label}`))?.[1]
+
+	test("is a dialog named by its heading, and each switch says whether it is on", () => {
 		const { body } = render(DisplayOptions, {})
 		expect(body).toContain("<dialog")
-		expect(body).toContain("Display options")
-		expect(body).toContain("Hide amounts")
-		expect(body).toContain("Dark theme")
+		expect(body).toContain('aria-labelledby="display-options-title"')
+		expect(body).toContain('id="display-options-title"')
+		expect(switchState(body, "Hide amounts")).toBe("false")
+		expect(switchState(body, "Dark theme")).toBe("false")
+
+		const saved = { hidden: preferences.hidden, theme: preferences.theme }
+		try {
+			// One switch on at a time, so a switch that read the other's state would fail.
+			preferences.hidden = true
+			preferences.theme = "light"
+			const hidden = render(DisplayOptions, {}).body
+			expect(switchState(hidden, "Hide amounts")).toBe("true")
+			expect(switchState(hidden, "Dark theme")).toBe("false")
+			preferences.hidden = false
+			preferences.theme = "dark"
+			const dark = render(DisplayOptions, {}).body
+			expect(switchState(dark, "Hide amounts")).toBe("false")
+			expect(switchState(dark, "Dark theme")).toBe("true")
+		} finally {
+			preferences.hidden = saved.hidden
+			preferences.theme = saved.theme
+		}
 	})
 })
 

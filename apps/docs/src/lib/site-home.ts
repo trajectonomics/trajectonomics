@@ -4,23 +4,18 @@
  * loading the React shell.
  */
 
-import { APEX_ORIGIN } from "./site"
-
-/**
- * Accessible name of the header's glyph tile, the way back to the Site Home, as the blog names
- * its own (ADR 0009).
- */
+/** Accessible name of the header's glyph tile, the way back to the Site Home, as the blog names its own (ADR 0009). */
 export const SITE_HOME_NAME = "Trajectonomics home"
 
 /**
- * Absolute URL of the Site Home. The Docs Portal is its own host, so `/` is the Landing Page
- * and the way back has to name trajectonomics.com (ADR 0013).
+ * The Site Home's path. The Site serves the root of the host the Portal's `/docs` mount lives on,
+ * so the way back is `/` (ADR 0017).
  */
-export const SITE_HOME_PATH = `${APEX_ORIGIN}/`
+export const SITE_HOME_PATH = "/"
 
 /**
- * Attributes that make the Site Home a full document load. It is another host, so the Client
- * Router must not prefetch it on hover (ADR 0013).
+ * Attributes that make the Site Home a full document load. The Site is another Worker and not a
+ * route of this Astro app, so the Client Router must not prefetch or intercept it (ADR 0017).
  */
 export const SITE_HOME_LOAD = {
 	"data-astro-reload": true,

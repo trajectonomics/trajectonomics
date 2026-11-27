@@ -9,6 +9,7 @@ test("the top bar has one page title, icon-only actions and the As-of date", asy
 
 	await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1)
 	await expect(page.locator("header h1 + p")).toHaveCount(0)
+	expect(await page.getByRole("banner").textContent()).not.toContain("Net worth")
 
 	const display = page.getByRole("button", { name: "Display options" })
 	await expect(display).toHaveText("")
@@ -41,4 +42,17 @@ test("Hide amounts masks the page's figures and stays on in Display options", as
 	await expect(
 		page.getByRole("dialog").getByRole("button", { name: "Hide amounts" }),
 	).toHaveAttribute("aria-pressed", "true")
+})
+
+test("the top bar's icon buttons show a focus ring to a keyboard", async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await openDemo(page, "/net-worth/", { theme: "light" })
+	for (const name of ["Hide amounts", "Display options"]) {
+		const button = page.getByRole("button", { name }).first()
+		await button.focus()
+		await page.keyboard.press("Shift+Tab")
+		await page.keyboard.press("Tab")
+		const style = await button.evaluate((element) => getComputedStyle(element).outlineStyle)
+		expect(style, name).not.toBe("none")
+	}
 })

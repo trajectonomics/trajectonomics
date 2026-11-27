@@ -6,22 +6,27 @@ export interface BuiltFile {
 	readonly content: string
 }
 
-/** A portal file's path relative to the Worker's assets root. */
-export function portalAsset(relative: string): string {
-	const dir = DOCS_BASE_PATH.replace(/^\//, "")
-	const file = relative.replace(/^\//, "")
-	return dir.length === 0 ? file : `${dir}/${file}`
+/**
+ * A public Portal path or an assets-relative path, as the file's path under the Worker's assets
+ * root. `assets.base_path` maps `/docs/...` to the root of `dist/`, so the base is not a directory
+ * in the build (ADR 0017).
+ */
+export function portalAsset(path: string): string {
+	const pathname = path.startsWith("/") ? path : `/${path}`
+	const relative =
+		DOCS_BASE_PATH.length > 0 &&
+		(pathname === DOCS_BASE_PATH || pathname.startsWith(`${DOCS_BASE_PATH}/`))
+			? pathname.slice(DOCS_BASE_PATH.length)
+			: pathname
+	return relative.replace(/^\/+/, "")
 }
 
-/** The slug of a built `index.html` below the Docs Portal's base, or `undefined` for another file. */
+/** The slug of a built `index.html`, or `undefined` for another file. The Landing Page's slug is empty. */
 export function builtPageSlug(path: string): string | undefined {
-	const dir = DOCS_BASE_PATH.replace(/^\//, "")
-	const rest =
-		dir.length === 0 ? path : path.startsWith(`${dir}/`) ? path.slice(dir.length + 1) : undefined
-	if (rest === undefined) return undefined
-	if (rest === "index.html") return ""
-	if (!rest.endsWith("/index.html")) return undefined
-	return rest.slice(0, -"index.html".length).replace(/\/$/, "")
+	const file = portalAsset(path)
+	if (file === "index.html") return ""
+	if (!file.endsWith("/index.html")) return undefined
+	return file.slice(0, -"index.html".length).replace(/\/$/, "")
 }
 
 /** The file at one assets-root-relative path, or `undefined` when the build produced none. */

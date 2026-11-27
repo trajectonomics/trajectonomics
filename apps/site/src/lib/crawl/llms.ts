@@ -2,9 +2,9 @@ import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import { openJotDictionaryFor } from "../language/openjot-dictionary"
 import {
-	DOCS_CLI_INSTALL_PATH,
-	DOCS_CLI_PATH,
-	DOCS_PATH,
+	DOCS_CLI_INSTALL_URL,
+	DOCS_CLI_URL,
+	DOCS_URL,
 	GITHUB_CLI_URL,
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
@@ -30,11 +30,11 @@ const SITE_LINES = [
 	linkLine(openJot.documentTitle, ABSOLUTE_OPENJOT_URL),
 ]
 
-/** The Docs Portal's pages, under the footer's own words for them. The constants are full URLs already. */
+/** The Docs Portal's pages, under the footer's own words for them. The file states them in full. */
 const DOCS_LINES = [
-	linkLine(dictionary.footerDocsLink, DOCS_PATH),
-	linkLine(dictionary.footerCliDocsLink, DOCS_CLI_PATH),
-	linkLine(dictionary.footerInstallLink, DOCS_CLI_INSTALL_PATH),
+	linkLine(dictionary.footerDocsLink, DOCS_URL),
+	linkLine(dictionary.footerCliDocsLink, DOCS_CLI_URL),
+	linkLine(dictionary.footerInstallLink, DOCS_CLI_INSTALL_URL),
 ]
 
 /** The two repositories that hold traj and the skills that operate it. */

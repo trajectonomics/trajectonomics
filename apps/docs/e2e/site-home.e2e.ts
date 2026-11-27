@@ -6,10 +6,9 @@ import { waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
 import { TEST_VIEWPORT_HEIGHT_PX } from "./viewports"
 
-/** Whether `url` is the Site Home. The link is absolute, so the path alone is not enough. */
+/** Whether `url` is the Site Home, the Site Worker's root (ADR 0017). */
 function isSiteHome(url: URL): boolean {
-	const home = new URL(SITE_HOME_PATH)
-	return url.origin === home.origin && url.pathname === home.pathname
+	return url.pathname === SITE_HOME_PATH && url.search === "" && url.hash === ""
 }
 
 /** The pages of each layout: a docs page (notebook), the Landing Page and the 404 page (home). */
@@ -22,7 +21,7 @@ const PAGES = [
 /** The header each layout renders: the home layout's, and the notebook layout's. */
 const HEADER = "#nd-nav, #nd-subnav"
 
-/** A Site Home document, so the browser test never asks the network for trajectonomics.com. */
+/** A Site Home document, so the browser test never asks the dev server for the Site Worker. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
 
 /** The header's glyph tile, the one way back to the Site Home. */
@@ -61,7 +60,7 @@ for (const pageUnderTest of PAGES.filter((candidate) => candidate.name !== "a Ta
 	})
 }
 
-test("clicking the glyph tile loads trajectonomics.com as a new document", async ({ page }) => {
+test("clicking the glyph tile loads the Site Home as a new document", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: TEST_VIEWPORT_HEIGHT_PX })
 	await openPage(page, tabUrl(TABS[0]))
 	await page.route(

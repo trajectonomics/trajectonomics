@@ -4,7 +4,10 @@ import type { Env, RequestContext } from "../env"
 import { healthCacheKey } from "./cache"
 import { json, methodNotAllowed } from "./responses"
 
-/** Handles `GET /api/health`: the last ingest time and whether it is stale. */
+/**
+ * Handles `GET /data/api/health` (and the old host's `/api/health`): the last ingest time and
+ * whether it is stale.
+ */
 export async function handleHealth(
 	request: Request,
 	env: Env,

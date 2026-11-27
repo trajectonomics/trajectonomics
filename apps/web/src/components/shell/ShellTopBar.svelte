@@ -25,7 +25,7 @@ $effect(() => {
 
 const BUTTON = cx(
 	"inline-flex size-[34px] shrink-0 items-center justify-center rounded-md border border-border bg-card",
-	"text-muted-foreground outline-none hover:text-foreground",
+	"text-muted-foreground hover:text-foreground",
 	"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
 )
 </script>
@@ -41,7 +41,7 @@ const BUTTON = cx(
 			aria-expanded={shellPanels.menu}
 			aria-label="Open the menu"
 			title="Open the menu"
-			onclick={() => (shellPanels.menu = true)}
+			onclick={() => shellPanels.openMenu()}
 		>
 			<NavIcon name="menu" />
 		</button>
@@ -49,7 +49,7 @@ const BUTTON = cx(
 		{#if asOf !== null}
 			<span
 				class="hidden h-[34px] items-center rounded-md border border-border bg-card px-3 text-sm text-muted-foreground sm:inline-flex"
-				title={`Figures as of ${asOf}`}>{asOf}</span
+				title={`Figures as of ${asOf}`}><span class="sr-only">Figures as of </span>{asOf}</span
 			>
 		{/if}
 		<button
@@ -68,7 +68,7 @@ const BUTTON = cx(
 			aria-haspopup="dialog"
 			aria-label="Display options"
 			title="Display options"
-			onclick={() => (shellPanels.options = true)}
+			onclick={() => shellPanels.openOptions()}
 		>
 			<NavIcon name="sliders-horizontal" />
 		</button>

@@ -1,8 +1,9 @@
 # AGENTS.md
 
 Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is specific to
-`apps/data`, the data app at data.trajectonomics.com: the static site, the `data` Worker that
-serves it, and the nested `collector/` package.
+`apps/data`, the data app at trajectonomics.com/data/: the static site, the `data` Worker that
+serves it, and the nested `collector/` package. The old host still answers the API and ingest and
+redirects its pages (ADR 0006).
 
 ## Rules
 
@@ -21,7 +22,7 @@ serves it, and the nested `collector/` package.
 
 ## The site
 
-1. The static pages are Astro (`src/pages`, `src/layouts`) with Svelte 5 islands (`src/components`, `src/client`). `astro build` writes `dist/`, which wrangler serves; the brand fonts and Favicon Set are copied into `public/` before a build and are never committed.
+1. The static pages are Astro (`src/pages`, `src/layouts`) with Svelte 5 islands (`src/components`, `src/client`). `astro build` writes `dist/`, which wrangler serves at `/data/` through `assets.base_path`; the brand fonts and Favicon Set are copied into `public/` before a build and are never committed.
 2. `src/lib/` is pure and tested with `bun test`: data in, data out, no clock, no `fetch`, no DOM. `src/client/api.ts` is the only module that calls `fetch`; a component renders what the pure functions give it.
 3. No colour literal: paint from the brand's Theme roles (`--ds-color-*`). `colour-literals.test.ts` fails any literal in a stylesheet, an Astro file or a Svelte component.
 4. Data never bakes into the build (ADR 0001). The pages fetch the read API in the browser, so a new ingest needs no rebuild.
@@ -33,10 +34,11 @@ serves it, and the nested `collector/` package.
    buckets, numbers, and the auth user id on `contributor`.
 2. The public API serves `rollup_daily` only. No response carries a machine, a contributor or an
    hourly bucket.
-3. `/ingest` authenticates with the temporary `INGEST_BOOTSTRAP_KEY` secret. The contributor comes
-   from the key, never from the body; a row that names another contributor is rejected.
-4. `src/core/` is pure: validation, rollups, query parsing and health take their clock as an
-   argument. D1 stays in `src/db/`, HTTP in `src/http/`.
+3. `/data/ingest` (and the old host's `/ingest`) authenticates with the temporary
+   `INGEST_BOOTSTRAP_KEY` secret. The contributor comes from the key, never from the body; a row
+   that names another contributor is rejected.
+4. `src/core/` is pure: validation, rollups, query parsing, health and host/path routing take their
+   inputs as arguments. D1 stays in `src/db/`, HTTP in `src/http/`.
 5. Data never triggers a rebuild (ADR 0001). Ingest recomputes rollups in D1; the pages and the API
    are served by the deployed Worker.
 6. An ingest batch is all-or-nothing: the whole body is validated before anything is written, and

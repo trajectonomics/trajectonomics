@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by [ADR 0017](./0017-the-portal-is-served-under-the-sites-host.md)
 ---
 
 # The Docs Portal is served on its own host

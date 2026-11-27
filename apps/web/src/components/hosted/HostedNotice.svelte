@@ -1,4 +1,5 @@
 <script lang="ts">
+import { shellPanels } from "../../client/shell.svelte.js"
 import { INSTALL_URL } from "./message"
 </script>
 
@@ -6,13 +7,14 @@ import { INSTALL_URL } from "./message"
 <div
 	role="note"
 	aria-label="About this demo"
-	class="border-b border-border bg-muted text-xs leading-5 text-muted-foreground print:hidden lg:pl-60"
+	inert={shellPanels.menu}
+	class="border-b border-border bg-muted text-xs text-muted-foreground print:hidden lg:pl-60"
 >
 	<p class="mx-auto w-full max-w-6xl px-4 py-1.5 sm:px-6">
 		Demo with made-up numbers. Changes are switched off.
 		<a
 			href={INSTALL_URL}
-			class="font-medium text-foreground underline underline-offset-2 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+			class="font-medium text-foreground underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 			>Get traj</a
 		>
 	</p>

@@ -1,4 +1,4 @@
-import { DOCS_INDEX_PATH } from "../tabs"
+import { DOCS_BASE_PATH, DOCS_INDEX_PATH } from "../tabs"
 import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import { DOCS_INDEX_FILE, type DocsIndexEntry, parseDocsIndex } from "./docs-index-file"
@@ -63,8 +63,9 @@ export function checkMarkdownTwins(files: readonly BuiltFile[]): readonly BuildF
 	const indexFile = fileAt(files, DOCS_INDEX_FILE)
 	const entries = indexFile === undefined ? [] : (parseDocsIndex(indexFile.content) ?? [])
 	return twinFiles(files).flatMap((file) =>
-		[titleFailure(file, entryFor(entries, `/${file.path}`)), referenceFailure(file)].filter(
-			(failure): failure is BuildFailure => failure !== undefined,
-		),
+		[
+			titleFailure(file, entryFor(entries, `${DOCS_BASE_PATH}/${file.path}`)),
+			referenceFailure(file),
+		].filter((failure): failure is BuildFailure => failure !== undefined),
 	)
 }

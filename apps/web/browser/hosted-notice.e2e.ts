@@ -26,6 +26,7 @@ for (const [width, lines] of [
 				.map((rect) => Math.round(rect.top))
 			return new Set(tops).size
 		})
+		expect(measured).toBeGreaterThan(0)
 		expect(measured).toBeLessThanOrEqual(lines)
 		const fit = await measureOverflow(page, true)
 		expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.innerWidth)
