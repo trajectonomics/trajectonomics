@@ -1,0 +1,46 @@
+/* The email-updates switch: one native checkbox, painted as a track, with a visible focus ring. */
+
+.switch {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--ds-space-3);
+	cursor: pointer;
+}
+
+.switch input {
+	position: relative;
+	inline-size: 2.75rem;
+	block-size: 1.5rem;
+	margin: 0;
+	border: 1px solid var(--ds-color-input);
+	border-radius: 999px;
+	background: var(--ds-color-secondary);
+	appearance: none;
+	cursor: pointer;
+}
+
+.switch input::after {
+	content: "";
+	position: absolute;
+	inset-block-start: 0.2rem;
+	inset-inline-start: 0.2rem;
+	inline-size: 1rem;
+	block-size: 1rem;
+	border-radius: 50%;
+	background: var(--ds-color-muted-foreground);
+	transition: translate 120ms ease;
+}
+
+.switch input:checked {
+	background: var(--ds-color-primary);
+}
+
+.switch input:checked::after {
+	translate: 1.15rem 0;
+	background: var(--ds-color-primary-foreground);
+}
+
+.switch input:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}

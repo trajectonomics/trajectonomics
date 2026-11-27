@@ -1,10 +1,12 @@
 import type { BetterAuthOptions } from "better-auth"
+import { deleteUserOptions } from "./account-deletion"
 import { buildPlugins } from "./auth-plugins"
 import { buildSocialProviders } from "./auth-providers"
 import { devSignInAllowed } from "./core/dev"
 import { REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS } from "./core/resources"
 import { requireSecret } from "./core/secret"
 import type { Env } from "./env"
+import { hasMarketingConsent } from "./marketing-consent-store"
 import {
 	type OAuthHookOptions,
 	oauthAfterHook,
@@ -48,6 +50,7 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 			enabled: devSignIn,
 			minPasswordLength: 12,
 		},
+		user: { deleteUser: deleteUserOptions(input.env) },
 		socialProviders: buildSocialProviders({
 			googleClientId: input.env.GOOGLE_CLIENT_ID,
 			googleClientSecret: input.env.GOOGLE_CLIENT_SECRET,
@@ -85,8 +88,11 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		},
 		plugins: buildPlugins({
 			baseURL,
+			db: input.env.DB,
 			passkeyRpID: input.env.PASSKEY_RP_ID ?? new URL(baseURL).hostname,
 			passkeyOrigin: input.env.PASSKEY_ORIGIN ?? new URL(baseURL).origin,
+			requiresMarketingConsent: async (userId) =>
+				!(await hasMarketingConsent(input.env.DB, userId)),
 		}),
 	}
 }

@@ -2,6 +2,7 @@ import { defineCollection } from "astro:content"
 import { glob } from "astro/loaders"
 import { z } from "astro/zod"
 import { POST_TYPES } from "./lib/posts"
+import { PRODUCTS } from "./lib/products"
 
 /** An image a Post shows, served from `public/`, with the words that say what it shows. */
 const image = z.object({
@@ -13,9 +14,9 @@ const image = z.object({
 
 /**
  * Every Translation of every Post: `src/content/posts/<slug>/<language>.md`. The folder is the Post's
- * slug, the file name its Post Language, and the Translations of one Post agree on type, date, draft
- * and cover image (`src/lib/translations.ts` refuses a build where they do not). Every Markdown file
- * is loaded, so a file outside a Post's folder fails the build instead of vanishing.
+ * slug, the file name its Post Language, and the Translations of one Post agree on type, products,
+ * date, draft and cover image (`src/lib/translations.ts` refuses a build where they do not). Every
+ * Markdown file is loaded, so a file outside a Post's folder fails the build instead of vanishing.
  */
 const posts = defineCollection({
 	loader: glob({ pattern: "**/*.md", base: "./src/content/posts" }),
@@ -23,6 +24,7 @@ const posts = defineCollection({
 		title: z.string().min(1),
 		description: z.string().min(1),
 		type: z.enum(POST_TYPES),
+		products: z.array(z.enum(PRODUCTS)).default([]),
 		publishedOn: z.coerce.date(),
 		cover: image,
 		draft: z.boolean().default(false),

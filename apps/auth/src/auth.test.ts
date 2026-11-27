@@ -29,7 +29,7 @@ describe("authOptions", () => {
 		expect(options.emailAndPassword?.enabled).toBe(true)
 	})
 
-	it("installs the JWT, passkey, OAuth provider, device and grant plugins exactly once", () => {
+	it("installs the JWT, passkey, OAuth provider, device, grant and account plugins once", () => {
 		const ids = authOptions({ env: env() })
 			.plugins?.map((plugin) => plugin.id)
 			.sort()
@@ -37,8 +37,10 @@ describe("authOptions", () => {
 			"device-authorization",
 			"grant-management",
 			"jwt",
+			"marketing-consent",
 			"oauth-provider",
 			"passkey",
+			"pending-deletion",
 		])
 	})
 

@@ -1,0 +1,56 @@
+/* The legal pages read at a comfortable measure; the text is exact, so it keeps a paragraph. */
+
+.legal {
+	width: 100%;
+	max-width: 42rem;
+}
+
+.legal .page-title {
+	margin-bottom: var(--ds-space-2);
+}
+
+.legal-updated {
+	margin: 0;
+	font-family: var(--font-meta);
+	font-size: var(--ds-font-size-xs);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+.legal-note {
+	margin: var(--ds-space-3) 0 0;
+	padding: var(--ds-space-2) var(--ds-space-3);
+	border-inline-start: 3px solid var(--ds-color-accent);
+	font-size: var(--ds-font-size-sm);
+}
+
+.legal-section {
+	margin-top: var(--ds-space-8);
+}
+
+.legal-section p {
+	margin-block: 0 var(--ds-space-3);
+	max-width: 65ch;
+}
+
+.legal-items {
+	margin: var(--ds-space-3) 0 0;
+	padding-inline-start: var(--ds-space-5);
+	display: grid;
+	gap: var(--ds-space-2);
+	max-width: 65ch;
+}
+
+.legal-link {
+	margin-top: var(--ds-space-2);
+}
+
+.legal-link a {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 0.2em;
+}
+
+.legal-link a:hover {
+	color: var(--ds-color-accent);
+}

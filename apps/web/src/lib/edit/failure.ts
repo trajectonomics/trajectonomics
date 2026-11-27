@@ -4,7 +4,8 @@
  * body it cannot read (`serve-edit-answer.ts`), an Account it does not hold (`serve-record-values.ts`), a CLI
  * it cannot start (`run-traj.ts`), a holder swap (`tax-swap.ts`), and a write that landed while the Snapshot
  * read that answers it failed. So are the Dashboard's own Reads (`contract_mismatch`, `unparsed_error`), its
- * parameters' codes and a preview it cannot send (`unreachable`).
+ * parameters' codes and a preview it cannot send (`unreachable`). A guided plan answers `contract_mismatch` too,
+ * when the CLI's template is not the document it expects (web ADR 0031).
  */
 import type { ErrorBody } from "../contract"
 import { CONTRACT_MISMATCH } from "../snapshot/decode-read"
@@ -69,6 +70,10 @@ export const SERVER_CODES: ReadonlySet<string> = new Set([
 	"invalid_return_model",
 	"invalid_paths",
 	"invalid_seed",
+	// A guided plan's own refusals: the template no longer lines up, no row is kept, or its household was refused and the plan would not go (web ADR 0031).
+	"guided_ledger_changed",
+	"guided_no_flow",
+	"guided_plan_half_saved",
 ])
 
 /**
