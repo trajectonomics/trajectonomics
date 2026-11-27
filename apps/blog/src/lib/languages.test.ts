@@ -17,9 +17,9 @@ describe("the Language Trees", () => {
 	})
 
 	test("a page's address in a tree", () => {
-		expect(treePath("en", "/guides/a/")).toBe("/guides/a/")
-		expect(treePath("th", "/guides/a/")).toBe("/th/guides/a/")
-		expect(treePath("th", "/")).toBe("/th/")
+		expect(treePath("en", "/guides/a/")).toBe("/blog/guides/a/")
+		expect(treePath("th", "/guides/a/")).toBe("/blog/th/guides/a/")
+		expect(treePath("th", "/")).toBe("/blog/th/")
 	})
 
 	test("refuses a relative path", () => {
@@ -40,7 +40,10 @@ describe("the Language Trees", () => {
 	})
 
 	test("gives one value per Language", () => {
-		expect(perLanguage((language) => treePath(language, "/"))).toEqual({ en: "/", th: "/th/" })
+		expect(perLanguage((language) => treePath(language, "/"))).toEqual({
+			en: "/blog/",
+			th: "/blog/th/",
+		})
 	})
 
 	test("orders Languages the blog's way, each once", () => {

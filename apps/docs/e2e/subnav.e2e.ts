@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test"
+import { DOCS_BASE_PATH } from "../src/lib/tabs"
 import { openPage } from "./built-site"
 import { SUBNAV_TRIGGER, waitForSettledPage } from "./docs-portal"
 import { expect, test } from "./fixtures"
@@ -12,7 +13,7 @@ const PHONE_WIDTH_PX = 390
 const WIDTHS_BELOW_XL_PX = [390, 768, 1024, 1279] as const
 
 /** A docs page whose headings give the subnav row a table of contents. */
-const PAGE_WITH_SUBNAV = "/cli/"
+const PAGE_WITH_SUBNAV = `${DOCS_BASE_PATH}/cli/`
 
 /** Open a docs page at `widthPx` and check the row clips the labels it cross-fades. */
 async function checkRowIsClipped(page: Page, widthPx: number): Promise<void> {

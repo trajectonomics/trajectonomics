@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN, SITE_ORIGIN } from "../site"
 import { indexReference } from "./index-reference"
 import { buildMarkdownTwin, MarkdownTwinError, type PageTwinSource } from "./markdown-twin"
 
@@ -44,7 +44,7 @@ describe("a page's Markdown twin", () => {
 	})
 
 	test("ends with a reference to the Docs index, so a twin read alone can find the rest", () => {
-		expect(buildMarkdownTwin(PAGE, ORIGIN)).toContain(`[Docs index](${ORIGIN}/llms.txt)`)
+		expect(buildMarkdownTwin(PAGE, ORIGIN)).toContain(`[Docs index](${PORTAL_ORIGIN}/llms.txt)`)
 	})
 
 	test("makes an internal link absolute and leaves an external one untouched", () => {
@@ -61,7 +61,7 @@ describe("a page's Markdown twin", () => {
 				"",
 				"> Manage ledger transactions.",
 				"",
-				"[Commands](https://docs.trajectonomics.com/cli/commands/) and [npm](https://www.npmjs.com/package/x).",
+				`[Commands](${PORTAL_ORIGIN}/cli/commands/) and [npm](https://www.npmjs.com/package/x).`,
 			),
 		)
 	})

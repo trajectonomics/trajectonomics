@@ -1,6 +1,6 @@
 import type { LanguagePage } from "../language/language-pages"
 import { otherLanguages } from "../language/languages"
-import { SITE_NAME } from "../site"
+import { SITE_BRAND_NAME } from "../site"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../social/layout"
 import { SHARE_IMAGE_TYPE } from "../social/share-advert"
 import type { BuiltFile } from "./built-files"
@@ -34,7 +34,7 @@ function cardOf(page: LanguagePage): readonly CardProperty[] {
 			expected: other.locale,
 		})),
 		{ attribute: "property", key: "og:type", expected: "website" },
-		{ attribute: "property", key: "og:site_name", expected: SITE_NAME },
+		{ attribute: "property", key: "og:site_name", expected: SITE_BRAND_NAME },
 		{ attribute: "property", key: "og:image", expected: page.shareImageUrl },
 		{ attribute: "property", key: "og:image:width", expected: String(SHARE_IMAGE_WIDTH) },
 		{ attribute: "property", key: "og:image:height", expected: String(SHARE_IMAGE_HEIGHT) },

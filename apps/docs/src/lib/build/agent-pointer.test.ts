@@ -5,7 +5,7 @@ import type { BuiltFile } from "./built-files"
 
 /** The pointer line every page with a twin carries before its content. */
 const POINTER =
-	'<p>For AI agents: <a href="/cli.md">Markdown</a> · <a href="/llms.txt">Docs index</a></p>'
+	'<p>For AI agents: <a href="/docs/cli.md">Markdown</a> · <a href="/docs/llms.txt">Docs index</a></p>'
 
 /** One built page with a twin, its pointer and its content. */
 function page(path: string, body: string): BuiltFile {
@@ -62,7 +62,7 @@ describe("the agent pointer of a built page", () => {
 	})
 
 	test("an absolute link to the index is the same pointer", () => {
-		const absolute = POINTER.replace("/llms.txt", `${SITE_ORIGIN}/llms.txt`)
+		const absolute = POINTER.replace("/docs/llms.txt", `${SITE_ORIGIN}/docs/llms.txt`)
 		const files = [page("cli/index.html", `${absolute}<main><h1>Quickstart</h1></main>`)]
 
 		expect(checkAgentPointers(files)).toEqual([])
@@ -74,7 +74,7 @@ describe("the agent pointer of a built page", () => {
 			{ path: "404.html", content: "<html><body><h1>Page not found</h1></body></html>" },
 			{
 				path: "operators/index.html",
-				content: '<html><meta http-equiv="refresh" content="0;url=/cli/"></html>',
+				content: '<html><meta http-equiv="refresh" content="0;url=/docs/cli/"></html>',
 			},
 		]
 

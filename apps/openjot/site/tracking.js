@@ -1,15 +1,16 @@
-// Source links, cookieless counting and the PostHog proxy for openjot.trajectonomics.com
-// (and the moojot.trajectonomics.com host, which forwards to it). Routed from handle() in release.js.
+// Source links, cookieless counting and the PostHog proxy for the OpenJot Worker, which
+// serves them under https://trajectonomics.com/openjot/. Routed from handle() in release.js.
 //
-//   /go/<source>[/<campaign>]        302 to the landing page on the Site with utm_* tags,
-//                                    and counts a `link_clicked` event.
-//   /download/<source>[/<campaign>]  302 straight to the APK, and counts `apk_download`.
-//   /download                        Counts `apk_download` too. The source comes from the
+//   /openjot/go/<source>[/<campaign>]        302 to the landing page on the Site with utm_*
+//                                    tags, and counts a `link_clicked` event.
+//   /openjot/download/<source>[/<campaign>]  302 straight to the APK, and counts `apk_download`.
+//   /openjot/download                Counts `apk_download` too. The source comes from the
 //                                    landing page URL in the Referer (its utm_* tags), or
 //                                    from the referring site.
-//   /ingest/*                        First-party proxy to PostHog EU Cloud. The landing page
-//                                    uses it after cookie consent, and the app uses it once
-//                                    the user opts in to usage stats.
+//   /openjot/ingest/*                First-party proxy to PostHog EU Cloud. The comparison
+//                                    page uses it after cookie consent, and the app uses it
+//                                    once the user opts in to usage stats. The old hosts
+//                                    still proxy their /ingest for earlier app versions.
 //
 // The counts are sent from the Worker with no cookie, no IP address and no user agent, a
 // fresh random id for every event, and no person profile. They need no consent, and they
@@ -32,7 +33,7 @@ export const SOURCES = {
 /** The landing page on the Site, where every source link now sends people. */
 export const LANDING_URL = "https://trajectonomics.com/openjot/";
 
-/** The host and path a download's referrer names when the button is the Site's OpenJot page. */
+/** The host and path a download's referrer names when the button is on the Site's OpenJot pages. */
 const SITE_HOST = "trajectonomics.com";
 const SITE_LANDING_PATH = "/openjot";
 
@@ -104,9 +105,9 @@ export function sourceFromReferer(request) {
   const onSiteLanding =
     ref.hostname === SITE_HOST &&
     (ref.pathname === SITE_LANDING_PATH || ref.pathname.startsWith(`${SITE_LANDING_PATH}/`));
-  if (ref.host === new URL(request.url).host || onSiteLanding) {
-    // A download button on the landing page: this host's old page, or the Site's /openjot/.
-    // With Referrer-Policy strict-origin-when-cross-origin, same-origin requests carry the full URL.
+  if (onSiteLanding) {
+    // A download button on the Site's OpenJot page or its comparison page. With
+    // Referrer-Policy strict-origin-when-cross-origin, same-origin requests carry the full URL.
     const tag = (name) => {
       const value = (ref.searchParams.get(name) ?? "").toLowerCase();
       return SLUG.test(value) ? value : null;
@@ -203,19 +204,19 @@ export async function count(request, env, ctx, deps, event, properties) {
   else await sent;
 }
 
-/** /go/<source>[/<campaign>] */
-export async function handleGo(request, env, ctx, deps = {}) {
+/** `<prefix>/go/<source>[/<campaign>]` */
+export async function handleGo(request, env, ctx, deps = {}, prefix = "") {
   const { pathname } = new URL(request.url);
-  const link = parseSourcePath(pathname.slice("/go".length));
+  const link = parseSourcePath(pathname.slice(`${prefix}/go`.length));
   if (!link) return redirect(LANDING_URL);
   await count(request, env, ctx, deps, "link_clicked", linkProps(link, "link"));
   return redirect(landingUrl(request.url, link));
 }
 
-/** Properties for an apk_download from /download or /download/<source>[/<campaign>]. */
-export function downloadSource(request) {
+/** Properties for an apk_download from `<prefix>/download` or `<prefix>/download/<source>[/<campaign>]`. */
+export function downloadSource(request, prefix = "") {
   const { pathname } = new URL(request.url);
-  const link = parseSourcePath(pathname.slice("/download".length));
+  const link = parseSourcePath(pathname.slice(`${prefix}/download`.length));
   return link ? linkProps(link, "link") : sourceFromReferer(request);
 }
 
@@ -225,13 +226,13 @@ export function downloadSource(request) {
  * The visitor's IP, as Cloudflare saw it, is passed on as X-Forwarded-For so PostHog can
  * estimate the country, as it would without a proxy.
  */
-export async function proxyIngest(request, env, deps = {}) {
+export async function proxyIngest(request, env, deps = {}, prefix = "") {
   if (!PROXY_METHODS.includes(request.method)) {
     return new Response("method not allowed", { status: 405, headers: { allow: PROXY_METHODS.join(", ") } });
   }
   const fetchImpl = deps.fetch ?? fetch;
   const url = new URL(request.url);
-  const path = url.pathname.slice("/ingest".length) || "/";
+  const path = url.pathname.slice(`${prefix}/ingest`.length) || "/";
   const isAsset = path.startsWith("/static/") || path.startsWith("/array/");
   const host = `${region(env)}${isAsset ? "-assets" : ""}.i.posthog.com`;
 

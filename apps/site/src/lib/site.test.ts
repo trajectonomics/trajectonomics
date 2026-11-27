@@ -1,8 +1,16 @@
 import { describe, expect, it } from "bun:test"
 import * as site from "./site"
 import {
+	BLOG_PATH,
+	BLOG_SITEMAP_URL,
+	DATA_PATH,
 	DOCS_CLI_INSTALL_PATH,
+	DOCS_CLI_INSTALL_URL,
 	DOCS_CLI_PATH,
+	DOCS_CLI_URL,
+	DOCS_PATH,
+	DOCS_SITEMAP_URL,
+	DOCS_URL,
 	FI_DEMO_COMMAND,
 	FI_DEMO_DATE,
 	FI_DEMO_OUTPUT,
@@ -11,6 +19,7 @@ import {
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
 	ONBOARDING_SKILL_URL,
+	SITE_BRAND_NAME,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 	STAR_REPOS,
@@ -42,6 +51,7 @@ describe("the Site's own constants", () => {
 
 	it("names the Site trajectonomics, the brand lockup's accessible name", () => {
 		expect(SITE_NAME).toBe("trajectonomics")
+		expect(SITE_BRAND_NAME).toBe("Trajectonomics")
 	})
 
 	it("points the skills links at the monorepo folder the Site installs from", () => {
@@ -63,14 +73,22 @@ describe("the Site's own constants", () => {
 		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_REPO_URL])
 	})
 
-	it("names the CLI's docs page, and leaves the release facts to the Release snapshot", () => {
-		expect(DOCS_CLI_PATH).toBe("https://docs.trajectonomics.com/cli/")
+	it("mounts the docs, blog and data sites root-relative on the Site's one host", () => {
+		expect(DOCS_PATH).toBe("/docs/")
+		expect(DOCS_CLI_PATH).toBe("/docs/cli/")
+		expect(DOCS_CLI_INSTALL_PATH).toBe("/docs/cli/installation/")
+		expect(BLOG_PATH).toBe("/blog/")
+		expect(DATA_PATH).toBe("/data/")
 		expect(Object.hasOwn(site, "CLI_VERSION")).toBe(false)
 		expect(Object.hasOwn(site, "RELEASE_DATE")).toBe(false)
 	})
 
-	it("pinpoints the CLI installation page, the way out under the prompt", () => {
-		expect(DOCS_CLI_INSTALL_PATH).toBe("https://docs.trajectonomics.com/cli/installation/")
+	it("states the docs pages and every sitemap in full, where a reader is away from the Site", () => {
+		expect(DOCS_URL).toBe("https://trajectonomics.com/docs/")
+		expect(DOCS_CLI_URL).toBe("https://trajectonomics.com/docs/cli/")
+		expect(DOCS_CLI_INSTALL_URL).toBe("https://trajectonomics.com/docs/cli/installation/")
+		expect(DOCS_SITEMAP_URL).toBe("https://trajectonomics.com/docs/sitemap.xml")
+		expect(BLOG_SITEMAP_URL).toBe("https://trajectonomics.com/blog/sitemap.xml")
 	})
 
 	it("shows the CLI's own `traj fi` example, with the JSON flag an agent reads", () => {

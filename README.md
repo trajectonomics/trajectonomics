@@ -8,7 +8,8 @@ so the same question always gets the same answer.
 It starts with people who file taxes in Thailand: Thai baht, and Thailand's 2026 personal income
 tax. Your ledger stays on your machine, in `~/.traj`.
 
-[Website](https://trajectonomics.com/) · [Docs](https://docs.trajectonomics.com/) ·
+[Website](https://trajectonomics.com/) · [Docs](https://trajectonomics.com/docs/) ·
+[Blog](https://trajectonomics.com/blog/) ·
 [Releases](https://github.com/trajectonomics/trajectonomics/releases) · MIT licence
 
 ![Terminal demo with a fictional ledger: traj records three accounts, shows net worth of 1,340,000 THB, then answers when its owner can stop working, which is financial independence on 2037-09-01.](docs/demo/traj-demo.gif)
@@ -56,7 +57,9 @@ agent can learn the tool from the tool.
 | [`apps/cli`](apps/cli) | `traj`, the command line ([`@trajectonomics/cli`](https://www.npmjs.com/package/@trajectonomics/cli)) |
 | [`skills/customer`](skills/customer) | The agent skills a person installs |
 | [`packages/core`](packages/core) | The pure ledger, tax and simulation cores the command line builds on |
-| [`apps/docs`](apps/docs) | The docs at docs.trajectonomics.com |
+| [`apps/docs`](apps/docs) | The docs at trajectonomics.com/docs |
+| [`apps/blog`](apps/blog) | The blog at trajectonomics.com/blog |
+| [`apps/data`](apps/data) | The data site at trajectonomics.com/data |
 | [`apps/site`](apps/site) | The website at trajectonomics.com |
 
 ## Contributing

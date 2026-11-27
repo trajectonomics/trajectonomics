@@ -150,7 +150,7 @@ describe("the home for a visitor who has answered the banner", () => {
 })
 
 describe("the cookie domain the Worker names", () => {
-	it("scopes the cookies to trajectonomics.com, so the Docs Portal's host reads them", async () => {
+	it("scopes the cookies to trajectonomics.com, so every app on the zone reads them", async () => {
 		const response = await handleRequest(get("/?consent=denied"), fakeAssets(), mint)
 		for (const cookie of setCookies(response))
 			expect(cookie).toContain("Domain=trajectonomics.com;")

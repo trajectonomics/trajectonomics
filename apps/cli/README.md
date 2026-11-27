@@ -4,7 +4,7 @@
 The command line never calls a model, so every result is repeatable.
 
 The landing page is [trajectonomics.com](https://trajectonomics.com/) and the docs are at
-[docs.trajectonomics.com](https://docs.trajectonomics.com/).
+[trajectonomics.com/docs/](https://trajectonomics.com/docs/).
 
 ## Install
 
@@ -124,7 +124,7 @@ row and rolls every write back, so run it first. A file name of `-` reads the CS
 `traj tx import - --dry-run`. The import is all or nothing, and `external_ref` is the duplicate
 key, so importing the same statement twice adds nothing the second time. Each command's flags and
 the rest of the columns are in
-[the `tx` page of the docs](https://docs.trajectonomics.com/cli/commands/tx/).
+[the `tx` page of the docs](https://trajectonomics.com/docs/cli/commands/tx/).
 
 ## Development
 

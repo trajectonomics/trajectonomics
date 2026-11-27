@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted, 2026-11-25. Slice 2a of issue #592.
+Accepted, 2026-11-25. Slice 2a of issue #592. The public paths moved under `/data/` on
+`trajectonomics.com` ([ADR 0006](0006-the-data-site-is-served-under-the-sites-host.md)); the old
+host keeps answering them.
 
 ## Context
 

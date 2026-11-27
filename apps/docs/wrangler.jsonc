@@ -3,18 +3,24 @@
 	"name": "docs",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-11-01",
-	// The custom domain serves the Portal; the *.workers.dev copy stays off (infra#82).
+	// The old Docs host serves the Portal's permanent redirect to the Site; the *.workers.dev copy
+	// stays off (infra#82).
 	"workers_dev": false,
 	// One Worker only: a merge to `main` deploys production (ADR 0007), so there is no `env` block.
-	// The Worker owns docs.trajectonomics.com. It does not attach the apex: the router still
-	// forwards /docs there, and this Worker redirects those paths (ADR 0013).
-	"routes": [{ "pattern": "docs.trajectonomics.com", "custom_domain": true }],
+	// The Worker serves the Site's /docs mount through a zone route, which takes precedence over the
+	// Site's Custom Domain on the apex. It keeps its old custom domain so every URL there redirects
+	// to the new address (ADR 0017).
+	"routes": [
+		{ "pattern": "trajectonomics.com/docs*", "zone_name": "trajectonomics.com" },
+		{ "pattern": "docs.trajectonomics.com", "custom_domain": true }
+	],
 	"assets": {
-		// astro.config.ts builds into ./dist, and request paths are the host root.
+		// astro.config.ts builds into ./dist at its root; base_path serves that root at /docs/.
 		"directory": "./dist",
-		// The Worker redirects the old /docs mount and answers `Accept: text/markdown`
-		// (ADR 0010, ADR 0013), then forwards everything else to the assets.
+		// The Worker redirects the old host, the retired /developers paths and answers
+		// `Accept: text/markdown` (ADR 0010, ADR 0017), then forwards everything else to the assets.
 		"binding": "ASSETS",
+		"base_path": "/docs",
 		"run_worker_first": true,
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"

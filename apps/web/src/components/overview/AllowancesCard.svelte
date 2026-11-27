@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { AllowancesSummary } from "../../lib/view/allowances/home"
 import type { ScenarioView } from "../../lib/view/overview/scenario"
+import ItemWords from "../ui/ItemWords.svelte"
 import Money from "../ui/Money.svelte"
 import ScenarioCard from "./ScenarioCard.svelte"
 
@@ -32,7 +33,7 @@ const single = $derived(
 						<dl class="space-y-1">
 							{#each view.savings as one (one.key)}
 								<div class="flex items-baseline justify-between gap-3">
-									<dt class="text-sm text-muted-foreground">{one.name ?? ""}</dt>
+									<dt class="text-sm text-muted-foreground">{#if one.name !== null}<ItemWords label={one.name} />{/if}</dt>
 									<dd class="text-xl font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} compact /></dd>
 								</div>
 							{/each}

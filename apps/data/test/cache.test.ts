@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { usageCacheKey, usageStaleCacheKey } from "../src/http/cache"
-import { get } from "./support/http"
+import { healthCacheKey, usageCacheKey, usageStaleCacheKey } from "../src/http/cache"
+import { get, legacy } from "./support/http"
 
 describe("usageCacheKey", () => {
 	test("keeps only known params in a fixed order", () => {
@@ -8,7 +8,7 @@ describe("usageCacheKey", () => {
 			get("/api/usage?to=2026-11-24&from=2026-11-01&foo=bar&plan=claude&asOf=2026-11-20&model=x"),
 		)
 		expect(key.url).toBe(
-			"https://data.test/api/usage?asOf=2026-11-20&from=2026-11-01&model=x&plan=claude&to=2026-11-24",
+			"https://trajectonomics.com/data/api/usage?asOf=2026-11-20&from=2026-11-01&model=x&plan=claude&to=2026-11-24",
 		)
 	})
 
@@ -21,8 +21,25 @@ describe("usageCacheKey", () => {
 	test("gives the stale copy its own key", () => {
 		const request = get("/api/usage?from=2026-11-24&__stale=1")
 		expect(usageStaleCacheKey(request).url).toBe(
-			"https://data.test/api/usage?from=2026-11-24&__stale=1",
+			"https://trajectonomics.com/data/api/usage?from=2026-11-24&__stale=1",
 		)
 		expect(usageStaleCacheKey(request).url).not.toBe(usageCacheKey(request).url)
+	})
+
+	test("names one resource from either host", () => {
+		const apex = usageCacheKey(get("/api/usage?from=2026-11-24&plan=claude"))
+		const old = usageCacheKey(legacy("/api/usage?plan=claude&from=2026-11-24"))
+		expect(old.url).toBe(apex.url)
+	})
+})
+
+describe("healthCacheKey", () => {
+	test("drops the query and names one resource from either host", () => {
+		expect(healthCacheKey(legacy("/api/health?from=elsewhere")).url).toBe(
+			"https://trajectonomics.com/data/api/health",
+		)
+		expect(healthCacheKey(legacy("/api/health?from=elsewhere")).url).toBe(
+			healthCacheKey(get("/api/health")).url,
+		)
 	})
 })

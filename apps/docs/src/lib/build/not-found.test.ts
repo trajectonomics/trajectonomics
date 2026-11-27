@@ -3,8 +3,9 @@ import type { BuiltFile } from "./built-files"
 import { checkNotFoundPage, NOT_FOUND_PAGE_FILE } from "./not-found"
 
 const HEADER =
-	'<header id="nd-nav"><button data-search-full=""></button><a href="/">Trajectonomics Docs</a></header>'
-const BODY = '<div id="portal-not-found"><h1>Page not found</h1><a href="/">Docs Portal</a></div>'
+	'<header id="nd-nav"><button data-search-full=""></button><a href="/docs/">Trajectonomics Docs</a></header>'
+const BODY =
+	'<div id="portal-not-found"><h1>Page not found</h1><a href="/docs/">Docs Portal</a></div>'
 
 function page(header: string, body: string): BuiltFile {
 	return { path: NOT_FOUND_PAGE_FILE, content: `${header}${body}` }
@@ -36,7 +37,7 @@ describe("the 404 page of the built Docs Portal", () => {
 	})
 
 	test("a body whose only link is the Operator Tab is reported as NOT_FOUND_LINK_MISSING", () => {
-		expect(codesOf([page(HEADER, BODY.replace('href="/"', 'href="/cli/"'))])).toEqual([
+		expect(codesOf([page(HEADER, BODY.replace('href="/docs/"', 'href="/docs/cli/"'))])).toEqual([
 			"NOT_FOUND_LINK_MISSING",
 		])
 	})

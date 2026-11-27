@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { preferences } from "../../client/preferences.svelte.js"
-import type { ProjectionAllowances } from "../../lib/contract"
+import type { HouseholdDocument, ProjectionAllowances } from "../../lib/contract"
 import { GOLDEN_ALLOWANCES } from "../../lib/view/allowances/fixtures.test-support"
 import { allowancesSummaryOf } from "../../lib/view/allowances/home"
-import { NO_PEOPLE, snapshotPeople } from "../../lib/view/item-names"
+import { NO_PEOPLE, personNames, snapshotPeople } from "../../lib/view/item-names"
 import type { ScenarioView } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
@@ -98,5 +98,66 @@ describe("the Home card: tax you could still save this year", () => {
 		expect(body.match(/•••••/g)).toHaveLength(2)
 		expect(body).not.toContain("84,950.00")
 		expect(body).not.toContain("4,600.00")
+	})
+})
+
+describe("the Home card names a departed Filer as the Tax profile tables do", () => {
+	const gone: HouseholdDocument = {
+		schemaVersion: 2,
+		people: [
+			{ id: "partner", role: "holder", born: "1992-02", lifeExpectancy: 88 },
+			{ id: "bob", role: "partner", born: "1990-06", lifeExpectancy: 90 },
+		],
+		anchors: [],
+		owners: [],
+	}
+	const renamed: HouseholdDocument = {
+		schemaVersion: 2,
+		people: [
+			{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+			{ id: "bob", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+		],
+		anchors: [],
+		owners: [],
+	}
+	const bothGone: HouseholdDocument = {
+		schemaVersion: 2,
+		people: [
+			{ id: "ann", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+			{ id: "bob", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+		],
+		anchors: [],
+		owners: [],
+	}
+	const summary = (household: HouseholdDocument | null, claimsHolder: string | null) =>
+		allowancesSummaryOf(readOf("separate"), personNames(household), claimsHolder)
+
+	test("names the recorded holder the earlier holder", () => {
+		const body = card(summary(gone, "me"), "separate")
+		expect(body).toContain(">The earlier holder<")
+		expect(body).toContain(">You<")
+		expect(body).not.toContain(">me<")
+	})
+
+	test("names another departed id another person", () => {
+		const body = card(summary(renamed, null), "separate")
+		expect(body).toContain(">You<")
+		expect(body).toContain(">Another person<")
+		expect(body).not.toContain(">partner<")
+	})
+
+	test("gives two departed Returns that would read alike their ids, apart", () => {
+		const body = card(summary(bothGone, null), "separate")
+		expect(body).toContain(">Another person (me)<")
+		expect(body).toContain(">Another person (partner)<")
+	})
+
+	test("shows the ids when there is no household at all", () => {
+		const body = card(summary(null, null), "separate")
+		expect(body).toContain(">me<")
+		expect(body).toContain(">partner<")
+		expect(body).not.toContain("Another person")
+		expect(body).toMatch(/<code[^>]*data-unnamed[^>]*>me<\/code>/)
+		expect(body).toMatch(/<code[^>]*data-unnamed[^>]*>partner<\/code>/)
 	})
 })

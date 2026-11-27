@@ -11,3 +11,8 @@ export function planName(plan: string): string {
 export function planRank(plan: string): number {
 	return ORDER.get(plan) ?? plans.length
 }
+
+/** Orders two entries by the plan table, then by plan id for plans the table does not name. */
+export function comparePlans(a: { plan: string }, b: { plan: string }): number {
+	return planRank(a.plan) - planRank(b.plan) || a.plan.localeCompare(b.plan)
+}
