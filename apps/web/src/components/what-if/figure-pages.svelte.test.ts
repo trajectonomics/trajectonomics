@@ -92,14 +92,14 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 			props: { names, chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
 		}).body
 		expect(chance).toContain("What-if on base")
-		expect(chance).toMatch(/Chance of success from \d+\.\d\d% to \d+\.\d\d%/)
+		expect(chance).toMatch(/Chance of success from [\d.]+% to [\d.]+%/)
 
 		const tax = render(TaxPanel, {
 			props: { names, projections, people: {}, requested: "base", onScenario: () => {} },
 		}).body
 		expect(tax).toContain("What-if on base")
 		expect(tax).toContain("Baseline:")
-		expect(tax).toContain("The Levy each year")
+		expect(tax).toContain("The tax each year")
 
 		const cash = render(CashFlowView, {
 			props: {
@@ -145,8 +145,8 @@ describe("the Overview's what-if", () => {
 		expect(body).toContain("+2 years, later")
 		expect(body).toContain("Closing net worth")
 		expect(body).toMatch(/\+<span[^>]*><span>5,000\.00<\/span>.*?, higher/s)
-		expect(body).toContain("What-if: Nominal net worth")
-		expect(body).toContain("Baseline: Nominal net worth")
+		expect(body).toContain("What-if: Net worth in future money")
+		expect(body).toContain("Baseline: Net worth in future money")
 		expect(body).toContain("Baseline:")
 		expect(body).toContain("Chance of success from")
 	})

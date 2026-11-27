@@ -51,7 +51,7 @@ const milestoneChoices = $derived([
 		<Field id="payout-date" label="Date" hint="YYYY-MM-DD" bind:value={draft.date} problem={shown.at("payoutStart")} />
 	{/if}
 	{#if taxed}
-		<Field id="payout-kind" label="Kind of income for tax" hint="Picks the tax label a Levy sums the payout under." options={PAYOUT_KIND_CHOICES} bind:value={draft.kind} problem={shown.at("payoutKind")} />
+		<Field id="payout-kind" label="Kind of income for tax" hint="Picks the tax label a tax year sums the payout under." options={PAYOUT_KIND_CHOICES} bind:value={draft.kind} problem={shown.at("payoutKind")} />
 	{/if}
 	<Field id="payout-rounding" label="Each payout rounds" options={ROUNDING_CHOICES} bind:value={draft.rounding} problem={shown.at("payoutRounding")} />
 </fieldset>

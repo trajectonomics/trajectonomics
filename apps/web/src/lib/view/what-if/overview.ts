@@ -45,7 +45,7 @@ export function overviewExtras(
 		tax:
 			first === undefined || owed === undefined
 				? null
-				: { ...owed, label: `Tax owed for ${first.period}, Levy ${first.levy}` },
+				: { ...owed, label: `Tax owed for ${first.period}` },
 		fees: feesTriple(lens, baselineRun),
 	}
 }

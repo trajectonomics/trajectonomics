@@ -1,7 +1,7 @@
 import type { AllowanceRow, AllowanceYear } from "../../contract"
 import { allowanceName, SSF_LABEL } from "../../contract/allowance-labels"
 import { bareLabelOf } from "../../edit/tax-labels"
-import { formatDate } from "../../format"
+import { formatDate, periodWords } from "../../format"
 import { filerOfRow } from "./returns"
 import { SSF_WORDS, STOP_WORDS } from "./words"
 import type { LineView, YearView } from "./years"
@@ -46,7 +46,7 @@ export function yearOf(year: AllowanceYear, rows: readonly AllowanceRow[]): Year
 		filer: year.filer ?? filerOfLines(lines),
 		from: year.from,
 		to: year.to,
-		period: `${formatDate(year.from)} to ${formatDate(year.to)}`,
+		period: periodWords(year.from, year.to),
 		settles: formatDate(year.settlementDate),
 		dueBefore: year.dueBefore,
 		dueAfter: year.dueAfter,

@@ -54,10 +54,10 @@ describe("the Reports page on paper", () => {
 				label: "Account balances",
 				columns: [{ key: "account", numeric: false }],
 				records: [{ account: "<b>ธนาคาร</b> & co" }],
-				heading: "แผน · As of 2026-10-31 · Nominal",
+				heading: "แผน · As of 2026-10-31 · Future money",
 			},
 		})
-		expect(body).toMatch(/<p class="print:hidden [^"]*">แผน · As of 2026-10-31 · Nominal<\/p>/)
+		expect(body).toMatch(/<p class="print:hidden [^"]*">แผน · As of 2026-10-31 · Future money<\/p>/)
 		expect(body).toContain("&lt;b&gt;ธนาคาร&lt;/b&gt; &amp; co")
 		expect(body).not.toContain("<b>ธนาคาร</b>")
 		expect(body).toContain('<div data-report="">')

@@ -39,7 +39,7 @@ describe("NetWorthCard", () => {
 		expect(body).toContain('role="alert"')
 		expect(body).toContain("Net worth could not be read")
 		expect(body).toContain("LEDGER_EMPTY message")
-		expect(body).toContain("Net worth</h2>")
+		expect(body).toContain(">Net worth<")
 		expect(body).toContain('href="/net-worth/"')
 	})
 

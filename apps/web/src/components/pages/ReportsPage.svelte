@@ -22,7 +22,7 @@ let { scenario, terms }: Props = $props()
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}
 		{#if plan === null}
-			<p role="status" class="text-muted-foreground">The Snapshot holds no plan to report on.</p>
+			<p role="status" class="text-muted-foreground">No plan to report on.</p>
 		{:else}
 			<ReportView
 				{snapshot}

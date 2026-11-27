@@ -8,12 +8,12 @@ import { statusLine } from "./status-line"
 const state = $derived(currentSnapshot())
 </script>
 
-<!-- The As-of, the currency and the traj version of the Snapshot, and a badge when it is the Demo. -->
+<!-- The As-of, the currency and the traj version these figures state, and a badge when it is the Demo. -->
 <div class="flex flex-wrap items-center gap-x-3 gap-y-2 py-2 text-sm text-muted-foreground">
 	{#if state.status === "loading"}
-		<span>Loading the Snapshot.</span>
+		<span>Loading…</span>
 	{:else if state.status !== "ready"}
-		<span>No Snapshot is loaded.</span>
+		<span>No figures are loaded.</span>
 	{:else}
 		<span>{statusLine(state.snapshot)}</span>
 	{/if}

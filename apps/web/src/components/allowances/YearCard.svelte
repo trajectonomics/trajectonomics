@@ -30,7 +30,7 @@ const label = $derived(region === undefined ? "This tax year" : `${region}: this
 		{:else}
 			<h3 class="text-base font-semibold">This tax year</h3>
 		{/if}
-		<p class="text-sm text-muted-foreground">{year.levy}, {year.period}, settles {year.settles}</p>
+		<p class="text-sm text-muted-foreground">Tax for {year.period}, due {year.settles}</p>
 	</header>
 	<div class="grid gap-4 sm:grid-cols-3">
 		<Stat label="Tax due now">{#snippet value()}<Money amount={year.dueBefore} {currency} />{/snippet}</Stat>

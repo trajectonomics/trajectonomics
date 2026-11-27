@@ -54,10 +54,10 @@ export async function settle(page: Page, theme: Theme): Promise<void> {
 	await expect(page.locator("html")).toHaveAttribute("data-theme", theme)
 	await page.addStyleTag({ content: `html, body { font-family: "${PINNED_FONT}" !important }` })
 	await page.waitForLoadState("networkidle")
-	// The status line says "Loading the Snapshot." until the Demo snapshot has been read, and "No
-	// Snapshot is loaded." when the read failed: a page checked in either state proves nothing.
-	await expect(page.getByText("Loading the Snapshot.")).toHaveCount(0)
-	await expect(page.getByText("No Snapshot is loaded.")).toHaveCount(0)
+	// The status line says "Loading…" until the Demo snapshot has been read, and "No figures are
+	// loaded." when the read failed: a page checked in either state proves nothing.
+	await expect(page.getByText("Loading…")).toHaveCount(0)
+	await expect(page.getByText("No figures are loaded.")).toHaveCount(0)
 	await expect(page.locator("main")).toBeVisible()
 	await page.evaluate(() => document.fonts.ready)
 	expect(await pinnedFontIsInstalled(page), `${PINNED_FONT} is not installed`).toBe(true)

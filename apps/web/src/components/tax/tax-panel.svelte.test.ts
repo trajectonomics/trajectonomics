@@ -5,9 +5,9 @@ import { personNames } from "../../lib/view/item-names"
 import { panel, withLevy, year } from "./tax-panel.test-support"
 
 describe("TaxPanel: the plan", () => {
-	test("a plan with no Levy says so, that its figures are before tax, and gives the command", () => {
+	test("a plan with no tax rules says so, that its figures are before tax, and gives the command", () => {
 		const body = panel({ base: ok(projectionRun({ tax: "not_applied", taxYears: [] })) })
-		expect(body).toContain("No Levy in this plan")
+		expect(body).toContain("No tax rules in this plan")
 		expect(body).toContain("before tax")
 		expect(body).toContain("traj scenario tax base --tax th-2026")
 	})
@@ -60,9 +60,9 @@ describe("TaxPanel: the Returns of a separate filing", () => {
 })
 
 describe("TaxPanel: the tax years", () => {
-	test("the headline says Owed for a positive figure", () => {
+	test("the headline says Tax for a positive figure", () => {
 		const body = panel({ base: ok(withLevy) })
-		expect(body).toContain(">Owed<")
+		expect(body).toContain(">Tax<")
 		expect(body).toContain("89,000.00")
 	})
 

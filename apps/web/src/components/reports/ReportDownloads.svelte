@@ -34,6 +34,6 @@ const button =
 	</div>
 	<p class="max-w-prose text-xs text-muted-foreground">
 		An empty CSV cell means traj stated null for that figure, as the JSON shows. The JSON holds the same values
-		as the Snapshot does, though not its exact text: the Dashboard keeps the parsed result, so spacing may differ.
+		as these figures do, though not their exact text: the Dashboard keeps the parsed result, so spacing may differ.
 	</p>
 </div>

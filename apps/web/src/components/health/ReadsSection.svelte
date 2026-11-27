@@ -46,10 +46,10 @@ const columns: Column<AuditRow>[] = [
 <ReportSection
 	id="every-read"
 	title="Every Read"
-	intro="The audit trail for every figure on this Dashboard: each traj call the Snapshot holds, and whether it succeeded."
+	intro="The audit trail for every figure on this Dashboard: each traj call these figures hold, and whether it succeeded."
 >
 	{#if rows.length === 0}
-		<EmptyState title="No Reads in this Snapshot" />
+		<EmptyState title="No Reads in these figures" />
 	{:else}
 		<DataTable caption="Reads" {rows} rowKey={(row) => row.key} {columns} />
 	{/if}

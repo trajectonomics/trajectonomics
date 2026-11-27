@@ -14,7 +14,7 @@ let { scenario, onScenario }: Props = $props()
 
 <PageShell
 	title="Chance of success"
-	intro="The share of seeded Market paths on which a plan holds to its Horizon, with the net-worth Bands it draws from."
+	intro="How often a plan lasts to its horizon across many markets, with the net-worth Bands it draws from."
 >
 	{#snippet children(snapshot)}
 		<ChanceView

@@ -14,10 +14,8 @@ let { scenario }: Props = $props()
 <ScenarioCard title="Chance of success" href="/chance/" label="chance" {scenario}>
 	{#snippet body(view: ChanceSummary)}
 		<div class="space-y-2">
-			<p class="text-3xl font-semibold tracking-tight tabular-nums">{view.share}</p>
-			<p class="text-sm">
-				{view.succeeded} of {view.paths} seeded Market paths hold to {view.horizon}.
-			</p>
+			<p class="text-3xl font-semibold tracking-tight tabular-nums">{view.share} <span class="text-base font-normal text-muted-foreground">chance</span></p>
+			<p class="text-sm">{view.lasts}</p>
 		</div>
 	{/snippet}
 </ScenarioCard>

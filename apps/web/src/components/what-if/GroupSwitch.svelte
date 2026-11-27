@@ -34,7 +34,7 @@ function change(control: HTMLInputElement): void {
 }
 </script>
 
-<!-- One what-if control for the whole loan or asset: the switch takes every part out together, and "Try a value" sets its parts together. A debt the ledger holds has no switch, and a loan inside an asset follows the asset. -->
+<!-- One what-if control for the whole loan or asset: the switch takes every part out together, and "What if…" sets its parts together. A debt the ledger holds has no switch, and a loan inside an asset follows the asset. -->
 <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-sm">
 	{#if group.refused === null}
 		<label class="inline-flex items-center gap-2">
@@ -54,5 +54,5 @@ function change(control: HTMLInputElement): void {
 			{group.refused}{#if ownerOff && group.owner !== null} Off with {group.owner.name}.{/if}
 		</p>
 	{/if}
-	<button type="button" onclick={onTry} disabled={whatIfSession.saving || ownerOff} class={button}>Try a value</button>
+	<button type="button" onclick={onTry} disabled={whatIfSession.saving || ownerOff} class={button}>What if…</button>
 </div>

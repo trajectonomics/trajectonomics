@@ -32,9 +32,9 @@ export function reportSource(
 /** The words the print header gives the terms the page shows figures in. */
 export function termsWords(raw: string): string {
 	const terms: Terms = parseTerms(raw)
-	if (terms === "nominal") return "Nominal"
-	if (terms === "real") return "Real, in As-of terms"
-	return "Nominal and real, in As-of terms"
+	if (terms === "nominal") return "Future money"
+	if (terms === "real") return "Today's money"
+	return "Future money and today's money"
 }
 
 /** Why a plan has no projection to report on, and whether the CLI stated it or the page did. */
@@ -50,7 +50,7 @@ export function noProjectionReason(
 ): NoProjectionReason {
 	const read = Object.hasOwn(reads.projections, plan) ? reads.projections[plan] : undefined
 	if (read === undefined)
-		return { text: "The Snapshot holds no projection for this plan.", fromCli: false }
+		return { text: "These figures hold no projection for this plan.", fromCli: false }
 	return read.ok
 		? { text: "The projection of this plan holds no table.", fromCli: false }
 		: { text: read.error.message, fromCli: true }

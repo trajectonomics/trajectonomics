@@ -35,14 +35,14 @@ export function figureRows(data: ProjectionCompare): readonly FigureRow[] {
 		},
 		{
 			key: "final-nominal",
-			label: "Net worth at the end, nominal",
+			label: "Net worth at the end, in future money",
 			a: endCell(a, "nominal"),
 			difference: moneyDifference(deltas.netWorth?.nominal ?? null, END_REASON),
 			b: endCell(b, "nominal"),
 		},
 		{
 			key: "final-real",
-			label: "Net worth at the end, real",
+			label: "Net worth at the end, in today's money",
 			a: endCell(a, "real"),
 			difference: moneyDifference(deltas.netWorth?.real ?? null, END_REASON),
 			b: endCell(b, "real"),
@@ -58,7 +58,7 @@ export function figureRows(data: ProjectionCompare): readonly FigureRow[] {
 	]
 }
 
-/** The nominal and real rows of one age the compare was asked for. */
+/** The future-money and today's-money rows of one age the compare was asked for. */
 function ageRows(data: ProjectionCompare, index: number, age: number): FigureRow[] {
 	const delta = data.deltas.atAges[index]
 	const sideA = data.sides.a.netWorth.atAges[index]
@@ -66,14 +66,14 @@ function ageRows(data: ProjectionCompare, index: number, age: number): FigureRow
 	return [
 		{
 			key: `age-${age}-nominal`,
-			label: `Net worth at age ${age}, nominal`,
+			label: `Net worth at age ${age}, in future money`,
 			a: ageCell(sideA?.nominal),
 			difference: moneyDifference(delta?.nominal ?? null, AGE_REASON),
 			b: ageCell(sideB?.nominal),
 		},
 		{
 			key: `age-${age}-real`,
-			label: `Net worth at age ${age}, real`,
+			label: `Net worth at age ${age}, in today's money`,
 			a: ageCell(sideA?.real),
 			difference: moneyDifference(delta?.real ?? null, AGE_REASON),
 			b: ageCell(sideB?.real),

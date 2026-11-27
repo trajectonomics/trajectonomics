@@ -8,7 +8,7 @@ import { periodText } from "./year"
 export function linesOf(found: Resolved, terms: Terms): Drawn[] {
 	const { real } = found
 	if (real === null) {
-		const suffix = terms === "nominal" ? "" : " (nominal)"
+		const suffix = terms === "nominal" ? "" : " (future money)"
 		return [{ name: `${found.name}${suffix}`, dashed: false, dotted: false, points: found.nominal }]
 	}
 	return [
@@ -17,7 +17,7 @@ export function linesOf(found: Resolved, terms: Terms): Drawn[] {
 			: [{ name: found.name, dashed: false, dotted: false, points: found.nominal }]),
 		...(terms === "nominal"
 			? []
-			: [{ name: `${found.name}, in As-of terms`, dashed: true, dotted: false, points: real }]),
+			: [{ name: `${found.name} in today's money`, dashed: true, dotted: false, points: real }]),
 	]
 }
 

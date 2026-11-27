@@ -33,7 +33,7 @@ const names = $derived(currentItemNames())
 	<EmptyState title="No plan to show" />
 {:else if read.ok && !hasCashflow(read)}
 	<EmptyState title={`No cash flow for ${name}`}>
-		<p>The Snapshot holds this plan's projection without its cash flow.</p>
+		<p>These figures hold this plan's projection without its cash flow.</p>
 	</EmptyState>
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}

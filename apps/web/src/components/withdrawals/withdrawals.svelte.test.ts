@@ -60,8 +60,8 @@ describe("the Withdrawals page", () => {
 	test("states the chance, the Bands and the lowest year with the paths it counts, each level in words", () => {
 		const body = page()
 		expect(body).toContain("In good and bad markets")
-		expect(body).toContain("96.50%")
-		expect(body).toContain("193 of 200 seeded Market paths")
+		expect(body).toContain("96.5%")
+		expect(body).toContain("Lasts to 2053 in 193 of 200 markets.")
 		expect(body).toContain("In the worst years you would spend")
 		expect(body).toContain("Worst 1 in 10 paths")
 		expect(body).toContain("211,506.76")
@@ -212,6 +212,6 @@ describe("trying another way", () => {
 		const body = page()
 		expect(body).toContain("With your try")
 		expect(body).toContain("Saved plan")
-		expect(body.match(/chance of success:/g)).toHaveLength(2)
+		expect(body.match(/chance\. Lasts to/g)).toHaveLength(2)
 	})
 })

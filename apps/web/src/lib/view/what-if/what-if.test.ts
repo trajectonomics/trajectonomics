@@ -164,8 +164,8 @@ describe("the chart", () => {
 		const lens = demoLens()
 		const series = whatIfSeries(lens.run ?? failing(), baselineRun(DEMO, "base"), "both", NO_PEOPLE)
 		expect(series.map((entry) => entry.name)).toEqual([
-			"What-if: Nominal net worth",
-			"Baseline: Nominal net worth",
+			"What-if: Net worth in future money",
+			"Baseline: Net worth in future money",
 		])
 		expect(series.map((entry) => entry.dashed === true)).toEqual([false, true])
 	})
@@ -179,7 +179,7 @@ describe("the chart", () => {
 		const lens = demoLens()
 		const baseline = baselineRun(DEMO, "base")
 		const hidden = whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE, true)
-		expect(hidden.map((entry) => entry.name)).toEqual(["What-if: Nominal net worth"])
+		expect(hidden.map((entry) => entry.name)).toEqual(["What-if: Net worth in future money"])
 		expect(hidden.every((entry) => entry.dashed !== true)).toBe(true)
 		expect(hidden.some((entry) => entry.name.includes("Baseline"))).toBe(false)
 	})
@@ -189,15 +189,15 @@ describe("the chart", () => {
 		const baseline = baselineRun(DEMO, "base")
 		const shown = whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE, false)
 		expect(shown.map((entry) => entry.name)).toEqual([
-			"What-if: Nominal net worth",
-			"Baseline: Nominal net worth",
+			"What-if: Net worth in future money",
+			"Baseline: Net worth in future money",
 		])
 		expect(shown.map((entry) => entry.dashed === true)).toEqual([false, true])
 		expect(
 			whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE).map(
 				(entry) => entry.name,
 			),
-		).toEqual(["What-if: Nominal net worth", "Baseline: Nominal net worth"])
+		).toEqual(["What-if: Net worth in future money", "Baseline: Net worth in future money"])
 	})
 })
 

@@ -21,7 +21,7 @@ describe("printHeading", () => {
 		expect(printHeading(state, "base", "real", false)).toEqual({
 			plan: "base",
 			asOf: formatDate(run.asOf),
-			terms: "Real, in As-of terms",
+			terms: "Today's money",
 			whatIf: false,
 		})
 	})
@@ -30,7 +30,7 @@ describe("printHeading", () => {
 		const heading = printHeading(ready(failedRead(["projection"])), "base", "nominal", true)
 		expect(heading?.asOf).toBe("30 Sep 2026")
 		expect(heading && printHeadingText(heading)).toBe(
-			"base · As of 30 Sep 2026 · Nominal · What-if session",
+			"base · As of 30 Sep 2026 · Future money · What-if session",
 		)
 	})
 

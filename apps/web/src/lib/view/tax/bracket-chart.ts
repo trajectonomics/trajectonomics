@@ -19,13 +19,13 @@ function bracketed(
 }
 
 function label(year: TaxYear): { xLabel: string; xTitle: string } {
-	return { xLabel: formatMonth(year.to), xTitle: `${year.levy}, ${periodOf(year)}` }
+	return { xLabel: formatMonth(year.to), xTitle: periodOf(year) }
 }
 
 /**
  * The chart of every tax year the CLI stated brackets for, or null when no year has income in a bracket. A bracket
- * reached in some year is a series by its rate, lowest first, and a year it was not reached in has none of it. Figures are nominal: a tax year states no
- * real one. The step line is each year's top rate, left out when no year states one.
+ * reached in some year is a series by its rate, lowest first, and a year it was not reached in has none of it. Figures are in future money: a tax year states no
+ * today's-money one. The step line is each year's top rate, left out when no year states one.
  */
 export function bracketChart(years: readonly TaxYear[]): BracketChart | null {
 	const shown = bracketed(years)

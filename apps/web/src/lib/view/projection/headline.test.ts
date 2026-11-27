@@ -21,7 +21,7 @@ describe("headlineOf", () => {
 	test("reports no run-out when the money does not run out before the horizon", () => {
 		const headline = headlineOf(projectionRunFixture({ runsOut: null }))
 		expect(headline?.runsOut).toBeNull()
-		expect(headline?.horizon).toBe("2028-12-31")
+		expect(headline?.horizonYear).toBe("2028")
 	})
 
 	test("reports the run-out date and the unmet amount exactly as the CLI states them", () => {

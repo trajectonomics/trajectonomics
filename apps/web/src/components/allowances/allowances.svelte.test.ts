@@ -68,7 +68,7 @@ describe("the result: this year first, then the later years", () => {
 	test("the later years are a table inside its own scroller, so the page does not scroll sideways", () => {
 		const body = result(GOLDEN_ALLOWANCES)
 		expect(body).toContain("Every later tax year")
-		expect(body).toContain("1 Jan 2027 to 31 Dec 2027")
+		expect(body).toContain("2027")
 		expect(body).toContain("max-w-full overflow-auto")
 	})
 
@@ -116,7 +116,7 @@ describe("the page over the Demo snapshot", () => {
 	const body = (snapshot: Snapshot, scenario = "base") =>
 		render(AllowancesBody, { props: { snapshot, scenario } }).body
 
-	test("a plan with a Levy shows the order, the step and the CLI's read", () => {
+	test("a plan with tax rules shows the order, the step and the CLI's read", () => {
 		const page = body(DEMO)
 		expect(page).toContain("Your order")
 		expect(page).toContain("RMF, then ThaiESG")
@@ -128,12 +128,12 @@ describe("the page over the Demo snapshot", () => {
 		expect(body(DEMO)).not.toContain("Read the allowances")
 	})
 
-	test("a plan with no Levy says so and gives the command that adds one", () => {
+	test("a plan with no tax rules says so and gives the command that adds one", () => {
 		const bare = structuredClone(DEMO)
 		const read = bare.reads.documents["base"]
 		if (read?.ok) delete read.data.scenario.document.levies
 		const page = body(bare)
-		expect(page).toContain("No Levy in this plan")
+		expect(page).toContain("No tax rules in this plan")
 		expect(page).toContain("traj scenario tax base --tax th-2026")
 	})
 
@@ -154,7 +154,7 @@ describe("the page over the Demo snapshot", () => {
 	test("a Filer plan whose Levies tally no Filer label says why it has no read", () => {
 		const page = body(flowOnlyFilerPlan(), "separate")
 		expect(page).toContain("No Return to read")
-		expect(page).toContain("no Levy of it tallies a Filer's label")
+		expect(page).toContain("no tax rules of it tally a Filer's label")
 		expect(page).toContain("<code>traj scenario tax separate --from-stored</code>")
 		expect(page).not.toContain("`traj")
 		expect(page).not.toContain("Choose the allowances you could buy")

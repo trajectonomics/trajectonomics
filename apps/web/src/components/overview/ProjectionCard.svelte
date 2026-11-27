@@ -11,7 +11,7 @@ interface Props {
 let { scenario }: Props = $props()
 </script>
 
-<!-- The projection's closing net worth, nominal and in As-of terms, and whether it runs out. -->
+<!-- The projection's closing net worth, in future money and today's money, and whether it runs out. -->
 <ScenarioCard title="Projection" href="/projection/" label="Projection" {scenario}>
 	{#snippet body(view: ProjectionView | null)}
 		{#if view === null}
@@ -26,14 +26,14 @@ let { scenario }: Props = $props()
 						</p>
 					</div>
 					<div>
-						<p class="text-sm text-muted-foreground">Real, in As-of terms</p>
+						<p class="text-sm text-muted-foreground">Today's money</p>
 						<p class="mt-1 text-2xl font-semibold tracking-tight">
 							<Money amount={view.real} currency={view.currency} />
 						</p>
 					</div>
 				</div>
 				{#if view.runsOut === null}
-					<p class="text-sm">Does not run out before {view.horizon}.</p>
+					<p class="text-sm">Money lasts to the end of the plan, {view.horizonYear}.</p>
 				{:else}
 					<p class="text-sm">
 						Runs out on {view.runsOut.date}, with

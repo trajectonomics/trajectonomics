@@ -1,5 +1,4 @@
 import { afterAll, beforeEach, describe, expect, test } from "bun:test"
-import type { Component } from "svelte"
 import { render } from "svelte/server"
 import { demoSnapshotText } from "../../scripts/demo-snapshot"
 import { setTestUrl } from "../../scripts/svelte/app-stub"
@@ -7,61 +6,16 @@ import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
 import { whatIfSession } from "../client/what-if.svelte"
 import { HASH, useSessionHooks } from "../client/what-if.test-support"
-import FigureChart from "../components/routing/FigureChart.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
 import { ROUTES } from "../lib/view/routes"
 import { LOADING } from "../lib/view/state"
 import { startWhatIf, withSet } from "../lib/what-if/session"
+import { pagesOfRoutes, problemsOf, type RoutePage, visible } from "./words.test-support"
 
 const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(await demoSnapshotText()))
 
-/** The attributes a person reads or hears: a link's and a chart's labels, a tooltip, and a field's placeholder. */
-const ATTRIBUTE = /(?:aria-label|title|placeholder)="([^"]*)"/g
-
-/** The text a person reads, without the tags, the code a page quotes, or the CLI's own strings shown as data. */
-function pageText(body: string): string {
-	return body
-		.replace(/<code\b[\s\S]*?<\/code>/g, " ")
-		.replace(/<(li|p|span|div)\b[^>]*\bdata-cli\b[^>]*>[\s\S]*?<\/\1>/g, " ")
-		.replace(/<[^>]+>/g, " ")
-}
-
-/** The values of the attributes a person reads or hears. */
-function pageAttributes(body: string): string {
-	return [...body.matchAll(ATTRIBUTE)].map((match) => match[1] ?? "").join(" ")
-}
-
-/** Everything a page says to a person, in its text or in an attribute. */
-function visible(body: string): string {
-	return `${pageText(body)} ${pageAttributes(body)}`
-}
-
-/** What the guard forbids in one page: the CLI's word for a Plan, and an ISO date, each outside code or CLI text. */
-function problemsOf(body: string): string[] {
-	const words = visible(body)
-	const found: string[] = []
-	if (/scenario/i.test(words)) found.push("Scenario")
-	if (/\b\d{4}-\d{2}(-\d{2})?\b/.test(words)) found.push("ISO date")
-	return found
-}
-
-// biome-ignore lint/suspicious/noExplicitAny: a test renders pages whose props differ.
-type AnyPage = Component<any>
-
-/** Every page under `src/routes/`, so a page added there is guarded without an edit here. */
-async function pagesOfRoutes(): Promise<readonly { path: string; page: AnyPage }[]> {
-	const files = [...new Bun.Glob("**/+page.svelte").scanSync({ cwd: import.meta.dir })].sort()
-	const pages = files.map(async (file) => {
-		const dir = file.slice(0, -"/+page.svelte".length)
-		const path = dir === "" ? "/" : `/${dir}/`
-		const imported = (await import(`${import.meta.dir}/${file}`)) as { default: AnyPage }
-		return { path, page: imported.default }
-	})
-	return Promise.all(pages)
-}
-
-const PAGES: readonly { path: string; page: AnyPage }[] = await pagesOfRoutes()
+const PAGES: readonly RoutePage[] = await pagesOfRoutes()
 
 function h1Of(body: string): string | undefined {
 	const match = body.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)
@@ -144,32 +98,5 @@ describe("the What-if bar", () => {
 		const body = render(WhatIfBar, { props: {} }).body
 		expect(visible(body)).toContain("1 Mar 2027")
 		expect(problemsOf(body)).toEqual([])
-	})
-})
-
-describe("the guard", () => {
-	test("finds a Scenario in an aria-label, even with an ISO date beside it", () => {
-		expect(problemsOf('<p aria-label="The two Scenarios on 2026-10-31"></p>')).toEqual([
-			"Scenario",
-			"ISO date",
-		])
-	})
-
-	test("finds a lowercase scenario in an intro", () => {
-		expect(problemsOf("<p>Every scenario has its own plan.</p>")).toEqual(["Scenario"])
-	})
-
-	test("finds a page-written date in a note that used to be marked as the CLI's", () => {
-		const body = render(FigureChart, {
-			props: {
-				label: "Money moved, by year",
-				figure: {
-					series: [{ name: "Rent", points: [] }],
-					notes: ["2026-10-31: nothing moved."],
-				},
-				empty: "No money moved in this run.",
-			},
-		}).body
-		expect(problemsOf(body)).toEqual(["ISO date"])
 	})
 })
