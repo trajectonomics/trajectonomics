@@ -76,4 +76,18 @@ describe("the --decimal hint on the what-if forms", () => {
 			details: { path: "flows.salary.amount", code: "NOT_SAFE_INTEGER" },
 		})
 	})
+
+	it("names --decimal when a percent field is refused before the money field", async () => {
+		const home = await seeded()
+		const fund = { id: "fund", kind: "asset", rate: 0, fee: { bps: "1.50", rounding: "halfUp" } }
+		const res = await apply(home, [
+			"base",
+			"--add",
+			`accounts=${JSON.stringify(fund)}`,
+			"--set",
+			'flows.salary.amount="9000.50"',
+		])
+		expect(res.code).toBe(2)
+		expect(errorOf(res).hint).toContain(DECIMAL_HINT)
+	})
 })

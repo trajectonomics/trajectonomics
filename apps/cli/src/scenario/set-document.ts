@@ -1,5 +1,5 @@
 import type { AppError } from "../errors"
-import { decimalAmountHint } from "./decimal-amount-hint"
+import { firstDecimalAmountHint } from "./decimal-amount-hint"
 import { documentPath, type ScenarioProblem } from "./document"
 import { ownDocumentError } from "./document-error"
 import { isOwnProblem, ownProblems } from "./own-problems"
@@ -86,7 +86,7 @@ export function documentFailure(
 		chosen.problem,
 		path,
 		details,
-		decimalAmountHint(document, chosen.problem),
+		firstDecimalAmountHint(document, problems),
 	)
 }
 

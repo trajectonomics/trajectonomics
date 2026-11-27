@@ -51,6 +51,8 @@ function currencyOfHint(document: unknown): string | undefined {
 /**
  * The hint for a minor-unit refusal of a money field that holds a value `--decimal` reads, or
  * undefined when the refusal is another one, the field is not money, or the value is not decimal.
+ * A string with no dot is a minor-unit amount quoted by mistake: `--decimal` would read it as major
+ * units, 100 times larger, while removing the quotes is the fix, so it gets no hint.
  */
 export function decimalAmountHint(document: unknown, problem: ScenarioProblem): string | undefined {
 	if (problem.code !== "NOT_SAFE_INTEGER") return undefined
@@ -58,7 +60,17 @@ export function decimalAmountHint(document: unknown, problem: ScenarioProblem): 
 	const value = valueAt(document, problem.segments)
 	if (typeof value !== "string") return undefined
 	const currency = currencyOfHint(document)
-	return currency !== undefined && isDecimalAmount(value, currency)
+	return currency !== undefined && value.includes(".") && isDecimalAmount(value, currency)
 		? DECIMAL_AMOUNT_HINT
 		: undefined
+}
+
+/** The first problem's decimal hint, in any order: the refusal shows one problem, which may not be money. */
+export function firstDecimalAmountHint(
+	document: unknown,
+	problems: readonly ScenarioProblem[],
+): string | undefined {
+	return problems
+		.map((problem) => decimalAmountHint(document, problem))
+		.find((hint) => hint !== undefined)
 }

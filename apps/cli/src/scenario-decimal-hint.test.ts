@@ -66,6 +66,7 @@ describe("scenario apply of a decimal document without --decimal", () => {
 
 	const notDecimal: [string, unknown][] = [
 		["a non-numeric string", "abc"],
+		["a whole number without a dot, a minor-unit amount quoted by mistake", "9000"],
 		["a leading dot", ".50"],
 		["a JSON number", 9000.5],
 	]
@@ -117,8 +118,8 @@ describe("scenario apply of a decimal document without --decimal", () => {
 		expect(errorOf(res).hint).toBe(`${DECIMAL_HINT} ${SCHEMA_HINT}`)
 	})
 
-	it("names --decimal for -0.50, 9000 and 9000.500, and none for 1.005, which --decimal refuses", async () => {
-		for (const amount of ["-0.50", "9000", "9000.500"]) {
+	it("names --decimal for -0.50 and 9000.500, and none for 1.005, which --decimal refuses", async () => {
+		for (const amount of ["-0.50", "9000.500"]) {
 			const res = await applyScenario(
 				scenarioHome(),
 				"base",
@@ -134,5 +135,12 @@ describe("scenario apply of a decimal document without --decimal", () => {
 		const details = errorOf(refused).details as { code?: string }[]
 		expect(details[0]?.code).toBe("NOT_SAFE_INTEGER")
 		expect(errorOf(refused).hint).toBe(SCHEMA_HINT)
+	})
+
+	it("carries no decimal hint in a currency --decimal does not read", async () => {
+		const document = { ...withFirstAmount(SCENARIO_DOCUMENT as Doc, "9000.50"), currency: "USD" }
+		const res = await applyScenario(scenarioHome(), "base", document)
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).hint).not.toContain(DECIMAL_HINT)
 	})
 })
