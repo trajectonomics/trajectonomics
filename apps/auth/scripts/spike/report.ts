@@ -1,9 +1,10 @@
 import type { JSONWebKeySet, JWTPayload } from "jose"
-import { DATA_AUDIENCE, RELAY_AUDIENCE } from "../../src/auth"
+import { DATA_AUDIENCE, RELAY_AUDIENCE } from "../../src/core/resources"
 import { describeClaims, describeJwk, describeTokenResponse } from "../../src/core/token-shape"
+import { buildChecks } from "./checks"
 import { BASE_URL } from "./config"
-import type { DeviceCodeResponse, TokenResponse } from "./flow"
-import { failedBecause, verifyJwt } from "./verify"
+import type { DeviceCodeResponse, GateEvidence, TokenResponse } from "./types"
+import { verifyJwt } from "./verify"
 
 export type SpikeReport = {
 	report: Record<string, unknown>
@@ -18,6 +19,7 @@ export async function buildReport(input: {
 	refreshed: TokenResponse
 	jwks: JSONWebKeySet
 	claims: JWTPayload
+	gates: GateEvidence
 }): Promise<SpikeReport> {
 	const { token, jwks } = input
 	const verification = await verifyJwt({
@@ -39,27 +41,17 @@ export async function buildReport(input: {
 		audience: DATA_AUDIENCE,
 		algorithms: ["RS256"],
 	})
-	const audience = input.claims["aud"]
-	const dataAudience =
-		audience === DATA_AUDIENCE || (Array.isArray(audience) && audience.includes(DATA_AUDIENCE))
-	const relayAudience = Array.isArray(audience) && audience.includes(RELAY_AUDIENCE)
-	const checks = {
-		pendingPollReportsAuthorizationPending: input.pending === "authorization_pending",
-		deviceCodeHasRefreshToken: input.token.refresh_token !== undefined,
-		refreshGrantRotatesRefreshToken:
-			input.refreshed.refresh_token !== undefined &&
-			input.refreshed.refresh_token !== input.token.refresh_token,
-		accessTokenExpiresInFifteenMinutes: input.token.expires_in === 900,
-		accessTokenIsEdDsaJwt:
-			input.token.access_token.split(".").length === 3 && input.claims["iss"] === BASE_URL,
-		accessTokenAudienceIsDataServer: dataAudience && !relayAudience,
-		jwksPublishesEd25519: jwks.keys.some(
-			(key) => key.kty === "OKP" && key.crv === "Ed25519" && key.alg === "EdDSA",
-		),
-		jwtVerifiesAgainstJwks: verification.ok,
-		wrongAudienceRejected: failedBecause(wrongAudience, "aud"),
-		wrongAlgorithmRejected: !wrongAlgorithm.ok,
-	}
+	const checks = buildChecks({
+		pending: input.pending,
+		token,
+		refreshed: input.refreshed,
+		jwks,
+		claims: input.claims,
+		verificationOk: verification.ok,
+		wrongAudienceError: wrongAudience.ok ? null : wrongAudience.error,
+		wrongAlgorithmOk: wrongAlgorithm.ok,
+		gates: input.gates,
+	})
 	return {
 		ok: Object.values(checks).every(Boolean),
 		report: {
@@ -83,6 +75,7 @@ export async function buildReport(input: {
 				error: verification.ok ? null : verification.error,
 				wrongAudienceError: wrongAudience.ok ? null : wrongAudience.error,
 			},
+			gates: input.gates,
 			checks,
 		},
 	}
