@@ -6,6 +6,7 @@ export type IconName =
 	| "book-open"
 	| "calendar"
 	| "chart-line"
+	| "chevron-down"
 	| "eye"
 	| "eye-off"
 	| "file-text"
@@ -38,11 +39,21 @@ export interface Route {
 	readonly needsLevy?: true
 }
 
-/** A run of pages under one heading. A heading of null is a run of pages that belong to no group. */
-export interface NavGroup {
-	readonly heading: string | null
-	readonly routes: readonly Route[]
-}
+/**
+ * A run of pages that belong to no group, or a group with a heading that opens and closes. A group that
+ * holds the current page is always open; `defaultOpen` is how it starts otherwise.
+ */
+export type NavGroup =
+	| {
+			readonly heading: null
+			readonly routes: readonly Route[]
+	  }
+	| {
+			readonly heading: string
+			readonly collapsible: true
+			readonly defaultOpen: boolean
+			readonly routes: readonly Route[]
+	  }
 
 export { NAV_GROUPS }
 
@@ -74,8 +85,27 @@ export function routesShown(
 	)
 }
 
-/** Pages that are opened from a page in the navigation and are not listed in it: each stands under its parent. */
-const CHILD_PAGES: Readonly<Record<string, string>> = { "/chance/path/": "/chance/" }
+/** The id of a group's list, which its heading button controls: the Plan group's is "nav-pages-plan". */
+export function navGroupId(heading: string): string {
+	const slug = heading
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-|-$/g, "")
+	return `nav-pages-${slug}`
+}
+
+/**
+ * Pages that are opened from a page in the navigation and are not listed in it: each stands under its
+ * parent, so the parent's entry is marked as the current page.
+ */
+const CHILD_PAGES: Readonly<Record<string, string>> = {
+	"/chance/path/": "/chance/",
+	"/income/": "/projection/",
+	"/expenses/": "/projection/",
+	"/assets-and-debts/": "/projection/",
+	"/fi/": "/projection/",
+	"/routing/": "/cash-flow/",
+}
 
 /** The navigation's page a path belongs to: the page itself, or the parent of a page opened from it. */
 export function navPath(path: string): string {
@@ -83,7 +113,14 @@ export function navPath(path: string): string {
 }
 
 /** The titles of pages that are in no navigation group, by path. */
-const OTHER_TITLES: Readonly<Record<string, string>> = { "/plans/": "Plans" }
+const OTHER_TITLES: Readonly<Record<string, string>> = {
+	"/plans/": "Plans",
+	"/income/": "Income",
+	"/expenses/": "Expenses",
+	"/assets-and-debts/": "Assets and debts",
+	"/fi/": "FI date",
+	"/routing/": "Where money goes",
+}
 
 /** The heading of the page at a path: its navigation label, or the title of a page the navigation does not list. */
 export function pageTitle(path: string): string {

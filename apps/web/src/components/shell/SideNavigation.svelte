@@ -1,9 +1,7 @@
 <script lang="ts">
 import { shellPanels } from "../../client/shell.svelte.js"
-import type { PlanRow } from "../../lib/view/plans/rows"
 import { cx } from "../ui/cx"
 import NavIcon from "./NavIcon.svelte"
-import PlanSwitcher from "./PlanSwitcher.svelte"
 import SiteBrand from "./SiteBrand.svelte"
 import SiteNavLinks from "./SiteNavLinks.svelte"
 
@@ -12,14 +10,6 @@ interface Props {
 	brand: string
 	/** The path of the page being rendered. It is marked as the current page. */
 	current: string
-	/** The Scenario names the Snapshot holds, and the one the pages show. */
-	names: readonly string[]
-	selected: string
-	onPlan: (name: string) => unknown
-	/** What the Snapshot says of each plan, for the Main tag, the notes icon and the plan menus. */
-	rows?: readonly PlanRow[]
-	/** Whether the server answers Edits, so the plan switcher offers a plan's menu and a new plan. */
-	editable?: boolean
 	/** Whether the Snapshot holds the selected plan's document, which the planner pages need. */
 	planDocument?: boolean
 	/** Whether the selected plan's projection has milestones, which the Milestones page needs. */
@@ -33,11 +23,6 @@ interface Props {
 let {
 	brand,
 	current,
-	names,
-	selected,
-	onPlan,
-	rows = [],
-	editable = false,
 	planDocument = true,
 	milestones = true,
 	cashflow = true,
@@ -47,6 +32,11 @@ let closeButton: HTMLButtonElement | undefined = $state()
 
 function close(): void {
 	shellPanels.closeMenu()
+}
+
+/** A link is followed: the drawer shuts, and focus returns to the menu button once the new page shows. */
+function follow(): void {
+	shellPanels.navigateFromMenu()
 }
 
 // On a narrow screen the menu drawer takes focus when it opens, so a keyboard reader can reach it.
@@ -65,21 +55,18 @@ $effect(() => {
 	)}
 >
 	<div class="flex items-center justify-between gap-2">
-		<SiteBrand artwork={brand} onNavigate={close} />
+		<SiteBrand artwork={brand} onNavigate={follow} />
 		<button
 			type="button"
 			bind:this={closeButton}
 			onclick={close}
-			class="inline-flex rounded-md p-1.5 text-muted-foreground outline-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring lg:hidden"
+			class="inline-flex rounded-md p-1.5 text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring lg:hidden"
 		>
 			<NavIcon name="x" />
 			<span class="sr-only">Close the menu</span>
 		</button>
 	</div>
-	<SiteNavLinks {current} onNavigate={close} {planDocument} {milestones} {cashflow} {levy} />
-	<div class="mt-auto">
-		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} {rows} />
-	</div>
+	<SiteNavLinks {current} onNavigate={follow} {planDocument} {milestones} {cashflow} {levy} />
 </aside>
 {#if shellPanels.menu}
 	<button

@@ -42,6 +42,7 @@ const BASE_ICON_NODES: Omit<Readonly<Record<IconName, readonly IconElement[]>>, 
 		["path", { d: "M3 3v16a2 2 0 0 0 2 2h16" }],
 		["path", { d: "m19 9-5 5-4-4-3 3" }],
 	],
+	"chevron-down": [["path", { d: "m6 9 6 6 6-6" }]],
 	"git-compare": [
 		["circle", { cx: "18", cy: "18", r: "3" }],
 		["circle", { cx: "6", cy: "6", r: "3" }],

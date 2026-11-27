@@ -68,9 +68,6 @@ describe("the Reports page on paper", () => {
 			props: {
 				brand: "<svg></svg>",
 				current: "/reports/",
-				names: ["base"],
-				selected: "base",
-				onPlan: noop,
 			},
 		})
 		expect(body).toMatch(/<aside[^>]*class="print:hidden /)

@@ -10,9 +10,11 @@ interface Props {
 	title: string
 	/** Renders the page from the ready Snapshot. */
 	children: Snippet<[Snapshot]>
+	/** A control placed at the heading's right, such as a link the page offers besides its body. */
+	actions?: Snippet | undefined
 }
 
-let { title, children }: Props = $props()
+let { title, children, actions }: Props = $props()
 </script>
 
-<PageFrame {title} state={currentSnapshot()} pathname={currentPathname()} {children} />
+<PageFrame {title} state={currentSnapshot()} pathname={currentPathname()} {children} {actions} />

@@ -14,13 +14,13 @@ interface Props {
 	onTerms: (terms: Terms) => void
 }
 
-/** Compare: two Scenarios side by side, and the deltas the CLI states between them. */
+/** Compare plans: two Scenarios side by side, and the deltas the CLI states between them. */
 let { terms, onTerms }: Props = $props()
 const chosen = $derived(parseTerms(terms))
 </script>
 
 <PageShell
-	title="Compare"
+	title="Compare plans"
 >
 	{#snippet children(snapshot)}
 		{@const read = snapshot.reads.compare}

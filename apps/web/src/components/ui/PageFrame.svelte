@@ -14,14 +14,17 @@ interface Props {
 	pathname: string
 	/** Renders the page from the ready Snapshot. Runs only when the Snapshot is ready. */
 	children: Snippet<[Snapshot]>
+	/** A control placed at the heading's right, such as the Cash flow page's link to Where money goes. */
+	actions?: Snippet | undefined
 }
 
-let { title, state, pathname, children }: Props = $props()
+let { title, state, pathname, children, actions }: Props = $props()
 </script>
 
 <section aria-labelledby="page-title" class="space-y-6">
-	<header>
+	<header class="flex items-baseline justify-between gap-3">
 		<h1 id="page-title" class="text-xl font-semibold tracking-tight">{title}</h1>
+		{#if actions}{@render actions()}{/if}
 	</header>
 	{#if state.status === "loading"}
 		<p role="status" class="text-muted-foreground">Loading the Snapshot.</p>

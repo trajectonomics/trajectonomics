@@ -1,8 +1,8 @@
 <script lang="ts">
-import { NAV_GROUPS, routesShown } from "../../lib/view/routes"
-import { cx } from "../ui/cx"
-import SiteLink from "../ui/SiteLink.svelte"
-import NavIcon from "./NavIcon.svelte"
+import { currentSnapshot } from "../../client/snapshot.svelte.js"
+import { healthWarningLabel } from "../../lib/view/health/warning"
+import { NAV_GROUPS } from "../../lib/view/routes"
+import NavGroupList from "./NavGroupList.svelte"
 
 interface Props {
 	/** The path of the page being rendered, such as "/net-worth/". It is marked as the current page. */
@@ -27,38 +27,22 @@ let {
 	cashflow = true,
 	levy = true,
 }: Props = $props()
+const state = $derived(currentSnapshot())
+const warning = $derived(state.status === "ready" ? healthWarningLabel(state.snapshot) : null)
 </script>
 
 <!-- The pages in groups: a group with a heading, then the pages that belong to no group. -->
 <nav aria-label="Pages" class="space-y-5">
 	{#each NAV_GROUPS as group, index (index)}
-		<div>
-			{#if group.heading}
-				<h2 class="px-3 pb-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-					{group.heading}
-				</h2>
-			{/if}
-			<ul class="space-y-1">
-				{#each routesShown(group, planDocument, milestones, cashflow, levy) as route (route.path)}
-					{@const isCurrent = route.path === current}
-					<li>
-						<SiteLink
-							href={route.path}
-							aria-current={isCurrent ? "page" : undefined}
-							onclick={onNavigate}
-							class={cx(
-								"flex items-center gap-3 rounded-md px-3 py-2 text-sm whitespace-nowrap outline-none focus-visible:outline-2 focus-visible:outline-ring",
-								isCurrent
-									? "bg-secondary font-medium text-foreground"
-									: "text-muted-foreground hover:text-foreground",
-							)}
-						>
-							<NavIcon name={route.icon} />
-							{route.label}
-						</SiteLink>
-					</li>
-				{/each}
-			</ul>
-		</div>
+		<NavGroupList
+			{group}
+			{current}
+			{onNavigate}
+			warning={group.heading === "Records" ? warning : null}
+			{planDocument}
+			{milestones}
+			{cashflow}
+			{levy}
+		/>
 	{/each}
 </nav>
