@@ -1,6 +1,6 @@
 [
 	{
-		"path": "AGENTS.md",
+		"path": "docs/agents/skills.md",
 		"match": "trajectonomics/internal-skills` (internal)",
 		"reason": "The source table names the internal skills' former repository; its Lives-in column is the monorepo folder."
 	},
