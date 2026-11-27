@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioShow } from "../contract"
-import { householdHashOf } from "../contract/household-hash.test-support"
+import { brandHouseholdHash } from "../contract/household-hash.test-support"
 import { failedRead } from "./fixtures.test-support"
 import { hasTaxProfile, planTaxNotes } from "./stage-two-tax-notes"
 
@@ -10,7 +10,7 @@ function shown(tax: ScenarioShow["scenario"]["tax"]): ScenarioShow {
 			id: "id",
 			name: "base",
 			contentHash: "hash",
-			householdHash: householdHashOf("hash-household"),
+			householdHash: brandHouseholdHash("hash-household"),
 			forkedFrom: null,
 			version: 1,
 			createdAt: "2026-01-01T00:00:00.000Z",

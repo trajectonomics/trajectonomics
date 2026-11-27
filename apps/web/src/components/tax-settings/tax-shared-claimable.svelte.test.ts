@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import type { HouseholdDocument, ScenarioShow, TaxProfile } from "../../lib/contract"
-import { householdHashOf } from "../../lib/contract/household-hash.test-support"
+import { brandHouseholdHash } from "../../lib/contract/household-hash.test-support"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { blankDraft, draftOf, wholeDraftOf } from "../../lib/view/tax-settings/draft"
 import { canClaimShared } from "../../lib/view/tax-settings/shared-plan"
@@ -43,7 +43,7 @@ function show(
 		id: "id",
 		name: "base",
 		contentHash: HASH,
-		householdHash: householdHashOf(HASH),
+		householdHash: brandHouseholdHash(HASH),
 		forkedFrom: null,
 		version: 1,
 		createdAt: "2026-11-01T00:00:00Z",

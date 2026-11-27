@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import type { ScenarioDocument, ScenarioShow, TaxProfile } from "../../lib/contract"
-import { householdHashOf } from "../../lib/contract/household-hash.test-support"
+import { brandHouseholdHash } from "../../lib/contract/household-hash.test-support"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { blankDraft } from "../../lib/view/tax-settings/draft"
 import TaxProfileCard from "./TaxProfileCard.svelte"
@@ -31,7 +31,7 @@ function show(extra: { tax?: TaxProfile | null; taxed?: boolean }): ScenarioShow
 		id: "id",
 		name: "base",
 		contentHash: HASH,
-		householdHash: householdHashOf(HASH),
+		householdHash: brandHouseholdHash(HASH),
 		forkedFrom: null,
 		version: 1,
 		createdAt: "2026-11-01T00:00:00Z",

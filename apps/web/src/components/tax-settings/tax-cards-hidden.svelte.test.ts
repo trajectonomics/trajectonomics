@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { preferences } from "../../client/preferences.svelte.js"
 import type { ScenarioShow, TaxProfile } from "../../lib/contract"
-import { householdHashOf } from "../../lib/contract/household-hash.test-support"
+import { brandHouseholdHash } from "../../lib/contract/household-hash.test-support"
 import { AMOUNT_MASK } from "../../lib/format"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import TaxProfileCard from "./TaxProfileCard.svelte"
@@ -22,7 +22,7 @@ const SHOW: ScenarioShow["scenario"] = {
 	id: "id",
 	name: "base",
 	contentHash: HASH,
-	householdHash: householdHashOf(HASH),
+	householdHash: brandHouseholdHash(HASH),
 	forkedFrom: null,
 	version: 1,
 	createdAt: "2026-11-01T00:00:00Z",

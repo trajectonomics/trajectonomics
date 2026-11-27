@@ -6,7 +6,7 @@ import { removeHousehold, saveHousehold } from "../../client/household-save.js"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
 import { RAN } from "../../client/what-if.test-support"
 import type { HouseholdDocument, ScenarioShow, Snapshot } from "../../lib/contract"
-import { householdHashOf } from "../../lib/contract/household-hash.test-support"
+import { brandHouseholdHash } from "../../lib/contract/household-hash.test-support"
 import { householdWithPerson } from "../../lib/view/household/document"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { LOADING } from "../../lib/view/state"
@@ -50,7 +50,7 @@ function splitHashes(): { snapshot: Snapshot; read: ScenarioShow["scenario"] } {
 	const scenario: ScenarioShow["scenario"] = {
 		...read.data.scenario,
 		household,
-		householdHash: householdHashOf(HOUSEHOLD_HASH),
+		householdHash: brandHouseholdHash(HOUSEHOLD_HASH),
 	}
 	Object.defineProperty(scenario, "contentHash", {
 		get() {
@@ -67,7 +67,7 @@ function card(options: { household?: HouseholdDocument | null; editable?: boolea
 			name: "base",
 			doc: planDocument(),
 			household: options.household === undefined ? household : options.household,
-			householdHash: householdHashOf(
+			householdHash: brandHouseholdHash(
 				"jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
 			),
 			editable: options.editable ?? true,
