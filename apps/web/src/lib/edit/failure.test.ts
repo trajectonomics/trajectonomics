@@ -13,7 +13,15 @@ describe("an Edit's error", () => {
 	})
 
 	test("the server's own refusals are not", () => {
-		for (const code of ["edit_running", "bad_token", "not_ready", "scenario_name_taken"]) {
+		for (const code of [
+			"edit_running",
+			"bad_token",
+			"not_ready",
+			"scenario_name_taken",
+			"contract_mismatch",
+			"unparsed_error",
+			"traj_unavailable",
+		]) {
 			expect(isCliError({ code, exitCode: 1, message: "The Dashboard's own words." })).toBe(false)
 		}
 	})

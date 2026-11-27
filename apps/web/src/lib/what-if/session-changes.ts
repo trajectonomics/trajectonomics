@@ -1,5 +1,6 @@
 /** The changes of a session as the bar lists them, in the order `traj` applies them. Pure. */
 import { additionId, additionPath, additionWords } from "./additions"
+import { fieldWords } from "./field-words"
 import type { Json } from "./overrides"
 import type { WhatIf } from "./session"
 import { inGroup } from "./session-group"
@@ -100,7 +101,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 			return {
 				kind: "set",
 				path: set.path,
-				label: `${itemLabel(set.path)} ${field} set to ${valueText(set.value)}`,
+				label: `${itemLabel(set.path)} ${fieldWords(field)} set to ${valueText(set.value)}`,
 				value: valueText(set.value),
 			}
 		})

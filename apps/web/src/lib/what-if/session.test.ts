@@ -93,6 +93,20 @@ describe("the What-if session", () => {
 		])
 	})
 
+	test("names a field by the words its card uses, not by its key", () => {
+		const locked = withSet(startWhatIf("base", HASH), "accounts.fund.lockedUntil", "2033-09-15")
+		expect(changesOf(locked)).toEqual([
+			{
+				kind: "set",
+				path: "accounts.fund.lockedUntil",
+				label: "Fund locked until set to 2033-09-15",
+				value: "2033-09-15",
+			},
+		])
+		const rate = withSet(startWhatIf("base", HASH), "flows.retire.rateBps", "5.00")
+		expect(changesOf(rate).map((change) => change.label)).toEqual(["Retire rate set to 5.00"])
+	})
+
 	test("the Overrides are what the server sends: the Sets and the Removals, each in order", () => {
 		let session = withSet(startWhatIf("base", HASH), "flows.a.amount", 1)
 		session = switchedOff(session, "milestones.downsize")

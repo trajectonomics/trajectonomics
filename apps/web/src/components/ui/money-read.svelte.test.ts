@@ -100,4 +100,19 @@ describe("ReadView", () => {
 		expect(body).toContain("traj report networth --as-of 2026-10-31 --json")
 		expect(body).not.toContain("never")
 	})
+
+	test("marks the error text as the CLI's only when the CLI wrote it", () => {
+		const children = createRawSnippet(() => ({ render: () => "<p>never</p>" }))
+		const shown = (code: string) => {
+			const read: Read<{ total: string }> = {
+				argv: ["report", "networth", "--json"],
+				ok: false,
+				error: { code, exitCode: 1, message: "Some words." },
+			}
+			return render(ReadView, { props: { read, label: "Net worth", children } }).body
+		}
+		expect(shown("LEDGER_EMPTY")).toContain("data-cli")
+		for (const code of ["traj_unavailable", "contract_mismatch", "unparsed_error"])
+			expect(shown(code)).not.toContain("data-cli")
+	})
 })

@@ -56,7 +56,7 @@ describe("the What-if bar words a change by its session plan", () => {
 		)
 		const body = render(WhatIfChanges, { props: {} }).body
 		expect(body).toContain("Alpha spending: spends 4.00%")
-		expect(body).toContain("Alpha spending rateBps set to 5.00")
+		expect(body).toContain("Alpha spending rate set to 5.00")
 		expect(body).not.toContain("Beta spending")
 	})
 })
