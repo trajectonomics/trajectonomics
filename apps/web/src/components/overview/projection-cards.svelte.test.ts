@@ -13,18 +13,18 @@ import ProjectionCard from "./ProjectionCard.svelte"
 import TaxCard from "./TaxCard.svelte"
 
 describe("ProjectionCard", () => {
-	test("shows the closing net worth nominal and in As-of terms, and that it does not run out", () => {
+	test("shows the closing net worth in future money and today's money, and that the money lasts", () => {
 		const run = projectionRun({ annual: [annualRow("2060-12-31", "19756836.98", "7196252.23")] })
 		const read = okRead(["projection"], projectionView(run))
 		const { body } = render(ProjectionCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
 		expect(body).toContain("19.7M")
-		expect(body).toContain("Real, in As-of terms")
+		expect(body).toContain("Today's money")
 		expect(body).toContain("7.19M")
 		expect(body).toContain('title="19,756,836.98"')
 		expect(body).toContain('title="7,196,252.23"')
-		expect(body).toContain("Does not run out before 31 Dec 2060.")
+		expect(body).toContain("Money lasts to the end of the plan, 2060.")
 	})
 
 	test("states when it runs out, and when there are no annual rows", () => {
@@ -46,13 +46,13 @@ describe("ProjectionCard", () => {
 })
 
 describe("TaxCard", () => {
-	test("says the Scenario has no Levy when there are no rows", () => {
+	test("says the plan has no tax rules when there are no rows", () => {
 		const run = projectionRun({ tax: "not_applied", taxYears: [] })
 		const read = okRead(["projection"], taxView(run))
 		const { body } = render(TaxCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
-		expect(body).toContain("no Levy, so every figure is before tax")
+		expect(body).toContain("no tax rules, so every figure is before tax")
 		expect(body).toContain("Tax not applied")
 	})
 
@@ -64,8 +64,8 @@ describe("TaxCard", () => {
 		})
 		expect(body).toContain("89k")
 		expect(body).toContain('title="89,000.00"')
-		expect(body).toContain("1 Jan 2026 to 31 Dec 2026")
-		expect(body).toContain("Settles 31 Mar 2027")
+		expect(body).toContain("Tax for 2026")
+		expect(body).toContain("Due 31 Mar 2027")
 		expect(body).toContain("Tax applied")
 	})
 })

@@ -69,8 +69,10 @@ describe("refuseEdit", () => {
 		expect(refuseEdit({ ...GOOD, busy: true })?.code).toBe("edit_running")
 	})
 
-	test("refuses an Edit before the first Snapshot is in, and any method but POST", () => {
-		expect(refuseEdit({ ...GOOD, ready: false })?.code).toBe("not_ready")
+	test("refuses an Edit before the first figures are read, and any method but POST", () => {
+		const refused = refuseEdit({ ...GOOD, ready: false })
+		expect(refused?.code).toBe("not_ready")
+		expect(refused?.message).toBe("The figures are still being read.")
 		expect(refuseEdit({ ...GOOD, method: "GET" })?.status).toBe(405)
 	})
 

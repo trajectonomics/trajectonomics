@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { abbreviate } from "./abbreviate"
 import { formatArgv } from "./argv"
-import { formatDate, formatMonth } from "./date"
+import { formatDate, formatMonth, periodWords } from "./date"
 import { AMOUNT_MASK, maskMoney } from "./mask"
 import { formatMoney } from "./money"
 import { formatShare } from "./share"
@@ -47,6 +47,21 @@ describe("formatDate and formatMonth", () => {
 		expect(formatMonth("1990-06")).toBe("Jun 1990")
 		expect(formatMonth("1990-13")).toBe("1990-13")
 		expect(formatMonth("June")).toBe("June")
+	})
+})
+
+describe("periodWords", () => {
+	test("names a whole calendar year by its year", () => {
+		expect(periodWords("2026-01-01", "2026-12-31")).toBe("2026")
+	})
+
+	test("names a fiscal year that is not a calendar year by its range", () => {
+		expect(periodWords("2026-04-01", "2027-03-31")).toBe("1 Apr 2026 – 31 Mar 2027")
+	})
+
+	test("names a part of a year by its range, and leaves a date that is not a day as it came", () => {
+		expect(periodWords("2026-01-01", "2026-06-30")).toBe("1 Jan 2026 – 30 Jun 2026")
+		expect(periodWords("2026-01-01", "later")).toBe("1 Jan 2026 – later")
 	})
 })
 

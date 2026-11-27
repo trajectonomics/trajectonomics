@@ -27,7 +27,7 @@ const columns: Column<AnnualRow>[] = [
 	{ key: "interest", header: "Interest", numeric: true, cell: interest },
 	{ key: "unmet", header: "Unmet", numeric: true, cell: unmet },
 	{ key: "ages", header: "Ages", cell: ages },
-	{ key: "real", header: "Real net worth, in As-of terms", numeric: true, cell: real },
+	{ key: "real", header: "Net worth in today's money", numeric: true, cell: real },
 ]
 </script>
 

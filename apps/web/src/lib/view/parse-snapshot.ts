@@ -21,7 +21,7 @@ export function parseSnapshotText(text: string): ParseResult {
 	const version = versionOf(json)
 	if (version !== undefined && version !== SNAPSHOT_VERSION) {
 		return refused(
-			`is Snapshot version ${String(version)}; this Dashboard reads version ${SNAPSHOT_VERSION}`,
+			`is version ${String(version)}; this Dashboard reads version ${SNAPSHOT_VERSION}`,
 		)
 	}
 	const result = snapshot.safeParse(json)
@@ -29,7 +29,7 @@ export function parseSnapshotText(text: string): ParseResult {
 	const details = result.error.issues
 		.slice(0, MAX_DETAILS)
 		.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
-	return refused("does not match the Snapshot contract", details)
+	return refused("does not match the expected shape", details)
 }
 
 function refused(reason: string, details: readonly string[] = []): ParseResult {

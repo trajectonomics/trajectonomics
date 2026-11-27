@@ -40,8 +40,8 @@ const WINDOW_LABELS: Record<Reference["window"], string> = {
 }
 
 const TERMS_LABELS: Record<Reference["terms"], string> = {
-	nominal: "Nominal money",
-	real: "Real money",
+	nominal: "Future money",
+	real: "Today's money",
 }
 
 /** The reference, with its figures, its basis, window and terms, and whether it is met or partial. */

@@ -47,12 +47,12 @@ const note = $derived(plan === null ? null : noCostNote(plan))
 		<EstateActions {name} contentHash={doc.data.scenario.contentHash} {plan} />
 	{/if}
 	{#if run === undefined}
-		<EmptyState title="No projection in this Snapshot" />
+		<EmptyState title="No projection for this plan" />
 	{:else}
 		<ReadView read={run} label={`The estate of ${name}`}>
 			{#snippet children()}
 				{#if dates === null || saved === null}
-					<EmptyState title="No estate in this Snapshot" />
+					<EmptyState title="No estate for this plan" />
 				{:else}
 					<EstateControls {dates} {terms} {onTerms} {onAt} />
 					{#if tried}<EstateResult view={tried} terms={chosen} title="With your try" />{/if}

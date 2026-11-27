@@ -1,6 +1,7 @@
 import { FAN_LEVELS, fanSeriesName, type LineSeries, toChartNumber } from "../../chart"
 import type { ProjectionChance } from "../../contract"
-import { formatDate, formatMoney, formatShare } from "../../format"
+import { formatMoney, formatShare, trimPercent } from "../../format"
+import { chanceLasts } from "../chance/words"
 import { levelWords } from "./words"
 
 /** One Percentile of the lowest year a path spent, in plain words, with the CLI's amount. */
@@ -26,16 +27,17 @@ export interface ChanceLine {
 	readonly share: string
 	readonly succeeded: number
 	readonly paths: number
-	readonly horizon: string
+	/** "Lasts to 2028 in 174 of 200 markets." */
+	readonly lasts: string
 }
 
 /** The chance of success of a chance read, in the words the chance page uses. */
 export function chanceLineOf(chance: ProjectionChance): ChanceLine {
 	return {
-		share: formatShare(chance.successBps),
+		share: trimPercent(formatShare(chance.successBps)),
 		succeeded: chance.succeeded,
 		paths: chance.paths,
-		horizon: formatDate(chance.horizon),
+		lasts: chanceLasts(chance.succeeded, chance.paths, chance.horizon),
 	}
 }
 

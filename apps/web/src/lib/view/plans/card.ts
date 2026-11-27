@@ -1,7 +1,7 @@
 import type { LineMarker, LineSeries } from "../../chart"
 import type { Fi, ProjectionChance, ProjectionRun, Read, Snapshot } from "../../contract"
 import { isCliError } from "../../edit/failure"
-import { formatMonth, formatShare } from "../../format"
+import { formatMonth, formatShare, trimPercent } from "../../format"
 import { agesText } from "../household/model"
 import { type ItemLabel, itemLabel, type PersonNames, snapshotItemNames } from "../item-names"
 import { projectionView } from "../overview/projection"
@@ -71,7 +71,7 @@ function fiOf(read: Read<Fi> | undefined, people: PersonNames): CardFi | null {
 
 function chanceOf(read: Read<ProjectionChance> | undefined): CardChance | null {
 	if (read === undefined || !read.ok) return null
-	return { share: formatShare(read.data.successBps), paths: read.data.paths }
+	return { share: trimPercent(formatShare(read.data.successBps)), paths: read.data.paths }
 }
 
 function netWorthOf(run: ProjectionRun): CardNetWorth | null {

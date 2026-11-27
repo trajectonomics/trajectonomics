@@ -15,7 +15,7 @@ let { bands, currency }: Props = $props()
 <div class="space-y-4">
 	<div class="space-y-2">
 		<h4 class="text-sm font-medium">What the rule pays each year, across the paths</h4>
-		<p class="text-sm text-muted-foreground">The shaded areas are the 10th to 90th and the 25th to 75th Percentiles of what a year pays; the line is the middle path. Nominal.</p>
+		<p class="text-sm text-muted-foreground">The shaded areas are the 10th to 90th and the 25th to 75th Percentiles of what a year pays; the line is the middle path. Future money.</p>
 		<ChanceFan label="What the rule pays each year, from the 10th to the 90th Percentile" series={bands.series} />
 	</div>
 	<div class="space-y-2">

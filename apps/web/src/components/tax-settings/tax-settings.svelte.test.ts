@@ -60,9 +60,9 @@ describe("the tax profile card", () => {
 		expect(body).toMatch(/<button[^>]*>\s*Remove tax\s*<\/button>/)
 	})
 
-	test("a plan with no profile and no Levy is not taxed: nothing is shown, and no Remove", () => {
+	test("a plan with no profile and no tax rules is not taxed: nothing is shown, and no Remove", () => {
 		const body = card({ tax: null, taxed: false })
-		expect(body).toContain("Plan base is not taxed")
+		expect(body).toContain("base is not taxed")
 		expect(body).toMatch(/<button[^>]*>\s*Set the tax profile\s*<\/button>/)
 		expect(body).not.toContain("Remove tax")
 		expect(body).not.toContain("Married")

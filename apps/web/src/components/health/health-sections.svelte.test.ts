@@ -136,10 +136,10 @@ describe("ReadsSection", () => {
 })
 
 describe("SnapshotSection", () => {
-	test("states the As-of the Snapshot was planned from and the two versions", () => {
+	test("states the As-of these figures were planned from and the two versions", () => {
 		const { body } = render(SnapshotSection, { props: { snapshot: demo } })
 		expect(body).toContain(formatDate(demo.params.asOf))
 		expect(body).toContain(`>${demo.cliVersion}<`)
-		expect(body).toContain("Snapshot version")
+		expect(body).toContain("Version of these figures")
 	})
 })

@@ -37,7 +37,7 @@ async function apply(event: SubmitEvent): Promise<void> {
 <form onsubmit={apply} class="space-y-4" aria-label="Chance of success">
 	<h2 class="text-base font-semibold">Chance of success</h2>
 	<p class="text-sm text-muted-foreground">
-		The chance draws seeded market paths from the returns and swings above. The same paths and seed give the same answer.
+		The chance draws market paths from the returns and swings above. The same paths and seed give the same answer.
 	</p>
 	<div class="grid gap-4 sm:grid-cols-2">
 		<Field id="chance-paths" label="Market paths" inputmode="numeric" hint="A whole number from 1 to 10,000" bind:value={text.paths} problem={problems["paths"]} disabled={!editable} />

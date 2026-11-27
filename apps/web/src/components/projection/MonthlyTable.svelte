@@ -16,11 +16,11 @@ let { rows, count }: Props = $props()
 const columns: Column<MonthlyRow>[] = [
 	{ key: "date", header: "Date", cell: date },
 	{ key: "netWorth", header: "Net worth", numeric: true, cell: netWorth },
-	{ key: "real", header: "Real net worth, in As-of terms", numeric: true, cell: real },
+	{ key: "real", header: "Net worth in today's money", numeric: true, cell: real },
 	{ key: "accessible", header: "Accessible net worth", numeric: true, cell: accessible },
 	{
 		key: "realAccessible",
-		header: "Accessible, real, in As-of terms",
+		header: "Accessible net worth in today's money",
 		numeric: true,
 		cell: realAccessible,
 	},

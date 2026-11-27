@@ -26,7 +26,7 @@ function setMemo(value: string): void {
 <ReportSection
 	id="transactions"
 	title="Transactions"
-	intro="Newest first, each with its postings and their signed amounts. The filters only hide rows already loaded in this Snapshot."
+	intro="Newest first, each with its postings and their signed amounts. The filters only hide rows already loaded."
 >
 	<TransactionsBody read={transactions} {filter} {onAccount} onMemo={setMemo} />
 </ReportSection>

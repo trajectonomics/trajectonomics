@@ -15,7 +15,7 @@ describe("the current tax year", () => {
 		const years = [walkedYear(), walkedYear(NEXT)]
 		expect(pickCurrent(years, "2026-10-31")?.from).toBe("2026-01-01")
 		expect(pickCurrent(years, "2027-03-01")?.from).toBe("2027-01-01")
-		expect(currentYear(years, "2027-12-31")?.period).toBe("1 Jan 2027 to 31 Dec 2027")
+		expect(currentYear(years, "2027-12-31")?.period).toBe("2027")
 	})
 
 	test("is the first year after the As-of when none holds it, and none when all are past", () => {

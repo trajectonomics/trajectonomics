@@ -6,8 +6,8 @@ import SegmentedControl from "../ui/SegmentedControl.svelte"
 import type { SegmentedOption } from "../ui/segmented-option"
 
 const TERMS_OPTIONS: readonly SegmentedOption<Terms>[] = [
-	{ value: "nominal", label: "Nominal" },
-	{ value: "real", label: "Real" },
+	{ value: "nominal", label: "Future money" },
+	{ value: "real", label: "Today's money" },
 ]
 
 interface Props {
@@ -32,7 +32,10 @@ let { state, terms, onTerms }: Props = $props()
 		/>
 	</div>
 	{#if state.kind === "chart"}
-		<LineChart label={`Net worth by year, ${terms}`} series={state.series} />
+		<LineChart
+			label={`Net worth by year, ${terms === "nominal" ? "future money" : "today's money"}`}
+			series={state.series}
+		/>
 	{:else}
 		<EmptyState title="The chart is not drawn">
 			{#each state.reasons as reason, index (index)}

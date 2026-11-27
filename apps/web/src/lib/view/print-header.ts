@@ -6,7 +6,7 @@ import type { SnapshotState } from "./state"
 export interface PrintHeading {
 	readonly plan: string
 	readonly asOf: string
-	/** The terms in words, such as "Nominal". */
+	/** The terms in words, such as "Future money". */
 	readonly terms: string
 	readonly whatIf: boolean
 }
