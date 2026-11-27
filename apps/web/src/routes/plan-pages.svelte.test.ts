@@ -5,7 +5,10 @@ import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
 import { LOADING } from "../lib/view/state"
 import { DEMO } from "../lib/view/what-if/fixtures.test-support"
+import AssetsAndDebts from "./assets-and-debts/+page.svelte"
+import Expenses from "./expenses/+page.svelte"
 import Household from "./household/+page.svelte"
+import Income from "./income/+page.svelte"
 import Plan from "./projection/+page.svelte"
 import Years from "./projection/years/+page.svelte"
 
@@ -42,6 +45,27 @@ describe("the Plan page", () => {
 		expect(body).toMatch(/href="\/projection\/years\//)
 		expect(body).toMatch(/href="\/routing\//)
 		expect(body).toMatch(/href="\/compare\//)
+	})
+
+	test("holds the item tabs, its strip above a panel of the tab the address names", () => {
+		setTestUrl("http://127.0.0.1/projection/?demo=1&scenario=base&items=expenses")
+		const body = render(Plan).body
+		expect(body).toContain('role="tablist"')
+		expect(body).toContain('role="tabpanel"')
+		expect(body).toMatch(/role="tab"[^>]*aria-selected="true"[^>]*>Expenses/)
+		expect(body).toMatch(/role="tab"[^>]*aria-selected="false"[^>]*>Income/)
+	})
+})
+
+describe("the Plan's full item pages", () => {
+	test("each one links back to the Plan and lists its items as full cards", () => {
+		const pages = [Income, Expenses, AssetsAndDebts]
+		for (const page of pages) {
+			setTestUrl("http://127.0.0.1/income/?demo=1&scenario=base")
+			const body = render(page).body
+			expect(body, "the way back to the Plan").toContain("← Plan")
+			expect(body).toContain("<dt")
+		}
 	})
 })
 

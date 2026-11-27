@@ -32,6 +32,7 @@ function renderView(options: {
 	const projections = options.projections ?? { base: okRead(projectionRunFixture()) }
 	return render(ProjectionView, {
 		props: {
+			snapshot: DEMO,
 			names: Object.keys(projections),
 			projections,
 			scenario: options.scenario ?? "",
@@ -43,6 +44,8 @@ function renderView(options: {
 			onTerms: () => {},
 			chart: "",
 			onChart: () => {},
+			items: "income",
+			onItems: () => {},
 		},
 	}).body
 }

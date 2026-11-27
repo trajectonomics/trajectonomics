@@ -16,6 +16,8 @@ interface Props {
 	marks?: LoanMarks
 	currency: string
 	editable: boolean
+	/** False on the drawer's face, which shows no Edit control: the form is right below it. */
+	actions?: boolean
 	/** The plan and the content hash the page read for it: the what-if switch names both. */
 	plan: string
 	contentHash: string
@@ -29,6 +31,7 @@ let {
 	marks = NO_LOAN_MARKS,
 	currency,
 	editable,
+	actions = true,
 	plan,
 	contentHash,
 	onEdit,
@@ -38,13 +41,13 @@ let {
 const title = $derived(nameOf(currentAccountNames(), card.id))
 const statement = $derived(card.statement)
 const button =
-	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 </script>
 
 <li class="min-w-0 rounded-lg border border-border bg-card p-4 {marks.off ? 'opacity-60' : ''}">
 	<div class="flex flex-wrap items-start justify-between gap-3">
 		<h3 class="font-semibold break-all"><AccountName id={card.id} /></h3>
-		{#if editable}
+		{#if actions && editable}
 			<div class="flex shrink-0 flex-wrap gap-2">
 				<button type="button" aria-label="Edit loan {title}" onclick={onEdit} class={button}>Edit</button>
 				<button type="button" aria-label="Pay {title} extra" onclick={onPay} class={button}>Pay extra</button>

@@ -1,4 +1,8 @@
 import { type ItemKind, type ItemNames, itemText } from "../item-names"
+import type { ItemsView } from "../what-if/plan-changes"
+import type { AssetCardView } from "./asset-card"
+import type { FlowCard } from "./flows"
+import type { PlanKind } from "./kinds"
 
 /**
  * What the planner's item drawer is open on: an item to edit (or none, for a new one), in which form, and
@@ -15,6 +19,8 @@ export interface PlanDrawer {
 	readonly extra?: boolean
 	/** True when the drawer edits a real asset (a home or car), by the id of its Account. */
 	readonly asset?: boolean
+	/** True when the drawer opens on the item's full card first, with its form below when the page edits. */
+	readonly details?: boolean
 }
 
 /** The words of an item: the label a Read states for it, or the id (`itemText`). */
@@ -43,8 +49,31 @@ export function drawerTitle(
 	names: ItemNames,
 	kind: ItemKind,
 ): string {
+	if (drawer.details === true) return itemName(drawer, names, kind)
 	if (drawer.extra === true) return `Pay extra on ${itemName(drawer, names, kind)}`
 	if (drawer.asset === true) return itemTitle(drawer, "Add a home or car", "", names, kind)
 	if (drawer.loan === true) return itemTitle(drawer, "Add loan", "loan ", names, kind)
 	return itemTitle(drawer, `Add ${noun}`, "", names, kind)
+}
+
+/**
+ * Whether the drawer's form may edit the open item. A computed Flow has no amount the form could edit, and a
+ * home or car whose parts were changed outside its form is refused, as the pages already leave both without
+ * an Edit control (web ADR 0011).
+ */
+export function canEdit(
+	kind: PlanKind,
+	drawer: PlanDrawer,
+	lists: {
+		readonly flows: ItemsView<FlowCard>
+		readonly assets: readonly AssetCardView[]
+	},
+): boolean {
+	if (drawer.id === undefined) return true
+	if (kind !== "assets") {
+		return lists.flows.cards.find((card) => card.id === drawer.id)?.editable === true
+	}
+	if (drawer.asset !== true) return true
+	const asset = lists.assets.find((card) => card.id === drawer.id)
+	return asset !== undefined && asset.outside.length === 0
 }
