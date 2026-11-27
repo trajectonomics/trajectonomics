@@ -1,9 +1,9 @@
 import { parseUsageQuery } from "../core/query"
 import { readRollups } from "../db/read"
 import type { Env, RequestContext } from "../env"
-import { usageCacheKey } from "./cache"
+import { usageCacheKey, usageStaleCacheKey } from "./cache"
+import { cachedFresh, cachedInvalid, cachedStale } from "./read-cache"
 import { json, methodNotAllowed } from "./responses"
-import { cachedFresh, cachedInvalid, cachedStale } from "./usage-cache"
 import { usagePayload } from "./usage-payload"
 
 /**
@@ -24,11 +24,11 @@ export async function handleUsage(
 	try {
 		const rows = await readRollups(env.DB, parsed.query.filter)
 		const body = usagePayload(parsed.query.asOf, parsed.query.filter.series, rows)
-		return await cachedFresh(context.cache, key, request, body)
+		return await cachedFresh(context.cache, key, usageStaleCacheKey(request), body)
 	} catch (error) {
 		console.error("data: usage read failed", error)
 		return (
-			(await cachedStale(context.cache, request)) ??
+			(await cachedStale(context.cache, usageStaleCacheKey(request))) ??
 			json({ error: "storage_error" }, { status: 503 })
 		)
 	}

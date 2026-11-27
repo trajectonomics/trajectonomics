@@ -1,6 +1,7 @@
 import type { D1Database } from "@cloudflare/workers-types"
 import type { Granularity } from "@trajectonomics/data-collector/types"
 import type { UsageFilter } from "../core/query"
+import { nextDay } from "../core/rules"
 
 /** The rollup columns the public API serves; no machine, contributor or hour. */
 export type RollupDbRow = {
@@ -44,6 +45,35 @@ export async function readRollups(db: D1Database, filter: UsageFilter): Promise<
 		.prepare(sql)
 		.bind(...values)
 		.all<RollupDbRow>()
+	return result.results
+}
+
+/** One plan's tokens at one UTC bucket, summed over models and machines and nothing else. */
+export type PeakDbRow = {
+	plan: string
+	hour_utc: string
+	granularity: Granularity
+	tokens_total: number
+}
+
+/**
+ * Reads every hourly and daily bucket up to and including `asOf`, one figure per plan and bucket.
+ * `usage_hourly` keeps no series; its org rows are what the rollups' `measured-by-us` series is
+ * built from, so the join selects the same rows the public rollups hold. The peaks core turns the
+ * hours into a start day; no hour leaves this module.
+ */
+export async function readPeaks(db: D1Database, asOf: string): Promise<PeakDbRow[]> {
+	const sql = `SELECT usage_hourly.plan AS plan, usage_hourly.hour_utc AS hour_utc,
+		 usage_hourly.granularity AS granularity, SUM(usage_hourly.tokens_total) AS tokens_total
+		 FROM usage_hourly
+		 JOIN contributor ON contributor.id = usage_hourly.contributor_id
+		 WHERE contributor.kind = 'org' AND usage_hourly.hour_utc < ?
+		 GROUP BY usage_hourly.plan, usage_hourly.hour_utc, usage_hourly.granularity
+		 ORDER BY usage_hourly.hour_utc, usage_hourly.plan`
+	const result = await db
+		.prepare(sql)
+		.bind(`${nextDay(asOf)}T00:00:00.000Z`)
+		.all<PeakDbRow>()
 	return result.results
 }
 

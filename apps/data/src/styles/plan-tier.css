@@ -1,0 +1,11 @@
+/* The tier beside a plan's name: a small, quiet label whose tooltip carries the remark. */
+
+.plan-tier {
+	flex: none;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+	text-wrap: nowrap;
+	color: var(--ds-color-muted-foreground);
+}

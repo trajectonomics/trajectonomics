@@ -9,7 +9,7 @@
 
 .meter-row {
 	display: grid;
-	grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) auto;
+	grid-template-columns: minmax(0, 20rem) minmax(0, 1fr) auto;
 	align-items: center;
 	gap: 8px 16px;
 	padding: 12px 0;
@@ -63,6 +63,9 @@
 	line-height: 1.2;
 	font-variant-numeric: tabular-nums;
 	text-wrap: nowrap;
+	/* One width for every figure, so every bar ends on the same edge. */
+	min-width: 7.5rem;
+	text-align: right;
 }
 
 .meter-unit {
@@ -76,6 +79,11 @@
 @media (max-width: 30rem) {
 	.meter-row {
 		grid-template-columns: minmax(0, 1fr) auto;
+	}
+
+	/* The tier stays in "What each plan gives" below, so the name keeps its room on a phone. */
+	.meter-row .plan-tier {
+		display: none;
 	}
 
 	.meter-track {

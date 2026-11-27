@@ -75,7 +75,11 @@ import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 
 		<h2>What is excluded</h2>
 		<ul>
-			<li>Hourly rows are not public: the API serves daily rollups only.</li>
+			<li>
+				Hourly rows are not public: the API serves daily rollups, and one aggregate per plan
+				computed from the hourly rows. A response carries the UTC day a peak's window starts,
+				never an hour.
+			</li>
 			<li>
 				Prompts, session titles, project names, paths, account ids and times of day are excluded
 				from every published response; a response carries no machine or contributor.
@@ -103,6 +107,15 @@ import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
 		<p>
 			A day runs from 00:00 to 24:00 UTC. A row that starts at 23:00 UTC belongs to that UTC day,
 			whatever the local clock says.
+		</p>
+
+		<h2>The peaks</h2>
+		<p>
+			“What each plan gives” shows the most tokens a plan carried in any 5 clock hours, any 7 UTC
+			days and any 30 UTC days. Missing hours and days count as zero, so a window is
+			calendar-consecutive, not consecutive in the rows. Each figure is <em>at least</em> that
+			much: it is what we used, never the plan's limit, and a quiet window says nothing about the
+			headroom left.
 		</p>
 
 		<h2>What “measured by us” means</h2>
