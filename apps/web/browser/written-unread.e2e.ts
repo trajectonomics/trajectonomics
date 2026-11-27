@@ -13,7 +13,7 @@ const SLOW = 120_000
 const SENTENCE = "Your change was saved, but the page could not show it. Reload to see it."
 
 // Each save waits up to SLOW, so the whole test needs more than Playwright's 30 s default.
-test.describe.configure({ mode: "serial", timeout: 3 * SLOW / 2 })
+test.describe.configure({ mode: "serial", timeout: (3 * SLOW) / 2 })
 
 /** Lets every /edit reach the server, then answers as a write that landed while the read after it failed. */
 async function landWrites(page: import("@playwright/test").Page): Promise<void> {
