@@ -53,7 +53,7 @@ const plan = $derived(
 	{#if read === undefined}
 		{#if why !== null}
 			<EmptyState title="No Return to read">
-				<p>{why}</p>
+				<p>{why.before}<code>{why.command}</code>{why.after}</p>
 			</EmptyState>
 		{:else}
 			<EmptyState title="No allowances read yet">

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
+import { formatDate } from "../../lib/format"
 import { shownColumns, toggleHidden } from "../../lib/view/reports/columns"
 import {
 	everythingFile,
@@ -42,10 +43,11 @@ const shown = $derived(table === undefined ? [] : shownColumns(table.columns, hi
 const heading = $derived(
 	source === null
 		? ""
-		: `${plan} · As of ${source.asOf} · ${termsWords(terms)}${source.whatIf ? " · What-if session" : ""}`,
+		: `${plan} · As of ${formatDate(source.asOf)} · ${termsWords(terms)}${source.whatIf ? " · What-if session" : ""}`,
 )
 // With no projection the other reads of the plan may still be fine, so "Download everything" stays.
 const named = $derived<ReportTarget>(source ?? { plan, asOf: snapshot.params.asOf, whatIf: false })
+const reason = $derived(noProjectionReason(snapshot.reads, plan))
 const downloads = $derived(
 	source === null || table === undefined
 		? null
@@ -63,7 +65,7 @@ function pick(name: string): void {
 </script>
 
 {#if downloads === null || table === undefined}
-	<p role="status" class="text-muted-foreground">{noProjectionReason(snapshot.reads, plan)}</p>
+	<p role="status" class="text-muted-foreground">{#if reason.fromCli}<span data-cli>{reason.text}</span>{:else}{reason.text}{/if}</p>
 	<ReportDownloads csv={null} json={null} {all} csvReady={false} />
 {:else}
 	<ReportPicker

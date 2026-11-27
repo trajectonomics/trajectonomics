@@ -1,4 +1,5 @@
 import { createRawSnippet } from "svelte"
+import { formatDate } from "../../lib/format"
 import type { ReportColumn } from "../../lib/view/reports/table"
 import type { Column } from "../ui/table-types"
 
@@ -17,14 +18,23 @@ export function escapeHtml(text: string): string {
 		.replaceAll('"', "&quot;")
 }
 
-/** The DataTable columns for a table's shown fields: each cell is the record's string for its field, as stated. */
+/** The fields that hold a date, whose cell the preview prints in the Dashboard's date format. */
+const DATE_KEYS = new Set(["date", "from", "to", "settlementDate", "realNetWorth.date"])
+
+/** The preview's text for one cell: a date is formatted for display, and every other string is shown as stated. */
+function cellText(column: ReportColumn, record: Readonly<Record<string, string>>): string {
+	const text = record[column.key] ?? ""
+	return DATE_KEYS.has(column.key) ? formatDate(text) : text
+}
+
+/** The DataTable columns for a table's shown fields: each cell is the record's string for its field, with its dates written out. */
 export function dataColumns(columns: readonly ReportColumn[]): Column<ReportRow>[] {
 	return columns.map((column) => ({
 		key: column.key,
 		header: column.key,
 		numeric: column.numeric,
 		cell: createRawSnippet<[ReportRow]>((row) => ({
-			render: () => escapeHtml(row().record[column.key] ?? ""),
+			render: () => escapeHtml(cellText(column, row().record)),
 		})),
 	}))
 }

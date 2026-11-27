@@ -60,7 +60,7 @@ export function doctorView(doctor: Doctor): DoctorView {
 			{ label: "Accounts", count: formatCount(doctor.rows.account) },
 			{ label: "Transactions", count: formatCount(doctor.rows.tx) },
 			{ label: "Postings", count: formatCount(doctor.rows.posting) },
-			{ label: "Scenarios", count: formatCount(doctor.rows.scenario) },
+			{ label: "Plans", count: formatCount(doctor.rows.scenario) },
 		],
 		trialBalance: doctor.trialBalance ?? null,
 	}

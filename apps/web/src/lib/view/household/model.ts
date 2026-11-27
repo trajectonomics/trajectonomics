@@ -4,6 +4,7 @@
  * holds, calling each person by the role the household states; it never works out what the anchor's date is.
  */
 import type { HouseholdAnchor, HouseholdDocument, HouseholdPerson, PersonAge } from "../../contract"
+import { formatMonth } from "../../format"
 import { anchorWords, type PersonNames, personNames } from "../item-names"
 import { withSearch } from "../links"
 
@@ -29,9 +30,10 @@ export function personCards(household: HouseholdDocument | null): PersonCard[] {
 	return (household?.people ?? []).map((person) => ({
 		id: person.id,
 		role: roleText(person),
-		born: person.born,
+		born: formatMonth(person.born),
 		lifeExpectancy: String(person.lifeExpectancy),
-		joins: person.role === "partner" ? (person.joins ?? null) : null,
+		joins:
+			person.role === "partner" && person.joins !== undefined ? formatMonth(person.joins) : null,
 	}))
 }
 

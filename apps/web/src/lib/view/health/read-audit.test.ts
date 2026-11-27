@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { demoSnapshotJson } from "../../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot } from "../../contract"
+import { formatDate } from "../../format"
 import { readAudit } from "./read-audit"
 
 const DEMO = await demoSnapshotJson()
@@ -74,12 +75,12 @@ describe("readAudit", () => {
 	test("keeps the Snapshot's order among the Reads that succeeded", () => {
 		const rows = readAudit(withFailedPnl(demo)).filter((row) => !row.failed)
 		const questions = rows.map((row) => row.question)
-		expect(questions.indexOf("Chart of accounts")).toBeLessThan(questions.indexOf("Scenarios"))
+		expect(questions.indexOf("Chart of accounts")).toBeLessThan(questions.indexOf("Plans"))
 	})
 
 	test("dates each net worth history Read from the month it answers", () => {
-		const first = readAudit(demo).find((row) => row.question.startsWith("Net worth at 20"))
-		expect(first?.question).toBe(`Net worth at ${demo.params.historyDates[0]}`)
+		const first = readAudit(demo).find((row) => /^Net worth at \d/.test(row.question))
+		expect(first?.question).toBe(`Net worth at ${formatDate(demo.params.historyDates[0] ?? "")}`)
 	})
 
 	test("gives every row a key unique in the table", () => {

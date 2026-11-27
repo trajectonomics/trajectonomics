@@ -9,11 +9,11 @@ export type LiveEntry =
 
 /** What the page shows for a path, and whether it must ask the server for it. */
 export type PathState =
-	| { readonly kind: "no-chance"; readonly message: string }
-	| { readonly kind: "bad-index"; readonly message: string }
+	| { readonly kind: "no-chance"; readonly message: string; readonly fromCli: boolean }
+	| { readonly kind: "bad-index"; readonly message: string; readonly fromCli: false }
 	| { readonly kind: "unavailable" }
 	| { readonly kind: "loading" }
-	| { readonly kind: "failed"; readonly message: string }
+	| { readonly kind: "failed"; readonly message: string; readonly fromCli: boolean }
 	| {
 			readonly kind: "ready"
 			readonly path: ProjectionPath
@@ -65,8 +65,8 @@ const ANOTHER_RUN =
 
 /** A read held against the chance: its path when it is of that chance, else the sentence of why not. */
 function checked(chance: ProjectionChance, read: Read<ProjectionPath>): PathState {
-	if (!read.ok) return { kind: "failed", message: read.error.message }
-	if (!sameRun(chance, read.data)) return { kind: "failed", message: ANOTHER_RUN }
+	if (!read.ok) return { kind: "failed", message: read.error.message, fromCli: true }
+	if (!sameRun(chance, read.data)) return { kind: "failed", message: ANOTHER_RUN, fromCli: false }
 	return { kind: "ready", path: read.data, argv: read.argv, chance }
 }
 
@@ -80,13 +80,13 @@ function refusal(
 			chance?.ok === false
 				? chance.error.message
 				: "This plan has no chance of success to open a future of."
-		return { state: { kind: "no-chance", message }, wanted: null }
+		return { state: { kind: "no-chance", message, fromCli: chance?.ok === false }, wanted: null }
 	}
 	const index = indexOf(input.index, chance.data.paths)
 	if (index !== null) return { state: { kind: "loading" }, chance: chance.data, index }
 	const last = chance.data.paths - 1
 	const message = `The chance has ${chance.data.paths} futures, numbered 0 to ${last}.`
-	return { state: { kind: "bad-index", message }, wanted: null }
+	return { state: { kind: "bad-index", message, fromCli: false }, wanted: null }
 }
 
 /**
@@ -111,6 +111,6 @@ export function resolvePath(input: PathInput): PathResolution {
 /** The state of a path read live for this run. */
 function ofLive(chance: ProjectionChance, live: LiveEntry): PathState {
 	if (live.status === "loading") return { kind: "loading" }
-	if (live.status === "failed") return { kind: "failed", message: live.message }
+	if (live.status === "failed") return { kind: "failed", message: live.message, fromCli: false }
 	return checked(chance, live.read)
 }

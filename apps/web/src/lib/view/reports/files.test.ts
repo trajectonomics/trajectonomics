@@ -114,10 +114,14 @@ describe("a plan whose projection read failed", () => {
 
 	test("has no source, and the reason is the CLI's own message", () => {
 		expect(reportSource(reads, "base", null)).toBeNull()
-		expect(noProjectionReason(reads, "base")).toBe("no_ledger message")
-		expect(noProjectionReason(reads, "missing")).toBe(
-			"The Snapshot holds no projection for this plan.",
-		)
+		expect(noProjectionReason(reads, "base")).toEqual({
+			text: "no_ledger message",
+			fromCli: true,
+		})
+		expect(noProjectionReason(reads, "missing")).toEqual({
+			text: "The Snapshot holds no projection for this plan.",
+			fromCli: false,
+		})
 	})
 
 	test("still has an everything file, with the other reads and the failed one as the Snapshot holds them", () => {

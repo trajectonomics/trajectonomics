@@ -25,7 +25,7 @@ export function healthView(data: Doctor): HealthView {
 			{ label: "Accounts", value: data.rows.account },
 			{ label: "Transactions", value: data.rows.tx },
 			{ label: "Postings", value: data.rows.posting },
-			{ label: "Scenarios", value: data.rows.scenario },
+			{ label: "Plans", value: data.rows.scenario },
 		],
 	}
 }

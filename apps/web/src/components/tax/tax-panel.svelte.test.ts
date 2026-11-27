@@ -4,17 +4,17 @@ import { failed, ok, projectionRun } from "../../lib/view/compare/projection.tes
 import { personNames } from "../../lib/view/item-names"
 import { panel, withLevy, year } from "./tax-panel.test-support"
 
-describe("TaxPanel: the Scenario", () => {
-	test("a Scenario with no Levy says so, that its figures are before tax, and gives the command", () => {
+describe("TaxPanel: the plan", () => {
+	test("a plan with no Levy says so, that its figures are before tax, and gives the command", () => {
 		const body = panel({ base: ok(projectionRun({ tax: "not_applied", taxYears: [] })) })
-		expect(body).toContain("No Levy in this Scenario")
+		expect(body).toContain("No Levy in this plan")
 		expect(body).toContain("before tax")
 		expect(body).toContain("traj scenario tax base --tax th-2026")
 	})
 
-	test("an unknown name says so and shows the first Scenario", () => {
+	test("an unknown name says so and shows the first plan", () => {
 		const body = panel({ base: ok(withLevy), "retire-early": ok(withLevy) }, "ghost")
-		expect(body).toContain("There is no Scenario named ghost. Showing base.")
+		expect(body).toContain("There is no plan named ghost. Showing base.")
 	})
 
 	test("a failed Projection Read shows the CLI's message and keeps the picker", () => {

@@ -2,19 +2,19 @@ import { MONEY_GROUP } from "./nav-money"
 import { OPTIMIZE_GROUPS } from "./nav-optimize"
 import type { NavGroup } from "./routes"
 
-/** The navigation in order: Home and Net worth, the Plan group, the Optimize group, Cash flow, Chance of success, Tax, then the Records group, then the Settings group. */
+/** The navigation in order: Overview and Net worth, the Plan group, the Optimize group, Cash flow, Chance of success, Tax, then the Records group, then the Settings group. */
 export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		heading: null,
 		routes: [
-			{ path: "/", label: "Home", page: "OverviewPage", icon: "house" },
+			{ path: "/", label: "Overview", page: "OverviewPage", icon: "house" },
 			{ path: "/net-worth/", label: "Net worth", page: "NetWorthPage", icon: "wallet" },
 		],
 	},
 	{
 		heading: "Plan",
 		routes: [
-			{ path: "/projection/", label: "Overview", page: "ProjectionPage", icon: "chart-line" },
+			{ path: "/projection/", label: "Projection", page: "ProjectionPage", icon: "chart-line" },
 			{
 				path: "/milestones/",
 				label: "Milestones",

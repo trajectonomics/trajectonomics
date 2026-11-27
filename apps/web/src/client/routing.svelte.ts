@@ -1,3 +1,4 @@
+import { isCliError } from "../lib/edit/failure"
 import {
 	documentWith,
 	flowIdsAfter,
@@ -19,7 +20,7 @@ class Routing {
 	/** The ids of the Flows of the document the last save sent, in order, which a refusal's position in its path names. */
 	sent = $state<string[]>([])
 	private readonly failure = $derived(editSession.source === SOURCE ? editSession.failure : null)
-	/** The message of a refusal or a failure to reach traj: the CLI's words, shown as they are. */
+	/** The message of a refusal or a failure to reach traj, as its source words it: the CLI's, or the server's own. */
 	readonly message = $derived.by(() => {
 		if (
 			editSession.source === SOURCE &&
@@ -30,6 +31,16 @@ class Routing {
 		return this.refused !== null && placeOf(this.refused, this.sent) !== null
 			? this.refused.message
 			: null
+	})
+	/** Whether `message` is the CLI's own words, or the server's or the page's sentence about not reaching it. */
+	readonly messageFromCli = $derived.by(() => {
+		if (
+			editSession.source === SOURCE &&
+			(editSession.failure !== null || editSession.error !== null)
+		) {
+			return isCliError(editSession.failure)
+		}
+		return this.refused !== null && placeOf(this.refused, this.sent) !== null
 	})
 	/**
 	 * The refusal the What-if session's own read states for a routing list it holds a Set of (`cashflow.*`): the CLI's error, whose

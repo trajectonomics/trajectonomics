@@ -58,7 +58,7 @@ describe("the home on the Assets and debts page", () => {
 		expect(body).toContain("Rises 3.00% a year (your own estimate)")
 		expect(body).toContain("1.00% of its value a year")
 		expect(body).toContain("Value of home at the close of each year")
-		expect(body).toContain("Its loan is paid off on 2028-07-15.")
+		expect(body).toContain("Its loan is paid off on 15 Jul 2028.")
 		expect(body).toContain("Running costs")
 		expect(body).toContain('aria-label="Include home in the what-if"')
 		expect(body).toContain("not taxed in this plan unless a Tally label is set")
@@ -67,7 +67,7 @@ describe("the home on the Assets and debts page", () => {
 
 	test("a row's words and its money are separated by a space", () => {
 		const text = page("assets").replace(/<!---->|<[^>]*>/g, "")
-		expect(text).toMatch(/On 2027-07-15 for\s+\S*1,500,000\.00/)
+		expect(text).toMatch(/On 15 Jul 2027 for\s+\S*1,500,000\.00/)
 		expect(text).toMatch(/With a loan of\s+\S*1,200,000\.00/)
 		expect(text).not.toMatch(/for\d|loan of\d/)
 	})

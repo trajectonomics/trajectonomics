@@ -26,17 +26,17 @@ const household: HouseholdDocument = {
 }
 
 describe("personCards", () => {
-	test("lists each person's role, birth month and life expectancy as the stored text", () => {
+	test("lists each person's role, birth month and life expectancy in the Dashboard's format", () => {
 		expect(personCards(household)).toEqual([
-			{ id: "me", role: "Account holder", born: "1990-06", lifeExpectancy: "90", joins: null },
+			{ id: "me", role: "Account holder", born: "Jun 1990", lifeExpectancy: "90", joins: null },
 			{
 				id: "partner",
 				role: "Partner",
-				born: "1992-02",
+				born: "Feb 1992",
 				lifeExpectancy: "88",
-				joins: "2028-01",
+				joins: "Jan 2028",
 			},
-			{ id: "mali", role: "Dependent, child", born: "2027-09", lifeExpectancy: "90", joins: null },
+			{ id: "mali", role: "Dependent, child", born: "Sep 2027", lifeExpectancy: "90", joins: null },
 		])
 	})
 

@@ -1,5 +1,6 @@
 import type { Baseline, ProjectionRun, Read, ScenarioAccount } from "../../contract"
 import { formatBps } from "../../format/bps"
+import { formatDate } from "../../format/date"
 import { percentWords } from "../../format/percent"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import type { Words } from "../words"
@@ -66,7 +67,7 @@ export function accountCards(
 			kind: account.kind,
 			rate: `${formatBps(account.rate)}%`,
 			compounding: account.compounding ?? null,
-			lockedUntil: account.lockedUntil ?? null,
+			lockedUntil: account.lockedUntil === undefined ? null : formatDate(account.lockedUntil),
 			balance: balanceOf(account, baseline),
 			payout: payoutWords(account, names),
 			payoutHow: payoutHowWords(account),

@@ -41,7 +41,7 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 	<div class="space-y-6">
 		<SegmentedControl
 			name="scenario"
-			label="Scenario"
+			label="Plan"
 			{options}
 			value={name}
 			onChange={onScenario}

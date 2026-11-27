@@ -38,12 +38,12 @@ const view = $derived(allowancesView(data))
 			<summary class="cursor-pointer font-medium">Tax figures used</summary>
 			<ul class="mt-2 list-disc space-y-1 pl-5">
 				{#each view.assumptions as line (line.key)}
-					<li><code class="font-mono text-xs">{line.path}</code>: {line.text}</li>
+					<li><code class="font-mono text-xs">{line.path}</code>: <span data-cli>{line.note}</span> {line.used}</li>
 				{/each}
 			</ul>
 		</details>
 	{/if}
 	<ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-		{#each view.notes as note, index (index)}<li>{note}</li>{/each}
+		{#each view.notes as note (note.text)}<li>{#if note.fromCli}<span data-cli>{note.text}</span>{:else}{note.text}{/if}</li>{/each}
 	</ul>
 </div>

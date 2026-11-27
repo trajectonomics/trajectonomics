@@ -44,7 +44,7 @@ async function apply(event: SubmitEvent): Promise<void> {
 	</div>
 	{#if source}<ChanceSource {source} />{/if}
 	{#if read && !read.ok}
-		<p role="alert" class="text-sm text-destructive">{read.error.message}</p>
+		<p role="alert" class="text-sm text-destructive" data-cli>{read.error.message}</p>
 	{:else if !read}
 		<p class="text-sm text-muted-foreground">No chance of success is read yet: enter the paths and the seed.</p>
 	{/if}

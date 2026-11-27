@@ -40,12 +40,12 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 </script>
 
 {#if name === null || read === undefined}
-	<EmptyState title="No Scenario to project" />
+	<EmptyState title="No plan to project" />
 {:else}
 	<div class="space-y-6">
 		<SegmentedControl
 			name="scenario"
-			label="Scenario"
+			label="Plan"
 			{options}
 			value={name}
 			onChange={onScenario}

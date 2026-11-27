@@ -4,6 +4,7 @@ import { GOLDEN_ALLOWANCES, inYear, withoutTarget, withSsf } from "./fixtures.te
 import { allowancesSummaryOf } from "./home"
 import { draftOf, planFromDraft } from "./inputs"
 import { chosenLabels, moved, orderOf, toggled } from "./order"
+import { ESTIMATE_NOTE } from "./words"
 import { allowancesView } from "./years"
 
 const RMF = "allowance.retirement.rmf"
@@ -126,9 +127,15 @@ describe("the reading of one allowances result", () => {
 	})
 
 	test("the estimate sentence is said once: the CLI's note stands, ours is added only when it is missing", () => {
-		const said = (notes: readonly string[]) => notes.filter((note) => /tax advice/i.test(note))
+		const said = (notes: readonly { text: string }[]) =>
+			notes.filter((note) => /tax advice/i.test(note.text))
 		expect(said(allowancesView(GOLDEN_ALLOWANCES).notes)).toHaveLength(1)
 		expect(said(allowancesView({ ...GOLDEN_ALLOWANCES, notes: [] }).notes)).toHaveLength(1)
+		const ours = allowancesView({ ...GOLDEN_ALLOWANCES, notes: [] }).notes.filter(
+			(note) => !note.fromCli,
+		)
+		expect(ours.map((note) => note.text)).toEqual([ESTIMATE_NOTE])
+		expect(allowancesView(GOLDEN_ALLOWANCES).notes.every((note) => note.fromCli)).toBe(true)
 	})
 
 	test("SSF is stated as no longer deductible and never as a missed saving", () => {

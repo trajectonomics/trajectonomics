@@ -14,8 +14,8 @@ describe("flowCards", () => {
 			amount: "90000.00",
 			frequency: "monthly",
 			startLabel: "Starts",
-			start: { text: "2026-11-01", parts: ["2026-11-01"] },
-			end: { text: "2050-05-14", parts: ["2050-05-14"] },
+			start: { text: "1 Nov 2026", parts: ["1 Nov 2026"] },
+			end: { text: "14 May 2050", parts: ["14 May 2050"] },
 			startAnchor: null,
 			endAnchor: null,
 			growth: "Follows inflation",
@@ -60,7 +60,7 @@ describe("flowCards of a once Flow", () => {
 		const [card] = flowCards([bonus], "income")
 		expect(card).toMatchObject({
 			startLabel: "On",
-			start: { text: "2027-03-01" },
+			start: { text: "1 Mar 2027" },
 			end: null,
 			endAnchor: null,
 		})
@@ -75,7 +75,7 @@ describe("flowCards of a once Flow", () => {
 			amount: "1200.00",
 		})
 		const [card] = flowCards([fee], "expense")
-		expect(card).toMatchObject({ startLabel: "On", start: { text: "2027-03-01" }, end: null })
+		expect(card).toMatchObject({ startLabel: "On", start: { text: "1 Mar 2027" }, end: null })
 	})
 
 	test("a recurring expense still reads Starts and Ends", () => {
@@ -90,8 +90,8 @@ describe("flowCards of a once Flow", () => {
 		const [card] = flowCards([rent], "expense")
 		expect(card).toMatchObject({
 			startLabel: "Starts",
-			start: { text: "2026-11-01" },
-			end: { text: "2030-01-01" },
+			start: { text: "1 Nov 2026" },
+			end: { text: "1 Jan 2030" },
 		})
 	})
 })
@@ -174,7 +174,7 @@ describe("flowCards with a Milestone date", () => {
 			endAt: "retire",
 		}
 		const [card] = flowCards([rent as ScenarioFlow], "expense")
-		expect(card?.start.text).toBe("2026-10-31")
+		expect(card?.start.text).toBe("31 Oct 2026")
 		expect(card?.end?.text).toBe("When retire fires")
 	})
 })

@@ -1,4 +1,5 @@
 import type { Fi, HouseholdDocument, ProjectionChance, Read, Snapshot } from "../../contract"
+import { formatDate } from "../../format"
 import { type BestCaseView, fiModelOf, type UnreachableFi } from "../fi/model"
 import { householdOf, type PersonNames, personNames } from "../item-names"
 import { noteAnchor } from "../projection/notes"
@@ -19,8 +20,9 @@ export interface HeroWarning {
 export interface PlanNote {
 	/** The words that label the note: "Your plan as written:". */
 	readonly label: string
-	/** The CLI's note, or the chance's own horizon and counts when it states no success note. */
+	/** The CLI's note, or the chance's own horizon and counts when it states none; `fromCli` says which. */
 	readonly text: string
+	readonly fromCli: boolean
 }
 
 /** Home's answer to "when could I stop working?", built only from Snapshot fields. */
@@ -95,8 +97,8 @@ function planNoteOf(chance: Read<ProjectionChance> | undefined): PlanNote | null
 	const stated = chance.data.notes.find((note) => note.startsWith(SUCCESS_NOTE_PREFIX))
 	const text =
 		stated ??
-		`${SUCCESS_NOTE_PREFIX}${chance.data.horizon} in ${chance.data.succeeded} of ${chance.data.paths} simulated markets, which is not a guarantee.`
-	return { label: "Your plan as written:", text }
+		`${SUCCESS_NOTE_PREFIX}${formatDate(chance.data.horizon)} in ${chance.data.succeeded} of ${chance.data.paths} simulated markets, which is not a guarantee.`
+	return { label: "Your plan as written:", text, fromCli: stated !== undefined }
 }
 
 /** The unreachable answer: the horizon, the FI model's binding sentence and the CLI's best case, if any. */
@@ -108,9 +110,8 @@ function unreachableSentence(model: UnreachableFi): string {
 
 /** What the CLI's best case says: when the money runs out, or when the buffer is breached. */
 function bestCaseSentence(best: BestCaseView): string {
-	if (best.kind === "runsOut") {
+	if (best.kind === "runsOut")
 		return `If earned income stopped in ${best.month}, the money runs out on ${best.date}.`
-	}
 	return `If earned income stopped in ${best.month}, accessible net worth falls short of the buffer on ${best.date}.`
 }
 
@@ -129,6 +130,5 @@ function warningsOf(fi: Fi, plan: string): HeroWarning[] {
 }
 
 export function warningsLabel(count: number): string | null {
-	if (count === 0) return null
-	return count === 1 ? "1 thing to check" : `${count} things to check`
+	return count === 0 ? null : count === 1 ? "1 thing to check" : `${count} things to check`
 }

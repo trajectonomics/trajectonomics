@@ -79,13 +79,13 @@ describe("the household card", () => {
 		expect(body).not.toContain("This plan changed since the page read it.")
 	})
 
-	test("lists each person's role, birth month and life expectancy as the stored text", () => {
+	test("lists each person's role, birth month and life expectancy in the Dashboard's format", () => {
 		const body = card()
 		expect(body).toContain("Account holder")
-		expect(body).toContain("1990-06")
+		expect(body).toContain("Jun 1990")
 		expect(body).toContain("Dependent, child")
 		expect(body).toContain("Joins")
-		expect(body).toContain("2028-01")
+		expect(body).toContain("Jan 2028")
 	})
 
 	test("labels each anchored date with the anchor's text: at an age, or at life end", () => {
