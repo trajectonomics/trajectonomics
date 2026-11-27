@@ -1,8 +1,10 @@
 // The write path of the loopback server: the session token, and POST /edit, which runs one Edit through
 // traj, re-reads the Snapshot and answers it ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 import type { Snapshot } from "../src/lib/contract"
+import { writtenRereadFailed } from "../src/lib/edit/failure"
 import { followCompare, followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
+import { createEditGate } from "./edit-gate"
 import { changedBy, paramsAfter, rereadInputs } from "./run-reread"
 import { runEdit } from "./serve-apply"
 import { answerOf, failure, readEdit, readReread, refused } from "./serve-edit-answer"
@@ -20,7 +22,7 @@ export function createEditor(options: EditorOptions): Editor {
 	let params = options.params
 	let body: string | null = null
 	let held: Snapshot | null = null
-	let busy = false
+	const gate = createEditGate()
 
 	/** Keeps a Snapshot that ran as the served body and as the one a later reread may keep reads of. */
 	function keep(run: SnapshotRun): SnapshotRun {
@@ -50,7 +52,10 @@ export function createEditor(options: EditorOptions): Editor {
 			scenarios: followPlan(params.scenarios, edit),
 			compare: followCompare(params.compare, edit),
 		}
-		return answerOf(await refresh(), undefined, run.droppedAnchors, run.droppedOwners)
+		// The write is in, and `params` already follows it: a failed read here must not say the Edit did not run.
+		const again = await refresh()
+		if (again.ok) return answerOf(again, undefined, run.droppedAnchors, run.droppedOwners)
+		return failure(200, writtenRereadFailed())
 	}
 
 	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data; or reads one path. */
@@ -86,14 +91,11 @@ export function createEditor(options: EditorOptions): Editor {
 			contentType: request.headers.get("content-type"),
 			expectedToken: options.token,
 			ready: body !== null,
-			busy,
+			busy: gate.busy,
 			port,
 		})
 		if (refusal) return Promise.resolve(refused(refusal.status, refusal.code, refusal.message))
-		busy = true
-		return work().finally(() => {
-			busy = false
-		})
+		return gate.run(work)
 	}
 
 	return {
