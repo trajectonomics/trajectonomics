@@ -188,8 +188,8 @@ function choose(plan: string, tier: string): void {
 {/snippet}
 
 <div class="plan-peaks">
-	<h2 id="peaks-title" class="meta-label section-title peaks-title">
-		<span>What each plan gives</span>
+	<h2 class="meta-label section-title peaks-title">
+		<span id="peaks-title">What each plan gives</span>
 		<button
 			class="peaks-info"
 			type="button"

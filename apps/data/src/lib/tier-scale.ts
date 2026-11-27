@@ -32,14 +32,16 @@ export function sourceTier(
 	catalog: PlanCatalog,
 	key: PeakWindowKey,
 ): MeasuredTier | null {
-	const preferred = measured.find((entry) => entry.tier === current)
-	if (preferred !== undefined && sourceMultiplier(preferred, catalog, key) !== null)
-		return preferred
+	const usable = measured.filter(
+		(entry) => entry[key] !== null && sourceMultiplier(entry, catalog, key) !== null,
+	)
+	const preferred = usable.find((entry) => entry.tier === current)
+	if (preferred !== undefined) return preferred
 	let best: MeasuredTier | null = null
-	for (const entry of measured) {
-		if (sourceMultiplier(entry, catalog, key) === null) continue
-		const tokens = entry.sevenDays?.tokens ?? -1
-		if (best === null || tokens > (best.sevenDays?.tokens ?? -1)) best = entry
+	for (const entry of usable) {
+		if (best === null || (entry.sevenDays?.tokens ?? -1) > (best.sevenDays?.tokens ?? -1)) {
+			best = entry
+		}
 	}
 	return best
 }
@@ -67,7 +69,7 @@ export function estimateCell(
 	const factor = ratio / fromRatio
 	return {
 		kind: "estimated",
-		tokens: Math.floor(peak.tokens * factor),
+		tokens: Math.floor((peak.tokens * ratio) / fromRatio),
 		factor,
 		fromTier: from.tier,
 	}
