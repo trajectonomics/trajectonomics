@@ -7,6 +7,7 @@ import { isFixed } from "../types"
 import { fixedAmountAt } from "./amount"
 import { flowOccurrences } from "./flow-occurrences"
 import { compareIds } from "./order"
+import { inflationOf } from "./run-scenario"
 
 export interface DatedEvent {
 	readonly date: DateString
@@ -60,7 +61,10 @@ function eventsOf(
 			}
 			events.push(
 				isFixed(flow)
-					? { ...event, amount: fixedAmountAt(flow, occurrence.years, scenario.economy.inflation) }
+					? {
+							...event,
+							amount: fixedAmountAt(flow, occurrence.years, inflationOf(scenario), occurrence.date),
+						}
 					: event,
 			)
 		}

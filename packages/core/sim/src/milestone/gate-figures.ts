@@ -1,5 +1,6 @@
 import { addDays } from "../calendar/arith"
 import type { DatedEvent } from "../engine/events"
+import { inflationOf } from "../engine/run-scenario"
 import type { AccountState, StateMap } from "../engine/state"
 import { valuation } from "../engine/value"
 import type { DateString, MilestoneTerms, ReferenceWindow, Scenario, Timeline } from "../types"
@@ -21,7 +22,7 @@ export function planViewOf(
 		flows: scenario.flows,
 		pastHorizon: addDays(timeline.horizon, 1),
 		start: timeline.start,
-		inflation: scenario.economy.inflation,
+		inflation: inflationOf(scenario),
 	}
 }
 

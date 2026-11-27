@@ -1,6 +1,6 @@
 import type { DateString } from "../types"
 import type { ChancePathOutcome } from "../types/path"
-import type { PathOutcome } from "./path"
+import type { PathOutcome } from "./path-outcome"
 
 /**
  * The Milestones that fired on one path, by id, in the order the run reported them. Built with
