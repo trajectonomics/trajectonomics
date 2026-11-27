@@ -105,7 +105,7 @@ describe("a loan switched off is one group", () => {
 		const kept = withGroupOff(start, SPEC, SPEC.paths.slice(1))
 		const tried = withSet(kept, "accounts.boat-loan.rate", 700)
 		expect(changesOf(tried).map((change) => change.label)).toEqual([
-			"Boat-loan rate set to 700",
+			"Boat-loan rate set to 7.00%",
 			"Loan boat-loan switched off",
 		])
 		const group = changesOf(tried).find((change) => change.kind === "group")

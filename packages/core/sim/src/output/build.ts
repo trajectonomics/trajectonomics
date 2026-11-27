@@ -1,4 +1,5 @@
 import type { EngineRun } from "../engine/result"
+import { inflationOf } from "../engine/run-scenario"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
 import { buildCashflow } from "./cashflow"
@@ -54,7 +55,7 @@ export function buildProjection(
 	const shown = run.snapshots.filter(
 		(snapshot) => reported.has(snapshot.date) || snapshot.date === run.runsOut?.date,
 	)
-	const rows = buildRows(shown, timeline, rules, scenario.economy.inflation)
+	const rows = buildRows(shown, timeline, rules, inflationOf(scenario))
 	if (rows.problem !== undefined) return { problem: rows.problem }
 	const end = run.runsOut?.date ?? timeline.horizon
 	const periods = buildPeriods(timeline.start, end, run.runsOut?.date)

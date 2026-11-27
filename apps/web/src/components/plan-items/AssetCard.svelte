@@ -13,6 +13,8 @@ interface Props {
 	card: AssetCardView
 	currency: string
 	editable: boolean
+	/** False on the drawer's face, which shows no Edit control: the form is right below it. */
+	actions?: boolean
 	/** The plan and the content hash the page read for it: the what-if switches name both. */
 	plan: string
 	contentHash: string
@@ -20,17 +22,17 @@ interface Props {
 	onTry: () => void
 }
 
-let { card, currency, editable, plan, contentHash, onEdit, onTry }: Props = $props()
+let { card, currency, editable, actions = true, plan, contentHash, onEdit, onTry }: Props = $props()
 const title = $derived(nameOf(currentAccountNames(), card.id))
 const off = $derived(whatIfSession.isGroupOffIn(plan, card.switch.spec))
 const button =
-	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 </script>
 
 <li class="min-w-0 rounded-lg border border-border bg-card p-4 {off ? 'opacity-60' : ''}">
 	<div class="flex flex-wrap items-start justify-between gap-3">
 		<h3 class="min-w-0 font-semibold break-all"><AccountName id={card.id} /></h3>
-		{#if editable && card.outside.length === 0}
+		{#if actions && editable && card.outside.length === 0}
 			<button type="button" aria-label="Edit asset {title}" onclick={onEdit} class="shrink-0 {button}">Edit</button>
 		{/if}
 	</div>

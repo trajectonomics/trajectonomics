@@ -32,6 +32,27 @@ for (const path of ["/net-worth/", "/reports/"]) {
 	})
 }
 
+test("hosted: a compact card's drawer is a read of the facts, with no Edit", async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	const requests = logRequests(page)
+	await openHosted(page, "/projection/", "light", "?scenario=base&items=income")
+
+	await page.locator('[role="tabpanel"] button[data-plan-item]').first().click()
+	const drawer = page.locator("dialog[open]")
+	await expect(drawer).toBeVisible()
+	await expect(drawer.locator("dt").first()).toBeVisible()
+
+	// The hosted build has no write path: no Save, no Make plan, no Add, and no form to type in.
+	for (const name of [/^Save$/, /^Make plan$/, /^Add /]) {
+		await expect(drawer.getByRole("button", { name })).toHaveCount(0)
+	}
+	await expect(drawer.locator("input, select, textarea")).toHaveCount(0)
+	await expect(drawer.getByRole("button", { name: "Close the drawer" })).toBeEnabled()
+	expect(strays(requests), "requests that are not a GET under /demo/ of this origin").toEqual([])
+	expect(failures(requests), "responses with an error status under /demo/").toEqual([])
+	expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
+})
+
 test("hosted: the plan menu's keys skip the switched-off New plan and wrap", async ({ page }) => {
 	await page.setViewportSize({ width: 360, height: 800 })
 	await openHosted(page, "/net-worth/")

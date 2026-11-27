@@ -1,6 +1,7 @@
 /* The value and cache scatters: two axes, one dot per plan, and the best-value area shaded. */
 
 .scatter-figure {
+	position: relative;
 	margin: 32px 0 0;
 	padding: 24px 0 0;
 	border-top: 1px solid var(--ds-color-border);
@@ -50,27 +51,26 @@
 }
 
 .scatter-dot {
-	fill: var(--ds-color-primary);
+	fill: var(--ds-color-secondary);
+	stroke: var(--plan-ink, var(--ds-color-primary));
+	stroke-width: 1.5;
+	vector-effect: non-scaling-stroke;
 }
 
 /* A hollow dot is a lower bound: the most we used, not an estimate. */
 .scatter-dot-open {
 	fill: var(--ds-color-background);
-	stroke: var(--ds-color-primary);
+	stroke: var(--plan-ink, var(--ds-color-primary));
 	stroke-width: 2;
-	vector-effect: non-scaling-stroke;
 }
 
-.scatter-logo {
-	fill: var(--ds-color-primary-foreground);
-}
-
-.scatter-logo-open {
-	fill: var(--ds-color-primary);
+.scatter-logo,
+.scatter-logo-open,
+.scatter-initial {
+	fill: var(--plan-ink, var(--ds-color-foreground));
 }
 
 .scatter-initial {
-	fill: var(--ds-color-primary-foreground);
 	font-size: 10px;
 	font-weight: 600;
 }

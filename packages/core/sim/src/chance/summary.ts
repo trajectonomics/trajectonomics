@@ -3,7 +3,7 @@ import type { ChanceOfSuccess, ChanceOfSuccessOptions, ChanceRunsOut } from "../
 import { bandAt } from "./band"
 import { milestoneSummaries } from "./milestone-dates"
 import { pathOutcomes } from "./outcomes"
-import type { PathOutcome } from "./path"
+import type { PathOutcome } from "./path-outcome"
 import { spendingOf } from "./spending"
 
 /** `succeeded × 10000 / paths`, floored, in integer arithmetic. */

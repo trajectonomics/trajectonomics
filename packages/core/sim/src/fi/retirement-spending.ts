@@ -41,10 +41,8 @@ export function retirementMeasurements(
 	const measurements: RetirementMeasurement[] = []
 	for (let due = from; due <= through; due = addMonthsClamped(due, 1)) {
 		const years = growthYears(timeline.start, due)
-		measurements.push({
-			date: landedDate(due, calendar),
-			amount: fixedAmountAt(flow, years, inflation),
-		})
+		const date = landedDate(due, calendar)
+		measurements.push({ date, amount: fixedAmountAt(flow, years, inflation, date) })
 	}
 	return measurements
 }

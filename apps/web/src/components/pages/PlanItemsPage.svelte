@@ -2,6 +2,7 @@
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import PlanItemsBody from "../plan-items/PlanItemsBody.svelte"
 import PageShell from "../ui/PageShell.svelte"
+import SiteLink from "../ui/SiteLink.svelte"
 
 interface Props {
 	/** Which items the page lists: Income, Expenses, or Assets and debts. */
@@ -18,6 +19,12 @@ const page = $derived(PLAN_PAGES[kind])
 
 <PageShell title={page.title}>
 	{#snippet children(snapshot)}
+		<SiteLink
+			href="/projection/"
+			class="text-sm text-accent underline-offset-4 hover:underline print:hidden"
+		>
+			← Plan
+		</SiteLink>
 		<PlanItemsBody {snapshot} {kind} {scenario} {editable} />
 	{/snippet}
 </PageShell>

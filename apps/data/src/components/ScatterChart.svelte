@@ -1,6 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
+import { planColour } from "../lib/plan-colour"
 import { planLogo } from "../lib/plan-logos"
 import { type ScatterPoint, scatterAriaLabel, scatterGeometry } from "../lib/scatter"
 import { type TickKind, tickText } from "../lib/tick-label"
@@ -25,14 +26,48 @@ let {
 
 const chart = $derived(scatterGeometry(points, xDomain))
 const label = $derived(scatterAriaLabel(points, xTitle, yTitle))
+let active = $state<string | null>(null)
+const activeDot = $derived(chart?.dots.find((dot) => dot.key === active) ?? null)
+
+function dotLabel(dot: ScatterPoint): string {
+	return `${dot.label}: ${tickText(yKind, dot.y)} ${yTitle}, ${tickText(xKind, dot.x)} ${xTitle}`
+}
+
+function pointerLeft(event: PointerEvent) {
+	const plot = event.currentTarget
+	const focused = document.activeElement
+	if (plot instanceof HTMLElement && focused instanceof Node && plot.contains(focused)) return
+	active = null
+}
+
+function focusLeft(event: FocusEvent) {
+	const plot = event.currentTarget
+	const next = event.relatedTarget
+	if (plot instanceof HTMLElement && next instanceof Node && plot.contains(next)) return
+	active = null
+}
+
+function chooseKey(event: KeyboardEvent, plan: string) {
+	if (event.key !== "Enter" && event.key !== " ") return
+	event.preventDefault()
+	active = plan
+}
 </script>
 
 {#if chart !== null}
-	<figure class="scatter-figure">
+	<figure
+		class="scatter-figure"
+		class:is-choosing={active !== null}
+		onpointerleave={pointerLeft}
+		onfocusout={focusLeft}
+	>
+		{#if activeDot !== null}
+			<p class="chart-readout">{dotLabel(activeDot)}</p>
+		{/if}
 		<svg
 			class="scatter-svg"
 			viewBox={`0 0 ${chart.width} ${chart.height}`}
-			role="img"
+			role="group"
 			aria-label={label}
 		>
 			<rect
@@ -90,8 +125,17 @@ const label = $derived(scatterAriaLabel(points, xTitle, yTitle))
 			{#each chart.dots as dot, index (dot.key)}
 				{@const logo = planLogo(dot.key)}
 				{@const anchor = dot.cx > chart.width * 0.72 ? "end" : "start"}
-				<g class="scatter-mark">
-					<title>{`${dot.label}: ${tickText(yKind, dot.y)} ${yTitle}, ${tickText(xKind, dot.x)} ${xTitle}`}</title>
+				<g
+					class="scatter-mark"
+					class:scatter-mark-on={active === null || active === dot.key}
+					style={`--plan-ink: ${planColour(dot.key)}`}
+					role="button"
+					tabindex="0"
+					aria-label={dotLabel(dot)}
+					onpointerenter={() => (active = dot.key)}
+					onfocus={() => (active = dot.key)}
+					onkeydown={(event) => chooseKey(event, dot.key)}
+				>
 					<circle
 						class="scatter-dot"
 						class:scatter-dot-open={dot.hollow}

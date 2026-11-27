@@ -5,6 +5,7 @@
 }
 
 .bars-figure {
+	position: relative;
 	margin: 0;
 	padding: 24px 0 0;
 }
@@ -46,25 +47,24 @@
 }
 
 .bars-fill {
-	fill: var(--ds-color-primary);
+	fill: var(--plan-ink, var(--ds-color-primary));
 }
 
 /* A lower bound is hatched, never a solid figure, so it cannot read as a limit. */
 .bars-fill-fallback {
 	fill: url(#plan-bar-hatch);
-	stroke: var(--ds-color-muted-foreground);
+	stroke: var(--plan-ink, var(--ds-color-muted-foreground));
 	stroke-width: 1;
 	vector-effect: non-scaling-stroke;
 }
 
-/* A rough estimate steps back but keeps its shape. */
+/* A rough estimate steps back but keeps its brand colour. */
 .bars-fill-rough {
-	fill: var(--ds-color-muted-foreground);
 	opacity: 0.55;
 }
 
 .bars-stub {
-	fill: var(--ds-color-muted-foreground);
+	fill: var(--plan-ink, var(--ds-color-muted-foreground));
 	opacity: 0.45;
 }
 

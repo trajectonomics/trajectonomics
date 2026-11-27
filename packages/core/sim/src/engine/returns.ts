@@ -1,3 +1,4 @@
+import type { PricePath } from "../money/inflation"
 import type { AccountId, BasisPoints, DateString } from "../types"
 
 /** One dated span return for one Account. */
@@ -22,6 +23,8 @@ export interface ReturnSeries {
 export interface Returns {
 	readonly returnsVersion: 1
 	readonly series: readonly ReturnSeries[]
+	/** The run's Price path when it follows one Market path's inflation (ADR 0033). */
+	readonly prices?: PricePath
 }
 
 /** A Return row with its window and day count fixed at run start. */

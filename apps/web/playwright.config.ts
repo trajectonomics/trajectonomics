@@ -20,7 +20,7 @@ export default defineConfig({
 	testMatch: "**/*.e2e.ts",
 	fullyParallel: true,
 	retries: 0,
-	workers: process.env["CI"] ? 2 : "50%",
+	workers: process.env["CI"] ? 4 : "50%",
 	reporter: process.env["CI"] ? [["list"], ["html", { open: "never" }]] : "list",
 	use: { trace: "retain-on-failure" },
 	projects: [

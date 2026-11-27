@@ -17,7 +17,7 @@ let { unreached }: Props = $props()
 		<h2 id="milestones-unreached" class="text-base font-semibold">Unreached</h2>
 		<ul class="space-y-2">
 			{#each unreached as milestone (milestone.id)}
-				<li class="rounded-lg border border-border bg-card p-4">
+				<li id={milestone.id} class="rounded-lg border border-border bg-card p-4">
 					<p class="font-medium"><ItemName kind="milestone" id={milestone.id} /></p>
 					<p class="mt-1 text-sm text-muted-foreground">
 						Not reached by <time datetime={milestone.notReachedBy}>{formatDate(milestone.notReachedBy)}</time>
