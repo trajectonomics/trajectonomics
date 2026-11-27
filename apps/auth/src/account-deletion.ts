@@ -51,14 +51,20 @@ export async function finishAccountDeletion(input: {
 	} catch {
 		// A leftover row is not worth failing the response for; the id is no longer a live account.
 	}
-	const row = await findPendingDeletion(input.db, input.authUserId)
-	if (row === undefined || row.acknowledgedAt !== null) return
-	await deliverPendingDeletion({
-		db: input.db,
-		data: input.data,
-		row,
-		...(input.nowMs === undefined ? {} : { nowMs: input.nowMs }),
-	})
+	// The user row is already gone here, so nothing below may fail the response: the page would
+	// then say "not deleted" for a deleted account. The queued row stays, and the cron retries it.
+	try {
+		const row = await findPendingDeletion(input.db, input.authUserId)
+		if (row === undefined || row.acknowledgedAt !== null) return
+		await deliverPendingDeletion({
+			db: input.db,
+			data: input.data,
+			row,
+			...(input.nowMs === undefined ? {} : { nowMs: input.nowMs }),
+		})
+	} catch {
+		// Left for the cron.
+	}
 }
 
 /** The `deleteUser` options: queue first, then delete, then tell the data side. */
