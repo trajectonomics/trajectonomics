@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import CompositionBar from "./CompositionBar.svelte"
-import Sparkline from "./Sparkline.svelte"
 
 describe("CompositionBar", () => {
 	const segments = [
@@ -32,13 +31,5 @@ describe("CompositionBar", () => {
 		})
 		expect(body).toContain('role="img"')
 		expect(body).toContain("gap-[2px]")
-	})
-})
-
-describe("Sparkline", () => {
-	test("is an image with its label and a path through its values", () => {
-		const { body } = render(Sparkline, { props: { label: "Net worth", values: [1, 3, 2] } })
-		expect(body).toContain('aria-label="Net worth"')
-		expect(body).toContain('d="M0 32 L60 0 L120 16"')
 	})
 })

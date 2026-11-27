@@ -4,6 +4,7 @@ import { netWorthPageView } from "../../lib/view/net-worth/page"
 import { chooseScenario } from "../../lib/view/plan"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
+import PnlCard from "../net-worth/PnlCard.svelte"
 import RecordValues from "../record-values/RecordValues.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import ProjectionWhatIf from "../what-if/ProjectionWhatIf.svelte"
@@ -24,6 +25,7 @@ let { scenario }: Props = $props()
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
+		{@const view = netWorthPageView(snapshot)}
 		<WhatIfAbove open={lens !== null}>
 			{#snippet whatIf()}
 				{#if lens && plan !== null}
@@ -31,8 +33,9 @@ let { scenario }: Props = $props()
 				{/if}
 			{/snippet}
 			<div class="space-y-8">
+				<PnlCard pnl={view.pnl} />
 				<RecordValues {snapshot} />
-				<NetWorthContent view={netWorthPageView(snapshot)} />
+				<NetWorthContent {view} />
 			</div>
 		</WhatIfAbove>
 	{/snippet}

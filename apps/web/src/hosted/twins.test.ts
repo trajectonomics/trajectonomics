@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
-import { disabledTitle } from "../components/hosted/message"
+import { disabledTitle, INSTALL_URL } from "../components/hosted/message"
 import { chanceHref, futureHref } from "./chance-links"
 import { postEdit, postPreview } from "./edit-post"
 import { editSession } from "./edit-session.svelte"
+import { setupButton } from "./focus-setup"
 import { withBase, withSearch } from "./links"
 import { postReread } from "./reread"
 import { navPath, pageTitle } from "./routes"
@@ -54,6 +55,14 @@ describe("the hosted twins", () => {
 		expect((await postPreview("t", { kind: "delete-plan", name: "base" })).ok).toBe(false)
 		expect((await postReread("t", {})).ok).toBe(false)
 		expect(typeof (await readWhatIf({} as never, null, () => true))).toBe("string")
+	})
+
+	test("point the setup action at the install, where a visitor can make a plan", () => {
+		expect(setupButton()).toEqual({
+			label: "Start a plan",
+			href: INSTALL_URL,
+			external: true,
+		})
 	})
 
 	test("say on a switched-off control what it would do and where to do it", () => {

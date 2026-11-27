@@ -6,6 +6,7 @@
 		"lib/view/chance/links.ts": "chance-links.ts",
 		"lib/view/routes.ts": "routes.ts",
 		"lib/view/chance/path-state.ts": "path-state.ts",
+		"lib/view/overview/focus-setup.ts": "focus-setup.ts",
 		"lib/edit/shown.ts": "shown.ts",
 		"client/edit.svelte.ts": "edit-session.svelte.ts",
 		"client/edit-post.ts": "edit-post.ts",

@@ -30,6 +30,11 @@ const WORD: Readonly<Record<AmountKind, { readonly negative: Word; readonly posi
 	net: { negative: "Money out", positive: "Money in" },
 }
 
+/** The CLI's digits with at most its leading minus dropped: formatting, never parsing. */
+export function dropLeadingMinus(amount: string): string {
+	return amount.startsWith("-") ? amount.slice(1) : amount
+}
+
 /** A zero stated either way the CLI writes it: "0.00" or "-0.00". */
 const ZERO = /^0+(?:\.0+)?$/
 
@@ -39,7 +44,7 @@ const ZERO = /^0+(?:\.0+)?$/
  * their account type does. Zero has no direction at all.
  */
 export function directedAmount(amount: string, kind: AmountKind): DirectedAmount {
-	const digits = amount.startsWith("-") ? amount.slice(1) : amount
+	const digits = dropLeadingMinus(amount)
 	if (ZERO.test(digits)) return { word: null, digits }
 	return { word: WORD[kind][amount.startsWith("-") ? "negative" : "positive"], digits }
 }

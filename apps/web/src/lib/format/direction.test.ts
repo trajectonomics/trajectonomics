@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { directedAmount } from "./direction"
+import { directedAmount, dropLeadingMinus } from "./direction"
 
 /** A CLI amount and the digits a person reads: the string itself, or itself without its leading minus. */
 const AMOUNTS = [
@@ -12,6 +12,15 @@ const AMOUNTS = [
 	"-90071992547409.91",
 	"7.10",
 ] as const
+
+describe("dropLeadingMinus", () => {
+	test("drops one leading minus and changes no digit", () => {
+		expect(dropLeadingMinus("-12000.00")).toBe("12000.00")
+		expect(dropLeadingMinus("12000.00")).toBe("12000.00")
+		expect(dropLeadingMinus("-0.00")).toBe("0.00")
+		expect(dropLeadingMinus("--1.00")).toBe("-1.00")
+	})
+})
 
 describe("directedAmount", () => {
 	test("never changes a digit: the digits are the CLI's string with at most its leading minus removed", () => {
