@@ -1,3 +1,4 @@
+import { seriesWords } from "./series-ids"
 import { type ChartDef, type ChartKind, MAX_CHARTS, MAX_NAME } from "./types"
 
 /** An id from a name, unique among the ones taken: "My chart", then "my-chart-2". */
@@ -37,7 +38,7 @@ export function savedName(
 	names: ReadonlyMap<string, string>,
 ): string {
 	const chosen = typed.trim()
-	return chosen === "" ? defaultName(series.map((id) => names.get(id) ?? id)) : chosen
+	return chosen === "" ? defaultName(series.map((id) => names.get(id) ?? seriesWords(id))) : chosen
 }
 
 /** Adds a chart, or replaces the one with the same id. Refused (null) when the list is full. */

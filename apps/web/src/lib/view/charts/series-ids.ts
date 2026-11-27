@@ -11,7 +11,8 @@ function bare(id: string): string {
 function cashFields(seriesId: string): unknown[] | null {
 	if (!seriesId.startsWith(CASH)) return null
 	try {
-		return JSON.parse(seriesId.slice(CASH.length)) as unknown[]
+		const parsed: unknown = JSON.parse(seriesId.slice(CASH.length))
+		return Array.isArray(parsed) ? parsed : null
 	} catch {
 		return null
 	}
