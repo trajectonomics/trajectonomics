@@ -2,6 +2,7 @@
 title: วิธีติดตั้ง MooJot บน Android
 description: MooJot อ่านสลิปโอนเงินที่แอปธนาคารไทยเซฟไว้ แล้วบันทึกรายจ่ายทุกยอดลงในเครื่องให้เอง ตอนนี้ยังไม่มีใน Google Play นี่คือวิธีติดตั้งใน 2 นาที พร้อมวิดีโอสอน
 type: guide
+products: [openjot]
 publishedOn: 2026-11-23
 cover:
   src: /blog/posts/install-moojot-on-android/cover.webp

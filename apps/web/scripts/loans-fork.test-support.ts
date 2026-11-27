@@ -1,7 +1,7 @@
 // Forks a plan with a What-if session's changes straight through `traj`, to read the content hash of the plan
 // they make, without the Snapshot read an Edit ends with.
 import { writeCommand } from "../src/lib/edit/command"
-import { type Edit, editSchema } from "../src/lib/edit/edit"
+import { type Edit, singleWriteEditSchema } from "../src/lib/edit/edit"
 import { BINARY } from "./edit-fixture.test-support"
 import { env, hashOf } from "./loans-ledger.test-support"
 
@@ -18,7 +18,7 @@ export function forkHash(
 	changes: Pick<Copy, "sets" | "removals"> | null,
 ): string {
 	// Parsed as the server parses the body, so a change its guards refuse fails here too.
-	const edit = editSchema.parse({
+	const edit = singleWriteEditSchema.parse({
 		kind: "copy-plan",
 		from,
 		name,

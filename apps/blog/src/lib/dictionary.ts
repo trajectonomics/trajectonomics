@@ -1,5 +1,6 @@
 import { EN } from "./dictionary-en"
 import { TH } from "./dictionary-th"
+import type { FilterGroupName } from "./filters"
 import type { Language } from "./languages"
 import type { PostType } from "./posts"
 
@@ -25,6 +26,14 @@ export interface Dictionary {
 	readonly noPosts: string
 	readonly postTitleSuffix: string
 	readonly typeLabels: Readonly<Record<PostType, string>>
+	/** The front page's filter bar: its name, the option that clears a group, and each group's name. */
+	readonly filterLabel: string
+	readonly filterAll: string
+	readonly filterGroups: Readonly<Record<FilterGroupName, string>>
+	/** The line the front page shows when no Post matches the chosen filters. */
+	readonly noMatches: string
+	/** Live-region announcement written after a filter changes. */
+	readonly filterResults: (count: number) => string
 	readonly minutesRead: (minutes: number) => string
 	readonly byline: string
 	readonly availableIn: string

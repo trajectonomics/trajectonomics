@@ -45,7 +45,7 @@ The list of argv a Snapshot needs, computed from the parameters alone. Stage one
 _Avoid_: pipeline, workflow, job, script
 
 **Edit**:
-A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` writes, copy a plan, apply a Scenario document, delete a plan, rename it, keep notes on it, mark the main plan, or record values in the ledger. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot (and, for recorded values, what `traj` stated) or the CLI's error envelope.
+A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` writes, copy a plan, apply a Scenario document, delete a plan, rename it, keep notes on it, mark the main plan, record values in the ledger, or start a guided first plan. Each is one write, apart from the guided plan: two writes (the plan, then its household), and `scenario rm` when the household is refused (ADR 0031). The server runs each write dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot (and, for recorded values, what `traj` stated) or the CLI's error envelope.
 _Avoid_: save, mutation, update, PATCH, request, write
 
 **Value sheet**:

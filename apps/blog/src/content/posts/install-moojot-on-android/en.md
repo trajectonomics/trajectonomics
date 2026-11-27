@@ -2,6 +2,7 @@
 title: How to install MooJot on Android
 description: MooJot reads the payment slips your Thai banking apps save and logs every expense on your phone. It isn't on Google Play yet, so here is the two-minute install, with a video.
 type: guide
+products: [openjot]
 publishedOn: 2026-11-23
 cover:
   src: /blog/posts/install-moojot-on-android/cover.webp

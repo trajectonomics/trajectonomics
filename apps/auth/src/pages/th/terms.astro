@@ -1,0 +1,21 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import LegalPage from "../../components/LegalPage.astro"
+import Layout from "../../layouts/Layout.astro"
+import { dictionaryFor } from "../../lib/language"
+import { TERMS_TH } from "../../lib/legal-terms-th"
+
+const language = "th"
+const words = dictionaryFor(language)
+---
+
+<Layout
+	language={language}
+	page="terms"
+	title={`${words.termsTitle} — Trajectonomics`}
+	description={words.termsDescription}
+	indexed
+>
+	<LegalPage language={language} title={words.termsTitle} content={TERMS_TH} />
+</Layout>

@@ -110,4 +110,4 @@ gh api repos/VocaHQ/vocalinux -q .license.spdx_id
 
 ---
 
-ถ้าอยากเห็นว่าผมเลือก AI subscription ยังไงในแต่ละงบ อ่านต่อได้ที่ [AI Subscription ไหนดีที่สุดตามงบ](/blog/th/guides/ai-subscription-by-budget/)
+ถ้าอยากเห็นว่าผมเลือก AI subscription ยังไงในแต่ละงบ อ่านต่อได้ที่ [AI Subscription ไหนดีที่สุดตามงบ](/blog/th/compare/ai-subscription-by-budget/)

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { editSchema, writeCommand } from "../edit/edit"
+import { editSchema, singleWriteEditSchema, writeCommand } from "../edit/edit"
 import type { Addition } from "./additions"
 import { plannedWhatIfReads } from "./argv"
 import { whatIfSchema } from "./overrides"
@@ -79,7 +79,7 @@ describe("the reads of a what-if with Additions", () => {
 
 describe("the Edits that keep Additions", () => {
 	test("copy-plan and apply-overrides carry --add in the order traj applies them", () => {
-		const copy = editSchema.parse({
+		const copy = singleWriteEditSchema.parse({
 			kind: "copy-plan",
 			from: "base",
 			name: "early",
@@ -94,7 +94,7 @@ describe("the Edits that keep Additions", () => {
 			"--decimal",
 			"--json",
 		])
-		const apply = editSchema.parse({
+		const apply = singleWriteEditSchema.parse({
 			kind: "apply-overrides",
 			name: "base",
 			contentHash: HASH,

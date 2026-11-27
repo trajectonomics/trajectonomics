@@ -1,0 +1,78 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { dictionaryFor } from "../lib/dictionary"
+import { filterQuery } from "../lib/filter-query"
+import type { FilterGroup, FilterGroupName } from "../lib/filters"
+import { type Language, treePath } from "../lib/languages"
+import type { PostType } from "../lib/posts"
+import { type Product, productName } from "../lib/products"
+import { BLOG_PATH } from "../lib/site"
+
+interface Props {
+	/** The filter groups to show, already trimmed to values and groups that narrow the list. */
+	readonly groups: readonly FilterGroup[]
+	/** The Interface Language the bar's labels are written in. */
+	readonly language: Language
+}
+
+const { groups, language } = Astro.props
+const words = dictionaryFor(language)
+const basePath = treePath(language, BLOG_PATH)
+
+/** The reader-facing label for one option value inside its group. */
+function optionLabel(group: FilterGroupName, value: string): string {
+	switch (group) {
+		case "type":
+			return words.typeLabels[value as PostType]
+		case "language":
+			return words.languageNames[value as Language]
+		case "product":
+			return productName(value as Product)
+	}
+}
+---
+
+{
+	groups.length === 0 ? null : (
+		<nav
+			class="filter-bar"
+			aria-label={words.filterLabel}
+			data-filter-bar
+			data-base-path={basePath}
+			data-language={language}
+			hidden
+		>
+			{groups.map((group) => (
+				<div class="filter-group" role="group" aria-labelledby={`filter-group-${group.name}`}>
+					<span id={`filter-group-${group.name}`} class="meta-label filter-group-label">
+						{words.filterGroups[group.name]}
+					</span>
+					<div class="filter-options">
+						<a
+							class="filter-option"
+							href={basePath}
+							data-filter-option
+							data-filter-group={group.name}
+							data-filter-value=""
+							aria-current="true"
+						>
+							{words.filterAll}
+						</a>
+						{group.values.map((value) => (
+							<a
+								class="filter-option"
+								href={`${basePath}${filterQuery({}, group.name, value)}`}
+								data-filter-option
+								data-filter-group={group.name}
+								data-filter-value={value}
+							>
+								{optionLabel(group.name, value)}
+							</a>
+						))}
+					</div>
+				</div>
+			))}
+		</nav>
+	)
+}

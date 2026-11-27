@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import { dictionaryFor } from "./dictionary"
+import { FILTER_GROUPS } from "./filters"
 import { LANGUAGES } from "./languages"
+import { POST_TYPES } from "./posts"
 
 describe("the Dictionaries", () => {
 	test("every Interface Language writes every word, and none is blank", () => {
@@ -16,11 +18,12 @@ describe("the Dictionaries", () => {
 		}
 	})
 
-	test("every Dictionary names every Language", () => {
+	test("every Dictionary names every Language, Post Type and filter group", () => {
 		for (const language of LANGUAGES) {
-			expect(Object.keys(dictionaryFor(language).languageNames).toSorted()).toEqual(
-				[...LANGUAGES].toSorted(),
-			)
+			const words = dictionaryFor(language)
+			expect(Object.keys(words.languageNames).toSorted()).toEqual([...LANGUAGES].toSorted())
+			expect(Object.keys(words.typeLabels).toSorted()).toEqual([...POST_TYPES].toSorted())
+			expect(Object.keys(words.filterGroups).toSorted()).toEqual([...FILTER_GROUPS].toSorted())
 		}
 	})
 

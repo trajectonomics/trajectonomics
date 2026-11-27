@@ -1,6 +1,7 @@
 import { type CollectionEntry, getCollection } from "astro:content"
 import { chooseTranslation, type Language, treePath } from "../lib/languages"
 import { type PostType, postPath, publishedNewestFirst, readingMinutes } from "../lib/posts"
+import { inProductOrder, type Product } from "../lib/products"
 import { groupTranslations, translationPlace } from "../lib/translations"
 
 /** One Post in one Post Language, with its reading time worked out once. */
@@ -8,6 +9,7 @@ export interface Translation {
 	readonly slug: string
 	readonly language: Language
 	readonly type: PostType
+	readonly products: readonly Product[]
 	readonly publishedOn: Date
 	readonly draft: boolean
 	readonly cover: CollectionEntry<"posts">["data"]["cover"]
@@ -19,6 +21,8 @@ export interface Translation {
 export interface Post {
 	readonly slug: string
 	readonly type: PostType
+	/** The Products the Post is about, in the blog's order; empty when general. */
+	readonly products: readonly Product[]
 	readonly publishedOn: Date
 	readonly draft: boolean
 	/** The Post Languages it is written in, in the blog's order. */
@@ -35,6 +39,7 @@ export async function readPosts(): Promise<readonly Post[]> {
 			slug,
 			language,
 			type: entry.data.type,
+			products: inProductOrder(entry.data.products),
 			publishedOn: entry.data.publishedOn,
 			draft: entry.data.draft,
 			cover: entry.data.cover,
