@@ -18,6 +18,9 @@ const READ_CONTROLS = [
 	"select#estate-date",
 	// A visitor's own charts live in this browser's localStorage only: editing, copying, deleting, exporting and importing send nothing.
 	'[role="group"][aria-label="This chart"] button',
+	// The Plan's tabs and its compact cards only choose what the page shows; the cards open a read of the facts.
+	'[role="tab"]',
+	"[data-plan-item]",
 	'input[type="file"][accept="application/json,.json"]',
 	'div:has(> label > input[type="file"][accept="application/json,.json"]) > button',
 	'input[name="memo"]',
