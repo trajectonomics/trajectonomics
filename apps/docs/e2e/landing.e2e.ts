@@ -78,8 +78,10 @@ test("the hero picture keeps its column clear of the prompt at 1024px", async ({
 test("the Landing Page has one entry per Tab, each linking to its Tab", async ({ page }) => {
 	await page.goto(LANDING_PATH)
 
+	// The header's centred Tabs sit inside the home layout's main landmark too, so the entries are
+	// counted in the page body alone.
 	const entries = page
-		.getByRole("main")
+		.locator("#landing-body")
 		.locator(TABS.map((tab) => `a[href="${tabUrl(tab)}"]`).join(", "))
 	await expect(entries).toHaveCount(TABS.length)
 	for (const tab of TABS) {

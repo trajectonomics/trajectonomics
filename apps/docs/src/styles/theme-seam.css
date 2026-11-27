@@ -62,6 +62,9 @@
 	--font-mono: var(--ds-font-family-mono);
 	/* The display face of the header's Docs marker, as the blog and the Site draw their markers. */
 	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
+	/* The meta face of the header's centred Tabs: the shared nav-link type the other sites draw. */
+	--font-meta:
+		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
 
 	--text-xs: var(--ds-font-size-xs);
 	--text-sm: var(--ds-font-size-sm);
