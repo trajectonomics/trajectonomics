@@ -12,7 +12,7 @@ let { plan }: Props = $props()
 const saved = $derived(session.saved)
 </script>
 
-<!-- What traj recorded, in its own counts, then Done. The history chart behind the drawer now reads the new Snapshot. -->
+<!-- What traj recorded, in its own counts, then Done. The history chart behind the drawer reads the new Snapshot once one is read. -->
 <div class="min-w-0 space-y-6">
 	{#if saved}
 		<p role="status" class="text-sm text-foreground">{doneLine(saved.counts.added, saved.counts.unchanged, plan.earliest, plan.latest)}</p>

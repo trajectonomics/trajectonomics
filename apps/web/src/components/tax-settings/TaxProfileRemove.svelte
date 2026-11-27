@@ -33,7 +33,7 @@ async function remove(): Promise<void> {
 		{/if}
 		{#if editSession.source === "remove-tax"}
 			{#if editSession.error}<FormAlert message={editSession.error} />{/if}
-			<StaleNotice />
+			<StaleNotice shows="stale" />
 		{/if}
 		<div class="flex flex-wrap gap-2">
 			<button type="button" disabled={editSession.busy || disabled} onclick={remove} class={button}>Remove tax</button>

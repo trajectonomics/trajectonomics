@@ -1,18 +1,12 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { editSession, STALE_PLAN } from "../../client/edit.svelte.js"
-import { WRITTEN_REREAD_FAILED, WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
+import { WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
 import StaleNotice from "./StaleNotice.svelte"
-
-/** The error a write that landed answers when the Snapshot read after it failed. */
-const SAVED_UNREAD = {
-	code: WRITTEN_REREAD_FAILED,
-	exitCode: 1,
-	message: WRITTEN_REREAD_FAILED_MESSAGE,
-}
 
 afterEach(() => {
 	editSession.stale = false
+	editSession.savedUnread = false
 	editSession.failure = null
 })
 
@@ -29,12 +23,32 @@ describe("StaleNotice", () => {
 		expect(body).toContain(">Reload</button>")
 	})
 
-	test("says the change was saved but the plan could not be read, with the same Reload button", () => {
-		editSession.failure = SAVED_UNREAD
+	test("says the change was saved but the page could not show it, with the same Reload button", () => {
+		editSession.savedUnread = true
 		const { body } = render(StaleNotice)
 		expect(body).toContain('role="alert"')
 		expect(body).toContain(WRITTEN_REREAD_FAILED_MESSAGE)
 		expect(body).not.toContain(STALE_PLAN)
 		expect(body).toContain(">Reload</button>")
+	})
+
+	test("shows only its own case: a form hides the landed sentence, the page hides the refusal", () => {
+		editSession.savedUnread = true
+		expect(render(StaleNotice, { props: { shows: "stale" } }).body).not.toContain(
+			WRITTEN_REREAD_FAILED_MESSAGE,
+		)
+		editSession.savedUnread = false
+		editSession.stale = true
+		const landed = render(StaleNotice, { props: { shows: "landed" } }).body
+		expect(landed).not.toContain(STALE_PLAN)
+		expect(landed).not.toContain(">Reload</button>")
+	})
+
+	test("draws a focus ring on its button and never turns the ring off", () => {
+		editSession.stale = true
+		const { body } = render(StaleNotice)
+		expect(body).toContain("focus-visible:outline-2")
+		expect(body).toContain("focus-visible:outline-offset-2")
+		expect(body).not.toContain("outline-none")
 	})
 })

@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test"
+import { writtenRereadFailed } from "../lib/edit/failure"
 import { EDIT_PATH } from "../lib/edit/guard"
+import { editSession } from "./edit.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 import {
 	fakeServer,
@@ -13,6 +15,9 @@ import {
 } from "./what-if.test-support"
 
 useSessionHooks()
+
+/** A write that landed while the Snapshot read after it failed. */
+const LANDED = { ok: false, error: writtenRereadFailed() }
 
 /** Reads a session of one switch to the end, so Apply and Save are allowed, and returns the Edit's request. */
 async function readyToSend(
@@ -73,6 +78,14 @@ describe("a change made while Apply or Save runs", () => {
 			expect(whatIfSession.whatIf?.removals).toEqual(["flows.rent"])
 			expect(whatIfSession.setOff("base", HASH, "flows.living", true)).toBe(true)
 			expect(whatIfSession.whatIf?.removals).toEqual(["flows.rent", "flows.living"])
+		})
+
+		test(`${action}: a write that landed while its read failed still ends the session and says so above the page`, async () => {
+			const { held: edit, done } = await readyToSend(send)
+			edit.settle(200, LANDED)
+			expect(await done).toBe(true)
+			expect(whatIfSession.whatIf).toBeNull()
+			expect(editSession.savedUnread).toBe(true)
 		})
 	}
 
