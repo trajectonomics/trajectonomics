@@ -24,6 +24,7 @@ export const ENGLISH_PAGES = {
 	signInPasskeyError: "That passkey did not work. Try again, or use another way.",
 	signInNoScript: "Signing in needs JavaScript. Turn it on and reload this page.",
 	signInDeleted: "Your account was deleted.",
+	signInCancelled: "Sign-in was cancelled or failed. Try again.",
 
 	welcomeTitle: "Email updates",
 	welcomeDescription: "One question before you continue.",

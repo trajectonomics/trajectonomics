@@ -13,7 +13,9 @@ test("the device page approves a code, and the CLI poll gets tokens and a revoca
 	await expect(page.getByText("Send your AI usage numbers to the data site")).toBeVisible()
 	// RFC 8628 §3.3.1 and §5.4: the person must be able to match the code against the app's screen,
 	// and must see which account is about to be linked.
-	await expect(page.locator(".device-code")).toHaveText(code.userCode)
+	await expect(page.locator(".device-code")).toHaveText(
+		code.userCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase(),
+	)
 	await expect(page.getByText(user.email)).toBeVisible()
 	await expect(
 		page.getByText("Only approve if this code is shown on your own device."),
@@ -28,8 +30,14 @@ test("the device page approves a code, and the CLI poll gets tokens and a revoca
 
 	await page.goto("/account/")
 	await expect(page.getByText("traj data collector")).toBeVisible()
-	await page.getByRole("button", { name: "Revoke: traj data collector" }).click()
+	const opener = page.getByRole("button", { name: "Revoke: traj data collector" })
+	await opener.click()
 	// Revoking asks once, in the row, before it removes anything.
+	await expect(page.getByText("Revoke access?")).toBeVisible()
+	// Cancel returns the reader to the button that asked the question, not to BODY.
+	await page.locator(".confirm-row").getByRole("button", { name: "Cancel" }).click()
+	await expect(opener).toBeFocused()
+	await opener.click()
 	await expect(page.getByText("Revoke access?")).toBeVisible()
 	await page.locator(".confirm-row").getByRole("button", { name: "Revoke" }).click()
 	await expect(page.getByText("No app is connected.")).toBeVisible()
@@ -62,7 +70,7 @@ test("the web client's consent page names the app, then allows the flow", async 
 	await page.goto(authorizePath("e2e-state"))
 	await page.waitForURL(/\/consent\//)
 	await expect(page.getByRole("heading", { name: /Trajectonomics data site/ })).toBeVisible()
-	await expect(page.getByText("See your name and picture")).toBeVisible()
+	await expect(page.getByText("See your name and email")).toBeVisible()
 	const callback = page.waitForRequest((request) =>
 		request.url().startsWith("https://trajectonomics.com/data/auth/callback?"),
 	)

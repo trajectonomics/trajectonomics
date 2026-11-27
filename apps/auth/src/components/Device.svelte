@@ -26,6 +26,8 @@ let view = $state<View>("loading")
 let code = $state("")
 let message = $state("")
 let busy = $state(false)
+/** The signed-in address, kept from the session read so every review can name it. */
+let email = $state("")
 let review = $state<Review>({ code: "", shown: "", email: "", clientName: "", lines: [] })
 
 onMount(() => {
@@ -44,8 +46,12 @@ async function load(): Promise<void> {
 	const entry = await enterDevice(language)
 	if (entry.kind === "stop") return
 	if (entry.kind === "failed") view = "failed"
-	else if (entry.kind === "enter") view = "enter"
-	else if (entry.kind === "status") view = entry.status
+	else if (entry.kind === "enter") {
+		email = entry.email
+		view = "enter"
+		if (entry.reason === "expired") message = words.deviceExpired
+		else if (entry.reason === "invalid") message = words.deviceInvalid
+	} else if (entry.kind === "status") view = entry.status
 	else showReview(entry, entry.email)
 }
 
@@ -54,7 +60,7 @@ async function submit(event: SubmitEvent): Promise<void> {
 	busy = true
 	const outcome = await lookUpDevice(code)
 	busy = false
-	if (outcome.kind === "review") showReview(outcome, review.email)
+	if (outcome.kind === "review") showReview(outcome, email)
 	else if (outcome.kind === "failed") view = "failed"
 	else if (outcome.kind === "status") view = outcome.status
 	else {

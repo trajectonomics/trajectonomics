@@ -28,14 +28,14 @@ onMount(() => {
 async function load(): Promise<void> {
 	view = "loading"
 	try {
-		const session = await ensureSignedIn(language)
-		if (session === null) return
+		const signedIn = await ensureSignedIn(language)
+		if (signedIn === null) return
 		const search = window.location.search
 		next = safeNextPath(new URLSearchParams(search).get("next")) ?? pagePath(language, "account")
 		oauth = isSignedOAuthSearch(search)
 		// The provider signs the flow for ten minutes; an older one cannot be continued and no
-		// button would help, so the page stops at the explanation.
-		if (oauth && isExpiredSignedOAuthSearch(search, Date.now())) {
+		// button would help, so the page stops at the explanation. The server's clock decides.
+		if (oauth && isExpiredSignedOAuthSearch(search, signedIn.serverNowMs)) {
 			view = "expired"
 			return
 		}

@@ -1,7 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import { onMount } from "svelte"
+import { onMount, tick } from "svelte"
 import { listGrants, listPasskeys } from "../client/account"
 import { getConsent, signOut } from "../client/auth"
 import { ensureConsent, ensureSignedIn } from "../client/guard"
@@ -22,6 +22,10 @@ let consent = $state<MarketingConsent | null>(null)
 let grants = $state<readonly Grant[]>([])
 let passkeys = $state<readonly Passkey[]>([])
 let view = $state<"loading" | "ready" | "failed">("loading")
+let signOutError = $state("")
+/** Set when a deletion failed after the session ended, so no account control is offered again. */
+let ended = $state("")
+let endedAlert: HTMLParagraphElement | undefined = $state()
 
 onMount(() => {
 	void load()
@@ -30,15 +34,15 @@ onMount(() => {
 async function load(): Promise<void> {
 	view = "loading"
 	try {
-		const session = await ensureSignedIn(language)
-		if (session === null) return
+		const signedIn = await ensureSignedIn(language)
+		if (signedIn === null) return
 		if (!(await ensureConsent(language))) return
 		const [state, grantList, passkeyList] = await Promise.all([
 			getConsent(),
 			listGrants(),
 			listPasskeys(),
 		])
-		user = session.user
+		user = signedIn.session.user
 		consent = state
 		grants = grantList.grants
 		passkeys = passkeyList
@@ -50,16 +54,32 @@ async function load(): Promise<void> {
 }
 
 async function out(): Promise<void> {
+	signOutError = ""
 	try {
 		await signOut()
-	} finally {
-		window.location.assign(pagePath(language, "sign-in"))
+	} catch {
+		// A failed sign-out leaves the session in place; staying on the page is the honest answer.
+		signOutError = words.accountSignOutError
+		return
 	}
+	window.location.assign(pagePath(language, "sign-in"))
+}
+
+/** A failed deletion ends the session, so only its message is left to show. */
+function deleteFailed(): void {
+	ended = words.accountDeleteError
+	void tick().then(() => endedAlert?.focus())
 }
 </script>
 
 {#if view === "failed"}
 	<LoadFailure message={words.accountLoadError} retryLabel={words.loadRetry} onretry={load} />
+{:else if ended !== ""}
+	<div class="panel">
+		<h1 class="page-title">{words.accountTitle}</h1>
+		<p class="form-message" role="alert" tabindex="-1" bind:this={endedAlert}>{ended}</p>
+		<p class="legal-links"><a href={pagePath(language, "sign-in")}>{words.signInTitle}</a></p>
+	</div>
 {:else if view === "loading" || user === null}
 	<Loading title={words.accountTitle} text={words.loading} />
 {:else}
@@ -70,7 +90,10 @@ async function out(): Promise<void> {
 		<Passkeys {language} initial={passkeys} />
 		<div class="account-section">
 			<button class="button button-secondary" type="button" onclick={out}>{words.accountSignOut}</button>
+			{#if signOutError !== ""}
+				<p class="form-message" role="alert">{signOutError}</p>
+			{/if}
 		</div>
-		<DeleteAccount {language} email={user.email} />
+		<DeleteAccount {language} email={user.email} onfailed={deleteFailed} />
 	</div>
 {/if}

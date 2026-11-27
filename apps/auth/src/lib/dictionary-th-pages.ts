@@ -24,6 +24,7 @@ export const THAI_PAGES = {
 	signInPasskeyError: "พาสคีย์นี้ใช้ไม่ได้ ลองอีกครั้ง หรือเลือกวิธีอื่น",
 	signInNoScript: "การเข้าสู่ระบบต้องใช้ JavaScript โปรดเปิดแล้วโหลดหน้านี้ใหม่",
 	signInDeleted: "ลบบัญชีของคุณแล้ว",
+	signInCancelled: "การเข้าสู่ระบบถูกยกเลิกหรือไม่สำเร็จ ลองอีกครั้ง",
 
 	welcomeTitle: "ข่าวสารทางอีเมล",
 	welcomeDescription: "อีกหนึ่งคำถามก่อนไปต่อ",

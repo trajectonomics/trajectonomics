@@ -105,11 +105,35 @@ export function fillHeadersTemplate(
 	return filled
 }
 
-/** The same frame and type rules on a Worker answer, with a policy that loads nothing. */
+/** Whether a policy already names a framing rule, so appending one would duplicate it. */
+function hasFrameAncestors(policy: string): boolean {
+	return /\bframe-ancestors\b/i.test(policy)
+}
+
+/**
+ * The same frame and type rules on a Worker answer.
+ *
+ * Better Auth answers some paths with a page of its own; the end-session confirmation posts a form
+ * and `/api/auth/error` paints itself, so each sets the policy it needs. Overwriting that policy
+ * with the strict one would break the form and leave the page unstyled, so an answer that already
+ * carries a policy keeps it; only the frame rule is added when the handler's policy has none.
+ * Every other answer (JSON, redirects) loads nothing, so it gets the strict default.
+ */
 export function withSecurityHeaders(response: Response): Response {
 	const headers = new Headers(response.headers)
-	for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value)
-	headers.set("content-security-policy", WORKER_CONTENT_SECURITY_POLICY)
+	// A handler may have set its own value; only fill in what is missing.
+	for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+		if (!headers.has(name)) headers.set(name, value)
+	}
+	const existing = headers.get("content-security-policy")
+	if (existing === null || existing.trim() === "") {
+		headers.set("content-security-policy", WORKER_CONTENT_SECURITY_POLICY)
+	} else if (!hasFrameAncestors(existing)) {
+		headers.set(
+			"content-security-policy",
+			`${existing.trim().replace(/;$/, "")}; frame-ancestors 'none'`,
+		)
+	}
 	const bodyless = response.status === 204 || response.status === 304 || response.body === null
 	return new Response(bodyless ? null : response.body, {
 		status: response.status,

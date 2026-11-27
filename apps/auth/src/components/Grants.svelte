@@ -16,6 +16,14 @@ let message = $state("")
 let heading: HTMLHeadingElement | undefined = $state()
 let confirmButton: HTMLButtonElement | undefined = $state()
 
+/** The Revoke button of each row, so a cancelled confirm can return focus to the one that opened it. */
+const openers = new Map<string, HTMLButtonElement>()
+
+function rememberOpener(node: HTMLButtonElement, id: string): { destroy: () => void } {
+	openers.set(id, node)
+	return { destroy: () => openers.delete(id) }
+}
+
 /** Asks once in the row itself: a native confirm box is not a confirm a person can read. */
 async function ask(id: string): Promise<void> {
 	confirming = id
@@ -24,20 +32,31 @@ async function ask(id: string): Promise<void> {
 	confirmButton?.focus()
 }
 
+/** Cancels the question and puts the reader back on the button that asked it. */
+async function cancel(id: string): Promise<void> {
+	confirming = ""
+	await tick()
+	openers.get(id)?.focus()
+}
+
 async function revoke(id: string): Promise<void> {
 	busyId = id
 	message = ""
+	let removed = false
 	try {
 		await revokeGrant(id)
 		grants = grants.filter((grant) => grant.id !== id)
+		removed = true
 		message = words.accountRevoked
 	} catch {
 		message = words.accountRevokeError
 	} finally {
 		confirming = ""
 		busyId = ""
-		// The row that held the button is gone; the section title is where the reader lands.
-		heading?.focus()
+		await tick()
+		// A removed row has no button to return to, so the section title holds the reader's place.
+		if (removed) heading?.focus()
+		else openers.get(id)?.focus()
 	}
 }
 </script>
@@ -61,11 +80,14 @@ async function revoke(id: string): Promise<void> {
 					</div>
 					{#if confirming === grant.id}
 						<div class="confirm-row">
-							<span class="confirm-question">{words.accountRevokeConfirm}</span>
+							<span class="confirm-question" id={`revoke-question-${grant.id}`}
+								>{words.accountRevokeConfirm}</span
+							>
 							<button
 								class="button button-danger button-small"
 								type="button"
 								bind:this={confirmButton}
+								aria-describedby={`revoke-question-${grant.id}`}
 								onclick={() => revoke(grant.id)}
 								disabled={busyId === grant.id}
 							>
@@ -74,7 +96,8 @@ async function revoke(id: string): Promise<void> {
 							<button
 								class="button button-secondary button-small"
 								type="button"
-								onclick={() => (confirming = "")}
+								onclick={() => cancel(grant.id)}
+								disabled={busyId === grant.id}
 							>
 								{words.accountConfirmCancel}
 							</button>
@@ -83,6 +106,7 @@ async function revoke(id: string): Promise<void> {
 						<button
 							class="button button-secondary button-small"
 							type="button"
+							use:rememberOpener={grant.id}
 							onclick={() => ask(grant.id)}
 							aria-label={`${words.accountRevoke}: ${grant.clientName}`}
 						>

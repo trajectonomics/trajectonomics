@@ -7,7 +7,8 @@ import { retryPendingDeletions } from "./pending-deletion-retry"
 /**
  * The auth Worker. Better Auth answers `/api/auth/*`, `/jwks` and `/.well-known/*` first; every
  * other path is a static page from `dist-site`, served by the assets binding. The hourly cron
- * retries the data Worker's deletion notices that did not get through and purges the old ones.
+ * retries the data Worker's deletion notices that did not get through, purges the old ones and
+ * deletes rate-limit counters whose window has long been reused.
  *
  * Static pages get their headers from `dist-site/_headers`; the Worker's own answers carry the same
  * frame and type rules here, because an API answer or a redirect must not be framed either.

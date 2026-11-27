@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { BASE_URL } from "./base-url"
 import { answerConsent, signUp } from "./people"
 import { queryLocal, queryLocalMany, scratchDir } from "./scratch"
 
@@ -62,27 +63,31 @@ test("deleting the account removes it and queues the data side notice", async ({
 	expect(leftovers).toEqual([])
 })
 
-test("a failed queue insert aborts the deletion, so the account is still there", async ({
-	page,
-}) => {
+test("a passkey challenge left by registration goes with the deleted account", async ({ page }) => {
 	const user = await signUp(page)
 	await answerConsent(page)
-	// A trigger is the one way to make a real D1 insert fail from outside the Worker without taking
-	// the rest of the schema down with it: only the queue's insert is refused.
-	queryLocal(
-		scratch,
-		`create trigger "block_queue" before insert on "pendingDeletion" begin select raise(abort, 'queue blocked'); end`,
+	// Starting a registration writes a verification row whose value holds the user id inside
+	// `"userData":{"id":"…"}`; the delete must remove it even though it names the id in another shape.
+	const options = await page.request.get(
+		`${BASE_URL}/api/auth/passkey/generate-register-options?name=E2E%20passkey`,
+		{ headers: { origin: BASE_URL } },
 	)
-	try {
-		await page.goto("/account/")
-		await page.getByLabel("Type your email to confirm").fill(user.email)
-		await page.getByRole("button", { name: "Delete my account" }).click()
-		await expect(page.getByRole("alert")).toContainText("The account was not deleted")
-		expect(
-			queryLocal<{ id: string }>(scratch, `select "id" from "user" where "id" = '${user.id}'`),
-		).toHaveLength(1)
-		await expect(page.getByRole("switch", { name: "Email updates" })).toBeVisible()
-	} finally {
-		queryLocal(scratch, 'drop trigger "block_queue"')
-	}
+	expect(options.ok(), await options.text()).toBe(true)
+	expect(
+		queryLocal<{ value: string }>(
+			scratch,
+			`select "value" from "verification" where instr("value", '"id":"${user.id}"') > 0`,
+		),
+	).toHaveLength(1)
+
+	await page.goto("/account/")
+	await page.getByLabel("Type your email to confirm").fill(user.email)
+	await page.getByRole("button", { name: "Delete my account" }).click()
+	await page.waitForURL(/\/sign-in\/\?deleted=1/)
+	expect(
+		queryLocal<{ id: string }>(
+			scratch,
+			`select "id" from "verification" where instr("value", '"id":"${user.id}"') > 0`,
+		),
+	).toEqual([])
 })

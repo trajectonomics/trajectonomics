@@ -25,12 +25,13 @@ onMount(() => {
 async function load(): Promise<void> {
 	view = "loading"
 	try {
-		const session = await ensureSignedIn(language)
-		if (session === null) return
+		const signedIn = await ensureSignedIn(language)
+		if (signedIn === null) return
 		const search = window.location.search
 		// The provider signs the flow for ten minutes. An expired one cannot be approved, so the page
-		// says so rather than posting an answer the provider will refuse.
-		if (isExpiredSignedOAuthSearch(search, Date.now())) {
+		// says so rather than posting an answer the provider will refuse. The clock is the server's,
+		// from the same session answer, so a device clock that runs fast cannot block a valid flow.
+		if (isExpiredSignedOAuthSearch(search, signedIn.serverNowMs)) {
 			view = "expired"
 			return
 		}

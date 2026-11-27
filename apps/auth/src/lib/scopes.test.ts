@@ -25,6 +25,12 @@ describe("the scopes an app asks for", () => {
 		expect(scopeLines("  openid   openid  ").length).toBe(1)
 	})
 
+	it("merges openid, profile and email into the one line the person needs", () => {
+		const lines = scopeLines("openid profile email")
+		expect(lines).toEqual([{ scope: "openid", key: "scopeOpenId" }])
+		expect(scopeText(lines[0]!, dictionaryFor("en"))).toBe("See your name and email")
+	})
+
 	it("has nothing to show when the app asked for nothing", () => {
 		expect(scopeLines(null)).toEqual([])
 		expect(scopeLines("")).toEqual([])

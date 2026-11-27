@@ -28,11 +28,12 @@ export const THAI_ACCOUNT = {
 	accountPasskeyRemoveError: "ลบพาสคีย์ไม่สำเร็จ ลองอีกครั้ง",
 	accountConfirmCancel: "ยกเลิก",
 	accountSignOut: "ออกจากระบบ",
+	accountSignOutError: "ออกจากระบบไม่สำเร็จ ลองอีกครั้ง",
 	accountDeleteHeading: "ลบบัญชี",
 	accountDeleteWarning: "บัญชี พาสคีย์ และการเชื่อมต่อแอปทั้งหมดจะถูกลบ และกู้คืนไม่ได้",
 	accountDeleteEmailLabel: "พิมพ์อีเมลของคุณเพื่อยืนยัน",
 	accountDeleteButton: "ลบบัญชีของฉัน",
 	accountDeleteExpired: "คุณเข้าสู่ระบบมานานเกินกำหนดสำหรับการลบบัญชี ออกจากระบบแล้วเข้าสู่ระบบใหม่ก่อนลบ",
-	accountDeleteError: "ลบบัญชีไม่สำเร็จ ลองอีกครั้ง",
+	accountDeleteError: "ลบบัญชีไม่สำเร็จ คุณออกจากระบบแล้ว เข้าสู่ระบบใหม่แล้วลองอีกครั้ง",
 	accountLoadError: "บางส่วนโหลดไม่สำเร็จ โหลดหน้าใหม่แล้วลองอีกครั้ง",
 } satisfies Partial<Dictionary>

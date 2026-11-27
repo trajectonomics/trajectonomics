@@ -22,11 +22,17 @@ import {
  * the user id after the account is gone.
  */
 export async function deleteUserLeftovers(db: D1Database, authUserId: string): Promise<void> {
-	// The verification value is the provider's own JSON, which names the user as `"userId":"<id>"`.
+	// The verification value is the provider's own JSON. An authorization code names the user as
+	// `"userId":"<id>"` and is matched with LIKE; a passkey challenge (registration or
+	// authentication) nests it as `"userData":{"id":"<id>"…}` and is matched with instr. LIKE is not
+	// used for the passkey form because D1 caps a LIKE pattern at 50 bytes.
 	const authorizationCodeValue = `%"userId":"${authUserId}"%`
+	const passkeyUserIdValue = `"id":"${authUserId}"`
 	await db.batch([
 		db.prepare('delete from "deviceCode" where "userId" = ?').bind(authUserId),
-		db.prepare('delete from "verification" where "value" like ?').bind(authorizationCodeValue),
+		db
+			.prepare('delete from "verification" where "value" like ? or instr("value", ?) > 0')
+			.bind(authorizationCodeValue, passkeyUserIdValue),
 	])
 }
 
@@ -67,10 +73,13 @@ export function deleteUserOptions(env: {
 		beforeDelete: async (user) => {
 			await queuePendingDeletion({ db: env.DB, authUserId: user.id })
 		},
-		// The person's marketing consent rows go with the user row (the schema cascades on `userId`).
+		// `afterDelete` runs only once Better Auth has deleted the user row, and a failed deletion
+		// never reaches it, so the data side is never told about a live account from here. The
+		// person's marketing consent rows go with the user row (the schema cascades on `userId`).
 		// The rows that can still name the id (`deviceCode`, the `verification` rows that hold an
-		// authorization code) have no foreign key, so they are deleted here too. Only then is the
-		// data side told, once; a failed call is recorded on the row and retried by the cron.
+		// authorization code or a passkey challenge) have no foreign key, so they are deleted here
+		// too. Only then is the data side told, once; a failed call is recorded on the row and
+		// retried by the cron.
 		afterDelete: async (user) => {
 			try {
 				await finishAccountDeletion({ db: env.DB, data: env.DATA, authUserId: user.id })

@@ -3,7 +3,7 @@
  *
  * Two session-scoped endpoints: GET returns the latest record, POST appends one. The history is
  * never updated except to stamp `withdrawnAt` on the rows a withdrawal closes. The rules live in
- * `src/core/consent.ts`; this module speaks to the adapter for the read and to D1 for the write,
+ * `src/core/marketing-consent-rules.ts`; this module speaks to the adapter for the read and to D1 for the write,
  * because the withdrawal and the new answer must land in one batch.
  */
 import type { D1Database } from "@cloudflare/workers-types"
@@ -13,7 +13,7 @@ import {
 	consentView,
 	parseConsentAnswer,
 	type StoredConsent,
-} from "./core/consent"
+} from "./core/marketing-consent-rules"
 import { marketingConsentSchema } from "./marketing-consent-schema"
 
 /** The adapter fields this module calls, so a caller can pass Better Auth's own adapter. */

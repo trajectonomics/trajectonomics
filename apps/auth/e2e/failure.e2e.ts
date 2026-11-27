@@ -1,12 +1,27 @@
-import { expect, test } from "@playwright/test"
+import { expect, type Page, test } from "@playwright/test"
 import { answerConsent, signUp } from "./people"
 
 const EXPIRED = "?client_id=traj-data-web&sig=c2lnbmF0dXJl&exp=1&ba_iat=1764259200000"
+
+/**
+ * The page judges a signed query's expiry by the server's `Date` header. The local dev server does
+ * not send one, so this adds it to the real get-session answer; the page then sees `exp=1` as past.
+ */
+async function stampServerClock(page: Page): Promise<void> {
+	await page.route("**/api/auth/get-session", async (route) => {
+		const response = await route.fetch()
+		await route.fulfill({
+			response,
+			headers: { ...response.headers(), date: new Date().toUTCString() },
+		})
+	})
+}
 
 test("an expired signed flow on the first question says so and offers no retry", async ({
 	page,
 }) => {
 	await signUp(page)
+	await stampServerClock(page)
 	await page.goto(`/welcome/${EXPIRED}`)
 	await expect(
 		page.getByText("This sign-in took too long. Go back to the app and start again."),
@@ -18,6 +33,7 @@ test("an expired signed flow on the first question says so and offers no retry",
 test("an expired signed flow on the consent page says so in Thai too", async ({ page }) => {
 	await signUp(page)
 	await answerConsent(page)
+	await stampServerClock(page)
 	await page.goto(`/th/consent/${EXPIRED}`)
 	await expect(page.getByText("การเข้าสู่ระบบนี้ใช้เวลานานเกินไป กลับไปที่แอปแล้วเริ่มใหม่")).toBeVisible()
 	await expect(page.getByRole("button", { name: "อนุญาต" })).toHaveCount(0)

@@ -26,6 +26,7 @@ export interface AccountWords {
 	readonly accountPasskeyRemoveError: string
 	readonly accountConfirmCancel: string
 	readonly accountSignOut: string
+	readonly accountSignOutError: string
 	readonly accountDeleteHeading: string
 	readonly accountDeleteWarning: string
 	readonly accountDeleteEmailLabel: string

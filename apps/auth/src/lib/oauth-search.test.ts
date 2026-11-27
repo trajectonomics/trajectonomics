@@ -46,8 +46,29 @@ describe("a signed OAuth query", () => {
 		expect(isExpiredSignedOAuthSearch(search, now)).toBe(true)
 	})
 
+	it("keeps the flow alive when the device clock runs fifteen minutes fast", () => {
+		const search = signedSearch(now / 1_000 + 60)
+		expect(isExpiredSignedOAuthSearch(search, now)).toBe(false)
+		expect(isExpiredSignedOAuthSearch(search, now + 15 * 60_000)).toBe(true)
+	})
+
+	it("still expires the flow when the device clock runs slow", () => {
+		const search = signedSearch(now / 1_000 - 10)
+		expect(isExpiredSignedOAuthSearch(search, now)).toBe(true)
+		expect(isExpiredSignedOAuthSearch(search, now - 15 * 60_000)).toBe(false)
+	})
+
+	it("lets the server decide when the Date header is missing or unreadable", () => {
+		const expired = signedSearch(now / 1_000 - 60)
+		const noExpiry = "?client_id=traj-data-web&sig=signature"
+		expect(isExpiredSignedOAuthSearch(expired, null)).toBe(false)
+		expect(isExpiredSignedOAuthSearch(noExpiry, null)).toBe(false)
+		expect(isExpiredSignedOAuthSearch(expired, Number.NaN)).toBe(false)
+	})
+
 	it("leaves a page without a signed flow alone", () => {
 		expect(isExpiredSignedOAuthSearch("?next=%2Faccount%2F", now)).toBe(false)
 		expect(isExpiredSignedOAuthSearch("", now)).toBe(false)
+		expect(isExpiredSignedOAuthSearch("?next=%2Faccount%2F", null)).toBe(false)
 	})
 })

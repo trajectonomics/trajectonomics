@@ -57,10 +57,11 @@ The `oauthProviderClient()` plugin adds the page's signed OAuth query to every P
 flow as soon as a session cookie is set, so a social sign-in returns to the consent page or the
 client without the page doing anything.
 
-A passkey sign-in is different: its fetch would follow the provider's redirect internally. The page
-removes the query from the address bar for that one request, so no `oauth_query` is sent, then
-navigates to `/api/auth/oauth2/authorize` with the signed query to resume. If no flow is in
-progress, it goes to `?next=` instead.
+A passkey sign-in resumes the same way: the provider's client plugin puts the page's signed query on
+the POST as `oauth_query`, and the provider's after-hook answers with the address the flow continues
+to. The page follows that URL. If no flow is in progress the answer carries no URL, and the page
+continues to `?next=` instead; it never navigates back to the signed authorize link, which would
+re-run the prompt.
 
 `?next=` is validated by `src/lib/next.ts`: a same-origin path, no absolute address, no protocol
 relative form, no backslash, no control character, and no path that normalizes to another host. A
@@ -128,8 +129,8 @@ and its plugins exist in exactly one module.
 - `POST /marketing-consent` takes `{ optedIn, source, language }`, appends a row, and stamps
   `withdrawnAt` on every open opted-in row when the new answer is false. The stamp and the insert are
   one `DB.batch`, so D1 applies both or neither. It never deletes or rewrites an earlier answer.
-- Both require a session. The pure rules are in `src/core/consent.ts`; the plugin reads through the
-  adapter and writes through the D1 binding it is given.
+- Both require a session. The pure rules are in `src/core/marketing-consent-rules.ts`; the plugin
+  reads through the adapter and writes through the D1 binding it is given.
 
 ### Account deletion
 
@@ -158,11 +159,15 @@ consent rows and the grant history go with the person; `deviceCode` and `verific
 foreign key, which is why `afterDelete` deletes those two by hand.
 
 The hourly Cron Trigger (`43 * * * *`) calls `scheduled`, which reads at most fifty rows whose
-`acknowledgedAt` is null and whose `nextAttemptAt` is due, oldest attempt first, and retries each
-once. A failed attempt moves `nextAttemptAt` forward, so sixty failing rows cannot fill the batch and
-a newly queued row is attempted on the next tick. Notices the data site confirmed more than thirty
-days ago are deleted in the same tick. The pure timing rules are in `src/core/deletion.ts`: the
-first retry waits five minutes, each later one doubles, and the delay stops growing at one day.
+`acknowledgedAt` is null, whose `nextAttemptAt` is due and whose user row no longer exists, in
+`nextAttemptAt` order, and retries each once. A row whose user still exists is skipped, so a failed
+deletion can leave its notice behind without the data site ever being told about a live account. A
+failed attempt moves `nextAttemptAt` forward, so failing rows cannot hold the batch. All per-row
+writes of a tick go in one `DB.batch`, so a tick is one select, one write batch and one purge batch.
+Notices the data site confirmed more than thirty days ago are deleted in that tick, along with
+rate-limit counters whose `lastRequest` is older than an hour. The pure timing rules are in
+`src/core/deletion.ts`: the first retry waits five minutes, each later one doubles, and the delay
+stops growing at one day.
 
 The data-side endpoint is **not built here**. Issue #601 adds it to the `data` Worker. Until then
 every notice stays pending and the hourly job retries it; once #601 deploys, the queue drains with

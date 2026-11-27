@@ -28,6 +28,7 @@ export const ENGLISH_ACCOUNT = {
 	accountPasskeyRemoveError: "The passkey was not removed. Try again.",
 	accountConfirmCancel: "Cancel",
 	accountSignOut: "Sign out",
+	accountSignOutError: "You were not signed out. Try again.",
 	accountDeleteHeading: "Delete account",
 	accountDeleteWarning:
 		"This removes your account, your passkeys and every app connection. It cannot be undone.",
@@ -35,6 +36,7 @@ export const ENGLISH_ACCOUNT = {
 	accountDeleteButton: "Delete my account",
 	accountDeleteExpired:
 		"Your sign-in is too old for this. Sign out and sign in again, then delete.",
-	accountDeleteError: "The account was not deleted. Try again.",
+	accountDeleteError:
+		"The account was not deleted. You were signed out; sign in again to try again.",
 	accountLoadError: "Some of this did not load. Reload the page.",
 } satisfies Partial<Dictionary>

@@ -1,12 +1,19 @@
 import type { SessionResponse } from "../lib/api-types"
 import type { Language } from "../lib/language"
-import { getConsent, getSession } from "./auth"
+import { getConsent, readSession } from "./auth"
 import { currentPath, signInHref, welcomeHref } from "./navigation"
 
+/** The signed-in person and the server's clock, from the session read that found them. */
+export type SignedIn = {
+	readonly session: SessionResponse
+	/** The `Date` header of the get-session answer, or null when it is missing. */
+	readonly serverNowMs: number | null
+}
+
 /** The signed-in person, or null after sending the browser to the sign-in page. */
-export async function ensureSignedIn(language: Language): Promise<SessionResponse | null> {
-	const session = await getSession()
-	if (session !== null) return session
+export async function ensureSignedIn(language: Language): Promise<SignedIn | null> {
+	const read = await readSession()
+	if (read.session !== null) return { session: read.session, serverNowMs: read.serverNowMs }
 	window.location.replace(signInHref(language, currentPath()))
 	return null
 }

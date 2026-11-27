@@ -18,11 +18,16 @@ export function signedOAuthExpiresAtMs(search: string): number | null {
 }
 
 /**
- * Whether a signed flow is too old to continue. A signed query with no expiry is treated as too
- * old, because the provider's own check fails closed on the same query.
+ * Whether a signed flow is too old to continue, judged by the server's clock.
+ *
+ * `nowMs` comes from the `Date` header of the page's get-session answer. When that header is
+ * missing or unreadable the page cannot judge the expiry, so it treats the query as alive and lets
+ * the provider's server decide; a device clock 15 minutes fast must not block a valid sign-in. A
+ * signed query with no `exp` is treated as too old, because the provider's own check fails closed.
  */
-export function isExpiredSignedOAuthSearch(search: string, nowMs: number): boolean {
+export function isExpiredSignedOAuthSearch(search: string, nowMs: number | null): boolean {
 	if (!isSignedOAuthSearch(search)) return false
+	if (nowMs === null || !Number.isFinite(nowMs)) return false
 	const expiresAt = signedOAuthExpiresAtMs(search)
 	return expiresAt === null || nowMs >= expiresAt
 }

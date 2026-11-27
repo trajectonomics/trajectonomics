@@ -17,6 +17,14 @@ let message = $state("")
 let heading: HTMLHeadingElement | undefined = $state()
 let confirmButton: HTMLButtonElement | undefined = $state()
 
+/** The Remove button of each row, so a cancelled confirm can return focus to the one that opened it. */
+const openers = new Map<string, HTMLButtonElement>()
+
+function rememberOpener(node: HTMLButtonElement, id: string): { destroy: () => void } {
+	openers.set(id, node)
+	return { destroy: () => openers.delete(id) }
+}
+
 async function add(): Promise<void> {
 	busy = true
 	message = ""
@@ -40,19 +48,30 @@ async function ask(id: string): Promise<void> {
 	confirmButton?.focus()
 }
 
+/** Cancels the question and puts the reader back on the button that asked it. */
+async function cancel(id: string): Promise<void> {
+	confirming = ""
+	await tick()
+	openers.get(id)?.focus()
+}
+
 async function remove(id: string): Promise<void> {
 	busy = true
 	message = ""
+	let removed = false
 	try {
 		await removePasskey(id)
 		passkeys = passkeys.filter((passkey) => passkey.id !== id)
+		removed = true
 		message = words.accountPasskeyRemoved
 	} catch {
 		message = words.accountPasskeyRemoveError
 	} finally {
 		confirming = ""
 		busy = false
-		heading?.focus()
+		await tick()
+		if (removed) heading?.focus()
+		else openers.get(id)?.focus()
 	}
 }
 </script>
@@ -79,11 +98,14 @@ async function remove(id: string): Promise<void> {
 					</div>
 					{#if confirming === passkey.id}
 						<div class="confirm-row">
-							<span class="confirm-question">{words.accountRemoveConfirm}</span>
+							<span class="confirm-question" id={`remove-question-${passkey.id}`}
+								>{words.accountRemoveConfirm}</span
+							>
 							<button
 								class="button button-danger button-small"
 								type="button"
 								bind:this={confirmButton}
+								aria-describedby={`remove-question-${passkey.id}`}
 								onclick={() => remove(passkey.id)}
 								disabled={busy}
 							>
@@ -92,7 +114,8 @@ async function remove(id: string): Promise<void> {
 							<button
 								class="button button-secondary button-small"
 								type="button"
-								onclick={() => (confirming = "")}
+								onclick={() => cancel(passkey.id)}
+								disabled={busy}
 							>
 								{words.accountConfirmCancel}
 							</button>
@@ -101,6 +124,7 @@ async function remove(id: string): Promise<void> {
 						<button
 							class="button button-secondary button-small"
 							type="button"
+							use:rememberOpener={passkey.id}
 							onclick={() => ask(passkey.id)}
 							disabled={busy}
 							aria-label={`${words.accountRemove}: ${name}`}

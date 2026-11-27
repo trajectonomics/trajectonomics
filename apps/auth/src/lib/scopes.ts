@@ -19,12 +19,20 @@ const SCOPE_KEYS: Readonly<Record<string, ScopeKey>> = Object.freeze({
 	"data:ingest": "scopeDataIngest",
 })
 
-/** The distinct scopes in a space-separated string, each with the line that describes it. */
+/**
+ * The distinct scopes in a space-separated string, each with the line that describes it.
+ *
+ * `openid` already says the name and email are seen, so when a client asks for `openid`, `profile`
+ * and `email` together the three overlapping lines become the one sentence the person needs.
+ */
 export function scopeLines(scope: string | null | undefined): readonly ScopeLine[] {
 	const values = (scope ?? "").split(/\s+/).filter((value) => value !== "")
-	return Object.freeze(
-		[...new Set(values)].map((value) => ({ scope: value, key: SCOPE_KEYS[value] ?? null })),
-	)
+	const distinct = [...new Set(values)]
+	const merged =
+		distinct.includes("openid") && distinct.includes("profile") && distinct.includes("email")
+			? distinct.filter((value) => value !== "profile" && value !== "email")
+			: distinct
+	return Object.freeze(merged.map((value) => ({ scope: value, key: SCOPE_KEYS[value] ?? null })))
 }
 
 /** The words for one scope: the mapped line, or the scope itself when no line exists. */

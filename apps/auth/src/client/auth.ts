@@ -1,7 +1,4 @@
-/**
- * The only module that creates and calls the Better Auth client. Every island calls these
- * functions, so the client's plugins and the signed OAuth query are handled in one place.
- */
+/** The only module that creates and calls the Better Auth client, so plugins live in one place. */
 import {
 	oauthDeviceAuthorizationClient,
 	oauthProviderClient,
@@ -45,8 +42,31 @@ export async function request<T>(
 	return data as T
 }
 
-export async function getSession(): Promise<SessionResponse | null> {
-	return request<SessionResponse | null>("/get-session")
+/** The session and the server's clock (from the HTTP `Date` header), read from the same answer. */
+export type SessionRead = {
+	readonly session: SessionResponse | null
+	readonly serverNowMs: number | null
+}
+
+/** The `Date` header of one response, or null when the server sent none a browser can read. */
+function serverNowOf(response: Response): number | null {
+	const header = response.headers.get("date")
+	if (header === null || header.trim() === "") return null
+	const parsed = Date.parse(header)
+	return Number.isFinite(parsed) ? parsed : null
+}
+
+/** Reads the session and the server's clock in one request, so a drifted local clock cannot judge. */
+export async function readSession(): Promise<SessionRead> {
+	let serverNowMs: number | null = null
+	const { data, error } = await auth().$fetch<SessionResponse | null>("/get-session", {
+		throw: false,
+		onResponse: ({ response }) => {
+			serverNowMs = serverNowOf(response)
+		},
+	})
+	if (error) throw new AuthRequestError(error)
+	return { session: (data as SessionResponse | null) ?? null, serverNowMs }
 }
 
 export async function getConsent(): Promise<MarketingConsent | null> {
@@ -74,17 +94,13 @@ export async function addPasskey(name: string): Promise<void> {
 export async function startSocial(
 	provider: "google" | "github",
 	callbackURL: string,
+	errorCallbackURL: string,
 ): Promise<void> {
-	const { error } = await auth().signIn.social({ provider, callbackURL })
+	const { error } = await auth().signIn.social({ provider, callbackURL, errorCallbackURL })
 	if (error) throw new AuthRequestError(error)
 }
 
-/**
- * Signs in with a passkey. The provider's client plugin puts the page's signed query on the POST,
- * so the provider's after-hook resumes an interrupted `prompt=login` or `max_age=0` flow on its own
- * and answers with the address to continue to. The page navigates there when it gets one, and
- * otherwise continues to its own `next`.
- */
+/** Signs in with a passkey; the provider's answer may carry the address that resumes its flow. */
 export async function startPasskey(): Promise<string | null> {
 	const { data, error } = await auth().signIn.passkey()
 	if (error) throw new AuthRequestError(error)

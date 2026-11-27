@@ -1,4 +1,4 @@
-import { CONSENT_WORDING_VERSION } from "../core/consent"
+import { CONSENT_WORDING_VERSION } from "../core/marketing-consent-rules"
 import type { Language } from "./language"
 
 /**

@@ -11,6 +11,7 @@ export interface PageWords {
 	readonly signInPasskeyError: string
 	readonly signInNoScript: string
 	readonly signInDeleted: string
+	readonly signInCancelled: string
 
 	readonly welcomeTitle: string
 	readonly welcomeDescription: string

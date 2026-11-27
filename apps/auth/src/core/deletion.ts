@@ -6,8 +6,8 @@
  * data Worker that is down or not deployed yet (issue #601) catches up without a person waiting.
  *
  * The table carries `nextAttemptAt`, so the due rows are read with one ordered query: a row that
- * keeps failing moves into the future and cannot hold the batch, and a row that was just queued is
- * attempted on the next tick.
+ * keeps failing moves into the future and cannot hold the batch, and the tick takes them in
+ * `nextAttemptAt` order, fifty at a time.
  *
  * Pure: `now` and timestamps arrive as arguments, in milliseconds.
  */
@@ -47,37 +47,10 @@ export function retryDueAtMs(failedAtMs: number, attempts: number): number {
 	return failedAtMs + retryDelaySeconds(attempts) * 1_000
 }
 
-/** Whether one row is due at `nowMs`, given the moment it was last attempted. */
-export function isRetryDue(nowMs: number, failedAtMs: number, attempts: number): boolean {
-	if (!Number.isFinite(failedAtMs)) return false
-	return nowMs >= retryDueAtMs(failedAtMs, attempts)
-}
-
-/** The attempts value after one more failed call. */
-export function nextAttempts(attempts: number): number {
-	return safeAttempts(attempts) + 1
-}
-
 /**
  * The acknowledged rows a cron tick may purge: the data site confirmed them this long ago, so the
  * notice has served its purpose and the id it holds is deleted with it.
  */
 export function purgeCutoffMs(nowMs: number): number {
 	return nowMs - DELETION_NOTICE_RETENTION_DAYS * DAY_MS
-}
-
-/**
- * The rows one tick attempts, from the due rows in `nextAttemptAt` order. Pure so the starvation
- * rule is testable: a row that keeps failing is pushed past `now`, so it never keeps a newer row
- * out of the batch.
- */
-export function dueRows<T extends { readonly nextAttemptAtMs: number }>(
-	rows: readonly T[],
-	nowMs: number,
-	limit: number = DELETION_BATCH_LIMIT,
-): readonly T[] {
-	return rows
-		.filter((row) => row.nextAttemptAtMs <= nowMs)
-		.sort((left, right) => left.nextAttemptAtMs - right.nextAttemptAtMs)
-		.slice(0, limit)
 }

@@ -7,7 +7,7 @@
  * `nextAttemptAt` is the whole retry schedule: the cron reads the due rows by it, and a failed
  * attempt moves it into the future, so no failing row can starve a newer one.
  */
-import type { D1Database, Fetcher } from "@cloudflare/workers-types"
+import type { D1Database, D1PreparedStatement, Fetcher } from "@cloudflare/workers-types"
 import { retryDueAtMs } from "./core/deletion"
 import type { DeleteOutcome } from "./data-worker"
 import { capErrorText, messageOf, notifyDataWorker } from "./data-worker"
@@ -56,23 +56,24 @@ export async function findPendingDeletion(
 	return row ?? undefined
 }
 
-/** Writes one attempt's result: acknowledged on success, backoff and error text on failure. */
-export async function recordOutcome(
+/**
+ * The statement that writes one attempt's result: acknowledged on success, backoff and error text
+ * on failure. Returned rather than run so a cron tick can send every row's write in one batch.
+ */
+export function outcomeStatement(
 	db: D1Database,
 	row: PendingDeletionRow,
 	outcome: DeleteOutcome,
 	nowMs: number,
-): Promise<void> {
+): D1PreparedStatement {
 	if (outcome.ok) {
-		await db
+		return db
 			.prepare(
 				'update "pendingDeletion" set "acknowledgedAt" = ?, "lastError" = null where "id" = ?',
 			)
 			.bind(new Date(nowMs).toISOString(), row.id)
-			.run()
-		return
 	}
-	await db
+	return db
 		.prepare(
 			'update "pendingDeletion" set "attempts" = ?, "nextAttemptAt" = ?, "lastError" = ? where "id" = ?',
 		)
@@ -82,12 +83,37 @@ export async function recordOutcome(
 			capErrorText(outcome.error),
 			row.id,
 		)
-		.run()
+}
+
+/** Writes one attempt's result. */
+export async function recordOutcome(
+	db: D1Database,
+	row: PendingDeletionRow,
+	outcome: DeleteOutcome,
+	nowMs: number,
+): Promise<void> {
+	await outcomeStatement(db, row, outcome, nowMs).run()
 }
 
 /**
- * Notifies the data Worker about one queued row and records the outcome. Never throws: the person's
- * account is already gone by the time this runs, so a broken data side is the cron's problem.
+ * Asks the data Worker about one queued row and reports what it answered. Never throws: the
+ * person's account is already gone by the time this runs, so a broken data side is the cron's
+ * problem.
+ */
+export async function attemptPendingDeletion(input: {
+	data: Fetcher | undefined
+	row: PendingDeletionRow
+}): Promise<DeleteOutcome> {
+	try {
+		return await notifyDataWorker(input.data, input.row.authUserId)
+	} catch (error) {
+		return { ok: false, error: capErrorText(messageOf(error)) }
+	}
+}
+
+/**
+ * Notifies the data Worker about one queued row and records the outcome. Used by `afterDelete`,
+ * where there is exactly one row.
  */
 export async function deliverPendingDeletion(input: {
 	db: D1Database
@@ -96,12 +122,7 @@ export async function deliverPendingDeletion(input: {
 	nowMs?: number
 }): Promise<DeleteOutcome> {
 	const nowMs = input.nowMs ?? Date.now()
-	let outcome: DeleteOutcome
-	try {
-		outcome = await notifyDataWorker(input.data, input.row.authUserId)
-	} catch (error) {
-		outcome = { ok: false, error: capErrorText(messageOf(error)) }
-	}
+	const outcome = await attemptPendingDeletion({ data: input.data, row: input.row })
 	try {
 		await recordOutcome(input.db, input.row, outcome, nowMs)
 	} catch {

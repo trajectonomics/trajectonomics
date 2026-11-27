@@ -5,7 +5,7 @@ import {
 	consentView,
 	isConsentLanguage,
 	parseConsentAnswer,
-} from "./consent"
+} from "./marketing-consent-rules"
 
 describe("parsing a consent answer", () => {
 	it("accepts a boolean with either source and language", () => {

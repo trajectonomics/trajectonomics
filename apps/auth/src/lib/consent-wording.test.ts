@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { CONSENT_WORDING_VERSION } from "../core/consent"
+import { CONSENT_WORDING_VERSION } from "../core/marketing-consent-rules"
 import { CONSENT_WORDINGS, consentWording, currentConsentWording } from "./consent-wording"
 import { LANGUAGES } from "./language"
 
