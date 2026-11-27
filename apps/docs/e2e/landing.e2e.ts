@@ -17,16 +17,15 @@ const LANDING_PATH = `${DOCS_BASE_PATH}/`
 /** The release line the built page must state: the newest cli tag this checkout sees, or none. */
 const RELEASE_LINE = readReleaseLine()
 
-/** Whether `url` is the Site Home, which is on another host (ADR 0013). */
+/** Whether `url` is the Site Home, the Site Worker's root (ADR 0017). */
 function isSiteHome(url: URL): boolean {
-	const home = new URL(SITE_HOME_PATH)
-	return url.origin === home.origin && url.pathname === home.pathname
+	return url.pathname === SITE_HOME_PATH && url.search === "" && url.hash === ""
 }
 
 /** A Site Home document, so the browser test never asks the network for trajectonomics.com. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
 
-test("/docs reaches the Landing Page at /", async ({ page }) => {
+test("the /docs mount reaches the Landing Page", async ({ page }) => {
 	const response = await page.goto(DOCS_BASE_PATH)
 
 	expect(response?.status()).toBe(200)

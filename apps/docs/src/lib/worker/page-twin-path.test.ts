@@ -1,21 +1,22 @@
 import { describe, expect, test } from "bun:test"
 import { pageTwinPath } from "./page-twin-path"
 
-// Only a page URL negotiates. The old `/docs` prefix is a redirect, and a path without a
-// trailing slash is not a page URL (ADR 0010, ADR 0013).
+// Only a page URL under the Portal's /docs base negotiates, and only with its trailing slash
+// (ADR 0010, ADR 0017). A file, the Site root and the base itself are not page URLs.
 const cases: readonly (readonly [string, string | null])[] = [
-	["/", "/index.md"],
-	["/cli/", "/cli.md"],
-	["/cli/commands/tx/", "/cli/commands/tx.md"],
-	["/blog/", "/blog.md"],
+	["/docs/", "/docs/index.md"],
+	["/docs/cli/", "/docs/cli.md"],
+	["/docs/cli/commands/tx/", "/docs/cli/commands/tx.md"],
+	["/", null],
+	["/cli/", null],
+	["/blog/", null],
+	["/data/", null],
 	["/docs", null],
-	["/docs/", null],
-	["/docs/cli/", null],
-	["/cli", null],
-	["/cli/commands/tx.md", null],
-	["/llms.txt", null],
-	["/sitemap.xml", null],
-	["/_astro/app.css", null],
+	["/docs/cli", null],
+	["/docs/cli/commands/tx.md", null],
+	["/docs/llms.txt", null],
+	["/docs/sitemap.xml", null],
+	["/docs/_astro/app.css", null],
 ]
 
 describe("a page URL asks for its Markdown twin", () => {

@@ -20,8 +20,9 @@ describe("the Worker config", () => {
 		expect(config.name).toBe("docs")
 	})
 
-	test("serves the built assets from ./dist", () => {
+	test("serves the built assets from ./dist at the /docs mount", () => {
 		expect(config.assets.directory).toBe("./dist")
+		expect(config.assets.base_path).toBe("/docs")
 	})
 
 	test("runs this repository's Worker entry before the assets", () => {
@@ -64,9 +65,11 @@ describe("the Worker config", () => {
 		expect(declaredRoutes({ routes: [], env: { staging: { routes: [] } } })).toEqual([])
 	})
 
-	test("the shipped Worker attaches the docs subdomain and no other hostname", () => {
-		expect(config.routes).toEqual([{ pattern: "docs.trajectonomics.com", custom_domain: true }])
+	test("the shipped Worker serves the apex /docs route and keeps the old Docs host", () => {
+		expect(config.routes).toEqual([
+			{ pattern: "trajectonomics.com/docs*", zone_name: "trajectonomics.com" },
+			{ pattern: "docs.trajectonomics.com", custom_domain: true },
+		])
 		expect(declaredRoutes(config)).toEqual([{ scope: "top level", key: "routes" }])
-		expect(JSON.stringify(config)).not.toContain("trajectonomics.com/docs")
 	})
 })

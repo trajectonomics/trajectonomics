@@ -1,9 +1,10 @@
+import { DOCS_BASE_PATH } from "../src/lib/tabs"
 import { openPage, pageName } from "./built-site"
 import { expect, test } from "./fixtures"
 import { TEST_VIEWPORT_HEIGHT_PX } from "./viewports"
 
 /** The Quickstart page, whose install fence is wider than a phone column. */
-const CLI_PAGE = "/cli/"
+const CLI_PAGE = `${DOCS_BASE_PATH}/cli/`
 
 test("a CLI code block scrolls inside its own container, not the page", async ({ page }) => {
 	await page.setViewportSize({ width: 390, height: TEST_VIEWPORT_HEIGHT_PX })

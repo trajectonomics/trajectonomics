@@ -6,10 +6,10 @@
  */
 
 import { twinUrl } from "./agent/twin-url"
-import { DOCS_INDEX_PATH, OPERATOR_TAB_CONTENT } from "./tabs"
+import { DOCS_BASE_PATH, DOCS_INDEX_PATH, OPERATOR_TAB_CONTENT } from "./tabs"
 
 /** The Operator tab page that carries the skill and install commands the prompt sends an Agent to. */
-export const INSTALLATION_PAGE_PATH = `/${OPERATOR_TAB_CONTENT}/installation/`
+export const INSTALLATION_PAGE_PATH = `${DOCS_BASE_PATH}/${OPERATOR_TAB_CONTENT}/installation/`
 
 /** The heading of the Landing Page section that hands the Docs Portal to an Agent. */
 export const AGENT_START_HEADING = "Start with your Agent"
@@ -56,7 +56,8 @@ export function agentRoutes(origin: string): readonly [AgentRoute, AgentRoute, A
 		},
 		{
 			title: "Any page as Markdown",
-			description: "Put .md in place of a page's trailing slash. The Landing Page is /index.md.",
+			description:
+				"Put .md in place of a page's trailing slash. The Landing Page is /docs/index.md.",
 			snippet: twinUrl(origin, INSTALLATION_PAGE_PATH),
 		},
 		{

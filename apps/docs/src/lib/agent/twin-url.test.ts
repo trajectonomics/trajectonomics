@@ -6,10 +6,10 @@ const ORIGIN = SITE_ORIGIN
 
 describe("the absolute URL of a page's Markdown twin", () => {
 	test.each([
-		["/cli", "https://docs.trajectonomics.com/cli.md"],
-		["/cli/installation", "https://docs.trajectonomics.com/cli/installation.md"],
-		["/cli/commands/tx", "https://docs.trajectonomics.com/cli/commands/tx.md"],
-		["/", "https://docs.trajectonomics.com/index.md"],
+		["/docs/cli", `${ORIGIN}/docs/cli.md`],
+		["/docs/cli/installation", `${ORIGIN}/docs/cli/installation.md`],
+		["/docs/cli/commands/tx", `${ORIGIN}/docs/cli/commands/tx.md`],
+		["/docs/", `${ORIGIN}/docs/index.md`],
 	])("the twin of %s is %s", (pageUrl, url) => {
 		expect(twinUrl(ORIGIN, pageUrl)).toBe(url)
 	})
