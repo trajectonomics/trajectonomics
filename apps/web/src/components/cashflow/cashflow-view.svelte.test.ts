@@ -99,7 +99,8 @@ describe("CashFlowView", () => {
 
 	test("the wide diagram is for a medium screen and up, and the stacked one for a phone, so neither scrolls sideways", () => {
 		const body = renderView({ base: okRun(cashflowRunFixture()) })
-		expect(body.match(/<svg/g)?.length).toBe(2)
+		// Two diagrams and the one zero-size probe both measure through, outside both breakpoint wrappers.
+		expect(body.match(/<svg/g)?.length).toBe(3)
 		expect(body).toMatch(/class="max-w-full overflow-x-auto[^"]*hidden md:block"/)
 		expect(body).toMatch(/class="[^"]*md:hidden"/)
 		// The stacked one has no minimum width and no scroll box of its own.
