@@ -9,9 +9,7 @@ export type Env = Readonly<Record<string, string | undefined>>
 /** What a command returns on success: structure only. The envelope layer renders it. */
 export type Result<T = unknown> = { readonly ok: true; readonly data: T }
 
-export function ok<T>(data: T): Result<T> {
-	return { ok: true, data }
-}
+export const ok = <T>(data: T): Result<T> => ({ ok: true, data })
 
 export type Example = { command: string; description: string }
 
@@ -63,6 +61,7 @@ export type DocumentSpec<D extends z.ZodType = z.ZodType> = {
 	 * first, and the two never mix: the flag selects one schema before the document is read.
 	 */
 	alternate?: { flag: string; schema: z.ZodType }
+	flagForm?: { fields: readonly string[]; required?: readonly string[] }
 }
 
 type Outcome<T> = Result<T> | AppError | Promise<Result<T> | AppError>
@@ -94,10 +93,8 @@ export type Command<
 	/** Input fields filled from positional words, in order. The last may be an array. */
 	positionals: readonly string[]
 	input: I
-	/**
-	 * The alternate document form, beside the flag form (ADR-0020). The flag form's input schema
-	 * stays the single source of flags, `required` and usage.
-	 */
+	/** The alternate document form, beside the flag form (ADR-0020); its input schema stays the single
+	 * source of flags, `required` and usage. */
 	document?: DocumentSpec<NonNullable<D>>
 	/** Documents a flag names beside the other flags, published by `traj schema` (ADR-0030). */
 	flagDocuments?: readonly FlagDocument[]

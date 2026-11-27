@@ -15,7 +15,8 @@ describe("scenario apply --set, with a household", () => {
 		const before = await stored(home)
 		const res = await apply(home, ["base", "--set", 'flows.salary.end="2030-01-01"'])
 		expect(res.code).toBe(2)
-		expect(errorOf(res)).toMatchObject({
+		const error = errorOf(res)
+		expect(error).toMatchObject({
 			code: "invalid_input",
 			path: "document.flows.0.end",
 			details: {
@@ -23,6 +24,7 @@ describe("scenario apply --set, with a household", () => {
 				anchored: "2050-06-30",
 			},
 		})
+		expect(error.hint).toContain('--set flows.salary.end="2030-01-01"')
 		expect((await stored(home)).row).toEqual(before.row)
 	})
 
@@ -114,6 +116,9 @@ describe("traj schema scenario apply, for the what-if form", () => {
 		expect(res.code).toBe(0)
 		const described = JSON.parse(res.out)
 		expect(described.input.properties.set).toMatchObject({ flag: "--set" })
+		expect(described.input.properties.set.description).toContain(
+			"Applied to the stored plan, the Set is saved.",
+		)
 		expect(described.input.properties.without).toMatchObject({ flag: "--without" })
 		expect(described.input.properties.add).toMatchObject({ flag: "--add" })
 		expect(described.description).toContain("--set, --without and --add")

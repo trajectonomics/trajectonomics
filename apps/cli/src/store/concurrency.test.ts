@@ -4,7 +4,7 @@ import { join } from "node:path"
 import { isAppError } from "../errors"
 import { LOADED_MACHINE_MS } from "../test-timeouts"
 import { HEAD, openStore } from "./index"
-import { ledgerHome, must, mustOpen, steppingClock } from "./testing"
+import { ledgerHome, must, mustOpen, SCENARIO_DOCUMENT, steppingClock } from "./testing"
 
 const CHILD = join(import.meta.dir, "concurrent-writer.fixture.ts")
 
@@ -96,6 +96,56 @@ describe("concurrency", () => {
 			const { integrity, foreignKeys } = health(home)
 			expect(integrity).toEqual([{ integrity_check: "ok" }])
 			expect(foreignKeys).toEqual([])
+		},
+		LOADED_MACHINE_MS,
+	)
+
+	it(
+		"lets exactly one what-if with the same --if-hash win, and refuses the rest as scenario_changed",
+		async () => {
+			const home = ledgerHome()
+			const setup = mustOpen(home)
+			const saved = must(setup.saveScenario({ name: "shared", document: SCENARIO_DOCUMENT }))
+			setup.close()
+			const hash = saved.scenario.contentHash
+			const busyMs = String(LOADED_MACHINE_MS)
+			const writers = 4
+			const children = Array.from({ length: writers }, (_, writer) =>
+				Bun.spawn(
+					[
+						process.execPath,
+						CHILD,
+						home,
+						String(writer),
+						"0",
+						busyMs,
+						"apply",
+						"shared",
+						hash,
+						"economy.inflation=100",
+					],
+					{ stdout: "pipe", stderr: "pipe" },
+				),
+			)
+			const results = await Promise.all(
+				children.map(async (child) => ({
+					code: await child.exited,
+					err: await new Response(child.stderr).text(),
+				})),
+			)
+			expect(results.filter((result) => result.code === 0)).toHaveLength(1)
+			const refused = results.filter((result) => result.code !== 0)
+			expect(refused).toHaveLength(writers - 1)
+			for (const result of refused) {
+				expect(result.code).toBe(5)
+				expect(JSON.parse(result.err).error).toMatchObject({ code: "scenario_changed" })
+			}
+			const store = mustOpen(home)
+			const [shared] = must(store.listScenarios({ sort: "name" }))
+			expect(shared?.version).toBe(2)
+			expect(JSON.parse(shared?.document ?? "").economy.inflation).toBe(100)
+			store.close()
+			expect(health(home).integrity).toEqual([{ integrity_check: "ok" }])
 		},
 		LOADED_MACHINE_MS,
 	)

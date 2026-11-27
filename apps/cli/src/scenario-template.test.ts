@@ -173,12 +173,13 @@ describe("scenario apply --template", () => {
 		}
 	})
 
-	it("shows both usage lines, the flag in Options and the invocation in Examples", async () => {
+	it("shows every usage line, the flag in Options and the invocation in Examples", async () => {
 		const help = await capture(["help", "scenario", "apply"])
 		expect(help.code).toBe(0)
 		expect(help.out.split("\n").filter((line) => line.startsWith("Usage:"))).toEqual([
 			"Usage: traj scenario apply [options] [name]",
 			"Usage: traj scenario apply <name> --file <file|-> [--dry-run] [--decimal] [--if-hash <string>]",
+			"Usage: traj scenario apply <name> [--set <string>] [--without <string>] [--add <string>] [--dry-run] [--decimal] [--if-hash <string>]",
 		])
 		expect(help.out).toContain("--template")
 		expect(help.out).toContain("traj scenario apply --template")

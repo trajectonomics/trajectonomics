@@ -7,6 +7,7 @@ import type { ScenarioRow } from "../store"
 import { withStore } from "../with-store"
 import { type ApplyFlags, WHAT_IF_NAME } from "./apply-forms"
 import { removedLevyNotes } from "./apply-notes"
+import { nameTheSet } from "./apply-set-hint"
 import { type ApplyResult, applyShape, replyOf } from "./apply-write"
 import type { ScenarioDocument } from "./document"
 import { invalidScenarioName, scenarioChanged, scenarioNotFound } from "./errors"
@@ -83,7 +84,7 @@ export function writeWhatIf(ctx: Context, write: WhatIfWrite): Result<WhatIfResu
 			{ name: write.name, document: applied.document, expectedHash: plan.contentHash },
 			{ dryRun: write.dryRun },
 		)
-		if (isAppError(outcome)) return outcome
+		if (isAppError(outcome)) return nameTheSet(outcome, write.sets, applied.overrides)
 		const reply = replyOf(outcome, {
 			decimal: write.decimal,
 			dryRun: write.dryRun,
