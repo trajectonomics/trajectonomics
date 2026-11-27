@@ -1,6 +1,7 @@
 import { mkdir } from "node:fs/promises"
 import { join, resolve } from "node:path"
 import { chromium, type Page } from "playwright-core"
+import { BLOG_BASE } from "../src/lib/site"
 
 /** The built assets root the Worker serves. */
 const BUILD_ROOT = resolve(import.meta.dir, "..", "dist")
@@ -8,14 +9,14 @@ const BUILD_ROOT = resolve(import.meta.dir, "..", "dist")
 /** Where the committed screenshots live, one folder per Theme. */
 const OUTPUT_ROOT = resolve(import.meta.dir, "..", "docs", "screenshots")
 
-/** The pages a Surface ticket shows, by file-name stem. */
+/** The pages a Surface ticket shows, by file-name stem, at their public paths under the blog's base. */
 const PAGES = Object.freeze([
-	{ name: "front", path: "/" },
-	{ name: "post", path: "/guides/one-answer-every-time/" },
-	{ name: "front-th", path: "/th/" },
-	{ name: "post-th", path: "/th/guides/one-answer-every-time/" },
-	{ name: "post-fallback", path: "/guides/software-factory/" },
-	{ name: "not-found", path: "/missing/" },
+	{ name: "front", path: `${BLOG_BASE}/` },
+	{ name: "post", path: `${BLOG_BASE}/guides/one-answer-every-time/` },
+	{ name: "front-th", path: `${BLOG_BASE}/th/` },
+	{ name: "post-th", path: `${BLOG_BASE}/th/guides/one-answer-every-time/` },
+	{ name: "post-fallback", path: `${BLOG_BASE}/guides/software-factory/` },
+	{ name: "not-found", path: `${BLOG_BASE}/missing/` },
 ])
 
 /** The widths every Surface ticket's evidence covers: desktop, wide and phone. */
@@ -24,13 +25,20 @@ const WIDTHS = Object.freeze([1280, 2000, 390])
 /** The device schemes, which pick the Theme because the blog follows the device. */
 const SCHEMES = Object.freeze(["light", "dark"] as const)
 
-/** Answers a request the way Workers Static Assets does for this build: index files and the Not-found Page. */
+/**
+ * Answers a request the way Workers Static Assets does for this build under `assets.base_path`:
+ * the base is stripped before the file lookup, index files resolve, and the Not-found Page answers
+ * a miss or a path outside the base.
+ */
 async function answer(request: Request): Promise<Response> {
-	const { pathname } = new URL(request.url)
-	const file = Bun.file(
-		join(BUILD_ROOT, pathname.endsWith("/") ? `${pathname}index.html` : pathname),
-	)
-	if (await file.exists()) return new Response(file)
+	const requested = new URL(request.url).pathname
+	if (requested.startsWith(`${BLOG_BASE}/`)) {
+		const pathname = requested.slice(BLOG_BASE.length)
+		const file = Bun.file(
+			join(BUILD_ROOT, pathname.endsWith("/") ? `${pathname}index.html` : pathname),
+		)
+		if (await file.exists()) return new Response(file)
+	}
 	return new Response(Bun.file(join(BUILD_ROOT, "404.html")), {
 		status: 404,
 		headers: { "content-type": "text/html; charset=utf-8" },

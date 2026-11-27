@@ -11,8 +11,8 @@
 		{ "pattern": "blog.trajectonomics.com", "custom_domain": true }
 	],
 	"assets": {
-		// The build stays at ./dist; base_path serves its root under /blog/, and the Worker gets
-		// requests outside it (the old host) and misses inside it (the 404 page) (ADR 0004).
+		// The build stays at ./dist; base_path serves its root under /blog/. Only requests outside it
+		// (the old host) run the Worker; a miss inside it gets the 404 page (ADR 0004).
 		"directory": "./dist",
 		"binding": "ASSETS",
 		"base_path": "/blog",

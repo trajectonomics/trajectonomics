@@ -25,11 +25,12 @@ hostname. Each sub-app keeps its own Worker, build, checks and deploy.
   nested under `dist/blog`; paths in `run_worker_first` and `_headers` would use the public path.
 - The Worker gains the smallest script, `src/worker.ts`, with `assets.binding: "ASSETS"` and no
   `run_worker_first`: requests under `/blog/` that match an asset are served straight from assets,
-  without running the script. Requests outside the base, and a miss under it, reach the script: the
-  script redirects the old host, and forwards everything else to `env.ASSETS.fetch(request)` so the
-  Not-found Page still answers.
+  without running the script. Requests outside the base reach the script, which redirects the old
+  host and forwards anything else to `env.ASSETS.fetch(request)`. A miss under the base gets the
+  Not-found Page from `not_found_handling`: a browser navigation never runs the script, and any other
+  request that reaches it is forwarded to the assets, which answer the same page.
 - `blog.trajectonomics.com` stays attached as a Custom Domain. The script answers its GET and HEAD
-  requests with a 301 to `https://trajectonomics.com/blog<path><query>`, and does not add the base a
+  requests outside `/blog/` with a 301 to `https://trajectonomics.com/blog<path><query>`, and does not add the base a
   second time to a path that already has it. Other hosts, including localhost and previews, serve
   normally.
 - The Site owns the host-root files: `robots.txt`, the IndexNow key file and the root favicon. The
@@ -47,6 +48,10 @@ hostname. Each sub-app keeps its own Worker, build, checks and deploy.
 - The blog keeps its own Worker, build, checks and deploy; only its public address changed.
 - The Worker now has a script, so it can no longer be described as Static Assets only. Requests
   under `/blog/` still cost no script run.
+- On the old host, a path that already starts with `/blog/` and matches an asset is served there
+  without a redirect, because assets answer before the script and `run_worker_first` matches paths,
+  not hosts. No published URL ever had that prefix, and every canonical names the apex, so this is
+  accepted rather than running the script on every apex request with `run_worker_first: true`.
 - An asset reference in the blog is now absolute under `/blog/` (`/blog/posts/...`, `/blog/fonts/...`,
   `/blog/favicon/...`); a root-relative path without the base names a Site-owned file instead.
 - The Site's `robots.txt` must list the blog's sitemap; the blog no longer publishes one.
