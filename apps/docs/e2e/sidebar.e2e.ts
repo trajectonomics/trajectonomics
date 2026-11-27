@@ -75,23 +75,28 @@ test("the sidebar's tree keeps the reference's rhythm", async ({ page }) => {
 	expect(pitch, "the rows stand 6px apart").toBe(ROW_PITCH_PX)
 })
 
-test("the sidebar's top block carries the search and no way back to the site", async ({ page }) => {
+test("the sidebar's top block carries neither the search nor a way back to the site", async ({
+	page,
+}) => {
 	await openDocsPage(page, 1280)
 	const block = page.locator("#nd-sidebar [data-sidebar-top-block]")
 
-	await expect(block.locator("[data-search-full]")).toBeVisible()
+	// Search lives in the header's right slot on every page (ADR 0009's 2026-11-27 amendment).
+	await expect(block.locator("[data-search], [data-search-full]")).toHaveCount(0)
+	await expect(page.locator("#nd-subnav [data-search-full]")).toBeVisible()
 	// The way back is the header's glyph tile, as on the blog (ADR 0009).
 	await expect(block.locator("[data-site-home]")).toHaveCount(0)
 })
 
-test("the phone drawer opens with the search and the Tab dropdown", async ({ page }) => {
+test("the phone drawer opens with the Tab dropdown and no search", async ({ page }) => {
 	await openDocsPage(page, PHONE_WIDTH_PX)
 	await openSidebarDrawer(page)
 
 	const block = page.locator("#nd-sidebar-mobile [data-sidebar-top-block]")
 	await expect(block).toBeVisible()
-	await expect(block.locator("[data-search-full]")).toBeVisible()
+	await expect(block.locator("[data-search], [data-search-full]")).toHaveCount(0)
 	await expect(block.locator("[data-sidebar-tabs]")).toBeVisible()
+	await expect(page.locator("#nd-subnav [data-search]")).toBeVisible()
 
 	// The drawer's own close button is the library's, rendered through the block, not one the shell
 	// drew: it closes the drawer (docs#91).
@@ -106,13 +111,15 @@ test("the phone drawer opens with the search and the Tab dropdown", async ({ pag
 	expect(treeSize, "the drawer's tree reads at the desktop sidebar's size").toBe("14px")
 })
 
-test(`the header of ${DOCS_PAGE_PATH} carries the header mark and the Tabs and nothing else`, async ({
+test(`the header of ${DOCS_PAGE_PATH} carries the mark, the Tabs and the search`, async ({
 	page,
 }) => {
 	await openDocsPage(page, 1280)
 	const header = page.locator("#nd-subnav")
 
-	expect(await header.locator("[data-search], [data-search-full]").count()).toBe(0)
+	await expect(header.locator("[data-search-full]")).toHaveCount(1)
+	// The phone icon is in the row's markup, hidden from lg up.
+	await expect(header.locator("[data-search]").filter({ visible: true })).toHaveCount(0)
 	await expect(header.locator("[data-site-home]")).toHaveCount(1)
 	await expect(header.locator("[data-shell-tabs] a")).toHaveCount(2)
 })

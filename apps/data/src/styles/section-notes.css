@@ -1,0 +1,54 @@
+/* The definitions and sources, folded away under every chart, and the table details. */
+
+.section-notes {
+	margin-top: 24px;
+	padding-top: 12px;
+	border-top: 1px solid var(--ds-color-border);
+}
+
+.section-notes summary,
+.table-details summary {
+	width: fit-content;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+	cursor: pointer;
+}
+
+.section-notes summary:hover,
+.table-details summary:hover {
+	color: var(--ds-color-foreground);
+}
+
+.section-notes summary:focus-visible,
+.table-details summary:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+.section-notes-body {
+	max-width: 46rem;
+	padding-top: 6px;
+}
+
+.section-notes-body p {
+	margin: 10px 0 0;
+	font-size: 13px;
+	line-height: 1.7;
+	color: var(--ds-color-muted-foreground);
+}
+
+.section-notes-body a {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 3px;
+}
+
+.table-details {
+	margin-top: 20px;
+}
+
+.table-details .plan-peaks {
+	padding-top: 8px;
+}

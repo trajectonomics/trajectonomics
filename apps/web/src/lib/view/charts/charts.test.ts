@@ -63,7 +63,7 @@ describe("the series catalogue", () => {
 		const namesOfRun = resolveSeries(run, names)
 			.filter((item) => item.id.startsWith("cash:"))
 			.map((item) => item.name)
-		expect(namesOfRun).toEqual(["Expense: rent (a)", "Expense: rent (rent)"])
+		expect(namesOfRun).toEqual(["Expense: rent (a)", "Expense: rent"])
 	})
 
 	test("adds the id when a label equals another Flow's twin form", () => {
@@ -77,7 +77,7 @@ describe("the series catalogue", () => {
 			.filter((item) => item.id.startsWith("cash:"))
 			.map((item) => item.name)
 		expect(namesOfRun).toEqual([
-			"Expense: rent (a) (a)",
+			"Expense: rent (a)",
 			"Expense: rent (a) (b)",
 			"Expense: rent (rent)",
 		])
@@ -185,6 +185,14 @@ describe("storage", () => {
 		expect(uniqueId("My chart!", new Set(["my-chart"]))).toBe("my-chart-2")
 		expect(duplicateOf([CHART], CHART)).toMatchObject({ id: "spend-2", name: "Spend (copy)" })
 		expect(defaultName(["Income", "Expenses"])).toBe("Income and 1 more")
+	})
+
+	test("a long first name is cut with an ellipsis, so the default name keeps its count", () => {
+		const first = "Saving: condo-loan-payment (no category) into Provident fund"
+		expect(defaultName([first])).toBe(first)
+		const name = defaultName([first, "Income"])
+		expect(name).toBe("Saving: condo-loan-payment (no category) into Pr… and 1 more")
+		expect(name.length).toBeLessThanOrEqual(60)
 	})
 
 	test("a new chart's default name reads the series ids, so it fits every plan", () => {
