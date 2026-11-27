@@ -24,6 +24,8 @@ describe("flowCards", () => {
 			employer: null,
 			employerId: null,
 			editable: true,
+			compactLine: "a month · until May 2050 · grows with inflation",
+			ruleShare: null,
 		})
 		expect(cards[1]?.earned).toBe("Passive")
 		expect(cards[1]?.growth).toBe("0.00% a year")
@@ -35,6 +37,17 @@ describe("flowCards", () => {
 		expect(cards).toHaveLength(1)
 		expect(cards[0]?.growth).toBe("3.00% a year")
 		expect(cards[0]?.earned).toBeNull()
+	})
+
+	test("a compact line names a start the household pins, in the household's own words", () => {
+		const household = {
+			schemaVersion: 1 as const,
+			people: [{ id: "me", role: "holder" as const, born: "1990-06", lifeExpectancy: 90 }],
+			anchors: [{ path: "flows.salary.start", person: "me", age: 36 }],
+		}
+		expect(flowCards(planDocument().flows, "income", household)[0]?.compactLine).toBe(
+			"a month · from Nov 2026, at you, age 36 · until May 2050 · grows with inflation",
+		)
 	})
 
 	test("a computed Flow reads computed, and is not editable here", () => {

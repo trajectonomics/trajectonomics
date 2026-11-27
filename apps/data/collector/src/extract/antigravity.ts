@@ -35,6 +35,22 @@ function rowFrom(record: JsonObject | null, conversationId: string): TranscriptR
 	}
 }
 
+/** One transcript record's identity, so a conversation copied under both roots counts once. */
+function recordKey(row: TranscriptRow): string {
+	return [row.conversationId, row.timestamp, row.tokensIn, row.tokensOut, row.cacheRead].join(
+		"\u0000",
+	)
+}
+
+/** Pushes a record unless the same conversation already contributed it from another root. */
+function addRow(rows: TranscriptRow[], seenRecords: Set<string>, row: TranscriptRow | null): void {
+	if (!row) return
+	const key = recordKey(row)
+	if (seenRecords.has(key)) return
+	seenRecords.add(key)
+	rows.push(row)
+}
+
 function rememberModel(
 	seen: Map<string, Set<string>>,
 	conversationId: string,
@@ -58,8 +74,10 @@ function learnedModels(seen: Map<string, Set<string>>): Map<string, string> {
 }
 
 /**
- * Extracts Antigravity planner responses. `transcript_full.jsonl` duplicates the same steps and
- * is skipped. A step without a model borrows its conversation's only model, else `unknown-gemini`.
+ * Extracts Antigravity planner responses from both the `~/.gemini` tree and T3 Code's copy under
+ * `~/.t3/userdata/providers/antigravity`. `transcript_full.jsonl` duplicates the same steps and is
+ * skipped; a record that the same conversation has under both roots counts once. A step without a
+ * model borrows its conversation's only model, else `unknown-gemini`.
  */
 export function extractAntigravity(
 	files: Iterable<AntigravityFile>,
@@ -67,13 +85,13 @@ export function extractAntigravity(
 ): UsageRow[] {
 	const rows: TranscriptRow[] = []
 	const seen = new Map<string, Set<string>>()
+	const seenRecords = new Set<string>()
 	for (const file of files) {
 		if (file.fileName !== "transcript.jsonl") continue
 		for (const line of file.lines) {
 			const record = parseJsonLine(line)
 			rememberModel(seen, file.conversationId, asString(record?.["model"]))
-			const row = rowFrom(record, file.conversationId)
-			if (row) rows.push(row)
+			addRow(rows, seenRecords, rowFrom(record, file.conversationId))
 		}
 	}
 	const learned = learnedModels(seen)

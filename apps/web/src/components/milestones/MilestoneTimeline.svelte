@@ -19,7 +19,7 @@ let { reached }: Props = $props()
 	{:else}
 		<ol class="ml-2 space-y-5 border-l border-border pl-6">
 			{#each reached as milestone (milestone.id)}
-				<li class="relative">
+				<li id={milestone.id} class="relative">
 					<span
 						aria-hidden="true"
 						class="absolute top-1.5 -left-[31px] size-3 rounded-full border-2 border-accent bg-background"

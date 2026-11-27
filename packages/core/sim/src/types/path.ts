@@ -41,6 +41,8 @@ export interface PathRollupReturns {
 	readonly index: number
 	readonly from: DateString
 	readonly to: DateString
+	/** The path's own inflation over the roll-up; present only when it has a Price path (ADR 0033). */
+	readonly inflationBps?: BasisPoints
 	readonly accounts: readonly PathAccountReturn[]
 }
 
