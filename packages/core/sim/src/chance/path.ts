@@ -5,10 +5,11 @@ import { openingNetWorth } from "../output/opening"
 import { buildPeriods, type Period } from "../output/periods"
 import { buildRollups } from "../output/rollups"
 import { accountRules } from "../output/rules"
-import type { Baseline, DateString, Scenario, Timeline } from "../types"
+import type { Baseline, DateString, MinorUnits, Scenario, Timeline } from "../types"
 import { rollupGrid, rollupObservations } from "./grid"
 import { lowestOf } from "./lowest"
 import type { PathOutcome, PathResult } from "./path-outcome"
+import { realWorth } from "./real-worth"
 import { spentBy } from "./spent"
 
 /** What every Market path of one chance shares: the inputs, the roll-up grid and the opening worth. */
@@ -31,6 +32,13 @@ export function pathInputs(baseline: Baseline, scenario: Scenario, timeline: Tim
 		observations: rollupObservations(timeline),
 		opening: openingNetWorth(baseline, accountRules(scenario)),
 	}
+}
+
+/** The `realNetWorth` field of a path's outcome, present only when the run followed a Price path. */
+function realFields(real: readonly MinorUnits[] | undefined): {
+	readonly realNetWorth?: readonly MinorUnits[]
+} {
+	return real === undefined ? {} : { realNetWorth: real }
 }
 
 /**
@@ -59,10 +67,20 @@ export function outcomeOf(
 	const annual = rollups.annual!
 	const last = annual[annual.length - 1]!
 	const netWorth = inputs.grid.map((period) => (annual[period.index] ?? last).closingNetWorth)
+	const real = realWorth(
+		result.run.snapshots,
+		accountRules(inputs.scenario),
+		timeline.start,
+		returns.prices,
+		inputs.grid,
+		inputs.opening,
+	)
+	if (!real.ok) return { ok: false, problem: real.problem }
 	const spent = spentBy(result.run, inputs.scenario, inputs.grid)
 	if (!spent.ok) return { ok: false, problem: spent.problem }
 	const outcome: PathOutcome = {
 		netWorth,
+		...realFields(real.real),
 		lowest: lowestOf(netWorth),
 		...(runsOut === undefined
 			? {}
