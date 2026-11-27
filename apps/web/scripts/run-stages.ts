@@ -56,7 +56,10 @@ export async function runStageTwo(
 	context: RunContext,
 	plan: StageTwoPlan,
 	records: readonly unknown[],
-): Promise<Omit<SnapshotReads, "accounts" | "netWorth" | "scenarios">> {
+): Promise<
+	Omit<SnapshotReads, "accounts" | "netWorth" | "scenarios"> &
+		Required<Pick<SnapshotReads, "rates">>
+> {
 	const pool = createPool()
 	const comparePlan = plan.compare
 	const phaseOne = await Promise.all([

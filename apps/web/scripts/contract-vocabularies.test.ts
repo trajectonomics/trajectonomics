@@ -131,6 +131,12 @@ const RATES_LISTS: readonly {
 		follow: "same",
 	},
 	{
+		label: "Rate total type",
+		web: baselineRateType.options,
+		path: "output.properties.totals.items.properties.type.enum",
+		follow: "same",
+	},
+	{
 		label: "Rate frequency",
 		web: baselineRateFrequency.options,
 		path: `${RATE_ROW}.frequency.enum`,
