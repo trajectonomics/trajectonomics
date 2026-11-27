@@ -4,6 +4,7 @@ import { sumNullable, sumOf } from "./sum"
 /** Every plan's totals added up, for the summary's tiles and the breakdown's closing row. */
 export type GrandTotal = {
 	tokensTotal: number
+	tokensUncached: number
 	requests: number
 	activeDays: number
 	tokensIn: number | null
@@ -16,6 +17,7 @@ export type GrandTotal = {
 export function grandTotal(totals: readonly PlanTotal[]): GrandTotal {
 	return {
 		tokensTotal: sumOf(totals, (total) => total.tokensTotal),
+		tokensUncached: sumOf(totals, (total) => total.tokensUncached),
 		requests: sumOf(totals, (total) => total.requests),
 		activeDays: sumOf(totals, (total) => total.activeDays),
 		tokensIn: sumNullable(totals.map((total) => total.tokensIn)),

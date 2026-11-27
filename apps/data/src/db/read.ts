@@ -48,23 +48,30 @@ export async function readRollups(db: D1Database, filter: UsageFilter): Promise<
 	return result.results
 }
 
-/** One plan's tokens at one UTC bucket, summed over models and machines and nothing else. */
+/**
+ * One plan's tokens at one UTC bucket, summed over models and machines and nothing else.
+ * `tokens_total` leaves cache reads out, and `cache_read` holds them apart.
+ */
 export type PeakDbRow = {
 	plan: string
 	hour_utc: string
 	granularity: Granularity
 	tokens_total: number
+	cache_read: number
 }
 
 /**
  * Reads every hourly and daily bucket up to and including `asOf`, one figure per plan and bucket.
  * `usage_hourly` keeps no series; its org rows are what the rollups' `measured-by-us` series is
- * built from, so the join selects the same rows the public rollups hold. The peaks core turns the
- * hours into a start day; no hour leaves this module.
+ * built from, so the join selects the same rows the public rollups hold. Cache reads are summed
+ * apart, so a cache-heavy hour never becomes the headline figure. The peaks core turns the hours
+ * into a start day; no hour leaves this module.
  */
 export async function readPeaks(db: D1Database, asOf: string): Promise<PeakDbRow[]> {
 	const sql = `SELECT usage_hourly.plan AS plan, usage_hourly.hour_utc AS hour_utc,
-		 usage_hourly.granularity AS granularity, SUM(usage_hourly.tokens_total) AS tokens_total
+		 usage_hourly.granularity AS granularity,
+		 SUM(MAX(0, usage_hourly.tokens_total - COALESCE(usage_hourly.cache_read, 0))) AS tokens_total,
+		 SUM(COALESCE(usage_hourly.cache_read, 0)) AS cache_read
 		 FROM usage_hourly
 		 JOIN contributor ON contributor.id = usage_hourly.contributor_id
 		 WHERE contributor.kind = 'org' AND usage_hourly.hour_utc < ?

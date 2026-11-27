@@ -4,6 +4,8 @@
 
 Accepted, 2026-11-27. Follow-up to issue #739 and #744.
 
+Partly superseded by [ADR 0009](0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md), 2026-11-27: figures leave cache reads out, Claude's 5 hours are anchored to activity, and "≥" is gone (measured figures read "Most we used").
+
 ## Context
 
 The "What each plan gives" section shows the most tokens a plan carried in any 5 hours, 7 days and

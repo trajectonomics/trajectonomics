@@ -58,10 +58,9 @@ function rowOf(
 }
 
 /**
- * Per window, the higher of two floors: what we measured on the picked tier, or the estimate
- * scaled from another tier. Both are true lower bounds on the picked tier's limit, so the higher
- * one says more. A tier we used for one hour would otherwise show a floor far below what its
- * stated multiplier already proves.
+ * Per window, the larger of what we used and the scaled figure: both are true lower bounds on the
+ * picked tier's limit, so the larger one says more. A tier we used for one hour would otherwise
+ * show a floor far below what its stated multiplier already proves.
  */
 function higherFloors(
 	measuredCells: Record<PeakWindowKey, TierCell>,

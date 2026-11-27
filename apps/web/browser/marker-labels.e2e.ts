@@ -55,3 +55,16 @@ for (const [name, dates] of CASES) {
 		expect(await measureMarkers(page)).toEqual([])
 	})
 }
+
+// The Plan's own chart at 360px is shorter than a card's, so its marker labels are measured by the same rules.
+test("the Plan keeps marker labels off the rules at 360px, Milestones three in half a year", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 360, height: 800 })
+	await serveMoved(page, ["2039-01-01", "2039-03-01", "2039-06-01"])
+	await openDemo(page, "/projection/?scenario=base", { theme: "light" })
+	const chart = page.getByRole("img", { name: "Net worth at the close of each year" })
+	await expect(chart.locator("[data-marker-rule]")).toHaveCount(3)
+	await expect(chart.locator("[data-marker-label]").first()).toBeVisible()
+	expect(await measureMarkers(page)).toEqual([])
+})

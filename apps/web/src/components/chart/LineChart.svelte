@@ -41,6 +41,8 @@ interface Props {
 	wide?: boolean
 	/** A column chart's step line on a second axis on the right, such as the rate of each period. Left out, there is none. */
 	step?: StepLine | undefined
+	/** The chart's height in pixels. Left out, the default line chart's height. */
+	height?: number | undefined
 }
 
 let {
@@ -52,6 +54,7 @@ let {
 	kind = "line",
 	wide = false,
 	step,
+	height,
 }: Props = $props()
 let clientWidth = $state(0)
 let active = $state<number | null>(null)
@@ -60,9 +63,10 @@ const width = $derived(
 )
 const masked = $derived((hidden ?? preferences.hidden) && money)
 const subLine = $derived(series.some((line) => line.points.some((point) => point.subLabel)))
+const chartHeight = $derived(height ?? HEIGHT)
 const plot = $derived({
 	width,
-	height: HEIGHT,
+	height: chartHeight,
 	margin: {
 		...MARGIN,
 		...(step ? { right: RIGHT_AXIS_MARGIN } : {}),
@@ -79,17 +83,14 @@ const layout = $derived(
 )
 </script>
 
-<!--
-	A line chart. Hover, and the arrow keys once it has focus, show a crosshair and a tooltip with every
-	series' string as the CLI printed it. Its axis labels are round tick values, abbreviated, and hide with
-	the amounts.
--->
+<!-- A line chart with hover, keyboard and abbreviated axis labels, and a tooltip of each series' own string. -->
 <div bind:clientWidth class="w-full">
 	{#if layout}
 		<LineHover
 			{label}
 			{layout}
 			{width}
+			height={chartHeight}
 			{masked}
 			{active}
 			onActive={(index) => (active = index)}

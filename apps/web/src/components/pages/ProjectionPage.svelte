@@ -1,19 +1,18 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
+import { householdOf } from "../../lib/view/item-names"
 import { chooseScenario } from "../../lib/view/plan"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import { ALL_YEAR_FIGURES } from "../../lib/view/what-if/years"
-import HouseholdSection from "../household/HouseholdSection.svelte"
 import ProjectionView from "../projection/ProjectionView.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import ProjectionWhatIf from "../what-if/ProjectionWhatIf.svelte"
 
 interface Props {
-	/** The Scenario the address bar asks for, and the setter that writes it. */
+	/** The Scenario the address bar asks for. */
 	scenario: string
 	/** Whether the Edit controls show: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
-	onScenario: (value: string) => unknown
 	/** The terms the address bar asks for, and the setter that writes them. */
 	terms: string
 	onTerms: (value: string) => void
@@ -22,8 +21,8 @@ interface Props {
 	onChart: (id: string) => void
 }
 
-/** The Plan: one Scenario, year by year, in nominal and real terms, with its notes and tax status. */
-let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = $props()
+/** The Plan: its people, the three figures, and its chart. The household and the years have their own pages. */
+let { scenario, editable, terms, onTerms, chart, onChart }: Props = $props()
 </script>
 
 <PageShell
@@ -35,12 +34,14 @@ let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = 
 		{#if lens && plan !== null}
 			<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} {terms} keys={ALL_YEAR_FIGURES} />
 		{/if}
-		<HouseholdSection {snapshot} {scenario} {editable} />
 		<ProjectionView
 			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
 			{scenario}
-			{onScenario}
+			household={householdOf(snapshot, plan)}
+			fi={plan === null ? undefined : snapshot.reads.fi[plan]}
+			chance={plan === null ? undefined : snapshot.reads.chance[plan]}
+			{editable}
 			{terms}
 			{onTerms}
 			{chart}

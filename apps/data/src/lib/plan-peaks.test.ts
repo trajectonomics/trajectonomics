@@ -1,19 +1,12 @@
 import { describe, expect, test } from "bun:test"
-import {
-	measuredOf,
-	PEAK_COLUMNS,
-	peakColumnMax,
-	peakOf,
-	peakShare,
-	peakSpoken,
-	peakTableRows,
-} from "./plan-peaks"
+import { PEAK_COLUMNS, peakCacheShare, peakNote, peakSpoken } from "./peak-words"
+import { measuredOf, peakColumnMax, peakOf, peakShare, peakTableRows } from "./plan-peaks"
 import type { Peak, PlanPeak } from "./types"
 
 const DAY = "2026-11-27"
 
-function peak(tokens: number, fromDay = "2026-11-24"): Peak {
-	return { tokens, fromDay }
+function peak(tokens: number, fromDay = "2026-11-24", cacheRead: number | null = null): Peak {
+	return { tokens, fromDay, cacheRead }
 }
 
 function plan(planId: string, overrides: Partial<Omit<PlanPeak, "plan">> = {}): PlanPeak {
@@ -112,12 +105,61 @@ describe("the peaks table's figures", () => {
 })
 
 describe("peakSpoken", () => {
-	test("spells out an at-least figure with its window and start day", () => {
+	test("spells out the figure with its window and start day", () => {
 		expect(peakSpoken(peak(2_300_000_000), PEAK_COLUMNS[0] as (typeof PEAK_COLUMNS)[number])).toBe(
-			"at least 2,300,000,000 tokens in 5 hours, from 2026-11-24",
+			"2,300,000,000 tokens in 5 hours, from 2026-11-24",
 		)
 		expect(peakSpoken(peak(5), PEAK_COLUMNS[2] as (typeof PEAK_COLUMNS)[number])).toBe(
-			"at least 5 tokens in 30 days, from 2026-11-24",
+			"5 tokens in 30 days, from 2026-11-24",
+		)
+	})
+
+	test("names the cache reads it counted apart", () => {
+		expect(peakCacheShare(peak(100, "2026-11-24", 900))).toBe(0.9)
+		expect(peakNote(peak(100, "2026-11-24", 900), "fiveHours")).toBe("90% cache reads")
+		expect(
+			peakSpoken(peak(100, "2026-11-24", 900), PEAK_COLUMNS[0] as (typeof PEAK_COLUMNS)[number]),
+		).toBe("100 tokens in 5 hours, from 2026-11-24, 90% cache reads")
+	})
+})
+
+describe("a derived month", () => {
+	test("scales Claude's week to 30 days and says so instead of a start day", () => {
+		const rows = peakTableRows(
+			[],
+			[plan("claude", { sevenDays: peak(700), thirtyDays: null })],
+			DAY,
+		)
+		const month = peakOf(findRow(rows, "claude"), "thirtyDays")
+		expect(month).toEqual({ tokens: 3_000, fromDay: "2026-11-24", cacheRead: null, derived: true })
+		expect(peakNote(month as Peak, "thirtyDays")).toBe("week × 30/7")
+		expect(peakSpoken(month as Peak, PEAK_COLUMNS[2] as (typeof PEAK_COLUMNS)[number])).toBe(
+			"3,000 tokens in 30 days, worked out as the busiest week × 30/7",
+		)
+	})
+
+	test("keeps a stated monthly window for another plan", () => {
+		const rows = peakTableRows([], [plan("mistral", { thirtyDays: peak(900) })], DAY)
+		expect(peakOf(findRow(rows, "mistral"), "thirtyDays")).toEqual(peak(900))
+	})
+})
+
+describe("an old-shape body", () => {
+	test("renders a body cached before cache reads without a cache line", () => {
+		const old = {
+			plan: "mistral",
+			tier: "Pro",
+			fiveHours: null,
+			sevenDays: { tokens: 700, fromDay: "2026-11-20" },
+			thirtyDays: { tokens: 1_200, fromDay: "2026-11-20" },
+		} as unknown as PlanPeak
+		const rows = peakTableRows([], [old], DAY)
+		const week = peakOf(findRow(rows, "mistral"), "sevenDays") as Peak
+		expect(peakCacheShare(week)).toBeNull()
+		expect(peakNote(week, "sevenDays")).toBeNull()
+		expect(peakNote(week, "sevenDays", false)).toBe("no cache split")
+		expect(peakSpoken(week, PEAK_COLUMNS[1] as (typeof PEAK_COLUMNS)[number])).toBe(
+			"700 tokens in 7 days, from 2026-11-20",
 		)
 	})
 })

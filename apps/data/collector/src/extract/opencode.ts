@@ -4,6 +4,9 @@ import type { OpenCodeRow } from "../stores/opencode"
 import type { CollectorContext, UsageRow, UsageSample } from "../types"
 import { asNumber, asObject, asString, parseJsonLine } from "./parse"
 
+/** The source label on rows read from OpenCode's SQLite database. */
+export const OPENCODE_DB_SOURCE = "opencode-db"
+
 function outputWithReasoning(tokens: Record<string, unknown>): number | null {
 	const output = asNumber(tokens["output"])
 	const reasoning = asNumber(tokens["reasoning"])
@@ -28,7 +31,7 @@ function sampleFromMessage(row: OpenCodeRow): UsageSample | null {
 		cacheRead: asNumber(cache?.["read"]),
 		cacheWrite: asNumber(cache?.["write"]),
 		requests: 1,
-		source: "opencode-db",
+		source: OPENCODE_DB_SOURCE,
 	}
 }
 
@@ -51,7 +54,7 @@ function sampleFromSessionMessage(row: OpenCodeRow): UsageSample | null {
 		cacheRead: asNumber(cache?.["read"]),
 		cacheWrite: asNumber(cache?.["write"]),
 		requests: 1,
-		source: "opencode-db",
+		source: OPENCODE_DB_SOURCE,
 	}
 }
 

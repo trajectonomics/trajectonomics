@@ -47,12 +47,13 @@ afterAll(() => {
 })
 
 describe("the Projection's charts", () => {
-	test("the title is a picker: the net worth chart, My charts, then New chart", () => {
+	test("the picker is behind one Charts button, and the chart still draws", () => {
 		const body = show("")
 		expect(body).toContain("Net worth by year")
-		expect(body).toContain('label="My charts"')
-		expect(body).toContain("Income, expenses and tax")
-		expect(body).toContain("New chart…")
+		expect(body).toContain('aria-label="Charts"')
+		expect(body).toContain('aria-expanded="false"')
+		expect(body).not.toContain("New chart…")
+		expect(body).not.toContain("Import charts")
 		expect(body).toContain('role="img"')
 	})
 
@@ -91,11 +92,13 @@ describe("the Projection's charts", () => {
 		expect(body).toContain("<rect")
 	})
 
-	test("the chart's controls are reachable: edit, duplicate and delete, export and import", () => {
+	test("the chart's controls are reachable: the picker, edit, duplicate and delete", () => {
 		const body = show("spend")
-		for (const word of ["Edit", "Duplicate", "Delete", "Export my charts", "Import charts"]) {
+		for (const word of ["Charts", "Edit", "Duplicate", "Delete"]) {
 			expect(body).toContain(word)
 		}
+		expect(body).toContain('aria-label="Charts"')
+		expect(body).not.toContain("Import charts")
 	})
 
 	test("hiding amounts masks the table and the axis, and every figure with it", () => {
@@ -108,14 +111,12 @@ describe("the Projection's charts", () => {
 		expect(body).toContain("•")
 	})
 
-	test("a long chart name cannot widen the page: the picker may shrink and fills only its own box", () => {
+	test("a long chart name cannot widen the page: the heading wraps and stays in its box", () => {
 		const body = show("spend", withTax(), { ...CHART, name: "N".repeat(60) })
-		const heading = /<h2 id="net-worth-chart" class="([^"]*)"/.exec(body)?.[1] ?? ""
+		const heading = /<h2 class="([^"]*)">N{60}<\/h2>/.exec(body)?.[1] ?? ""
 		expect(heading).toContain("min-w-0")
 		expect(heading).toContain("max-w-full")
-		const select = /<select id="net-worth-chart-select"[^>]*class="([^"]*)"/.exec(body)?.[1] ?? ""
-		expect(select).toContain("w-full")
-		expect(select).toContain("max-w-full")
+		expect(heading).toContain("break-words")
 		// The name also appears in the table's summary, where a long unbroken word must wrap.
 		expect(body).toMatch(/<summary class="[^"]*wrap-anywhere[^"]*">Values of N{60}/)
 	})
