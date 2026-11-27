@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { ScenarioDocument } from "../../lib/contract"
 import type { YearView } from "../../lib/view/allowances"
-import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
+import type { PersonNames } from "../../lib/view/item-names"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
 import type { Column } from "../ui/table-types"
@@ -13,14 +13,14 @@ interface Props {
 	currency: string
 	plan: { name: string; contentHash: string; doc: ScenarioDocument } | null
 	/** The household's people, so a joint Return names each spouse's allowances. */
-	people?: PersonNames
+	people: PersonNames
 	/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
 	claimsHolder: string | null
 	/** The Return this table sits in, when the page shows one section per Return: it names the region and steps the heading down. */
 	region?: string
 }
 
-let { years, currency, plan, people = NO_PEOPLE, claimsHolder, region }: Props = $props()
+let { years, currency, plan, people, claimsHolder, region }: Props = $props()
 let open: string | null = $state(null)
 const label = $derived(
 	region === undefined ? "Every later tax year" : `${region}: every later tax year`,

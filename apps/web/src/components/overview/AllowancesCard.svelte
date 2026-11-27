@@ -33,7 +33,7 @@ const single = $derived(
 						<dl class="space-y-1">
 							{#each view.savings as one (one.key)}
 								<div class="flex items-baseline justify-between gap-3">
-									<dt class="text-sm text-muted-foreground">{#if one.name !== null}<ItemWords label={one.name} />{/if}</dt>
+									<dt class="text-sm text-muted-foreground">{#if typeof one.name === "string"}{one.name}{:else if one.name !== null}<ItemWords label={one.name} />{/if}</dt>
 									<dd class="text-xl font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} compact /></dd>
 								</div>
 							{/each}
