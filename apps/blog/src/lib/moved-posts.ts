@@ -15,13 +15,13 @@ export interface MovedPost {
  */
 export const MOVED_POSTS: readonly MovedPost[] = Object.freeze([
 	// 2026-11-28: the Post Types grew from compare, guide and news to five.
-	{ slug: "ai-model-tier-breakdown", from: "guide", to: "compare" },
-	{ slug: "ai-subscription-by-budget", from: "guide", to: "compare" },
-	{ slug: "ai-subscribe-1000-baht", from: "guide", to: "compare" },
-	{ slug: "one-answer-every-time", from: "guide", to: "essay" },
-	{ slug: "review-proof-not-code", from: "guide", to: "essay" },
-	{ slug: "software-factory", from: "guide", to: "essay" },
-	{ slug: "software-factory-7-things", from: "guide", to: "essay" },
+	Object.freeze({ slug: "ai-model-tier-breakdown", from: "guide", to: "compare" }),
+	Object.freeze({ slug: "ai-subscription-by-budget", from: "guide", to: "compare" }),
+	Object.freeze({ slug: "ai-subscribe-1000-baht", from: "guide", to: "compare" }),
+	Object.freeze({ slug: "one-answer-every-time", from: "guide", to: "essay" }),
+	Object.freeze({ slug: "review-proof-not-code", from: "guide", to: "essay" }),
+	Object.freeze({ slug: "software-factory", from: "guide", to: "essay" }),
+	Object.freeze({ slug: "software-factory-7-things", from: "guide", to: "essay" }),
 ])
 
 /** One permanent redirect from an old public path to the new one. */

@@ -26,7 +26,11 @@ export function offeredGroups(options: readonly HTMLAnchorElement[]): readonly F
 			byGroup.set(group, [...(byGroup.get(group) ?? []), value])
 		}
 	}
-	return [...byGroup.entries()].map(([name, values]) => ({ name, values }))
+	return Object.freeze(
+		[...byGroup.entries()].map(([name, values]) =>
+			Object.freeze({ name, values: Object.freeze(values) }),
+		),
+	)
 }
 
 /** Updates `aria-current` and `href` on every filter option to reflect the active filters. */

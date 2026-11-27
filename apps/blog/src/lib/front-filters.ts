@@ -37,11 +37,11 @@ export function initFrontFilters(root: Document = document): void {
 		const search = new URLSearchParams(window.location.search)
 		const next = nextFilterValue(current, group, optionValue(option))
 		const query = filterQuery(current, group, next, search)
-		const nextUrl = `${basePath}${query}`
-		if (nextUrl !== `${window.location.pathname}${window.location.search}`) {
-			window.history.pushState(null, "", nextUrl)
+		const nextSearch = new URLSearchParams(query)
+		if (nextSearch.toString() !== search.toString() || window.location.pathname !== basePath) {
+			window.history.pushState(null, "", `${basePath}${query}`)
 		}
-		apply(new URLSearchParams(query), true)
+		apply(nextSearch, true)
 	}
 
 	for (const option of options) option.addEventListener("click", (event) => onClick(option, event))
