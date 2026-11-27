@@ -172,8 +172,7 @@ describe("heroOf", () => {
 
 	test("names the chance's own horizon and counts when it states no success note", () => {
 		const hero = heroOf(snapshotOf(reachable(), { chance: chanceFixture({ succeeded: 174 }) }))
-		const text =
-			"The plan holds to 31 Dec 2028 in 174 of 200 simulated markets, which is not a guarantee."
+		const text = "Lasts to 2028 in 174 of 200 markets."
 		expect(hero?.planNote).toMatchObject({ text, fromCli: false })
 	})
 
@@ -190,7 +189,7 @@ describe("heroOf", () => {
 		)
 		expect(hero?.sentence).toBe("You could stop working in Jul 2057, when you are 47.")
 		expect(hero?.sentence.match(/\d+/g)).toEqual(["2057", "47"])
-		expect(hero?.planNote?.text.match(/\d+/g)).toEqual(["31", "2058", "137", "219"])
+		expect(hero?.planNote?.text.match(/\d+/g)).toEqual(["2058", "137", "219"])
 	})
 })
 

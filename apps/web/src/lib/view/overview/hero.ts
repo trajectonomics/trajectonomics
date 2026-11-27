@@ -1,5 +1,5 @@
 import type { Fi, HouseholdDocument, ProjectionChance, Read, Snapshot } from "../../contract"
-import { formatDate } from "../../format"
+import { chanceLasts } from "../chance/words"
 import { type BestCaseView, fiModelOf, type UnreachableFi } from "../fi/model"
 import { householdOf, type PersonNames, personNames } from "../item-names"
 import { noteAnchor } from "../projection/notes"
@@ -95,9 +95,7 @@ function andList(parts: readonly string[]): string {
 function planNoteOf(chance: Read<ProjectionChance> | undefined): PlanNote | null {
 	if (chance === undefined || !chance.ok) return null
 	const stated = chance.data.notes.find((note) => note.startsWith(SUCCESS_NOTE_PREFIX))
-	const text =
-		stated ??
-		`${SUCCESS_NOTE_PREFIX}${formatDate(chance.data.horizon)} in ${chance.data.succeeded} of ${chance.data.paths} simulated markets, which is not a guarantee.`
+	const text = stated ?? chanceLasts(chance.data.succeeded, chance.data.paths, chance.data.horizon)
 	return { label: "Your plan as written:", text, fromCli: stated !== undefined }
 }
 

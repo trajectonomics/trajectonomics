@@ -86,11 +86,11 @@ describe("the inputs the person types", () => {
 describe("the reading of one allowances result", () => {
 	test("the year the As-of falls in is first, with the tax due now, with every suggestion and the saving", () => {
 		const view = allowancesView(inYear("2026-03-01"))
-		expect(view.current?.period).toBe("1 Jan 2026 to 31 Dec 2026")
+		expect(view.current?.period).toBe("2026")
 		expect(view.current?.dueBefore).toBe("28400.00")
 		expect(view.current?.dueAfter).toBe("300.00")
 		expect(view.current?.saving).toBe("28100.00")
-		expect(view.later.map((year) => year.period)).toEqual(["1 Jan 2027 to 31 Dec 2027"])
+		expect(view.later.map((year) => year.period)).toEqual(["2027"])
 	})
 
 	test("an As-of in no year the read states leaves every year to the table", () => {
@@ -179,7 +179,7 @@ describe("the Home card", () => {
 				},
 			],
 			currency: "THB",
-			period: "1 Jan 2026 to 31 Dec 2026",
+			period: "2026",
 		})
 	})
 

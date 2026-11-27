@@ -36,7 +36,7 @@ describe("the Reports view, rendered from the Demo snapshot", () => {
 			expect(body).toContain(label)
 		}
 		expect(body).toContain(
-			`${PLAN} · As of ${formatDate(RUN.asOf)} · Nominal and real, in As-of terms`,
+			`${PLAN} · As of ${formatDate(RUN.asOf)} · Future money and today's money`,
 		)
 		expect(body).not.toContain("What-if session")
 	})
@@ -61,7 +61,7 @@ describe("the Reports view, rendered from the Demo snapshot", () => {
 		const lens = { plan: PLAN, run: RUN, fi: null, compare: null, chance: null }
 		const body = view({ lens, changes: { sets: [], removals: [] } })
 		expect(body).toContain(
-			`${PLAN} · As of ${formatDate(RUN.asOf)} · Nominal and real, in As-of terms · What-if session`,
+			`${PLAN} · As of ${formatDate(RUN.asOf)} · Future money and today's money · What-if session`,
 		)
 		expect(reportSource(DEMO.reads, PLAN, lens)?.whatIf).toBe(true)
 	})
@@ -91,9 +91,9 @@ describe("the Reports view, rendered from the Demo snapshot", () => {
 		expect(body).not.toContain("<table")
 	})
 
-	test("a plan the Snapshot has no read for says so", () => {
+	test("a plan these figures have no read for says so", () => {
 		const body = view({ plan: "no-such-plan" })
-		expect(body).toContain("The Snapshot holds no projection for this plan.")
+		expect(body).toContain("These figures hold no projection for this plan.")
 		expect(body).toContain("Download everything")
 	})
 })

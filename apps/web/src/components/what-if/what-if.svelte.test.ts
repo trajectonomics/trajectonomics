@@ -30,11 +30,11 @@ describe("the What-if controls", () => {
 		}).body
 		expect(body).toContain('role="switch"')
 		expect(body).toContain("Include gym in the what-if")
-		expect(body).toContain("Try a value")
+		expect(body).toContain("What if…")
 		expect(body).toContain("On")
 	})
 
-	test("the switch and Try a value are disabled while Apply or Save runs, so no change can start", () => {
+	test("the switch and What if… are disabled while Apply or Save runs, so no change can start", () => {
 		const props = {
 			plan: "base",
 			contentHash: HASH,
@@ -48,18 +48,18 @@ describe("the What-if controls", () => {
 			const body = render(ItemSwitch, { props }).body
 			expect(body).toMatch(/role="switch"[^>]*disabled/)
 			// The attribute on that button, not the `disabled:` Tailwind variant in its class list.
-			const tryButton = /<button([^>]*)>\s*Try a value\s*<\/button>/.exec(body)?.[1] ?? ""
+			const tryButton = /<button([^>]*)>\s*What if…\s*<\/button>/.exec(body)?.[1] ?? ""
 			expect(tryButton).toMatch(/\sdisabled=""/)
 		} finally {
 			whatIfSession.saving = false
 		}
 	})
 
-	test("the planner list shows a switch and Try a value on each editable card, and none on a read-only page", () => {
+	test("the planner list shows a switch and What if… on each editable card, and none on a read-only page", () => {
 		expect(list(true)).toContain('role="switch"')
-		expect(list(true)).toContain("Try a value")
+		expect(list(true)).toContain("What if…")
 		expect(list(false)).not.toContain('role="switch"')
-		expect(list(false)).not.toContain("Try a value")
+		expect(list(false)).not.toContain("What if…")
 	})
 
 	test("the session bar is absent without a session, so a page with no changes shows none", () => {

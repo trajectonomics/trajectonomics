@@ -36,7 +36,7 @@ const read = $derived(name === null ? undefined : projections[name])
 {#snippet taxScenario(scenario: string, scenarioRead: Read<ProjectionRun>)}
 	{@const lens = whatIfSession.lensFor(scenario)}
 	<div class="space-y-8">
-		{#if lens}<TaxWhatIf {lens} />{/if}
+		{#if lens}<TaxWhatIf {lens} people={people[scenario] ?? NO_PEOPLE} claimsHolder={holders[scenario] ?? null} />{/if}
 		<ReadView read={scenarioRead} label={`The tax of ${scenario}`}>
 			{#snippet children(run)}
 				<TaxBodyView

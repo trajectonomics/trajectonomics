@@ -18,6 +18,7 @@
 		"apps/docs",
 		"apps/web",
 		"apps/blog",
+		"apps/auth",
 		"apps/data",
 		"apps/data/collector",
 		"apps/openjot",

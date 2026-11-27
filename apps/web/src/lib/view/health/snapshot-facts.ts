@@ -24,7 +24,7 @@ export function snapshotFacts(snapshot: Snapshot): readonly FactLine[] {
 		},
 		{ label: "Ages", value: listOf(params.ages.map(String), "None") },
 		{ label: "History dates", value: `${params.historyDates.length} month-ends` },
-		{ label: "Snapshot version", value: String(snapshot.snapshotVersion) },
+		{ label: "Version of these figures", value: String(snapshot.snapshotVersion) },
 		{ label: "traj version", value: snapshot.cliVersion },
 	]
 }

@@ -45,7 +45,7 @@ describe("parseSnapshotText", () => {
 	test("names the version of a Snapshot this Dashboard does not read", () => {
 		const result = parseSnapshotText(JSON.stringify({ snapshotVersion: 2 }))
 		expect(result.ok).toBe(false)
-		if (!result.ok) expect(result.reason).toContain("Snapshot version 2")
+		if (!result.ok) expect(result.reason).toContain("is version 2")
 	})
 
 	test("says a file that is not JSON is not JSON", () => {

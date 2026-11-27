@@ -17,7 +17,10 @@ redirects its pages (ADR 0006).
    test, a doc, a commit message or a pull request.
 4. No prices in slice 1. A price enters the plan table only with a dated public source, in a later
    slice.
-5. Cursor is counted from exactly one source per run: its SDK store when `usage_json` is populated,
+5. A multiplier for a plan tier enters the catalogue only with a dated public source: a URL, the day
+   it was read, and an exact quote. The catalogue lives in `collector/src/tier-catalog.ts`; a
+   multiplier is never inferred from a price or a neighbouring tier.
+6. Cursor is counted from exactly one source per run: its SDK store when `usage_json` is populated,
    else the T3 Code `cursor` logs. Never both.
 
 ## The site
@@ -46,3 +49,7 @@ redirects its pages (ADR 0006).
    the upserts plus each affected day's SQL rollup rebuild share one `DB.batch` (one D1 query).
 7. The schema changes only through numbered files in `migrations/`; the deploy workflow applies
    them before deploying the Worker.
+8. A cached read outlives a deploy (`/api/peaks` keeps a body for 4 hours). A change to a read's
+   body shape bumps that read's cache-key shape (`PEAKS_SHAPE` in `src/http/cache.ts`), and the
+   page tolerates the old shape: on 2026-11-27 a cached peaks body without `measured` broke the
+   overview after #748 deployed.

@@ -11,10 +11,10 @@ interface Props {
 let { headline, currency }: Props = $props()
 </script>
 
-<!-- The first tax year: what is owed, or a refund in words, with its Levy, period and settlement date. -->
+<!-- The first tax year: what is owed, or a refund in words, with its period and settlement date. -->
 <Stat
-	label={headline.refund ? "Refund" : "Owed"}
-	secondary={`${headline.levy}, ${headline.period}, settles ${headline.settles}`}
+	label={headline.refund ? "Refund" : "Tax"}
+	secondary={`For ${headline.period}, due ${headline.settles}`}
 >
 	{#snippet value()}
 		<Money amount={headline.owed} {currency} />
