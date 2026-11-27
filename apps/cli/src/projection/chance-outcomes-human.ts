@@ -32,6 +32,7 @@ export const OUTCOME_EXTRA: readonly ExtraTable[] = [
 			column("lowestYear"),
 			column("runsOut"),
 			column("unmet", "right"),
+			{ ...column("milestones"), optional: true },
 		],
 	},
 ]
@@ -57,6 +58,14 @@ function byClosing(left: Row, right: Row): number {
 	return Number(left["index"]) - Number(right["index"])
 }
 
+/** The fired dates by id as one cell, such as `retire 2030-06-01, rich 2031-01-01`. */
+function firedText(value: unknown): string {
+	if (!isRow(value)) return ""
+	return Object.entries(value)
+		.map(([id, date]) => `${id} ${String(date)}`)
+		.join(", ")
+}
+
 /** The outcome as one flat table row, the run-out's date and unmet shortfall in their own columns. */
 function flat(outcome: Row): Row {
 	const runsOut = isRow(outcome["runsOut"]) ? outcome["runsOut"] : undefined
@@ -67,6 +76,9 @@ function flat(outcome: Row): Row {
 		lowestYear: outcome["lowestYear"],
 		runsOut: runsOut?.["date"] ?? "",
 		unmet: runsOut?.["unmet"] ?? "",
+		...(outcome["milestones"] === undefined
+			? {}
+			: { milestones: firedText(outcome["milestones"]) }),
 	}
 }
 

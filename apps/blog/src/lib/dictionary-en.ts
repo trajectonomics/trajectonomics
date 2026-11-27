@@ -37,5 +37,5 @@ export const EN: Dictionary = Object.freeze({
 	footerOrganisation: "Organisation",
 	footerReport: "Report a wrong fact",
 	footerLicence: "Licence",
-	footerLicenceLine: (siteName: string) => `${siteName}. The blog's source is MIT licensed.`,
+	footerLicenceLine: (siteName: string) => `${siteName}. The blog's source is AGPL-3.0 licensed.`,
 })

@@ -64,6 +64,30 @@ describe("the projection chance contract against the CLI's goldens", () => {
 		expect(chance.outcomes?.some((outcome) => outcome.index === lowest)).toBe(true)
 	})
 
+	it("parses a chance with --milestone-dates: each Milestone's reach, dates, ages and years (cli ADR-0081)", async () => {
+		const chance = projectionChance.parse(await golden("chance-milestones.output"))
+		expect(chance.milestones?.map((entry) => entry.id)).toEqual(["stop", "retire", "rich", "never"])
+		expect(chance.milestones?.[0]).toMatchObject({
+			displayLabel: "stop work",
+			reached: { paths: 20, share: "100.00%" },
+		})
+		expect(chance.milestones?.[0]?.dates?.p50).toEqual({
+			date: "2026-09-01",
+			ages: [{ person: "me", age: 36 }],
+		})
+		expect(chance.milestones?.at(-1)?.dates).toBeNull()
+	})
+
+	it("parses each outcome's fired dates with --outcomes too, and refuses an unknown Milestone key", async () => {
+		const chance = projectionChance.parse(await golden("chance-milestones-outcomes.output"))
+		expect(chance.outcomes?.[0]?.milestones).toMatchObject({ stop: "2026-09-30" })
+		const body = (await golden("chance-milestones-outcomes.output")) as {
+			milestones: object[]
+		}
+		const bad = { ...body, milestones: [{ ...body.milestones[0], extra: 1 }] }
+		expect(projectionChance.safeParse(bad).success).toBe(false)
+	})
+
 	it("leaves a chance without --outcomes with neither key, and refuses an outcome it does not name", async () => {
 		const plain = projectionChance.parse(await golden("chance.output"))
 		expect(plain.outcomes).toBeUndefined()

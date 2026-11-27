@@ -23,7 +23,7 @@ export const THAI: LanguageEntry = Object.freeze({
 		heroHeadingPrefix: "ชุดเครื่องมือสำหรับ",
 		heroHeadingAccent: "การวางแผนการเงิน",
 		heroVersion: RELEASE.heroVersion,
-		heroLicence: "MIT · โอเพนซอร์ส",
+		heroLicence: "AGPL-3.0 · โอเพนซอร์ส",
 		releaseLine: RELEASE.releaseLine,
 		releaseDate: RELEASE.releaseDate,
 		heroSubline:
@@ -45,7 +45,7 @@ export const THAI: LanguageEntry = Object.freeze({
 		copied: "คัดลอกพรอมต์แล้ว",
 		copiedLabel: "คัดลอกแล้ว",
 		copyFailed: "เลือกพรอมต์แล้วคัดลอก",
-		licence: "MIT",
+		licence: "AGPL-3.0-only",
 		org: "trajectonomics",
 		footerDisclaimer:
 			"ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli แล้วเราจะอัปเดตโดยเร็ว",

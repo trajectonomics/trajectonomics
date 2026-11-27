@@ -3,7 +3,7 @@
 	"version": "0.0.0-development",
 	"private": true,
 	"description": "Pure personal-finance core: money, double-entry ledger, Thai and US income tax, and the projection engine, as subpath exports.",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
