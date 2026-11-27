@@ -24,7 +24,6 @@ const MONEY: MoneyView = {
 			type: "income",
 			frequency: "monthly",
 			amount: "50000.00",
-			monthsText: "12 of 12 months",
 		},
 		{
 			id: "bonus",
@@ -32,7 +31,6 @@ const MONEY: MoneyView = {
 			type: "income",
 			frequency: "yearly",
 			amount: "100000.00",
-			monthsText: "12 of 12 months",
 		},
 		{
 			id: "rent",
@@ -40,7 +38,6 @@ const MONEY: MoneyView = {
 			type: "expense",
 			frequency: "monthly",
 			amount: "15000.00",
-			monthsText: "12 of 12 months",
 		},
 		{
 			id: "food",
@@ -48,11 +45,11 @@ const MONEY: MoneyView = {
 			type: "expense",
 			frequency: "monthly",
 			amount: "8000.00",
-			monthsText: "12 of 12 months",
 		},
 	],
 	leftOut: [],
 	totals: { income: "50000.00", spending: "23000.00" },
+	monthsCovered: 12,
 }
 
 const TOTALS: MoneyView = { ...MONEY, path: "totals", rows: [] }
@@ -111,6 +108,20 @@ describe("guidedEditOf", () => {
 			from: "totals",
 			income: "40000",
 			spending: "18000.50",
+		})
+	})
+
+	test("omits a dropped row's amount, so a typed number cannot become a kept row's", () => {
+		const rows = { ...ROWS, rent: { keep: false, amount: "999", earned: true } }
+		const made = guidedEditOf(draft({ rows }), "2026-10-31")
+		expect(made.ok && made.edit.money).toEqual({
+			from: "history",
+			rows: [
+				{ id: "salary", keep: true, amount: "52000", earned: true },
+				{ id: "bonus", keep: true, earned: false },
+				{ id: "rent", keep: false },
+				{ id: "food", keep: true },
+			],
 		})
 	})
 

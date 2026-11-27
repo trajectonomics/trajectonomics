@@ -5,6 +5,7 @@ import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { editSession } from "../../client/edit.svelte.js"
 import { guidedSession } from "../../client/guided-plan.svelte.js"
 import { type Snapshot, snapshot } from "../../lib/contract"
+import { blankPerson } from "../../lib/view/guided/people"
 import NewPlanForm from "../plans/NewPlanForm.svelte"
 import ProjectionView from "../projection/ProjectionView.svelte"
 import GuidedPlanPage from "./GuidedPlanPage.svelte"
@@ -85,6 +86,24 @@ describe("the guided plan page", () => {
 		expect(body).not.toContain("<table")
 		expect(body).toContain("flex-wrap")
 		expect(body).toContain("per month")
+	})
+
+	test("shows no problem on an untouched field, and every problem once Next finds one", () => {
+		const first = page()
+		expect(first).not.toContain("Enter a name for the person.")
+		expect(first).not.toContain("Enter the birth month as YYYY-MM.")
+		guidedSession.showProblems = true
+		const next = page()
+		expect(next).toContain("Enter a name for the person.")
+		expect(next).toContain("Enter the birth month as YYYY-MM.")
+	})
+
+	test("offers Remove on an added person, named with that person, and never on the holder", () => {
+		guidedSession.people = [blankPerson("holder")]
+		guidedSession.addPerson(guidedSession.people ?? [], "partner")
+		const body = page()
+		expect(body).toContain('aria-label="Remove Your partner"')
+		expect(body.match(/aria-label="Remove /g)).toHaveLength(1)
 	})
 })
 

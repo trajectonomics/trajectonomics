@@ -44,7 +44,8 @@ export type Composed =
 function historyRows(draft: GuidedDraft) {
 	return draft.money.rows.map((row) => {
 		const answer = draft.rows[row.id] ?? { keep: true, amount: "", earned: true }
-		const amount = amountSent(answer.amount)
+		// A dropped row takes no amount: its field is off, and the CLI would read a typed amount as a kept row's.
+		const amount = answer.keep ? amountSent(answer.amount) : undefined
 		return {
 			id: row.id,
 			keep: answer.keep,

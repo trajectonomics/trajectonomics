@@ -3,6 +3,7 @@
  * text; the commas come off before they are sent and nothing else about them changes (web ADR 0002).
  * Pure.
  */
+import { typedAmount } from "../plan-items/form"
 import type { GuidedMoneyRow } from "./money"
 
 /** One row's answers: kept or dropped, an amount (empty for the CLI's), and whether income stops at stop-work. */
@@ -35,10 +36,14 @@ export function draftsOf(rows: readonly GuidedMoneyRow[]): RowDrafts {
 	return Object.fromEntries(rows.map((row) => [row.id, { keep: true, amount: "", earned: true }]))
 }
 
-/** The text an amount sends: the commas off, and undefined for the empty one ("as the read states it"). */
+/**
+ * The text an amount sends: only thousands commas come off, by `typedAmount`, and the empty answer is undefined
+ * ("as the read states it"). A decimal comma stays a comma and is refused by `amountProblem`, never dropped.
+ */
 export function amountSent(text: string): string | undefined {
-	const amount = text.replaceAll(",", "")
-	return amount === "" ? undefined : amount
+	const typed = typedAmount(text)
+	if (typed !== null) return typed
+	return text === "" ? undefined : text
 }
 
 /** Why a typed row amount cannot be sent, or null when it can; empty means the CLI's own amount. */

@@ -1,7 +1,8 @@
 <script lang="ts">
 import { planNameError } from "../../lib/edit/name"
 import { ageProblem } from "../../lib/view/guided/stop"
-import { BUTTON, HINT, INPUT, LABEL, PRIMARY, PROBLEM } from "./styles"
+import GuidedRefusal from "./GuidedRefusal.svelte"
+import { HINT, INPUT, LABEL, PRIMARY, PROBLEM } from "./styles"
 
 interface Props {
 	name: string
@@ -15,8 +16,14 @@ interface Props {
 	saving: boolean
 	/** The CLI's message when it refused the save, unchanged. */
 	refusal: string | null
+	/** The hint the CLI offers under its refusal. */
+	hint: string | null
 	/** Whether the refusal offers Reload, as a ledger that moved since the page read it does. */
 	reloadable: boolean
+	/** Whether Next found a problem, so every field shows its own. */
+	showProblems: boolean
+	/** The step's heading, which the page focuses when the step changes. */
+	heading?: HTMLHeadingElement | undefined
 	onName: (name: string) => void
 	onAge: (age: string) => void
 	onSave: () => void
@@ -31,42 +38,60 @@ let {
 	saveable,
 	saving,
 	refusal,
+	hint,
 	reloadable,
+	showProblems,
+	heading = $bindable(),
 	onName,
 	onAge,
 	onSave,
 	onReload,
 }: Props = $props()
-const nameProblem = $derived(planNameError(name, stored))
+const nameProblem = $derived(planNameError(name, stored, "plan"))
 const ageText = $derived(ageProblem(age, lifeExpectancy))
+/** Save waits on every problem, but a field only shows its own after Next or once the person touched it. */
 const held = $derived(saving || nameProblem !== null || ageText !== null)
+interface Touched {
+	name?: boolean
+	age?: boolean
+}
+let touched = $state<Touched>({})
+const shownName = $derived(
+	nameProblem !== null && (showProblems || touched.name === true) ? nameProblem : null,
+)
+const shownAge = $derived(
+	ageText !== null && (showProblems || touched.age === true) ? ageText : null,
+)
 </script>
 
 <section class="space-y-4">
-	<h2 class="text-base font-semibold">When you would stop working</h2>
+	<h2 bind:this={heading} tabindex="-1" class="text-base font-semibold">When you would stop working</h2>
 	<div class="space-y-1.5">
 		<label for="guided-age" class={LABEL}>Stop-work age</label>
 		<p class={HINT}>The age you stop working. Every income that stops with it ends then.</p>
 		<input id="guided-age" class={INPUT} inputmode="numeric" autocomplete="off" value={age}
-			aria-invalid={ageText ? "true" : undefined}
-			aria-describedby={ageText ? "guided-age-problem" : undefined}
-			oninput={(event) => onAge(event.currentTarget.value)} />
-		{#if ageText}<p id="guided-age-problem" role="alert" class={PROBLEM}>{ageText}</p>{/if}
+			oninput={(event) => {
+				touched.age = true
+				onAge(event.currentTarget.value)
+			}}
+			onblur={() => (touched.age = true)}
+			aria-invalid={shownAge ? "true" : undefined}
+			aria-describedby={shownAge ? "guided-age-problem" : undefined} />
+		{#if shownAge}<p id="guided-age-problem" role="alert" class={PROBLEM}>{shownAge}</p>{/if}
 	</div>
 	<div class="space-y-1.5">
 		<label for="guided-name" class={LABEL}>Plan name</label>
 		<input id="guided-name" class={INPUT} autocomplete="off" value={name}
-			aria-invalid={nameProblem ? "true" : undefined}
-			aria-describedby={nameProblem ? "guided-name-problem" : undefined}
-			oninput={(event) => onName(event.currentTarget.value)} />
-		{#if nameProblem}<p id="guided-name-problem" role="alert" class={PROBLEM}>{nameProblem}</p>{/if}
+			oninput={(event) => {
+				touched.name = true
+				onName(event.currentTarget.value)
+			}}
+			onblur={() => (touched.name = true)}
+			aria-invalid={shownName ? "true" : undefined}
+			aria-describedby={shownName ? "guided-name-problem" : undefined} />
+		{#if shownName}<p id="guided-name-problem" role="alert" class={PROBLEM}>{shownName}</p>{/if}
 	</div>
-	{#if refusal}
-		<div class="space-y-2">
-			<p role="alert" class={PROBLEM}>{refusal}</p>
-			{#if reloadable}<button type="button" class={BUTTON} onclick={onReload}>Reload</button>{/if}
-		</div>
-	{/if}
+	{#if refusal}<GuidedRefusal {refusal} {hint} {reloadable} {onReload} />{/if}
 	{#if saveable}
 		<button type="button" class={PRIMARY} disabled={held} onclick={onSave}>
 			{saving ? "Saving…" : "Save plan"}

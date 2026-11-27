@@ -59,7 +59,8 @@ function moneyProblems(draft: GuidedDraft): string[] {
 			(problem): problem is string => problem !== null,
 		)
 	}
-	const rows = draft.money.rows.map((row) => amountProblem(draft.rows[row.id]?.amount ?? ""))
+	const kept = draft.money.rows.filter((row) => draft.rows[row.id]?.keep !== false)
+	const rows = kept.map((row) => amountProblem(draft.rows[row.id]?.amount ?? ""))
 	const keep = keepProblem(draft.rows)
 	return [...rows, ...(keep === null ? [] : [keep])].filter(
 		(problem): problem is string => problem !== null,
@@ -71,7 +72,7 @@ export function problemsOf(step: Step, draft: GuidedDraft): readonly string[] {
 	if (step === "household") return peopleOf(draft.people).problems.map((one) => one.problem)
 	if (step === "money") return moneyProblems(draft)
 	const holder = peopleOf(draft.people).holderLifeExpectancy
-	const name = planNameError(draft.name, draft.stored)
+	const name = planNameError(draft.name, draft.stored, "plan")
 	const age = ageProblem(draft.age, holder)
 	return [name, age].filter((problem): problem is string => problem !== null)
 }

@@ -60,6 +60,7 @@ describe("moneyOf", () => {
 			rows: [],
 			leftOut: [],
 			totals: { income: null, spending: null },
+			monthsCovered: null,
 		})
 	})
 
@@ -68,6 +69,7 @@ describe("moneyOf", () => {
 		expect(view.path).toBe("totals")
 		expect(view.rows.map((one) => one.id)).toEqual(["rent"])
 		expect(view.totals).toEqual({ income: "50000.00", spending: "20000.00" })
+		expect(view.monthsCovered).toBe(2)
 	})
 
 	test("takes the totals path when no row would be carried in", () => {
@@ -88,6 +90,7 @@ describe("moneyOf", () => {
 			),
 		)
 		expect(view.path).toBe("history")
+		expect(view.monthsCovered).toBe(3)
 		expect(view.rows).toEqual([
 			{
 				id: "salary",
@@ -95,7 +98,6 @@ describe("moneyOf", () => {
 				type: "income",
 				frequency: "monthly",
 				amount: "50000.00",
-				monthsText: "3 of 12 months",
 			},
 			{
 				id: "insurance",
@@ -103,7 +105,6 @@ describe("moneyOf", () => {
 				type: "expense",
 				frequency: "yearly",
 				amount: "24000.00",
-				monthsText: "3 of 12 months",
 			},
 		])
 	})

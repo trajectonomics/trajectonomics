@@ -13,8 +13,6 @@ export interface GuidedMoneyRow {
 	readonly frequency: "monthly" | "yearly"
 	/** The CLI's one occurrence, as it stated it. */
 	readonly amount: string
-	/** The window the rate was read over, in the person's words, such as "8 of 12 months". */
-	readonly monthsText: string
 }
 
 /** An Account the read does not carry in, and the words for why. */
@@ -29,6 +27,8 @@ export interface MoneyView {
 	readonly rows: readonly GuidedMoneyRow[]
 	readonly leftOut: readonly LeftOutRow[]
 	readonly totals: { readonly income: string | null; readonly spending: string | null }
+	/** The whole months the read covered, stated once above the rows; null when the Snapshot holds no read. */
+	readonly monthsCovered: number | null
 }
 
 /** The shortest record a run-rate is stated over; a shorter one takes the totals path. */
@@ -46,7 +46,7 @@ function monthlyOf(rates: BaselineRates | undefined, type: "income" | "expense")
 	return rates?.totals.find((total) => total.type === type)?.monthly ?? null
 }
 
-/** One carried row, with the window the read covered. */
+/** One carried row: what the read states of its Account, and nothing the page infers. */
 function carriedOf(rates: BaselineRates): GuidedMoneyRow[] {
 	return rates.rows
 		.filter((row) => row.inTemplate)
@@ -56,7 +56,6 @@ function carriedOf(rates: BaselineRates): GuidedMoneyRow[] {
 			type: row.type,
 			frequency: row.frequency,
 			amount: row.amount,
-			monthsText: `${rates.monthsCovered} of ${rates.months} months`,
 		}))
 }
 
@@ -81,5 +80,6 @@ export function moneyOf(rates: BaselineRates | undefined): MoneyView {
 		rows,
 		leftOut: leftOutOf(rates),
 		totals,
+		monthsCovered: rates?.monthsCovered ?? null,
 	}
 }

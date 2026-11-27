@@ -1,4 +1,5 @@
 <script lang="ts">
+import { tick } from "svelte"
 import { editSession } from "../../client/edit.svelte.js"
 import { guidedSession } from "../../client/guided-plan.svelte.js"
 import type { Snapshot } from "../../lib/contract"
@@ -9,9 +10,9 @@ import {
 	nextOf,
 	previousOf,
 	problemsOf,
-	STEP_LABELS,
-	STEPS,
+	type Step,
 } from "../../lib/view/guided/steps"
+import GuidedSteps from "./GuidedSteps.svelte"
 import HouseholdStep from "./HouseholdStep.svelte"
 import MoneyStep from "./MoneyStep.svelte"
 import StopStep from "./StopStep.svelte"
@@ -31,34 +32,50 @@ const peopleProblems = $derived(peopleOf(draft.people).problems)
 const lifeExpectancy = $derived(peopleOf(draft.people).holderLifeExpectancy)
 const step = $derived(guidedSession.step)
 const onStep = (one: string) => step === one
+/** The step's heading, focused whenever the step changes so a reader hears where they are. */
+let heading = $state<HTMLHeadingElement | undefined>()
+let lastStep: Step | null = null
+$effect(() => {
+	const current = step
+	if (lastStep === null) {
+		lastStep = current
+		return
+	}
+	if (lastStep === current) return
+	lastStep = current
+	void tick().then(() => heading?.focus())
+})
+
+/** Next advances while the step holds no problem, and otherwise shows every problem where the person is. */
+function advance(): void {
+	if (problems.length > 0) {
+		guidedSession.showProblems = true
+		return
+	}
+	guidedSession.advance()
+}
 </script>
 
-<div class="space-y-6">
-	<nav aria-label="Steps">
-		<ol class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-			{#each STEPS as one, index (one)}
-				<li aria-current={onStep(one) ? "step" : undefined}
-					class={onStep(one) ? "font-semibold text-foreground" : "text-muted-foreground"}>
-					{index + 1}. {STEP_LABELS[one]}
-				</li>
-			{/each}
-		</ol>
-	</nav>
+<div class="space-y-6" data-guided>
+	<GuidedSteps {step} />
 	{#if onStep("household")}
 		<HouseholdStep people={draft.people} problems={peopleProblems}
+			showProblems={guidedSession.showProblems} bind:heading
 			onName={(index, name) => guidedSession.changePerson(seed.people, index, nameChange(name))}
 			onChange={(index, change) => guidedSession.changePerson(seed.people, index, change)}
-			onAdd={(role) => guidedSession.addPerson(seed.people, role)} />
+			onAdd={(role) => guidedSession.addPerson(seed.people, role)}
+			onRemove={(index) => guidedSession.removePerson(seed.people, index)} />
 	{:else if onStep("money") && seed.money.path === "history"}
-		<MoneyStep money={seed.money} rows={draft.rows}
+		<MoneyStep money={seed.money} rows={draft.rows} showProblems={guidedSession.showProblems} bind:heading
 			onRow={(id, change) => guidedSession.changeRow(seed.rows, id, change)} />
 	{:else if onStep("money")}
-		<TotalsStep totals={draft.totals}
+		<TotalsStep totals={draft.totals} showProblems={guidedSession.showProblems} bind:heading
 			onTotal={(field, value) => guidedSession.changeTotal(seed.totals, field, value)} />
 	{:else}
 		<StopStep name={guidedSession.name} age={guidedSession.age} {lifeExpectancy} stored={draft.stored}
 			saveable={editSession.token !== null} saving={editSession.busy}
-			refusal={guidedSession.refusal} reloadable={guidedSession.reloadable}
+			refusal={guidedSession.refusal ?? editSession.error} hint={guidedSession.hint}
+			reloadable={guidedSession.reloadable} showProblems={guidedSession.showProblems} bind:heading
 			onName={(name) => (guidedSession.name = name)}
 			onAge={(age) => (guidedSession.age = age)}
 			onSave={() => guidedSession.save(snapshot)} onReload={() => guidedSession.reload()} />
@@ -67,8 +84,7 @@ const onStep = (one: string) => step === one
 		<button type="button" class={BUTTON} disabled={previousOf(step) === null}
 			onclick={() => guidedSession.back()}>Back</button>
 		{#if nextOf(step) !== null}
-			<button type="button" class={PRIMARY} disabled={problems.length > 0}
-				onclick={() => (guidedSession.step = nextOf(step) ?? step)}>Next</button>
+			<button type="button" class={PRIMARY} onclick={advance}>Next</button>
 		{/if}
 		<button type="button" class={BUTTON} onclick={() => guidedSession.cancelAndLeave()}>Cancel</button>
 	</div>

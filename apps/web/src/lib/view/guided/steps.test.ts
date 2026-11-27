@@ -14,11 +14,11 @@ const MONEY: MoneyView = {
 			type: "income",
 			frequency: "monthly",
 			amount: "50000.00",
-			monthsText: "12 of 12 months",
 		},
 	],
 	leftOut: [],
 	totals: { income: "50000.00", spending: "20000.00" },
+	monthsCovered: 12,
 }
 
 const TOTALS: MoneyView = { ...MONEY, path: "totals", rows: [] }
@@ -93,6 +93,14 @@ describe("problemsOf", () => {
 		expect(problemsOf("money", draft({ rows }))).toEqual([KEEP_PROBLEM])
 	})
 
+	test("leaves a dropped row's amount out of the problems, because it is not sent", () => {
+		const rows = rowsChanged(draftsOf(MONEY.rows), "salary", {
+			keep: false,
+			amount: "not an amount",
+		})
+		expect(problemsOf("money", draft({ rows }))).toEqual([KEEP_PROBLEM])
+	})
+
 	test("requires both totals on the short path", () => {
 		const empty = { income: "", spending: "" }
 		expect(problemsOf("money", draft({ money: TOTALS, totals: empty }))).toEqual([
@@ -112,7 +120,7 @@ describe("problemsOf", () => {
 		expect(problemsOf("stop", draft({ name: "base" }))).toEqual([
 			"A plan named base already exists.",
 		])
-		expect(problemsOf("stop", draft({ name: "" }))).toEqual(["Enter a name for the copy."])
+		expect(problemsOf("stop", draft({ name: "" }))).toEqual(["Enter a name for the plan."])
 	})
 
 	test("holds the stop step on an age at or past the holder's life expectancy", () => {

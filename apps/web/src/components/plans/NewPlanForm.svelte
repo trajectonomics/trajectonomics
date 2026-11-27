@@ -66,7 +66,7 @@ async function save(): Promise<void> {
 	{#if copyOf === ""}
 		<p class="text-sm">
 			<a class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-				href={withSearch("/plans/new/", currentSearch())}>Set up step by step</a>
+				href={withSearch("/plans/new/", currentSearch())} onclick={onDone}>Set up step by step</a>
 		</p>
 	{/if}
 </PlanForm>

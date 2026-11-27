@@ -17,7 +17,6 @@ const SALARY: GuidedMoneyRow = {
 	type: "income",
 	frequency: "monthly",
 	amount: "50000.00",
-	monthsText: "12 of 12 months",
 }
 
 const RENT: GuidedMoneyRow = {
@@ -26,7 +25,6 @@ const RENT: GuidedMoneyRow = {
 	type: "expense",
 	frequency: "monthly",
 	amount: "15000.00",
-	monthsText: "12 of 12 months",
 }
 
 /** The drafts with one row changed, by id. */
@@ -47,10 +45,10 @@ describe("draftsOf", () => {
 })
 
 describe("amountSent", () => {
-	test("takes the commas off, and nothing else", () => {
+	test("takes the thousands commas off, and keeps a decimal comma for the CLI to refuse", () => {
 		expect(amountSent("52,000")).toBe("52000")
 		expect(amountSent("12,500.50")).toBe("12500.50")
-		expect(amountSent(" 12500")).toBe(" 12500")
+		expect(amountSent(" 12500")).toBe("12500")
 	})
 
 	test("sends nothing for the empty answer, which means the read's amount", () => {
@@ -64,9 +62,18 @@ describe("amountProblem", () => {
 			expect(amountProblem(text)).toBeNull()
 	})
 
+	test("takes a thousands-grouped amount as it was typed", () => {
+		expect(amountProblem("12,500.50")).toBeNull()
+	})
+
 	test("states the one problem for anything else", () => {
 		for (const text of ["1.234", "12 500", "12,500.500", "abc", "-1", " "])
 			expect(amountProblem(text)).toBe(AMOUNT_PROBLEM)
+	})
+
+	test("refuses a decimal comma instead of dropping it, which would make the amount 100 times larger", () => {
+		expect(amountProblem("12500,50")).toBe(AMOUNT_PROBLEM)
+		expect(amountProblem("1,2,3")).toBe(AMOUNT_PROBLEM)
 	})
 })
 
