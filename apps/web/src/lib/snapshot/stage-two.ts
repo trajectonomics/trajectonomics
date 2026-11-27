@@ -26,6 +26,7 @@ export type StageTwoPlan = {
 	pnl: PlannedRead
 	transactions: PlannedRead
 	baseline: PlannedRead
+	rates: PlannedRead
 	/** The one `report networth --monthly` read of every month-end in `historyDates`; null when there is none. */
 	netWorthHistory: PlannedRead | null
 	/** One `scenario show --decimal` per Scenario, the documents the planner pages show and edit. */
@@ -106,6 +107,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 			"--json",
 		]),
 		baseline: plainRead(["baseline", "show", "--as-of", params.asOf, "--json"]),
+		rates: plainRead(["baseline", "rates", "--as-of", params.asOf, "--json"]),
 		netWorthHistory: planHistory(historyDates),
 		documents: planDocuments(scenarios),
 		projections: planProjections(params, scenarios),
