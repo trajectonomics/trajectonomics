@@ -28,6 +28,12 @@ describe("the hosted twins", () => {
 		expect(futureHref("", "base", 3)).toBe("/demo/chance/path/?scenario=base&index=3")
 	})
 
+	test("keep a link's own scenario over the page's, with the page's other parameters", () => {
+		expect(withSearch("/tax/?scenario=separate", "?scenario=base&demo=1")).toBe(
+			"/demo/tax/?scenario=separate&demo=1",
+		)
+	})
+
 	test("find a page by its path with or without the base path", () => {
 		expect(navPath("/demo/net-worth/")).toBe("/net-worth/")
 		expect(navPath("/demo/chance/path/")).toBe("/chance/")

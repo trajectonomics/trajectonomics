@@ -5,7 +5,7 @@ import { fiModelOf } from "../../lib/view/fi/model"
 import Fact from "../projection/Fact.svelte"
 import ResultStatement from "../projection/ResultStatement.svelte"
 import Money from "../ui/Money.svelte"
-import SiteLink from "../ui/SiteLink.svelte"
+import PlanLink from "../ui/PlanLink.svelte"
 import FiReachable from "./FiReachable.svelte"
 import FiUnreachable from "./FiUnreachable.svelte"
 
@@ -42,9 +42,10 @@ const reference = $derived(model.kind === "reachable" ? model.reference : null)
 	{#if fi.taxYears.length > 0}
 		<!-- A reachable answer's tax rows stop work at the FI date; the Tax page keeps the plan as written. -->
 		<p class="text-sm text-muted-foreground">
-			The <SiteLink
+			The <PlanLink
 				href={`/tax/?scenario=${encodeURIComponent(fi.scenario.name)}`}
-				class="text-accent underline underline-offset-4">Tax page</SiteLink
+				plan={fi.scenario.name}
+				class="text-accent underline underline-offset-4">Tax page</PlanLink
 			> shows the plan as written{model.kind === "reachable" ? ", without stopping work at the FI date" : ""}.
 		</p>
 	{/if}
