@@ -1,5 +1,6 @@
 import { addDays } from "../calendar/arith"
 import { countedDays } from "../calendar/counted"
+import { priceChangeBps } from "../money/price-path"
 import type { DateString, Timeline } from "../types"
 import type { PathRollupReturns } from "../types/path"
 import type { AnnualRollup } from "../types/projection"
@@ -48,12 +49,16 @@ export function pathReturnsOf(
 	annual: readonly AnnualRollup[],
 ): readonly PathRollupReturns[] {
 	const resolved = resolveReturns(returns, timeline)
+	const prices = returns.prices
 	return annual.map((rollup) => {
 		const end = addDays(rollup.to, 1)
 		return {
 			index: rollup.index,
 			from: rollup.from,
 			to: rollup.to,
+			...(prices === undefined
+				? {}
+				: { inflationBps: priceChangeBps(prices, rollup.from, rollup.to) }),
 			accounts: returns.series.map(({ account }) => ({
 				account,
 				returnBps: compounded(resolved.get(account)!, rollup.from, end),

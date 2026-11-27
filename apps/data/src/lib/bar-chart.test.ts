@@ -7,6 +7,7 @@ function bar(overrides: Partial<PlanBar> = {}): PlanBar {
 		plan: "claude",
 		planName: "Claude",
 		tier: "Max",
+		unit: "tokens",
 		kind: "estimate",
 		tokens: 10,
 		low: 5,
@@ -69,6 +70,26 @@ describe("barGeometry", () => {
 		if (chart === null) throw new Error("no chart")
 		expect(chart.bars[0]?.lowY).toBeNull()
 		expect(chart.bars[0]?.openHigh).toBe(false)
+	})
+
+	test("writes token ticks in the token unit", () => {
+		const chart = barGeometry([bar()])
+		if (chart === null) throw new Error("no chart")
+		expect(chart.yTicks.map((tick) => tick.label)).toEqual(["40", "32", "24", "16", "8", "0"])
+	})
+
+	test("writes dollar ticks in the API $ unit", () => {
+		const chart = barGeometry([bar({ unit: "usd", tokens: 1.2, low: 1, high: 1.6 })])
+		if (chart === null) throw new Error("no chart")
+		expect(chart.max).toBe(2)
+		expect(chart.yTicks.map((tick) => tick.label)).toEqual([
+			"$2",
+			"$1.6",
+			"$1.2",
+			"$0.8",
+			"$0.4",
+			"$0",
+		])
 	})
 })
 

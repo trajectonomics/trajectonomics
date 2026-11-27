@@ -2,6 +2,7 @@ import {
 	accountList,
 	balance,
 	baseline,
+	baselineRates,
 	doctor,
 	fi,
 	netWorth,
@@ -55,7 +56,10 @@ export async function runStageTwo(
 	context: RunContext,
 	plan: StageTwoPlan,
 	records: readonly unknown[],
-): Promise<Omit<SnapshotReads, "accounts" | "netWorth" | "scenarios">> {
+): Promise<
+	Omit<SnapshotReads, "accounts" | "netWorth" | "scenarios"> &
+		Required<Pick<SnapshotReads, "rates">>
+> {
 	const pool = createPool()
 	const comparePlan = plan.compare
 	const phaseOne = await Promise.all([
@@ -72,6 +76,7 @@ export async function runStageTwo(
 		comparePlan === null
 			? Promise.resolve(null)
 			: pool(() => runPlanned(context, comparePlan, projectionCompare, records)),
+		pool(() => runPlanned(context, plan.rates, baselineRates, records)),
 	])
 	const [documents, projections, chance] = phaseOne
 	const [paths, allowances, taxNotes] = await Promise.all([
@@ -85,6 +90,7 @@ export async function runStageTwo(
 		pnl: phaseOne[5],
 		transactions: phaseOne[6],
 		baseline: phaseOne[7],
+		rates: phaseOne[11],
 		netWorthHistory: phaseOne[8],
 		documents,
 		projections,

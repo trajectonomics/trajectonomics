@@ -8,6 +8,8 @@ export interface PathOutcome {
 	readonly runsOutIndex?: number
 	/** The date and unmet amount the path ran out with; present only when it did. */
 	readonly runsOut?: RunsOut
+	/** Each grid period's closing net worth in the path's own today's money; only with a Price path (ADR 0033). */
+	readonly realNetWorth?: readonly MinorUnits[]
 	/** The least net worth over the grid and the first period index that closed at it. */
 	readonly lowest: { readonly value: MinorUnits; readonly at: number }
 	/** What the rule Flows paid in each grid period; present only when the Scenario has a rule Flow. */

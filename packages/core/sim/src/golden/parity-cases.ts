@@ -24,6 +24,7 @@ import { milestoneFreelancer } from "./milestone-cases"
 import { nominalLeapFebruary, nominalPartial, nominalReal, nominalZero } from "./nominal-cases"
 import { nominalMonthlyLoan } from "./nominal-flow-cases"
 import { configured, leapTie } from "./parity-fixtures"
+import type { ParityPath, ParityPlan } from "./parity-run"
 import type { ParitySavings } from "./parity-savings"
 
 export interface ParityCase {
@@ -32,7 +33,9 @@ export interface ParityCase {
 	readonly options?: SurvivalOptions
 	readonly chance?: ChanceOfSuccessOptions
 	/** A chance run over the Return model `planReturnModel` builds from the Scenario (ADR 0029). */
-	readonly plan?: { readonly buckets: number; readonly seed: string; readonly paths: number }
+	readonly plan?: ParityPlan
+	/** A per-path replay of the Return model `planReturnModel` builds from the Scenario (ADR 0033). */
+	readonly path?: ParityPath
 	readonly projectOptions?: ProjectionOptions
 	readonly savings?: ParitySavings
 }

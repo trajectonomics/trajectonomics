@@ -11,6 +11,7 @@ export function readsOf(document: Snapshot): Read<unknown>[] {
 		reads.pnl,
 		reads.transactions,
 		reads.baseline,
+		...(reads.rates === undefined ? [] : [reads.rates]),
 		reads.scenarios,
 	]
 	const maps = [
