@@ -43,4 +43,4 @@ console.log(toMinorUnits(12.34, 2), totalTax)
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+AGPL-3.0-only. See [LICENSE](./LICENSE).

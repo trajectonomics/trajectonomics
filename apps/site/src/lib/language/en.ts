@@ -23,7 +23,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		heroHeadingPrefix: "Deterministic layers for",
 		heroHeadingAccent: "Financial Planning",
 		heroVersion: RELEASE.heroVersion,
-		heroLicence: "MIT · open source",
+		heroLicence: "AGPL-3.0 · open source",
 		releaseLine: RELEASE.releaseLine,
 		releaseDate: RELEASE.releaseDate,
 		heroSubline:
@@ -45,7 +45,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		copied: "Prompt copied",
 		copiedLabel: "Copied",
 		copyFailed: "Select the prompt and copy it.",
-		licence: "MIT",
+		licence: "AGPL-3.0-only",
 		org: "trajectonomics",
 		footerDisclaimer:
 			"A bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli and we will update it as soon as we can.",

@@ -2,7 +2,7 @@
 	"name": "@trajectonomics/data",
 	"version": "0.0.0-development",
 	"description": "The data site at trajectonomics.com/data/: static Astro pages with Svelte islands, an hourly usage ingest into D1, and cached daily rollups. Never published to npm.",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"type": "module",
 	"private": true,
 	"packageManager": "bun@1.4.4",

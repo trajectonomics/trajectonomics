@@ -46,4 +46,4 @@ The built-file rules are a pure core in `src/lib/build/`, and the scan is `bun t
 
 ## License
 
-[MIT](./LICENSE)
+[AGPL-3.0-only](./LICENSE)

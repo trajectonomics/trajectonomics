@@ -3,7 +3,7 @@ import { SITE_HOME_LOAD, SITE_HOME_PATH } from "../../lib/site-home"
 /** The Source link's destination: the Docs Portal's package in the monorepo. */
 const SOURCE_URL = "https://github.com/trajectonomics/trajectonomics/tree/main/apps/docs"
 
-/** The License link's destination: the MIT license the Docs Portal ships. */
+/** The License link's destination: the AGPL-3.0-only license the Docs Portal ships. */
 const LICENSE_URL = "https://github.com/trajectonomics/trajectonomics/blob/main/apps/docs/LICENSE"
 
 /**
