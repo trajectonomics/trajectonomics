@@ -237,6 +237,21 @@ The timer fires at minute 1 of every hour (plus up to 60 seconds of jitter), cat
 missed run, and the oneshot service inherits `DO_NOT_TRACK=1`. `Persistent=true` means a laptop
 that was asleep still runs once after it wakes.
 
+## Where it runs (since 2026-11-27)
+
+Two timers, not one, because homeserver1 cannot reach the dev machine unattended: Tailscale SSH
+there asks for a browser check.
+
+| Runner host | Collects | Quota |
+|---|---|---|
+| homeserver1 | itself, and homeserver2 over ssh (`skipOpenCodeBefore` `2026-10-23T14:00:00.000Z`, its `opencode.db` is a copy) | no |
+| the dev machine (prameubuntu) | itself | yes: Claude Code runs there, so its OAuth token stays fresh |
+
+Each host keeps the collector in `~/.cache/traj-collector` (`bun` is a link to `~/.local/bin/bun`,
+or homeserver2's own binary), its `hosts.json` and `ingest.key` in `~/.config/traj-data/`, and its
+cursors in `~/.local/state/traj-data/`. To update, copy `src/`, `deploy/` and `package.json` from
+`main` over the old copy on every host. A run peaks at about 1.4 GB of memory.
+
 ## Rules
 
 - **Never commit real logs, collector output, hostnames, prompts, paths or ids.** Fixtures in
