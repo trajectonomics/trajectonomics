@@ -74,13 +74,15 @@ const LANDING_PAGE = [
 	alternate(`${DOCS_BASE_PATH}/index.md`),
 	"</head><body>",
 	`<header id="nd-nav"><a href="${DOCS_BASE_PATH}/" aria-label="Trajectonomics Docs"><svg></svg></a>`,
-	`<a href="${DOCS_BASE_PATH}/llms.txt">Docs index</a></header>`,
-	"<main>",
+	`<a href="${DOCS_BASE_PATH}/llms.txt">Docs index</a>`,
+	`<a href="${DOCS_BASE_PATH}/cli/">CLI &amp; Quickstart</a>`,
+	`<a href="${DOCS_BASE_PATH}/contribute/">Contribute</a></header>`,
+	'<div id="landing-body">',
 	`<a href="${DOCS_BASE_PATH}/cli/">Use traj: install it and get your first answer</a>`,
 	`<a href="${DOCS_BASE_PATH}/contribute/">For Contributors: help make the tax rules right</a>`,
 	`<p>${RELEASE_LINE}</p>`,
 	"<h1>Trajectonomics Docs</h1>",
-	"</main>",
+	"</div>",
 	"</body></html>",
 ].join("")
 

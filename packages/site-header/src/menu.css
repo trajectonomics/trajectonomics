@@ -1,4 +1,34 @@
-/* The Language menu's panel: it floats 8 px under its summary, on the popover role, with a hairline. */
+/*
+ * The Language menu: a native disclosure whose panel floats 8 px under its summary. The frame and
+ * the link type come from `@trajectonomics/brand/header.css` and the brand's `--ds-*` roles, so no
+ * colour is written here.
+ */
+
+.header-menu {
+	position: relative;
+}
+
+/* The summary is a nav link and the native disclosure marker is not drawn. */
+.header-menu-summary {
+	cursor: pointer;
+	list-style: none;
+}
+
+.header-menu-summary::-webkit-details-marker {
+	display: none;
+}
+
+.header-menu-summary::marker {
+	content: "";
+}
+
+.header-menu-chevron {
+	transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-menu[open] .header-menu-chevron {
+	transform: rotate(180deg);
+}
 
 .header-menu-panel {
 	position: absolute;
@@ -9,6 +39,8 @@
 	padding: 4px;
 	border: 1px solid var(--ds-color-border);
 	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-popover);
+	color: var(--ds-color-popover-foreground);
 }
 
 /*

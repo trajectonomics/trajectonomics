@@ -2,14 +2,22 @@ import { expect, test } from "./fixtures"
 import { box, DOCS_PAGE_PATH, openDocsPage, readingBlocks } from "./shell"
 import { TEST_WIDTHS_PX } from "./viewports"
 
-/** The one header row's height: `--spacing(14)`, which Fumadocs sets for the sidebar Tab mode. */
-const HEADER_HEIGHT_PX = 56
+/** The one header row's height: the shared frame's 64px (`@trajectonomics/brand/header.css`). */
+const HEADER_HEIGHT_PX = 64
+
+/** The bar's cap: 94.5rem, the shared frame's measure, as the Site draws it. */
+const HEADER_BAR_MAX_WIDTH_PX = 1512
 
 /** The reading column's measure, the design brief's 900px page column (ADR 0009). */
 const READING_MEASURE_PX = 900
 
-/** The header's own inset (`md:px-6`), which the header mark opens the row from. */
-const HEADER_INSET_PX = 24
+/** The header bar's inset (`1rem`, and `2.5rem` from 40rem up), which the mark opens the row from. */
+const HEADER_INSET_PX = 40
+
+/** The left edge of the capped bar at one viewport width. */
+function barLeft(viewportWidth: number): number {
+	return Math.max(0, (viewportWidth - HEADER_BAR_MAX_WIDTH_PX) / 2)
+}
 
 /**
  * The reading column's width at each width the shell is looked at: the 900px measure where the page
@@ -37,7 +45,7 @@ test("the shell spans the page and the header is one row", async ({ page }) => {
 	expect(header, "the header is rendered").not.toBeNull()
 	expect(header?.x, "the header starts at the page's left edge").toBe(0)
 	expect(header?.width, "the header spans the page").toBe(viewport.width)
-	expect(header?.height, "the header is one 56px row").toBe(HEADER_HEIGHT_PX)
+	expect(header?.height, "the header is one 64px row").toBe(HEADER_HEIGHT_PX)
 	expect(
 		await page.locator("#nd-subnav [data-header-tabs]").count(),
 		"the header draws no second Tab row",
@@ -55,8 +63,10 @@ test("the shell spans the page and the header is one row", async ({ page }) => {
 	expect(
 		Math.abs((tabs?.x ?? 0) + (tabs?.width ?? 0) / 2 - viewport.width / 2),
 	).toBeLessThanOrEqual(1)
-	// The mark keeps the header's own inset, so the row starts where the page does.
-	expect(mark?.x, "the mark sits at the header's inset").toBe(HEADER_INSET_PX)
+	// The mark opens the capped bar at the shared inset, as it does on every static site.
+	expect(mark?.x, "the mark sits at the bar's shared inset").toBe(
+		barLeft(viewport.width) + HEADER_INSET_PX,
+	)
 
 	// Every block of the column — the title, the prose, a code block — keeps the measure.
 	const reading = blocks.find((block) => block.width === READING_MEASURE_PX)
@@ -99,7 +109,7 @@ test(`the reading column keeps its width and its place on the ${DOCS_PAGE_PATH} 
 		// The one header row spans the page at every width, the phone's included, and stays one row.
 		const header = await box(page, "#nd-subnav")
 		expect(header?.width, `the header spans the page at ${widthPx}px`).toBe(widthPx)
-		expect(header?.height, `the header is one 56px row at ${widthPx}px`).toBe(HEADER_HEIGHT_PX)
+		expect(header?.height, `the header is one 64px row at ${widthPx}px`).toBe(HEADER_HEIGHT_PX)
 
 		// From xl up the contents column sits at the page's right edge; a phone shows none.
 		const contents = await box(page, "#nd-toc")

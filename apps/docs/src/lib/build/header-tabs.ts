@@ -54,10 +54,35 @@ function headerFailures(file: BuiltFile, tab: TabDefinition): readonly BuildFail
 	return [...missingFailures(file, links), ...currentFailures(file, tab, links)]
 }
 
+/** The Landing Page's home-layout header, which carries the Tabs with neither marked current. */
+const LANDING_PAGE_FILE = portalAsset("index.html")
+
+function landingHeaderFailures(file: BuiltFile): readonly BuildFailure[] {
+	const links = anchors(elementContent(file.content, "nd-nav") ?? "").filter((link) =>
+		TABS.some((candidate) => tabUrl(candidate) === link.href),
+	)
+	const marked = links.flatMap((link) =>
+		link.ariaCurrent === "page"
+			? [
+					buildFailure(
+						"HEADER_TAB_OTHER_CURRENT",
+						file.path,
+						`#nd-nav marks ${link.href} aria-current="page" on the Landing Page`,
+					),
+				]
+			: [],
+	)
+	return [...missingFailures(file, links), ...marked]
+}
+
 /** Failures for Tab links a built Tab page's header lacks, or marks as current on the wrong page. */
 export function checkHeaderTabs(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return TABS.flatMap((tab) => {
-		const file = fileAt(files, tabPageFile(tab))
-		return file === undefined ? [] : headerFailures(file, tab)
-	})
+	const landing = fileAt(files, LANDING_PAGE_FILE)
+	return [
+		...TABS.flatMap((tab) => {
+			const file = fileAt(files, tabPageFile(tab))
+			return file === undefined ? [] : headerFailures(file, tab)
+		}),
+		...(landing === undefined ? [] : landingHeaderFailures(landing)),
+	]
 }

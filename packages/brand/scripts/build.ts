@@ -7,7 +7,8 @@
  * 3. Copies the brand named by `BRAND` (default `trajectonomics`) to `dist/current/`, so apps
  *    import one fixed path and a white-label build is `BRAND=<name> bun run build`.
  *
- * The brand-agnostic `tailwind.css` and `typography.css` are copied to `dist/` unchanged.
+ * The brand-agnostic `tailwind.css`, `typography.css` and `header.css` are copied to `dist/`
+ * unchanged.
  */
 import { cp, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
@@ -70,7 +71,7 @@ export async function buildBrands(
 	for (const name of names) {
 		await writeBrand(join(packageRoot, "brands", name), join(dist, "brands", name))
 	}
-	for (const shared of ["tailwind.css", "typography.css"]) {
+	for (const shared of ["tailwind.css", "typography.css", "header.css"]) {
 		await cp(join(packageRoot, shared), join(dist, shared))
 	}
 	await rm(join(dist, "current"), { recursive: true, force: true })
