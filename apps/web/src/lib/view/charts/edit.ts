@@ -1,3 +1,4 @@
+import { graphemes } from "../../chart/label-graphemes"
 import type { AccountNames } from "../account-names"
 import { seriesWords } from "./series-ids"
 import { type ChartDef, type ChartKind, MAX_CHARTS, MAX_NAME } from "./types"
@@ -22,11 +23,24 @@ export interface ChartDraft {
 	readonly series: readonly string[]
 }
 
+/** The longest prefix of whole graphemes that fits `room` characters, ended with an ellipsis. */
+function shortened(text: string, room: number): string {
+	let kept = ""
+	for (const part of graphemes(text, false)) {
+		if (kept.length + part.text.length > room - 1) break
+		kept += part.text
+	}
+	return `${kept.trimEnd()}…`
+}
+
 /** The name a chart gets when the person types none: its first series, and how many more. */
 export function defaultName(seriesNames: readonly string[]): string {
 	const first = seriesNames[0] ?? "My chart"
 	const more = seriesNames.length - 1
-	return (more > 0 ? `${first} and ${more} more` : first).slice(0, MAX_NAME)
+	if (more <= 0) return first.length > MAX_NAME ? shortened(first, MAX_NAME) : first
+	const suffix = ` and ${more} more`
+	const room = MAX_NAME - suffix.length
+	return `${first.length > room ? shortened(first, room) : first}${suffix}`
 }
 
 /**

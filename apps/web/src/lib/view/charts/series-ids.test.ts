@@ -33,19 +33,23 @@ describe("words from a series id", () => {
 			"Income: gone (no category)",
 		)
 		expect(seriesWords(cash("contribution", "save", "a", null), accounts)).toBe(
-			"Saving: save (no category) into cash",
+			"Saving: save into cash",
 		)
 		expect(seriesWords(cash("withdrawal", "save", "a", null), accounts)).toBe(
-			"Withdrawal: save (no category) from cash",
+			"Withdrawal: save from cash",
 		)
+	})
+
+	test("only an income or expense line states a category, so the others carry no (no category)", () => {
+		expect(seriesWords(cash("category", "Food", null, null))).toBe("Spending on: Food")
+		expect(seriesWords(cash("category", null, null, null))).toBe("Spending on: no category")
+		expect(seriesWords(cash("contribution", "save", "a", "Home"))).toBe("Saving: save into a")
+		expect(seriesWords(cash("withdrawal", "save", "a", "Home"))).toBe("Withdrawal: save from a")
 	})
 
 	test("a literal no category item is quoted, beside the words for none", () => {
 		expect(seriesWords(cash("category", "no category", null, null))).toBe(
-			'Spending on: "no category" (no category)',
-		)
-		expect(seriesWords(cash("category", null, null, null))).toBe(
-			"Spending on: no category (no category)",
+			'Spending on: "no category"',
 		)
 		expect(seriesWords(cash("expense", "no category", null, "no category"))).toBe(
 			'Expense: "no category" ("no category")',
@@ -62,8 +66,20 @@ describe("words from a series id", () => {
 		}
 	})
 
-	test("a removed Account reads its bare id, never account:", () => {
-		expect(seriesWords("account:savings")).toBe("savings")
+	test("an odd tax id splits at its last colon and still reads words, never its key", () => {
+		expect(seriesWords("tax:a:b:due")).toBe("Tax due, a:b")
+		expect(seriesWords("tax:a:b:taxable")).toBe("Taxable income, a:b")
+		expect(seriesWords("tax:th-pit")).toBe("Tax, th-pit")
+		for (const id of ["tax:a:b:due", "tax:th-pit"]) {
+			expect(seriesWords(id)).not.toContain("tax:")
+		}
+	})
+
+	test("a removed Account reads Value of its ledger name, else its id, never account:", () => {
+		expect(seriesWords("account:savings", new Map([["savings", "Savings"]]))).toBe(
+			"Value of Savings",
+		)
+		expect(seriesWords("account:01a21b51")).toBe("Value of 01a21b51")
 		expect(seriesWords("account:savings")).not.toContain("account:")
 	})
 })

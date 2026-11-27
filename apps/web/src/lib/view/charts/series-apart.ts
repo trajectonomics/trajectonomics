@@ -5,6 +5,26 @@ import { clashing, numbered, type Series } from "./series-numbering"
 /** The twin steps a clash takes before a number: "(item)", "(item, category)", "(item, category, Account)". */
 const TWIN_STEPS = 3
 
+const WORDS = /[\p{L}\p{N}]+/gu
+
+/** The words a name says, in lower case, so a suffix that only repeats them adds no information. */
+function wordsOf(text: string): ReadonlySet<string> {
+	return new Set(text.toLowerCase().match(WORDS) ?? [])
+}
+
+/** Whether a twin suffix says a word the name does not already say. */
+function informs(name: string, suffix: string): boolean {
+	const said = wordsOf(name)
+	return (suffix.toLowerCase().match(WORDS) ?? []).some((word) => !said.has(word))
+}
+
+/** The first twin level above `from` that adds information, or `from` when every form only repeats the name. */
+function toldApart(item: Series, from: number, category: boolean, accounts: AccountNames): number {
+	for (let level = from + 1; level <= TWIN_STEPS; level += 1)
+		if (informs(item.name, twin(item, level, category, accounts))) return level
+	return from
+}
+
 /**
  * The twin form a name takes at a step: "(item)", then "(item, category)", then "(item, category, Account)";
  * past those the item repeats, so a tie nothing tells apart falls to a number.
@@ -40,7 +60,8 @@ export function apart<T extends Series>(
 		const clash = clashing(names)
 		if (!clash.some(Boolean)) break
 		for (const [index, item] of items.entries())
-			if (clash[index] === true && !fixed.has(item.id)) levels[index] = (levels[index] ?? 0) + 1
+			if (clash[index] === true && !fixed.has(item.id))
+				levels[index] = toldApart(item, levels[index] ?? 0, category[index] === true, accounts)
 	}
 	const told = numbered(items, names, fixed)
 	return items.map((item, index) => ({ ...item, name: told[index] ?? item.name }))
