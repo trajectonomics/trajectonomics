@@ -3,7 +3,10 @@ import { render } from "svelte/server"
 import { chartStore } from "../../client/charts.svelte"
 import { preferences } from "../../client/preferences.svelte"
 import { plain, withTax } from "../../lib/view/charts/fixtures.test-support"
+import { planNames, withExpenseFlows } from "../../lib/view/charts/flow-fixtures.test-support"
+import { resolveSeries } from "../../lib/view/charts/resolve"
 import type { ChartDef } from "../../lib/view/charts/types"
+import { itemNames } from "../../lib/view/item-names"
 import ProjectionCharts from "./ProjectionCharts.svelte"
 
 const CHART: ChartDef = {
@@ -13,7 +16,15 @@ const CHART: ChartDef = {
 	series: ["income", "expenses", "tax:th-pit:due"],
 }
 
-function show(chart: string, run = withTax(), made: ChartDef = CHART, terms = "both"): string {
+const SAVED_NAMES = itemNames(new Map([["savings", "Savings"]]), null)
+
+function show(
+	chart: string,
+	run = withTax(),
+	made: ChartDef = CHART,
+	terms = "both",
+	names = SAVED_NAMES,
+): string {
 	chartStore.charts = [made]
 	return render(ProjectionCharts, {
 		props: {
@@ -23,8 +34,8 @@ function show(chart: string, run = withTax(), made: ChartDef = CHART, terms = "b
 			charts: {
 				chart,
 				onChart: () => {},
-				runs: [withTax(), plain()],
-				accountNames: new Map([["savings", "Savings"]]),
+				runs: [run, plain()],
+				names,
 			},
 		},
 	}).body
@@ -53,6 +64,23 @@ describe("the Projection's charts", () => {
 		expect(body).toContain("120,000.00")
 		expect(body).toContain("9,000.00")
 		expect(body).toContain("stacked chart draws one set of terms")
+	})
+
+	test("two series whose labels read the same are told apart by their ids", () => {
+		const run = withExpenseFlows(["a", "rent"])
+		const names = planNames([{ id: "a", displayLabel: "rent" }, { id: "rent" }])
+		const series = resolveSeries(run, names)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.id)
+		const body = show(
+			"same",
+			run,
+			{ id: "same", name: "Same", kind: "line", series },
+			"both",
+			names,
+		)
+		expect(body).toContain("Expense: rent (a)")
+		expect(body).toContain("Expense: rent (rent)")
 	})
 
 	test("on a plan without tax it draws what it can and says what is missing", () => {

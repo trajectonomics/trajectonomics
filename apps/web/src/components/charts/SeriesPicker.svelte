@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { CatalogueGroup } from "../../lib/view/charts/catalogue"
+import { seriesWords } from "../../lib/view/charts/series-ids"
 import { MAX_SERIES } from "../../lib/view/charts/types"
 
 interface Props {
@@ -47,7 +48,7 @@ const full = $derived(chosen.length >= MAX_SERIES)
 			{#each unlisted as id (id)}
 				<label class="flex items-start gap-2 text-sm text-muted-foreground">
 					<input type="checkbox" checked onchange={() => onToggle(id)} class="mt-0.5" />
-					<span>{names.get(id) ?? id}</span>
+					<span>{names.get(id) ?? seriesWords(id)}</span>
 				</label>
 			{/each}
 		</fieldset>
