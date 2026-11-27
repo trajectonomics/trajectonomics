@@ -127,3 +127,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## simple-icons/simple-icons
+
+- Source: https://github.com/simple-icons/simple-icons
+- Version: 16.38.1
+- Licence: CC0-1.0
+- Copies: `apps/data/src/lib/plan-logos.ts` (each plan mark's path data only)
+
+Simple Icons dedicates its marks to the public domain under CC0 1.0. The marks belong to their owners and are shown only to identify each plan.

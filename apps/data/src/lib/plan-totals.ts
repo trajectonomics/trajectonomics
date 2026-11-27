@@ -1,62 +1,48 @@
 import { comparePlans, planName } from "./plans"
+import { sumNullable, sumOf } from "./sum"
 import type { UsageRow } from "./types"
+import { daysBetween } from "./window"
 
-/** One plan's totals over the window, and its share of every plan's total. */
+/** A plan is in use when its last active day is at most this many days before the window end. */
+export const IN_USE_DAYS = 7
+
+/** One plan's activity over the window, and how its tokens break down. */
 export type PlanTotal = {
 	plan: string
 	planName: string
 	tokensTotal: number
 	requests: number
-	models: number
-	share: number
+	tokensIn: number | null
+	tokensOut: number | null
+	cacheRead: number | null
+	cacheWrite: number | null
+	/** Days with at least one token. */
+	activeDays: number
+	/** Tokens divided by active days; zero when the plan has no active day. */
+	tokensPerActiveDay: number
+	/** The day with the most tokens, the earliest on a tie; null when the plan has none. */
+	busiestDay: { day: string; tokens: number } | null
+	/** The latest day with tokens. */
+	lastDay: string | null
+	/** Whether the last active day is at most seven days before the window end. */
+	inUse: boolean
 	/** At least one of the plan's rows comes from a daily export. */
 	daily: boolean
 	/** At least one of the plan's rows comes from a best-effort source. */
 	bestEffort: boolean
 }
 
-/** Every plan's totals added up, for the summary's closing row. */
-export type GrandTotal = {
-	tokensTotal: number
-	requests: number
-	/** 1 when any plan has tokens, else 0: the closing row's share column. */
-	share: number
-}
-
-/** API rows to one total per plan over the window, in the plan table's order. */
-export function planTotals(rows: readonly UsageRow[]): PlanTotal[] {
+/** API rows to one total per plan over the window, ranked by tokens per active day. */
+export function planTotals(rows: readonly UsageRow[], to: string): PlanTotal[] {
 	const groups = new Map<string, UsageRow[]>()
 	for (const row of rows) {
 		const group = groups.get(row.plan) ?? []
 		group.push(row)
 		groups.set(row.plan, group)
 	}
-	const grand = sumOf(rows, (row) => row.tokensTotal)
 	return [...groups.entries()]
-		.map(([plan, group]) => {
-			const tokensTotal = sumOf(group, (row) => row.tokensTotal)
-			return {
-				plan,
-				planName: planName(plan),
-				tokensTotal,
-				requests: sumOf(group, (row) => row.requests),
-				models: new Set(group.map((row) => row.model)).size,
-				share: grand === 0 ? 0 : tokensTotal / grand,
-				daily: group.some((row) => row.granularity === "day"),
-				bestEffort: group.some((row) => row.bestEffort),
-			}
-		})
-		.sort(comparePlans)
-}
-
-/** Every plan's tokens and requests added up. */
-export function grandTotal(totals: readonly PlanTotal[]): GrandTotal {
-	const tokensTotal = sumOf(totals, (total) => total.tokensTotal)
-	return {
-		tokensTotal,
-		requests: sumOf(totals, (total) => total.requests),
-		share: tokensTotal === 0 ? 0 : 1,
-	}
+		.map(([plan, group]) => summaryOf(plan, group, to))
+		.sort((a, b) => b.tokensPerActiveDay - a.tokensPerActiveDay || comparePlans(a, b))
 }
 
 /**
@@ -70,8 +56,41 @@ export function planNote(total: Pick<PlanTotal, "daily" | "bestEffort">): string
 	return notes.length === 0 ? null : notes.join(" · ")
 }
 
-function sumOf<T>(items: readonly T[], value: (item: T) => number): number {
-	let sum = 0
-	for (const item of items) sum += value(item)
-	return sum
+function summaryOf(plan: string, group: readonly UsageRow[], to: string): PlanTotal {
+	const days = new Map<string, number>()
+	for (const row of group) days.set(row.day, (days.get(row.day) ?? 0) + row.tokensTotal)
+	const active = [...days.entries()].filter(([, tokens]) => tokens > 0)
+	const tokensTotal = sumOf(group, (row) => row.tokensTotal)
+	const cacheRead = sumNullable(group.map((row) => row.cacheRead))
+	const lastDay = active.reduce<string | null>(
+		(latest, [day]) => (latest === null || day > latest ? day : latest),
+		null,
+	)
+	return {
+		plan,
+		planName: planName(plan),
+		tokensTotal,
+		requests: sumOf(group, (row) => row.requests),
+		tokensIn: sumNullable(group.map((row) => row.tokensIn)),
+		tokensOut: sumNullable(group.map((row) => row.tokensOut)),
+		cacheRead,
+		cacheWrite: sumNullable(group.map((row) => row.cacheWrite)),
+		activeDays: active.length,
+		tokensPerActiveDay: active.length === 0 ? 0 : tokensTotal / active.length,
+		busiestDay: busiestOf(active),
+		lastDay,
+		inUse: lastDay !== null && daysBetween(lastDay, to) <= IN_USE_DAYS,
+		daily: group.some((row) => row.granularity === "day"),
+		bestEffort: group.some((row) => row.bestEffort),
+	}
+}
+
+function busiestOf(days: readonly (readonly [string, number])[]): PlanTotal["busiestDay"] {
+	let best: PlanTotal["busiestDay"] = null
+	for (const [day, tokens] of days) {
+		if (best === null || tokens > best.tokens || (tokens === best.tokens && day < best.day)) {
+			best = { day, tokens }
+		}
+	}
+	return best
 }
