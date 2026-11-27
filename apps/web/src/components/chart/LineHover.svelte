@@ -50,7 +50,7 @@ function onKeyDown(event: KeyboardEvent): void {
 	onfocus={() => onActive(count - 1)}
 	onblur={() => onActive(null)}
 	onkeydown={onKeyDown}
-	class="relative rounded-md outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+	class="relative rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 >
 	<LineSvg {label} {layout} {width} {height} {masked} {index} />
 	{#if index !== null}

@@ -9,17 +9,23 @@ interface Props {
 	stats: PlanStats
 }
 
-/** The Plan's three headline figures, each a link to the page that explains it. */
+/** The Plan's three headline figures, one row at every width, each a link to the page that explains it. */
 let { stats }: Props = $props()
 const link =
-	"block rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+	"block min-w-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const figure = "text-lg sm:text-2xl"
 </script>
 
-<div class="grid gap-6 sm:grid-cols-3">
+<div class="grid grid-cols-3 gap-3 sm:gap-6">
 	{#if stats.stopWorking}
 		{@const stop = stats.stopWorking}
 		<SiteLink href="/fi/" class={link}>
-			<Stat label="Stop working" secondary={stop.date}>
+			<Stat
+				label="Stop working"
+				secondary={stop.date}
+				valueClassName={figure}
+				secondaryClassName="hidden sm:block"
+			>
 				{#snippet value()}{stop.month}{/snippet}
 			</Stat>
 		</SiteLink>
@@ -27,14 +33,14 @@ const link =
 	{#if stats.closing}
 		{@const closing = stats.closing}
 		<SiteLink href="/projection/years/" class={link}>
-			<Stat label={`At the end, ${closing.year}`} secondary="Future money">
+			<Stat label={`At the end, ${closing.year}`} secondary="Future money" valueClassName={figure}>
 				{#snippet value()}<Money amount={closing.amount} compact />{/snippet}
 			</Stat>
 		</SiteLink>
 	{/if}
 	{#if stats.chance}
 		<SiteLink href="/chance/" class={link}>
-			<Stat label="Chance of success">
+			<Stat label="Chance of success" valueClassName={figure}>
 				{#snippet value()}{stats.chance}{/snippet}
 			</Stat>
 		</SiteLink>

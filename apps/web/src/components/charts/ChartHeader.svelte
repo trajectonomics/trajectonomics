@@ -6,21 +6,28 @@ import TermsControl from "../projection/TermsControl.svelte"
 interface Props {
 	/** The chart's name, which its section is named by. */
 	title: string
+	/** The id the heading takes, when a section points at it. */
+	headingId?: string
 	/** The terms the address bar asks for. */
 	terms: string
 	onTerms: (value: string) => void
-	/** Controls beside the terms control, such as the chart picker. */
-	actions?: Snippet
+	/** Controls on the heading's own row, such as the Charts button. */
+	actions?: Snippet | undefined
 }
 
-/** A chart's heading, its terms control and the controls on its right, such as the picker. */
-let { title, terms, onTerms, actions }: Props = $props()
+/**
+ * A chart's heading: its name on the left and its controls on the right, with the choice of terms beside
+ * them from `sm` up and on its own row below on a phone, where the controls would not fit beside it.
+ */
+let { title, headingId, terms, onTerms, actions }: Props = $props()
 </script>
 
-<div class="flex flex-wrap items-start justify-between gap-3">
-	<h2 class="min-w-0 max-w-full text-base font-semibold break-words">{title}</h2>
-	<div class="flex flex-wrap items-center gap-2">
+<div class="flex flex-wrap items-center gap-2">
+	<h2 id={headingId} class="min-w-0 max-w-full flex-1 text-base font-semibold break-words">{title}</h2>
+	<div class="order-last w-full sm:order-none sm:w-auto">
 		<TermsControl value={parseTerms(terms)} onChange={onTerms} />
-		{@render actions?.()}
 	</div>
+	{#if actions}
+		<div class="shrink-0">{@render actions()}</div>
+	{/if}
 </div>

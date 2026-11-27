@@ -129,7 +129,7 @@ describe("ProjectionView, the Plan", () => {
 		expect(renderView({ projections: {} })).toContain("No plan to project")
 	})
 
-	test("shows the CLI's error for a failed Read, with its command", () => {
+	test("shows the CLI's error for a failed Read, with its command, and still shows the people and the plan's pages", () => {
 		const body = renderView({
 			projections: {
 				base: {
@@ -142,5 +142,7 @@ describe("ProjectionView, the Plan", () => {
 		expect(body).toContain("Projection of base could not be read")
 		expect(body).toContain("The engine refused.")
 		expect(body).toContain("PROJECTION_REFUSED")
+		expect(body).toContain('href="/household/"')
+		expect(body).toContain("Year by year →")
 	})
 })

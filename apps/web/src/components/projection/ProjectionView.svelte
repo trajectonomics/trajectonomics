@@ -54,6 +54,9 @@ let {
 }: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : projections[name])
+/** The run a successful projection Read holds; a failed one states no ages, so the row shows the people alone. */
+const run = $derived(read?.ok === true ? read.data : null)
+const ages = $derived(run === null ? [] : firstAges(run))
 const charts = $derived({
 	chart,
 	onChart,
@@ -65,16 +68,14 @@ const charts = $derived({
 {#if name === null || read === undefined}
 	<EmptyState title="No plan to project" />
 {:else}
-	<ReadView {read} label={`Projection of ${name}`}>
-		{#snippet children(run)}
-			{@const ages = firstAges(run)}
-			<div class="space-y-8">
-				<PlanPeople people={planPeople(household, ages)} hasHousehold={household !== null} {editable} />
+	<div class="space-y-8">
+		<PlanPeople people={planPeople(household, ages)} hasHousehold={household !== null} {editable} />
+		<ReadView {read} label={`Projection of ${name}`}>
+			{#snippet children(run)}
 				<PlanStats stats={planStats(fi, chance, run)} />
 				<ProjectionCharts {run} {terms} {onTerms} {charts} />
-			</div>
-			<section aria-label="Plan items"></section>
-			<div class="mt-8"><PlanFooter /></div>
-		{/snippet}
-	</ReadView>
+			{/snippet}
+		</ReadView>
+		<PlanFooter />
+	</div>
 {/if}

@@ -18,6 +18,10 @@ for (const path of PAGES) {
 		await seedChart(page)
 		const query = `chart=${SEEDED_CHART}`
 		await openHosted(page, path, "light", `?${query}`)
+		// The picker, Import and Export live behind the Charts panel, so both builds open it before the lists compare.
+		if (path === "/projection/") {
+			await page.getByRole("button", { name: "Charts", exact: true }).click()
+		}
 		const hosted = await enabledControls(page)
 		if (path === "/projection/") {
 			const own = page.getByRole("group", { name: "This chart" }).getByRole("button")
@@ -37,6 +41,9 @@ for (const path of PAGES) {
 		await chooseBeforeLoad(loopback, { theme: "light" })
 		await loopback.goto(`${BASE_URL}${path}?demo=1&${query}`)
 		await settle(loopback, "light")
+		if (path === "/projection/") {
+			await loopback.getByRole("button", { name: "Charts", exact: true }).click()
+		}
 		const reads = await enabledControls(loopback)
 
 		const left = [...hosted]

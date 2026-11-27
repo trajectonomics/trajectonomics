@@ -1,4 +1,5 @@
 <script lang="ts">
+import { focusOnNextFrame } from "../../client/browser"
 import { subscribeOutsideClick } from "../../client/menu"
 import type { ChartDef } from "../../lib/view/charts/types"
 import NavIcon from "../shell/NavIcon.svelte"
@@ -14,28 +15,22 @@ interface Props {
 	onExport: () => void
 	onImport: (file: File) => void
 	hasCharts: boolean
+	/** Bumped by the page after a save or a delete, when this button takes focus back. */
+	focusWhen?: number
 }
 
 /** The chart picker and the chart files, behind one icon button at the chart's top right. */
-let { charts, value, onChange, onNew, onExport, onImport, hasCharts }: Props = $props()
+let { charts, value, onChange, onNew, onExport, onImport, hasCharts, focusWhen }: Props = $props()
 const panelId = $props.id()
 let open = $state(false)
 let root: HTMLDivElement | undefined = $state()
 let button: HTMLButtonElement | undefined = $state()
+// svelte-ignore state_referenced_locally
+const firstFocusWhen = focusWhen ?? 0
 
 function close(): void {
 	open = false
 	button?.focus()
-}
-
-function choose(id: string): void {
-	open = false
-	onChange(id)
-}
-
-function make(): void {
-	open = false
-	onNew()
 }
 
 function onKey(event: KeyboardEvent): void {
@@ -48,6 +43,13 @@ function onKey(event: KeyboardEvent): void {
 $effect(() => {
 	if (!open || root === undefined) return
 	return subscribeOutsideClick(root, () => (open = false))
+})
+
+// A chart saved or deleted swaps the page's chart, so focus would be lost: the button takes it once the
+// drawer has closed and put its own focus back.
+$effect(() => {
+	if (focusWhen === undefined || focusWhen <= firstFocusWhen) return
+	focusOnNextFrame(button)
 })
 </script>
 
@@ -70,7 +72,7 @@ $effect(() => {
 			id={panelId}
 			class="absolute right-0 z-20 mt-2 w-64 max-w-[calc(100vw-2rem)] space-y-3 rounded-lg border border-border bg-card p-3 shadow-lg"
 		>
-			<ChartPicker id={`${panelId}-chart`} {charts} {value} onChange={choose} onNew={make} />
+			<ChartPicker id={`${panelId}-chart`} {charts} {value} {onChange} {onNew} />
 			<ChartFiles {hasCharts} {onExport} {onImport} />
 		</div>
 	{/if}
