@@ -79,7 +79,7 @@ find /tmp/openjot-apk/lib -name '*.so' -print0 |
 
 ## Third-party notices
 
-The app shows an "Open-source licenses" page (My Moo → About). It displays `static/third-party-notices.txt`, a generated list of everything bundled in the app (Rust crates, web packages, Android libraries, ONNX Runtime, the OCR model and the fonts: Noto Sans Thai, Inter and Azeret Mono) with each copyright notice and license text. MIT, Apache-2.0, BSD and OFL all require those to ship with copies of the software.
+The app shows an "Open-source licenses" page (My Moo → About). It displays `static/third-party-notices.txt`, a generated list of everything bundled in the app (Rust crates, web packages, Android libraries, ONNX Runtime, the OCR model and the fonts: Noto Sans Thai, Inter and Azeret Mono) with each copyright notice and license text. OpenJot's own entry states the AGPL-3.0-only licence; the dependencies' MIT, Apache-2.0, BSD and OFL licences all require their notices to ship with copies of the software.
 
 **Regenerate it before each release**, and whenever a dependency changes (`Cargo.lock`, `bun.lock`, `build.gradle.kts`):
 

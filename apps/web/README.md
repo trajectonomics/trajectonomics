@@ -52,4 +52,4 @@ The plan switcher in the side navigation lists the plans, the main plan first, e
 
 ## Licence
 
-MIT. Not published to npm. Only its hosted Demo build is served, as static pages on the Site.
+AGPL-3.0-only. Not published to npm. Only its hosted Demo build is served, as static pages on the Site.
