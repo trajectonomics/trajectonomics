@@ -6,7 +6,10 @@ import { json, methodNotAllowed } from "./responses"
 import { cachedFresh, cachedInvalid, cachedStale } from "./usage-cache"
 import { usagePayload } from "./usage-payload"
 
-/** Handles `GET /api/usage`: a cached rollup read with `asOf` and plan/model filters. */
+/**
+ * Handles `GET /data/api/usage` (and the old host's `/api/usage`): a cached rollup read with
+ * `asOf` and plan/model filters.
+ */
 export async function handleUsage(
 	request: Request,
 	env: Env,
