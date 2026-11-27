@@ -40,11 +40,12 @@ const reference = $derived(model.kind === "reachable" ? model.reference : null)
 		{/snippet}
 	</ResultStatement>
 	{#if fi.taxYears.length > 0}
+		<!-- A reachable answer's tax rows stop work at the FI date; the Tax page keeps the plan as written. -->
 		<p class="text-sm text-muted-foreground">
-			This plan has tax years. <SiteLink
-				href="/tax/"
-				class="text-accent underline-offset-4 hover:underline">See them on the Tax page</SiteLink
-			>.
+			The <SiteLink
+				href={`/tax/?scenario=${encodeURIComponent(fi.scenario.name)}`}
+				class="text-accent underline underline-offset-4">Tax page</SiteLink
+			> shows the plan as written{model.kind === "reachable" ? ", without stopping work at the FI date" : ""}.
 		</p>
 	{/if}
 </div>
