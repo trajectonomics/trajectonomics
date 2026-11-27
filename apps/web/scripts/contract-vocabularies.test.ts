@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { scenarioAccount, scenarioFlow } from "../src/lib/contract"
+import { ASSUMED_KINDS, scenarioAccount, scenarioFlow } from "../src/lib/contract"
 import { COMPOUNDINGS } from "../src/lib/view/plan-items/accounts"
 import { ROUNDINGS as ASSET_ROUNDINGS } from "../src/lib/view/plan-items/asset-shape"
 import { LOAN_COMPOUNDINGS, LOAN_ROUNDINGS } from "../src/lib/view/plan-items/loan-check"
@@ -14,7 +14,7 @@ import {
 } from "../src/lib/view/plan-items/options"
 import { ROUNDINGS as WITHDRAWAL_ROUNDINGS } from "../src/lib/view/withdrawals/rule"
 import { spawnCapture } from "./spawn"
-import { type Follow, vocabularyProblems, wordsAt } from "./vocabulary"
+import { type Follow, unionWordsAt, vocabularyProblems, wordsAt } from "./vocabulary"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
 const BINARY = fileURLToPath(new URL("../../cli/dist/traj", import.meta.url))
@@ -32,9 +32,17 @@ const valuesOf = (choices: readonly { value: string }[]): string[] =>
  * Each web list against the word list the CLI states. `same` is a closed enum of the contract: the pages branch on
  * those words, so a word the CLI adds must reach the contract. `within` is a list a form offers: it may offer fewer
  * words than the CLI accepts, never one the CLI refuses. The words the pages only show (compounding, rounding, a
- * payout's frequency) are plain strings in the contract and have no copy here to follow.
+ * payout's frequency) are plain strings in the contract and have no copy here to follow. `leaf` names the `traj
+ * schema` leaf the list is published on, `union` says the list is the discriminator of a union.
  */
-const LISTS: readonly { label: string; web: readonly string[]; path: string; follow: Follow }[] = [
+const LISTS: readonly {
+	label: string
+	web: readonly string[]
+	path: string
+	follow: Follow
+	leaf?: string
+	union?: boolean
+}[] = [
 	{
 		label: "Flow kind",
 		web: scenarioFlow.shape.kind.options,
@@ -107,14 +115,22 @@ const LISTS: readonly { label: string; web: readonly string[]; path: string; fol
 		path: `${FLOW}.rule.properties.rounding.enum`,
 		follow: "within",
 	},
+	{
+		label: "Assumed value kind",
+		web: ASSUMED_KINDS,
+		path: "output.properties.scenario.properties.assumed.items.oneOf",
+		follow: "same",
+		leaf: "scenario show",
+		union: true,
+	},
 ]
 
-/** The parsed `traj schema "scenario apply" --json`, read with a scratch ledger directory so no real ledger is touched. */
-async function readSchema(): Promise<unknown> {
+/** The parsed `traj schema <leaf> --json`, read with a scratch ledger directory so no real ledger is touched. */
+async function readSchema(leaf = "scenario apply"): Promise<unknown> {
 	const home = await mkdtemp(join(tmpdir(), "traj-vocab-"))
 	try {
 		if (home === "") throw new Error("no scratch directory for TRAJ_HOME")
-		const captured = await spawnCapture([BINARY, "schema", "scenario apply", "--json"], {
+		const captured = await spawnCapture([BINARY, "schema", leaf, "--json"], {
 			env: { ...process.env, DO_NOT_TRACK: "1", TRAJ_HOME: home },
 		})
 		if (captured.code !== 0)
@@ -127,11 +143,16 @@ async function readSchema(): Promise<unknown> {
 
 describe("the closed vocabularies of the web contract follow `traj schema`", () => {
 	test("every list names the words the built CLI states", async () => {
-		const schema = await readSchema()
-		const problems = LISTS.flatMap(({ label, web, path, follow }) => {
-			const cli = wordsAt(schema, path)
+		const leaves = new Set(LISTS.map((entry) => entry.leaf ?? "scenario apply"))
+		const schemas = new Map<string, unknown>()
+		for (const leaf of leaves) schemas.set(leaf, await readSchema(leaf))
+		const problems = LISTS.flatMap(({ label, web, path, follow, leaf, union }) => {
+			const schema = schemas.get(leaf ?? "scenario apply")
+			const cli = union === true ? unionWordsAt(schema, path) : wordsAt(schema, path)
 			if (cli === null)
-				return [`${label}: \`traj schema "scenario apply"\` has no word list at ${path}.`]
+				return [
+					`${label}: \`traj schema "${leaf ?? "scenario apply"}"\` has no word list at ${path}.`,
+				]
 			return vocabularyProblems(label, web, cli, follow)
 		})
 		expect(problems).toEqual([])

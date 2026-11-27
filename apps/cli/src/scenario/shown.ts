@@ -1,5 +1,7 @@
 import { z } from "zod"
 import type { ScenarioRow } from "../store"
+import { type AssumedItem, assumedField } from "./assumed/shape"
+import { mainShape, notesShape, taxedShape } from "./shown-fields"
 import type { TaxProfileView } from "./tax/profile"
 import { taxAllowancesShape } from "./tax/shown-allowances"
 import { parsedTax } from "./tax/stored"
@@ -15,23 +17,6 @@ import {
 	view,
 } from "./view"
 
-const taxedShape = z
-	.boolean()
-	.describe(
-		"True when the document holds a tax Levy, whether or not a tax profile is stored beside it (cli ADR-0066).",
-	)
-
-const mainShape = z
-	.boolean()
-	.describe("True when this is the ledger's main plan, a label and not a default (cli ADR-0071).")
-
-const notesShape = z
-	.string()
-	.nullable()
-	.describe(
-		"The notes kept on this plan, or null when it has none. Notes are outside the document and its contentHash (cli ADR-0071).",
-	)
-
 /** What `scenario show` prints beside the document: its household, tax profile, notes and mark. */
 export type ShownScenario = ScenarioView & {
 	household: HouseholdDocument
@@ -39,6 +24,7 @@ export type ShownScenario = ScenarioView & {
 	tax: StoredTax | null
 	taxed: boolean
 	taxAllowances?: TaxProfileView | undefined
+	assumed: AssumedItem[]
 	notes: string | null
 	main: boolean
 }
@@ -60,6 +46,7 @@ export const scenarioWithHousehold: z.ZodType<ShownScenario> = z.strictObject({
 		),
 	taxed: taxedShape,
 	taxAllowances: taxAllowancesShape.optional(),
+	assumed: assumedField,
 	notes: notesShape,
 	main: mainShape,
 })

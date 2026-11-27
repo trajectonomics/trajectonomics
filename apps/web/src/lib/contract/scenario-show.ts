@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { assumedItem } from "./assumed"
 import { householdDocument } from "./household"
 import { money } from "./money"
 import { scenarioAccount } from "./scenario-account"
@@ -91,6 +92,12 @@ export const scenarioShow = z.strictObject({
 		householdHash: z.string().brand<"HouseholdHash">(),
 		// The stored tax profile, whether the plan is taxed and which deduction classes it states (cli ADR-0066, ADR-0073).
 		...taxShown,
+		/**
+		 * The values the plan assumes that nobody stated, in kind order (cli ADR-0083), empty when it
+		 * assumes none. `template-default` arrives with cli ADR-0084, and the field is absent in an
+		 * older Snapshot.
+		 */
+		assumed: z.array(assumedItem).optional(),
 		/** The notes kept on the plan, or null when it has none (cli ADR-0071); absent in an older Snapshot. */
 		notes: z.string().nullable().optional(),
 		/** True for the ledger's main plan, a label and not a default (cli ADR-0071); absent in an older Snapshot. */

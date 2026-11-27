@@ -63,6 +63,7 @@ describe("scenario list and show", () => {
 			householdHash: NO_HOUSEHOLD_HASH,
 			tax: null,
 			taxed: false,
+			assumed: [],
 			notes: null,
 			main: false,
 		})
@@ -72,6 +73,7 @@ describe("scenario list and show", () => {
 			householdHash: NO_HOUSEHOLD_HASH,
 			tax: null,
 			taxed: false,
+			assumed: [],
 			notes: null,
 			main: false,
 		})

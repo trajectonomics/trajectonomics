@@ -1,13 +1,8 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { isPositionalList, positionOf } from "./positional"
-import {
-	beginnableKeysAt,
-	beginsKey,
-	beginsWithdrawFloor,
-	isBeginnableBlock,
-	unbegunBlock,
-} from "./set-begin"
+import { isBeginnableBlock, unbegunBlock } from "./set-begin"
+import { beginnableKeysAt, beginsKey, beginsWithdrawFloor } from "./set-begin-keys"
 import {
 	ambiguousSegment,
 	identityFailure,
