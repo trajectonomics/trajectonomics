@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import {
+	measuredOf,
 	PEAK_COLUMNS,
 	peakColumnMax,
 	peakOf,
@@ -118,5 +119,28 @@ describe("peakSpoken", () => {
 		expect(peakSpoken(peak(5), PEAK_COLUMNS[2] as (typeof PEAK_COLUMNS)[number])).toBe(
 			"at least 5 tokens in 30 days, from 2026-11-24",
 		)
+	})
+})
+
+describe("measuredOf", () => {
+	test("stands the plan's own figures in for a body cached before measured existed", () => {
+		const peak = { tokens: 10, fromDay: "2026-11-20" }
+		const old = { plan: "claude", tier: "Max", fiveHours: peak, sevenDays: peak, thirtyDays: null }
+		expect(measuredOf(old as unknown as PlanPeak)).toEqual([
+			{ tier: "Max", fiveHours: peak, sevenDays: peak, thirtyDays: null },
+		])
+	})
+
+	test("keeps the measured tiers when the body has them", () => {
+		const measured = [{ tier: "Pro", fiveHours: null, sevenDays: null, thirtyDays: null }]
+		const entry = {
+			plan: "claude",
+			tier: "Max",
+			fiveHours: null,
+			sevenDays: null,
+			thirtyDays: null,
+			measured,
+		}
+		expect(measuredOf(entry)).toBe(measured)
 	})
 })
