@@ -241,17 +241,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Read only, like the shards: the build below is a hit when `Check web` or `Check packages` saved it.
+      # Read only, like the shards: prefer `-packages-` (which caches cli#build, web#build and web#build:hosted).
       - name: Restore the Turborepo cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo/cache
-          key: turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          key: turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-${{ github.sha }}
           restore-keys: |
-            turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
             turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
-            turbo-${{ runner.os }}-web-
+            turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
             turbo-${{ runner.os }}-packages-
+            turbo-${{ runner.os }}-web-
 
       - name: Setup the workspace
         uses: ./.github/actions/setup
