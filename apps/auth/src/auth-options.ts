@@ -7,12 +7,7 @@ import { REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS } from "./core/resources"
 import { requireSecret } from "./core/secret"
 import type { Env } from "./env"
 import { hasMarketingConsent } from "./marketing-consent-store"
-import {
-	type OAuthHookOptions,
-	oauthAfterHook,
-	oauthBeforeHook,
-	testClockEnabled,
-} from "./oauth-hooks"
+import { type OAuthHookOptions, oauthBeforeHook, testClockEnabled } from "./oauth-hooks"
 
 export type CreateAuthInput = {
 	env: Env
@@ -84,7 +79,6 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		},
 		hooks: {
 			before: oauthBeforeHook(hookOptions),
-			after: oauthAfterHook(hookOptions),
 		},
 		plugins: buildPlugins({
 			baseURL,

@@ -60,4 +60,12 @@ export type SecurityEvidence = {
 	smuggledJsonResourceArrayRejected: boolean
 	reapprovalAfterExpiryWorks: boolean
 	revokeKillsPendingAuthCode: boolean
+	revokeHoldsWithManyVerificationRows: boolean
+	deviceCodeContentTypeSmugglingRejected: boolean
+	postAuthorizeRejected: boolean
+	expiredConsentNeverIssuesCode: boolean
+	deviceConsentExistsBeforeRedeem: boolean
+	revokeRemovesDuplicateConsents: boolean
+	emptyScopeDeviceRequestRejected: boolean
+	consentScopesAreUnion: boolean
 }

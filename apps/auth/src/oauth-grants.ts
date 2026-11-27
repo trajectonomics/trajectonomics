@@ -7,11 +7,13 @@
  * endpoint.
  *
  * A grant is one consent per user and client, which is also how 1.7.28's refresh-token family is
- * keyed. Revoking it deletes that family, so the refresh token fails at once.
+ * keyed. Revoking it deletes every consent row for that user and client, so a duplicate cannot
+ * outlive the revoke, and then the codes and the token family.
  */
 import { APIError, createAuthEndpoint, sessionMiddleware } from "better-auth/api"
+import { findAllPages } from "./oauth/adapter"
 import {
-	deleteConsentRow,
+	deleteConsentsForGrant,
 	deleteDeviceCodes,
 	deletePendingAuthorizationCodes,
 	deleteTokenFamily,
@@ -41,11 +43,11 @@ export function grantManagement() {
 				{ method: "GET", use: [sessionMiddleware] },
 				async (ctx) => {
 					const userId = ctx.context.session.user.id
-					const rows = await ctx.context.adapter.findMany({
-						model: "oauthConsent",
-						where: [{ field: "userId", value: userId }],
-					})
-					const consents = rows as StoredConsent[]
+					// Paged: the adapter's default limit is 100 rows, and a missing grant would be a
+					// grant the owner cannot see or revoke.
+					const consents = await findAllPages<StoredConsent>(ctx, "oauthConsent", [
+						{ field: "userId", value: userId },
+					])
 					const grants = await Promise.all(
 						consents.map(async (consent) => {
 							const client = (await ctx.context.adapter.findOne({
@@ -89,12 +91,14 @@ export function grantManagement() {
 							error_description: "grant not found",
 						})
 					}
-					// Consent first, then the rest: a concurrent rotation that slips through lands on a
-					// grant with no approval record, and its next refresh fails closed (ADR 0002).
-					await deleteConsentRow(ctx, id)
-					await deleteTokenFamily(ctx, { userId, clientId: consent.clientId })
-					await deleteDeviceCodes(ctx, { userId, clientId: consent.clientId })
-					await deletePendingAuthorizationCodes(ctx, { userId, clientId: consent.clientId })
+					const owner = { userId, clientId: consent.clientId }
+					// Consents first (every row for the user and client, not only the named one), then
+					// the pending codes, then the tokens. A concurrent rotation that slips through
+					// lands on a grant with no approval record, and its next refresh fails closed.
+					await deleteConsentsForGrant(ctx, owner)
+					await deleteDeviceCodes(ctx, owner)
+					await deletePendingAuthorizationCodes(ctx, owner)
+					await deleteTokenFamily(ctx, owner)
 					return ctx.json({ revoked: true })
 				},
 			),

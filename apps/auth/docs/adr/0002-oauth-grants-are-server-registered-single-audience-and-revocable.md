@@ -67,13 +67,21 @@ history and is not rewritten.
 
 ### 3. Revocable grants with an absolute lifetime
 
-A grant's approval record is its `oauthConsent` row. A device approval creates or updates one in an
-after-hook on `/device/approve`. The after-hook finds the code with the library's own lookup order:
-the typed value first, then the stripped, upper-cased form, so approving `abcd-efgh` records the
-consent for `ABCDEFGH`. The token exchange never creates a consent: if the after-hook failed, the
-next refresh fails closed instead of reviving a code that was approved before a revocation. The
-authorization-code flow creates its consent on `/oauth2/consent`. The consent's `createdAt` is the
-original approval and is never moved by rotation.
+A grant's approval record is its `oauthConsent` row. A device approval creates or updates one in a
+**before**-hook on `/device/approve`, after confirming the code is pending, unexpired and claimed
+by the signed-in user, and that it names a scope. The before-hook finds the code with the
+library's own lookup order: the typed value first, then the stripped, upper-cased form, so
+approving `abcd-efgh` records the consent for `ABCDEFGH`. Recording it before the endpoint flips
+the code to `approved` is what closes the race: no poll can redeem an approved code before its
+consent exists. The token exchange never creates a consent: an approved code left unredeemed
+after a revoke fails closed. The authorization-code flow creates its consent on `/oauth2/consent`.
+The consent's `createdAt` is the original approval and is never moved by rotation.
+
+One user may approve the same client from several machines. The consent is keyed by user and
+client, and 1.7.28 has no unique constraint on that pair, so the hooks merge instead of relying
+on the database: the oldest row is kept so `createdAt` never moves forward, the scopes and
+resources become the union of every approval, and any duplicate row is deleted. A second approval
+therefore cannot narrow the first, and a revoke can never leave a second row behind.
 
 A refresh is rejected with `invalid_grant` when `consent.createdAt + 90 days <= now`, or when no
 consent exists. Failing closed is deliberate: without an approval record the platform cannot prove
@@ -83,9 +91,16 @@ still rotates every thirty days; the absolute check stops the chain at ninety.
 Re-approving a client after the ninety days is a new grant, not an extension: when the existing
 consent is expired, the approval deletes the old consent, then its token family, then creates a
 fresh consent with a new `createdAt`. `createdAt` is never moved without deleting the tokens. The
-authorize before-hook does the same for the authorization-code flow before the provider can update
-the expired row, and the consent before-hook removes a leftover token family before the provider
+authorize before-hook expires the signed-in user's own consent before the provider can update the
+expired row, on a GET to `/oauth2/authorize`, the internal re-dispatch after sign-in and
+`/oauth2/continue`; the consent before-hook removes a leftover token family before the provider
 creates a new consent. The refresh error says `approve the client again`.
+
+The authorize-time expiry reads only the signed-in user's consent for the request's `client_id`.
+An anonymous authorize request expires nothing: a client-wide scan would delete other people's
+grants, and the operator cannot see who the request belongs to until they sign in. The provider's
+auto-consent path compares scopes and resources but not the approval age, so deleting the expired
+row is what makes every code-issuing path fail closed into the consent page.
 
 Whenever a consent is newly created, any leftover access and refresh tokens for that user and
 client are deleted first, so an old token can never attach to the new approval.
@@ -95,14 +110,27 @@ client are deleted first, so an old token can never attach to the new approval.
 - `GET /oauth2/grants` lists the signed-in user's consents with the client id and name, the
   approval time, the scopes and the resources;
 - `POST /oauth2/grants/revoke` takes `{ id }`, verifies the consent belongs to the session user,
-  and deletes the grant in this order: the consent, the user+client access and refresh tokens, the
-  pending `deviceCode` rows, and the pending authorization codes.
+  and deletes every consent row for that user and client, then the pending `deviceCode` rows and
+  authorization codes, then the user+client access and refresh tokens.
 
 Authorization codes are not a table of their own in 1.7.28: each lives in `verification` under the
 hashed code, with the user id and `query.client_id` in its JSON value. The revoke scans that table
 for the grant's user and client and deletes the matches, so a code issued before the revoke cannot
-be exchanged afterwards. The consent is deleted first to narrow the concurrent-rotation window: a
-rotation that slips through lands on a grant with no approval record and fails closed next time.
+be exchanged afterwards. The scan pages with an explicit limit and offset: `findMany` defaults to
+100 rows, and anonymous requests (passkey options, social sign-in state) fill `verification`, so a
+pending code can sit past the first page. The same paged scan serves consent preparation and
+expiry. The consents are deleted first to narrow the concurrent-rotation window: a rotation that
+slips through lands on a grant with no approval record and fails closed next time.
+
+POST `/oauth2/authorize` is rejected with `invalid_request`: no first-party client posts the
+authorization request, and the library parses a POST body before the before-hook runs, so a
+repeated `resource` in that body collapses to its last value and the one-resource gate cannot
+count it. The same rule must not fire on the provider's internal re-dispatch of authorize after a
+sign-in, where the real request is the sign-in and the authorization parameters live in the query;
+the hook tells the two apart by the request's pathname. `/device/code` rejects any `Content-Type`
+whose media type merely contains `application/x-www-form-urlencoded`: the library form-parses such
+a body while the hook reads it as JSON, and the two disagree about the resources it names. A body
+the hook cannot read fails closed rather than counting as no resource.
 
 The provider's `/oauth2/delete-consent` is in `disabledPaths`. It deletes the consent but leaves
 the tokens alive, and a later approval would revive them. `/oauth2/grants/revoke` is the only
