@@ -10,6 +10,7 @@ const chanceShape: Shape = {
 	seed: req(seed),
 	paths: req(paths),
 	outcomes: opt(bool),
+	milestoneDates: opt(bool),
 }
 const pathShape: Shape = {
 	model: opt(anyVersion),
@@ -30,7 +31,7 @@ function checkOptions(value: unknown, root: Root, shape: Shape): readonly Proble
 }
 
 /**
- * Validates the seed, path count and `outcomes` flag of `chanceOfSuccess` options. The Return model is
+ * Validates the seed, path count and report flags of `chanceOfSuccess` options. The Return model is
  * checked by `checkReturnModel`, which needs the Scenario's accounts.
  */
 export function checkChanceOptions(value: unknown): readonly Problem[] {
