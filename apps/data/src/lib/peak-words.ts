@@ -1,4 +1,4 @@
-import { cacheShare, cacheShareLabel } from "./cache-share"
+import { cacheShare, cacheShareLabel, NO_CACHE_SPLIT } from "./cache-share"
 import { displayCount } from "./format"
 import type { Peak, PeakWindowKey } from "./types"
 
@@ -27,12 +27,15 @@ export function peakCacheShare(peak: Peak): number | null {
 
 /**
  * The small note under a measured figure: a derived 30-day figure says how it was derived, and a
- * cache-heavy window says how much of its tokens were cache reads.
+ * cache-heavy window says how much of its tokens were cache reads. A plan whose source reports no
+ * cache reads says so, because its figure then holds them.
  */
-export function peakNote(peak: Peak, key: PeakWindowKey): string | null {
+export function peakNote(peak: Peak, key: PeakWindowKey, cacheSplit = true): string | null {
 	const notes: string[] = []
 	if (peak.derived === true && key === "thirtyDays") notes.push("week × 30/7")
-	const cache = cacheShareLabel(cacheShare(peak.tokens, peak.cacheRead))
+	const cache = cacheSplit
+		? cacheShareLabel(cacheShare(peak.tokens, peak.cacheRead))
+		: NO_CACHE_SPLIT
 	if (cache !== null) notes.push(cache)
 	return notes.length === 0 ? null : notes.join(" · ")
 }

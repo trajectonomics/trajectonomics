@@ -1,7 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import { cacheShareLabel } from "../lib/cache-share"
+import { cacheShareLabel, NO_CACHE_SPLIT } from "../lib/cache-share"
 import { compactCount, displayCount } from "../lib/format"
 import { grandTotal } from "../lib/grand-total"
 import { planModels } from "../lib/plan-models"
@@ -34,7 +34,7 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 		{#each totals as total}
 			{@const width = topRate === 0 ? 0 : Math.round((total.tokensPerActiveDay / topRate) * 100)}
 			{@const tier = planTier(total.plan, day)}
-			{@const cache = cacheShareLabel(total.cacheReadShare)}
+			{@const cache = total.cacheRead === null ? NO_CACHE_SPLIT : cacheShareLabel(total.cacheReadShare)}
 			{@const models = planModels(rows, total.plan)}
 			{@const modelMax = models[0]?.tokens ?? 0}
 			<li
@@ -78,7 +78,7 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 					</summary>
 					<ol class="model-list">
 						{#each models as model (model.model)}
-							{@const modelCache = cacheShareLabel(model.cacheReadShare)}
+							{@const modelCache = model.cacheRead === null ? NO_CACHE_SPLIT : cacheShareLabel(model.cacheReadShare)}
 							{@const modelWidth = modelMax === 0 ? 0 : Math.round((model.tokens / modelMax) * 100)}
 							<li class="model-row">
 								<span class="model-identity">

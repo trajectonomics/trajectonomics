@@ -26,7 +26,7 @@ let {
 	/** The peaks API's plans. */
 	plans: PlanPeak[]
 	/** The summary's ranked plans, whose order this table follows. */
-	ranked: { plan: string }[]
+	ranked: { plan: string; cacheRead?: number | null }[]
 	/** The window's last day, whose tier each plan's name carries. */
 	day: string
 } = $props()
@@ -42,6 +42,10 @@ type RowView = {
 const chosen = $state<Record<string, string>>({})
 
 const rows = $derived(peakTableRows(ranked, plans, day))
+/** Plans whose source reports no cache reads, so their figures hold them. */
+const unsplit = $derived(
+	new Set(ranked.filter((entry) => entry.cacheRead === null).map((entry) => entry.plan)),
+)
 
 function viewOf(row: PeakTableRow): RowView {
 	const catalog = planCatalog(row.plan)
@@ -146,7 +150,7 @@ function choose(plan: string, tier: string): void {
 					</span>
 				</div>
 			{:else}
-				{@const note = peakNote(current.peak, column.key)}
+				{@const note = peakNote(current.peak, column.key, !unsplit.has(view.row.plan))}
 				<div class="peaks-cell" title={peakSpoken(current.peak, column)}>
 					<span class="peaks-figure" aria-hidden="true">
 						{compactCount(current.peak.tokens)}

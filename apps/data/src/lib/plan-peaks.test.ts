@@ -157,6 +157,7 @@ describe("an old-shape body", () => {
 		const week = peakOf(findRow(rows, "mistral"), "sevenDays") as Peak
 		expect(peakCacheShare(week)).toBeNull()
 		expect(peakNote(week, "sevenDays")).toBeNull()
+		expect(peakNote(week, "sevenDays", false)).toBe("no cache split")
 		expect(peakSpoken(week, PEAK_COLUMNS[1] as (typeof PEAK_COLUMNS)[number])).toBe(
 			"700 tokens in 7 days, from 2026-11-20",
 		)
