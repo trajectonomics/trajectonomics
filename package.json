@@ -34,6 +34,7 @@
 		"check": "turbo run check",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
+		"format": "turbo run format",
 		"typecheck": "turbo run typecheck",
 		"skills:check": "bunx skills@latest check",
 		"skills:update": "bunx skills@latest update"

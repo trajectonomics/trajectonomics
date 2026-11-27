@@ -44,9 +44,11 @@ describe("GET /api/peaks limits by plan", () => {
 			tokens: 6_000_000,
 			low: 5_714_286,
 			high: 6_315_789,
+			processed: { value: 6_000_000, low: 5_714_286, high: 6_315_789 },
+			usd: null,
 			points: 20,
 			readings: 2,
-			rough: false,
+			rough: true,
 		})
 		expect(body.plans[0]?.limits?.thirtyDays?.derived).toBeUndefined()
 	})
@@ -92,9 +94,11 @@ describe("GET /api/peaks limits by plan", () => {
 			tokens: 10_000_000,
 			low: 9_523_810,
 			high: 10_526_316,
+			processed: { value: 10_000_000, low: 9_523_810, high: 10_526_316 },
+			usd: null,
 			points: 20,
 			readings: 2,
-			rough: false,
+			rough: true,
 		})
 	})
 })

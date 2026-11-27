@@ -1,7 +1,7 @@
 ---
 title: "เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR"
 description: "เบื้องหลังระบบ Software Factory ที่รันจริงใน Trajectonomics: Dispatcher ทุก 6 ชั่วโมง, สถาปัตยกรรม 6 ขั้น, Dual-Model Cross-Review Gate, ขอบเขตความปลอดภัย ADR 0011 และ 4 Exit ของ Ticket Run"
-type: guide
+type: essay
 publishedOn: 2026-11-23
 cover:
   src: /blog/posts/software-factory/cover.webp
@@ -130,6 +130,6 @@ gh issue view <n> -R trajectonomics/<repo> --json number,title,body,labels,comme
 6. **จดทุกการตัดสินใจเป็น ADR** ให้ agent ทุกตัวทำตามกฎชุดเดียวกัน ของ Factory ตอนนี้มี [28 ข้อ](https://github.com/trajectonomics/factory/tree/main/docs/adr)
 7. **วัดสองอย่าง:** จำนวน PR ที่ merge และจำนวนครั้งที่คุณต้องเข้าไปแก้เอง
 
-ถ้าอยากอ่านบทเรียน 7 ข้อที่ผมเจอก่อนสร้างระบบนี้ อ่านต่อได้ที่ [7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory](/blog/th/guides/software-factory-7-things/)
+ถ้าอยากอ่านบทเรียน 7 ข้อที่ผมเจอก่อนสร้างระบบนี้ อ่านต่อได้ที่ [7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory](/blog/th/essays/software-factory-7-things/)
 
 อ่านโค้ด, runbook และ ADR ทั้งหมดได้ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory) และดูงานที่มันสร้างจริงได้ที่ [trajectonomics/trajectonomics](https://github.com/trajectonomics/trajectonomics) ถ้ามีประโยชน์ ฝากกดดาวให้ทั้งสอง repo ด้วยนะครับ

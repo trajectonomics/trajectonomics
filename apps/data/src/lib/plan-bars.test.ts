@@ -52,6 +52,7 @@ describe("planBars", () => {
 		)
 		expect(bars[0]).toMatchObject({
 			kind: "estimate",
+			unit: "tokens",
 			tokens: 2_000,
 			low: 1_800,
 			high: 2_200,

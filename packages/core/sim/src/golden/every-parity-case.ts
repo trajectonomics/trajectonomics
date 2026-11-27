@@ -4,6 +4,7 @@ import { CATEGORY_PARITY_CASES } from "./category-parity-cases"
 import { EMPLOYER_PARITY_CASES } from "./employer-cases"
 import { ESTATE_PARITY_CASES } from "./estate-parity-cases"
 import { FEE_PARITY_CASES } from "./fee-cases"
+import { INFLATION_PARITY_CASES } from "./inflation-cases"
 import { LIFETIME_PARITY_CASES } from "./lifetime-cases"
 import { PARITY_CASES, type ParityCase } from "./parity-cases"
 import { PATH_PARITY_CASES } from "./path-parity-cases"
@@ -38,4 +39,5 @@ export const EVERY_PARITY_CASE: readonly ParityCase[] = [
 	...TRANSFER_PARITY_CASES,
 	...PATH_PARITY_CASES,
 	...LIFETIME_PARITY_CASES,
+	...INFLATION_PARITY_CASES,
 ]

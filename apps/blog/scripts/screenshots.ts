@@ -12,10 +12,11 @@ const OUTPUT_ROOT = resolve(import.meta.dir, "..", "docs", "screenshots")
 /** The pages a Surface ticket shows, by file-name stem, at their public paths under the blog's base. */
 const PAGES = Object.freeze([
 	{ name: "front", path: `${BLOG_BASE}/` },
-	{ name: "post", path: `${BLOG_BASE}/guides/one-answer-every-time/` },
+	{ name: "front-filtered", path: `${BLOG_BASE}/?type=compare` },
+	{ name: "post", path: `${BLOG_BASE}/essays/one-answer-every-time/` },
 	{ name: "front-th", path: `${BLOG_BASE}/th/` },
-	{ name: "post-th", path: `${BLOG_BASE}/th/guides/one-answer-every-time/` },
-	{ name: "post-fallback", path: `${BLOG_BASE}/guides/software-factory/` },
+	{ name: "post-th", path: `${BLOG_BASE}/th/essays/one-answer-every-time/` },
+	{ name: "post-fallback", path: `${BLOG_BASE}/essays/software-factory/` },
 	{ name: "not-found", path: `${BLOG_BASE}/missing/` },
 ])
 

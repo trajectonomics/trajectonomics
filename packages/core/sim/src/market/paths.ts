@@ -3,16 +3,26 @@ import type { ResolvedReturns, ReturnRow, Returns } from "../engine/returns"
 import { type BucketTable, bucketTable, draw32, pickBucket } from "../prng/bucket"
 import { pathSeed } from "../prng/path-seed"
 import { nextSplitMix } from "../prng/splitmix64"
-import type { ReturnModel, Timeline } from "../types"
+import type { BasisPoints, InflationFactor, ReturnModel, Timeline } from "../types"
+import { drawPrices } from "./inflation-draws"
 import { MAX_MARKET_ROWS, type MarketRow, marketRows } from "./rows"
 
-/** One Market path: a bucket draw per row, one Return series per Account in the model. */
+/** The bucket table of a factor, or nothing when the model holds no factor to draw from. */
+function inflationTable(factor: InflationFactor | undefined): BucketTable | undefined {
+	if (factor === undefined) return undefined
+	return bucketTable(factor.buckets.map((bucket) => bucket.weight))
+}
+
+/** One Market path: a bucket draw per row, one Return series per Account in the model, then inflation. */
 function pathReturns(
 	model: ReturnModel,
 	table: BucketTable,
+	inflTable: BucketTable | undefined,
 	dates: readonly MarketRow[],
 	seed: bigint,
 	index: number,
+	timeline: Timeline,
+	outsideBps: BasisPoints | undefined,
 ): Returns {
 	const rows: ReturnRow[][] = model.accounts.map(() => [])
 	let state = pathSeed(seed, index)
@@ -24,9 +34,15 @@ function pathReturns(
 			rows[account]!.push({ from, returnBps: bucket.returnsBps[account]!, span })
 		}
 	}
+	const factor = model.inflation
+	const prices =
+		factor === undefined || inflTable === undefined || outsideBps === undefined
+			? undefined
+			: drawPrices(factor, inflTable, state, timeline, outsideBps)
 	return {
 		returnsVersion: 1,
 		series: model.accounts.map((account, position) => ({ account, rows: rows[position]! })),
+		...(prices === undefined ? {} : { prices }),
 	}
 }
 
@@ -36,10 +52,20 @@ export function marketPath(
 	seed: bigint,
 	index: number,
 	timeline: Timeline,
+	outsideBps?: BasisPoints,
 ): Returns {
 	const table = bucketTable(model.buckets.map((bucket) => bucket.weight))
 	const dates = marketRows(timeline).slice(0, MAX_MARKET_ROWS)
-	return pathReturns(model, table, dates, seed, index)
+	return pathReturns(
+		model,
+		table,
+		inflationTable(model.inflation),
+		dates,
+		seed,
+		index,
+		timeline,
+		outsideBps,
+	)
 }
 
 /**
@@ -51,11 +77,13 @@ export function* marketReturns(
 	seed: bigint,
 	paths: number,
 	timeline: Timeline,
+	outsideBps?: BasisPoints,
 ): Generator<Returns> {
 	const table = bucketTable(model.buckets.map((bucket) => bucket.weight))
+	const inflTable = inflationTable(model.inflation)
 	const dates = marketRows(timeline).slice(0, MAX_MARKET_ROWS)
 	for (let index = 0; index < paths; index++) {
-		yield pathReturns(model, table, dates, seed, index)
+		yield pathReturns(model, table, inflTable, dates, seed, index, timeline, outsideBps)
 	}
 }
 

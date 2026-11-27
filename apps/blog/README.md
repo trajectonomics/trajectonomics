@@ -6,25 +6,30 @@ The Trajectonomics blog at [trajectonomics.com/blog](https://trajectonomics.com/
 script answers the old blog host with a permanent redirect to the new address
 ([ADR 0004](./docs/adr/0004-the-blog-is-served-under-the-sites-host.md)). It is never published to npm.
 
-**Status:** the Shell, the front page, the Post page, English and Thai Language Trees, and the
-first Posts. The type filter, the compare template, structured data and the first Compare Page
-(`traj` vs vanilla agents) follow.
+**Status:** the Shell, the front page (with Post Type, Post Language and Product filters), the Post
+page, English and Thai Language Trees, permanent redirects for moved Posts, and the first Posts.
+The compare template and the first Compare Page (`traj` vs vanilla agents) follow.
 
 ## Write a Post
 
 Add `src/content/posts/<slug>/<language>.md`, where `<language>` is `en` or `th`, with `title`,
-`description`, `type` (`compare`, `guide` or `news`), `publishedOn`, `cover` (`src`, `alt`,
-`width`, `height`) and optionally `draft: true`. Its images go in `public/posts/<slug>/` as WebP, and
-a `src` is their public path under the blog's base, such as `/blog/posts/<slug>/cover.webp`. Stamp a
-short thumbnail title and optional kicker onto the `1024 × 1024` cover artwork with `bun run cover`
-and state the visible words in `cover.alt`.
+`description`, `type` (`compare`, `release`, `guide`, `essay` or `news`), optional `products`
+(`traj`, `openjot`), `publishedOn`, `cover` (`src`, `alt`, `width`, `height`) and optionally
+`draft: true`. Its images go in `public/posts/<slug>/` as WebP, and a `src` is their public path
+under the blog's base, such as `/blog/posts/<slug>/cover.webp`. Stamp a short thumbnail title and
+optional kicker onto the `1024 × 1024` cover artwork with `bun run cover` and state the visible
+words in `cover.alt`.
 
 To translate a Post, add another `<language>.md` in the same folder. Translate `title`,
-`description`, `cover.alt` and the body, and keep `type`, `publishedOn`, `cover.src`, the cover's
-size and `draft` exactly as the other Translations have them: the build refuses a mismatch.
+`description`, `cover.alt` and the body, and keep `type`, `products`, `publishedOn`, `cover.src`,
+the cover's size and `draft` exactly as the other Translations have them: the build refuses a
+mismatch.
 
-A `guide` is served at `/blog/guides/<slug>/` in English and at `/blog/th/guides/<slug>/` in Thai. Every Post
-has both pages. A page whose Language the Post is not written in shows the English Translation (or
+A Post's address follows its type folder (`/compare/`, `/releases/`, `/guides/`, `/essays/`,
+`/news/`), e.g. `/blog/guides/<slug>/` in English and `/blog/th/guides/<slug>/` in Thai. Changing a
+published Post's `type` requires an entry in `src/lib/moved-posts.ts`, which writes
+`public/_redirects` before every build so old URLs answer 301. Every Post has a page in every
+Language Tree. A page whose Language the Post is not written in shows the English Translation (or
 the Post's own Language when there is no English) with a notice, and lists the Languages the Post
 is written in ([ADR 0003](./docs/adr/0003-interface-language-and-post-language-are-separate.md)).
 
