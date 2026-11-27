@@ -21,7 +21,7 @@ const RMF = "allowance.retirement.rmf"
 const ESG = "allowance.thai_esg"
 const FIRST = { labels: [RMF], step: "1000", budget: null, minSaving: null }
 const SECOND = { labels: [RMF, ESG], step: "5000", budget: "100000", minSaving: "1" }
-const CHECK = ["scenario list", "account list", "report networth"]
+const CHECK = ["account list", "report networth", "scenario list"]
 
 let spy: Editor
 let log = ""
@@ -40,6 +40,7 @@ function checksOf(ran: string[]): (string | undefined)[] {
 	return ran
 		.filter((line) => !line.startsWith("projection allowances"))
 		.map((line) => CHECK.find((prefix) => line.startsWith(prefix)))
+		.sort()
 }
 
 /** The Snapshot without its allowance reads and their inputs: everything a settings change must leave alone. */

@@ -6,7 +6,6 @@ import { type Edit, editSchema } from "../src/lib/edit/edit"
 import { type Reread, rereadSchema } from "../src/lib/edit/reread"
 import { type WhatIfBody, whatIfSchema } from "../src/lib/what-if/overrides"
 import { json } from "./serve-respond"
-import type { SnapshotRun } from "./snapshot-run"
 
 /** The exit code a refusal carries: the write path refuses rather than runs, so none of traj's codes fits. */
 export const REFUSED_EXIT_CODE = 1
@@ -17,24 +16,8 @@ export function failure(status: number, error: ErrorBody): Response {
 }
 
 /**
- * Answers a Snapshot run: the Snapshot, with the write's own result when it states one and the household
- * anchors and Owners it dropped when it dropped any, or the CLI's error as data.
+ * Answers a preview: the dry run's own result, with no Snapshot, because nothing was written.
  */
-export function answerOf(
-	run: SnapshotRun,
-	result?: unknown,
-	droppedAnchors: readonly string[] = [],
-	droppedOwners: readonly string[] = [],
-): Response {
-	if (!run.ok) return failure(200, run.error)
-	const dropped =
-		(droppedAnchors.length === 0 ? "" : `,"droppedAnchors":${JSON.stringify(droppedAnchors)}`) +
-		(droppedOwners.length === 0 ? "" : `,"droppedOwners":${JSON.stringify(droppedOwners)}`)
-	const stated = (result === undefined ? "" : `,"result":${JSON.stringify(result)}`) + dropped
-	return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}${stated}}`)
-}
-
-/** Answers a preview: the dry run's own result, with no Snapshot, because nothing was written. */
 export function answerPreview(result: unknown): Response {
 	return json(200, `{"ok":true,"preview":true,"result":${JSON.stringify(result)}}`)
 }

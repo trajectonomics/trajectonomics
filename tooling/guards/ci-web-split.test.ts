@@ -36,9 +36,9 @@ describe("the CI split of the web check", () => {
 	})
 
 	it("keeps `test` equal to the `./src` half and the `./scripts` half CI runs apart", () => {
-		expect(web.scripts["test"]).toBe("bun test ./src ./scripts")
+		expect(web.scripts["test"]).toBe("bun test --parallel=2 --no-isolate ./src ./scripts")
 		expect(web.scripts["test:src"]).toBe("bun test ./src")
-		expect(web.scripts["test:scripts"]).toBe("bun test ./scripts")
+		expect(web.scripts["test:scripts"]).toBe("bun test --parallel=2 --no-isolate ./scripts")
 	})
 
 	it("runs lint, typecheck, test:src and build in the web job, and the scripts in shards", () => {

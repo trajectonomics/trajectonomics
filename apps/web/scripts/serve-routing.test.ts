@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { join } from "node:path"
 import { EDIT_TOKEN_HEADER } from "../src/lib/edit/guard"
 import { demoCarryIn } from "./demo/carry-in"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { PARAMS } from "./edit-request.test-support"
 import { makeScratch, removeScratch } from "./scratch"
@@ -24,7 +24,7 @@ function pageHeaders(): Record<string, string> {
 beforeAll(async () => {
 	scratch = await makeScratch("traj-web-routing-")
 	const home = join(scratch, "traj-home")
-	await buildDemoLedger({ binary: BINARY, home, scratch })
+	await copyDemoLedger({ binary: BINARY, home, scratch })
 	const running = await startDashboard({
 		traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home, DO_NOT_TRACK: "1" } },
 		cliVersion: "test",
