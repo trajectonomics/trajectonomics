@@ -102,7 +102,6 @@ test("the top bar's plan button picks a plan, and keeps its keyboard in the menu
 	expect(after.find((item) => item.checked === "false")?.name).toBe(
 		items.find((item) => item.checked === "true")?.name ?? "",
 	)
-	await page.keyboard.press("ArrowDown")
 	await page.keyboard.press("Escape")
 	await expect(menu).toBeHidden()
 	await expect(button).toBeFocused()

@@ -13,11 +13,22 @@ interface Props {
 	editable?: boolean
 	/** Shuts the menu, and gives focus back to the button that opened it. */
 	onClose: () => void
+	/** Shuts the menu after Tab, which moves focus on by itself. */
+	onDismiss: () => void
 	/** The choice that takes focus as the menu opens: the plan the page shows. */
 	initialIndex: number
 }
 
-let { names, selected, rows, onChange, editable = false, onClose, initialIndex }: Props = $props()
+let {
+	names,
+	selected,
+	rows,
+	onChange,
+	editable = false,
+	onClose,
+	onDismiss,
+	initialIndex,
+}: Props = $props()
 let menu: HTMLDivElement | undefined = $state()
 
 // On opening, focus lands on the plan on screen, as a keyboard reader expects from a menu button.
@@ -29,6 +40,11 @@ function onKeydown(event: KeyboardEvent): void {
 	if (event.key === "Escape") {
 		event.preventDefault()
 		onClose()
+		return
+	}
+	// Tab is not caught: the items are out of the tab order, so focus moves on to the page and the menu shuts.
+	if (event.key === "Tab") {
+		onDismiss()
 		return
 	}
 	if (menu === undefined) return

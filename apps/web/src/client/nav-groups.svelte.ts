@@ -31,8 +31,9 @@ export class NavGroups {
 		return this.choices[heading] ?? parseStored(this.read(navGroupKey(heading))) ?? defaultOpen
 	}
 
-	/** Turns a group over, and keeps the new state. */
-	toggle(heading: string, defaultOpen = true): void {
+	/** Turns a group over, and keeps the new state. A group that holds the current page stays open, so its heading does nothing. */
+	toggle(heading: string, defaultOpen = true, holdsCurrent = false): void {
+		if (holdsCurrent) return
 		this.keep(heading, !this.isOpen(heading, defaultOpen))
 	}
 

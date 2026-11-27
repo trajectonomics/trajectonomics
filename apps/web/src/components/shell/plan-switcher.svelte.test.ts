@@ -84,7 +84,9 @@ describe("PlanMenuList", () => {
 		const readOnly = render(PlanMenuList, {
 			props: { names: ["base"], selected: "base", rows, onChange: noop, onClose: noop },
 		}).body
+		expect(readOnly).toMatch(/href="\/plans\/"[^>]*role="menuitem"/)
 		expect(readOnly).toMatch(/href="\/plans\/"[\s\S]*?All plans/)
+		expect(readOnly).toContain('role="separator"')
 		expect(readOnly).not.toContain("New plan")
 		const editing = render(PlanMenuList, {
 			props: {
@@ -96,6 +98,7 @@ describe("PlanMenuList", () => {
 				onClose: noop,
 			},
 		}).body
-		expect(editing).toContain("New plan")
+		// "All plans" and "New plan" are menu items too, so the arrow keys reach them.
+		expect(editing).toMatch(/role="menuitem"[\s\S]*?New plan/)
 	})
 })

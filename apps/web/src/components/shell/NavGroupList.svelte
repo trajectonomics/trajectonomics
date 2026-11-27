@@ -50,7 +50,7 @@ const open = $derived(
 				aria-current={isCurrent ? "page" : undefined}
 				onclick={onNavigate}
 				class={cx(
-					"flex items-center gap-3 rounded-md px-3 py-2 text-sm whitespace-nowrap outline-none focus-visible:outline-2 focus-visible:outline-ring",
+					"flex items-center gap-3 rounded-md px-3 py-2 text-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-ring",
 					isCurrent
 						? "bg-secondary font-medium text-foreground"
 						: "text-muted-foreground hover:text-foreground",
@@ -72,8 +72,8 @@ const open = $derived(
 				type="button"
 				aria-expanded={open}
 				aria-controls={navGroupId(group.heading)}
-				onclick={() => navGroups.toggle(group.heading, group.defaultOpen)}
-				class="flex w-full items-center gap-2 rounded-md px-3 pb-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase outline-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				onclick={() => navGroups.toggle(group.heading, group.defaultOpen, holdsCurrent)}
+				class="flex w-full items-center gap-2 rounded-md px-3 pb-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 			>
 				{group.heading}
 				{#if warning}

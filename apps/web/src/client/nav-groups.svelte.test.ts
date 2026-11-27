@@ -57,4 +57,12 @@ describe("the navigation groups' open state", () => {
 		groups.toggle("Plan", true)
 		expect(groups.isOpen("Plan", true)).toBe(true)
 	})
+
+	test("does nothing to a group that holds the current page, and stores no choice for it", () => {
+		const store = storage()
+		const groups = new NavGroups(store.read, store.write)
+		groups.toggle("Records", false, true)
+		expect(store.values.has(navGroupKey("Records"))).toBe(false)
+		expect(groups.isOpen("Records", false)).toBe(false)
+	})
 })

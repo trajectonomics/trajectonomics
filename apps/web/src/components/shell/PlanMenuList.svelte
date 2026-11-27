@@ -36,6 +36,7 @@ function newPlan(): void {
 	<button
 		type="button"
 		role="menuitemradio"
+		tabindex={-1}
 		aria-checked={name === selected}
 		onclick={() => pick(name)}
 		class={cx(
@@ -49,9 +50,11 @@ function newPlan(): void {
 		{#if row?.main}<Badge tone="accent">Main</Badge>{/if}
 	</button>
 {/each}
-<hr class="my-1 border-border" />
+<div role="separator" class="my-1 border-t border-border"></div>
 <SiteLink
 	href="/plans/"
+	role="menuitem"
+	tabindex={-1}
 	onclick={onClose}
 	class="block rounded-md px-2.5 py-1.5 text-sm text-accent underline-offset-4 hover:underline"
 >
@@ -60,6 +63,8 @@ function newPlan(): void {
 {#if editable}
 	<button
 		type="button"
+		role="menuitem"
+		tabindex={-1}
 		onclick={newPlan}
 		class="block w-full rounded-md px-2.5 py-1.5 text-left text-sm text-foreground hover:text-accent"
 	>

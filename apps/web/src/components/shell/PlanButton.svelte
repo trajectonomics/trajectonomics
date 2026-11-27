@@ -1,5 +1,5 @@
 <script lang="ts">
-import { subscribeOutsidePointer } from "../../client/menu"
+import { focusIfBody, subscribeOutsideClick } from "../../client/menu"
 import { planButtonName } from "../../lib/view/plans/menu"
 import type { PlanRow } from "../../lib/view/plans/rows"
 import Badge from "../ui/Badge.svelte"
@@ -33,6 +33,17 @@ function hide(): void {
 	button?.focus()
 }
 
+/** Shuts the menu after Tab: the browser moves focus on by itself, so the button does not take it back. */
+function dismiss(): void {
+	open = false
+}
+
+/** A click outside shuts the menu. Blank content leaves focus on the body, so the button takes it back; another control keeps its own. */
+function hideOnOutsideClick(): void {
+	open = false
+	focusIfBody(button)
+}
+
 function onButtonKey(event: KeyboardEvent): void {
 	if (event.key === "Escape") {
 		if (open) hide()
@@ -43,10 +54,10 @@ function onButtonKey(event: KeyboardEvent): void {
 	open = true
 }
 
-// A press outside the button and its menu shuts the menu; Escape shuts it through the key handlers.
+// A click outside the button and its menu shuts the menu; Escape shuts it through the key handlers.
 $effect(() => {
 	if (!open || root === undefined) return
-	return subscribeOutsidePointer(root, hide)
+	return subscribeOutsideClick(root, hideOnOutsideClick)
 })
 </script>
 
@@ -81,6 +92,7 @@ $effect(() => {
 			{onChange}
 			{editable}
 			onClose={hide}
+			onDismiss={dismiss}
 		/>
 	{/if}
 </div>

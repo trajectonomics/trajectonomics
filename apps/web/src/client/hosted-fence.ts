@@ -21,11 +21,12 @@ const READ_CONTROLS = [
 	'input[type="file"][accept="application/json,.json"]',
 	'div:has(> label > input[type="file"][accept="application/json,.json"]) > button',
 	'input[name="memo"]',
-	'ul[aria-labelledby="plan-switcher"] li > div:first-child > button',
+	// The plan menu's choices only pick the plan the pages show; "New plan" beside them is an Edit.
+	'[role="menuitemradio"]',
 ].join(",")
 
-/** Where the fence applies: the page, and the plan switcher beside it. A dialog is left alone: a switched-off control is the only way to open an Edit drawer, and the charts' own drawer keeps a person's charts in their own browser. */
-const FENCED = "main, div:has(> #plan-switcher)"
+/** Where the fence applies: the page, and the plan menu in the top bar, which sits outside `main`. A dialog is left alone: a switched-off control is the only way to open an Edit drawer, and the charts' own drawer keeps a person's charts in their own browser. */
+const FENCED = 'main, [role="menu"][aria-label="Plans"]'
 
 /** Pages whose controls all read: the report picker, the downloads and Print. */
 const READ_PAGES: readonly string[] = ["/reports/"]
