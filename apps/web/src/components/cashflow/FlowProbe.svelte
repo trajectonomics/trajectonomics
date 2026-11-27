@@ -16,6 +16,12 @@ let { text = $bindable(null) }: Props = $props()
 	text-rendering="geometricPrecision"
 	aria-hidden="true"
 >
-	<rect data-flow-size width="1em" height="1em" visibility="hidden" />
-	<text bind:this={text} data-flow-probe aria-hidden="true" class="fill-foreground"></text>
+	<text data-flow-size visibility="hidden" aria-hidden="true">Ag Wy 0</text>
+	<text
+		bind:this={text}
+		data-flow-probe
+		visibility="hidden"
+		aria-hidden="true"
+		class="fill-foreground"
+	></text>
 </svg>

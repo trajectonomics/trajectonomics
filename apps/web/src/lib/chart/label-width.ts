@@ -68,8 +68,10 @@ function prefix(
 	measure?: TextMeasure,
 ): LabelText {
 	if (measure !== undefined) {
-		// A prefix grows with every grapheme it holds, so the longest that fits is found by halving the
-		// candidates instead of walking them all: 80 letters take 7 measurements, not 80.
+		// A prefix usually grows with every grapheme it holds, so the longest that fits is found by halving
+		// the candidates instead of walking them all: 80 letters take 7 measurements, not 80. Where a face
+		// joins its letters (Arabic), a longer prefix can paint narrower, so this may keep more text than a
+		// linear walk would; it never overflows, because it only returns a prefix it measured as fitting.
 		let low = 0
 		let high = parts.length
 		while (low < high) {
