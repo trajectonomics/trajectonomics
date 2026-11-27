@@ -5,17 +5,26 @@ import type { Person } from "./model"
 /** A person as a household document states them (cli ADR-0048). The shape only; `rules.ts` holds the rest. */
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/
+const MONTH_HINT = "A month is YYYY-MM: a four-digit year, a dash, then a month from 01 to 12."
+
+/** A YYYY-MM month, whose refusal names the rule at its own path (cli ADR-0048). */
+function month(what: string): z.ZodString {
+	return z
+		.string()
+		.refine((text) => MONTH.test(text), {
+			error: `${what} must be a month, as YYYY-MM`,
+			params: { hint: MONTH_HINT },
+		})
+		.meta({ pattern: MONTH.source })
+}
 
 const personId = z
 	.string()
 	.min(1)
 	.describe("The name this household gives the person, unique within it.")
-const born = z
-	.string()
-	.regex(MONTH)
-	.describe(
-		"The month the person was born, as YYYY-MM. Age N falls on the last day of that month in year born + N.",
-	)
+const born = month("The birth month").describe(
+	"The month the person was born, as YYYY-MM. Age N falls on the last day of that month in year born + N.",
+)
 const lifeExpectancy = z
 	.number()
 	.int()
@@ -46,9 +55,7 @@ const partner = z.strictObject({
 	role: z.literal("partner").describe("A partner: at most one per household."),
 	born,
 	lifeExpectancy,
-	joins: z
-		.string()
-		.regex(MONTH)
+	joins: month("The join month")
 		.optional()
 		.describe(
 			"The month the partner joins the plan, as YYYY-MM. Omit it when they are in the plan from the start.",

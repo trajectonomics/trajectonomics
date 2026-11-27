@@ -17,6 +17,7 @@ import type { ItemNames } from "../../lib/view/item-names"
 import EmptyState from "../ui/EmptyState.svelte"
 import CashFlowTable from "./CashFlowTable.svelte"
 import FlowDiagram from "./FlowDiagram.svelte"
+import FlowProbe from "./FlowProbe.svelte"
 import YearSelect from "./YearSelect.svelte"
 
 interface Props {
@@ -33,6 +34,8 @@ interface Props {
 let { run, year, onYear, names }: Props = $props()
 /** The band the person picked, with the roll-up it was picked in: a pick does not carry over to another year. */
 let pickedIn: Pick | null = $state(null)
+/** The page's one probe, outside the keyed diagram so a year change neither clears its widths nor adds an observer. */
+let probe = $state<SVGTextElement | null>(null)
 
 const rollups = $derived(rollupsOf(run))
 const rollup = $derived(chooseRollup(rollups, year))
@@ -56,8 +59,9 @@ function pick(band: string): void {
 {:else}
 	<div class="space-y-6">
 		<YearSelect {rollups} selected={rollup.index} {onYear} />
+		<FlowProbe bind:text={probe} />
 		{#key rollup.index}
-			<FlowDiagram {layout} {stack} {picked} onPick={pick} label={`Cash flow, ${yearLabel(rollup, currentItemNames().people)}`} />
+			<FlowDiagram {probe} {layout} {stack} {picked} onPick={pick} label={`Cash flow, ${yearLabel(rollup, currentItemNames().people)}`} />
 			<p class="text-sm text-muted-foreground">
 				A refund is shown as money in, so the tax band is the tax paid, and the tax total is the tax paid
 				less the refund.
