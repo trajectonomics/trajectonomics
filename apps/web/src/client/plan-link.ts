@@ -1,7 +1,10 @@
 import { selectPlan } from "./select-plan.svelte.js"
 
 /** What a plan link reads of a click: a modified one opens the link in a new tab or window, not a plan switch. */
-type LinkClick = Pick<MouseEvent, "altKey" | "button" | "ctrlKey" | "metaKey" | "shiftKey" | "preventDefault">
+type LinkClick = Pick<
+	MouseEvent,
+	"altKey" | "button" | "ctrlKey" | "metaKey" | "shiftKey" | "preventDefault"
+>
 
 /**
  * Follows a link that names a plan: the page switches to that plan before the link moves on, so every

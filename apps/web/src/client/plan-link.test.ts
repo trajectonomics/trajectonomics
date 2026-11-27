@@ -6,7 +6,9 @@ import { HASH } from "./what-if.test-support"
 
 /** A click on a link, with the parts of it a browser reads: a modified one opens the link elsewhere. */
 function click(
-	overrides: Partial<Pick<MouseEvent, "altKey" | "button" | "ctrlKey" | "metaKey" | "shiftKey">> = {},
+	overrides: Partial<
+		Pick<MouseEvent, "altKey" | "button" | "ctrlKey" | "metaKey" | "shiftKey">
+	> = {},
 ) {
 	let prevented = false
 	const event = {

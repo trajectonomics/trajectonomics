@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { returnFocus, takeQuestionFocus } from "../../client/question-focus.js"
 import { selectPlan } from "../../client/select-plan.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import WhatIfActions from "./WhatIfActions.svelte"
@@ -20,15 +21,13 @@ let returnTo: HTMLElement | null = null
 // link that asked may be far below it. Its scroll margin clears the sticky top bar.
 $effect(() => {
 	if (whatIfSession.asking === null || question === undefined) return
-	returnTo = document.activeElement instanceof HTMLElement ? document.activeElement : null
-	question.scrollIntoView({ block: "nearest" })
-	question.focus({ preventScroll: true })
+	returnTo = takeQuestionFocus(question)
 })
 
 /** Keeps the changes, closes the question, and puts the focus back on the control that asked. */
 function stay(): void {
 	whatIfSession.stay()
-	returnTo?.focus()
+	returnFocus(returnTo)
 }
 </script>
 
