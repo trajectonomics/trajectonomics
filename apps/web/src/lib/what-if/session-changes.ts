@@ -1,5 +1,6 @@
 /** The changes of a session as the bar lists them, in the order `traj` applies them. Pure. */
 import { additionId, additionPath, additionWords } from "./additions"
+import { fieldValueWords, fieldWords } from "./field-words"
 import type { Json } from "./overrides"
 import type { WhatIf } from "./session"
 import { inGroup } from "./session-group"
@@ -25,12 +26,6 @@ export type Change =
 function itemLabel(path: string): string {
 	const id = path.split(".")[1] ?? path
 	return id.charAt(0).toUpperCase() + id.slice(1)
-}
-
-/** The value of a Set as the bar shows it: a decimal string or a number, as the person typed it. */
-function valueText(value: Json): string {
-	if (typeof value === "string") return value
-	return JSON.stringify(value)
 }
 
 /**
@@ -97,11 +92,12 @@ export function changesOf(whatIf: WhatIf): Change[] {
 				}
 			}
 			const field = set.path.split(".").slice(2).join(".")
+			const value = fieldValueWords(field, set.value)
 			return {
 				kind: "set",
 				path: set.path,
-				label: `${itemLabel(set.path)} ${field} set to ${valueText(set.value)}`,
-				value: valueText(set.value),
+				label: `${itemLabel(set.path)} ${fieldWords(field)} set to ${value}`,
+				value,
 			}
 		})
 	return [...removals, ...additions, ...sets, ...groupChanges(whatIf)]
