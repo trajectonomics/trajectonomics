@@ -1,0 +1,69 @@
+/* The tier picker, the estimate tag and the highlighted, striped estimated row. */
+
+/* The name keeps its room, and the picker or the plain tier sits after it. */
+.peaks-identity-text {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	gap: 1px;
+}
+
+.peaks-name-line {
+	display: flex;
+	min-width: 0;
+	align-items: center;
+	gap: 8px;
+}
+
+.peaks-name-line .peaks-name {
+	flex: 0 1 auto;
+}
+
+/* The picker is a chip: the meta face, a hairline and a quiet colour. */
+.peaks-tier-picker {
+	max-width: 9rem;
+	flex: none;
+	padding: 1px 6px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-sm);
+	background: var(--ds-color-background);
+	color: var(--ds-color-muted-foreground);
+	font-family: var(--font-meta);
+	font-size: 11px;
+	line-height: 1.4;
+}
+
+/* An estimate is marked by surface, edge, tag and striped bars, never by colour alone. */
+tr.peaks-row-estimated > th,
+tr.peaks-row-estimated > td,
+tbody.peaks-row-estimated > tr > th,
+tbody.peaks-row-estimated > tr > td {
+	background: color-mix(in srgb, var(--ds-color-accent) 10%, var(--ds-color-background));
+}
+
+tr.peaks-row-estimated > :first-child,
+tbody.peaks-row-estimated > tr > :first-child {
+	border-left: 3px solid var(--ds-color-accent);
+}
+
+.peaks-tag {
+	display: block;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+	color: var(--ds-color-accent);
+}
+
+.peaks-tag-muted {
+	color: var(--ds-color-muted-foreground);
+}
+
+.peaks-bar-estimated {
+	background-color: var(--ds-color-accent);
+	background-image: repeating-linear-gradient(
+		45deg,
+		var(--ds-color-background) 0 2px,
+		var(--ds-color-accent) 2px 6px
+	);
+}

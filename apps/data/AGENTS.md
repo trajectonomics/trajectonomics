@@ -17,7 +17,10 @@ redirects its pages (ADR 0006).
    test, a doc, a commit message or a pull request.
 4. No prices in slice 1. A price enters the plan table only with a dated public source, in a later
    slice.
-5. Cursor is counted from exactly one source per run: its SDK store when `usage_json` is populated,
+5. A multiplier for a plan tier enters the catalogue only with a dated public source: a URL, the day
+   it was read, and an exact quote. The catalogue lives in `collector/src/tier-catalog.ts`; a
+   multiplier is never inferred from a price or a neighbouring tier.
+6. Cursor is counted from exactly one source per run: its SDK store when `usage_json` is populated,
    else the T3 Code `cursor` logs. Never both.
 
 ## The site
@@ -32,8 +35,9 @@ redirects its pages (ADR 0006).
 
 1. `traj-data` never holds an email or a name. It holds contributor ids, plan and model ids, UTC
    buckets, numbers, and the auth user id on `contributor`.
-2. The public API serves `rollup_daily` only. No response carries a machine, a contributor or an
-   hourly bucket.
+2. The public API serves aggregates, never a stored row: `rollup_daily` for the usage read, and
+   `usage_hourly` summed per plan and bucket for the peaks (ADR 0007). No response carries a
+   machine, a contributor or an hourly bucket.
 3. `/data/ingest` (and the old host's `/ingest`) authenticates with the temporary
    `INGEST_BOOTSTRAP_KEY` secret. The contributor comes from the key, never from the body; a row
    that names another contributor is rejected.

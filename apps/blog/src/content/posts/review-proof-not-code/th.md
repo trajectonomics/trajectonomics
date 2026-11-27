@@ -5,7 +5,7 @@ type: guide
 publishedOn: 2026-11-23
 cover:
   src: /blog/posts/review-proof-not-code/cover.webp
-  alt: หุ่นยนต์สีครีมตาสีส้มยืนเอามือแตะคางทำท่าครุ่นคิด อยู่บนเนินทรายลายไม้ ฉากหลังมืด
+  alt: หุ่นยนต์สีครีมตาสีส้มยืนเอามือแตะคางทำท่าครุ่นคิดข้างพีระมิดสีส้มเรืองแสงบนเนินทรายลายไม้ใต้ท้องฟ้าสีเข้ม ใต้หัวข้อ "Review Proof, Not Code — POTETO PYRAMID"
   width: 1024
   height: 1024
 ---

@@ -1,4 +1,4 @@
-import type { Health, UsagePayload } from "../lib/types"
+import type { Health, PeaksPayload, UsagePayload } from "../lib/types"
 import { type DayWindow, lastDays, utcDay } from "../lib/window"
 import { loadOverview } from "./api"
 
@@ -10,6 +10,7 @@ export class OverviewState {
 	status = $state<OverviewStatus>("loading")
 	usage = $state<UsagePayload | null>(null)
 	health = $state<Health | null>(null)
+	peaks = $state<PeaksPayload | null>(null)
 	requestedAsOf = $state<string | null>(null)
 	days = $state<DayWindow | null>(null)
 	#run = 0
@@ -20,6 +21,7 @@ export class OverviewState {
 		this.status = "loading"
 		this.usage = null
 		this.health = null
+		this.peaks = null
 		const window = lastDays(asOf ?? utcDay(Date.now()))
 		this.days = window
 		try {
@@ -27,6 +29,7 @@ export class OverviewState {
 			if (run !== this.#run) return
 			this.usage = result.usage
 			this.health = result.health
+			this.peaks = result.peaks
 			this.days = lastDays(result.usage.asOf)
 			this.status = "ready"
 		} catch {

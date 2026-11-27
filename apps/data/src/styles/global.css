@@ -17,6 +17,11 @@
 @import "./plan-mark.css";
 @import "./summary.css";
 @import "./meter.css";
+@import "./plan-tier.css";
+@import "./peaks.css";
+@import "./peaks-info.css";
+@import "./peaks-tier.css";
+@import "./peaks-phone.css";
 @import "./state.css";
 @import "./chart.css";
 @import "./table.css";
