@@ -4,7 +4,7 @@ import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import type { Dictionary } from "../lib/language/dictionary"
 import { currentLanguageName } from "../lib/language/dictionary"
 import { LANGUAGES, languageEntry, otherLanguages } from "../lib/language/languages"
-import { BLOG_PATH, DOCS_PATH, SITE_NAME, STAR_REPOS } from "../lib/site"
+import { BLOG_PATH, DATA_PATH, DOCS_PATH, SITE_NAME, STAR_REPOS } from "../lib/site"
 import { STAR_SNAPSHOT } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import Header from "./Header.astro"
@@ -147,18 +147,14 @@ describe("the Header component in every Language, current or not", () => {
 				expect(artwork).toBeDefined()
 			})
 
-			it(`links the docs (${variant})`, async () => {
+			it(`links the docs, the blog and the data site by name (${variant})`, async () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
-				const docs = withAttribute(page, "href", DOCS_PATH)[0]
-				if (docs === undefined) throw new Error("the docs link is missing")
-				expect(textOf(page, docs)).toBe(dictionary.docsLink)
-			})
-
-			it(`links the blog (${variant})`, async () => {
-				const page = await renderHeader(language, dictionary, markCurrent)
-				const blog = withAttribute(page, "href", BLOG_PATH)[0]
-				if (blog === undefined) throw new Error("the blog link is missing")
-				expect(textOf(page, blog)).toBe(dictionary.blogLink)
+				const names = [DOCS_PATH, BLOG_PATH, DATA_PATH].map((href) => {
+					const link = withAttribute(page, "href", href)[0]
+					if (link === undefined) throw new Error(`the ${href} link is missing`)
+					return textOf(page, link)
+				})
+				expect(names).toEqual([dictionary.docsLink, dictionary.blogLink, dictionary.dataLink])
 			})
 
 			it(`links the one repository, with its star count and no repository menu (${variant})`, async () => {

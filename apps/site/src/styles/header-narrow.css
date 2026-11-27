@@ -1,4 +1,4 @@
-/* On a 360 px phone the three nav links, the repository count and the Language menu share one row. */
+/* On a 360 px phone the four nav links, the repository count and the Language menu share one row. */
 @media (max-width: 30rem) {
 	.header-bar {
 		grid-template-columns: auto minmax(0, 1fr) auto;

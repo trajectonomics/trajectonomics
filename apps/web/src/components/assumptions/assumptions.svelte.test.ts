@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { editSession } from "../../client/edit.svelte.js"
-import type { Snapshot } from "../../lib/contract"
+import type { ProjectionChance, Read, Snapshot } from "../../lib/contract"
 import { chanceFixture } from "../../lib/view/chance/fixtures.test-support"
 import { chanceViewOf } from "../../lib/view/chance/page"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
@@ -145,6 +145,24 @@ describe("an error is shown once, in the form that sent it", () => {
 		editSession.error = "reread failed"
 		expect(chance().split("reread failed")).toHaveLength(2)
 		expect(form()).not.toContain("reread failed")
+	})
+
+	test("marks a chance read's error as the CLI's words only when the CLI wrote it", () => {
+		const failed = (code: string): Read<ProjectionChance> => ({
+			argv: ["projection", "chance", "--json", "--", "base"],
+			ok: false,
+			error: { code, exitCode: 1, message: `The chance read failed: ${code}` },
+		})
+		const shown = (code: string) =>
+			render(ChanceSettings, {
+				props: { params: DEMO.params, read: failed(code), editable: true },
+			}).body
+		expect(shown("invalid_input")).toContain("data-cli")
+		for (const code of ["contract_mismatch", "traj_unavailable"]) {
+			const body = shown(code)
+			expect(body).toContain(`The chance read failed: ${code}`)
+			expect(body).not.toContain("data-cli")
+		}
 	})
 })
 

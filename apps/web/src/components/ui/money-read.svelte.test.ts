@@ -36,6 +36,27 @@ describe("Money", () => {
 		expect(body).toContain("amount hidden")
 	})
 
+	test("shows a card's short form, keeping the exact figure in the accessible text and the title", () => {
+		const { body } = render(Money, {
+			props: { amount: "1214900.00", currency: "THB", hidden: false, compact: true },
+		})
+		expect(body).toMatch(/aria-hidden="true">1\.21M<\/span>/)
+		expect(body).toContain('<span class="sr-only">1,214,900.00</span>')
+		expect(body).toContain('title="1,214,900.00"')
+		expect(body).toContain("THB")
+	})
+
+	test("masks a compact amount, revealing neither form when hidden", () => {
+		const { body } = render(Money, {
+			props: { amount: "1214900.00", currency: "THB", hidden: true, compact: true },
+		})
+		expect(body).toContain("•••••")
+		expect(body).toContain("amount hidden")
+		expect(body).not.toContain("1.21M")
+		expect(body).not.toContain("1,214,900.00")
+		expect(body).not.toContain("title=")
+	})
+
 	test("colours a negative amount as a warning only when asked to", () => {
 		const plain = render(Money, { props: { amount: "-5.00", hidden: false } }).body
 		const signed = render(Money, { props: { amount: "-5.00", hidden: false, signed: true } }).body
@@ -99,5 +120,20 @@ describe("ReadView", () => {
 		expect(body).toContain("LEDGER_EMPTY")
 		expect(body).toContain("traj report networth --as-of 2026-10-31 --json")
 		expect(body).not.toContain("never")
+	})
+
+	test("marks the error text as the CLI's only when the CLI wrote it", () => {
+		const children = createRawSnippet(() => ({ render: () => "<p>never</p>" }))
+		const shown = (code: string) => {
+			const read: Read<{ total: string }> = {
+				argv: ["report", "networth", "--json"],
+				ok: false,
+				error: { code, exitCode: 1, message: "Some words." },
+			}
+			return render(ReadView, { props: { read, label: "Net worth", children } }).body
+		}
+		expect(shown("LEDGER_EMPTY")).toContain("data-cli")
+		for (const code of ["traj_unavailable", "contract_mismatch", "unparsed_error"])
+			expect(shown(code)).not.toContain("data-cli")
 	})
 })

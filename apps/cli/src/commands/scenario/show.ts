@@ -8,6 +8,7 @@ import { scenarioNotFound } from "../../scenario/errors"
 import { isTaxed, scenarioWithHousehold, taxOf } from "../../scenario/shown"
 import { taxAllowancesOf } from "../../scenario/tax/shown-allowances"
 import { householdOf, view } from "../../scenario/view"
+import { householdHash } from "../../store/canonical"
 import { withStore } from "../../with-store"
 
 export const show: Leaf = defineCommand({
@@ -49,6 +50,7 @@ export const show: Leaf = defineCommand({
 				scenario: {
 					...shown,
 					household: householdOf(row),
+					householdHash: householdHash(row.document, row.household),
 					tax,
 					taxed: isTaxed(shown.document),
 					...(taxAllowances === undefined ? {} : { taxAllowances }),

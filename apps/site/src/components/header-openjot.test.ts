@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { BLOG_PATH, DOCS_PATH, OPENJOT_PATH } from "../lib/site"
+import { BLOG_PATH, DATA_PATH, DOCS_PATH, OPENJOT_PATH } from "../lib/site"
 import Header from "./Header.astro"
 import { renderComponent } from "./testing/render"
 import { scanComponent, withAttribute, withClass } from "./testing/scan"
@@ -36,10 +36,10 @@ describe("the header's OpenJot link", () => {
 			expect(on.link.attributes["aria-current"]).toBe("page")
 		})
 
-		it(`puts Docs before Blog, and OpenJot after it (${language})`, async () => {
+		it(`puts the nav links in the order OpenJot, Data, Blog, Docs (${language})`, async () => {
 			const { page } = await linkOn(language, false)
 			const hrefs = withClass(page, "header-nav-link").map((element) => element.attributes["href"])
-			expect(hrefs).toEqual([DOCS_PATH, BLOG_PATH, OPENJOT_PATH])
+			expect(hrefs).toEqual([OPENJOT_PATH, DATA_PATH, BLOG_PATH, DOCS_PATH])
 		})
 
 		it(`marks one current link off OpenJot, and two on it (${language})`, async () => {

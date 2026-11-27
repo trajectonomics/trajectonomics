@@ -28,13 +28,13 @@ const single = $derived(
 			{#if view !== null}
 				<div class="space-y-2">
 					{#if single !== undefined && single.name === null}
-						<p class="text-2xl font-semibold tracking-tight"><Money amount={single.saving} currency={view.currency} /></p>
+						<p class="text-2xl font-semibold tracking-tight"><Money amount={single.saving} currency={view.currency} compact /></p>
 					{:else}
 						<dl class="space-y-1">
 							{#each view.savings as one (one.key)}
 								<div class="flex items-baseline justify-between gap-3">
 									<dt class="text-sm text-muted-foreground">{#if one.name !== null}<ItemWords label={one.name} />{/if}</dt>
-									<dd class="text-xl font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} /></dd>
+									<dd class="text-xl font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} compact /></dd>
 								</div>
 							{/each}
 						</dl>

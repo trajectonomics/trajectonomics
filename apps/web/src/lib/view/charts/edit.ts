@@ -1,3 +1,4 @@
+import type { AccountNames } from "../account-names"
 import { seriesWords } from "./series-ids"
 import { type ChartDef, type ChartKind, MAX_CHARTS, MAX_NAME } from "./types"
 
@@ -36,9 +37,12 @@ export function savedName(
 	typed: string,
 	series: readonly string[],
 	names: ReadonlyMap<string, string>,
+	accounts: AccountNames = new Map(),
 ): string {
 	const chosen = typed.trim()
-	return chosen === "" ? defaultName(series.map((id) => names.get(id) ?? seriesWords(id))) : chosen
+	return chosen === ""
+		? defaultName(series.map((id) => names.get(id) ?? seriesWords(id, accounts)))
+		: chosen
 }
 
 /** Adds a chart, or replaces the one with the same id. Refused (null) when the list is full. */

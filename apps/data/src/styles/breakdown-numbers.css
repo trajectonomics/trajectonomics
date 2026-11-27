@@ -1,0 +1,29 @@
+/* The full numbers behind the bars, opened on request. */
+
+.breakdown-numbers {
+	padding-top: 20px;
+}
+
+.breakdown-numbers summary {
+	cursor: pointer;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+.breakdown-numbers summary:hover {
+	color: var(--ds-color-foreground);
+}
+
+.breakdown-numbers[open] summary {
+	padding-bottom: 8px;
+}
+
+.busiest-date {
+	margin-left: 6px;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	color: var(--ds-color-muted-foreground);
+}

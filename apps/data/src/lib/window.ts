@@ -23,6 +23,16 @@ export function utcDay(nowMs: number): string {
 	return new Date(nowMs).toISOString().slice(0, 10)
 }
 
+/** The whole UTC days from one day to another; negative when the second day is earlier. */
+export function daysBetween(from: string, to: string): number {
+	if (!isDay(from) || !isDay(to)) {
+		throw new Error(`daysBetween: "${from}" and "${to}" must be UTC days`)
+	}
+	const start = Date.parse(`${from}T00:00:00.000Z`)
+	const end = Date.parse(`${to}T00:00:00.000Z`)
+	return Math.round((end - start) / DAY_MS)
+}
+
 /** The inclusive window ending on `to`, oldest day first. */
 export function lastDays(to: string, count = WINDOW_DAYS): DayWindow {
 	if (!isDay(to)) throw new Error(`lastDays: "${to}" is not a UTC day`)

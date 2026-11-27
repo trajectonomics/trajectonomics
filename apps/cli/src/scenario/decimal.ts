@@ -9,7 +9,7 @@ import { formatPercent } from "./percent"
 /*
  * The decimal form of a Scenario document (ADR-0047): the same document with every money field
  * written as a decimal string of the Currency's major unit, such as "350.00" for 35000 satang.
- * The money fields are found by walking the published schema (money-fields.ts), never listed here.
+ * The money fields are found by walking the published schema (field-paths.ts), never listed here.
  */
 
 /** The element a document path names: a list item's `id` when it has one, otherwise its index. */
