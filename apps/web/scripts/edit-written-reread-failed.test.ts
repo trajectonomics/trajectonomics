@@ -7,7 +7,7 @@ import { join } from "node:path"
 import { scenarioList } from "../src/lib/contract"
 import { WRITTEN_REREAD_FAILED, WRITTEN_REREAD_FAILED_MESSAGE } from "../src/lib/edit/failure"
 import { demoCarryIn } from "./demo/carry-in"
-import { buildDemoLedger } from "./demo-ledger"
+import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { makeScratch, removeScratch } from "./scratch"
@@ -44,7 +44,7 @@ beforeAll(async () => {
 	scratch = await makeScratch("traj-web-written-")
 	home = join(scratch, "traj-home")
 	marker = join(scratch, "fail-reads")
-	await buildDemoLedger({ binary: BINARY, home, scratch })
+	await copyDemoLedger({ binary: BINARY, home, scratch })
 	const made = createEditor({
 		traj: {
 			binary: "/bin/sh",

@@ -32,7 +32,9 @@ function run(code: string): { status: number | null; stdout: string; stderr: str
 	try {
 		const file = join(dir, "example.ts")
 		writeFileSync(file, code.replaceAll(`"${PACKAGE}"`, JSON.stringify(ENTRY)))
-		const done = Bun.spawnSync([process.execPath, file], { cwd: dir })
+		const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1" }
+		delete env["FORCE_COLOR"]
+		const done = Bun.spawnSync([process.execPath, file], { cwd: dir, env })
 		return { status: done.exitCode, stdout: done.stdout.toString(), stderr: done.stderr.toString() }
 	} finally {
 		rmSync(dir, { recursive: true, force: true })
