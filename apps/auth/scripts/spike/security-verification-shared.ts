@@ -1,8 +1,10 @@
 import type { Database } from "bun:sqlite"
+import { randomBytes } from "node:crypto"
 import { openScratchDatabase } from "./database"
 import { listGrants, tokenRequest } from "./flow"
 import type { Session } from "./http"
 import { WEB, WEB_REDIRECT_URI } from "./security-shared"
+import { authorizeCode } from "./security-web"
 import type { RequestResult } from "./types"
 
 export const EXPIRED_ROWS = 20_000
@@ -72,4 +74,13 @@ export function exchangeCode(session: Session, issued: { code: string; verifier:
 
 export function isInvalidGrant(result: RequestResult): boolean {
 	return result.status === 400 && result.body["error"] === "invalid_grant"
+}
+
+/** Drives authorize -> consent accept -> returns a pending authorization code for `WEB`. */
+export async function issueWebCode(
+	session: Session,
+): Promise<{ code: string; verifier: string } | null> {
+	const verifier = randomBytes(32).toString("base64url")
+	const code = await authorizeCode(session, verifier)
+	return code === null ? null : { code, verifier }
 }

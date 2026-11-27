@@ -41,9 +41,14 @@ describe("deviceApprovalRejection", () => {
 		expect(deviceApprovalRejection({ ...pending, expiresAt: null })).toBe("expired")
 	})
 
-	it("rejects a code that is unclaimed or claimed by somebody else", () => {
-		expect(deviceApprovalRejection({ ...pending, deviceUserId: null })).toBe("not-owner")
+	it("rejects a code claimed by somebody else", () => {
 		expect(deviceApprovalRejection({ ...pending, deviceUserId: "user-2" })).toBe("not-owner")
+	})
+
+	it("lets an unclaimed code through so the endpoint answers its own 400", () => {
+		expect(deviceApprovalRejection({ ...pending, deviceUserId: null })).toBeNull()
+		expect(deviceApprovalRejection({ ...pending, deviceUserId: undefined })).toBeNull()
+		expect(deviceApprovalRejection({ ...pending, deviceUserId: "" })).toBeNull()
 	})
 
 	it("rejects a code with no scope, so no poll can redeem without an approval record", () => {

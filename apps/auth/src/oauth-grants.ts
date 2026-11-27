@@ -8,7 +8,7 @@
  *
  * A grant is one consent per user and client, which is also how 1.7.28's refresh-token family is
  * keyed. Revoking it deletes every consent row for that user and client, so a duplicate cannot
- * outlive the revoke, and then the codes and the token family.
+ * outlive the revoke, and the codes and the token family with it, in one atomic batch.
  */
 
 import type { D1Database } from "@cloudflare/workers-types"
@@ -89,8 +89,8 @@ export function grantManagement(input: { database: D1Database }) {
 						})
 					}
 					const owner = { userId, clientId: consent.clientId }
-					// Every step is tried before the error: a failed step must not leave the rest of
-					// the family alive. See `revoke.ts` for the order and why it is that order.
+					// One atomic batch: a failure deletes nothing, so the consent stays, the retry
+					// still finds the grant, and no pending code outlives a revoke that said 200.
 					const complete = await revokeGrantFamily(ctx, input.database, owner)
 					if (!complete) {
 						throw new APIError("INTERNAL_SERVER_ERROR", {

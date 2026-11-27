@@ -1,4 +1,5 @@
 import type { Session } from "./http"
+import { checkFailedDoubleApproveKeepsConsent } from "./security-approval-race"
 import { checkExpiredPollCreatesNoConsent, checkOldTokenNotRevived } from "./security-consent"
 import {
 	checkDashedUserCode,
@@ -19,9 +20,10 @@ import {
 	checkEmptyScopeDeviceRequestRejected,
 	checkPostAuthorizeRejected,
 } from "./security-request-shape"
+import { checkRevokeRetryAfterPartialFailure } from "./security-revoke-retry"
 import {
 	checkRevokeHoldsUnderConcurrentVerificationDeletes,
-	checkRevokeIsConstantQueryCount,
+	checkRevokeIsFastWithManyRows,
 } from "./security-verification"
 import { checkSmuggledJsonResource } from "./security-web"
 import type { SecurityEvidence } from "./types"
@@ -47,7 +49,7 @@ export async function runSecurityChecks(
 		),
 		revokeHoldsUnderConcurrentVerificationDeletes:
 			await checkRevokeHoldsUnderConcurrentVerificationDeletes(session, scratch),
-		revokeIsConstantQueryCount: await checkRevokeIsConstantQueryCount(session, scratch),
+		revokeIsFastWithManyRows: await checkRevokeIsFastWithManyRows(session, scratch),
 		updateConsentPathDisabled: await checkUpdateConsentDisabled(session, scratch),
 		deviceCodeContentTypeSmugglingRejected: await checkDeviceCodeContentTypeSmugglingRejected(
 			session,
@@ -59,5 +61,7 @@ export async function runSecurityChecks(
 		revokeRemovesDuplicateConsents: await checkRevokeRemovesDuplicateConsents(session, scratch),
 		emptyScopeDeviceRequestRejected: await checkEmptyScopeDeviceRequestRejected(session, scratch),
 		consentScopesAreUnion: await checkConsentScopesAreUnionOnApproval(session, scratch),
+		failedDoubleApproveKeepsConsent: await checkFailedDoubleApproveKeepsConsent(session, scratch),
+		revokeRetryAfterPartialFailure: await checkRevokeRetryAfterPartialFailure(session, scratch),
 	}
 }

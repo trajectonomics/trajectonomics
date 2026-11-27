@@ -2,18 +2,20 @@
  * What one approval changed in `oauthConsent`, and the way back.
  *
  * The `/device/approve` before-hook writes the consent before the endpoint flips the code to
- * `approved`, and the endpoint can still refuse after that write (a concurrent deny, a revoke, an
- * expired code). The after-hook takes the write back through this record: a row the hook created
- * is deleted, and a row it merged into gets its previous scopes and resources, unless a later
- * approval now owns that row.
+ * `approved`, and the endpoint can still refuse after that write (a concurrent approve, a deny, a
+ * revoke, an expiry). The after-hook takes the write back through this record.
+ *
+ * Each way back is one conditional statement, never a read followed by a write: the row is only
+ * touched while it still carries the `updatedAt` this write stamped. A revoke that deleted the row,
+ * or a later approval that bumped it, owns it now and is never undone. Zero changed rows means the
+ * row moved on; it is left alone.
  */
-import { adapterOf } from "./adapter"
-import type { StoredConsent } from "./store"
-import { asDate, storedResources } from "./values"
+import type { D1Database } from "@cloudflare/workers-types"
+import { storedResources } from "./values"
 
 export type ConsentWrite =
 	| { kind: "none" }
-	| { kind: "created"; id: string }
+	| { kind: "created"; id: string; writtenAt: Date }
 	| {
 			kind: "merged"
 			id: string
@@ -23,37 +25,41 @@ export type ConsentWrite =
 			writtenAt: Date
 	  }
 
+const DELETE_CREATED = `delete from "oauthConsent" where "id" = ?1 and "updatedAt" = ?2`
+
+const RESTORE_MERGED = `update "oauthConsent" set "scopes" = ?1, "resources" = ?2, "updatedAt" = ?3
+where "id" = ?4 and "updatedAt" = ?5`
+
 /** Undoes one approval's write, unless a later one has updated the same row since. */
-export async function undoConsentWrite(
-	ctx: { context: unknown },
-	write: ConsentWrite,
-): Promise<void> {
+export async function undoConsentWrite(database: D1Database, write: ConsentWrite): Promise<void> {
 	if (write.kind === "none") return
-	const adapter = adapterOf(ctx)
+	const writtenAt = sqlInstant(write.writtenAt)
+	if (writtenAt === null) return
 	if (write.kind === "created") {
-		await adapter.delete({ model: "oauthConsent", where: [{ field: "id", value: write.id }] })
+		await database.prepare(DELETE_CREATED).bind(write.id, writtenAt).run()
 		return
 	}
-	const row = (await adapter.findOne({
-		model: "oauthConsent",
-		where: [{ field: "id", value: write.id }],
-	})) as StoredConsent | null
-	// A revoke that removed the row, or a later approval that bumped `updatedAt`, owns it now.
-	if (row === null || !sameInstant(row.updatedAt, write.writtenAt)) return
 	const resources = storedResources(write.previousResources)
-	await adapter.update({
-		model: "oauthConsent",
-		where: [{ field: "id", value: write.id }],
-		update: {
-			scopes: storedResources(write.previousScopes),
-			resources: resources.length > 0 ? resources : null,
-			updatedAt: write.previousUpdatedAt,
-		},
-	})
+	await database
+		.prepare(RESTORE_MERGED)
+		.bind(
+			JSON.stringify(storedResources(write.previousScopes)),
+			resources.length > 0 ? JSON.stringify(resources) : null,
+			sqlInstant(write.previousUpdatedAt),
+			write.id,
+			writtenAt,
+		)
+		.run()
 }
 
-function sameInstant(left: unknown, right: unknown): boolean {
-	const a = asDate(left)
-	const b = asDate(right)
-	return a !== null && b !== null && a.getTime() === b.getTime()
+/**
+ * The exact text a D1 `date` column holds. The adapter writes a `Date` as its ISO string on SQLite
+ * and reads it back as a `Date`, so binding a `Date` directly would never match the stored row.
+ * A value with no readable instant leaves the conditional statement matching nothing, which is the
+ * safe direction: the write is not undone.
+ */
+function sqlInstant(value: unknown): string | null {
+	if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value.toISOString()
+	if (typeof value === "string") return value
+	return null
 }

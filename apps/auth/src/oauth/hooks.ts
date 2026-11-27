@@ -53,10 +53,10 @@ export function oauthBeforeHook(options: OAuthHookOptions): AuthMiddleware {
 }
 
 /** `/device/approve` only: take back an approval whose endpoint did not finish it. */
-export function oauthAfterHook(): AuthMiddleware {
+export function oauthAfterHook(options: OAuthHookOptions): AuthMiddleware {
 	return createAuthMiddleware(async (ctx) => {
 		if (ctx.path !== "/device/approve") return
-		await settleDeviceApproval(ctx)
+		await settleDeviceApproval(ctx, options.database)
 	})
 }
 

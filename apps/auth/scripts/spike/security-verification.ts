@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto"
 import { json, type Session, Session as SpikeSession } from "./http"
 import { requestResult } from "./request"
 import { reset, revokeAll, sql } from "./security-shared"
@@ -9,6 +8,7 @@ import {
 	fillExpiredResetRows,
 	fillVerification,
 	isInvalidGrant,
+	issueWebCode,
 	LIVE_ROWS,
 	MAX_REVOKE_MS,
 	pendingAuthorizationCodes,
@@ -16,13 +16,6 @@ import {
 	rowsWithIdPrefix,
 	verificationDatabase,
 } from "./security-verification-shared"
-import { authorizeCode } from "./security-web"
-
-async function issueWebCode(session: Session): Promise<{ code: string; verifier: string } | null> {
-	const verifier = randomBytes(32).toString("base64url")
-	const code = await authorizeCode(session, verifier)
-	return code === null ? null : { code, verifier }
-}
 
 /**
  * The library purges every expired `verification` row from inside the Worker on one anonymous
@@ -70,7 +63,7 @@ export async function checkRevokeHoldsUnderConcurrentVerificationDeletes(
  * 40,000 inert rows must not slow the revoke down to a paged scan. This cannot read D1's
  * per-invocation query count, so the bound is wall time: the offset scan needed 2 s here.
  */
-export async function checkRevokeIsConstantQueryCount(
+export async function checkRevokeIsFastWithManyRows(
 	session: Session,
 	scratch: string,
 ): Promise<boolean> {

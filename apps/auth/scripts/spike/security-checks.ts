@@ -15,7 +15,7 @@ export function securityChecks(gates: SecurityEvidence): Record<string, boolean>
 		revokeHoldsWithManyVerificationRows: gates.revokeHoldsWithManyVerificationRows,
 		revokeHoldsUnderConcurrentVerificationDeletes:
 			gates.revokeHoldsUnderConcurrentVerificationDeletes,
-		revokeIsConstantQueryCount: gates.revokeIsConstantQueryCount,
+		revokeIsFastWithManyRows: gates.revokeIsFastWithManyRows,
 		updateConsentPathDisabled: gates.updateConsentPathDisabled,
 		deviceCodeContentTypeSmugglingRejected: gates.deviceCodeContentTypeSmugglingRejected,
 		postAuthorizeRejected: gates.postAuthorizeRejected,
@@ -24,5 +24,7 @@ export function securityChecks(gates: SecurityEvidence): Record<string, boolean>
 		revokeRemovesDuplicateConsents: gates.revokeRemovesDuplicateConsents,
 		emptyScopeDeviceRequestRejected: gates.emptyScopeDeviceRequestRejected,
 		consentScopesAreUnion: gates.consentScopesAreUnion,
+		failedDoubleApproveKeepsConsent: gates.failedDoubleApproveKeepsConsent,
+		revokeRetryAfterPartialFailure: gates.revokeRetryAfterPartialFailure,
 	}
 }

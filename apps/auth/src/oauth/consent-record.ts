@@ -15,7 +15,9 @@ import { deletePendingAuthorizationCodes } from "./verification-sql"
  * fresh approval cannot inherit an old token.
  *
  * The return value says what the write changed, so the `/device/approve` after-hook can take it
- * back when the endpoint refuses the code the approval was written for.
+ * back when the endpoint refuses the code the approval was written for. Only the request whose own
+ * insert created the surviving row may record `created`: everything else is `none`, because undoing
+ * a row another approval has merged into would delete a grant that approval relies on.
  *
  * The library has no unique constraint on (clientId, userId), so two concurrent approvals can
  * insert two rows. The create path re-reads and merges, keeping the deterministic keeper, so both
@@ -51,11 +53,30 @@ export async function recordConsent(
 			updatedAt: now,
 		},
 	})) as { id?: unknown } | null
+	const id = created === null ? undefined : created.id
+	if (typeof id !== "string") return { kind: "none" }
+	return finishCreate(ctx, input, options, { id, writtenAt: now })
+}
+
+/** Decides what one insert may undo, after a concurrent approval may have joined it. */
+async function finishCreate(
+	ctx: { context: unknown; headers?: Headers | undefined },
+	input: { clientId: string; userId: string },
+	options: OAuthHookOptions,
+	write: { id: string; writtenAt: Date },
+): Promise<ConsentWrite> {
 	const reread = await findConsents(ctx, input.clientId, input.userId)
 	const liveAgain = reread.filter((row) => !consentExpired(ctx, row, options))
-	if (liveAgain.length > 1) await mergeIntoKeeper(ctx, reread, liveAgain, [], [], now)
-	const id = created === null ? undefined : created.id
-	return typeof id === "string" ? { kind: "created", id } : { kind: "none" }
+	if (liveAgain.length > 1) {
+		// Another request inserted its own row and this request merged into it. Its approval is
+		// not this request's to undo, whether or not this row is the keeper.
+		await mergeIntoKeeper(ctx, reread, liveAgain, [], [], write.writtenAt)
+		return { kind: "none" }
+	}
+	const only = liveAgain[0]
+	return only !== undefined && only.id === write.id
+		? { kind: "created", id: write.id, writtenAt: write.writtenAt }
+		: { kind: "none" }
 }
 
 type PreviousConsent = {

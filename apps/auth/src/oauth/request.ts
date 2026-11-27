@@ -11,6 +11,11 @@ export type OAuthHookOptions = {
 	 * `ENVIRONMENT=development`, `DEV_ONLY=true` and a loopback `BETTER_AUTH_URL`.
 	 */
 	testClock: boolean
+	/**
+	 * Honor `x-spike-hold` as a pause between the before-hook and the endpoint. The same dev gate
+	 * turns it on; the double-approval case needs one request to be slow after writing its consent.
+	 */
+	spikeHold: boolean
 	/** The D1 binding, for the grant clean-up that is one SQL statement rather than a scan. */
 	database: D1Database
 }

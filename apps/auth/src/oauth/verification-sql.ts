@@ -7,7 +7,7 @@
  * costs one query per hundred rows and misses rows when the table shrinks mid-scan. One statement
  * with bound parameters costs a constant query per revoke, whatever the table holds.
  */
-import type { D1Database } from "@cloudflare/workers-types"
+import type { D1Database, D1PreparedStatement } from "@cloudflare/workers-types"
 import type { GrantOwner } from "./family"
 
 const DELETE_PENDING_AUTHORIZATION_CODES = `delete from verification
@@ -16,13 +16,18 @@ where json_valid(value)
 	and json_extract(value, '$.userId') = ?1
 	and json_extract(value, '$.query.client_id') = ?2`
 
+/** The statement itself, for the revoke's atomic batch. */
+export function deletePendingAuthorizationCodesStatement(
+	database: D1Database,
+	owner: GrantOwner,
+): D1PreparedStatement {
+	return database.prepare(DELETE_PENDING_AUTHORIZATION_CODES).bind(owner.userId, owner.clientId)
+}
+
 /** Deletes every unconsumed authorization code issued for one grant. */
 export async function deletePendingAuthorizationCodes(
 	database: D1Database,
 	owner: GrantOwner,
 ): Promise<void> {
-	await database
-		.prepare(DELETE_PENDING_AUTHORIZATION_CODES)
-		.bind(owner.userId, owner.clientId)
-		.run()
+	await deletePendingAuthorizationCodesStatement(database, owner).run()
 }

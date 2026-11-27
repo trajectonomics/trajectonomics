@@ -62,7 +62,7 @@ export type SecurityEvidence = {
 	revokeKillsPendingAuthCode: boolean
 	revokeHoldsWithManyVerificationRows: boolean
 	revokeHoldsUnderConcurrentVerificationDeletes: boolean
-	revokeIsConstantQueryCount: boolean
+	revokeIsFastWithManyRows: boolean
 	updateConsentPathDisabled: boolean
 	deviceCodeContentTypeSmugglingRejected: boolean
 	postAuthorizeRejected: boolean
@@ -71,4 +71,6 @@ export type SecurityEvidence = {
 	revokeRemovesDuplicateConsents: boolean
 	emptyScopeDeviceRequestRejected: boolean
 	consentScopesAreUnion: boolean
+	failedDoubleApproveKeepsConsent: boolean
+	revokeRetryAfterPartialFailure: boolean
 }

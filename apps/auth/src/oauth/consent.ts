@@ -7,6 +7,7 @@ import { deviceApprovalRejection } from "../core/consent"
 import { rememberDeviceApproval } from "./approval"
 import { recordConsent } from "./consent-record"
 import { hookNow, type OAuthHookOptions } from "./request"
+import { holdDeviceApproval } from "./spike-hold"
 import { findDeviceCode, type StoredDeviceCode } from "./store"
 import { asDate, deviceScopes, readField, storedResources } from "./values"
 
@@ -60,6 +61,8 @@ export async function recordDeviceApprovalConsent(
 		options,
 	)
 	rememberDeviceApproval(ctx, { userCode, userId: check.owner.userId, write })
+	// Dev-only: let the spike park this request until the same code is approved elsewhere.
+	await holdDeviceApproval(ctx, options, userCode)
 }
 
 function approvalCheck(sessionUserId: unknown, device: StoredDeviceCode, now: Date): ApprovalCheck {

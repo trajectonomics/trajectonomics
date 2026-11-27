@@ -11,6 +11,7 @@ import {
 	type OAuthHookOptions,
 	oauthAfterHook,
 	oauthBeforeHook,
+	spikeHoldEnabled,
 	testClockEnabled,
 } from "./oauth-hooks"
 
@@ -32,6 +33,7 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 	const hookOptions: OAuthHookOptions = {
 		absoluteLifetimeSeconds: REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS,
 		testClock: testClockEnabled(devSignIn),
+		spikeHold: spikeHoldEnabled(devSignIn),
 		database: input.env.DB,
 	}
 	return {
@@ -87,7 +89,7 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		},
 		hooks: {
 			before: oauthBeforeHook(hookOptions),
-			after: oauthAfterHook(),
+			after: oauthAfterHook(hookOptions),
 		},
 		plugins: buildPlugins({
 			baseURL,

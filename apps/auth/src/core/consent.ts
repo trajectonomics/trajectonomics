@@ -28,8 +28,11 @@ export type DeviceApprovalRejection =
 /**
  * True when the signed-in user may approve this device code. The library's own approve endpoint
  * re-checks the same four things; the before-hook must check them first, because it creates the
- * consent before the endpoint flips the code to `approved`. A code that is not claimed by the
- * session user cannot be approved, so no consent may be recorded for one.
+ * consent before the endpoint flips the code to `approved`.
+ *
+ * A code claimed by somebody else is refused here. An unclaimed code is not: the endpoint answers
+ * its own 400 "not claimed", and the after-hook takes back the consent this hook wrote for it.
+ * Refusing it here would answer with this hook's error instead of the library's.
  */
 export function deviceApprovalRejection(input: {
 	sessionUserId: string | undefined
@@ -43,10 +46,14 @@ export function deviceApprovalRejection(input: {
 	if (input.status !== "pending") return "not-pending"
 	if (input.expiresAt === null || input.expiresAt === undefined) return "expired"
 	if (input.expiresAt.getTime() <= input.now.getTime()) return "expired"
-	if (input.deviceUserId !== input.sessionUserId) return "not-owner"
+	if (claimedByAnother(input.deviceUserId, input.sessionUserId)) return "not-owner"
 	if (input.scope === null || input.scope === undefined || input.scope.trim() === "")
 		return "no-scope"
 	return null
+}
+
+function claimedByAnother(deviceUserId: string | null | undefined, sessionUserId: string): boolean {
+	return typeof deviceUserId === "string" && deviceUserId !== "" && deviceUserId !== sessionUserId
 }
 
 /**
