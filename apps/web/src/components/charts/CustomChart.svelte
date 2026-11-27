@@ -8,9 +8,11 @@ import ChartTable from "./ChartTable.svelte"
 interface Props {
 	chart: ChartDef
 	view: ChartView
+	/** The chart's height in pixels. Left out, the default line chart's height. */
+	height?: number
 }
 
-let { chart, view }: Props = $props()
+let { chart, view, height }: Props = $props()
 const label = $derived(`${chart.name}, ${KIND_LABELS[chart.kind].toLowerCase()}, by year`)
 </script>
 
@@ -25,7 +27,7 @@ const label = $derived(`${chart.name}, ${KIND_LABELS[chart.kind].toLowerCase()},
 		</div>
 	{/if}
 	{#if view.series.length > 0}
-		<LineChart {label} series={view.series} kind={chart.kind} wide />
+		<LineChart {label} series={view.series} kind={chart.kind} wide {height} />
 		<ChartTable table={view.table} name={chart.name} />
 	{:else}
 		<p class="text-sm text-muted-foreground">Nothing to draw: this plan states none of the series of this chart.</p>

@@ -70,17 +70,16 @@ export function agesText(ages: readonly PersonAge[], people: PersonNames): strin
 		.join(", ")
 }
 
-/** The age under a chart's year: "age 50" for one person, "You 50" (the first person, by the household's words) for a household of several. Null without one. */
+/** The first person's age as a chart's x axis reads it: "You 50" by the household's words, or their id. Null without one. */
 export function axisAge(ages: readonly PersonAge[], people: PersonNames): string | null {
 	const [first] = ages
 	if (first === undefined) return null
-	if (ages.length === 1) return `age ${first.age}`
 	return `${people.get(first.person)?.label ?? first.person} ${first.age}`
 }
 
-/** The link to the household card on the Overview, for the Scenario it belongs to. Keeps the other parameters. */
+/** The link to the household page of the Scenario an anchor belongs to. Keeps the other parameters. */
 export function householdHref(scenario: string, search: string): string {
 	const params = new URLSearchParams(search)
 	params.set("scenario", scenario)
-	return withSearch("/projection/", params.toString()).concat("#household")
+	return withSearch("/household/", params.toString())
 }

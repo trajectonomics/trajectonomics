@@ -105,8 +105,8 @@ describe("agesText", () => {
 })
 
 describe("axisAge", () => {
-	test('reads "age N" for one person, the first person\'s age for several, and null for none', () => {
-		expect(axisAge([{ person: "me", age: 37 }], NO_PEOPLE)).toBe("age 37")
+	test("reads the first person's age, and null for none", () => {
+		expect(axisAge([{ person: "me", age: 37 }], NO_PEOPLE)).toBe("me 37")
 		expect(
 			axisAge(
 				[
@@ -119,19 +119,19 @@ describe("axisAge", () => {
 		expect(axisAge([], NO_PEOPLE)).toBeNull()
 	})
 
-	test("calls the first person by the household's words when the row carries several", () => {
+	test("calls the first person by the household's words", () => {
 		const ages = [
 			{ person: "me", age: 37 },
 			{ person: "partner", age: 35 },
 		]
 		expect(axisAge(ages, personNames(household))).toBe("You 37")
-		expect(axisAge([{ person: "me", age: 37 }], personNames(household))).toBe("age 37")
+		expect(axisAge([{ person: "me", age: 37 }], personNames(household))).toBe("You 37")
 	})
 })
 
 describe("householdHref", () => {
 	test("names the Scenario and keeps the other parameters of the address", () => {
-		expect(householdHref("base", "?demo=1")).toBe("/projection/?demo=1&scenario=base#household")
-		expect(householdHref("early plan", "")).toBe("/projection/?scenario=early+plan#household")
+		expect(householdHref("base", "?demo=1")).toBe("/household/?demo=1&scenario=base")
+		expect(householdHref("early plan", "")).toBe("/household/?scenario=early+plan")
 	})
 })

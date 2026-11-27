@@ -1,15 +1,17 @@
 <script lang="ts">
 import type { LineLayout } from "../../lib/chart"
-import { HEIGHT, MARGIN } from "./geometry"
+import { MARGIN } from "./geometry"
 import { strokeClass } from "./series-style"
 
 interface Props {
 	layout: LineLayout
 	/** The index of the hovered x. */
 	index: number
+	/** The chart's height in pixels. */
+	height: number
 }
 
-let { layout, index }: Props = $props()
+let { layout, index, height }: Props = $props()
 const x = $derived(layout.xPixels[index])
 </script>
 
@@ -20,7 +22,7 @@ const x = $derived(layout.xPixels[index])
 			x1={x}
 			x2={x}
 			y1={MARGIN.top}
-			y2={HEIGHT - MARGIN.bottom}
+			y2={height - MARGIN.bottom}
 			stroke-dasharray="2 3"
 			class="stroke-muted-foreground"
 		/>
