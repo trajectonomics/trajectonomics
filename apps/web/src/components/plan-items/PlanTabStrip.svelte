@@ -41,7 +41,7 @@ function onKey(event: KeyboardEvent, index: number): void {
 				bind:this={buttons[index]}
 				onclick={() => onSelect(tab.id)}
 				onkeydown={(event) => onKey(event, index)}
-				class="rounded-t-md px-3 py-2 text-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring {selected === tab.id
+				class="rounded-t-md px-3 py-2 text-sm whitespace-nowrap focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring {selected === tab.id
 					? 'border-b-2 border-accent font-semibold text-foreground'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>

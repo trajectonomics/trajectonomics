@@ -2,6 +2,7 @@
 import type { AssetCardView } from "../../lib/view/plan-items/asset-card"
 import type { PlanDensity } from "../../lib/view/plan-items/tabs"
 import AssetCard from "./AssetCard.svelte"
+import CompactAdd from "./CompactAdd.svelte"
 import CompactItem from "./CompactItem.svelte"
 
 interface Props {
@@ -10,8 +11,13 @@ interface Props {
 	editable: boolean
 	/** False on the drawer's face, which shows no Edit control: the form is right below it. */
 	actions?: boolean
+	/** False on the drawer's face, which repeats the asset's name and needs no section heading. */
+	heading?: boolean
 	/** How the cards are drawn: the page's full card, or the Plan's compact one. */
 	density?: PlanDensity
+	/** The words of the dashed card that adds one; absent when the list draws none. */
+	addNoun?: string | undefined
+	onAdd?: (() => void) | undefined
 	plan: string
 	contentHash: string
 	onEdit: (id: string) => void
@@ -24,7 +30,10 @@ let {
 	currency,
 	editable,
 	actions = true,
+	heading = true,
 	density = "full",
+	addNoun,
+	onAdd,
 	plan,
 	contentHash,
 	onEdit,
@@ -33,7 +42,7 @@ let {
 </script>
 
 <section class="min-w-0 space-y-3" aria-label="Homes and cars">
-	<h2 class="font-semibold">Homes and cars</h2>
+	{#if heading}<h2 class="font-semibold">Homes and cars</h2>{/if}
 	{#if density === "compact"}
 		<ul class="grid grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-3">
 			{#each cards as card (card.id)}
@@ -46,6 +55,9 @@ let {
 					onOpen={() => onEdit(card.id)}
 				/>
 			{/each}
+			{#if addNoun !== undefined}
+				<CompactAdd noun={addNoun} {editable} onOpen={() => onAdd?.()} />
+			{/if}
 		</ul>
 	{:else}
 		<ul class="grid min-w-0 gap-3 sm:grid-cols-2">

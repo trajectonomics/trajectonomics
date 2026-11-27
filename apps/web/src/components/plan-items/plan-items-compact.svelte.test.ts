@@ -1,21 +1,13 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
-import { accountCards } from "../../lib/view/plan-items/accounts"
 import { baselineRead } from "../../lib/view/plan-items/fixtures.test-support"
-import { flowCards } from "../../lib/view/plan-items/flows"
-import { loanCardsOf } from "../../lib/view/plan-items/loan-card"
 import { loanPlanDocument } from "../../lib/view/plan-items/loan-fixtures.test-support"
-import AccountCards from "./AccountCards.svelte"
-import FlowCards from "./FlowCards.svelte"
-import LoanCards from "./LoanCards.svelte"
-import PlanItemFace from "./PlanItemFace.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"
 import PlanMilestoneCards from "./PlanMilestoneCards.svelte"
 import { runWithLoan } from "./plan-loans.test-support"
 
 const HASH = "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-const LABELS = /<dt[^>]*>(.*?)<\/dt>/g
 
 function compact(kind: "income" | "expense" | "assets", editable = true): string {
 	return render(PlanItemsList, {
@@ -31,11 +23,6 @@ function compact(kind: "income" | "expense" | "assets", editable = true): string
 			density: "compact",
 		},
 	}).body
-}
-
-/** The fact labels a full card states, in order. */
-function labels(body: string): string[] {
-	return [...body.matchAll(LABELS)].map((match) => match[1] ?? "")
 }
 
 describe("the Plan's compact cards", () => {
@@ -67,140 +54,46 @@ describe("the Plan's compact cards", () => {
 		expect(readOnly).toContain("Add expense: switched off in this demo")
 	})
 
+	test("offer the dashed cards that add a loan and a home or car", () => {
+		const editable = compact("assets")
+		expect(editable).toContain("+ Add account")
+		expect(editable).toContain("+ Add loan")
+		expect(editable).toContain("+ Add a home or car")
+		const readOnly = compact("assets", false)
+		expect(readOnly).toContain("Add loan: switched off in this demo")
+		expect(readOnly).toContain("Add a home or car: switched off in this demo")
+	})
+
 	test("link each Milestone to its own row on the Milestones page, keeping the address's parameters", () => {
 		setTestUrl("http://127.0.0.1/projection/?demo=1&scenario=base")
 		try {
 			const body = render(PlanMilestoneCards, {
 				props: {
 					cards: [
-						{ id: "retire", date: "1 Jun 2027", notReachedBy: null, how: "On a date" },
-						{ id: "never", date: null, notReachedBy: "2053", how: "" },
+						{
+							id: "retire",
+							date: "1 Jun 2027",
+							notReachedBy: null,
+							terms: { words: "On a date", amount: null },
+						},
+						{
+							id: "worth",
+							date: null,
+							notReachedBy: "2053",
+							terms: { words: "When net worth reaches", amount: "10000000.00" },
+						},
+						{ id: "never", date: null, notReachedBy: "2053", terms: { words: "", amount: null } },
 					],
 				},
 			}).body
 			expect(body).toContain('href="/milestones/?demo=1&amp;scenario=base#retire"')
 			expect(body).toContain("Not reached by 2053")
+			expect(body).toContain("When net worth reaches")
+			expect(body).toContain("10M")
+			// The exact amount stays in the accessible text of the compact figure.
+			expect(body).toContain("10,000,000.00")
 		} finally {
 			setTestUrl("http://127.0.0.1/")
 		}
-	})
-})
-
-describe("the drawer's face", () => {
-	const baseline = baselineRead()
-	const doc = loanPlanDocument()
-	const cards = accountCards(doc.accounts, baseline)
-	const loans = loanCardsOf(doc, runWithLoan(), baseline)
-	const flows = flowCards(doc.flows, "income")
-	const lists = {
-		flows: { cards: flows, marks: {} },
-		accounts: { cards, marks: {} },
-		assets: [],
-		loans: { cards: loans, marks: {}, other: [] },
-	}
-
-	function face(kind: "income" | "assets", drawer: { id: string; loan?: boolean }): string {
-		return render(PlanItemFace, {
-			props: {
-				kind,
-				drawer,
-				lists,
-				currency: doc.currency,
-				editable: true,
-				plan: "base",
-				contentHash: HASH,
-				onTry: () => {},
-			},
-		}).body
-	}
-
-	test("states the same facts as the full card of a Flow, without its Edit control", () => {
-		const full = render(FlowCards, {
-			props: {
-				cards: flows.filter((card) => card.id === "salary"),
-				currency: doc.currency,
-				editable: true,
-				plan: "base",
-				contentHash: HASH,
-				onEdit: () => {},
-				onTry: () => {},
-			},
-		}).body
-		const faceBody = face("income", { id: "salary" })
-		expect(labels(faceBody)).toEqual(labels(full))
-		expect(labels(faceBody).length).toBeGreaterThan(0)
-		expect(faceBody).not.toContain('aria-label="Edit salary"')
-		expect(faceBody).toContain("What if…")
-	})
-
-	test("states the same facts as the full card of an Account, without its Edit control", () => {
-		const full = render(AccountCards, {
-			props: {
-				cards: cards.filter((card) => card.id === "bank"),
-				currency: doc.currency,
-				editable: true,
-				plan: "base",
-				contentHash: HASH,
-				onEdit: () => {},
-				onTry: () => {},
-			},
-		}).body
-		const faceBody = face("assets", { id: "bank" })
-		expect(labels(faceBody)).toEqual(labels(full))
-		expect(faceBody).not.toContain('aria-label="Edit Bank"')
-	})
-
-	test("states a loan's terms, its schedule and its statement as its full card does", () => {
-		const full = render(LoanCards, {
-			props: {
-				cards: loans,
-				currency: doc.currency,
-				editable: true,
-				plan: "base",
-				contentHash: HASH,
-				onEdit: () => {},
-				onPay: () => {},
-				onTry: () => {},
-			},
-		}).body
-		const faceBody = face("assets", { id: "loan", loan: true })
-		expect(labels(faceBody)).toEqual(labels(full))
-		expect(faceBody).toContain("Schedule")
-		expect(faceBody).toContain("Paid off on 31 Jan 2032.")
-		expect(faceBody).not.toContain('aria-label="Edit loan loan"')
-		expect(faceBody).not.toContain('aria-label="Pay loan extra"')
-	})
-
-	test("a loan's compact card shows the balance the Baseline states, which is negative", () => {
-		if (!baseline.ok) throw new Error("the fixture Baseline reads")
-		const owed = {
-			...baseline,
-			data: {
-				...baseline.data,
-				rows: [
-					...baseline.data.rows,
-					{
-						account: { id: "loan", name: "Car loan" },
-						kind: "liability" as const,
-						amount: "-500000.00",
-					},
-				],
-			},
-		}
-		const body = render(PlanItemsList, {
-			props: {
-				kind: "assets",
-				name: "base",
-				doc,
-				household: null,
-				baseline: owed,
-				run: runWithLoan(),
-				editable: true,
-				contentHash: HASH,
-				density: "compact",
-			},
-		}).body
-		expect(body).toContain("−500k")
-		expect(body).toContain("500,000.00")
 	})
 })

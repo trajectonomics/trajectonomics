@@ -57,6 +57,19 @@ export function drawerTitle(
 }
 
 /**
+ * The drawer's state when a face's "What if…" is chosen: the item the face states is tried in the same form, so
+ * a loan keeps its terms and a home or car its values, as the full page's card does.
+ */
+export function tryDrawer(drawer: PlanDrawer, id: string): PlanDrawer {
+	return {
+		id,
+		tryValue: true,
+		...(drawer.loan === true ? { loan: true } : {}),
+		...(drawer.asset === true ? { asset: true } : {}),
+	}
+}
+
+/**
  * Whether the drawer's form may edit the open item. A computed Flow has no amount the form could edit, and a
  * home or car whose parts were changed outside its form is refused, as the pages already leave both without
  * an Edit control (web ADR 0011).

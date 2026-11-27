@@ -64,17 +64,22 @@ const existingAccount = $derived(doc.accounts.find((account) => account.id === d
 	{#if face !== undefined}
 		<div class="space-y-4">{@render face()}</div>
 	{/if}
-	{#if form && drawer !== null && kind === "assets"}
-		{#if drawer.extra === true && drawer.id !== undefined}
-			<ExtraPaymentForm {name} {doc} {contentHash} loanId={drawer.id} onDone={onClose} />
-		{:else if drawer.asset === true}
-			<AssetForm {name} {doc} {household} {baseline} {contentHash} assetId={drawer.id} tryValue={trying} onDone={onClose} />
-		{:else if drawer.loan === true}
-			<LoanForm {name} {doc} {baseline} {contentHash} loanId={drawer.id} tryValue={trying} onDone={onClose} />
-		{:else}
-			<AccountForm {name} {doc} {household} {contentHash} existing={existingAccount} tryValue={trying} onDone={onClose} />
-		{/if}
-	{:else if form && drawer !== null}
-		<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} tryValue={trying} onDone={onClose} />
+	{#if form && drawer !== null}
+		<!-- A fresh form for each mode: a try starts from the session's values, never from the form the details opened. -->
+		{#key `${drawer.id ?? ""}:${trying}`}
+			{#if kind === "assets"}
+				{#if drawer.extra === true && drawer.id !== undefined}
+					<ExtraPaymentForm {name} {doc} {contentHash} loanId={drawer.id} onDone={onClose} />
+				{:else if drawer.asset === true}
+					<AssetForm {name} {doc} {household} {baseline} {contentHash} assetId={drawer.id} tryValue={trying} onDone={onClose} />
+				{:else if drawer.loan === true}
+					<LoanForm {name} {doc} {baseline} {contentHash} loanId={drawer.id} tryValue={trying} onDone={onClose} />
+				{:else}
+					<AccountForm {name} {doc} {household} {contentHash} existing={existingAccount} tryValue={trying} onDone={onClose} />
+				{/if}
+			{:else}
+				<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} tryValue={trying} onDone={onClose} />
+			{/if}
+		{/key}
 	{/if}
 </Drawer>

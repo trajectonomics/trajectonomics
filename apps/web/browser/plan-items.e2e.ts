@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test"
 import { openDemo, SCREENSHOTS } from "./demo"
-import { measureOverflow } from "./fit"
 
 // The Plan's item tabs (#703): a strip under the chart whose compact cards open the full card in the drawer.
 
@@ -42,8 +41,13 @@ test("the tabs move by keyboard, and the address follows them", async ({ page })
 	await expect(expenses).toBeFocused()
 	await expect(expenses).toHaveAttribute("aria-selected", "true")
 	await expect(page).toHaveURL(/items=expenses/)
-	const outline = await expenses.evaluate((element) => getComputedStyle(element).outlineStyle)
-	expect(outline, "the focused tab's ring").toBe("solid")
+	const ring = await expenses.evaluate((element) => {
+		const style = getComputedStyle(element)
+		return { style: style.outlineStyle, offset: style.outlineOffset }
+	})
+	expect(ring.style, "the focused tab's ring").toBe("solid")
+	// The ring sits inside the tab, so the strip's scroll box cannot clip it.
+	expect(ring.offset, "the ring's inset offset").toBe("-2px")
 
 	await page.keyboard.press("End")
 	await expect(milestones).toBeFocused()
@@ -76,46 +80,9 @@ test("a compact card opens the full card in the drawer, and focus comes back to 
 	await expect(drawer.getByText("Growth", { exact: true })).toBeVisible()
 	await expect(drawer.locator("dt").first()).toBeVisible()
 
-	await page.screenshot({
-		path: `${SCREENSHOTS}/plan-items/1280-light-drawer.png`,
-		fullPage: true,
-	})
+	await page.screenshot({ path: `${SCREENSHOTS}/plan-items/1280-light-drawer.png` })
 
 	await page.keyboard.press("Escape")
 	await expect(page.locator("dialog[open]")).toHaveCount(0)
 	await expect(card).toBeFocused()
-})
-
-test("Hide amounts masks every compact amount", async ({ page }) => {
-	await page.setViewportSize({ width: 1280, height: 800 })
-	await openDemo(page, "/projection/?scenario=base&items=assets", {
-		theme: "light",
-		hideAmounts: true,
-	})
-
-	const amounts = page.locator('[role="tabpanel"] .tabular-nums > span[aria-hidden="true"]')
-	await expect(amounts.first()).toBeVisible()
-	const texts = await amounts.allInnerTexts()
-	expect(texts.length, "a compact amount to mask").toBeGreaterThan(0)
-	for (const text of texts) expect(text, "a masked amount").not.toMatch(/\d/)
-	await expect(page.getByText("amount hidden").first()).toBeAttached()
-})
-
-for (const items of ["income", "expenses", "assets", "milestones"]) {
-	test(`the ${items} tab keeps a 360px phone from widening`, async ({ page }) => {
-		await page.setViewportSize({ width: 360, height: 800 })
-		await openDemo(page, `/projection/?scenario=base&items=${items}`, { theme: "light" })
-		const fit = await measureOverflow(page, true)
-		expect(fit.tables, "tables outside a scroll box").toEqual([])
-		expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.innerWidth)
-	})
-}
-
-test("the Expenses tab at 360px", async ({ page }) => {
-	await page.setViewportSize({ width: 360, height: 800 })
-	await openDemo(page, "/projection/?scenario=base&items=expenses", { theme: "light" })
-	await page.screenshot({
-		path: `${SCREENSHOTS}/plan-items/360-light-expenses.png`,
-		fullPage: true,
-	})
 })

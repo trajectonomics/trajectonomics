@@ -19,16 +19,13 @@ interface Props {
 	assets?: readonly AssetCardView[]
 	loans: readonly LoanCardView[]
 	loanMarks?: Readonly<Record<string, LoanMarks>>
-	/** The loan Flows no loan card places, which are shown read-only. */
 	other: readonly LoanCard[]
 	currency: string
 	editable: boolean
 	actions?: boolean
 	density?: PlanDensity
-	/** The plan and the content hash the page read for it: the what-if switches name both. */
 	plan: string
 	contentHash: string
-	/** Opens the planner's drawer on an item, in the form it names. */
 	open: (drawer: PlanDrawer) => void
 }
 
@@ -48,8 +45,6 @@ let {
 	open,
 }: Props = $props()
 const compact = $derived(density === "compact")
-/** A compact card opens the item's full card in the drawer; a full page's Edit opens its form. */
-const details = $derived(compact ? { details: true } : {})
 </script>
 
 {#if compact || accounts.length > 0}
@@ -64,26 +59,28 @@ const details = $derived(compact ? { details: true } : {})
 		onAdd={() => open({})}
 		{plan}
 		{contentHash}
-		onEdit={(id) => open({ id, ...details })}
+		onEdit={(id) => open({ id, ...(compact ? { details: true } : {}) })}
 		onTry={(id) => open({ id, tryValue: true })}
 	/>
 {:else if loans.length === 0 && assets.length === 0}
 	<EmptyState title="No accounts in this plan" />
 {/if}
-{#if assets.length > 0}
+{#if compact || assets.length > 0}
 	<AssetCards
 		cards={assets}
 		{currency}
 		{editable}
 		{actions}
 		{density}
+		addNoun={compact ? "a home or car" : undefined}
+		onAdd={() => open({ asset: true })}
 		{plan}
 		{contentHash}
-		onEdit={(id) => open({ id, asset: true, ...details })}
+		onEdit={(id) => open({ id, asset: true, ...(compact ? { details: true } : {}) })}
 		onTry={(id) => open({ id, asset: true, tryValue: true })}
 	/>
 {/if}
-{#if loans.length > 0}
+{#if compact || loans.length > 0}
 	<LoanCards
 		cards={loans}
 		marks={loanMarks}
@@ -91,9 +88,11 @@ const details = $derived(compact ? { details: true } : {})
 		{editable}
 		{actions}
 		{density}
+		addNoun={compact ? "loan" : undefined}
+		onAdd={() => open({ loan: true })}
 		{plan}
 		{contentHash}
-		onEdit={(id) => open({ id, loan: true, ...details })}
+		onEdit={(id) => open({ id, loan: true, ...(compact ? { details: true } : {}) })}
 		onPay={(id) => open({ id, extra: true })}
 		onTry={(id) => open({ id, loan: true, tryValue: true })}
 	/>

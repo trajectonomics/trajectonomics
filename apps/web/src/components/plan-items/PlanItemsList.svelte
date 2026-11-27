@@ -77,11 +77,15 @@ const formShown = $derived(
 /** A compact card opens the item's full card first; a full page's Edit opens the form. */
 const onEdit = (id: string) => setDrawer(compact ? { id, details: true } : { id })
 const onTry = (id: string) => setDrawer({ id, tryValue: true })
+/** A face's "What if…" keeps the form the face states: a loan's terms or a home or car's values. */
+const onTryFace = (next: PlanDrawer) => setDrawer(next)
+/** A loan's "Pay extra" opens the payment's own form. */
+const onPay = (id: string) => setDrawer({ id, extra: true })
 </script>
 
 {#snippet face()}
 	{#if drawer !== null}
-		<PlanItemFace {kind} {drawer} {lists} currency={doc.currency} editable={editable && drawerEditsShown()} plan={name} {contentHash} {onTry} />
+		<PlanItemFace {kind} {drawer} {lists} currency={doc.currency} editable={editable && drawerEditsShown()} plan={name} {contentHash} onTry={onTryFace} {onPay} />
 	{/if}
 {/snippet}
 

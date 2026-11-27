@@ -3,6 +3,7 @@ import { currentSearch } from "../../client/location.svelte.js"
 import { withSearch } from "../../lib/view/links"
 import type { MilestoneCardView } from "../../lib/view/plan-items/milestone-cards"
 import ItemName from "../ui/ItemName.svelte"
+import Money from "../ui/Money.svelte"
 
 interface Props {
 	/** The plan's Milestones, each with its date or the year it is not reached by. */
@@ -31,7 +32,9 @@ const href = $derived(withSearch("/milestones/", currentSearch()))
 						{/if}
 					</span>
 				</span>
-				{#if card.how !== ""}<span class="mt-1 block text-xs text-muted-foreground">{card.how}</span>{/if}
+				{#if card.terms.words !== ""}
+					<span class="mt-1 block text-xs text-muted-foreground">{card.terms.words}{#if card.terms.amount !== null} <Money amount={card.terms.amount} compact />{/if}</span>
+				{/if}
 			</a>
 		</li>
 	{/each}

@@ -41,9 +41,12 @@ describe("the Plan's compact Milestone cards", () => {
 			id: "first-year",
 			date: "31 Dec 2026",
 			notReachedBy: null,
-			how: "On a date",
+			terms: { words: "On a date", amount: null },
 		})
-		expect(cards.find((card) => card.id === "second-year")?.how).toBe("When net worth reaches 10M")
+		expect(cards.find((card) => card.id === "second-year")?.terms).toEqual({
+			words: "When net worth reaches",
+			amount: "10000000.00",
+		})
 	})
 
 	test("state the year a Milestone is not reached by, from the plan's own run-out date", () => {
@@ -54,7 +57,7 @@ describe("the Plan's compact Milestone cards", () => {
 			id: "never",
 			date: null,
 			notReachedBy: "2053",
-			how: "",
+			terms: { words: "", amount: null },
 		})
 	})
 

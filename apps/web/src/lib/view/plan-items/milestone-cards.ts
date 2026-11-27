@@ -1,6 +1,14 @@
 import type { ProjectionRun, ScenarioDocument } from "../../contract"
-import { formatCompact, formatDate, yearOf } from "../../format"
+import { formatDate, yearOf } from "../../format"
 import { milestoneRowsOf } from "../milestones/milestones"
+
+/** What a Milestone fires on, split so its amount is drawn as money and Hide amounts masks it. */
+export interface MilestoneTerms {
+	/** The words before the amount: "On a date", or "When net worth reaches"; "" when the page has none. */
+	readonly words: string
+	/** The amount the terms name, as the CLI states it; null when the words name none. */
+	readonly amount: string | null
+}
 
 /** One Milestone as a compact card on the Plan: when the CLI reaches it, and what states it. */
 export interface MilestoneCardView {
@@ -9,8 +17,8 @@ export interface MilestoneCardView {
 	readonly date: string | null
 	/** The year the plan runs out, for one it does not reach; null when the CLI states no run-out. */
 	readonly notReachedBy: string | null
-	/** "On a date" or "When net worth reaches 10M"; "" when the card has no words for the Milestone's terms. */
-	readonly how: string
+	/** The Milestone's terms, in the plan's words and its own amount; empty words when the card has none. */
+	readonly terms: MilestoneTerms
 }
 
 /** One Milestone as the plan's document states it: its id, and the terms it fires on. */
@@ -18,7 +26,8 @@ interface StatedMilestone {
 	readonly id: string
 	readonly criteria: readonly unknown[]
 }
-
+/** The terms of a Milestone the page has no words for. */
+const NO_TERMS: MilestoneTerms = { words: "", amount: null }
 /** The engine's metrics in the plan's words, for the ones this page reads. */
 const METRICS: Readonly<Record<string, string>> = {
 	netWorth: "net worth",
@@ -40,29 +49,29 @@ function statedIn(doc: ScenarioDocument | null): readonly StatedMilestone[] {
 	})
 }
 
-/** What one criterion fires on, in the plan's words: "On a date", "When net worth reaches 10M". */
-function criterionWords(criterion: unknown): string {
-	if (typeof criterion !== "object" || criterion === null) return ""
+/** What one criterion fires on, in the plan's words and its amount: "On a date", "When net worth reaches". */
+function criterionTerms(criterion: unknown): MilestoneTerms {
+	if (typeof criterion !== "object" || criterion === null) return NO_TERMS
 	const record = criterion as Record<string, unknown>
-	if (record["kind"] === "date") return "On a date"
-	if (record["kind"] !== "metric") return ""
+	if (record["kind"] === "date") return { words: "On a date", amount: null }
+	if (record["kind"] !== "metric") return NO_TERMS
 	const metric = METRICS[String(record["metric"] ?? "")]
 	const amount = record["amount"]
-	if (metric === undefined || typeof amount !== "string") return ""
-	const compact = formatCompact(amount)
-	return record["op"] === "atMost"
-		? `When ${metric} is at most ${compact}`
-		: `When ${metric} reaches ${compact}`
+	if (metric === undefined || typeof amount !== "string") return NO_TERMS
+	return {
+		words: record["op"] === "atMost" ? `When ${metric} is at most` : `When ${metric} reaches`,
+		amount,
+	}
 }
 
-/** A Milestone's terms in words, or "" for one the page has none for: several criteria, or one it does not know. */
-function howOf(criteria: readonly unknown[]): string {
-	return criteria.length === 1 ? criterionWords(criteria[0]) : ""
+/** A Milestone's terms in words, or none for one the page has none for: several criteria, or one it does not know. */
+function termsOf(criteria: readonly unknown[]): MilestoneTerms {
+	return criteria.length === 1 ? criterionTerms(criteria[0]) : NO_TERMS
 }
 
-/** The id of a Milestone the run states, matched to the document's terms. */
-function howById(stated: readonly StatedMilestone[], id: string): string {
-	return howOf(stated.find((milestone) => milestone.id === id)?.criteria ?? [])
+/** The terms of a Milestone the run states, matched to the document's own. */
+function termsById(stated: readonly StatedMilestone[], id: string): MilestoneTerms {
+	return termsOf(stated.find((milestone) => milestone.id === id)?.criteria ?? [])
 }
 
 /**
@@ -80,7 +89,7 @@ export function milestoneCards(
 			id: milestone.id,
 			date: null,
 			notReachedBy: null,
-			how: howOf(milestone.criteria),
+			terms: termsOf(milestone.criteria),
 		}))
 	}
 	const runOut = run === undefined ? null : (run.runsOut?.date ?? run.horizon)
@@ -88,6 +97,6 @@ export function milestoneCards(
 		id: row.id,
 		date: row.date === null ? null : formatDate(row.date),
 		notReachedBy: row.date === null && runOut !== null ? yearOf(runOut) : null,
-		how: howById(stated, row.id),
+		terms: termsById(stated, row.id),
 	}))
 }

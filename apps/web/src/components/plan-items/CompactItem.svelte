@@ -29,7 +29,7 @@ let { kind, id, amount = null, text = null, line = "", currency, onOpen }: Props
 		aria-haspopup="dialog"
 		data-plan-item
 		onclick={onOpen}
-		class="h-full w-full rounded-lg border border-border bg-card p-3 text-left hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+		class="flex h-full w-full flex-col justify-start rounded-lg border border-border bg-card p-3 text-left hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 	>
 		<span class="flex items-start justify-between gap-2">
 			<span class="min-w-0 font-medium wrap-anywhere"><ItemName {kind} {id} /></span>
