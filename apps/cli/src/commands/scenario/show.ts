@@ -44,12 +44,14 @@ export const show: Leaf = defineCommand({
 			const plain = view(row)
 			const shown = printedRow(plain, input.decimal === true)
 			if (isAppError(shown)) return shown
+			const household = householdOf(row)
+			if (isAppError(household)) return household
 			const tax = taxOf(row)
 			const taxAllowances = taxAllowancesOf(tax, plain.document)
 			return ok({
 				scenario: {
 					...shown,
-					household: householdOf(row),
+					household,
 					householdHash: householdHash(row.document, row.household),
 					tax,
 					taxed: isTaxed(shown.document),
