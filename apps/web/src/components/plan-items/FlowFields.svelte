@@ -4,9 +4,9 @@ import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
 import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
-import type { NoteParts } from "../../lib/view/plan-items/tax-label"
 import FormAlert from "../ui/FormAlert.svelte"
 import ItemName from "../ui/ItemName.svelte"
+import SiteLink from "../ui/SiteLink.svelte"
 import AnchoredNote from "./AnchoredNote.svelte"
 import EmployerFields from "./EmployerFields.svelte"
 import Field from "./Field.svelte"
@@ -28,8 +28,8 @@ interface Props {
 	/** What the employer adds to a salary, and the Accounts it may pay into. */
 	employer?: EmployerDraft
 	targets?: readonly string[]
-	/** Why a new income in a taxed plan needs a tax label, or null. */
-	note?: NoteParts | null
+	/** The Tax labels page a new income in a taxed plan must be given its label on, or null. */
+	note?: string | null
 }
 
 let {
@@ -58,7 +58,7 @@ const endHint = $derived.by(() => {
 
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
 <div class="space-y-4">
-	{#if note}<p class="text-sm text-muted-foreground">{note.before}<code class="wrap-anywhere">{note.command}</code>{note.after}</p>{/if}
+	{#if note}<p class="text-sm text-muted-foreground">This plan's tax counts only income it knows by its label. After you save, give this income a label in <SiteLink href={note} class="underline underline-offset-4">Tax labels</SiteLink>.</p>{/if}
 	{#if existing}
 		<p class="text-sm text-foreground">Item <span class="font-medium"><ItemName kind="flow" id={existing.id} /></span></p>
 	{:else}

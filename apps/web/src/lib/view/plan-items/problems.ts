@@ -22,8 +22,8 @@ export function shownProblems(
 	refusal: ErrorBody | null,
 	message: string | null,
 	fields: readonly string[],
-	item: string,
-	employer?: string,
+	item: readonly string[],
+	employer?: readonly string[],
 ): Shown {
 	const refused = fieldOfRefusal(refusal, fields, item, employer)
 	const text = message ?? undefined

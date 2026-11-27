@@ -6,10 +6,19 @@ interface Props {
 
 let { message }: Props = $props()
 let alert: HTMLParagraphElement | undefined = $state()
+/** The text the alert last took focus for; plain, so comparing it never schedules an effect of its own. */
+let focused = ""
 
-// A refusal fills this alert: focus moves to it, so a keyboard reader lands on the words instead of the next field.
+// A new refusal fills this alert: focus moves to it, so a keyboard reader lands on the words instead of the next
+// field. The same text shown again leaves focus where the person put it.
 $effect(() => {
-	if (message !== "") alert?.focus()
+	if (message === "") {
+		focused = ""
+		return
+	}
+	if (message === focused) return
+	focused = message
+	alert?.focus()
 })
 </script>
 

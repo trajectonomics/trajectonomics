@@ -19,6 +19,8 @@ interface Props {
 let { name, show, disabled }: Props = $props()
 let flow = $state("")
 let label = $state("")
+/** The Flow the last save sent, which a refusal names even after the select moves on. */
+let sent = $state("")
 let problems: Readonly<Record<string, string>> = $state({})
 const flows = $derived([
 	{ value: "", label: "Choose an income Flow" },
@@ -31,7 +33,7 @@ const shown = $derived(
 		problems,
 		mine ? editSession.failure : null,
 		mine ? editSession.error : null,
-		flow,
+		sent,
 		plan.flows.map((one) => one.id),
 	),
 )
@@ -47,6 +49,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	)
 	editSession.clear()
 	problems = result.ok ? {} : result.problems
+	sent = flow
 	if (result.ok && (await editSession.run(result.edit, "tax-label"))) {
 		flow = ""
 		label = ""

@@ -17,7 +17,7 @@ The planner pages (Income, Expenses, and Assets and debts) list a plan's Flows a
 - **Money is text.** A typed amount has its commas and spaces removed, is checked for shape only, and is sent as the decimal string the person typed. A comma groups thousands and is never a decimal point. `traj` accepts or refuses it, and a refusal is shown at the field its path names.
 - **A change is object editing.** An item is replaced, added or removed by its `id`, and every field the form does not show is kept as it came, so a save that changed nothing leaves the plan `unchanged`.
 - **A rate is a percent by moving the decimal point.** A rate stays an integer of basis points in the document. `formatBps` and `parseBps` in `src/lib/format/bps.ts` move the point in the text, refuse more than two places, and never make a float. A rate is not money, so this is not a figure the page computes.
-- **A date the household sets is the household's.** A form shows it read-only, with the household's label and a link to the household, and says that it cannot be cleared there. The household fills it on save, and a change that leaves it out is refused rather than guessed.
+- **A date the household sets is the household's.** A form shows it read-only, with the household's label and a link to the household, and says that it cannot be cleared there. The household fills a date the change leaves out, and a different date is refused.
 
 ## Amendment (2026-11-27): a multiple is a ratio, truncated to one decimal
 

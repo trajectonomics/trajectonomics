@@ -35,7 +35,7 @@ let draft: PersonDraft = $state(initial())
 let problems: Problems = $state({})
 const FIELDS = ["name", "displayLabel", "role", "relation", "born", "lifeExpectancy", "joins"]
 /** The whole path of the person the form edits, so a refusal at another person is the form's own problem. */
-let item = $state("people.")
+let item = $state<readonly string[]>(["people"])
 const shown = $derived(
 	shownProblems(problems, editSession.failure, editSession.error, FIELDS, item),
 )
@@ -43,7 +43,7 @@ const taken = $derived((household?.people ?? []).map((person) => person.id))
 
 /** Saves the household as one Edit; the drawer closes only when it ran. */
 async function commit(next: HouseholdDocument, index: number): Promise<void> {
-	item = `people.${index}`
+	item = ["people", String(index)]
 	if (
 		await editSession.run(
 			{ kind: "set-household", name, householdHash, household: next },

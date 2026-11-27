@@ -60,7 +60,7 @@ let problems: Problems = $state({})
 let sent: string[] = $state([])
 let savedId: string | undefined = $state()
 const refusal = $derived(namedRefusal(editSession.failure, sent, "accounts"))
-const item = $derived(`accounts.${savedId ?? existing?.id ?? ""}`)
+const item = $derived(["accounts", savedId ?? existing?.id ?? ""])
 const shown = $derived(shownProblems(problems, refusal, editSession.error, ACCOUNT_FIELDS, item))
 
 /** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */

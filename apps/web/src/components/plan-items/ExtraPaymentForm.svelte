@@ -34,7 +34,7 @@ let sent: string[] = $state([])
 let savedId: string | undefined = $state()
 const FIELDS = ["amount", "mode", "start", "end"]
 const refusal = $derived(namedRefusal(editSession.failure, sent))
-const item = $derived(`flows.${savedId ?? ""}`)
+const item = $derived(["flows", savedId ?? ""])
 const shown = $derived(shownProblems(problems, refusal, editSession.error, FIELDS, item))
 
 /** Saves the plan with the payment added, as one Edit; the drawer closes only when it ran. */

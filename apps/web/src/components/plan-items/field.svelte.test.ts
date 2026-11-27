@@ -56,6 +56,7 @@ describe("Hide amounts at a money field", () => {
 			expect(body).toContain("•••••")
 			expect(body).not.toContain("9000.50")
 			expect(body).toContain('id="amount-masked"')
+			expect(body).toContain("Amount hidden. Select the field to see and edit it.")
 		} finally {
 			preferences.hidden = false
 		}

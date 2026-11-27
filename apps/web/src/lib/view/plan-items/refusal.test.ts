@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { ErrorBody } from "../../contract"
 import { shownProblems } from "./problems"
-import { fieldOfRefusal } from "./refusal"
+import { fieldOfRefusal, namedRefusal } from "./refusal"
 
 const FLOW_FIELDS = ["name", "amount", "rate", "start"]
 
@@ -11,7 +11,7 @@ function refusal(path: string | undefined): ErrorBody {
 }
 
 describe("fieldOfRefusal: the whole path of the item the form edits", () => {
-	const SALARY = "flows.salary"
+	const SALARY = ["flows", "salary"]
 
 	test("names the field under that item, and no field for another item with the same last segment", () => {
 		expect(fieldOfRefusal(refusal("document.flows.salary.amount"), FLOW_FIELDS, SALARY)).toBe(
@@ -34,7 +34,7 @@ describe("fieldOfRefusal: the whole path of the item the form edits", () => {
 	})
 
 	test("reads an Account's payout and fee under that Account, and its prepayments as no field", () => {
-		const ACCOUNT = "accounts.fund"
+		const ACCOUNT = ["accounts", "fund"]
 		const FIELDS = ["rate", "payoutRate", "payoutStart", "feeRate"]
 		expect(fieldOfRefusal(refusal("document.accounts.fund.payout.bps"), FIELDS, ACCOUNT)).toBe(
 			"payoutRate",
@@ -53,7 +53,7 @@ describe("fieldOfRefusal: the whole path of the item the form edits", () => {
 
 	test("reads a salary's employer Flow under its own path, not the salary's", () => {
 		const FIELDS = ["amount", "employerAccount", "employerRounding"]
-		const EMPLOYER = "flows.salary-employer"
+		const EMPLOYER = ["flows", "salary-employer"]
 		expect(
 			fieldOfRefusal(
 				refusal("document.flows.salary-employer.derive.measures.1.rounding"),
@@ -81,7 +81,7 @@ describe("fieldOfRefusal: a household item", () => {
 	const PERSON_FIELDS = ["name", "displayLabel", "role", "born"]
 
 	test("names the age for an anchor refused as a whole, or at its date, and none for another anchor", () => {
-		const ANCHOR = "anchors.0"
+		const ANCHOR = ["anchors", "0"]
 		expect(fieldOfRefusal(refusal("document.anchors.0.path"), ANCHOR_FIELDS, ANCHOR)).toBe("age")
 		expect(fieldOfRefusal(refusal("document.anchors.0"), ANCHOR_FIELDS, ANCHOR)).toBe("age")
 		expect(fieldOfRefusal(refusal("document.anchors.1.path"), ANCHOR_FIELDS, ANCHOR)).toBeNull()
@@ -93,7 +93,7 @@ describe("fieldOfRefusal: a household item", () => {
 	})
 
 	test("keeps a person's display label on Name, and a refusal at another person off it", () => {
-		const PERSON = "people.1"
+		const PERSON = ["people", "1"]
 		expect(fieldOfRefusal(refusal("document.people.1.displayLabel"), PERSON_FIELDS, PERSON)).toBe(
 			"displayLabel",
 		)
@@ -110,7 +110,7 @@ describe("shownProblems", () => {
 			refusal("document.flows.salary.amount"),
 			"The amount has too many places.",
 			FLOW_FIELDS,
-			"flows.salary",
+			["flows", "salary"],
 		)
 		expect(shown.at("amount")).toBe("The amount has too many places.")
 		expect(shown.at("start")).toBeUndefined()
@@ -123,25 +123,19 @@ describe("shownProblems", () => {
 			refusal("document.flows.bonus.amount"),
 			"Refused.",
 			FLOW_FIELDS,
-			"flows.salary",
+			["flows", "salary"],
 		)
 		expect(other.at("amount")).toBeUndefined()
 		expect(other.general).toBe("Refused.")
-		const named = shownProblems(
-			{},
-			refusal("document.flows"),
-			"Refused.",
-			FLOW_FIELDS,
-			"flows.salary",
-		)
+		const named = shownProblems({}, refusal("document.flows"), "Refused.", FLOW_FIELDS, [
+			"flows",
+			"salary",
+		])
 		expect(named.general).toBe("Refused.")
-		const transport = shownProblems(
-			{},
-			null,
-			"The Dashboard could not reach traj.",
-			FLOW_FIELDS,
-			"flows.salary",
-		)
+		const transport = shownProblems({}, null, "The Dashboard could not reach traj.", FLOW_FIELDS, [
+			"flows",
+			"salary",
+		])
 		expect(transport.general).toBe("The Dashboard could not reach traj.")
 	})
 
@@ -151,7 +145,7 @@ describe("shownProblems", () => {
 			refusal("document.flows.salary.amount"),
 			"Refused.",
 			FLOW_FIELDS,
-			"flows.salary",
+			["flows", "salary"],
 		)
 		expect(shown.at("amount")).toBe("Enter an amount.")
 		expect(shown.general).toBeUndefined()
@@ -160,7 +154,7 @@ describe("shownProblems", () => {
 
 describe("a Flow's tax label is no form field, and its display label is", () => {
 	const FIELDS = ["name", "displayLabel", "amount", "rate", "start"]
-	const ITEM = "flows.salary"
+	const ITEM = ["flows", "salary"]
 
 	test("a refusal at the tax label is the form's problem, so it does not show under Name", () => {
 		const shown = shownProblems(
@@ -184,5 +178,39 @@ describe("a Flow's tax label is no form field, and its display label is", () => 
 		)
 		expect(shown.at("displayLabel")).toBe("The rule it broke.")
 		expect(shown.general).toBeUndefined()
+	})
+})
+
+describe("a path in the CLI's escape grammar (cli ADR-0024)", () => {
+	const FIELDS = ["amount", "start"]
+
+	test("an escaped dot keeps an id one segment, and a form for the shorter id claims nothing", () => {
+		const path = "document.flows.pay\\.2026.amount"
+		expect(fieldOfRefusal(refusal(path), FIELDS, ["flows", "pay.2026"])).toBe("amount")
+		expect(fieldOfRefusal(refusal(path), FIELDS, ["flows", "pay"])).toBeNull()
+	})
+
+	test("a backslash or an equals sign in an id is escaped in the path", () => {
+		expect(
+			fieldOfRefusal(refusal("document.flows.k\\\\401.amount"), FIELDS, ["flows", "k\\401"]),
+		).toBe("amount")
+		expect(fieldOfRefusal(refusal("document.flows.a\\=b.start"), FIELDS, ["flows", "a=b"])).toBe(
+			"start",
+		)
+	})
+
+	test("namedRefusal writes a positional item as its id, escaping what the grammar escapes", () => {
+		expect(namedRefusal(refusal("document.flows.0.amount"), ["pay.2026"])?.path).toBe(
+			"document.flows.pay\\.2026.amount",
+		)
+		expect(namedRefusal(refusal("document.flows.0.amount"), ["k\\401"])?.path).toBe(
+			"document.flows.k\\\\401.amount",
+		)
+		expect(namedRefusal(refusal("document.flows.0.amount"), ["a=b"])?.path).toBe(
+			"document.flows.a\\=b.amount",
+		)
+		expect(namedRefusal(refusal("document.flows.pay\\.2026.amount"), ["pay.2026"])?.path).toBe(
+			"document.flows.pay\\.2026.amount",
+		)
 	})
 })

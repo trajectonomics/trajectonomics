@@ -155,7 +155,7 @@ describe("the form in the drawer", () => {
 			},
 			"Too many decimal places.",
 			["amount"],
-			"flows.salary",
+			["flows", "salary"],
 		)
 		const body = render(FlowFields, {
 			props: {

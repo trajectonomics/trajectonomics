@@ -1,4 +1,5 @@
 <script lang="ts">
+import { maskedFocus } from "../../client/masked-focus.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { maskMoney } from "../../lib/format"
 import type { Choice } from "../../lib/view/plan-items/options"
@@ -45,6 +46,7 @@ let focused = $state(false)
 /** True while the digits show as the mask: a focused field shows the real value, so the person can edit it. */
 const masked = $derived(money && preferences.hidden && !focused && value.trim() !== "")
 const shown = $derived(masked ? maskMoney(value) : value)
+
 /** Every text the field is described by, so a hint and a problem are both there. */
 const described = $derived(
 	[
@@ -80,6 +82,7 @@ const described = $derived(
 			oninput={(event) => (value = event.currentTarget.value)}
 			onfocus={() => (focused = true)}
 			onblur={() => (focused = false)}
+			use:maskedFocus={() => money && preferences.hidden && value.trim() !== ""}
 			{inputmode}
 			autocomplete="off"
 			aria-invalid={problem ? "true" : undefined}
@@ -87,6 +90,6 @@ const described = $derived(
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 		/>
 	{/if}
-	{#if masked}<span id="{id}-masked" class="sr-only">Amount hidden while Hide amounts is on; focus the field to edit it.</span>{/if}
+	{#if masked}<span id="{id}-masked" class="sr-only">Amount hidden. Select the field to see and edit it.</span>{/if}
 	{#if problem}<p id="{id}-problem" role="alert" class="text-sm text-destructive">{problem}</p>{/if}
 </div>

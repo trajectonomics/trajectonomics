@@ -61,7 +61,7 @@ export function labelShown(
 	flows: readonly string[],
 ): Shown {
 	const named = namedRefusal(refusal, flows)
-	return shownProblems(problems, named, message, ["label"], `flows.${flow}`)
+	return shownProblems(problems, named, message, ["label"], ["flows", flow])
 }
 
 /** The key of the problem at one Flow's label in the whole form. */

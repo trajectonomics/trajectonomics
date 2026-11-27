@@ -10,21 +10,19 @@ const untaxed = (): ScenarioDocument => {
 }
 
 describe("the notice a new income shows in a taxed plan", () => {
-	test("names the command that sets its label, with the plan's name and the id typed", () => {
-		const note = newIncomeTaxNote("base", planDocument(), "income", undefined, "salary-2")
-		expect(note?.command).toBe("traj scenario tax base --from-stored --label salary-2=<label>")
-		expect(note?.before).toContain("only counts income it knows by its label")
-	})
-
-	test("leaves the id as a placeholder before the person types one", () => {
-		const note = newIncomeTaxNote("base", planDocument(), "income", undefined, "")
-		expect(note?.command).toContain("--label <flow>=<label>")
+	test("names the plan's Tax labels page, safe whatever the plan is called", () => {
+		expect(newIncomeTaxNote("base", planDocument(), "income", undefined)).toBe(
+			"/settings/tax/?scenario=base",
+		)
+		expect(newIncomeTaxNote("a b&c", planDocument(), "income", undefined)).toBe(
+			"/settings/tax/?scenario=a%20b%26c",
+		)
 	})
 
 	test("is no notice for an edit, a plan without a Levy, or an expense", () => {
 		const salary = planDocument().flows[0]
-		expect(newIncomeTaxNote("base", planDocument(), "income", salary, "salary")).toBeNull()
-		expect(newIncomeTaxNote("base", untaxed(), "income", undefined, "salary-2")).toBeNull()
-		expect(newIncomeTaxNote("base", planDocument(), "expense", undefined, "rent-2")).toBeNull()
+		expect(newIncomeTaxNote("base", planDocument(), "income", salary)).toBeNull()
+		expect(newIncomeTaxNote("base", untaxed(), "income", undefined)).toBeNull()
+		expect(newIncomeTaxNote("base", planDocument(), "expense", undefined)).toBeNull()
 	})
 })

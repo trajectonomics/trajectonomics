@@ -60,13 +60,13 @@ let sent: string[] = $state([])
 const savedId = $derived(
 	existing?.id ?? sent.find((id) => !doc.flows.some((flow) => flow.id === id)),
 )
-const item = $derived(`flows.${savedId ?? ""}`)
-const employerPath = $derived(`flows.${employerIdOf(savedId ?? "")}`)
+const item = $derived(["flows", savedId ?? ""])
+const employerPath = $derived(["flows", employerIdOf(savedId ?? "")])
 const refusal = $derived(namedRefusal(editSession.failure, sent))
 const shown = $derived(
 	shownProblems(problems, refusal, editSession.error, FLOW_FIELDS, item, employerPath),
 )
-const note = $derived(newIncomeTaxNote(name, doc, kind, existing, draft.name))
+const note = $derived(newIncomeTaxNote(name, doc, kind, existing))
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()

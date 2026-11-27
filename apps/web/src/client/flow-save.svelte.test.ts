@@ -181,7 +181,7 @@ describe("a refusal's position names the Flow of the document the Edit sent", ()
 		expect(sentIds).not.toContain("salary-employer")
 		const last = sentIds[sentIds.length - 1]
 		expect(refusal?.path).toBe(`document.flows.${last}.amount`)
-		expect(fieldOfRefusal(refusal, ["amount"], `flows.${last}`)).toBe("amount")
+		expect(fieldOfRefusal(refusal, ["amount"], ["flows", last ?? ""])).toBe("amount")
 	})
 
 	test("a new income whose name is taken is salary-2, and its employer Flow is named salary-2-employer", async () => {
@@ -207,8 +207,8 @@ describe("a refusal's position names the Flow of the document the Edit sent", ()
 			fieldOfRefusal(
 				refusal,
 				["employerAccount", "employerRounding"],
-				"flows.salary-2",
-				"flows.salary-2-employer",
+				["flows", "salary-2"],
+				["flows", "salary-2-employer"],
 			),
 		).toBe("employerRounding")
 	})

@@ -34,7 +34,7 @@ let draft: AnchorDraft = $state(anchorDraftOf())
 let problems: Problems = $state({})
 const FIELDS = ["flow", "edge", "person", "when", "age"]
 /** The whole path of the anchor the form writes, so a refusal at another anchor is the form's own problem. */
-let item = $state("anchors.")
+let item = $state<readonly string[]>(["anchors"])
 const shown = $derived(
 	shownProblems(problems, editSession.failure, editSession.error, FIELDS, item),
 )
@@ -58,7 +58,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
-	item = `anchors.${next.anchors.findIndex((anchor) => anchor.path === result.anchor.path)}`
+	item = ["anchors", String(next.anchors.findIndex((anchor) => anchor.path === result.anchor.path))]
 	if (
 		await editSession.run(
 			{ kind: "set-household", name, householdHash, household: next },
