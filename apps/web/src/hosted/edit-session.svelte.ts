@@ -22,6 +22,7 @@ class HostedEditSession implements Session {
 	source = $state<string>("form")
 	failure = $state<ErrorBody | null>(null)
 	stale = $state(false)
+	savedUnread = $state(false)
 	result = $state<AccountValues | null>(null)
 
 	open(): Promise<void> {
