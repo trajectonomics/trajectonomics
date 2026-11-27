@@ -5,7 +5,7 @@ import type { Snapshot } from "../../lib/contract"
 import type { SnapshotState } from "../../lib/view/state"
 import PageFrame from "./PageFrame.svelte"
 
-const shell = { title: "Net worth", intro: "What is here.", pathname: "/net-worth/" }
+const shell = { title: "Net worth", pathname: "/net-worth/" }
 const body = createRawSnippet(() => ({ render: () => "<p>body</p>" }))
 
 function frame(state: SnapshotState) {

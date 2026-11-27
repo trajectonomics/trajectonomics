@@ -1,3 +1,4 @@
+import type { ChanceMilestone } from "./chance-milestone"
 import type { BasisPoints, DateString, MinorUnits } from "./common"
 import type { ReturnModel } from "./market"
 import type { ChancePathOutcome } from "./path"
@@ -12,6 +13,8 @@ export interface ChanceOfSuccessOptions {
 	readonly paths: number
 	/** Also report each Market path's outcome (ADR 0011); the rest of the result is unchanged. */
 	readonly outcomes?: boolean
+	/** Also report when each Milestone fired across paths (ADR 0011); the rest is unchanged. */
+	readonly milestoneDates?: boolean
 }
 
 /** One nearest-rank net-worth Percentile across Market paths. */
@@ -73,6 +76,8 @@ export interface ChanceOfSuccess {
 	readonly runsOut: readonly ChanceRunsOut[]
 	/** Spending Bands, present only when the Scenario declares a rule Flow (ADR 0024). */
 	readonly spending?: ChanceSpending
+	/** One per Milestone in Scenario order; present only with `milestoneDates` (ADR 0011). */
+	readonly milestones?: readonly ChanceMilestone[]
 	/** One per Market path in index order; present only with the `outcomes` option (ADR 0011). */
 	readonly outcomes?: readonly ChancePathOutcome[]
 }
@@ -81,4 +86,5 @@ export type ChanceOfSuccessResult =
 	| { readonly ok: true; readonly chance: ChanceOfSuccess }
 	| { readonly ok: false; readonly problems: readonly ProjectionProblem[] }
 
+export type * from "./chance-milestone"
 export type * from "./path"

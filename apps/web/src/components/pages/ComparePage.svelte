@@ -21,7 +21,6 @@ const chosen = $derived(parseTerms(terms))
 
 <PageShell
 	title="Compare"
-	intro="A is drawn solid and B dashed everywhere on this page. Each difference is B minus A, as the CLI states it."
 >
 	{#snippet children(snapshot)}
 		{@const read = snapshot.reads.compare}

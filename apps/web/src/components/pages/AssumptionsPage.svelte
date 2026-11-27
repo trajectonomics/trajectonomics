@@ -14,7 +14,6 @@ let { scenario, editable }: Props = $props()
 
 <PageShell
 	title="Assumptions"
-	intro="What your plan assumes about prices and about what each account earns and how much it swings. The figures are yours: nothing is filled in for you."
 >
 	{#snippet children(snapshot)}
 		<AssumptionsBody {snapshot} {scenario} {editable} />

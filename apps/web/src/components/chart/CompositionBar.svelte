@@ -11,9 +11,11 @@ interface Props {
 	currency?: string | undefined
 	/** Overrides the hide-amounts switch. Left out, the switch decides. */
 	hidden?: boolean | undefined
+	/** A card's short form of each legend amount, truncated toward zero. */
+	compact?: boolean
 }
 
-let { label, segments, currency, hidden }: Props = $props()
+let { label, segments, currency, hidden, compact = false }: Props = $props()
 const SWATCHES = ["bg-primary", "bg-accent", "bg-muted-foreground", "bg-ring"]
 const parts = $derived(shares(segments.map((segment) => segment.value)))
 const rows = $derived(
@@ -43,7 +45,7 @@ const rows = $derived(
 					<span class="truncate">{row.label}</span>
 				</span>
 				<span class="shrink-0">
-					<Money amount={row.amount} {currency} {hidden} />
+					<Money amount={row.amount} {currency} {hidden} {compact} />
 				</span>
 			</li>
 		{/each}
