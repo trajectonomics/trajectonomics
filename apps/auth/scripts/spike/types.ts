@@ -75,4 +75,5 @@ export type SecurityEvidence = {
 	failedApprovalUndoesConsent: boolean
 	redeemedBeforeSettlementKeepsConsent: boolean
 	revokeRetryAfterPartialFailure: boolean
+	signedApprovalBodyRejected: boolean
 }

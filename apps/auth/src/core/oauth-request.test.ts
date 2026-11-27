@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import {
 	authorizeMethodRejection,
+	deviceApproveBodyRejection,
 	deviceScopeRejection,
 	formMediaTypeRejection,
 } from "./oauth-request"
@@ -59,5 +60,21 @@ describe("authorizeMethodRejection", () => {
 
 	it("allows the internal re-dispatch after sign-in, where the real request is not authorize", () => {
 		expect(authorizeMethodRejection({ method: "POST", isEndpointRequest: false })).toBeNull()
+	})
+})
+
+describe("deviceApproveBodyRejection", () => {
+	it("accepts a body with only userCode", () => {
+		expect(deviceApproveBodyRejection({ userCode: "ABCD-EFGH" })).toBeNull()
+	})
+
+	it("refuses a body that also carries a signed query", () => {
+		expect(
+			deviceApproveBodyRejection({ userCode: "ABCD-EFGH", oauth_query: "client_id=x&sig=bogus" }),
+		).toBe("unexpected-field")
+	})
+
+	it("leaves a missing body to the endpoint", () => {
+		expect(deviceApproveBodyRejection(undefined)).toBeNull()
 	})
 })

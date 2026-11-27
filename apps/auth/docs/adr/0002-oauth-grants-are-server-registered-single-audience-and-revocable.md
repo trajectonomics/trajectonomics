@@ -115,6 +115,12 @@ consent is then left without an approval. It grants nothing: no token is issued 
 `approved` code, so a poll for that code fails. A revoke, or the next approval of the client,
 cleans the row up. Nothing else is built for that case.
 
+A before-hook that runs after ours and throws skips the after-hook in the same way. The provider's
+own hook does this for a body carrying `oauth_query` whose signature fails, and it would leave a
+consent, or a widened one, that the person never approved. Our before-hook therefore refuses any
+`/device/approve` body with a field besides `userCode` before it writes anything; the first-party
+page sends only `userCode`.
+
 A revoke concurrent with an approval still has a window that no hook can close. It covers three
 in-flight requests: a device poll that read an approved `deviceCode` row before the revoke, a code
 exchange already running, and an authorize that writes its code after the revoke's delete. Each can

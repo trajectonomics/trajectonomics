@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { authOptions, requireSecret } from "./auth"
+import { oauthHookOptions } from "./auth-options"
 import type { Env } from "./env"
 
 function env(overrides: Partial<Env> = {}): Env {
@@ -16,6 +17,25 @@ describe("authOptions", () => {
 	it("keeps the dev sign-in off in production, even with DEV_ONLY set", () => {
 		const options = authOptions({ env: env({ DEV_ONLY: "true" }) })
 		expect(options.emailAndPassword?.enabled).toBe(false)
+	})
+
+	it("never honours the spike's hold or clock headers in production, even with DEV_ONLY set", () => {
+		const production = oauthHookOptions({ env: env({ DEV_ONLY: "true" }) })
+		const loopback = oauthHookOptions({
+			env: env({ DEV_ONLY: "true", BETTER_AUTH_URL: "http://localhost:8787" }),
+		})
+		const development = oauthHookOptions({
+			env: env({
+				ENVIRONMENT: "development",
+				DEV_ONLY: "true",
+				BETTER_AUTH_URL: "http://localhost:8787",
+			}),
+		})
+		for (const options of [production, loopback]) {
+			expect(options).toMatchObject({ testClock: false, spikeHold: false })
+		}
+		// The control: the same assertion would pass for a gate that is never on.
+		expect(development).toMatchObject({ testClock: true, spikeHold: true })
 	})
 
 	it("enables email and password only for a loopback development origin", () => {

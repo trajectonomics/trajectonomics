@@ -1,6 +1,7 @@
 import { APIError, type AuthMiddleware, createAuthMiddleware } from "better-auth/api"
 import {
 	authorizeMethodRejection,
+	deviceApproveBodyRejection,
 	deviceScopeRejection,
 	formMediaTypeRejection,
 } from "../core/oauth-request"
@@ -43,6 +44,12 @@ export function oauthBeforeHook(options: OAuthHookOptions): AuthMiddleware {
 				await checkTokenRequest(ctx, options)
 				return
 			case "/device/approve":
+				if (deviceApproveBodyRejection(ctx.body) !== null) {
+					throw new APIError("BAD_REQUEST", {
+						error: "invalid_request",
+						error_description: "the approval body carries only userCode",
+					})
+				}
 				// Record the approval before the endpoint marks the code `approved`, so no poll can
 				// redeem a code whose consent row does not exist yet.
 				await recordDeviceApprovalConsent(ctx, options)

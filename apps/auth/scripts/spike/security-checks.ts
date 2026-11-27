@@ -28,5 +28,6 @@ export function securityChecks(gates: SecurityEvidence): Record<string, boolean>
 		failedApprovalUndoesConsent: gates.failedApprovalUndoesConsent,
 		redeemedBeforeSettlementKeepsConsent: gates.redeemedBeforeSettlementKeepsConsent,
 		revokeRetryAfterPartialFailure: gates.revokeRetryAfterPartialFailure,
+		signedApprovalBodyRejected: gates.signedApprovalBodyRejected,
 	}
 }

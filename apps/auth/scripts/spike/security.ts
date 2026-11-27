@@ -1,4 +1,5 @@
 import type { Session } from "./http"
+import { checkSignedApprovalBodyRejected } from "./security-approval-body"
 import { checkFailedDoubleApproveKeepsConsent } from "./security-approval-race"
 import { checkExpiredPollCreatesNoConsent, checkOldTokenNotRevived } from "./security-consent"
 import {
@@ -70,5 +71,6 @@ export async function runSecurityChecks(
 			scratch,
 		),
 		revokeRetryAfterPartialFailure: await checkRevokeRetryAfterPartialFailure(session, scratch),
+		signedApprovalBodyRejected: await checkSignedApprovalBodyRejected(session, scratch),
 	}
 }

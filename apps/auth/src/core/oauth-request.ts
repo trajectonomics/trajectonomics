@@ -38,6 +38,19 @@ export function deviceScopeRejection(scope: unknown): DeviceScopeRejection | nul
 	return scope.trim() === "" ? "scope-required" : null
 }
 
+export type DeviceApproveBodyRejection = "unexpected-field"
+
+/**
+ * A `/device/approve` body carries `userCode` and nothing else. The provider's own before-hook
+ * runs after ours and throws on a body with `oauth_query` whose signature fails; a throw there
+ * skips the after-hook, so the consent our hook wrote would never be taken back. The first-party
+ * page sends only `userCode`, so any other field is refused before anything is written.
+ */
+export function deviceApproveBodyRejection(body: unknown): DeviceApproveBodyRejection | null {
+	if (typeof body !== "object" || body === null) return null
+	return Object.keys(body).every((key) => key === "userCode") ? null : "unexpected-field"
+}
+
 export type AuthorizeMethodRejection = "post-authorize"
 
 /**

@@ -22,20 +22,33 @@ export type CreateAuthInput = {
 	baseURL?: string
 }
 
-/** The options without constructing the instance, so the schema generator can read them. */
-export function authOptions(input: CreateAuthInput): BetterAuthOptions {
-	const baseURL = input.baseURL ?? input.env.BETTER_AUTH_URL
-	const devSignIn = devSignInAllowed({
+function devSignInFor(input: CreateAuthInput): boolean {
+	return devSignInAllowed({
 		environment: input.env.ENVIRONMENT,
 		devOnly: input.env.DEV_ONLY,
-		baseUrl: baseURL,
+		baseUrl: input.baseURL ?? input.env.BETTER_AUTH_URL,
 	})
-	const hookOptions: OAuthHookOptions = {
+}
+
+/**
+ * What the OAuth hooks are given. The spike's hold and clock headers are honoured only where the
+ * dev sign-in is: a development environment, DEV_ONLY and a loopback origin.
+ */
+export function oauthHookOptions(input: CreateAuthInput): OAuthHookOptions {
+	const devSignIn = devSignInFor(input)
+	return {
 		absoluteLifetimeSeconds: REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS,
 		testClock: testClockEnabled(devSignIn),
 		spikeHold: spikeHoldEnabled(devSignIn),
 		database: input.env.DB,
 	}
+}
+
+/** The options without constructing the instance, so the schema generator can read them. */
+export function authOptions(input: CreateAuthInput): BetterAuthOptions {
+	const baseURL = input.baseURL ?? input.env.BETTER_AUTH_URL
+	const devSignIn = devSignInFor(input)
+	const hookOptions = oauthHookOptions(input)
 	return {
 		appName: "Trajectonomics",
 		baseURL,
