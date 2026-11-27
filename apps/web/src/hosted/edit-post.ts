@@ -17,3 +17,8 @@ export function postPreview(_token: string, _edit: EditInput): Promise<PreviewAn
 		error: { code: "unreachable", exitCode: 1, message: NO_EDIT_CLIENT },
 	})
 }
+
+/** The loopback client asks the server for a token. The hosted build has none: it answers null and sends nothing. */
+export function fetchEditToken(): Promise<string | null> {
+	return Promise.resolve(null)
+}
