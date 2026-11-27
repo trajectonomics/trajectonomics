@@ -1,6 +1,8 @@
+import { growthYears } from "../calendar/arith"
 import type { Path } from "../check/codes"
 import { isSafeInteger } from "../engine/overflow"
-import type { DateString, Derive, DeriveMeasure } from "../types"
+import { type Inflation, inflateBy } from "../money/inflation"
+import type { ConstMeasure, DateString, Derive, DeriveMeasure } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { mulValue } from "./mul"
 import { dependencyOrder } from "./order"
@@ -13,7 +15,7 @@ export type DeriveOutcome =
 
 export interface DeriveContext {
 	readonly date: DateString
-	readonly inflation: number
+	readonly inflation: Inflation
 	/** Path of the Flow's `derive`, reported on a negative result. */
 	readonly path: Path
 	/** The planned gross amount a Flow lands on this date, before Prepayment and any cap. */
@@ -41,6 +43,22 @@ function binary(measure: DeriveMeasure, get: (id: string) => bigint): bigint | u
 	return undefined
 }
 
+/** A constant: a dated step or no growth reads as a Levy constant; growth follows the run's inflation. */
+function constantOf(measure: ConstMeasure, context: DeriveContext): bigint {
+	const { value, asOf, growth, steps } = measure
+	if (steps !== undefined || growth === undefined || asOf === undefined) {
+		return constantValue(measure, { date: context.date, inflation: 0 })
+	}
+	const rate: Inflation = growth === "inflation" ? context.inflation : growth.bps
+	const grown = inflateBy(
+		BigInt(Math.abs(value)),
+		rate,
+		growthYears(asOf, context.date),
+		context.date,
+	)
+	return value < 0 ? -grown : grown
+}
+
 /** One Derived-amount Measure; a `flow` read and an operand read are both checked for overflow. */
 function measureValue(
 	measure: DeriveMeasure,
@@ -51,7 +69,7 @@ function measureValue(
 	if (held !== undefined) return held
 	switch (measure.op) {
 		case "const":
-			return constantValue(measure, { date: context.date, inflation: context.inflation })
+			return constantOf(measure, context)
 		case "scale":
 			return scaleValue(get(measure.of), BigInt(measure.num), BigInt(measure.den), measure.rounding)
 		case "mul":

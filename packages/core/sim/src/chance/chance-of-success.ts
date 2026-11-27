@@ -5,7 +5,8 @@ import { marketReturns } from "../market/paths"
 import { withPayouts } from "../payout/flows"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { ChanceOfSuccessOptions, ChanceOfSuccessResult } from "../types/chance"
-import { outcomeOf, type PathInputs, type PathOutcome, pathInputs } from "./path"
+import { outcomeOf, type PathInputs, pathInputs } from "./path"
+import type { PathOutcome } from "./path-outcome"
 import { summarise } from "./summary"
 
 /** Runs every seeded Market path through the plan as written; never throws on valid-shaped input. */

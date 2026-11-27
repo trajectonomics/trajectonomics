@@ -1,4 +1,5 @@
-import type { BasisPoints, DateString } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { DateString } from "../types"
 import { isRuled } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { DatedEvent } from "./events"
@@ -20,7 +21,7 @@ export function ruledAmounts(
 	rules: RuleBook | undefined,
 	date: DateString,
 	reads: {
-		readonly inflation: BasisPoints
+		readonly inflation: Inflation
 		readonly readAccount: (accountId: string) => bigint
 	},
 ): RuledOutcome {
