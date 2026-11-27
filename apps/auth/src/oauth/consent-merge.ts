@@ -1,6 +1,6 @@
 import type { D1Database } from "@cloudflare/workers-types"
 import { pickConsentKeeper, unionValues } from "../core/consent"
-import { type ConsentWrite, mergeConsent } from "./consent-write"
+import { type ConsentWrite, mergeConsent, nextConsentUpdatedAt } from "./consent-write"
 import { deleteConsentRow } from "./family"
 import type { StoredConsent } from "./store"
 import { storedResources } from "./values"
@@ -26,13 +26,14 @@ export async function mergeIntoKeeper(
 	if (previous === undefined) return null
 	const scopes = [...merge.live.map((row) => storedResources(row.scopes)), merge.scopes]
 	const resources = [...merge.live.map((row) => storedResources(row.resources)), merge.resources]
+	const writtenAt = nextConsentUpdatedAt(merge.now, previous.updatedAt)
 	const written = await mergeConsent(database, {
 		id: previous.id,
 		readAt: previous.updatedAt,
 		next: {
 			scopes: unionValues(scopes),
 			resources: unionValues(resources),
-			updatedAt: merge.now,
+			updatedAt: writtenAt,
 		},
 	})
 	if (!written) return null
@@ -44,8 +45,7 @@ export async function mergeIntoKeeper(
 		id: previous.id,
 		previousScopes: previous.scopes,
 		previousResources: previous.resources,
-		previousUpdatedAt: previous.updatedAt,
-		writtenAt: merge.now,
+		writtenAt,
 	}
 }
 

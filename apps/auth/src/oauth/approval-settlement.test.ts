@@ -48,7 +48,7 @@ describe("settleDeviceApproval", () => {
 			userId: "user-1",
 			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.statements).toEqual([])
 		expect(consents.rows).toEqual([])
 	})
@@ -64,7 +64,7 @@ describe("settleDeviceApproval", () => {
 			userId: "user-1",
 			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.statements).toEqual([])
 		expect(consents.rows).toHaveLength(1)
 	})
@@ -80,7 +80,7 @@ describe("settleDeviceApproval", () => {
 			userId: "user-1",
 			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.rows).toEqual([])
 	})
 
@@ -94,7 +94,7 @@ describe("settleDeviceApproval", () => {
 			userId: "user-1",
 			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.statements).toEqual([])
 		expect(consents.rows).toHaveLength(1)
 	})
@@ -110,7 +110,7 @@ describe("settleDeviceApproval", () => {
 			userId: "user-1",
 			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.rows).toEqual([])
 	})
 
@@ -135,15 +135,14 @@ describe("settleDeviceApproval", () => {
 				id: "consent-1",
 				previousScopes: ["openid"],
 				previousResources: [],
-				previousUpdatedAt: "2026-11-01T00:00:00.000Z",
 				writtenAt: WRITTEN_AT,
 			},
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.rows[0]).toMatchObject({
 			scopes: `["openid"]`,
 			resources: null,
-			updatedAt: "2026-11-01T00:00:00.000Z",
+			updatedAt: "2026-11-28T00:00:00.001Z",
 		})
 	})
 
@@ -161,11 +160,10 @@ describe("settleDeviceApproval", () => {
 				id: "consent-1",
 				previousScopes: ["openid"],
 				previousResources: [],
-				previousUpdatedAt: "2026-11-01T00:00:00.000Z",
 				writtenAt: WRITTEN_AT,
 			},
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.rows[0]?.["scopes"]).toBe(`["openid","data:ingest"]`)
 	})
 
@@ -180,13 +178,13 @@ describe("settleDeviceApproval", () => {
 			userId: "user-1",
 			write: { kind: "created", id: "consent-1", writtenAt: WRITTEN_AT },
 		})
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.rows).toHaveLength(1)
 	})
 
 	it("ignores a request whose before-hook recorded nothing", async () => {
 		const { consents, ctx, database } = setup()
-		await settleDeviceApproval(ctx, database)
+		await settleDeviceApproval(ctx, database, WRITTEN_AT)
 		expect(consents.statements).toEqual([])
 	})
 })

@@ -64,6 +64,10 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		// `/oauth2/update-consent` raises a consent's scopes without the hooks or the consent page,
 		// so the next authorize would issue a code for scopes the person never saw.
 		disabledPaths: ["/token", "/oauth2/delete-consent", "/oauth2/update-consent"],
+		// A Worker never sets NODE_ENV, so the library's production default never hides its own
+		// error page. Every error redirect goes to the styled sign-in page, which reads the
+		// library's `?error=<code>` as its failed state (ADR 0003).
+		onAPIError: { errorURL: `${baseURL}/sign-in/` },
 		emailAndPassword: {
 			enabled: devSignIn,
 			minPasswordLength: 12,
