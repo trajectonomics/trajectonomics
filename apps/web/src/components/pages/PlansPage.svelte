@@ -23,7 +23,6 @@ const options = RANGES.map((one) => ({ value: one.id, label: one.label }))
 
 <PageShell
 	title="Plans"
-	intro="Every plan in your ledger side by side. The main plan comes first, then the others by name."
 >
 	{#snippet children(snapshot)}
 		{@const cards = planCards(snapshot, chosen)}

@@ -5,6 +5,7 @@ import type { Snapshot } from "../../lib/contract"
 import { editsShown } from "../../lib/edit/shown"
 import { skippedReadReason } from "../../lib/view/allowances"
 import { NO_PEOPLE, snapshotPeople } from "../../lib/view/item-names"
+import { claimsHolderOf } from "../../lib/view/tax-settings/holders"
 import EmptyState from "../ui/EmptyState.svelte"
 import Provenance from "../ui/Provenance.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -36,6 +37,8 @@ const why = $derived(
 )
 /** The household's people, so each Return is named by the role the CLI states. */
 const people = $derived(snapshotPeople(snapshot, [name])[name] ?? NO_PEOPLE)
+/** The recorded `claimsHolder`, so a departed Return reads here as the profile's tables name it. */
+const claimsHolder = $derived(claimsHolderOf(snapshot, name))
 const plan = $derived(
 	editable && stored?.ok
 		? {
@@ -63,7 +66,7 @@ const plan = $derived(
 	{:else}
 		<ReadView {read} label={`The tax allowances of ${name}`}>
 			{#snippet children(data)}
-				<AllowancesResult {data} {plan} {people} />
+				<AllowancesResult {data} {plan} {people} {claimsHolder} />
 			{/snippet}
 		</ReadView>
 		<Provenance name={`Allowances for ${name}`} commands={[read.argv]} />

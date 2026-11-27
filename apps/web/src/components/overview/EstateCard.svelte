@@ -27,7 +27,7 @@ const shown = $derived(
 		{#snippet body(view: EstateSummary | null)}
 			{#if view !== null}
 				<div class="space-y-2">
-					<p class="text-2xl font-semibold tracking-tight"><Money amount={view.toHeirs} currency={view.currency} /></p>
+					<p class="text-2xl font-semibold tracking-tight"><Money amount={view.toHeirs} currency={view.currency} compact /></p>
 					<p class="text-sm text-muted-foreground">
 						On {formatDate(view.date)}{WHEN[view.basis]}.
 						{#if view.short}Debts and costs come to more than everything owned, so heirs would receive nothing.{:else if view.noCost}No settlement cost is set, so this is everything owned less debts.{:else}After debts, settlement costs and gifts you set.{/if}

@@ -31,6 +31,35 @@ describe("overviewView", () => {
 		for (const item of view.pnl.data.largest) expect(rows).toContainEqual(item)
 	})
 
+	test("names a departed Return on the allowances card through the plan's stored claimsHolder", () => {
+		const changed = structuredClone(DEMO)
+		const read = changed.reads.documents["separate"]
+		if (read?.ok !== true) throw new Error("the Demo has no separate document")
+		read.data.scenario.household = {
+			schemaVersion: 2,
+			people: [
+				{ id: "ann", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+				{ id: "bob", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+			],
+			anchors: [],
+			owners: [],
+		}
+		read.data.scenario.tax = {
+			tax: "th-2026",
+			filingStatus: "married_separate",
+			children: 0,
+			childrenAtHigherRate: 0,
+			claimsHolder: "me",
+		}
+		const view = overviewView(changed, "separate")
+		expect(view.allowances.status).toBe("ready")
+		if (view.allowances.status !== "ready" || !view.allowances.read.ok) return
+		expect(view.allowances.read.data?.savings.map((one) => one.name?.text)).toEqual([
+			"The earlier holder",
+			"Another person",
+		])
+	})
+
 	test("names no Scenario when the Snapshot has none", () => {
 		const bare: Snapshot = { ...DEMO, params: { ...DEMO.params, scenarios: [], compare: null } }
 		expect(overviewView(bare).fi).toEqual({ status: "none" })

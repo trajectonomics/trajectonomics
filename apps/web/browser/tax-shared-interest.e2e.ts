@@ -63,7 +63,7 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 
 	// Show the amounts: the earlier holder's own interest is still stored, on the column of their Return.
 	await page.getByRole("button", { name: "Display options" }).click()
-	await page.getByRole("button", { name: "Hide amounts" }).click()
+	await page.getByRole("dialog").getByRole("button", { name: "Hide amounts" }).click()
 	await page.getByRole("button", { name: "Close Display options" }).click()
 	const claims = page.locator("section[aria-labelledby='tax-claims-title']")
 	await expect(claims).toContainText("30,000 THB")

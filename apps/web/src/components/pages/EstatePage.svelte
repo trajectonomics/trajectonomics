@@ -16,7 +16,6 @@ let { scenario, terms, onTerms, at, onAt }: Props = $props()
 
 <PageShell
 	title="Estate"
-	intro="What your heirs would receive on a date you choose, after debts, the settlement costs and the gifts you set."
 >
 	{#snippet children(snapshot)}
 		<EstateBody {snapshot} {scenario} {terms} {onTerms} {at} {onAt} />

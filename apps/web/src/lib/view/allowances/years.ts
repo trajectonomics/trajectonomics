@@ -43,7 +43,11 @@ export interface YearView {
 	/** The Flows with an Account to go into: the ones Try and Add offer. */
 	readonly placeable: readonly AllowanceFlow[]
 	/** The suggestions with no Account, each with the CLI's hint, so the year says which to add. */
-	readonly unplaced: readonly { readonly name: string; readonly hint: string }[]
+	readonly unplaced: readonly {
+		readonly name: string
+		readonly hint: string
+		readonly filer: string | null
+	}[]
 	/** True when at least one Flow has an Account to go into. */
 	readonly addable: boolean
 	readonly hints: readonly string[]

@@ -89,6 +89,17 @@ describe("a page of the Demo Snapshot", () => {
 		}
 	})
 
+	test("prints its title once, with no intro paragraph under it", () => {
+		for (const page of PAGES) {
+			setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=base`)
+			const body = render(page.page).body
+			expect(body.match(/<h1\b/g) ?? [], page.path).toHaveLength(1)
+			const header = body.match(/<header\b[^>]*>([\s\S]*?)<\/header>/)?.[1] ?? ""
+			expect(header, page.path).toContain("<h1")
+			expect(header, page.path).not.toMatch(/<\/h1>(?:\s|<!--[\s\S]*?-->)*<p\b/)
+		}
+	})
+
 	test("calls a Scenario a plan: the word appears nowhere outside code or the CLI's own text", () => {
 		for (const page of PAGES) {
 			setTestUrl(`http://127.0.0.1${page.path}?demo=1&scenario=base&index=0`)
