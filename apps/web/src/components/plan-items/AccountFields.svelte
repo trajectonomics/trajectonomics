@@ -4,6 +4,7 @@ import type { AccountDraft } from "../../lib/view/plan-items/accounts"
 import { COMPOUNDING_CHOICES, KIND_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import AccountName from "../ui/AccountName.svelte"
+import FormAlert from "../ui/FormAlert.svelte"
 import FeeFields from "./FeeFields.svelte"
 import Field from "./Field.svelte"
 import PayoutFields from "./PayoutFields.svelte"
@@ -49,5 +50,5 @@ let {
 			<FeeFields bind:draft={draft.fee} {shown} />
 		{/if}
 	{/if}
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 </div>
