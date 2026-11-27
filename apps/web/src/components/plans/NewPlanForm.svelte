@@ -1,7 +1,9 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { currentSearch } from "../../client/location.svelte.js"
 import { selectPlan } from "../../client/select-plan.svelte.js"
 import { planNameError } from "../../lib/edit/name"
+import { withSearch } from "../../lib/view/links"
 import { newPlanEdit, type StartFrom } from "../../lib/view/plans/edits"
 import PlanForm from "./PlanForm.svelte"
 import { FIELD } from "./styles"
@@ -60,5 +62,11 @@ async function save(): Promise<void> {
 		</fieldset>
 	{:else}
 		<p class="text-sm text-muted-foreground">A copy of {copyOf}.</p>
+	{/if}
+	{#if copyOf === ""}
+		<p class="text-sm">
+			<a class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				href={withSearch("/plans/new/", currentSearch())}>Set up step by step</a>
+		</p>
 	{/if}
 </PlanForm>
