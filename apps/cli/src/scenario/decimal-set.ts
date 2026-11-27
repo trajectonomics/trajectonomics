@@ -1,6 +1,7 @@
 import { type AppError, fail, isAppError } from "../errors"
-import { currencyOf, mapDecimalFields } from "./decimal"
+import { currencyOf } from "./decimal"
 import { hintOf, MONEY_HINT, notDecimal, parseField } from "./decimal-field"
+import { mapDecimalFields } from "./decimal-walk"
 import { isNode, type Node, PUBLISHED } from "./money-fields"
 import { formatPath } from "./path"
 import { flagError, type OverrideFlag } from "./set-parse"

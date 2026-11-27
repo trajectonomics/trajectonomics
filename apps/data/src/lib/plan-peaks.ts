@@ -2,7 +2,7 @@ import type { PeakColumnKey } from "./peak-words"
 import { monthTier } from "./plan-month"
 import { type PlanTierLabel, planTier } from "./plan-tier"
 import { comparePlans, planName } from "./plans"
-import type { MeasuredTier, Peak, PlanPeak } from "./types"
+import type { Limits, MeasuredTier, Peak, PlanPeak } from "./types"
 
 /** One plan's row: its identity, its tier at the window's end, and the three figures. */
 export type PeakTableRow = {
@@ -12,6 +12,8 @@ export type PeakTableRow = {
 	fiveHours: Peak | null
 	sevenDays: Peak | null
 	thirtyDays: Peak | null
+	/** The current tier's meter estimates; absent on a body cached before shape 4. */
+	limits: Limits | null
 	measured: MeasuredTier[]
 }
 
@@ -86,8 +88,19 @@ function tableRow(entry: PlanPeak, day: string): PeakTableRow {
 		fiveHours: own.fiveHours,
 		sevenDays: own.sevenDays,
 		thirtyDays: own.thirtyDays,
+		limits: entry.limits ?? null,
 		measured: measuredOf(entry).map((tier) => monthTier(entry.plan, tier)),
 	}
+}
+
+/**
+ * The limit estimates of the picked tier: its measured entry's own, or the current tier's when a
+ * body cached before shape 4 has no per-tier limits. Another tier has none.
+ */
+export function limitsOf(row: PeakTableRow, picked: string | null): Limits | null {
+	const measured = row.measured.find((entry) => entry.tier === picked)
+	if (measured !== undefined && measured.limits !== undefined) return measured.limits
+	return picked === row.tier?.name ? row.limits : null
 }
 
 /**

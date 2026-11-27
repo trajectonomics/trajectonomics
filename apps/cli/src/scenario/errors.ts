@@ -1,4 +1,5 @@
 import { type AppError, fail } from "../errors"
+import { printedCommand } from "./hint-command"
 
 /** A lookup miss for any Scenario command; `path` names the input field that held the word. */
 export function scenarioNotFound(what: string, path = "scenario"): AppError {
@@ -35,7 +36,7 @@ export function scenarioChanged(
 	const stored =
 		storedHash === null
 			? `No scenario named "${name}" is stored now. Run "traj scenario list" to see the scenarios.`
-			: `The stored ${hashName} of "${name}" is ${storedHash}. Run "traj scenario show ${name}" to read the plan again, then write the change to what it prints.`
+			: `The stored ${hashName} of "${name}" is ${storedHash}. Run "${printedCommand("traj scenario show", [name])}" to read the plan again, then write the change to what it prints.`
 	return fail("scenario_changed", {
 		path: "--if-hash",
 		message: `The scenario changed since it was read: the write expected ${expectedHash}.`,

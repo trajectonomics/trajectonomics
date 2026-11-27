@@ -25,6 +25,24 @@ export interface WhatsNewRelease {
 /** Newest first. Add an entry for every release: a unit test fails when the newest one is older than package.json. */
 export const CHANGELOG: WhatsNewRelease[] = [
   {
+    version: "1.7.0",
+    date: "2026-11-27",
+    items: [
+      {
+        id: "pull-to-refresh-anywhere",
+        icon: "smartphone",
+        title: {
+          en: "Pull to refresh from anywhere",
+          th: "ดึงลงเพื่อรีเฟรชได้ทุกที่",
+        },
+        body: {
+          en: "Pull down on any record to scan for new slips, not only at the top of the screen.",
+          th: "ดึงรายการไหนลงก็ได้เพื่อสแกนสลิปใหม่ ไม่ต้องดึงจากด้านบนของหน้าจออย่างเดียว",
+        },
+      },
+    ],
+  },
+  {
     version: "1.6.0",
     date: "2026-11-27",
     items: [
