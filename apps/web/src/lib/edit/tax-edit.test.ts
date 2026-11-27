@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { editSchema, writeCommand } from "./edit"
+import { editSchema, singleWriteEditSchema, writeCommand } from "./edit"
 import { followPlan } from "./follow"
 
 const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
@@ -9,7 +9,7 @@ describe("the tax profile Edits", () => {
 	const whole = (flags: object) => ({ kind: "set-tax", name: "early", contentHash: HASH, flags })
 
 	test("merge-tax is scenario tax --merge with the items it names, in a fixed order", () => {
-		const edit = editSchema.parse(
+		const edit = singleWriteEditSchema.parse(
 			merge({ donation1x: "5000", children: "2", filingStatus: "married_joint" }),
 		)
 		expect(writeCommand(edit, false).argv).toEqual([
@@ -31,7 +31,7 @@ describe("the tax profile Edits", () => {
 	})
 
 	test("the shared home-loan interest is --mortgage-interest shared=<amount>, so a stated zero clears it", () => {
-		const stated = editSchema.parse(merge({ sharedMortgageInterest: "60000" }))
+		const stated = singleWriteEditSchema.parse(merge({ sharedMortgageInterest: "60000" }))
 		expect(writeCommand(stated, false).argv).toEqual([
 			"scenario",
 			"tax",
@@ -43,14 +43,14 @@ describe("the tax profile Edits", () => {
 			HASH,
 			"--json",
 		])
-		const cleared = editSchema.parse(merge({ sharedMortgageInterest: "0" }))
+		const cleared = singleWriteEditSchema.parse(merge({ sharedMortgageInterest: "0" }))
 		expect(writeCommand(cleared, false).argv).toContain("shared=0")
 		// It is an amount like every other: a comma or a sign is not a value traj reads.
 		expect(editSchema.safeParse(merge({ sharedMortgageInterest: "1,000" })).success).toBe(false)
 	})
 
 	test("set-tax states the whole profile with --tax th-2026", () => {
-		const edit = editSchema.parse(
+		const edit = singleWriteEditSchema.parse(
 			whole({ filingStatus: "single", childrenAtHigherRate: "1", socialSecurity: "9000.50" }),
 		)
 		expect(writeCommand(edit, false).argv).toEqual([
@@ -72,7 +72,7 @@ describe("the tax profile Edits", () => {
 	})
 
 	test("set-tax writes the labels of income Flows as one --label=<flow>=<label> token each, after the profile and before the guard", () => {
-		const edit = editSchema.parse({
+		const edit = singleWriteEditSchema.parse({
 			...whole({ filingStatus: "single" }),
 			labels: [
 				{ flow: "salary", label: "income.section40_1" },
@@ -96,7 +96,7 @@ describe("the tax profile Edits", () => {
 	})
 
 	test("an id that starts with a dash or holds Thai script travels inside one token", () => {
-		const edit = editSchema.parse({
+		const edit = singleWriteEditSchema.parse({
 			...whole({ filingStatus: "single" }),
 			labels: [
 				{ flow: "--none", label: "income.section40_1" },
@@ -131,7 +131,11 @@ describe("the tax profile Edits", () => {
 	})
 
 	test("remove-tax is scenario tax --none, and no tax Edit changes the plans the Snapshot projects", () => {
-		const edit = editSchema.parse({ kind: "remove-tax", name: "early", contentHash: HASH })
+		const edit = singleWriteEditSchema.parse({
+			kind: "remove-tax",
+			name: "early",
+			contentHash: HASH,
+		})
 		expect(writeCommand(edit, true).argv).toEqual([
 			"scenario",
 			"tax",

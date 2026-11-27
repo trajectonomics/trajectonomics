@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { type Edit, editSchema, writeCommand } from "./edit"
+import { editSchema, type SingleWriteEdit, singleWriteEditSchema, writeCommand } from "./edit"
 import { followPlan } from "./follow"
 
 const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
@@ -9,7 +9,7 @@ describe("the what-if Edits", () => {
 	const removals = ["flows.gym"]
 
 	test("copy-plan with Overrides is scenario fork --set and --without with --decimal, and a copy without them keeps its argv", () => {
-		const edit = editSchema.parse({
+		const edit = singleWriteEditSchema.parse({
 			kind: "copy-plan",
 			from: "base",
 			name: "early",
@@ -29,7 +29,7 @@ describe("the what-if Edits", () => {
 			],
 		})
 		expect(writeCommand(edit, true).argv.slice(-2)).toEqual(["--dry-run", "--json"])
-		const plain = editSchema.parse({ kind: "copy-plan", from: "base", name: "early" })
+		const plain = singleWriteEditSchema.parse({ kind: "copy-plan", from: "base", name: "early" })
 		expect(plain).toEqual({
 			kind: "copy-plan",
 			from: "base",
@@ -44,11 +44,16 @@ describe("the what-if Edits", () => {
 	})
 
 	test("a copy or an apply that only removes something carries no --decimal", () => {
-		const copy = editSchema.parse({ kind: "copy-plan", from: "base", name: "early", removals })
+		const copy = singleWriteEditSchema.parse({
+			kind: "copy-plan",
+			from: "base",
+			name: "early",
+			removals,
+		})
 		expect(writeCommand(copy, false)).toEqual({
 			argv: ["scenario", "fork", "base", "early", "--without=flows.gym", "--json"],
 		})
-		const apply: Edit = {
+		const apply: SingleWriteEdit = {
 			kind: "apply-overrides",
 			name: "early",
 			contentHash: HASH,
@@ -62,7 +67,7 @@ describe("the what-if Edits", () => {
 	})
 
 	test("apply-overrides is scenario apply with the what-if flags and --if-hash, and no document", () => {
-		const edit: Edit = {
+		const edit: SingleWriteEdit = {
 			kind: "apply-overrides",
 			name: "early",
 			contentHash: HASH,
@@ -124,7 +129,7 @@ describe("the what-if Edits", () => {
 	})
 
 	test("apply-overrides joins the plans the Snapshot projects, as apply-plan does", () => {
-		const edit: Edit = {
+		const edit: SingleWriteEdit = {
 			kind: "apply-overrides",
 			name: "early",
 			contentHash: HASH,

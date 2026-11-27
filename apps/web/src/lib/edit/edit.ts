@@ -1,12 +1,14 @@
 /**
  * The Edits the Dashboard may send: a closed list, and each one is one `traj` write
- * ([ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)). The
- * page names an Edit by its kind and its values; the server builds the argv here, so nothing outside
+ * ([ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)), apart from a
+ * guided first plan, which runs two writes, and `scenario rm` when the household is refused ([ADR 0031](../../../docs/adr/0031-a-guided-first-plan-is-one-edit-that-saves-a-plan-and-its-household.md)).
+ * The page names an Edit by its kind and its values; the server builds the argv here, so nothing outside
  * this list ever runs. `edit.test.ts` pins the list and the argv of each Edit.
  */
 import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
 import { contentHash, householdHash, planName } from "./fields"
+import { guidedEditSchema } from "./guided-edit"
 import { planEditSchemas, startPlanSchema } from "./plan-edits"
 import { recordValuesSchema } from "./record-values"
 import { taxFlags } from "./tax-flags"
@@ -27,14 +29,15 @@ export const EDIT_KINDS = [
 	"set-plan-notes",
 	"set-main-plan",
 	"record-values",
+	"start-guided-plan",
 ] as const
 
 /** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
 const someChange = (edit: { sets: unknown[]; removals: unknown[]; additions: unknown[] }) =>
 	edit.sets.length + edit.removals.length + edit.additions.length > 0
 
-/** The Edits that name a kind and a plan the page read. Strict: an unknown field is refused. */
-const savedEdit = z.discriminatedUnion("kind", [
+/** The Edits that run one `traj` write. Strict: an unknown field is refused. */
+const singleWriteEdits = z.discriminatedUnion("kind", [
 	z.strictObject({
 		kind: z.literal("copy-plan"),
 		from: planName,
@@ -102,14 +105,23 @@ const savedEdit = z.discriminatedUnion("kind", [
 	recordValuesSchema,
 ])
 
+/** The Edits that name a kind and a plan the page read: the single writes, and the guided plan. */
+const savedEdit = z.union([singleWriteEdits, guidedEditSchema])
+
 /**
  * One Edit, as the page sends it in the body of `POST /edit`: one of those, or a plan started from the ledger's
  * accounts, which is an `apply-plan` with a template and no document.
  */
 export const editSchema = z.union([savedEdit, startPlanSchema])
 
+/** The Edits that are one `traj` write, as the page sends them: every Edit but the guided plan's two writes. */
+export const singleWriteEditSchema = z.union([singleWriteEdits, startPlanSchema])
+
 /** One Edit of the closed list. */
 export type Edit = z.infer<typeof editSchema>
+
+/** An Edit that is one `traj` write: every Edit but the guided plan, which runs two writes in `serve-guided.ts`. */
+export type SingleWriteEdit = z.infer<typeof singleWriteEditSchema>
 
 /** An Edit as a caller writes it: a copy's Overrides may be left out, and the server reads them as none. */
 export type EditInput = z.input<typeof editSchema>
