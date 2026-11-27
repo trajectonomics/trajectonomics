@@ -1,20 +1,31 @@
 # @trajectonomics/data-collector
 
 Reads the local logs of the AI coding tools on this machine and prints **hourly usage totals** as
-one JSON object per line. It does no network I/O, holds no server, and knows no prices. This is
-slice 1 of the `apps/data` app (issue #592); sending the rows is a separate step.
+one JSON object per line. It can also sample the subscription quotas of Claude and OpenCode Go, and
+send both kinds of row to the `data` Worker in batches. Sending is a separate subcommand; reading
+logs alone does no network I/O.
 
 ## Run
 
 ```sh
 bun apps/data/collector/src/cli.ts --since 2026-11-24T00:00:00Z
-bun apps/data/collector/src/cli.ts --since 2026-11-24T00:00:00Z --mistral-csv ~/Downloads/mistral-usage.csv
+bun apps/data/collector/src/cli.ts usage --since 2026-11-24T00:00:00Z --mistral-csv ~/Downloads/mistral-usage.csv
+bun apps/data/collector/src/cli.ts quota
+bun apps/data/collector/src/cli.ts send rows.jsonl
+bun apps/data/collector/src/cli.ts hourly --config ~/.config/traj-data/hosts.json
 ```
 
-`--machine` defaults to `m-` plus the first 8 hex chars of SHA-256(`os.hostname()`), so raw
-hostnames never appear in the output; pass `--machine` to override the label. Rows are sorted by
-UTC bucket, plan, model and source. The `--mistral-csv` import is the only input outside `$HOME`
-and is opt-in.
+With no subcommand, or with `usage`, the collector prints usage rows. `--machine` defaults to `m-`
+plus the first 8 hex chars of SHA-256(`os.hostname()`), so raw hostnames never appear in the output;
+pass `--machine` to override the label. Rows are sorted by UTC bucket, plan, model and source. The
+`--mistral-csv` import is the only input outside `$HOME` and is opt-in.
+
+Rows whose plan is `unknown` are dropped before printing or sending, with one stderr line per run
+that carries the count. The sender drops them again in case it is fed a file from an older run.
+
+`--skip-opencode-before <ISO>` drops a row whose `source` includes `opencode-db` and whose
+`hourUtc` is at or before that time. A combined row (`opencode-db+pi-jsonl`) is dropped whole: its
+OpenCode part cannot be separated, and keeping it would resend a copied database.
 
 ## What it reads
 
@@ -70,7 +81,7 @@ event is identified by `providerSessionId` plus `sourceRange.first.id`, `sourceR
 `stream`, and a replayed line counts once. In the inspected logs 49 events covered 9 turns, all 49
 source ranges were distinct, and no identical event repeated.
 
-## Output
+## Usage output
 
 ```json
 {"contributor":"trajectonomics","machine":"m-0123abcd","plan":"claude","model":"claude-opus-5-5","hourUtc":"2026-11-24T16:00:00.000Z","granularity":"hour","tokensIn":10,"tokensOut":20,"cacheRead":30,"cacheWrite":40,"tokensTotal":100,"requests":1,"source":"claude-code","bestEffort":false}
@@ -82,10 +93,170 @@ model and hour (Pi and OpenCode both use OpenCode Go), their rows are summed and
 both labels with `+`. Mistral rows are `granularity: "day"`, keep only `billing_metric`, `value`
 and `nb_api_calls`, and drop every id column. `bestEffort` is true only for Muse.
 
+## Quota samples
+
+`quota` reads two local credential files and never prints, refreshes or stores their tokens:
+
+| Plan | Credential file | Endpoint | Windows |
+| --- | --- | --- | --- |
+| `claude` | `~/.claude/.credentials.json`, `claudeAiOauth.accessToken` | `https://api.anthropic.com/api/oauth/usage` | `five_hour`, `weekly` |
+| `opencode-go` | `~/.local/share/opencode/auth.json`, `["opencode-go"].key` | `https://opencode.ai/inference/go/v1/usage` | `five_hour`, `weekly`, `monthly` |
+
+A missing file, an expired Claude token, a failed request or an unexpected body logs one stderr line
+naming the plan; the run still exits 0 and simply emits no row for that plan. Claude's token is never
+refreshed, because refreshing would rotate Claude Code's own credential.
+
+Each line is a quota row with a marker:
+
+```json
+{"kind":"quota","contributor":"trajectonomics","plan":"claude","window":"five_hour","sampledAt":"2026-11-27T14:00:00.000Z","usedPct":23,"resetsAt":"2026-11-27T14:20:00.160Z"}
+```
+
+Usage lines stay plain. The sender tells the two apart by the `window` field: a row with a string
+`window` is quota, and the sender removes `kind` before posting. Do not add `kind` to usage rows.
+
+`sampledAt` is always the **start of the current UTC hour**, because the Worker rejects anything
+else. The timer fires at minute 1, so a sample taken at 14:01 is stamped `14:00:00.000Z` and covers
+the usage of the hours before it, with up to one minute of the new hour folded in. Read it as the
+state at approximately `sampledAt`, not as a bucket total.
+
+`usedPct` is the percentage of the plan's limit, reported by both providers in whole numbers. One
+point is 1% of the limit, so a limit estimate needs a large change in percent before it is useful:
+`limit ≈ Δtokens / (ΔusedPct / 100)`. A one-point change over a quiet hour estimates almost nothing.
+
+## Sending
+
+`send` reads JSON lines from the files given, or from stdin when none are given, and posts batches
+of at most 5,000 rows and 1 MB of JSON body to the Worker:
+
+```sh
+bun apps/data/collector/src/cli.ts send rows.jsonl
+some-command | bun apps/data/collector/src/cli.ts send
+bun apps/data/collector/src/cli.ts send --url http://127.0.0.1:8787/data/ingest rows.jsonl
+```
+
+The URL defaults to `https://trajectonomics.com/data/ingest`; `TRAJ_DATA_URL` overrides it when
+`--url` is absent. The bearer key is read from `~/.config/traj-data/ingest.key` unless
+`--key-file` names another path. The file must be mode 600 or stricter; the sender refuses to run
+when group or others can read or write it, and it never prints the key.
+
+There are no retries. The Worker upserts rows, so the next hourly run resends the same hours and
+converges. A non-2xx response prints its HTTP status and the error codes in its body (never the
+request) and exits non-zero.
+
+## Hourly runner
+
+`hourly` reads a hosts file (default `~/.config/traj-data/hosts.json`) and collects every machine,
+then sends all rows in one call. The file is validated before anything runs:
+
+```json
+{
+  "hosts": [
+    {
+      "name": "example-local",
+      "ssh": null,
+      "bun": "/home/example/.cache/traj-collector/bun",
+      "collectorDir": "/home/example/.cache/traj-collector",
+      "quota": true,
+      "skipOpenCodeBefore": null
+    },
+    {
+      "name": "example-remote",
+      "ssh": "example-remote",
+      "bun": "/home/example/.cache/traj-collector/bun",
+      "collectorDir": "/home/example/.cache/traj-collector",
+      "quota": true,
+      "skipOpenCodeBefore": "2026-10-23T14:00:00.000Z"
+    }
+  ]
+}
+```
+
+`ssh: null` runs on the runner host. Any other value runs
+`ssh -o BatchMode=yes -o ConnectTimeout=10 <ssh> <bun> <collectorDir>/src/cli.ts ...` with an argument
+array, never a shell string. Paths must be absolute: `~` is not expanded. Host names are labels used
+in the cursor filename, so they are lowercase and unique.
+
+For each host the runner executes `usage --since <cursor minus 6 hours>`, adding
+`--skip-opencode-before` when configured, and then `quota` when `quota` is true. The machine label
+is left at the collector's default, so each machine keeps its own hash alias. A host with no cursor
+reads 7 days back; the 6-hour overlap lets late rows and clock skew arrive, and the upsert makes the
+resend harmless.
+
+Each host's cursor is `~/.local/state/traj-data/cursor-<name>`, holding the latest `hourUtc` that
+was accepted. A host that is offline, exits non-zero or prints a malformed line is logged and
+skipped; its cursor does not move and the other hosts still run. After every host has been tried,
+all rows are sent once. A host's cursor advances only when every row it contributed was accepted.
+The command exits non-zero if any host failed or any send failed, after trying everything.
+
+## Install on the runner host
+
+`homeserver1` is the always-on runner. Do this on it and on every machine it reads:
+
+1. Copy the collector to `~/.cache/traj-collector` and put a bun binary beside it, because a user
+   service has a minimal `PATH`:
+
+   ```sh
+   mkdir -p ~/.cache/traj-collector
+   rsync -a --exclude node_modules --exclude .turbo apps/data/collector/ ~/.cache/traj-collector/
+   install -m 755 "$(command -v bun)" ~/.cache/traj-collector/bun
+   ```
+
+   The collector has no runtime dependencies outside bun and the files under `src/`.
+
+2. Write the ingest key on the runner host only, readable by its owner alone:
+
+   ```sh
+   install -d -m 700 ~/.config/traj-data
+   printf '%s\n' '<the ingest key>' > ~/.config/traj-data/ingest.key
+   chmod 600 ~/.config/traj-data/ingest.key
+   ```
+
+3. Write `~/.config/traj-data/hosts.json` from
+   [`deploy/hosts.example.json`](deploy/hosts.example.json), with absolute paths that exist on each
+   machine. Leave `ssh` null for the runner itself and give each remote its ssh host or alias.
+
+4. Install the units and start the timer:
+
+   ```sh
+   mkdir -p ~/.config/systemd/user
+   cp deploy/traj-data-hourly.service deploy/traj-data-hourly.timer ~/.config/systemd/user/
+   systemctl --user daemon-reload
+   systemctl --user enable --now traj-data-hourly.timer
+   loginctl enable-linger "$USER"
+   ```
+
+5. Run it once by hand and read the journal:
+
+   ```sh
+   systemctl --user start traj-data-hourly.service
+   journalctl --user -u traj-data-hourly.service -n 50
+   ```
+
+The timer fires at minute 1 of every hour (plus up to 60 seconds of jitter), catches up after a
+missed run, and the oneshot service inherits `DO_NOT_TRACK=1`. `Persistent=true` means a laptop
+that was asleep still runs once after it wakes.
+
+## Where it runs (since 2026-11-27)
+
+Two timers, not one, because homeserver1 cannot reach the dev machine unattended: Tailscale SSH
+there asks for a browser check.
+
+| Runner host | Collects | Quota |
+|---|---|---|
+| homeserver1 | itself, and homeserver2 over ssh (`skipOpenCodeBefore` `2026-10-23T14:00:00.000Z`, its `opencode.db` is a copy) | no |
+| the dev machine (prameubuntu) | itself | yes: Claude Code runs there, so its OAuth token stays fresh |
+
+Each host keeps the collector in `~/.cache/traj-collector` (`bun` is a link to `~/.local/bin/bun`,
+or homeserver2's own binary), its `hosts.json` and `ingest.key` in `~/.config/traj-data/`, and its
+cursors in `~/.local/state/traj-data/`. To update, copy `src/`, `deploy/` and `package.json` from
+`main` over the old copy on every host. A run peaks at about 1.4 GB of memory.
+
 ## Rules
 
 - **Never commit real logs, collector output, hostnames, prompts, paths or ids.** Fixtures in
   `test/` are hand-written and synthetic.
 - `src/extract/` and `src/aggregate.ts` are pure: lines or rows in, `UsageRow[]` out, no `fs`,
-  SQLite, network or clock. I/O lives in `src/cli.ts`, `src/collect.ts` and `src/stores/`.
+  SQLite, network or clock. I/O lives in `src/cli.ts`, `src/collect.ts` and `src/stores/`. The quota
+  parsers take `sampledAt` as an argument for the same reason.
 - No prices in this slice. A price is added only with a dated, cited source.

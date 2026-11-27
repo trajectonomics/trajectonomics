@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the traj data collector every hour
+
+[Timer]
+OnCalendar=*-*-* *:01:00
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target

@@ -1,52 +1,39 @@
 #!/usr/bin/env bun
-import { hostname } from "node:os"
-import { type CollectOptions, collectUsage } from "./collect"
-import { machineAlias } from "./machine"
+import { runHourlyCommand } from "./commands/hourly"
+import { runQuotaCommand } from "./commands/quota"
+import { runSendCommand } from "./commands/send"
+import { runUsageCommand } from "./commands/usage"
 
-const USAGE = "Usage: bun src/cli.ts [--since <ISO>] [--machine <name>] [--mistral-csv <path>]"
+const USAGE = `Usage:
+  bun src/cli.ts [usage] [--since <ISO>] [--machine <name>] [--mistral-csv <path>] [--skip-opencode-before <ISO>]
+  bun src/cli.ts quota
+  bun src/cli.ts send [--url <url>] [--key-file <path>] [files...]
+  bun src/cli.ts hourly [--config <path>]`
 
-function fail(message: string): never {
-	console.error(`${message}\n${USAGE}`)
-	process.exit(1)
-}
-
-function valueAfter(argv: readonly string[], index: number, flag: string): string {
-	const value = argv[index + 1]
-	if (value === undefined) fail(`${flag} needs a value`)
-	return value
-}
-
-const FLAGS: Record<string, "since" | "machine" | "mistralCsv"> = {
-	"--since": "since",
-	"--machine": "machine",
-	"--mistral-csv": "mistralCsv",
-}
-
-/** Parses the CLI arguments; `--machine` defaults to a hash alias of this host's name. */
-export function parseArgs(argv: readonly string[]): CollectOptions {
-	const options: CollectOptions = {
-		machine: machineAlias(hostname()),
-		since: null,
-		mistralCsv: null,
+async function main(argv: readonly string[]): Promise<void> {
+	const [command, ...rest] = argv
+	if (command === undefined || command.startsWith("-")) {
+		runUsageCommand(argv)
+		return
 	}
-	for (let i = 0; i < argv.length; i += 1) {
-		const arg = argv[i] ?? ""
-		if (arg === "--help" || arg === "-h") {
-			console.log(USAGE)
-			process.exit(0)
-		}
-		const key = FLAGS[arg]
-		if (key === undefined) fail(`Unknown argument: ${arg}`)
-		options[key] = valueAfter(argv, i, arg)
-		i += 1
+	if (command === "usage") {
+		runUsageCommand(rest)
+		return
 	}
-	if (options.since !== null && Number.isNaN(Date.parse(options.since))) {
-		fail(`--since is not an ISO timestamp: ${options.since}`)
+	if (command === "quota") {
+		await runQuotaCommand(rest)
+		return
 	}
-	return options
+	if (command === "send") {
+		await runSendCommand(rest)
+		return
+	}
+	if (command === "hourly") {
+		await runHourlyCommand(rest)
+		return
+	}
+	console.error(`Unknown command: ${command}\n${USAGE}`)
+	process.exitCode = 1
 }
 
-if (import.meta.main) {
-	const options = parseArgs(process.argv.slice(2))
-	for (const row of collectUsage(options)) console.log(JSON.stringify(row))
-}
+if (import.meta.main) await main(process.argv.slice(2))

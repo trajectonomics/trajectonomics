@@ -3,15 +3,10 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import type { PlanCatalog } from "@trajectonomics/data-collector/tier-catalog"
 import { compactCount, displayCount } from "../lib/format"
+import { PEAK_COLUMNS, type PeakColumn, peakNote, peakSpoken } from "../lib/peak-words"
 import { defaultTier, planCatalog } from "../lib/plan-catalog"
-import {
-	figureShare,
-	PEAK_COLUMNS,
-	type PeakColumn,
-	type PeakTableRow,
-	peakSpoken,
-	peakTableRows,
-} from "../lib/plan-peaks"
+import { MONTH_FROM_WEEK } from "../lib/plan-month"
+import { figureShare, type PeakTableRow, peakTableRows } from "../lib/plan-peaks"
 import {
 	factorLabel,
 	figuresColumnMax,
@@ -31,7 +26,7 @@ let {
 	/** The peaks API's plans. */
 	plans: PlanPeak[]
 	/** The summary's ranked plans, whose order this table follows. */
-	ranked: { plan: string }[]
+	ranked: { plan: string; cacheRead?: number | null }[]
 	/** The window's last day, whose tier each plan's name carries. */
 	day: string
 } = $props()
@@ -47,6 +42,10 @@ type RowView = {
 const chosen = $state<Record<string, string>>({})
 
 const rows = $derived(peakTableRows(ranked, plans, day))
+/** Plans whose source reports no cache reads, so their figures hold them. */
+const unsplit = $derived(
+	new Set(ranked.filter((entry) => entry.cacheRead === null).map((entry) => entry.plan)),
+)
 
 function viewOf(row: PeakTableRow): RowView {
 	const catalog = planCatalog(row.plan)
@@ -114,6 +113,8 @@ function choose(plan: string, tier: string): void {
 				<span class="peaks-tag">
 					Estimated from {view.figures.fromTier} {factorLabel(tagFactor(view.figures))}
 				</span>
+			{:else if view.catalog === null}
+				<span class="peaks-tag peaks-tag-muted">Most we used</span>
 			{:else if view.figures.kind === "unknown"}
 				<span class="peaks-tag peaks-tag-muted">No stated multiplier</span>
 			{/if}
@@ -149,13 +150,14 @@ function choose(plan: string, tier: string): void {
 					</span>
 				</div>
 			{:else}
-				<div
-					class="peaks-cell"
-					title={`${displayCount(current.peak.tokens)} tokens from ${current.peak.fromDay}`}
-				>
+				{@const note = peakNote(current.peak, column.key, !unsplit.has(view.row.plan))}
+				<div class="peaks-cell" title={peakSpoken(current.peak, column)}>
 					<span class="peaks-figure" aria-hidden="true">
-						≥ {compactCount(current.peak.tokens)}
+						{compactCount(current.peak.tokens)}
 					</span>
+					{#if note !== null}
+						<span class="peaks-meta" aria-hidden="true">{note}</span>
+					{/if}
 					<span class="peaks-track" aria-hidden="true">
 						<span
 							class="peaks-bar"
@@ -166,13 +168,17 @@ function choose(plan: string, tier: string): void {
 				</div>
 			{/if}
 		{:else}
+			{@const derived = MONTH_FROM_WEEK.has(view.row.plan) && column.key === "thirtyDays"}
 			<div
 				class="peaks-cell"
-				title={`${displayCount(current.tokens)} tokens, estimated from ${current.fromTier}`}
+				title={`${displayCount(current.tokens)} tokens, estimated from ${current.fromTier}${derived ? ", the week × 30/7" : ""}`}
 			>
 				<span class="peaks-figure peaks-figure-estimated" aria-hidden="true">
 					≈ {compactCount(current.tokens)}
 				</span>
+				{#if derived}
+					<span class="peaks-meta" aria-hidden="true">week × 30/7</span>
+				{/if}
 				<span class="peaks-track" aria-hidden="true">
 					<span
 						class="peaks-bar peaks-bar-estimated"
@@ -180,7 +186,9 @@ function choose(plan: string, tier: string): void {
 					></span>
 				</span>
 				<span class="visually-hidden">
-					estimated, at least {displayCount(current.tokens)} tokens in {column.spoken}, from {current.fromTier}
+					estimated, {displayCount(current.tokens)} tokens in {column.spoken}, from {current.fromTier}{derived
+						? ", the week × 30/7"
+						: ""}
 				</span>
 			</div>
 		{/if}
@@ -261,8 +269,7 @@ function choose(plan: string, tier: string): void {
 	</table>
 
 	<p class="peaks-note">
-		<span class="visually-hidden">At least: </span>
-		<span aria-hidden="true">≥</span> what we measured, or <span aria-hidden="true">≈</span> estimated
-		from a tier we measured — never the plan's limit
+		Most we used in a window, or <span aria-hidden="true">≈</span> estimated from a tier we measured
+		— never the plan's limit
 	</p>
 </div>

@@ -28,10 +28,16 @@ export type Health = {
 	stale: boolean
 }
 
-/** The most tokens one plan used in a window, and the UTC day the window starts. */
+/**
+ * The most tokens one plan used in a window, and the UTC day the window starts. `cacheRead` is
+ * absent from a peaks body cached before shape 3, and `derived` marks a 30-day figure that is the
+ * week × 30/7 because the vendor states no monthly window.
+ */
 export type Peak = {
 	tokens: number
 	fromDay: string
+	cacheRead?: number | null
+	derived?: boolean
 }
 
 /** The three windows, as the peaks API names them. */

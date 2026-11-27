@@ -17,10 +17,6 @@
 }
 
 /* A plan we have not used lately stays readable but steps back from the ones in use. */
-.meter-dim {
-	opacity: 0.6;
-}
-
 .meter-identity {
 	display: flex;
 	min-width: 0;
@@ -44,13 +40,20 @@
 }
 
 .meter-track {
+	display: block;
 	height: 8px;
 	overflow: hidden;
 	border-radius: 999px;
 	background: var(--ds-color-secondary);
 }
 
+/* Only the bar dims: text in a plan out of use keeps full contrast. */
+.meter-dim .meter-track {
+	opacity: 0.6;
+}
+
 .meter-bar {
+	display: block;
 	height: 100%;
 	border-radius: inherit;
 	background: var(--ds-color-primary);
@@ -71,6 +74,15 @@
 .meter-unit {
 	margin-left: 2px;
 	font-size: 11px;
+	font-weight: 400;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The cache-read share stays a small figure beside the meter, never the headline. */
+.meter-cache {
+	display: block;
+	margin-top: 1px;
+	font-size: 10px;
 	font-weight: 400;
 	color: var(--ds-color-muted-foreground);
 }

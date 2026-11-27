@@ -61,13 +61,13 @@ function yearOf(date: string): string {
 	return date.slice(0, 4)
 }
 
-/** The x label of a row: its year, with the first person's age under it and every person's age in the tooltip. */
+/** The x label of a row: the first person's age, with the year under it and every person's age in the tooltip. */
 function agePart(
 	row: AnnualRow,
 	people: PersonNames,
 ): Pick<LineSeries["points"][number], "xLabel" | "xTitle" | "subLabel"> {
 	const year = yearOf(row.to)
-	const sub = axisAge(row.ages, people)
-	if (sub === null) return { xLabel: year }
-	return { xLabel: year, xTitle: `${year}, ${agesText(row.ages, people)}`, subLabel: sub }
+	const age = axisAge(row.ages, people)
+	if (age === null) return { xLabel: year }
+	return { xLabel: age, xTitle: `${year}, ${agesText(row.ages, people)}`, subLabel: year }
 }

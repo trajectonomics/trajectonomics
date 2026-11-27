@@ -7,7 +7,7 @@ import { get, harness, legacy } from "./support/http"
 import { silenceConsoleError } from "./support/log"
 import { failingEnv, read, readWith, seed } from "./support/usage"
 
-type Peak = { tokens: number; fromDay: string }
+type Peak = { tokens: number; fromDay: string; cacheRead: number }
 
 type MeasuredTier = {
 	tier: string | null
@@ -64,20 +64,20 @@ describe("GET /api/peaks", () => {
 		expect(response.status).toBe(200)
 		const body = (await response.json()) as PeaksBody
 		expect(body.asOf).toBe("2026-11-25")
-		expect(body.methodVersion).toBe(1)
+		expect(body.methodVersion).toBe(2)
 		expect(body.plans).toEqual([
 			{
 				plan: "claude",
 				tier: "Max",
-				fiveHours: { tokens: 200, fromDay: "2026-11-24" },
-				sevenDays: { tokens: 200, fromDay: "2026-11-24" },
-				thirtyDays: { tokens: 200, fromDay: "2026-11-24" },
+				fiveHours: { tokens: 200, fromDay: "2026-11-24", cacheRead: 0 },
+				sevenDays: { tokens: 200, fromDay: "2026-11-24", cacheRead: 0 },
+				thirtyDays: { tokens: 200, fromDay: "2026-11-24", cacheRead: 0 },
 				measured: [
 					{
 						tier: "Max",
-						fiveHours: { tokens: 200, fromDay: "2026-11-24" },
-						sevenDays: { tokens: 200, fromDay: "2026-11-24" },
-						thirtyDays: { tokens: 200, fromDay: "2026-11-24" },
+						fiveHours: { tokens: 200, fromDay: "2026-11-24", cacheRead: 0 },
+						sevenDays: { tokens: 200, fromDay: "2026-11-24", cacheRead: 0 },
+						thirtyDays: { tokens: 200, fromDay: "2026-11-24", cacheRead: 0 },
 					},
 				],
 			},
@@ -118,14 +118,14 @@ describe("GET /api/peaks", () => {
 			plan: "mistral",
 			tier: "Pro",
 			fiveHours: null,
-			sevenDays: { tokens: 1200, fromDay: "2026-11-20" },
-			thirtyDays: { tokens: 1200, fromDay: "2026-11-20" },
+			sevenDays: { tokens: 1200, fromDay: "2026-11-20", cacheRead: 0 },
+			thirtyDays: { tokens: 1200, fromDay: "2026-11-20", cacheRead: 0 },
 			measured: [
 				{
 					tier: "Pro",
 					fiveHours: null,
-					sevenDays: { tokens: 1200, fromDay: "2026-11-20" },
-					thirtyDays: { tokens: 1200, fromDay: "2026-11-20" },
+					sevenDays: { tokens: 1200, fromDay: "2026-11-20", cacheRead: 0 },
+					thirtyDays: { tokens: 1200, fromDay: "2026-11-20", cacheRead: 0 },
 				},
 			],
 		})
@@ -139,7 +139,7 @@ describe("GET /api/peaks", () => {
 		])
 		const body = (await (await read(context, "/api/peaks?asOf=2026-11-24")).json()) as PeaksBody
 		expect(body.asOf).toBe("2026-11-24")
-		expect(body.plans[0]?.fiveHours).toEqual({ tokens: 100, fromDay: "2026-11-24" })
+		expect(body.plans[0]?.fiveHours).toEqual({ tokens: 100, fromDay: "2026-11-24", cacheRead: 0 })
 		expect(body.plans[0]?.thirtyDays?.tokens).toBe(100)
 	})
 
