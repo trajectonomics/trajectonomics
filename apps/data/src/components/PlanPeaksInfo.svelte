@@ -25,10 +25,15 @@ function place(event: ToggleEvent): void {
 
 <div id="peaks-info-panel" class="peaks-info-panel" popover ontoggle={place}>
 	<p>Each figure is the most tokens we used in that window, not the plan's limit.</p>
+	<p>
+		A window shows a figure once we have collected for its full length; before that it shows the
+		days seen so far.
+	</p>
 	<p>Cache reads are counted apart because they cost far less, so they never lift a figure.</p>
 	<p>
-		Claude's 5 hours start at its first message. Claude and Antigravity months are the week × 30/7.
-		Other tiers scale by the vendor's stated multiplier; 30 days use the weekly one.
+		Claude's 5 hours start at its first message. Claude and Antigravity months are the week × 30/7,
+		once a full week is collected. Other tiers scale by the vendor's stated multiplier; 30 days
+		use the weekly one.
 	</p>
 	<p>
 		Highlighted: ≈ estimated from a tier we measured. – means the vendor states no multiplier.

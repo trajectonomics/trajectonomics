@@ -1,6 +1,8 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import type { TaxPlanner } from "../../store"
 import type { ScenarioDocument } from "../document"
+import type { Household } from "../household/model"
+import { storedHousehold } from "../household/stored"
 import { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
 import { type Couple, coupleOf, holderIdOf } from "./couple"
 import type { TaxRequest } from "./flags"
@@ -20,7 +22,7 @@ function storedRequest(
 	stored: string | null,
 	document: ScenarioDocument,
 	couple: Couple | null,
-	household: string | null,
+	household: Household | null,
 ): TaxRequest | AppError {
 	const profile = parsedTax(stored)
 	if (profile === null) {
@@ -30,7 +32,6 @@ function storedRequest(
 		)
 	}
 	const holder = holderIdOf(household)
-	if (isAppError(holder)) return holder
 	const filing = { couple, holder }
 	return mode.kind === "merge"
 		? mergedRequest(profile, mode.flags, filing)
@@ -42,10 +43,9 @@ function requestFor(
 	mode: Exclude<TaxMode, { kind: "remove" }>,
 	document: ScenarioDocument,
 	stored: string | null,
-	household: string | null,
+	household: Household | null,
 ): TaxRequest | AppError {
 	const couple = coupleOf(household)
-	if (isAppError(couple)) return couple
 	if (mode.kind === "write") {
 		const request = taxRequestOf(mode.flags, couple)
 		if (isAppError(request)) return request
@@ -55,6 +55,19 @@ function requestFor(
 		return request
 	}
 	return storedRequest(mode, stored, document, couple, household)
+}
+
+/** The Levy a mode other than remove writes, and the request it resolved, for the reply. */
+function planned(
+	mode: Exclude<TaxMode, { kind: "remove" }>,
+	document: ScenarioDocument,
+	stored: string | null,
+	household: Household | null,
+	labels: readonly FlowLabel[],
+): Written | AppError {
+	const request = requestFor(mode, document, stored, household)
+	if (isAppError(request)) return request
+	return withTaxLevy(document, request, labels, household)
 }
 
 /**
@@ -68,9 +81,9 @@ export function plannerOf(
 ): TaxPlanner {
 	return (document, stored, household) => {
 		if (mode.kind === "remove") return { document: withoutTaxLevy(document) ?? document, tax: null }
-		const request = requestFor(mode, document, stored, household)
-		if (isAppError(request)) return request
-		const next = withTaxLevy(document, request, labels, household)
+		const held = household === null ? null : storedHousehold(household)
+		if (isAppError(held)) return held
+		const next = planned(mode, document, stored, held, labels)
 		if (isAppError(next)) return next
 		done(next)
 		return { document: next.document, tax: canonicalTax(storedTaxOf(next.request)) }

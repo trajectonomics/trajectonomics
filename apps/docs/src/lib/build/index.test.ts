@@ -76,7 +76,7 @@ const LANDING_PAGE = [
 	`<header id="nd-nav"><a href="${DOCS_BASE_PATH}/" aria-label="Trajectonomics Docs"><svg></svg></a>`,
 	`<a href="${DOCS_BASE_PATH}/llms.txt">Docs index</a></header>`,
 	"<main>",
-	`<a href="${DOCS_BASE_PATH}/cli/">For Operators: install and run the CLI</a>`,
+	`<a href="${DOCS_BASE_PATH}/cli/">Use traj: install it and get your first answer</a>`,
 	`<a href="${DOCS_BASE_PATH}/contribute/">For Contributors: help make the tax rules right</a>`,
 	`<p>${RELEASE_LINE}</p>`,
 	"<h1>Trajectonomics Docs</h1>",

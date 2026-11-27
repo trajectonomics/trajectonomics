@@ -53,7 +53,7 @@ describe("the Docs index", () => {
 			buildDocsIndex(TABS_PAGES, ORIGIN)
 				.split("\n")
 				.filter((line) => line.startsWith("#")),
-		).toEqual(["# Trajectonomics Docs", "## Start here", "## Operator", "## Contributor"])
+		).toEqual(["# Trajectonomics Docs", "## Start here", "## CLI & Quickstart", "## Contribute"])
 	})
 
 	test("lists every page once, by title, at its absolute twin URL, with its description", () => {

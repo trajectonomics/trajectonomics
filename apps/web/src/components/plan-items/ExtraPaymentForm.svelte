@@ -9,6 +9,8 @@ import {
 } from "../../lib/view/plan-items/extra-payment"
 import { EXTRA_MODE_CHOICES } from "../../lib/view/plan-items/options"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import { namedRefusal } from "../../lib/view/plan-items/refusal"
+import FormAlert from "../ui/FormAlert.svelte"
 import Field from "./Field.svelte"
 import ItemActions from "./ItemActions.svelte"
 
@@ -27,8 +29,13 @@ interface Props {
 let { name, contentHash, doc, loanId, onDone }: Props = $props()
 let draft: ExtraDraft = $state(extraDraftOf())
 let problems: Problems = $state({})
+/** The ids of the Flows of the document the last save sent, in order, and the one the payment added. */
+let sent: string[] = $state([])
+let savedId: string | undefined = $state()
 const FIELDS = ["amount", "mode", "start", "end"]
-const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
+const refusal = $derived(namedRefusal(editSession.failure, sent))
+const item = $derived(["flows", savedId ?? ""])
+const shown = $derived(shownProblems(problems, refusal, editSession.error, FIELDS, item))
 
 /** Saves the plan with the payment added, as one Edit; the drawer closes only when it ran. */
 async function save(event: SubmitEvent): Promise<void> {
@@ -40,8 +47,10 @@ async function save(event: SubmitEvent): Promise<void> {
 		return
 	}
 	problems = {}
-	const document = withFlow(doc, result.flow)
-	if (await editSession.run({ kind: "apply-plan", name, contentHash, document })) onDone()
+	const next = withFlow(doc, result.flow)
+	sent = next.flows.map((flow) => flow.id)
+	savedId = result.flow.id
+	if (await editSession.run({ kind: "apply-plan", name, contentHash, document: next })) onDone()
 }
 </script>
 
@@ -51,13 +60,13 @@ async function save(event: SubmitEvent): Promise<void> {
 		Pay extra is saved to the plan. A What-if cannot try it: it only changes values the plan already holds.
 	</p>
 	<div class="space-y-4">
-		<Field id="extra-amount" label="Amount" inputmode="decimal" hint="A decimal number, such as 10000.00" bind:value={draft.amount} problem={shown.at("amount")} />
+		<Field id="extra-amount" label="Amount" inputmode="decimal" money hint="A decimal number, such as 10000.00" bind:value={draft.amount} problem={shown.at("amount")} />
 		<Field id="extra-mode" label="How often" options={EXTRA_MODE_CHOICES} bind:value={draft.mode} problem={shown.at("mode")} />
 		<Field id="extra-start" label="Starts" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} />
 		{#if draft.mode === "monthly"}
 			<Field id="extra-end" label="Last payment" hint="YYYY-MM-DD" bind:value={draft.end} problem={shown.at("end")} />
 		{/if}
-		{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+		{#if shown.general}<FormAlert message={shown.general} />{/if}
 	</div>
 	<ItemActions kind="flow" />
 </form>

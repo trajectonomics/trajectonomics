@@ -2,6 +2,7 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the components it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { cacheShareLabel, NO_CACHE_SPLIT } from "../lib/cache-share"
+import { daysCollected, shortDay } from "../lib/collecting"
 import { compactCount, displayCount } from "../lib/format"
 import { grandTotal } from "../lib/grand-total"
 import { planModels } from "../lib/plan-models"
@@ -11,10 +12,21 @@ import type { UsageRow } from "../lib/types"
 import { WINDOW_DAYS } from "../lib/window"
 import PlanMark from "./PlanMark.svelte"
 
-let { totals, rows, day }: { totals: PlanTotal[]; rows: UsageRow[]; day: string } = $props()
+let {
+	totals,
+	rows,
+	day,
+	since = null,
+}: { totals: PlanTotal[]; rows: UsageRow[]; day: string; since?: string | null } = $props()
 
 const grand = $derived(grandTotal(totals))
 const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
+/** How many UTC days collection covers, or null on a health body that does not say. */
+const collected = $derived(since === null ? null : daysCollected(since, day))
+const short = $derived(
+	since !== null && collected !== null && collected >= 1 && collected < WINDOW_DAYS,
+)
+const onlyDay = $derived(collected === 1)
 </script>
 
 <div class="plan-summary">
@@ -24,9 +36,10 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 		</p>
 		<p
 			class="use-key"
-			title={`${displayCount(grand.tokensUncached)} tokens without cache reads over ${WINDOW_DAYS} days`}
+			title={`${displayCount(grand.tokensUncached)} tokens without cache reads ${short && since !== null ? `since ${shortDay(since)}` : `over ${WINDOW_DAYS} days`}`}
 		>
-			{compactCount(grand.tokensUncached)} tokens · {WINDOW_DAYS} days
+			{compactCount(grand.tokensUncached)} tokens ·
+			{short && since !== null ? `since ${shortDay(since)}` : `${WINDOW_DAYS} days`}
 		</p>
 	</div>
 
@@ -60,14 +73,25 @@ const topRate = $derived(totals[0]?.tokensPerActiveDay ?? 0)
 				</div>
 				<span
 					class="meter-figure"
-					title={`${displayCount(Math.floor(total.tokensPerActiveDay))} tokens a day without cache reads`}
+					title={onlyDay
+						? `${displayCount(total.tokensUncached)} tokens so far without cache reads`
+						: `${displayCount(Math.floor(total.tokensPerActiveDay))} tokens a day without cache reads`}
 				>
-					<span aria-hidden="true">
-						{compactCount(total.tokensPerActiveDay)}<span class="meter-unit">/day</span>
-					</span>
-					<span class="visually-hidden">
-						{compactCount(total.tokensPerActiveDay)} tokens a day without cache reads
-					</span>
+					{#if onlyDay}
+						<span aria-hidden="true">
+							{compactCount(total.tokensUncached)}<span class="meter-unit"> so far</span>
+						</span>
+						<span class="visually-hidden">
+							{compactCount(total.tokensUncached)} tokens so far without cache reads
+						</span>
+					{:else}
+						<span aria-hidden="true">
+							{compactCount(total.tokensPerActiveDay)}<span class="meter-unit">/day</span>
+						</span>
+						<span class="visually-hidden">
+							{compactCount(total.tokensPerActiveDay)} tokens a day without cache reads
+						</span>
+					{/if}
 					{#if cache !== null}
 						<span class="meter-cache">{cache}</span>
 					{/if}

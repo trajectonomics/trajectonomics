@@ -1,12 +1,12 @@
 import { healthReport } from "../core/health"
-import { readLastIngest } from "../db/read"
+import { readCollectingDays, readLastIngest } from "../db/read"
 import type { Env, RequestContext } from "../env"
 import { healthCacheKey } from "./cache"
 import { json, methodNotAllowed } from "./responses"
 
 /**
- * Handles `GET /data/api/health` (and the old host's `/api/health`): the last ingest time and
- * whether it is stale.
+ * Handles `GET /data/api/health` (and the old host's `/api/health`): the last ingest time, whether
+ * it is stale, and the UTC days collection covers.
  */
 export async function handleHealth(
 	request: Request,
@@ -18,8 +18,11 @@ export async function handleHealth(
 	const cached = context.cache === undefined ? undefined : await context.cache.match(key)
 	if (cached !== undefined) return cached
 	try {
-		const lastIngestAt = await readLastIngest(env.DB)
-		const response = json(healthReport(lastIngestAt, context.nowMs), {
+		const [lastIngestAt, collected] = await Promise.all([
+			readLastIngest(env.DB),
+			readCollectingDays(env.DB),
+		])
+		const response = json(healthReport(lastIngestAt, context.nowMs, collected), {
 			headers: { "cache-control": "public, max-age=60" },
 		})
 		if (context.cache !== undefined) await context.cache.put(key, response.clone())

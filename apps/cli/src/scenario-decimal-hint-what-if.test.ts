@@ -90,4 +90,40 @@ describe("the --decimal hint on the what-if forms", () => {
 		expect(res.code).toBe(2)
 		expect(errorOf(res).hint).toContain(DECIMAL_HINT)
 	})
+
+	it("carries no hint beside a --set on a quoted whole amount", async () => {
+		const home = await seeded()
+		const res = await apply(home, [
+			"base",
+			"--set",
+			'flows.salary.amount="9000.50"',
+			"--set",
+			'flows.bonus.amount="5000"',
+		])
+		expect(res.code).toBe(2)
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).hint).toBe(ownHint("document.flows.0.amount"))
+	})
+
+	it("carries no hint beside an --add on a quoted whole percent", async () => {
+		const home = await seeded()
+		const fund = { id: "fund", kind: "asset", rate: 0, fee: { bps: "50", rounding: "halfUp" } }
+		const res = await apply(home, [
+			"base",
+			"--add",
+			`accounts=${JSON.stringify(fund)}`,
+			"--set",
+			'flows.salary.amount="9000.50"',
+		])
+		expect(res.code).toBe(2)
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).hint).toBe(ownHint("document.accounts.2.fee.bps"))
+	})
+
+	it("names --decimal for one quoted decimal amount, with nothing else quoted", async () => {
+		const home = await seeded()
+		const res = await apply(home, ["base", "--set", 'flows.salary.amount="9000.50"'])
+		expect(res.code).toBe(2)
+		expect(errorOf(res).hint).toBe(`${DECIMAL_HINT} ${ownHint("document.flows.0.amount")}`)
+	})
 })

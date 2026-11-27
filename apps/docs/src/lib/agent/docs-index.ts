@@ -51,7 +51,7 @@ export function buildDocsIndex(tabs: readonly DocsIndexTab[], origin: string): s
 		"",
 	]
 	for (const { tab, pages } of tabs) {
-		lines.push(`## ${tab.audience}`, "", ...pages.map((page) => bullet(page, origin)), "")
+		lines.push(`## ${tab.title}`, "", ...pages.map((page) => bullet(page, origin)), "")
 	}
 	return lines.join("\n")
 }

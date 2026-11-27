@@ -8,7 +8,9 @@ import { anchorChoices } from "../../lib/view/estate/anchors"
 import { accountFromDraft } from "../../lib/view/plan-items/account-draft"
 import { accountDraftOf } from "../../lib/view/plan-items/accounts"
 import { accountIds, withAccount, withoutAccount } from "../../lib/view/plan-items/document"
+import { ACCOUNT_FIELDS } from "../../lib/view/plan-items/fields"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import { namedRefusal } from "../../lib/view/plan-items/refusal"
 import { milestoneIds } from "../../lib/view/withdrawals/context"
 import { shownAccount } from "../../lib/what-if/lens-document"
 import { recordOf } from "../../lib/what-if/session"
@@ -54,24 +56,17 @@ const start = $derived(
 const initial = () => accountDraftOf(start, income)
 let draft = $state(initial())
 let problems: Problems = $state({})
-const FIELDS = [
-	"name",
-	"kind",
-	"rate",
-	"compounding",
-	"lockedUntil",
-	"payoutRate",
-	"payoutFrequency",
-	"payoutRounding",
-	"payoutStart",
-	"payoutKind",
-	"feeRate",
-	"feeRounding",
-]
-const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
+/** The ids of the Accounts of the document the last save sent, in order, and the one it wrote. */
+let sent: string[] = $state([])
+let savedId: string | undefined = $state()
+const refusal = $derived(namedRefusal(editSession.failure, sent, "accounts"))
+const item = $derived(["accounts", savedId ?? existing?.id ?? ""])
+const shown = $derived(shownProblems(problems, refusal, editSession.error, ACCOUNT_FIELDS, item))
 
 /** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
-async function commit(next: ScenarioDocument): Promise<void> {
+async function commit(next: ScenarioDocument, id: string): Promise<void> {
+	sent = next.accounts.map((account) => account.id)
+	savedId = id
 	if (await editSession.run({ kind: "apply-plan", name, contentHash, document: next })) onDone()
 }
 
@@ -95,11 +90,11 @@ async function save(event: SubmitEvent): Promise<void> {
 		onDone()
 		return
 	}
-	await commit(withAccount(doc, result.account))
+	await commit(withAccount(doc, result.account), result.account.id)
 }
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${nameOf(names, existing.id)}` : "Add account"}>
 	<AccountFields bind:draft existingId={existing?.id} {shown} illiquid={existing?.liquid === false} {...income} />
-	<ItemActions id={existing?.id} kind="account" onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
+	<ItemActions id={existing?.id} kind="account" onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""), existing?.id ?? "")} trying={tryValue} />
 </form>

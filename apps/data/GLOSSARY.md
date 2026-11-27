@@ -62,6 +62,13 @@ One UTC day's totals for one plan and model, summed from that day's Usage Rows a
 The provenance of a set of rollups. The org's series is `measured-by-us`; a community series is a
 separate series, never mixed into ours.
 
+## Collecting since
+
+The first UTC day the `measured-by-us` series holds a rollup for, and per plan the first day that
+plan holds one. `/api/health` serves them as `collectingSince` and `planSince`, as days only. A
+peaks window longer than the collected span shows its days so far instead of a figure
+(ADR 0010).
+
 ## asOf
 
 A `YYYY-MM-DD` cap on a read: the answer uses data up to and including that day. It is a

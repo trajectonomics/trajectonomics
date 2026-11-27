@@ -3,7 +3,7 @@ import type { BuiltFile } from "./built-files"
 import { checkLandingPage, LANDING_PAGE_FILE } from "./landing-page"
 import { SEARCH_INDEX_FILE } from "./search-index"
 
-const OPERATOR_LINK = '<a href="/docs/cli/">For Operators: install and run the CLI</a>'
+const OPERATOR_LINK = '<a href="/docs/cli/">Use traj: install it and get your first answer</a>'
 const CONTRIBUTE_LINK =
 	'<a href="/docs/contribute/">For Contributors: help make the tax rules right</a>'
 

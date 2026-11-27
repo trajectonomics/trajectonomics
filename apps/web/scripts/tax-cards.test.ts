@@ -101,7 +101,13 @@ describe("the tax cards through traj", () => {
 			if (!edit.ok) throw new Error("the draft makes an Edit")
 			const refused = await post("edit", edit.edit)
 			if (refused.ok) throw new Error("the CLI labelled a plan with no Levy")
-			const shown = labelShown({}, refused.error, refused.error.message)
+			const shown = labelShown(
+				{},
+				refused.error,
+				refused.error.message,
+				"side-gig",
+				plan.document.flows.map((one) => one.id),
+			)
 			expect(shown.at("label")).toBe(refused.error.message)
 			const whole = taxEdit(
 				{ name, contentHash: plan.hash, origin: null, unlabelled: unlabelledIncome(plan.document) },
