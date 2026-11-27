@@ -1,6 +1,7 @@
 import type { Period } from "../output/periods"
 import type { ChanceOfSuccess, ChanceOfSuccessOptions, ChanceRunsOut } from "../types/chance"
 import { bandAt } from "./band"
+import { milestoneSummaries } from "./milestone-dates"
 import { pathOutcomes } from "./outcomes"
 import type { PathOutcome } from "./path"
 import { spendingOf } from "./spending"
@@ -20,6 +21,7 @@ export function summarise(
 	options: ChanceOfSuccessOptions,
 	outcomes: readonly PathOutcome[],
 	grid: readonly Period[],
+	milestoneIds: readonly string[],
 ): ChanceOfSuccess {
 	const succeeded = outcomes.filter((outcome) => outcome.runsOutIndex === undefined).length
 	const spending = spendingOf(outcomes, grid)
@@ -31,6 +33,11 @@ export function summarise(
 		bands: grid.map((period) => bandAt(period, outcomes)),
 		runsOut: grid.map((period) => runsOutAt(period, outcomes)),
 		...(spending === undefined ? {} : { spending }),
-		...(options.outcomes === true ? { outcomes: pathOutcomes(outcomes) } : {}),
+		...(options.milestoneDates === true
+			? { milestones: milestoneSummaries(milestoneIds, outcomes) }
+			: {}),
+		...(options.outcomes === true
+			? { outcomes: pathOutcomes(outcomes, options.milestoneDates === true) }
+			: {}),
 	}
 }
