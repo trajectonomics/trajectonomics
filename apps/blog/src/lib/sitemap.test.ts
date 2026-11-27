@@ -2,25 +2,25 @@ import { describe, expect, test } from "bun:test"
 import { sitemapXml } from "./sitemap"
 
 describe("the sitemap", () => {
-	const xml = sitemapXml("https://blog.trajectonomics.com", [
-		{ path: "/" },
+	const xml = sitemapXml("https://trajectonomics.com", [
+		{ path: "/blog/" },
 		{
-			path: "/guides/a/",
+			path: "/blog/guides/a/",
 			alternates: [
-				{ hreflang: "en", path: "/guides/a/" },
-				{ hreflang: "th", path: "/th/guides/a/" },
+				{ hreflang: "en", path: "/blog/guides/a/" },
+				{ hreflang: "th", path: "/blog/th/guides/a/" },
 			],
 		},
 	])
 
-	test("lists every address, absolute on the blog's host", () => {
-		expect(xml).toContain("<loc>https://blog.trajectonomics.com/</loc>")
-		expect(xml).toContain("<loc>https://blog.trajectonomics.com/guides/a/</loc>")
+	test("lists every address, absolute on the Site's origin", () => {
+		expect(xml).toContain("<loc>https://trajectonomics.com/blog/</loc>")
+		expect(xml).toContain("<loc>https://trajectonomics.com/blog/guides/a/</loc>")
 	})
 
-	test("names each address's alternates, absolute on the blog's host", () => {
+	test("names each address's alternates, absolute on the Site's origin", () => {
 		expect(xml).toContain(
-			'<xhtml:link rel="alternate" hreflang="th" href="https://blog.trajectonomics.com/th/guides/a/" />',
+			'<xhtml:link rel="alternate" hreflang="th" href="https://trajectonomics.com/blog/th/guides/a/" />',
 		)
 	})
 

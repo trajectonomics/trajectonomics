@@ -4,7 +4,7 @@ description: MooJot อ่านสลิปโอนเงินที่แอ
 type: guide
 publishedOn: 2026-11-23
 cover:
-  src: /posts/install-moojot-on-android/cover.webp
+  src: /blog/posts/install-moojot-on-android/cover.webp
   alt: แบนเนอร์สีชมพูมีรูปหมูของ MooJot โบกมือข้างหน้าจอมือถือที่แสดงยอดใช้จ่ายรายเดือนแยกตามหมวดหมู่ เหนือข้อความภาษาไทย "โอนปุ๊บ มูจดให้ปั๊บ", "แอป Android ฟรี อ่านสลิปธนาคารไทย" และ moojot.trajectonomics.com
   width: 1200
   height: 630
@@ -15,7 +15,7 @@ cover:
 ตอนนี้แอปยังไม่ได้ขึ้น Google Play จึงต้องติดตั้งจากไฟล์ APK แทน ใช้เวลาประมาณ 1 นาที และมี [วิดีโอสอนความยาว 2 นาที](https://youtu.be/OIfqAEZv6_M) ที่ทำให้ดูทุกขั้นตอนที่ต้องกด ตัววิดีโอเป็นภาษาไทย ส่วนขั้นตอนเดียวกันทั้งหมดแบบอ่านก็อยู่ด้านล่างนี้
 
 <figure>
-  <img src="/posts/install-moojot-on-android/steps.webp" alt="ภาพหน้าจอมือถือ 3 หน้า: หน้าจอ Chrome ที่ถามว่าจะดาวน์โหลดไฟล์ moojot-android-arm64.apk ต่อไปหรือไม่, หน้าจอ Android ที่ถามว่าจะติดตั้ง moojot หรือไม่ และหน้าแรกของ MooJot ที่มีรูปหมูกับยอดรวมประจำเดือน โดยเบลอรายการธุรกรรมจริงไว้" width="1440" height="1070" loading="lazy" />
+  <img src="/blog/posts/install-moojot-on-android/steps.webp" alt="ภาพหน้าจอมือถือ 3 หน้า: หน้าจอ Chrome ที่ถามว่าจะดาวน์โหลดไฟล์ moojot-android-arm64.apk ต่อไปหรือไม่, หน้าจอ Android ที่ถามว่าจะติดตั้ง moojot หรือไม่ และหน้าแรกของ MooJot ที่มีรูปหมูกับยอดรวมประจำเดือน โดยเบลอรายการธุรกรรมจริงไว้" width="1440" height="1070" loading="lazy" />
   <figcaption>กด Download anyway (ดาวน์โหลดต่อไป), กด Install (ติดตั้ง) แล้วมูก็จะอ่านสลิปให้เลย รายการธุรกรรมจริงถูกเบลอไว้</figcaption>
 </figure>
 

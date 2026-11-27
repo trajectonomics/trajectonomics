@@ -4,7 +4,7 @@ description: "เปรียบเทียบวิธีเขียนโค
 type: guide
 publishedOn: 2026-11-24
 cover:
-  src: /posts/coding-from-mobile-t3-code/cover.webp
+  src: /blog/posts/coding-from-mobile-t3-code/cover.webp
   alt: หุ่นยนต์สีครีมสองตัวตาสีส้มยืนคนละฝั่งของแท่นไม้เรืองแสงสีส้มกลางเนินทรายลายไม้ใต้ท้องฟ้าสีเข้ม
   width: 1024
   height: 1024
@@ -76,6 +76,6 @@ cover:
 
 ---
 
-ถ้าอยากเห็นว่าผมเอา Home Server พวกนี้ไปต่อยอดเป็นระบบ **Software Factory** ที่รันอัตโนมัติทุก 6 ชั่วโมงได้ยังไง อ่านต่อได้ที่ [เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR](/th/guides/software-factory/) และ [7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory](/th/guides/software-factory-7-things/)
+ถ้าอยากเห็นว่าผมเอา Home Server พวกนี้ไปต่อยอดเป็นระบบ **Software Factory** ที่รันอัตโนมัติทุก 6 ชั่วโมงได้ยังไง อ่านต่อได้ที่ [เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR](/blog/th/guides/software-factory/) และ [7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory](/blog/th/guides/software-factory-7-things/)
 
 ดูโค้ดและเอกสาร open source ทั้งหมดของเราได้ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory) และ [trajectonomics/trajectonomics](https://github.com/trajectonomics/trajectonomics) ถ้ามีประโยชน์ ฝากกดดาวให้ทั้งสอง repo ด้วยนะครับ
