@@ -28,8 +28,8 @@ interface Props {
 	/** The Flow to edit; absent for a new one. */
 	existing?: ScenarioFlow | undefined
 	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. A saved new income in a
-	 * taxed plan also hands over the Tax labels page its label goes on. */
-	onDone: (taxLabelHref?: string) => void
+	 * taxed plan also hands over the Flow whose Tax labels page takes its label. */
+	onDone: (taxLabelFlow?: string) => void
 	/** True when the drawer tries values in the What-if session, instead of saving them. */
 	tryValue?: boolean
 }
@@ -73,6 +73,8 @@ const needsTaxLabel = $derived(note !== null)
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
+	/** The ids the drawer opened on: the save's document adds the Flow a tax label is needed for. */
+	const before = new Set(doc.flows.map((flow) => flow.id))
 	const saved = await saveFlow({
 		name,
 		contentHash,
@@ -86,7 +88,9 @@ async function save(event: SubmitEvent): Promise<void> {
 	problems = saved.problems
 	cleared = saved.cleared
 	sent = saved.sent
-	if (saved.done) onDone(tryValue ? undefined : (note ?? undefined))
+	const added = saved.sent.find((id) => !before.has(id))
+	const taxLabelFlow = note === null ? undefined : added
+	if (saved.done) onDone(tryValue ? undefined : taxLabelFlow)
 }
 
 async function remove(): Promise<void> {

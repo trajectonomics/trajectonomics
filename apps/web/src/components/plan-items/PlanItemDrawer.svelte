@@ -1,6 +1,7 @@
 <script lang="ts">
 import { currentItemNames } from "../../client/item-names.svelte.js"
-import { taxLabelNotice } from "../../client/tax-label-notice.svelte.js"
+import { currentSearch } from "../../client/location.svelte.js"
+import { taxLabelNotice, taxLabelsHref } from "../../client/tax-label-notice.svelte.js"
 import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
 import { drawerTitle, type PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
@@ -43,9 +44,14 @@ const existingFlow = $derived(doc.flows.find((flow) => flow.id === drawer?.id))
 const existingAccount = $derived(doc.accounts.find((account) => account.id === drawer?.id))
 
 /** Closes the drawer, and offers the Tax labels page a just-saved new income in a taxed plan needs. */
-function flowDone(taxLabelHref?: string): void {
+function flowDone(taxLabelFlow?: string): void {
 	onClose()
-	if (taxLabelHref !== undefined) taxLabelNotice.offer(taxLabelHref)
+	if (taxLabelFlow !== undefined)
+		taxLabelNotice.offer({
+			plan: name,
+			flow: taxLabelFlow,
+			href: taxLabelsHref(currentSearch(), name),
+		})
 }
 </script>
 

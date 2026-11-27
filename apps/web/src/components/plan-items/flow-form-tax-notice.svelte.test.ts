@@ -42,7 +42,7 @@ describe("a new income's tax label notice", () => {
 	})
 
 	test("no notice for an edit, or for a plan without a Levy", () => {
-		expect(form(taxed, taxed.flows[0])).not.toContain("only counts income it knows by its label")
-		expect(form(untaxed)).not.toContain("only counts income it knows by its label")
+		expect(form(taxed, taxed.flows[0])).not.toContain("counts only income it knows by its label")
+		expect(form(untaxed)).not.toContain("counts only income it knows by its label")
 	})
 })

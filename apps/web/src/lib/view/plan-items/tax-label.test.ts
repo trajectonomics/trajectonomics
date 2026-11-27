@@ -1,28 +1,34 @@
 import { describe, expect, test } from "bun:test"
-import type { ScenarioDocument } from "../../contract"
+import { withFlowLabel } from "../tax-settings/label-edit"
+import { withoutFlow } from "./document"
 import { planDocument } from "./fixtures.test-support"
-import { newIncomeTaxNote } from "./tax-label"
+import { heldTaxLabelHref, type TaxLabelOffer } from "./tax-label"
 
-const untaxed = (): ScenarioDocument => {
-	const doc = planDocument()
-	delete doc.levies
-	return doc
+const offer: TaxLabelOffer = {
+	plan: "base",
+	flow: "pension",
+	href: "/settings/tax/?scenario=base",
 }
 
-describe("the notice a new income shows in a taxed plan", () => {
-	test("names the plan's Tax labels page, safe whatever the plan is called", () => {
-		expect(newIncomeTaxNote("base", planDocument(), "income", undefined)).toBe(
-			"/settings/tax/?scenario=base",
-		)
-		expect(newIncomeTaxNote("a b&c", planDocument(), "income", undefined)).toBe(
-			"/settings/tax/?scenario=a%20b%26c",
-		)
+describe("the Tax labels page a save offers", () => {
+	test("shows while the saved income still has no label", () => {
+		expect(heldTaxLabelHref(offer, "base", planDocument())).toBe(offer.href)
 	})
 
-	test("is no notice for an edit, a plan without a Levy, or an expense", () => {
-		const salary = planDocument().flows[0]
-		expect(newIncomeTaxNote("base", planDocument(), "income", salary)).toBeNull()
-		expect(newIncomeTaxNote("base", untaxed(), "income", undefined)).toBeNull()
-		expect(newIncomeTaxNote("base", planDocument(), "expense", undefined)).toBeNull()
+	test("goes away on another plan's Income page, which the notice does not name", () => {
+		expect(heldTaxLabelHref(offer, "other", planDocument())).toBeNull()
+	})
+
+	test("goes away once that income is labelled through the side navigation", () => {
+		const labelled = withFlowLabel(planDocument(), "pension", "income.section40_1")
+		expect(heldTaxLabelHref(offer, "base", labelled)).toBeNull()
+	})
+
+	test("goes away once that income is deleted", () => {
+		expect(heldTaxLabelHref(offer, "base", withoutFlow(planDocument(), "pension"))).toBeNull()
+	})
+
+	test("is no notice at all when no save offered one", () => {
+		expect(heldTaxLabelHref(null, "base", planDocument())).toBeNull()
 	})
 })

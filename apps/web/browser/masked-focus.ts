@@ -21,7 +21,7 @@ async function switchAwayAndBack(page: Page): Promise<void> {
 }
 
 /** Opens the Income drawer of the scratch plan with Hide amounts on, its Id and Starts filled. */
-async function incomeDrawer(page: Page, id: string): Promise<Locator> {
+export async function incomeDrawer(page: Page, id: string): Promise<Locator> {
 	await page.setViewportSize({ width: 360, height: 800 })
 	await chooseBeforeLoad(page, { theme: "light", hideAmounts: true })
 	await page.goto(`${SCRATCH_ORIGIN}/income/?scenario=hidden-amount-360`)

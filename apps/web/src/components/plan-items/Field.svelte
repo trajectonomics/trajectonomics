@@ -2,6 +2,7 @@
 import { lostWindow, maskedFocus } from "../../client/masked-focus.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { draftAfterInput, maskMoney } from "../../lib/format"
+import { describedBy, fieldChoices } from "../../lib/view/plan-items/field"
 import type { Choice } from "../../lib/view/plan-items/options"
 
 interface Props {
@@ -36,12 +37,7 @@ let {
 	money = false,
 }: Props = $props()
 
-/** The choices the select offers, plus the held value when the list does not name it, so it never opens empty. */
-const choices = $derived(
-	options === undefined || value === "" || options.some((option) => option.value === value)
-		? options
-		: [...options, { value, label: value }],
-)
+const choices = $derived(fieldChoices(options, value))
 let focused = $state(false)
 /** True while the digits show as the mask: a focused field shows the real value, so the person can edit it. */
 const masked = $derived(money && preferences.hidden && !focused && value.trim() !== "")
@@ -49,22 +45,18 @@ const shown = $derived(masked ? maskMoney(value) : value)
 
 /** The draft a typed value makes. Undo can put the mask back, which is no amount, so it keeps the draft and the field. */
 function onInput(event: Event & { currentTarget: HTMLInputElement }): void {
-	const typed = event.currentTarget.value
+	const field = event.currentTarget
+	const typed = field.value
 	const next = money ? draftAfterInput(value, typed) : typed
-	if (next !== typed) event.currentTarget.value = next
+	const caret = (field.selectionStart ?? typed.length) - (typed.length - next.length)
 	value = next
+	if (next !== typed) {
+		field.value = shown
+		field.setSelectionRange(caret, caret)
+	}
 }
 
-/** Every text the field is described by, so a hint and a problem are both there. */
-const described = $derived(
-	[
-		hint === undefined ? undefined : `${id}-hint`,
-		problem === undefined ? undefined : `${id}-problem`,
-		masked ? `${id}-masked` : undefined,
-	]
-		.filter((one) => one !== undefined)
-		.join(" ") || undefined,
-)
+const described = $derived(describedBy(id, { hint, problem, masked }))
 </script>
 
 <div class="space-y-1.5">

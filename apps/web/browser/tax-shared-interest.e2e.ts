@@ -2,9 +2,12 @@ import { expect, test } from "@playwright/test"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
 import { maskedAmountEdit } from "./masked-amount"
+import { maskedAmountFocusAway } from "./masked-away"
 import { maskedAmountTabSwitch, maskedAmountTabThenClick } from "./masked-focus"
+import { maskedAmountPasteMask, maskedAmountUndo } from "./masked-undo"
 import { SLOW, setsAndClears } from "./shared-interest"
 import { taxLabelAlert } from "./tax-label-alert"
+import { taxLabelRefusalAtFlow } from "./tax-label-wiring"
 
 // The write checks of the editable scratch Dashboard (cli ADR-0075): the shared home-loan interest of the Tax profile
 // page, a masked amount in the Income drawer (#761), and the Tax labels form's refusal alert (#761).
@@ -104,4 +107,28 @@ test("a refusal keeps its message and never takes focus again when the Flow sele
 }) => {
 	test.setTimeout(180_000)
 	await taxLabelAlert(page)
+})
+
+// An undo can put the mask back into a masked amount, which must show the mask, not the draft it hides (web #783).
+test("an undo at a masked amount shows the mask, and keeps the amount", async ({ page }) => {
+	test.setTimeout(180_000)
+	await maskedAmountUndo(page)
+})
+
+// A paste that holds the mask is dropped, and the caret stays where the paste was (web #783).
+test("a paste holding the mask keeps the caret where the paste was", async ({ page }) => {
+	test.setTimeout(180_000)
+	await maskedAmountPasteMask(page)
+})
+
+// A focus that moves while the window is away leaves no blur; the window's return must mask the field (web #783).
+test("a focus moved while the window is away still masks the amount", async ({ page }) => {
+	test.setTimeout(180_000)
+	await maskedAmountFocusAway(page)
+})
+
+// A refusal at one Flow's label stays there after the Flow select moves, so the form matches on the sent Flow (web #783).
+test("a refusal at a Flow's label stays after the Flow select moves", async ({ page }) => {
+	test.setTimeout(180_000)
+	await taxLabelRefusalAtFlow(page)
 })
