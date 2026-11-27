@@ -51,6 +51,15 @@ function ellipsisWidth(code: boolean, measure?: TextMeasure): number {
 	return code ? CODE_ELLIPSIS_PX : ELLIPSIS_PX
 }
 
+/** The words of the first `count` graphemes, without their trailing spaces. */
+function words(parts: readonly Grapheme[], count: number): string {
+	return parts
+		.slice(0, count)
+		.map((part) => part.text)
+		.join("")
+		.trimEnd()
+}
+
 /** The longest prefix of whole graphemes that fits `room` beside the ellipsis. */
 function prefix(
 	parts: readonly Grapheme[],
@@ -59,16 +68,19 @@ function prefix(
 	measure?: TextMeasure,
 ): LabelText {
 	if (measure !== undefined) {
-		let text = ""
-		let kept = ""
-		for (const part of parts) {
-			const next = `${text}${part.text}`
-			const candidate = next.trimEnd()
-			if (measure(candidate) + ellipsis > room) break
-			text = next
-			kept = candidate
+		// A prefix usually grows with every grapheme it holds, so the longest that fits is found by halving
+		// the candidates instead of walking them all: 80 letters take 7 measurements, not 80. Where a face
+		// joins its letters (Arabic), a longer prefix can paint narrower, so this may keep more text than a
+		// linear walk would; it never overflows, because it only returns a prefix it measured as fitting.
+		let low = 0
+		let high = parts.length
+		while (low < high) {
+			const middle = Math.ceil((low + high) / 2)
+			if (measure(words(parts, middle)) + ellipsis <= room) low = middle
+			else high = middle - 1
 		}
-		return { text: kept, width: measure(kept) }
+		const text = words(parts, low)
+		return { text, width: measure(text) }
 	}
 	let width = 0
 	let kept = 0
@@ -77,12 +89,5 @@ function prefix(
 		width += part.width
 		kept += 1
 	}
-	return {
-		text: parts
-			.slice(0, kept)
-			.map((part) => part.text)
-			.join("")
-			.trimEnd(),
-		width,
-	}
+	return { text: words(parts, kept), width }
 }
