@@ -47,7 +47,7 @@ for (const width of WIDTHS_PX) {
 			)
 			expect(failures(requests), "responses with an error status under /demo/").toEqual([])
 			expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
-			await expect(page.getByRole("complementary", { name: "About this demo" })).toBeVisible()
+			await expect(page.getByRole("note", { name: "About this demo" })).toBeVisible()
 		})
 	}
 }

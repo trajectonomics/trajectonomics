@@ -91,4 +91,13 @@ describe("AssetsCard", () => {
 		expect(body).toContain("Net worth could not be read")
 		expect(body).toContain('href="/net-worth/"')
 	})
+
+	test("shortens each legend amount on the card, keeping the exact figure in its title", () => {
+		const data = netWorth("2026-10-31", [row("Bank", "asset", "1214900.00")], THB("1214900.00"))
+		const { body } = render(AssetsCard, {
+			props: { assets: okRead(NW_ARGV, netWorthView(data)) },
+		})
+		expect(body).toContain("1.21M")
+		expect(body).toContain('title="1,214,900.00"')
+	})
 })

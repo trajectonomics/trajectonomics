@@ -1,4 +1,5 @@
 import type { ProjectionRun, Snapshot } from "../../contract"
+import { isCliError } from "../../edit/failure"
 import type { WhatIfLens } from "../../what-if/lens"
 import { parseTerms, type Terms } from "../projection/terms"
 
@@ -53,5 +54,5 @@ export function noProjectionReason(
 		return { text: "The Snapshot holds no projection for this plan.", fromCli: false }
 	return read.ok
 		? { text: "The projection of this plan holds no table.", fromCli: false }
-		: { text: read.error.message, fromCli: true }
+		: { text: read.error.message, fromCli: isCliError(read.error) }
 }

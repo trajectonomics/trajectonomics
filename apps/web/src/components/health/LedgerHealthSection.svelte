@@ -43,7 +43,6 @@ const checkColumns: Column<CheckLine>[] = [
 			<div class="space-y-6">
 				<div class="flex flex-wrap items-center gap-3">
 					<Badge tone={view.ok ? "neutral" : "accent"}>{view.ok ? "OK" : "Needs attention"}</Badge>
-					<span class="text-sm text-muted-foreground">traj {view.cliVersion}</span>
 				</div>
 				<DataTable
 					caption="Checks"

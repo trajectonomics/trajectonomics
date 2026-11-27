@@ -17,7 +17,6 @@ let { account, onAccount }: Props = $props()
 <!-- The Ledger: the accounts and their balances, the trial balance, profit and loss, and transactions. -->
 <PageShell
 	title="Ledger"
-	intro="The chart of accounts with its balances, the trial balance, profit and loss, and the transactions in this Snapshot."
 >
 	{#snippet children(snapshot)}
 		<div class="space-y-12">

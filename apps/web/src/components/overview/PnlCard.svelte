@@ -31,6 +31,7 @@ let { pnl }: Props = $props()
 									amount={total.amount}
 									currency={total.currency}
 									kind="net"
+									compact
 								/>
 							{/each}
 						</span>
