@@ -11918,5 +11918,307 @@
 			"cashflowBreakdown": true
 		},
 		"sha256": "22429258a182680b79c8d27edba98667bbe6bb0c39bf4df3811d66ad766d2170"
+	},
+	{
+		"name": "freelancer-plan-chance-inflation",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200,
+				"inflationVolatility": 150
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2051-01-01",
+			"resolution": "day"
+		},
+		"sha256": "a2f7b7f7e6c709045fd0c4cb27be0e50fda465e844ca9c5f84859d97a45302dc",
+		"plan": {
+			"buckets": 256,
+			"seed": "0123456789abcdef",
+			"paths": 200
+		},
+		"planSha256": "91d2c62b36aae3c4566e0e69343e7006cd49c406aa4e0820da30adfedee5e8b6",
+		"chanceSha256": "7a4a4314a65dcb0c3082d6168c1f68e618c8c1088efa5c8f87d6df41f6f371e5"
+	},
+	{
+		"name": "freelancer-path-inflation",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200,
+				"inflationVolatility": 150
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2051-01-01",
+			"resolution": "day"
+		},
+		"sha256": "a2f7b7f7e6c709045fd0c4cb27be0e50fda465e844ca9c5f84859d97a45302dc",
+		"path": {
+			"buckets": 256,
+			"seed": "0123456789abcdef",
+			"paths": 200,
+			"index": 7
+		},
+		"pathSha256": "fc1049fe0b2c35a504cd83b5267d26b898aacea6fcf44b068ab85a6b8bbfd343"
 	}
 ]

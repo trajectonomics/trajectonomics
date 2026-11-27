@@ -73,6 +73,8 @@ export interface ChanceOfSuccess {
 	/** Floored share of Market paths with no Runs-out through the horizon, in basis points. */
 	readonly successBps: BasisPoints
 	readonly bands: readonly ChanceBand[]
+	/** The same Bands in each path's own today's money; present only when the model has `inflation` (ADR 0033). */
+	readonly realBands?: readonly ChanceBand[]
 	readonly runsOut: readonly ChanceRunsOut[]
 	/** Spending Bands, present only when the Scenario declares a rule Flow (ADR 0024). */
 	readonly spending?: ChanceSpending
