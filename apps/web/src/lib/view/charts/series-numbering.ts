@@ -1,10 +1,8 @@
-/** A series by id and the name it reads, before names are told apart. */
-export type Series = { readonly id: string; readonly name: string }
-
-function countNames(names: readonly string[]): Map<string, number> {
-	const counts = new Map<string, number>()
-	for (const name of names) counts.set(name, (counts.get(name) ?? 0) + 1)
-	return counts
+/** A series by id and the name it reads, before names are told apart. A `twinLabel` names a twin suffix instead of the id's label. */
+export type Series = {
+	readonly id: string
+	readonly name: string
+	readonly twinLabel?: string
 }
 
 /** The indexes of each name more than one series reads. */
@@ -76,10 +74,4 @@ export function numbered<T extends Series>(
 	for (const sorted of sortedGroups(items, names))
 		numberGroup(items, names, sorted, fixed, taken, result)
 	return result
-}
-
-/** The names that more than one series reads, by index. */
-export function clashing(names: readonly string[]): boolean[] {
-	const counts = countNames(names)
-	return names.map((name) => (counts.get(name) ?? 0) > 1)
 }

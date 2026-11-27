@@ -55,13 +55,13 @@ describe("one id reads one name", () => {
 		const none = withCashLines([{ group: "expense", id: "rent" }])
 		const named = seriesNames([home, none], home, NO_NAMES)
 		expect(named.get(rent("Home"))).toBe("Expense: rent")
-		expect(named.get(rent(null))).toBe("Expense: rent (rent)")
+		expect(named.get(rent(null))).toBe("Expense: rent (rent, no category)")
 		const chart: ChartDef = { id: "rent", name: "Rent", kind: "line", series: [rent(null)] }
 		const view = chartView(chart, byId(home), named, "nominal")
 		expect(view.missing).toEqual([
 			{
 				id: rent(null),
-				name: "Expense: rent (rent)",
+				name: "Expense: rent (rent, no category)",
 				reason: "this plan has no such cash-flow line",
 			},
 		])
@@ -75,7 +75,7 @@ describe("one id reads one name", () => {
 		const one = withCashLines([{ group: "category", id: null }])
 		const category = (id: string | null) => `cash:${JSON.stringify(["category", id, null, null])}`
 		const named = seriesNames([both], both, NO_NAMES)
-		expect(named.get(category("Uncategorised"))).toBe("Spending on: Uncategorised (Uncategorised)")
+		expect(named.get(category("Uncategorised"))).toBe("Spending on: Uncategorised")
 		expect(named.get(category(null))).toBe("Spending on: Uncategorised (no category)")
 		for (const runs of [
 			[both, one],
