@@ -26,6 +26,7 @@ let {
 	ranked,
 	day,
 	planSince = {},
+	heading = true,
 }: {
 	/** The peaks API's plans. */
 	plans: PlanPeak[]
@@ -35,6 +36,8 @@ let {
 	day: string
 	/** The first collected UTC day per plan; absent on an old health body. */
 	planSince?: Record<string, string>
+	/** Whether the section's own heading and info control are drawn above the table. */
+	heading?: boolean
 } = $props()
 
 type RowView = {
@@ -256,28 +259,30 @@ function choose(plan: string, tier: string): void {
 {/snippet}
 
 <div class="plan-peaks">
-	<h2 class="meta-label section-title peaks-title">
-		<span id="peaks-title">What each plan gives</span>
-		<button
-			class="peaks-info"
-			type="button"
-			popovertarget="peaks-info-panel"
-			aria-label="How these numbers are worked out"
-		>
-			<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-				<circle cx="8" cy="8" r="6.75" fill="none" stroke="currentColor" stroke-width="1.25" />
-				<path
-					d="M8 7.25v4"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.5"
-					stroke-linecap="round"
-				/>
-				<circle cx="8" cy="4.75" r="1" fill="currentColor" />
-			</svg>
-		</button>
-	</h2>
-	<PlanPeaksInfo />
+	{#if heading}
+		<h2 class="meta-label section-title peaks-title">
+			<span id="peaks-title">What each plan gives</span>
+			<button
+				class="peaks-info"
+				type="button"
+				popovertarget="peaks-info-panel"
+				aria-label="How these numbers are worked out"
+			>
+				<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+					<circle cx="8" cy="8" r="6.75" fill="none" stroke="currentColor" stroke-width="1.25" />
+					<path
+						d="M8 7.25v4"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+					/>
+					<circle cx="8" cy="4.75" r="1" fill="currentColor" />
+				</svg>
+			</button>
+		</h2>
+		<PlanPeaksInfo />
+	{/if}
 
 	<table class="peaks-table peaks-table-wide">
 		<caption class="visually-hidden">

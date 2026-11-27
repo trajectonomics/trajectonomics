@@ -17,7 +17,7 @@ export type PlanId =
 	| "mistral"
 	| "unknown"
 
-/** The hand-kept plan table. Prices intentionally do not belong to this slice. */
+/** The hand-kept plan table. Prices live in the separate dated price catalogue. */
 export type PlanDefinition = {
 	id: PlanId
 	name: string

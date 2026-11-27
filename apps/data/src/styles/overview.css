@@ -5,7 +5,7 @@
 	max-width: 72rem;
 	min-width: 0;
 	margin: 0 auto;
-	padding: 0 1.25rem 96px;
+	padding: 0 1rem 96px;
 }
 
 @media (min-width: 40rem) {

@@ -1,0 +1,117 @@
+/* The plan bars: one bar per plan on a shared scale, with the meter's range as a whisker. */
+
+.plan-bars {
+	padding-top: 4px;
+}
+
+.bars-figure {
+	margin: 0;
+	padding: 24px 0 0;
+}
+
+.bars-svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.bars-grid {
+	stroke: var(--ds-color-border);
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+}
+
+.bars-axis,
+.bars-value,
+.bars-meta {
+	font-family: var(--font-meta);
+	font-variant-numeric: tabular-nums;
+}
+
+.bars-axis {
+	fill: var(--ds-color-muted-foreground);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+}
+
+.bars-value {
+	fill: var(--ds-color-foreground);
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.bars-meta {
+	fill: var(--ds-color-muted-foreground);
+	font-size: 9px;
+}
+
+.bars-fill {
+	fill: var(--ds-color-primary);
+}
+
+/* A lower bound is hatched, never a solid figure, so it cannot read as a limit. */
+.bars-fill-fallback {
+	fill: url(#plan-bar-hatch);
+	stroke: var(--ds-color-muted-foreground);
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+}
+
+/* A rough estimate steps back but keeps its shape. */
+.bars-fill-rough {
+	fill: var(--ds-color-muted-foreground);
+	opacity: 0.55;
+}
+
+.bars-stub {
+	fill: var(--ds-color-muted-foreground);
+	opacity: 0.45;
+}
+
+.bars-whisker line,
+.bars-whisker polygon {
+	stroke: var(--ds-color-foreground);
+	fill: var(--ds-color-foreground);
+	stroke-width: 1.5;
+	vector-effect: non-scaling-stroke;
+}
+
+/* The labels under the bars share the SVG's slots: 56 units in, 16 units out of 720. */
+.bars-labels {
+	display: grid;
+	grid-template-columns: repeat(var(--bar-count), minmax(0, 1fr));
+	padding: 4px 2.2222% 0 7.7778%;
+}
+
+.bars-label {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 0 2px;
+	text-align: center;
+}
+
+.bars-name {
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.2;
+	overflow-wrap: break-word;
+}
+
+.bars-tier {
+	font-family: var(--font-meta);
+	font-size: 9px;
+	line-height: 1.3;
+	color: var(--ds-color-muted-foreground);
+	overflow-wrap: break-word;
+}
+
+.bars-note {
+	font-family: var(--font-meta);
+	font-size: 8px;
+	line-height: 1.2;
+	color: var(--ds-color-muted-foreground);
+	overflow-wrap: break-word;
+}
