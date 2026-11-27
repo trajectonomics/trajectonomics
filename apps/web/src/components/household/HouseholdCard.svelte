@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { saveHousehold } from "../../client/household-save.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, ScenarioDocument } from "../../lib/contract"
 import { householdWithoutAnchor } from "../../lib/view/household/document"
@@ -51,15 +52,7 @@ function open(next: Form | null): void {
 /** Removes the anchor of a path, as one write of the household without it. */
 async function unpin(path: string): Promise<void> {
 	if (household === null) return
-	await editSession.run(
-		{
-			kind: "set-household",
-			name,
-			householdHash,
-			household: householdWithoutAnchor(household, path),
-		},
-		"household",
-	)
+	await saveHousehold(name, householdHash, householdWithoutAnchor(household, path))
 }
 </script>
 

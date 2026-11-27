@@ -120,7 +120,7 @@ describe("an Edit over a plan that changed since the page read it", () => {
 	)
 
 	test(
-		"a household change that moves no anchored date still refuses the page's stale household save",
+		"a household change that moves no anchored date refuses the stale save, and a re-read lets it through",
 		async () => {
 			const editor = await setupEditor()
 			const reread = await editor.reread(editRequest({}, "{}"), 4321)
@@ -140,18 +140,30 @@ describe("an Edit over a plan that changed since the page read it", () => {
 			const people = household.people.map((person) =>
 				person.id === "me" ? { ...person, lifeExpectancy: 60 } : person,
 			)
-			const { status, answer } = await postEdit(
-				JSON.stringify({
-					kind: "set-household",
-					name: "base",
-					householdHash: stale,
-					household: { ...household, people },
-				}),
-			)
-			expect(status).toBe(200)
-			expect(answer.ok).toBe(false)
-			if (!answer.ok) expect(answer.error.code).toBe("scenario_changed")
+			const save = {
+				kind: "set-household",
+				name: "base",
+				householdHash: stale,
+				household: { ...household, people },
+			}
+			const refused = await postEdit(JSON.stringify(save))
+			expect(refused.status).toBe(200)
+			expect(refused.answer.ok).toBe(false)
+			if (!refused.answer.ok) expect(refused.answer.error.code).toBe("scenario_changed")
 			expect(holderLifeExpectancy()).toBe(95)
+
+			// Read again: the same save over the fresh read's householdHash is the one that runs.
+			const again = await editor.reread(editRequest({}, "{}"), 4321)
+			const freshPage = (await again.json()) as { ok: boolean; snapshot: unknown }
+			if (!freshPage.ok) throw new Error("the page could not read the plan")
+			const fresh = shownOf({ snapshot: freshPage.snapshot }, "base")
+			expect(fresh.scenario.householdHash).not.toBe(stale)
+			const saved = await postEdit(
+				JSON.stringify({ ...save, householdHash: fresh.scenario.householdHash }),
+			)
+			expect(saved.status).toBe(200)
+			if (!saved.answer.ok) throw new Error(saved.answer.error.message)
+			expect(holderLifeExpectancy()).toBe(60)
 		},
 		SLOW_MS,
 	)

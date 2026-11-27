@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { saveHousehold } from "../../client/household-save.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, HouseholdPerson } from "../../lib/contract"
 import { householdWithoutPerson, householdWithPerson } from "../../lib/view/household/document"
@@ -38,13 +39,7 @@ const taken = $derived((household?.people ?? []).map((person) => person.id))
 
 /** Saves the household as one Edit; the drawer closes only when it ran. */
 async function commit(next: HouseholdDocument): Promise<void> {
-	if (
-		await editSession.run(
-			{ kind: "set-household", name, householdHash, household: next },
-			"household",
-		)
-	)
-		onDone()
+	if (await saveHousehold(name, householdHash, next)) onDone()
 }
 
 async function save(event: SubmitEvent): Promise<void> {

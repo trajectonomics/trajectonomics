@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { saveHousehold } from "../../client/household-save.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, ScenarioFlow } from "../../lib/contract"
 import {
@@ -53,13 +54,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
-	if (
-		await editSession.run(
-			{ kind: "set-household", name, householdHash, household: next },
-			"household",
-		)
-	)
-		onDone()
+	if (await saveHousehold(name, householdHash, next)) onDone()
 }
 </script>
 
