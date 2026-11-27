@@ -24,15 +24,16 @@ function place(event: ToggleEvent): void {
 </script>
 
 <div id="peaks-info-panel" class="peaks-info-panel" popover ontoggle={place}>
+	<p>Each figure is the most tokens we used in that window, not the plan's limit.</p>
+	<p>Cache reads are counted apart because they cost far less, so they never lift a figure.</p>
 	<p>
-		≥ the most tokens we used in any 5 hours, 7 days or 30 days on that tier. The plan gives at
-		least this much.
+		Claude's 5 hours start at its first message. Claude and Antigravity months are the week × 30/7.
+		Other tiers scale by the vendor's stated multiplier; 30 days use the weekly one.
 	</p>
 	<p>
-		Highlighted: estimated from a tier we measured × the vendor's stated multiplier. 30 days follow
-		the weekly multiplier.
+		Highlighted: ≈ estimated from a tier we measured. – means the vendor states no multiplier.
 	</p>
-	<p>– means the vendor states no multiplier for that window.</p>
+	<p>Real limits will come from reading each plan's usage meter.</p>
 	<ul class="peaks-info-sources">
 		{#each sources as source (source.url)}
 			<li><a href={source.url}>{source.label}</a>, read {source.read}</li>

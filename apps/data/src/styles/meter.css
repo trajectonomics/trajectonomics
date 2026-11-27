@@ -44,6 +44,7 @@
 }
 
 .meter-track {
+	display: block;
 	height: 8px;
 	overflow: hidden;
 	border-radius: 999px;
@@ -51,6 +52,7 @@
 }
 
 .meter-bar {
+	display: block;
 	height: 100%;
 	border-radius: inherit;
 	background: var(--ds-color-primary);
@@ -71,6 +73,15 @@
 .meter-unit {
 	margin-left: 2px;
 	font-size: 11px;
+	font-weight: 400;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The cache-read share stays a small figure beside the meter, never the headline. */
+.meter-cache {
+	display: block;
+	margin-top: 1px;
+	font-size: 10px;
 	font-weight: 400;
 	color: var(--ds-color-muted-foreground);
 }
