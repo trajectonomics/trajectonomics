@@ -58,9 +58,13 @@ function milestoneLine(milestone: Record<string, unknown>, total: number): strin
 	const paths = typeof reached === "number" ? reached : 0
 	if (paths === 0) return `${label}: never reached in ${total} futures`
 	const dates = milestone["dates"]
-	const median = dateText(level(dates, "p50"))
+	const medianEntry = level(dates, "p50")
+	const median = dateText(medianEntry)
 	const low = dateText(level(dates, "p10"))
 	const high = dateText(level(dates, "p90"))
+	if (isRecord(medianEntry) && low === median && median === high) {
+		return `${label}: reached in ${paths} of ${total} futures; ${median}`
+	}
 	return `${label}: reached in ${paths} of ${total} futures; median ${median}, 10-90%: ${low} to ${high}`
 }
 

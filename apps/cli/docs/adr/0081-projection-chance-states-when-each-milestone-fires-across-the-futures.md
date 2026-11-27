@@ -21,11 +21,14 @@ reach "stop work" and the month of the median one, with their age then.
     `reached.paths` is 0.
   - `byYear` is `[{ year, paths }]` for every calendar year that holds a fire, ascending.
 - **Each stated date also carries each household person's age.** Every Percentile date is
-  `{ date, ages }`, and `ages` is `agesOn(household, date)` from the CLI's own household code
-  (cli ADR-0048): `[{ person, age }]` in household order, with each person's age on that date. A
-  person who is not in the plan on that date is absent from that date's `ages`: a partner with a
-  `joins` month before its first day, and a dependent before their birth month, are listed on later
-  dates only. A plan without a household has `ages: []` on every date.
+  `{ date, ages }`, where `date` is the month start the engine states and `ages` is
+  `agesOn(household, <the last day of that month>)` from the CLI's own household code (cli
+  ADR-0048). An age lands on the last day of its birth month, and an annual row states its ages on
+  its `to` date, so the month's last day is where a date and its ages agree: `[{ person, age }]` in
+  household order, with each person's age on that day. A person who is not in the plan on that date
+  is absent from that date's `ages`: a partner with a `joins` month before its first day, and a
+  dependent before their birth month, are listed on later dates only. A plan without a household has
+  `ages: []` on every date.
 - **`--outcomes` together adds each path's fired dates.** Each outcome row gains `milestones`: a map
   from Milestone id to the date it fired on that path, in the run's order, empty when none did. With
   `--outcomes` alone no outcome row carries it, and without `--milestone-dates` the result has no
@@ -34,7 +37,9 @@ reach "stop work" and the month of the median one, with their age then.
 - **The human form prints one line per Milestone**, after the Bands:
   `<label>: reached in 912 of 1000 futures; median Jun 2041 (age 52), 10-90%: Jan 2038 to Mar 2046`.
   The label is `displayLabel` or the id. One person's median age reads `(age 52)`; several read
-  `(me 52, partner 50)`, and a date without a household omits the parentheses. A Milestone no path
+  `(me 52, partner 50)`, and a date without a household omits the parentheses. When the 10th, 50th
+  and 90th Percentiles fall in one month, the line states that date and its ages once:
+  `<label>: reached in 200 of 200 futures; Jan 2031 (me 40, partner 38, mali 4)`. A Milestone no path
   reached reads `<label>: never reached in 1000 futures`. "Never" is the engine's `reached: 0` at
   the run's end, which includes the paths that ran out early.
 - **`traj schema projection chance` publishes the flag and the fields.** `--milestone-dates` joins
@@ -53,9 +58,11 @@ reach "stop work" and the month of the median one, with their age then.
   Scenario order (sim ADR 0012), and a second order is a second answer to which one is first.
 - **A new `projection milestones` leaf.** Rejected: the answer belongs to the chance run, which
   already has the paths and their end, and ADR-0015 keeps one result shape per leaf.
-- **Ages on the fire date rather than the reported month start.** The engine reports Percentiles as
-  month starts, and a date and its ages must agree; the ages are therefore the ages on the stated
-  date.
+- **Ages on the fire date rather than the reported month start.** Rejected: the engine states a
+  Percentile as its month's first day and not the path's own fire date, and ADR-0048 lands an age on
+  the last day of the birth month, as an annual row states its ages on its `to` date. The ages are
+  therefore the ages on the last day of the reported month: the month start would read a
+  birthday-month fire one year too young and leave out a dependent born in that month.
 
 ## Consequences
 

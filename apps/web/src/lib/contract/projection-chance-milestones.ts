@@ -19,7 +19,10 @@ const milestoneDates = z.strictObject({
 const chanceMilestone = z.strictObject({
 	id: z.string(),
 	displayLabel: z.string().nullable(),
-	reached: z.strictObject({ paths: integer, share: z.string() }),
+	reached: z.strictObject({
+		paths: integer,
+		share: z.string().regex(/^\d+\.\d{2}%$/, "a percentage with two places"),
+	}),
 	dates: milestoneDates.nullable(),
 	byYear: z.array(z.strictObject({ year: integer, paths: integer })),
 })

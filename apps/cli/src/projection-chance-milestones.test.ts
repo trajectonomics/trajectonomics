@@ -5,6 +5,7 @@ import {
 	captureChance,
 	GOLDENS,
 	goldenText,
+	milestonedDependentHome,
 	milestonedHome,
 	milestoneFlags,
 } from "./projection-chance-milestones-support"
@@ -26,6 +27,15 @@ describe("projection chance --milestone-dates", () => {
 		expect(res.code).toBe(0)
 		await recordGoldenTextIn(GOLDENS, "chance-milestones-human.output", res.out)
 		expect(await goldenTextIn(GOLDENS, "chance-milestones-human.output")).toBe(res.out)
+	})
+
+	it("prints one date when the 10th, 50th and 90th Percentiles are the same month", async () => {
+		const home = await milestonedHome()
+		const res = await captureChance(home, milestoneFlags(modelFile(home)), false)
+		expect(res.code).toBe(0)
+		expect(res.out).toContain("retire: reached in 20 of 20 futures; Jun 2027 (age 37)")
+		expect(res.out).not.toContain("10-90%: Jun 2027")
+		expect(res.out).toContain("rich: reached in 20 of 20 futures; median Oct 2031")
 	})
 
 	it("matches the committed golden with --outcomes too, each path's fired dates by id", async () => {
@@ -64,8 +74,19 @@ describe("projection chance --milestone-dates", () => {
 		const body = chanceBody(await captureChance(home, milestoneFlags(modelFile(home))))
 		const retire = body.milestones?.find((entry) => entry.id === "retire")
 		expect(retire?.dates?.p50?.date).toBe("2027-06-01")
-		expect(retire?.dates?.p50?.ages.map((entry) => entry.person)).toEqual(["me"])
+		expect(retire?.dates?.p50?.ages).toEqual([{ person: "me", age: 37 }])
 		const rich = body.milestones?.find((entry) => entry.id === "rich")
 		expect(rich?.dates?.p50?.ages.map((entry) => entry.person)).toEqual(["me", "partner"])
+	})
+
+	it("takes the ages on the month's last day, so a dependent born in the fire month is 0", async () => {
+		const home = await milestonedDependentHome()
+		const body = chanceBody(await captureChance(home, milestoneFlags(modelFile(home))))
+		const retire = body.milestones?.find((entry) => entry.id === "retire")
+		expect(retire?.dates?.p50?.date).toBe("2027-06-01")
+		expect(retire?.dates?.p50?.ages).toEqual([
+			{ person: "me", age: 37 },
+			{ person: "mali", age: 0 },
+		])
 	})
 })

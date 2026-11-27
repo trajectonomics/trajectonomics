@@ -1,10 +1,14 @@
 import { ILLUSTRATIVE_SEED } from "./projection/chance-testing"
 import { AS_OF } from "./projection/testing"
-import { HORIZON, milestonedHome } from "./projection-chance-milestones-fixture"
+import {
+	HORIZON,
+	milestonedDependentHome,
+	milestonedHome,
+} from "./projection-chance-milestones-fixture"
 import { chanceBody } from "./projection-chance-support"
 import { type Captured, capture } from "./test-support"
 
-export { milestonedHome }
+export { milestonedDependentHome, milestonedHome }
 
 export const GOLDENS: URL = new URL("./projection/fixtures/", import.meta.url)
 

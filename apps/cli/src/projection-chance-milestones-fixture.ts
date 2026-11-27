@@ -1,5 +1,6 @@
 import type { Milestone, Scenario } from "@trajectonomics/core/sim"
 import { PROJECTION_SCENARIO, projectionHome } from "./projection/testing"
+import type { Household } from "./scenario/household/model"
 import { applyScenario, scenario } from "./scenario-test-support"
 
 export const HORIZON = "2032-03-30"
@@ -50,13 +51,13 @@ const MILESTONES: Milestone[] = [
 	},
 ]
 
-const HOUSEHOLD = {
-	schemaVersion: 1 as const,
+const HOUSEHOLD: Household = {
+	schemaVersion: 1,
 	people: [
-		{ id: "me", role: "holder" as const, born: "1990-06", lifeExpectancy: 90 },
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
 		{
 			id: "partner",
-			role: "partner" as const,
+			role: "partner",
 			born: "1992-02",
 			lifeExpectancy: 90,
 			joins: "2030-01",
@@ -65,17 +66,34 @@ const HOUSEHOLD = {
 	anchors: [{ path: "milestones.retire.criteria.when.on", person: "me", age: 37 }],
 }
 
+/** The same household with a child born in the `retire` fire month, so they are 0 by its end. */
+const DEPENDENT_HOUSEHOLD: Household = {
+	...HOUSEHOLD,
+	people: [
+		...HOUSEHOLD.people,
+		{ id: "mali", role: "dependent", relation: "child", born: "2027-06", lifeExpectancy: 90 },
+	],
+}
+
 const PLAN: Scenario = { ...PROJECTION_SCENARIO, milestones: MILESTONES }
 
-export async function milestonedHome(): Promise<string> {
+async function holderHome(household: Household): Promise<string> {
 	const home = await projectionHome()
 	const applied = await applyScenario(home, "milestoned", PLAN)
 	if (applied.code !== 0) throw new Error(applied.err)
 	const set = await scenario(
 		home,
 		["household", "milestoned", "--file", "-"],
-		JSON.stringify(HOUSEHOLD),
+		JSON.stringify(household),
 	)
 	if (set.code !== 0) throw new Error(set.err)
 	return home
+}
+
+export function milestonedHome(): Promise<string> {
+	return holderHome(HOUSEHOLD)
+}
+
+export function milestonedDependentHome(): Promise<string> {
+	return holderHome(DEPENDENT_HOUSEHOLD)
 }
