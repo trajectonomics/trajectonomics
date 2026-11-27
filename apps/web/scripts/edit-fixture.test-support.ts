@@ -29,9 +29,11 @@ export type Answer =
 export type ShownDocument = {
 	scenario: {
 		contentHash: string
+		householdHash: string
 		version: number
 		document: { flows: { id: string; amount?: string; end?: string }[] }
 		household: {
+			people: { id: string; lifeExpectancy?: number }[]
 			anchors: { path: string; person: string; age?: number }[]
 			owners?: { path: string; person: string }[]
 		} | null
@@ -109,10 +111,9 @@ export function withAmount(
 	}
 }
 
-/** The stored content hash of a plan: the one a page that read it now would send with its Edit. */
-export function hashOf(name: string): string {
-	return ledgerShow(name, true).scenario.contentHash
-}
+/** The hash a plan Edit sends: the document's, or with a household Edit the document and household together. */
+export const hashOf = (name: string) => ledgerShow(name, true).scenario.contentHash
+export const householdHashOf = (name: string) => ledgerShow(name, true).scenario.householdHash
 
 /** `traj scenario show --json` on the scratch ledger, for the ledger's own answer. */
 export function ledgerShow(name: string, decimal: boolean): ShownDocument {
