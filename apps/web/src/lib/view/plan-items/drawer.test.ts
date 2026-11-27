@@ -26,10 +26,10 @@ describe("the drawer's heading", () => {
 		)
 	})
 
-	test("says Add when no item is open, and Try a value for a What-if", () => {
+	test("says Add when no item is open, and What if… for a What-if", () => {
 		expect(drawerTitle({}, "expense", NAMES, "flow")).toBe("Add expense")
 		expect(drawerTitle({ id: "salary", tryValue: true }, "income", NAMES, "flow")).toBe(
-			"Try a value for My salary",
+			"What if… My salary",
 		)
 	})
 })

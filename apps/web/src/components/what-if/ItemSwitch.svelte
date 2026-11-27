@@ -40,7 +40,7 @@ function change(control: HTMLInputElement): void {
 }
 </script>
 
-<!-- A what-if control per item: the switch takes it out of the what-if, and "Try a value" sets one field of it. -->
+<!-- A what-if control per item: the switch takes it out of the what-if, and "What if…" sets one field of it. -->
 <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-sm" data-also={also.join(" ") || undefined}>
 	<label class="inline-flex items-center gap-2">
 		<input
@@ -54,5 +54,5 @@ function change(control: HTMLInputElement): void {
 		/>
 		<span>{off ? "Off in this what-if" : "On"}</span>
 	</label>
-	<button type="button" onclick={onTry} disabled={whatIfSession.saving} class={button}>Try a value</button>
+	<button type="button" onclick={onTry} disabled={whatIfSession.saving} class={button}>What if…</button>
 </div>

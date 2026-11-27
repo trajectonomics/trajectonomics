@@ -31,3 +31,12 @@ A person who keeps several plans ("retire at 55", "retire at 60 and buy a condo"
 - Every new Edit kind stays a change to `src/lib/edit/edit.ts`, its pinned list and ADR 0008's list, which this ADR amends: the list now also holds `rename-plan`, `set-plan-notes` and `set-main-plan`, and `apply-plan` may carry a template.
 - A Snapshot saved before cli ADR 0071 has no `main` or `hasNotes`; it reads as no main plan and no notes, so the pages open on their first plan as they did.
 - The Demo snapshot has no main plan and no notes, so `/plans/` there shows two cards, the notes empty and no menu.
+
+## Amendment (2026-11-27): the switcher picks a plan, and the Plans page manages them
+
+The switcher had grown into a list of every plan, each with its own "Actions" menu, so finding a page or a plan meant scanning the same controls twice. The switcher now does one thing: it picks the plan the pages show.
+
+- **The switcher is one button in the top bar and a menu of plans.** The button names the plan on screen and tags the main plan; the menu lists each plan as one choice (`role="menuitemradio"`, the plan on screen checked), then a separator, then "All plans" and, when Edits show, "New plan". It sits in the top bar's flexible middle, so it is visible at every width, the phone included, and a long plan name truncates rather than widening the bar. The side navigation and the phone drawer no longer hold a plan list.
+- **The per-plan menu stays on `/plans/` only.** Rename, Notes, Make this my main plan, Copy and Delete are the cards' actions (`PlanMenu`), which already carried them. A second copy in the switcher put a destructive control one click from every page for a job the Plans page does.
+- **The single shared `PlanDrawer` is unchanged.** "New plan" in the switcher opens the same drawer on its new form, and the rest of the plan Edits keep their one form and one state (`src/client/plan-editor.svelte.ts`).
+- **Picking a plan is still one rule.** The menu calls the same handler as the pages (`selectPlan`), so it writes `?scenario=` and a What-if session's "Revert and switch" question still decides whether the switch runs.

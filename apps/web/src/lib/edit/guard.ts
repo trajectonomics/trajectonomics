@@ -96,7 +96,7 @@ export function refuseEdit(facts: EditFacts): Refusal | null {
 	if (mediaTypeOf(facts.contentType) !== "application/json") {
 		return refusal(415, "unsupported_media_type", "An Edit is sent as application/json.")
 	}
-	if (!facts.ready) return refusal(503, "not_ready", "The Snapshot is still being read.")
+	if (!facts.ready) return refusal(503, "not_ready", "The figures are still being read.")
 	if (facts.busy) return refusal(409, "edit_running", "Another Edit is running. Wait for it.")
 	return null
 }

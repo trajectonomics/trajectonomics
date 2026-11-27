@@ -20,7 +20,7 @@ describe("TrialBalanceSection", () => {
 			data: { asOf: "2026-10-31", rows: [], netWorth: [] },
 		}
 		const { body } = render(TrialBalanceSection, { props: { balance: without } })
-		expect(body).toContain("No trial balance in this Snapshot")
+		expect(body).toContain("No trial balance in these figures")
 	})
 
 	test("shows the CLI's error in its section when the balance Read failed", () => {

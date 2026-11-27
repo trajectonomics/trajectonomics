@@ -2,6 +2,7 @@ import type { DocumentSpec, RequiredDocumentField } from "../command"
 import { type AppError, fail } from "../errors"
 import { decimalDocument } from "./decimal-schema"
 import { scenarioDocument } from "./document-form"
+import { WHAT_IF_FLAG_FORM } from "./what-if-form"
 
 /** The input fields `scenario apply` reads; the forms share one input schema. */
 export type ApplyFlags = {
@@ -45,6 +46,7 @@ export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	hint: FORM_HINT,
 	exclusiveHints: { set: WHAT_IF_HINT, without: WHAT_IF_HINT, add: WHAT_IF_HINT },
 	alternate: { flag: "decimal", schema: decimalDocument },
+	flagForm: WHAT_IF_FLAG_FORM,
 }
 
 /** Whether the what-if form's Overrides were given: a removal, an addition or a Set, with or without `--decimal`. */

@@ -31,8 +31,8 @@ const session = $derived(
 </script>
 
 {#if name === null || read === undefined}
-	<EmptyState title="No plan document in this Snapshot">
-		<p>The Snapshot holds no document for the selected plan, so its routing cannot be shown.</p>
+	<EmptyState title="No plan document to show">
+		<p>These figures hold no document for the selected plan, so its routing cannot be shown.</p>
 	</EmptyState>
 {:else}
 	<ReadView {read} label={`The routing of ${name}`}>

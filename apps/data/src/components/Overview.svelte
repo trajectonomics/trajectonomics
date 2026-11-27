@@ -9,6 +9,7 @@ import { chartSeries } from "../lib/series"
 import { DATA_PATH } from "../lib/site"
 import { usageTable } from "../lib/table"
 import PlanBreakdown from "./PlanBreakdown.svelte"
+import PlanPeaks from "./PlanPeaks.svelte"
 import PlanSummary from "./PlanSummary.svelte"
 import UsageChart from "./UsageChart.svelte"
 import UsageTable from "./UsageTable.svelte"
@@ -69,8 +70,14 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 	{:else if days !== null}
 		<section class="section-block" aria-labelledby="plans-title">
 			<h2 id="plans-title" class="meta-label section-title">Tokens we used on each plan</h2>
-			<PlanSummary {totals} />
+			<PlanSummary {totals} day={days.to} />
 		</section>
+
+		{#if state.peaks !== null && state.peaks.plans.length > 0}
+			<section class="section-block" aria-labelledby="peaks-title">
+				<PlanPeaks plans={state.peaks.plans} ranked={totals} day={days.to} />
+			</section>
+		{/if}
 
 		<section class="section-block" aria-labelledby="details-title">
 			<h2 id="details-title" class="meta-label section-title">Details</h2>

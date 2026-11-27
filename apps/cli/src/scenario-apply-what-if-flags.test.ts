@@ -15,7 +15,8 @@ describe("scenario apply --set, with a household", () => {
 		const before = await stored(home)
 		const res = await apply(home, ["base", "--set", 'flows.salary.end="2030-01-01"'])
 		expect(res.code).toBe(2)
-		expect(errorOf(res)).toMatchObject({
+		const error = errorOf(res)
+		expect(error).toMatchObject({
 			code: "invalid_input",
 			path: "document.flows.0.end",
 			details: {
@@ -23,7 +24,29 @@ describe("scenario apply --set, with a household", () => {
 				anchored: "2050-06-30",
 			},
 		})
+		expect(error.hint).toContain("The value came from the `--set` on `flows.salary.end`.")
+		expect(error.hint).not.toContain("2030-01-01")
 		expect((await stored(home)).row).toEqual(before.row)
+	})
+
+	it("names the Set's path when the anchored Flow's id has an escaped =", async () => {
+		const home = scenarioHome()
+		const document = {
+			...SCENARIO_DOCUMENT,
+			flows: SCENARIO_DOCUMENT.flows.map((flow, index) =>
+				index === 0 ? { ...flow, id: "salary=old" } : flow,
+			),
+		}
+		await seedBase(home, document)
+		await setHousehold(home, {
+			...HOUSEHOLD,
+			anchors: [{ path: "flows.salary=old.end", person: "me", age: 60 }],
+		})
+		const res = await apply(home, ["base", "--set", 'flows.salary\\=old.end="2030-01-01"'])
+		expect(res.code).toBe(2)
+		expect(errorOf(res).hint).toContain(
+			"The value came from the `--set` on `flows.salary\\=old.end`.",
+		)
 	})
 
 	it("drops the anchor of a removed item and lists it in droppedAnchors", async () => {
@@ -114,6 +137,9 @@ describe("traj schema scenario apply, for the what-if form", () => {
 		expect(res.code).toBe(0)
 		const described = JSON.parse(res.out)
 		expect(described.input.properties.set).toMatchObject({ flag: "--set" })
+		expect(described.input.properties.set.description).toContain(
+			"Applied to the stored plan, the Set is saved.",
+		)
 		expect(described.input.properties.without).toMatchObject({ flag: "--without" })
 		expect(described.input.properties.add).toMatchObject({ flag: "--add" })
 		expect(described.description).toContain("--set, --without and --add")

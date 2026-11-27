@@ -7,11 +7,11 @@ import type { PersonNames } from "../item-names"
 import { type AnnualRow, annualRowsOf } from "./annual"
 import type { Terms } from "./terms"
 
-/** The name of the nominal series, as the chart's legend shows it. */
-export const NOMINAL_NAME = "Nominal net worth"
+/** The name of the future-money series, as the chart's legend shows it. */
+export const NOMINAL_NAME = "Net worth in future money"
 
-/** The name of the real series: net worth in As-of terms. Drawn dashed, so it is told apart. */
-export const REAL_NAME = "Real net worth, in As-of terms"
+/** The name of the today's-money series. Drawn dashed, so it is told apart. */
+export const REAL_NAME = "Net worth in today's money"
 
 /**
  * The net worth series of a projection, one point per annual row. The x position is the row's

@@ -30,10 +30,7 @@ let { netWorth }: Props = $props()
 					<p class="text-sm">{view.note}</p>
 				{/if}
 				{#if view.sparkline.length > 1}
-					<div>
-						<Sparkline label="Net worth at each month-end" values={view.sparkline} />
-						<p class="mt-1 text-xs text-muted-foreground">Month-end history</p>
-					</div>
+					<Sparkline label="Net worth at each month-end" values={view.sparkline} />
 				{/if}
 			</div>
 		{/snippet}

@@ -3,12 +3,12 @@ import { chanceFixture } from "./fixtures.test-support"
 import { chanceSummaryOf, chanceViewOf, fanSeriesOf, runsOutBarsOf } from "./page"
 
 describe("chanceSummaryOf", () => {
-	test("states the share from the CLI's basis points, with the paths, the horizon and the currency", () => {
+	test("states the share from the CLI's basis points, with the markets and the currency", () => {
 		expect(chanceSummaryOf(chanceFixture())).toEqual({
-			share: "87.00%",
+			share: "87%",
 			succeeded: 174,
 			paths: 200,
-			horizon: "31 Dec 2028",
+			lasts: "Lasts to 2028 in 174 of 200 markets.",
 			currency: "THB",
 		})
 	})
@@ -80,7 +80,7 @@ describe("runsOutBarsOf", () => {
 describe("chanceViewOf", () => {
 	test("carries the CLI's definition and notes beside the share and the bars", () => {
 		const view = chanceViewOf(chanceFixture())
-		expect(view.share).toBe("87.00%")
+		expect(view.share).toBe("87%")
 		expect(view.definition).toEqual({
 			modelId: "illustrative-demo-model",
 			seed: "0123456789abcdef",

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { parsePeaksQuery } from "../src/core/peaks-query"
 import { parseUsageQuery } from "../src/core/query"
 import { NOW_MS } from "./support/fixtures"
 
@@ -154,6 +155,35 @@ describe("parseUsageQuery", () => {
 		expect(parse("?from=2026-11-20&asOf=2026-11-19")).toMatchObject({
 			ok: false,
 			error: { code: "INVALID_RANGE" },
+		})
+	})
+})
+
+function parsePeaks(search: string) {
+	return parsePeaksQuery(new URL(`https://trajectonomics.com/data/api/peaks${search}`), NOW_MS)
+}
+
+describe("parsePeaksQuery", () => {
+	test("defaults asOf to today", () => {
+		expect(parsePeaks("")).toEqual({ ok: true, query: { asOf: "2026-11-25" } })
+	})
+
+	test("reads the asOf day like the usage endpoint", () => {
+		expect(parsePeaks("?asOf=2026-11-24")).toEqual({ ok: true, query: { asOf: "2026-11-24" } })
+	})
+
+	test("rejects a bad or out-of-range day", () => {
+		expect(parsePeaks("?asOf=2026-11-24T10:00:00Z")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_DATE" },
+		})
+		expect(parsePeaks("?asOf=2019-12-31")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_DATE" },
+		})
+		expect(parsePeaks("?asOf=2026-11-27")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_DATE" },
 		})
 	})
 })

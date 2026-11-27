@@ -61,6 +61,16 @@ function mainFirst(names: string[], read: StageOneReads["scenarios"]): string[] 
 		: names
 }
 
+/** The names of the Scenarios whose documents declare Milestones, from the list read. */
+function milestonedOf(read: StageOneReads["scenarios"]): Set<string> {
+	if (!read.ok) return new Set()
+	return new Set(
+		read.data.scenarios
+			.filter((scenario) => scenario.hasMilestones === true)
+			.map((scenario) => scenario.name),
+	)
+}
+
 /** The first transaction date net worth reports, or null when the ledger has none. */
 function firstDateOf(read: StageOneReads["netWorth"]): string | null {
 	return read.ok ? read.data.firstTransactionDate : null
@@ -101,7 +111,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		projections: planProjections(params, scenarios),
 		fi: planFi(params, scenarios),
 		compare: planCompare(params),
-		chance: planChance(params, scenarios),
+		chance: planChance(params, scenarios, milestonedOf(one.scenarios)),
 		readPaths: params.readPaths,
 		pathOf: (scenario, index) => pathRead(params, scenario, index),
 		allowances: planAllowances(params, scenarios),

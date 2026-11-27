@@ -36,7 +36,7 @@ describe("the layout, printed", () => {
 		const header = body.match(/<p data-print-header[^>]*>([^<]*)<\/p>/)
 		expect(header).not.toBeNull()
 		expect(header?.[1]).toContain(`As of ${formatDate(DEMO.params.asOf)}`)
-		expect(header?.[1]).toContain("Real, in As-of terms")
+		expect(header?.[1]).toContain("Today's money")
 		expect(header?.[1]).toContain(DEMO.params.scenarios[0] ?? "no plan in the Demo snapshot")
 		expect(body).toContain('<header class="print:hidden')
 		expect(body).toMatch(/<dialog[^>]*class="print:hidden/)

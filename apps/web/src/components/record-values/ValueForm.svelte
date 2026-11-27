@@ -28,7 +28,7 @@ const noAccount = $derived(needsAgainstAccount(sheet))
 		void session.save(sheet)
 	}}
 >
-	<Field id="value-date" label="Value as of" hint="YYYY-MM-DD, the Snapshot's As-of unless you change it" bind:value={session.date} problem={session.problems.date} />
+	<Field id="value-date" label="Value as of" hint="YYYY-MM-DD, the plan's As-of unless you change it" bind:value={session.date} problem={session.problems.date} />
 	<AgainstField {sheet} />
 	{#each sheet.groups as group (group.key)}
 		<SheetGroup {group} since={sheet.since} />

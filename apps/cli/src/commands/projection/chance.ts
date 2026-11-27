@@ -8,6 +8,7 @@ import { chanceOf } from "../../projection/chance"
 import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../../projection/chance-bounds"
 import { CHANCE_EXAMPLES } from "../../projection/chance-examples"
 import { chanceHint } from "../../projection/chance-hint"
+import { milestoneDatesFlag } from "../../projection/chance-milestones-view"
 import { returnModelFlagDocument } from "../../projection/chance-model"
 import { outcomesFlag } from "../../projection/chance-outcomes-view"
 import { bucketsFlag, modelSourceOf, returnModelFlag } from "../../projection/chance-plan"
@@ -54,6 +55,7 @@ export const chance: Leaf = defineCommand({
 			.meta({ pattern: SEED_PATTERN.source })
 			.describe("Sixteen lower-case hex digits. The same seed and model give the same paths."),
 		outcomes: outcomesFlag,
+		milestoneDates: milestoneDatesFlag,
 	}),
 	flagDocuments: [returnModelFlagDocument, carryInFlagDocument],
 	output: chanceView,
@@ -89,6 +91,7 @@ export const chance: Leaf = defineCommand({
 				seed: input.seed,
 				paths: input.paths,
 				outcomes: input.outcomes,
+				milestoneDates: input.milestoneDates,
 			})
 		})
 	},

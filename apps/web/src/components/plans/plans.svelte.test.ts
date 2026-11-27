@@ -9,7 +9,6 @@ import { ledgerWith } from "../../lib/view/plans/fixtures.test-support"
 import { type PlanRow, planRows } from "../../lib/view/plans/rows"
 import { LOADING } from "../../lib/view/state"
 import PlansPage from "../pages/PlansPage.svelte"
-import PlanSwitcher from "../shell/PlanSwitcher.svelte"
 import DeletePlanForm from "./DeletePlanForm.svelte"
 import NewPlanForm from "./NewPlanForm.svelte"
 import NotesForm from "./NotesForm.svelte"
@@ -62,8 +61,8 @@ describe("the plans page", () => {
 		expect(body.match(/<svg[^>]*role="img"/g)?.length ?? 0).toBeGreaterThanOrEqual(2)
 		expect(body).toContain('href="/projection/?scenario=base"')
 		expect(body).toContain('href="/projection/?scenario=retire-early"')
-		expect(body).toContain("Open the Projection of base")
-		expect(body).toContain("Open the Projection of retire-early")
+		expect(body).toContain("Open the Plan for base")
+		expect(body).toContain("Open the Plan for retire-early")
 		expect(body).not.toContain("Open the Overview")
 	})
 
@@ -113,41 +112,6 @@ describe("the plans page", () => {
 		expect(body).toContain("grid gap-4 sm:grid-cols-2 xl:grid-cols-3")
 		expect(body).toContain("break-words")
 		expect(body).toContain("flex flex-wrap")
-		expect(body).not.toMatch(/min-w-\[|(?<!max-)w-\[\d/)
-		expect(body).not.toContain("overflow-x")
-	})
-})
-
-describe("the plan switcher menu", () => {
-	const switcher = (editable = true) =>
-		render(PlanSwitcher, {
-			props: {
-				names: ["retire-early", "base"],
-				selected: "base",
-				onChange: noop,
-				editable,
-				rows: planRows(SNAPSHOT).filter((one) => one.projected),
-			},
-		}).body
-
-	test("tags the main plan and shows a notes icon on a plan that has notes", () => {
-		const body = switcher()
-		expect(body.indexOf("retire-early")).toBeLessThan(body.indexOf("base"))
-		expect(body.match(/>Main</g)).toHaveLength(1)
-		expect(body.match(/Has notes/g)?.length).toBeGreaterThanOrEqual(1)
-		expect(body.indexOf("Has notes")).toBeGreaterThan(body.indexOf("retire-early"))
-	})
-
-	test("does not offer to make the main plan the main plan", () => {
-		const body = switcher()
-		// Two plans, two menus; only the plan that is not main offers it.
-		expect(body.match(/Make this my main plan/g)).toHaveLength(1)
-	})
-
-	test("fits a phone: rows wrap, names break, and nothing has a fixed width", () => {
-		const body = switcher()
-		expect(body).toContain("flex flex-wrap items-center")
-		expect(body).toContain("break-words")
 		expect(body).not.toMatch(/min-w-\[|(?<!max-)w-\[\d/)
 		expect(body).not.toContain("overflow-x")
 	})

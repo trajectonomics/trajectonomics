@@ -19,8 +19,8 @@ const name = $derived(chooseScenario(snapshot.params.scenarios, scenario))
 {#if name === null}
 	<EmptyState title="No plan to read" />
 {:else if !hasLevy(snapshot.reads.documents[name])}
-	<EmptyState title="No Levy in this plan">
-		<p>Allowances lower a Levy's tax, so the plan needs one. Add Thailand's with:</p>
+	<EmptyState title="No tax rules in this plan">
+		<p>Allowances lower a plan's tax, so the plan needs tax rules. Add Thailand's with:</p>
 		<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code>{addLevyCommand(name)}</code></pre>
 	</EmptyState>
 {:else}

@@ -15,7 +15,9 @@ first Posts. The type filter, the compare template, structured data and the firs
 Add `src/content/posts/<slug>/<language>.md`, where `<language>` is `en` or `th`, with `title`,
 `description`, `type` (`compare`, `guide` or `news`), `publishedOn`, `cover` (`src`, `alt`,
 `width`, `height`) and optionally `draft: true`. Its images go in `public/posts/<slug>/` as WebP, and
-a `src` is their public path under the blog's base, such as `/blog/posts/<slug>/cover.webp`.
+a `src` is their public path under the blog's base, such as `/blog/posts/<slug>/cover.webp`. Stamp a
+short thumbnail title and optional kicker onto the `1024 × 1024` cover artwork with `bun run cover`
+and state the visible words in `cover.alt`.
 
 To translate a Post, add another `<language>.md` in the same folder. Translate `title`,
 `description`, `cover.alt` and the body, and keep `type`, `publishedOn`, `cover.src`, the cover's
@@ -46,6 +48,7 @@ bun run preview    # the build behind the real Worker config, with wrangler dev
 | `check` | lint, typecheck, test, build and `verify:build`, in that order; the deploy runs it |
 | `build` | copies the brand's fonts and Favicon Set into `public/`, then builds `dist/` |
 | `verify:build` | checks the built files: titles, canonicals and `hreflang` alternates that resolve, the Shell, every image present with alt text, a Not-found Page |
+| `cover` | composites a 1–2 line thumbnail title, optional 40 px kicker and brand mark onto a `1024 × 1024` WebP cover (`--in`, `--out`, `--title`, optional `--kicker`, `--shift`, `--size`; needs Playwright Chromium, `ffmpeg` with `libwebp`, and a Thai sans font for Thai text) |
 | `screenshots` | builds, then writes `docs/screenshots/<theme>/<page>-<width>.png` at 1280, 2000 and 390 px |
 | `test` | `bun test ./src ./scripts` |
 | `typecheck` | `astro sync`, `tsc`, then `astro check` |

@@ -9,10 +9,10 @@ export interface Drawn {
 	readonly points: readonly Pt[]
 }
 
-const STACKED_NOTE = "A stacked chart draws one set of terms, so it is nominal."
+const STACKED_NOTE = "A stacked chart draws one set of terms, so it is in future money."
 const STACKED_MIXED_NOTE =
-	"A stacked chart draws one set of terms, and a series here has no figure in today's money from traj, so it is nominal."
-const NOMINAL_NOTE = "Series marked nominal have no figure in today's money from traj."
+	"A stacked chart draws one set of terms, and a series here has no figure in today's money from traj, so it is in future money."
+const NOMINAL_NOTE = "Series marked future money have no figure in today's money from traj."
 const PART_YEAR_NOTE = "A faded column is a part year."
 
 /** The day a line's periods end each year, such as "30 Oct": from its first full period, or its first. */
@@ -39,7 +39,7 @@ function periodNote(lines: readonly Drawn[]): string | null {
 export function chartNotes(input: {
 	kind: ChartKind
 	lines: readonly Drawn[]
-	/** The terms asked for, when a stacked chart had to draw nominal instead. */
+	/** The terms asked for, when a stacked chart had to draw future money instead. */
 	stackedNominal: "real" | "both" | null
 	nominalLabelled: boolean
 }): string[] {

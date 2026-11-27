@@ -119,7 +119,7 @@ describe("a plan whose projection read failed", () => {
 			fromCli: true,
 		})
 		expect(noProjectionReason(reads, "missing")).toEqual({
-			text: "The Snapshot holds no projection for this plan.",
+			text: "These figures hold no projection for this plan.",
 			fromCli: false,
 		})
 	})

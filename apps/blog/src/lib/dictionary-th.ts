@@ -13,10 +13,7 @@ export const TH: Dictionary = Object.freeze({
 	languageMenuLabel: "ภาษา",
 	frontTitle: "บล็อก · Trajectonomics",
 	frontDescription: "บทเปรียบเทียบ คู่มือ และข่าวของ traj เครื่องมือจำลองการเงินฟรีแบบโอเพนซอร์สสำหรับ AI agent",
-	mastheadLabel: "บล็อก Trajectonomics",
-	mastheadTitle: "บทเปรียบเทียบ คู่มือ และข่าว",
-	mastheadLede: "traj ต่างจากวิธีที่คุณใช้อยู่ตรงไหน โดยทุกตัวเลขมาจากการทดสอบที่คุณรันซ้ำเองได้",
-	latest: "ล่าสุด",
+	frontHeading: "บทเปรียบเทียบ คู่มือ และข่าว",
 	noPosts: "ยังไม่มีบทความ",
 	postTitleSuffix: "บล็อก Trajectonomics",
 	typeLabels: Object.freeze({ compare: "เปรียบเทียบ", guide: "คู่มือ", news: "ข่าว" }),
@@ -39,5 +36,5 @@ export const TH: Dictionary = Object.freeze({
 	footerOrganisation: "องค์กร",
 	footerReport: "แจ้งข้อมูลผิด",
 	footerLicence: "สัญญาอนุญาต",
-	footerLicenceLine: (siteName: string) => `${siteName} · ซอร์สโค้ดของบล็อกใช้สัญญาอนุญาต MIT`,
+	footerLicenceLine: (siteName: string) => `${siteName} · ซอร์สโค้ดของบล็อกใช้สัญญาอนุญาต AGPL-3.0`,
 })

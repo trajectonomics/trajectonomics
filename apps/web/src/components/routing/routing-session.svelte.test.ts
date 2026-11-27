@@ -3,6 +3,7 @@ import { render } from "svelte/server"
 import { editSession } from "../../client/edit.svelte.js"
 import { routing } from "../../client/routing.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
+import { WRITTEN_REREAD_FAILED, WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
 import { sessionWith } from "../../lib/view/routing/change"
 import { moved } from "../../lib/view/routing/order"
 import { shownPlan } from "../../lib/what-if/routing"
@@ -115,6 +116,18 @@ describe("a refusal's source", () => {
 			message: "WITHDRAW_FLOOR_ORDER: a floor after a plain entry",
 		}
 		expect(routing.messageFromCli).toBe(true)
+	})
+
+	test("leaves a write that landed and could not be read again to the stale notice, not the form", () => {
+		editSession.source = "routing"
+		editSession.failure = {
+			code: WRITTEN_REREAD_FAILED,
+			exitCode: 1,
+			message: WRITTEN_REREAD_FAILED_MESSAGE,
+		}
+		expect(editSession.savedUnread).toBe(true)
+		expect(routing.message).toBeNull()
+		expect(routing.messageFromCli).toBe(false)
 	})
 })
 

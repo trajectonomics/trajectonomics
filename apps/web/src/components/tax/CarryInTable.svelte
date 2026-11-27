@@ -20,7 +20,7 @@ let { rows, currency }: Props = $props()
 	</h2>
 	{#each rows as row (row.key)}
 		<article class="rounded-lg border border-border p-4 text-sm">
-			<p class="font-medium">{row.levy}, period starts {row.periodStart}</p>
+			<p class="font-medium">Tax rules <code class="font-mono text-xs">{row.levy}</code>, period starts {row.periodStart}</p>
 			<p class="mt-1 text-muted-foreground">Source: {row.source}</p>
 			<p class="mt-2 flex justify-between gap-4">
 				<span>Prepaid</span>

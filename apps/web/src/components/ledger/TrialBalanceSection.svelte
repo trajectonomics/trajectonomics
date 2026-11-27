@@ -51,7 +51,7 @@ const totalColumns: Column<TrialBalanceTotal>[] = [
 		{#snippet children(data)}
 			{@const view = trialBalanceView(data.trialBalance, currentAccountNames())}
 			{#if view === null}
-				<EmptyState title="No trial balance in this Snapshot" />
+				<EmptyState title="No trial balance in these figures" />
 			{:else}
 				<div class="space-y-6">
 					<DataTable

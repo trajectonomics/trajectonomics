@@ -3,6 +3,7 @@ import { BASE_PATH, LEGACY_HOST, SITE_ORIGIN } from "./urls"
 /** What the Worker answers for one request; `src/http/router.ts` turns it into a Response. */
 export type Route =
 	| { kind: "usage" }
+	| { kind: "peaks" }
 	| { kind: "health" }
 	| { kind: "ingest" }
 	| { kind: "not_found" }
@@ -38,6 +39,7 @@ function legacyRoute(input: RouteInput): Route {
 	const prefixed = isUnderBase(input.pathname) ? siteRoute(input) : undefined
 	if (prefixed !== undefined && prefixed.kind !== "not_found") return prefixed
 	if (input.pathname === "/api/usage") return { kind: "usage" }
+	if (input.pathname === "/api/peaks") return { kind: "peaks" }
 	if (input.pathname === "/api/health") return { kind: "health" }
 	if (input.pathname.startsWith("/api/")) return { kind: "not_found" }
 	if (input.pathname === "/ingest") return { kind: "ingest" }
@@ -59,6 +61,7 @@ function siteRoute(input: RouteInput): Route {
 	if (!isUnderBase(input.pathname)) return { kind: "not_found" }
 	const pathname = input.pathname.slice(BASE_PATH.length)
 	if (pathname === "/api/usage") return { kind: "usage" }
+	if (pathname === "/api/peaks") return { kind: "peaks" }
 	if (pathname === "/api/health") return { kind: "health" }
 	if (pathname === "/ingest") return { kind: "ingest" }
 	return { kind: "not_found" }

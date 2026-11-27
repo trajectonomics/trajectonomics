@@ -42,7 +42,7 @@ describe("the short Answer engine file", () => {
 		expect(LLMS_TXT).not.toContain(`](${languageBuildUrl("th")})`)
 	})
 
-	it("links the Docs Portal, both repositories and the MIT licence the footer links", () => {
+	it("links the Docs Portal, both repositories and the AGPL-3.0-only licence the footer links", () => {
 		for (const url of [
 			DOCS_URL,
 			DOCS_CLI_URL,

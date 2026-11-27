@@ -73,7 +73,7 @@ function seriesOf(
 }
 
 const NOMINAL = "Value"
-const REAL = "Value, in As-of terms"
+const REAL = "Value in today's money"
 
 /** The value chart of an asset, or null when the run states no value for it (it was run without `--accounts`). */
 export function assetChartOf(run: ProjectionRun | undefined, parts: AssetParts): AssetChart | null {

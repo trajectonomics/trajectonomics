@@ -39,6 +39,7 @@ describe("scenario list and show", () => {
 				"contentHash",
 				"createdAt",
 				"forkedFrom",
+				"hasMilestones",
 				"hasNotes",
 				"id",
 				"main",
