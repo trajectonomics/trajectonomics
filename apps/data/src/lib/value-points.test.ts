@@ -9,6 +9,7 @@ function figure(overrides: Partial<WeeklyFigure> = {}): WeeklyFigure {
 		plan: "claude",
 		planName: "Claude",
 		tier: "Max",
+		unit: "tokens",
 		kind: "estimate",
 		tokens: 1_000_000,
 		low: 900_000,

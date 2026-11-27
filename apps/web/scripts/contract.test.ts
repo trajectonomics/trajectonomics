@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { existsSync } from "node:fs"
 import { fileURLToPath } from "node:url"
-import { snapshot } from "../src/lib/contract"
+import { baselineRates, snapshot } from "../src/lib/contract"
 import { readsOf } from "../src/lib/snapshot"
 import { type DemoRun, runDemo } from "./demo-run"
 import { demoSnapshotJson } from "./demo-snapshot"
@@ -40,6 +40,21 @@ describe("the Snapshot against the real traj", () => {
 			if (notes[0]?.ok === false) expect(notes[0].error.code).toBe("invalid_input")
 			expect(failed.filter((read) => !notes.includes(read))).toEqual([])
 			expect(snapshot.safeParse(run.snapshot).success).toBe(true)
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"the baseline rates read parses with its contract and states rows from the demo ledger",
+		async () => {
+			const run = await demoRun()
+			if (!run.ok) throw new Error(`the demo did not run: ${run.message}`)
+			const rates = run.snapshot.reads.rates
+			expect(rates?.ok).toBe(true)
+			if (rates?.ok) {
+				expect(baselineRates.parse(rates.data)).toEqual(rates.data)
+				expect(rates.data.rows.length).toBeGreaterThan(0)
+			}
 		},
 		SLOW_MS,
 	)

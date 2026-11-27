@@ -3,6 +3,7 @@ import { allowancePlan } from "../snapshot/allowance-params"
 import { accountList } from "./account-list"
 import { balance } from "./balance"
 import { baseline } from "./baseline"
+import { baselineRates } from "./baseline-rates"
 import { dateString } from "./date"
 import { doctor } from "./doctor"
 import { fi } from "./fi"
@@ -55,6 +56,8 @@ export const snapshotReads = z.strictObject({
 	pnl: readOf(pnl),
 	transactions: readOf(txList),
 	baseline: readOf(baseline),
+	// Absent from a Snapshot saved before the guided first plan, so a document that never had the key reads as none.
+	rates: readOf(baselineRates).optional(),
 	scenarios: readOf(scenarioList),
 	// Absent from a Snapshot made before the planner pages, so a document that never had the key reads as none.
 	documents: z.record(z.string(), readOf(scenarioShow)).default({}),

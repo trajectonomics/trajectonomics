@@ -18,6 +18,7 @@ const SNAPSHOT = {
 		pnl: single("report"),
 		transactions: single("tx"),
 		baseline: single("baseline"),
+		rates: single("rates"),
 		scenarios: single("scenario"),
 		netWorthHistory: [read(["report", "networth", "--json"], true)],
 		projections: {
@@ -71,7 +72,7 @@ describe("traj dashboard", () => {
 			url: "http://127.0.0.1:4321/",
 			asOf: "2026-11-30",
 			horizon: "2056-11-30",
-			reads: 12,
+			reads: 13,
 			failedReads: ["traj projection run --scenario base --breakdown --liabilities --json"],
 		})
 		expect(calls[0]?.port).toBe(DEFAULT_PORT)
