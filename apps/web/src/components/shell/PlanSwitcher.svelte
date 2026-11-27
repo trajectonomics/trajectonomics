@@ -1,5 +1,6 @@
 <script lang="ts">
 import { planEditor } from "../../client/plan-editor.svelte.js"
+import { planChoices } from "../../lib/view/plans/choices"
 import type { PlanRow } from "../../lib/view/plans/rows"
 import PlanRowItem from "../plans/PlanRowItem.svelte"
 import { BUTTON } from "../plans/styles"
@@ -31,12 +32,12 @@ let { names, selected, onChange, editable = false, rows = [] }: Props = $props()
 			Plans
 		</h2>
 		<ul aria-labelledby="plan-switcher" class="space-y-2">
-			{#each names as name (name)}
+			{#each planChoices(names, selected, onChange) as choice (choice.name)}
 				<PlanRowItem
-					{name}
-					row={rows.find((row) => row.name === name)}
-					selected={name === selected}
-					{onChange}
+					name={choice.name}
+					row={rows.find((row) => row.name === choice.name)}
+					selected={choice.selected}
+					onChoose={choice.choose}
 					{editable}
 				/>
 			{/each}

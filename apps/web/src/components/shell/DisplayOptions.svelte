@@ -1,12 +1,13 @@
 <script lang="ts">
 import { shellPanels } from "../../client/shell.svelte.js"
+import { clickedBackdrop } from "../../lib/view/shell/backdrop"
 import NavIcon from "./NavIcon.svelte"
 import PreferenceControls from "./PreferenceControls.svelte"
 
 let dialog: HTMLDialogElement | undefined = $state()
 
 function close(): void {
-	shellPanels.options = false
+	shellPanels.closeOptions()
 }
 
 // The drawer is a modal dialog: showModal traps focus, and Escape closes it through the dialog's own event.
@@ -23,7 +24,7 @@ $effect(() => {
 	aria-labelledby="display-options-title"
 	onclose={close}
 	onclick={(event) => {
-		if (event.target === dialog) close()
+		if (clickedBackdrop(event.target, dialog)) close()
 	}}
 	class="print:hidden m-0 ml-auto h-dvh max-h-none w-80 max-w-[90vw] border-l border-border bg-card p-0 text-card-foreground backdrop:bg-black/40"
 >
