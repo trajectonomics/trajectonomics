@@ -14,3 +14,11 @@ export const planName = z
 export const contentHash = z
 	.string()
 	.regex(/^jcs1:sha256:[0-9a-f]{64}$/, "not a content hash traj can take")
+
+/**
+ * The hash of the plan's document and household together, as the Snapshot states it (`householdHash`).
+ * A household write that names it is refused when either part moved on (cli ADR 0055).
+ */
+export const householdHash = z
+	.string()
+	.regex(/^jcs1:sha256:[0-9a-f]{64}$/, "not a household hash traj can take")

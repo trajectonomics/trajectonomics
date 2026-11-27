@@ -73,6 +73,7 @@ export function documentRead(document: ScenarioDocument = planDocument()): Read<
 				id: "01a2",
 				name: "base",
 				contentHash: "jcs1:sha256:abc",
+				householdHash: "hash-household",
 				forkedFrom: null,
 				version: 2,
 				createdAt: "2026-11-22T17:25:38.908Z",

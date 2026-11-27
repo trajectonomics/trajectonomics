@@ -8,10 +8,13 @@ import {
 	scenarioHome,
 	summariesOf,
 } from "./scenario-test-support"
+import { canonicalJson, householdHash } from "./store/canonical"
 import { SCENARIO_DOCUMENT } from "./store/testing"
 import { capture } from "./test-support"
 
 const BASE = SCENARIO_DOCUMENT
+/** A show of a plan with no household: the hash of its document and null household (cli ADR-0055). */
+const NO_HOUSEHOLD_HASH = householdHash(canonicalJson(BASE), null)
 
 describe("scenario fork", () => {
 	it("copies a Scenario under a new name and keeps the source byte-identical", async () => {
@@ -31,6 +34,7 @@ describe("scenario fork", () => {
 		expect(resultOf(await scenario(home, ["show", "base"])).scenario).toEqual({
 			...base,
 			household: null,
+			householdHash: NO_HOUSEHOLD_HASH,
 			tax: null,
 			taxed: false,
 			notes: null,

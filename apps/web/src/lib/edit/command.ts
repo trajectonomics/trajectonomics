@@ -74,7 +74,7 @@ export function writeCommand(edit: Edit, dryRun: boolean, template?: string): Wr
 					"--file",
 					"-",
 					"--if-hash",
-					edit.contentHash,
+					edit.householdHash,
 					...flags,
 				],
 				stdin: JSON.stringify(edit.household),
@@ -87,7 +87,7 @@ export function writeCommand(edit: Edit, dryRun: boolean, template?: string): Wr
 					edit.name,
 					"--none",
 					"--if-hash",
-					edit.contentHash,
+					edit.householdHash,
 					...flags,
 				],
 			}
