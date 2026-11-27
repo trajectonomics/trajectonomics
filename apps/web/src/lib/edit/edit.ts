@@ -1,12 +1,14 @@
 /**
  * The Edits the Dashboard may send: a closed list, and each one is one `traj` write
- * ([ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)). The
- * page names an Edit by its kind and its values; the server builds the argv here, so nothing outside
+ * ([ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)), apart from a
+ * guided first plan, which writes the plan and then its household ([ADR 0031](../../../docs/adr/0031-a-guided-first-plan-is-one-edit-that-saves-a-plan-and-its-household.md)).
+ * The page names an Edit by its kind and its values; the server builds the argv here, so nothing outside
  * this list ever runs. `edit.test.ts` pins the list and the argv of each Edit.
  */
 import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
 import { contentHash, householdHash, planName } from "./fields"
+import { guidedEditSchema } from "./guided-edit"
 import { planEditSchemas, startPlanSchema } from "./plan-edits"
 import { recordValuesSchema } from "./record-values"
 import { taxFlags } from "./tax-flags"
@@ -27,6 +29,7 @@ export const EDIT_KINDS = [
 	"set-plan-notes",
 	"set-main-plan",
 	"record-values",
+	"start-guided-plan",
 ] as const
 
 /** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
@@ -100,6 +103,8 @@ const savedEdit = z.discriminatedUnion("kind", [
 	}),
 	// The first write to the ledger itself: values stated as of a date, which traj turns into Transactions (cli ADR 0072).
 	recordValuesSchema,
+	// A guided first plan: the one Edit that runs two writes, the plan and then its household (web ADR 0031).
+	guidedEditSchema,
 ])
 
 /**

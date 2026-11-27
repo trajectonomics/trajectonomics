@@ -29,6 +29,7 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 		case "copy-plan":
 		case "apply-plan":
 		case "apply-overrides":
+		case "start-guided-plan":
 			return scenarios.length === 0 || scenarios.includes(edit.name)
 				? [...scenarios]
 				: [...scenarios, edit.name]

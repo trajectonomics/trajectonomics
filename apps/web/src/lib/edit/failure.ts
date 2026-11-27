@@ -69,6 +69,10 @@ export const SERVER_CODES: ReadonlySet<string> = new Set([
 	"invalid_return_model",
 	"invalid_paths",
 	"invalid_seed",
+	// A guided plan's own refusals: the template no longer lines up, no row is kept, or its household was refused and the plan would not go (web ADR 0031).
+	"guided_ledger_changed",
+	"guided_no_flow",
+	"guided_plan_half_saved",
 ])
 
 /**

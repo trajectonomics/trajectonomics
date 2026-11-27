@@ -20,6 +20,7 @@ describe("the Edit list", () => {
 			"set-plan-notes",
 			"set-main-plan",
 			"record-values",
+			"start-guided-plan",
 		])
 	})
 

@@ -1,6 +1,7 @@
 /**
- * The `traj` write each Edit runs: the argv, and the standard input the write reads. Pure; the Edit list is
+ * The `traj` write each single-write Edit runs: the argv, and the standard input the write reads. Pure; the Edit list is
  * `edit.ts`, and each Edit maps to one `traj` write here (a `scenario` write, or `account value` for the ledger) ([web ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
+ * A guided plan writes the plan and then its household, so its argv live in `edit-guided.ts` and `serve-guided.ts` runs them.
  */
 import { decimalTokens, overrideTokens } from "../what-if/argv"
 import type { Edit } from "./edit"
@@ -105,5 +106,8 @@ export function writeCommand(edit: Edit, dryRun: boolean, template?: string): Wr
 				argv: ["account", "value", "--file", "-", ...flags],
 				stdin: JSON.stringify(valuesDocument(edit)),
 			}
+		case "start-guided-plan":
+			// A guided plan runs three writes in a row, so its argv live in `edit-guided.ts` and `serve-guided.ts` runs them.
+			throw new Error("a guided plan's writes are built in serve-guided.ts")
 	}
 }
