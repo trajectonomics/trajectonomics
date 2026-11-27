@@ -10,8 +10,8 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 | `Plan` | decides whether the web jobs run | always |
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
 | `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
-| `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/4` | same as `Check web` |
-| `Check web browser` | the browser checks over the built Demo: `turbo run @trajectonomics/web#build`, then `bun run test:browser` in `apps/web` | same as `Check web` |
+| `Check web scripts (1)` ... `(6)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/6` | same as `Check web` |
+| `Check web browser (1)` ... `(2)` | one shard of the browser checks over the built Demo: `turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted`, then `bun run test:browser --shard=N/2` in `apps/web` | same as `Check web` |
 | `Check` | fails unless every job above passed (a skipped web job passes only when `Plan` said to skip it) | always |
 
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the

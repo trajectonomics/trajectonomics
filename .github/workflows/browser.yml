@@ -42,24 +42,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - name: Restore the Turborepo cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          node-version: "22"
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-web-
+            turbo-${{ runner.os }}-packages-
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: 1.4.4
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      # The site and docs import `@trajectonomics/brand`'s generated ./current folder, which `bun install`
-      # does not create. Turbo builds it before a check; these jobs run outside turbo, so build it here.
-      - name: Build the brand package
-        working-directory: packages/brand
-        run: bun run build
+      # Build the Site (and its upstream brand and hosted Demo dependencies) once through turbo,
+      # reusing the CI Turborepo cache instead of cold-building the hosted Demo twice.
+      - name: Build the Site and its Demo assets
+        run: bunx turbo run @trajectonomics/site#build --concurrency=4
 
       - name: Read the Playwright version
         id: playwright
@@ -67,6 +67,7 @@ jobs:
         run: echo "version=$(node -p 'require("./package.json").devDependencies["@playwright/test"]')" >> "$GITHUB_OUTPUT"
 
       - name: Cache the Playwright browser
+        id: browser
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
@@ -74,15 +75,20 @@ jobs:
 
       - name: Install Chromium
         working-directory: apps/site
-        run: bunx playwright install --with-deps chromium
+        run: |
+          if [ "${{ steps.browser.outputs.cache-hit }}" = true ]; then
+            bunx playwright install-deps chromium
+          else
+            bunx playwright install --with-deps chromium
+          fi
 
       - name: Run the browser checks
         working-directory: apps/site
-        run: bun run test:browser
+        run: bunx playwright test
 
       - name: Run the mobile performance budget
         working-directory: apps/site
-        run: bun run test:performance
+        run: bun scripts/performance.ts
 
       - name: Upload the browser report
         if: failure()

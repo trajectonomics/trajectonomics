@@ -13,6 +13,7 @@ export default defineConfig({
 	testMatch: "**/*.e2e.ts",
 	fullyParallel: true,
 	retries: 0,
+	workers: process.env["CI"] ? 4 : "50%",
 	reporter: process.env["CI"] ? [["list"], ["html", { open: "never" }]] : "list",
 	// The baselines e2e/visual.e2e.ts is validated against, committed so CI can compare them.
 	snapshotDir: "e2e/visual-snapshots",

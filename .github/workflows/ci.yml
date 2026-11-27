@@ -99,6 +99,7 @@ jobs:
           key: turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-${{ github.sha }}
           restore-keys: |
             turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-
 
       - name: Setup the workspace
         uses: ./.github/actions/setup
@@ -109,7 +110,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
-        run: bunx turbo run check --affected --filter='!@trajectonomics/web' --concurrency=2
+        run: bunx turbo run check --affected --filter='!@trajectonomics/web' --concurrency=4
 
       # The guards read every tracked file, but `--affected` selects them only when a file inside
       # tooling/guards changes. Run them on every pull request so an archived link in any folder
@@ -120,7 +121,7 @@ jobs:
 
       - name: Check every package
         if: github.event_name != 'pull_request'
-        run: bunx turbo run check --filter='!@trajectonomics/web' --concurrency=2
+        run: bunx turbo run check --filter='!@trajectonomics/web' --concurrency=4
 
       - name: Save the Turborepo cache
         if: ${{ !cancelled() && steps.cache.outputs.cache-hit != 'true' }}
@@ -148,6 +149,8 @@ jobs:
           restore-keys: |
             turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
             turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-web-
+            turbo-${{ runner.os }}-packages-
 
       - name: Setup the workspace
         uses: ./.github/actions/setup
@@ -156,7 +159,7 @@ jobs:
       # `./scripts` half of `test` left to the shards below. tooling/guards pins that the split
       # still covers `test`.
       - name: Lint, typecheck, test ./src and build the web package
-        run: bunx turbo run lint typecheck test:src build --filter=@trajectonomics/web --concurrency=2
+        run: bunx turbo run lint typecheck test:src build --filter=@trajectonomics/web --concurrency=4
 
       # SvelteKit's build stamp is the task's turbo hash (web ADR 0028), so two builds of the same inputs
       # must pack the same bytes. `--cache=local:` turns the cache off (the build runs and writes no entry)
@@ -165,9 +168,9 @@ jobs:
       - name: Check the Dashboard Pack is reproducible
         run: |
           set -euo pipefail
-          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=2
+          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=4
           first=$(sha256sum apps/web/pack/dashboard.bin)
-          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=2
+          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=4
           second=$(sha256sum apps/web/pack/dashboard.bin)
           echo "first:  $first"
           echo "second: $second"
@@ -190,7 +193,7 @@ jobs:
       fail-fast: false
       matrix:
         # The length of this list is the number of shards. Add a number to add a shard.
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -203,17 +206,18 @@ jobs:
           key: turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-${{ github.sha }}
           restore-keys: |
             turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-
 
       - name: Setup the workspace
         uses: ./.github/actions/setup
 
       # Builds what the tests read: the command line they spawn and the Demo snapshot (and what both
       # build on). This is a separate step, without `--shard`, on purpose: turbo adds the arguments after
-      # `--` to the hash of every task in the graph, so with `-- --shard=N/4` on one command the shard's
+      # `--` to the hash of every task in the graph, so with `-- --shard=N/6` on one command the shard's
       # `demo`, `core#build` and `cli#build` could never match what the packages job saved, and every
       # shard rebuilt them (#464). Here the hashes are the packages job's, so they are cache hits.
       - name: Build the command line and the Demo snapshot the tests read
-        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#demo --concurrency=2
+        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#demo --concurrency=4
 
       # bun splits the files the same way in every job, so the shards together run each file exactly
       # once. Run through bun, not turbo, so the shard argument reaches no task hash. The task graph of
@@ -222,14 +226,17 @@ jobs:
         run: bun run --cwd apps/web test:scripts --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
   # The browser checks (#377, web ADR 0026): Chromium over the built Demo, at phone and desktop width and in
-  # print. A job of its own, so it runs beside the shards and never lengthens `Check packages`. Budget: 10
-  # minutes from the start of the job (the timeout), about 5 when the build and the browser are cached.
+  # print. Sharded across runners so it stays off the critical path even as checks grow.
   web-browser:
-    name: Check web browser
+    name: Check web browser (${{ matrix.shard }})
     needs: plan
     if: needs.plan.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -243,15 +250,17 @@ jobs:
           restore-keys: |
             turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
             turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-web-
+            turbo-${{ runner.os }}-packages-
 
       - name: Setup the workspace
         uses: ./.github/actions/setup
 
-      # The suite serves `apps/web/dist` (the loopback build) and `apps/web/dist-hosted` (the hosted Demo, web ADR 0028)
-      # and reads the Demo snapshot in them. No arguments after `--`: turbo hashes them into every task of the graph
-      # and the build would miss the cache (docs/runbooks/ci.md).
-      - name: Build the web package, the hosted Demo and the Demo snapshot
-        run: bunx turbo run @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=2
+      # The suite serves `apps/web/dist` (the loopback build), `apps/web/dist-hosted` (the hosted Demo, web ADR 0028)
+      # and an editable scratch Dashboard using the compiled workspace `traj` binary (`browser/serve-scratch.ts`).
+      # No arguments after `--`: turbo hashes them into every task of the graph and the build would miss the cache.
+      - name: Build the CLI, the web package, the hosted Demo and the Demo snapshot
+        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=4
 
       - name: Read the Playwright version
         id: playwright
@@ -276,16 +285,16 @@ jobs:
             bunx playwright install --with-deps chromium
           fi
 
-      - name: Check every page at phone and desktop width, and in print
+      - name: Check every page at phone and desktop width, and in print (shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         working-directory: apps/web
-        run: bun run test:browser
+        run: bun run test:browser --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
       # The screenshots are for people to look at: they are uploaded whether the checks passed or not.
       - name: Upload the screenshots
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: web-screenshots
+          name: web-screenshots-${{ matrix.shard }}
           path: apps/web/screenshots/
           retention-days: 7
 
@@ -293,7 +302,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: web-playwright-report
+          name: web-playwright-report-${{ matrix.shard }}
           path: |
             apps/web/playwright-report/
             apps/web/test-results/
