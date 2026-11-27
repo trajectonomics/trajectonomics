@@ -29,7 +29,7 @@ function afterCode(problem: ScenarioProblem, said: ReturnType<typeof wordsOf>): 
 /**
  * The refusal for the problem an Override causes. A loan code states its sentence first, then the schema hint
  * every document refusal carries (ADR-0052), as `scenario apply --file` does (#336); any other code keeps its
- * code-first wording.
+ * code-first wording. A decimal amount's hint names `--decimal` before the rest, as the document form does (#728).
  */
 export function overrideRefusal(
 	flag: OverrideFlag,
@@ -37,12 +37,13 @@ export function overrideRefusal(
 	problem: ScenarioProblem,
 	path: string,
 	details: Record<string, unknown>,
+	decimal?: string,
 ): AppError {
 	const said = wordsOf(problem)
 	if (said !== undefined && LOAN_CODES.has(problem.code)) {
 		const schema = refusalOf(problem, "document").hint
 		return flagError(flag, index, said.message, {
-			hint: [said.hint, schema].filter((part) => part !== undefined).join(" "),
+			hint: [decimal, said.hint, schema].filter((part) => part !== undefined).join(" "),
 			details,
 		})
 	}
@@ -51,6 +52,9 @@ export function overrideRefusal(
 		flag,
 		index,
 		`the document is invalid after the overrides: ${path}: ${problem.code}${afterCode(problem, said)}`,
-		{ hint: said?.hint === undefined ? own : `${said.hint} ${own}`, details },
+		{
+			hint: [decimal, said?.hint, own].filter((part) => part !== undefined).join(" "),
+			details,
+		},
 	)
 }

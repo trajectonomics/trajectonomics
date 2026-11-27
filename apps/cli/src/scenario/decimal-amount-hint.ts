@@ -1,18 +1,23 @@
 import { isPlainObject } from "../json"
-import type { ScenarioProblem } from "./document"
+import { isDecimalAmount, supportedCurrency } from "../store/money"
+import { acceptedScenarioSchemaVersion, type ScenarioProblem } from "./document"
+import { moneyPathsOf } from "./field-paths"
+import { scenarioShapeProperties } from "./shape"
 
 /*
- * The hint a minor-unit apply gains when a money field holds the decimal form (issue #227): the
- * value is a decimal string, but the document was read without `--decimal`, so the engine refused
- * it as a non-integer. The offer is made only for a field `--decimal` converts: a decimal string in
- * a count or a rate it leaves as stored would not be fixed by the flag.
+ * The hint a minor-unit apply or what-if gains when a money field holds the decimal form (issue
+ * #227): the value is a decimal string, but the document was read without `--decimal`, so the
+ * engine refused it as a non-integer. The offer is made only for a field `--decimal` converts, and
+ * only for a value the `--decimal` parser itself accepts, so the hint and the flag cannot drift.
  */
 
 /** The sentence a minor-unit apply adds when a money field looks like the decimal form. */
 export const DECIMAL_AMOUNT_HINT = "This looks like the decimal form: add --decimal."
 
-/** A decimal amount: an optional minus, digits, one dot and one or two places, as "9000.50". */
-const DECIMAL_AMOUNT = /^-?(0|[1-9][0-9]*)\.[0-9]{1,2}$/
+/** Every money field of the published document, named as a problem's path is: `flows[].amount`. */
+const MONEY_PATHS: readonly string[] = moneyPathsOf({
+	properties: scenarioShapeProperties(acceptedScenarioSchemaVersion()),
+})
 
 /** The document path as the published schema names it: a list item is `[]`, so `flows[].amount`. */
 function schemaPathOf(segments: readonly (string | number)[]): string {
@@ -35,17 +40,25 @@ function valueAt(value: unknown, segments: readonly (string | number)[]): unknow
 	return current
 }
 
+/** The Currency `--decimal` would read the document in, or undefined when it would refuse one. */
+function currencyOfHint(document: unknown): string | undefined {
+	if (!isPlainObject(document)) return undefined
+	const currency = document["currency"]
+	if (typeof currency !== "string") return undefined
+	return supportedCurrency(currency) === null ? currency : undefined
+}
+
 /**
- * The hint for a minor-unit refusal of a money field that holds a decimal string, or undefined
- * when the refusal is another one, the field is not money, or the value is not decimal-shaped.
+ * The hint for a minor-unit refusal of a money field that holds a value `--decimal` reads, or
+ * undefined when the refusal is another one, the field is not money, or the value is not decimal.
  */
-export function decimalAmountHint(
-	document: unknown,
-	problem: ScenarioProblem,
-	moneyPaths: readonly string[],
-): string | undefined {
+export function decimalAmountHint(document: unknown, problem: ScenarioProblem): string | undefined {
 	if (problem.code !== "NOT_SAFE_INTEGER") return undefined
-	if (!moneyPaths.includes(schemaPathOf(problem.segments))) return undefined
+	if (!MONEY_PATHS.includes(schemaPathOf(problem.segments))) return undefined
 	const value = valueAt(document, problem.segments)
-	return typeof value === "string" && DECIMAL_AMOUNT.test(value) ? DECIMAL_AMOUNT_HINT : undefined
+	if (typeof value !== "string") return undefined
+	const currency = currencyOfHint(document)
+	return currency !== undefined && isDecimalAmount(value, currency)
+		? DECIMAL_AMOUNT_HINT
+		: undefined
 }

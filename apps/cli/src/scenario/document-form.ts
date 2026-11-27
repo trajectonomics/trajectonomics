@@ -2,7 +2,6 @@ import { z } from "zod"
 import { version as cliVersion } from "../../package.json"
 import { decimalAmountHint } from "./decimal-amount-hint"
 import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
-import { moneyPathsOf } from "./field-paths"
 import { wordsOf } from "./problem-words"
 import {
 	SCENARIO_SHAPE_REQUIRED,
@@ -20,7 +19,6 @@ import {
  */
 const version = acceptedScenarioSchemaVersion()
 const properties = scenarioShapeProperties(version)
-const moneyPaths = moneyPathsOf({ properties })
 
 export const scenarioDocument: z.ZodType<unknown> = z
 	.unknown()
@@ -29,7 +27,7 @@ export const scenarioDocument: z.ZodType<unknown> = z
 		// A money field holding the decimal form names the flag that reads it. The envelope shows only the
 		// first problem's hint, so every problem carries the sentence when any money field is in that form.
 		const decimal = problems
-			.map((problem) => decimalAmountHint(value, problem, moneyPaths))
+			.map((problem) => decimalAmountHint(value, problem))
 			.find((hint) => hint !== undefined)
 		for (const problem of problems) {
 			const refusal = refusalOf(problem, "document")
