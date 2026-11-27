@@ -6,7 +6,7 @@ import { markersIn } from "./markers"
 import { linearScale } from "./scale"
 import { type Span, stackSpans } from "./stack"
 import { niceTicks } from "./ticks"
-import { labelsFor, titlesFor, xTicksFor } from "./x-labels"
+import { labelsFor, subLabelsFor, titlesFor, xTicksFor } from "./x-labels"
 
 export type { ColumnKind }
 
@@ -53,11 +53,17 @@ export function columnLayout(
 	)
 	const frame: Frame = { xPixels, scaleY, slot, kind, lanes: lanesOf(cells) }
 	const xLabels = labelsFor(series, xs)
+	const subs = subLabelsFor(series, xs)
+	const xTicks = xTicksFor(
+		xLabels,
+		xPixels,
+		Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE)),
+	).map((tick) => (subs[tick.index] ? { ...tick, sub: subs[tick.index] as string } : tick))
 	return {
 		xLabels,
 		xTitles: titlesFor(series, xs),
 		xPixels,
-		xTicks: xTicksFor(xLabels, xPixels, Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE))),
+		xTicks,
 		yTicks: ticks.map((value) => ({ value, y: scaleY(value) })),
 		series: series.map((line, index) =>
 			seriesLayout(line, cells[index] ?? [], spans[index] ?? [], index, frame),

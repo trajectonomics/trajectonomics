@@ -56,6 +56,14 @@ describe("LineChart", () => {
 		expect(body).toContain('stroke-dasharray="6 4"')
 	})
 
+	test("draws at the height the page asks for, so the Plan's chart is taller than the default", () => {
+		const { body } = render(LineChart, {
+			props: { label: "Net worth", series: [net], hidden: false, height: 320 },
+		})
+		expect(body).toContain('height="320"')
+		expect(body).toContain('viewBox="0 0 640 320"')
+	})
+
 	test("says there is nothing to chart when no series has a point", () => {
 		const { body } = render(LineChart, {
 			props: { label: "Empty", series: [{ name: "none", points: [] }], hidden: false },

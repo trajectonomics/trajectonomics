@@ -1,4 +1,4 @@
-/* What each plan gives: one row per plan, its three at-least figures over thin bars. */
+/* What each plan gives: one row per plan, its three most-we-used figures over thin bars. */
 
 .plan-peaks {
 	padding: 0 0 8px;
@@ -61,6 +61,16 @@
 
 .peaks-figure-empty {
 	font-weight: 400;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The small line under a figure: a derived month, or the cache reads counted apart. */
+.peaks-meta {
+	display: block;
+	margin-top: 2px;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	line-height: 1.4;
 	color: var(--ds-color-muted-foreground);
 }
 

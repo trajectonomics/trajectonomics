@@ -1,4 +1,5 @@
 import type { AppError } from "../errors"
+import { firstDecimalAmountHint } from "./decimal-amount-hint"
 import { documentPath, type ScenarioProblem } from "./document"
 import { ownDocumentError } from "./document-error"
 import { isOwnProblem, ownProblems } from "./own-problems"
@@ -79,7 +80,14 @@ export function documentFailure(
 		documentPath: path,
 		code: chosen.problem.code,
 	}
-	return overrideRefusal(flag, index, chosen.problem, path, details)
+	return overrideRefusal(
+		flag,
+		index,
+		chosen.problem,
+		path,
+		details,
+		firstDecimalAmountHint(document, problems),
+	)
 }
 
 /** The applied Overrides in the order a command applied them: removals, additions, then Sets. */
