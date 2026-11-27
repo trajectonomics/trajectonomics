@@ -7,20 +7,22 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 
 | Job (check name) | Runs | When |
 |---|---|---|
-| `Plan` | decides whether the web jobs run | always |
+| `Plan` | decides whether the web jobs and the auth browser job run | always |
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
 | `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
 | `Check web scripts (1)` ... `(6)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/6` | same as `Check web` |
 | `Check web browser (1)` ... `(2)` | one shard of the browser checks over the built Demo: `turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted`, then `bun run test:browser --shard=N/2` in `apps/web` | same as `Check web` |
-| `Check` | fails unless every job above passed (a skipped web job passes only when `Plan` said to skip it) | always |
+| `Check auth browser` | `turbo run build --filter=@trajectonomics/brand`, then `bun run test:e2e` in `apps/auth`: the built pages, a scratch local D1 and Chromium | a pull request that affects `@trajectonomics/auth`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
+| `Check` | fails unless every job above passed (a skipped web or auth job passes only when `Plan` said to skip it) | always |
 
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the
 id of any new job to its `needs`: `tooling/guards/ci-web-split.test.ts` fails when it is missing.
 
 - **`Check` judges all of `needs`, not a list of job names.** Its script reads `toJSON(needs)`: every
-  job must be `success`, and a job may be `skipped` only when `Plan` said to skip the web jobs (`Plan`
-  and `Check packages` may never be skipped). A job added to `needs` is therefore judged with no edit
-  to the script, and a failing one fails `Check`.
+  job must be `success`, and a job may be `skipped` only when `Plan` said to skip it (`Plan` and
+  `Check packages` may never be skipped; the web jobs read `Plan`'s `web` output, and `Check auth
+  browser` its `auth` output). A job added to `needs` is therefore judged with no edit to the script,
+  and a failing one fails `Check`.
 - **`Check` runs with `if: always()`,** not `!cancelled()`. A cancelled run (a new push, or a person)
   then fails `Check`. GitHub counts a skipped required check as passing, so a skipped `Check` would let a
   cancelled run look green.
@@ -119,6 +121,16 @@ the shards, which it runs beside.
 - **When it fails.** The message names the page, the width or the paper, and the table or the text, for
   example `table "Period" is 1355px wide`. Open the screenshot of that page in the artifact, fix the page,
   and do not loosen the rule. A rule that is wrong goes through its own pull request and ADR.
+
+## The auth browser checks
+
+`Check auth browser` runs `bun run test:e2e` in `apps/auth`: it builds the pages, applies
+`migrations/` to a scratch D1 database under `~/.cache`, starts `wrangler dev --local` on
+`127.0.0.1:8793` and drives Chromium over every page and flow (`apps/auth/e2e`). It needs the
+`@trajectonomics/brand` build, because the pages import its `dist/current/`, and the same Playwright
+browser cache as the web browser job; it needs no Cloudflare credential and no secret, because the
+run never leaves the runner. `apps/auth/AGENTS.md` lists what the suite checks. The HTML report and
+the traces are uploaded on failure as `auth-playwright-report`.
 
 ## The Demo snapshot is generated per job, not once per run (#464)
 

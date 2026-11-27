@@ -1,15 +1,17 @@
 name: Deploy
 
 # Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs), the
-# blog (worker "blog", apps/blog), the data Worker (worker "data", apps/data) and OpenJot's download
-# and comparison Worker (worker "moojot-site", apps/openjot/site) to Cloudflare Workers from main.
-# Every static site is served under one host: the Site at trajectonomics.com (with OpenJot's page at
-# /openjot), the docs at /docs, the blog at /blog and the data site at /data. The Site owns the apex
-# as a Custom Domain; the docs, blog and data Workers declare zone routes for their paths and keep
-# their old subdomains for redirects. The OpenJot Worker declares zone routes for its short links,
-# API, analytics proxy and comparison page under /openjot, and keeps openjot.trajectonomics.com and
-# moojot.trajectonomics.com only to redirect (and to relay /ingest). There is no router.
-# docs/runbooks/deploy.md has the setup.
+# blog (worker "blog", apps/blog), the data Worker (worker "data", apps/data), the auth Worker
+# (worker "auth", apps/auth) and OpenJot's download and comparison Worker (worker "moojot-site",
+# apps/openjot/site) to Cloudflare Workers from main. Every static site is served under one host:
+# the Site at trajectonomics.com (with OpenJot's page at /openjot), the docs at /docs, the blog at
+# /blog and the data site at /data. The Site owns the apex as a Custom Domain; the docs, blog and
+# data Workers declare zone routes for their paths and keep their old subdomains for redirects. The
+# auth Worker is the one product on its own origin on purpose: auth.trajectonomics.com is a Custom
+# Domain, so an XSS on a site sharing one host cannot make credentialed requests to its endpoints.
+# The OpenJot Worker declares zone routes for its short links, API, analytics proxy and comparison
+# page under /openjot, and keeps openjot.trajectonomics.com and moojot.trajectonomics.com only to
+# redirect (and to relay /ingest). There is no router. docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
 #                         config, the lockfile), changed in the push. The Site also redeploys for its
@@ -21,7 +23,7 @@ name: Deploy
 #                         (the Site's build refreshes the Star snapshot first; see "Refresh the star count").
 #
 # Safety switch: nothing runs until the repository variable DEPLOYS_ENABLED is true. It needs the
-# secrets CLOUDFLARE_API_TOKEN (Workers Scripts: Edit; D1: Edit for the data Worker) and
+# secrets CLOUDFLARE_API_TOKEN (Workers Scripts: Edit; D1: Edit for the data and auth Workers) and
 # CLOUDFLARE_ACCOUNT_ID.
 on:
   push:
@@ -33,7 +35,7 @@ on:
       app:
         description: Which worker to deploy.
         type: choice
-        options: [all, site, docs, blog, data, openjot]
+        options: [all, site, docs, blog, data, auth, openjot]
         default: all
 
 permissions:
@@ -67,7 +69,7 @@ jobs:
               exit 1
             fi
             case "$APP" in
-            all) apps='["site","docs","blog","data","openjot"]' ;;
+            all) apps='["site","docs","blog","data","auth","openjot"]' ;;
             *) apps="[\"$APP\"]" ;;
             esac
           else
@@ -80,7 +82,7 @@ jobs:
             # core engine, so a change there redeploys the Site even though its own folder is unchanged.
             site_shared=(apps/web apps/cli/src packages/core)
             apps='[]'
-            for app in site docs blog data; do
+            for app in site docs blog data auth; do
               paths=("apps/$app" "${shared[@]}")
               if [ "$app" = "site" ]; then paths+=("${site_shared[@]}"); fi
               if [ -n "$(git diff --name-only "$base" "$SHA" -- "${paths[@]}")" ]; then
@@ -152,6 +154,7 @@ jobs:
           APP: ${{ matrix.app }}
         run: bunx turbo run build --filter="@trajectonomics/$APP" --concurrency=2
 
+      # Both D1-backed Workers apply their migrations before the Worker that reads the schema deploys.
       - name: Apply D1 migrations
         if: matrix.app == 'data'
         working-directory: apps/data
@@ -159,6 +162,14 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bunx wrangler d1 migrations apply traj-data --remote
+
+      - name: Apply the auth D1 migrations
+        if: matrix.app == 'auth'
+        working-directory: apps/auth
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bunx wrangler d1 migrations apply traj-auth --remote
 
       - name: Deploy to Cloudflare Workers
         # The landing site is a subfolder of the app folder, and has no package.json of its own.

@@ -29,8 +29,9 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    additive statement a later column needs: the generator only prints `create table` for a fresh
    database, so a column added to a table an earlier migration created is one `alter table` in a new
    file. `src/migrations.test.ts` applies every migration in order and fails when the result misses a
-   column a plugin declares. Deployment is not wired yet; when the auth app joins the deploy
-   workflow, it must apply the migrations before deploying the Worker.
+   column a plugin declares. `.github/workflows/deploy.yml` applies `migrations/` with
+   `bunx wrangler d1 migrations apply traj-auth --remote` before it deploys the Worker, so a schema
+   change ships ahead of the code that reads it.
 6. The dev-only email + password path exists for the spike's test user only. It needs
    `ENVIRONMENT=development`, `DEV_ONLY=true` and a loopback `BETTER_AUTH_URL`; production config
    can satisfy none of the three.
