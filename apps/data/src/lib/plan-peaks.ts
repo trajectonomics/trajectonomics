@@ -1,10 +1,10 @@
 import { displayCount } from "./format"
 import { type PlanTierLabel, planTier } from "./plan-tier"
 import { comparePlans, planName } from "./plans"
-import type { Peak, PlanPeak } from "./types"
+import type { MeasuredTier, Peak, PeakWindowKey, PlanPeak } from "./types"
 
 /** The three windows, in the order the table draws them. */
-export type PeakColumnKey = "fiveHours" | "sevenDays" | "thirtyDays"
+export type PeakColumnKey = PeakWindowKey
 
 /** One column of the peaks table: its heading and the words a screen reader hears. */
 export type PeakColumn = {
@@ -29,6 +29,7 @@ export type PeakTableRow = {
 	fiveHours: Peak | null
 	sevenDays: Peak | null
 	thirtyDays: Peak | null
+	measured: MeasuredTier[]
 }
 
 /**
@@ -73,9 +74,14 @@ export function peakColumnMax(rows: readonly PeakTableRow[], key: PeakColumnKey)
 }
 
 /** A bar's width as a whole percentage of the column's largest figure; zero shares draw 0%. */
+export function figureShare(tokens: number, max: number): number {
+	if (max <= 0) return 0
+	return Math.round((tokens / max) * 100)
+}
+
+/** A peak's bar width; a null peak draws nothing. */
 export function peakShare(peak: Peak | null, max: number): number {
-	if (peak === null || max <= 0) return 0
-	return Math.round((peak.tokens / max) * 100)
+	return peak === null ? 0 : figureShare(peak.tokens, max)
 }
 
 /** The words a screen reader gets for one cell. */
@@ -91,5 +97,6 @@ function tableRow(entry: PlanPeak, day: string): PeakTableRow {
 		fiveHours: entry.fiveHours,
 		sevenDays: entry.sevenDays,
 		thirtyDays: entry.thirtyDays,
+		measured: entry.measured,
 	}
 }

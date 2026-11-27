@@ -9,6 +9,13 @@ import { failingEnv, read, readWith, seed } from "./support/usage"
 
 type Peak = { tokens: number; fromDay: string }
 
+type MeasuredTier = {
+	tier: string | null
+	fiveHours: Peak | null
+	sevenDays: Peak | null
+	thirtyDays: Peak | null
+}
+
 type PeaksBody = {
 	asOf: string
 	methodVersion: number
@@ -18,6 +25,7 @@ type PeaksBody = {
 		fiveHours: Peak | null
 		sevenDays: Peak | null
 		thirtyDays: Peak | null
+		measured: MeasuredTier[]
 	}[]
 }
 
@@ -60,12 +68,21 @@ describe("GET /api/peaks", () => {
 		expect(body.plans).toEqual([
 			{
 				plan: "claude",
-				tier: "Max 5x",
+				tier: "Max",
 				fiveHours: { tokens: 200, fromDay: "2026-11-24" },
 				sevenDays: { tokens: 200, fromDay: "2026-11-24" },
 				thirtyDays: { tokens: 200, fromDay: "2026-11-24" },
+				measured: [
+					{
+						tier: "Max",
+						fiveHours: { tokens: 200, fromDay: "2026-11-24" },
+						sevenDays: { tokens: 200, fromDay: "2026-11-24" },
+						thirtyDays: { tokens: 200, fromDay: "2026-11-24" },
+					},
+				],
 			},
 		])
+		expect(body.plans[0]?.measured).toHaveLength(1)
 		expect(texts(body).filter((text) => /T\d\d:|hour/.test(text))).toEqual([])
 	})
 
@@ -103,6 +120,14 @@ describe("GET /api/peaks", () => {
 			fiveHours: null,
 			sevenDays: { tokens: 1200, fromDay: "2026-11-20" },
 			thirtyDays: { tokens: 1200, fromDay: "2026-11-20" },
+			measured: [
+				{
+					tier: "Pro",
+					fiveHours: null,
+					sevenDays: { tokens: 1200, fromDay: "2026-11-20" },
+					thirtyDays: { tokens: 1200, fromDay: "2026-11-20" },
+				},
+			],
 		})
 	})
 

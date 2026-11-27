@@ -6,7 +6,7 @@ import type { PlanId } from "./plans"
  * vendor's own API; `source` marks each entry that is still hand-kept until then.
  */
 export type PlanTier = {
-	/** Shown on the site, e.g. "Max 5x". */
+	/** Shown on the site, e.g. "Max". */
 	name: string
 	/** The first UTC day of the tier, or null when it began before our data. */
 	from: string | null
@@ -25,7 +25,14 @@ export type PlanTier = {
 export const TIERS: Readonly<Record<PlanId, readonly PlanTier[]>> = Object.freeze({
 	claude: [
 		{
-			name: "Max 5x",
+			name: "Pro",
+			from: null,
+			to: "2026-10-16",
+			source: "hand-kept",
+			note: "Before the Max subscription began on 2026-10-17",
+		},
+		{
+			name: "Max",
 			from: "2026-10-17",
 			to: null,
 			source: "vendor",
@@ -54,11 +61,11 @@ export const TIERS: Readonly<Record<PlanId, readonly PlanTier[]>> = Object.freez
 	antigravity: [{ name: "Google AI Pro", from: null, to: null, source: "hand-kept" }],
 	cursor: [
 		{
-			name: "Grok premium",
+			name: "Premium",
 			from: null,
 			to: null,
 			source: "hand-kept",
-			note: "Used through the Grok premium plan",
+			note: "Used mostly with Grok models",
 		},
 	],
 	meta: [],
