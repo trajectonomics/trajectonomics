@@ -105,6 +105,6 @@ export const fiView: z.ZodType<FiView> = z.strictObject({
 	}),
 	fi: fiLeafAnswer,
 	taxYears: taxYearsField.describe(
-		"One entry per Levy settlement period, for the path the FI answer describes: earned income as the Scenario states it before fiDate and stopped from fiDate on, so a period after fiDate owes tax on what remains. When FI is unreachable there is no such path, so the entries describe the plan as written, with earned income as the plan states it, and a note says so. Empty when the Scenario holds no Levy.",
+		"One entry per Levy settlement period, for the path the FI answer describes: earned income as the Scenario states it before fiDate and stopped from fiDate on, so a period after fiDate owes tax on what remains. When FI is unreachable there is no such path, so the entries describe the plan as written, and a note says so. Empty when the Scenario holds no Levy.",
 	),
 })
