@@ -19,7 +19,7 @@ import WithdrawalsResult from "./WithdrawalsResult.svelte"
 
 const TERM_OPTIONS: readonly SegmentedOption<Terms>[] = [
 	{ value: "both", label: "Both" },
-	{ value: "nominal", label: "Nominal" },
+	{ value: "nominal", label: "Future money" },
 	{ value: "real", label: "Today's money" },
 ]
 
@@ -64,7 +64,7 @@ const names = $derived(snapshotItemNames(snapshot, name))
 	{/if}
 	<SegmentedControl name="terms" label="Terms" options={TERM_OPTIONS} value={chosen} onChange={onTerms} />
 	{#if run === undefined}
-		<EmptyState title="No projection in this Snapshot" />
+		<EmptyState title="No projection for this plan" />
 	{:else}
 		<ReadView read={run} label={`The projection of ${name}`}>
 			{#snippet children()}

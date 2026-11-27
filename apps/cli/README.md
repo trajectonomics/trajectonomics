@@ -306,6 +306,9 @@ year: `projection run`'s result, with the same flags for the cash flow and each
 Account's value, plus the market return each Account drew in each year as
 `returns`. An index is a path's name under the seed, so it is from 0 to
 `--paths` minus 1.
+Add `--milestone-dates` to see when each Milestone of the plan fired: how many
+paths reached it, the median and 10th to 90th percentile months with each
+household person's age, and the paths per year.
 Pass `--paths` and `--seed` to `traj dashboard` to add the chance of success to the
 Dashboard, as a page of its own: it uses `plan` unless you name a
 `--return-model` file.

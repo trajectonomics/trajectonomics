@@ -131,7 +131,7 @@ export const GITHUB_CLI_RELEASES_URL = `${GITHUB_REPO_URL}/releases`
 /** The Organisation, for the footer's link. */
 export const GITHUB_ORG_URL = "https://github.com/trajectonomics"
 
-/** The customer skills' MIT licence, the footer's licence link. */
+/** The customer skills' AGPL-3.0-only licence, the footer's licence link. */
 export const SKILLS_LICENCE_URL = `${GITHUB_REPO_URL}/blob/main/skills/customer/LICENSE`
 
 /**

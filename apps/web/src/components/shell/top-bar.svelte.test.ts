@@ -8,6 +8,10 @@ import { LOADING } from "../../lib/view/state"
 import DisplayOptions from "./DisplayOptions.svelte"
 import ShellTopBar from "./ShellTopBar.svelte"
 
+const noop = () => {}
+const topBar = () =>
+	render(ShellTopBar, { props: { names: ["base"], selected: "base", onPlan: noop } })
+
 const SNAPSHOT = {
 	cliVersion: "0.0.0",
 	params: { asOf: "2026-10-31" },
@@ -26,7 +30,7 @@ beforeEach(() => {
 
 describe("ShellTopBar", () => {
 	test("keeps the page title out of the bar, with icon-only actions and the As-of date", () => {
-		const { body } = render(ShellTopBar, {})
+		const { body } = topBar()
 		expect(body).not.toContain(">Net worth<")
 		expect(body).toContain('aria-label="Display options"')
 		expect(body).toContain('title="Display options"')
@@ -41,7 +45,7 @@ describe("ShellTopBar", () => {
 
 	test("shows the closed eye and the pressed state while amounts are hidden", () => {
 		preferences.hidden = true
-		const { body } = render(ShellTopBar, {})
+		const { body } = topBar()
 		expect(body).toContain('aria-pressed="true"')
 		expect(body).toContain("m2 2 20 20")
 	})

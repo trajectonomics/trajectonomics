@@ -64,13 +64,21 @@ export const scenarioWithHousehold: z.ZodType<ShownScenario> = z.strictObject({
 	main: mainShape,
 })
 
-/** One row of `scenario list`: the summary, whether the document is taxed, has notes, is main. */
-export type ListedScenario = ScenarioSummary & { taxed: boolean; hasNotes: boolean; main: boolean }
+/** One row of `scenario list`: the summary, whether the document is taxed, has notes, has Milestones, is main. */
+export type ListedScenario = ScenarioSummary & {
+	taxed: boolean
+	hasNotes: boolean
+	hasMilestones: boolean
+	main: boolean
+}
 
 export const listedScenario: z.ZodType<ListedScenario> = z.strictObject({
 	...summaryShape,
 	taxed: taxedShape,
 	hasNotes: z.boolean().describe("True when the plan has notes; `scenario show` prints them."),
+	hasMilestones: z
+		.boolean()
+		.describe("True when the plan declares Milestones; `projection chance` can date them."),
 	main: mainShape,
 })
 
@@ -87,6 +95,11 @@ export function isTaxed(document: Record<string, unknown>): boolean {
 	return Array.isArray(document["levies"]) && document["levies"].length > 0
 }
 
+/** Whether a document declares any Milestones. */
+export function hasMilestones(document: Record<string, unknown>): boolean {
+	return Array.isArray(document["milestones"]) && document["milestones"].length > 0
+}
+
 /** The tax profile a row keeps, parsed from its stored canonical text. */
 export function taxOf(row: ScenarioRow): StoredTax | null {
 	return parsedTax(row.tax)
@@ -94,10 +107,12 @@ export function taxOf(row: ScenarioRow): StoredTax | null {
 
 /** One `scenario list` row: the summary, whether the document is taxed, and the notes and main marks. */
 export function listed(row: ScenarioRow): ListedScenario {
+	const document = view(row).document
 	return {
 		...summary(row),
-		taxed: isTaxed(view(row).document),
+		taxed: isTaxed(document),
 		hasNotes: row.notes !== null,
+		hasMilestones: hasMilestones(document),
 		main: row.main,
 	}
 }

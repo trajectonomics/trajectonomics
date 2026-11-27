@@ -41,7 +41,7 @@ export interface SkippedReadParts {
 function noFilerLevy(name: string): SkippedReadParts {
 	return {
 		before:
-			"This plan's labels name a Filer, but no Levy of it tallies a Filer's label, so there is no Return to read. Run ",
+			"This plan's labels name a Filer, but no tax rules of it tally a Filer's label, so there is no Return to read. Run ",
 		command: `traj scenario tax ${name} --from-stored`,
 		after: " to write each label with its Filer suffix.",
 	}

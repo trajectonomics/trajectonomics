@@ -62,7 +62,7 @@ describe("the Dictionary of every Language", () => {
 
 	it("keeps the release pill's licence and the repository link label the owner approved", () => {
 		const english = dictionaryFor("en")
-		expect(english.heroLicence).toBe("MIT · open source")
+		expect(english.heroLicence).toBe("AGPL-3.0 · open source")
 		expect(english.repoLinkLabel).toBe("GitHub stars")
 		expect(english.copied).toBe("Prompt copied")
 	})

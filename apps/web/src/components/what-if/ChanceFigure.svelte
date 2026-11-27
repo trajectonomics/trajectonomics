@@ -11,12 +11,10 @@ let { chance }: Props = $props()
 
 <div class="space-y-1">
 	<p class="text-2xl font-semibold tracking-tight tabular-nums">
-		<span class="sr-only">What-if: </span>{chance.whatIf}
+		<span class="sr-only">What-if: </span>{chance.whatIf} <span class="text-base font-normal text-muted-foreground">chance</span>
 	</p>
 	<p class="text-sm text-muted-foreground">
-		{chance.baseline === null ? "The Snapshot holds no baseline chance." : `Chance of success ${chance.sentence}.`}
+		{chance.baseline === null ? "No baseline chance was read." : `Chance of success ${chance.sentence}.`}
 	</p>
-	<p class="text-sm">
-		{chance.succeeded} of {chance.whatIfPaths} seeded Market paths hold to {chance.horizon}.
-	</p>
+	<p class="text-sm">{chance.lasts}</p>
 </div>

@@ -1,15 +1,17 @@
 import type { ProjectionCompare, TaxYear } from "../../contract"
-import { formatDate } from "../../format"
+import { formatDate, periodWords } from "../../format"
 import { type Cell, moneyCell, textCell } from "../compare/cell"
 import type { Triple } from "./triple"
 
-/** The reason a tax year has no change: the compare states a change per roll-up (the Levy), not per tax year. */
-const NO_TAX_YEAR_CHANGE = "The CLI states the Levy's change per year, not per tax year"
+/** The reason a tax year has no change: the compare states a change per roll-up, not per tax year. */
+const NO_TAX_YEAR_CHANGE = "The CLI states the tax's change per year, not per tax year"
 
 /** One tax year with its what-if and baseline figures, matched by Levy and period. */
 export interface TaxYearTriples {
 	readonly key: string
 	readonly levy: string
+	/** The Filer whose Return this year files, for a separate filing; null when the plan keeps one Return. */
+	readonly filer: string | null
 	readonly period: string
 	readonly settles: string
 	readonly figures: readonly Triple[]
@@ -48,7 +50,8 @@ export function taxYearTriples(data: ProjectionCompare): readonly TaxYearTriples
 		return {
 			key,
 			levy: year.levy,
-			period: `${formatDate(year.from)} to ${formatDate(year.to)}`,
+			filer: year.filer ?? null,
+			period: periodWords(year.from, year.to),
 			settles: formatDate(year.settlementDate),
 			figures,
 		}

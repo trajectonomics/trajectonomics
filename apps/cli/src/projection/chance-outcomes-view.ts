@@ -17,6 +17,8 @@ export type ChanceOutcomeView = {
 	/** The first day of the Annual roll-up whose closing net worth was the path's lowest. */
 	lowestYear: string
 	runsOut: RunsOutView | null
+	/** Fired Milestone dates by id, present only with `--milestone-dates` too (sim ADR 0011). */
+	milestones?: Record<string, string> | undefined
 }
 
 /** The path indexes a reader opens first, without sorting every outcome. */
@@ -46,6 +48,12 @@ const outcome: z.ZodType<ChanceOutcomeView> = z.strictObject({
 	runsOut: runsOut
 		.nullable()
 		.describe("The month the path ran out of money and what it could not fund, or null."),
+	milestones: z
+		.record(z.string(), dateField("The date the Milestone fired on this path"))
+		.optional()
+		.describe(
+			"Fired Milestone dates by id, in the order the run reported them. Present only with --milestone-dates too (sim ADR 0011).",
+		),
 })
 
 export const outcomesField: z.ZodOptional<z.ZodType<ChanceOutcomeView[]>> = z

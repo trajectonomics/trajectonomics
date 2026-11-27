@@ -65,6 +65,12 @@ describe("the headline figures", () => {
 			text: "+2 years",
 			words: "later",
 		})
+		expect(figureOf(statedCompare(), "final-nominal")?.label).toBe(
+			"Net worth at the end, in future money",
+		)
+		expect(figureOf(statedCompare(), "final-real")?.label).toBe(
+			"Net worth at the end, in today's money",
+		)
 	})
 
 	test("a compare with null deltas shows no change, never a computed one", () => {
@@ -96,7 +102,7 @@ describe("the years", () => {
 			amount: "-1000.00",
 			words: "less",
 		})
-		expect(yearLabels(rows)).toEqual(["Levy"])
+		expect(yearLabels(rows)).toEqual(["Tax"])
 		const without = yearRows(DEMO_COMPARE, ["levy"]).map((row) => ({ ...row, figures: [] }))
 		expect(yearLabels(without)).toEqual([])
 	})
@@ -109,7 +115,7 @@ describe("the years", () => {
 			"Expense",
 			"Contributions",
 			"Interest",
-			"Levy",
+			"Tax",
 		])
 	})
 })
@@ -132,6 +138,7 @@ describe("the chance, tax and cash flow", () => {
 			expect(figure.change.kind).toBe("none")
 		}
 		expect(years[0]?.figures.map((figure) => figure.label)).toEqual(["Due", "Prepaid", "Owed"])
+		expect(years[0]?.period).toBe("2026")
 	})
 
 	test("a tax year only one side has reads no such year on the other", () => {
@@ -146,7 +153,7 @@ describe("the chance, tax and cash flow", () => {
 		const lens = demoLens(statedCompare())
 		const extras = overviewExtras(lens, baselineChance(DEMO, "base"))
 		expect(extras.chance?.whatIf).toMatch(/%$/)
-		expect(extras.tax?.label).toContain("Tax owed for")
+		expect(extras.tax?.label).toContain("Tax for")
 	})
 
 	test("the cash flow totals of a year are the CLI's rows, with no change between them", () => {
@@ -164,8 +171,8 @@ describe("the chart", () => {
 		const lens = demoLens()
 		const series = whatIfSeries(lens.run ?? failing(), baselineRun(DEMO, "base"), "both", NO_PEOPLE)
 		expect(series.map((entry) => entry.name)).toEqual([
-			"What-if: Nominal net worth",
-			"Baseline: Nominal net worth",
+			"What-if: Net worth in future money",
+			"Baseline: Net worth in future money",
 		])
 		expect(series.map((entry) => entry.dashed === true)).toEqual([false, true])
 	})
@@ -179,7 +186,7 @@ describe("the chart", () => {
 		const lens = demoLens()
 		const baseline = baselineRun(DEMO, "base")
 		const hidden = whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE, true)
-		expect(hidden.map((entry) => entry.name)).toEqual(["What-if: Nominal net worth"])
+		expect(hidden.map((entry) => entry.name)).toEqual(["What-if: Net worth in future money"])
 		expect(hidden.every((entry) => entry.dashed !== true)).toBe(true)
 		expect(hidden.some((entry) => entry.name.includes("Baseline"))).toBe(false)
 	})
@@ -189,15 +196,15 @@ describe("the chart", () => {
 		const baseline = baselineRun(DEMO, "base")
 		const shown = whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE, false)
 		expect(shown.map((entry) => entry.name)).toEqual([
-			"What-if: Nominal net worth",
-			"Baseline: Nominal net worth",
+			"What-if: Net worth in future money",
+			"Baseline: Net worth in future money",
 		])
 		expect(shown.map((entry) => entry.dashed === true)).toEqual([false, true])
 		expect(
 			whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE).map(
 				(entry) => entry.name,
 			),
-		).toEqual(["What-if: Nominal net worth", "Baseline: Nominal net worth"])
+		).toEqual(["What-if: Net worth in future money", "Baseline: Net worth in future money"])
 	})
 })
 

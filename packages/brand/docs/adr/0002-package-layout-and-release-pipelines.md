@@ -116,6 +116,6 @@ The Packages table above gains this row:
 - 2026-11-12: that package ships the Brand Assets. It has no dependencies and no peer dependencies, so
   it sits outside the `svelte` → `theme` → `core` direction above. It has its own caller,
   `release-assets.yml`, triggered only by `packages/assets/**`, with tag prefix `assets-v`, which
-  keeps art releases independent of Theme releases. Its art is not MIT: the owner supplies the
+  keeps art releases independent of Theme releases. Its art is not AGPL-3.0-only: the owner supplies the
   `NOTICE` that governs it, and the package is first published by the owner
   (`trajectonomics/infra#26`).

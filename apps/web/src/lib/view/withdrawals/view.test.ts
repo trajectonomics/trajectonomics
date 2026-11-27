@@ -78,10 +78,10 @@ describe("in good and bad markets", () => {
 		expect(bands?.series[0]?.points).toHaveLength(chance.spendingBands?.length ?? -1)
 		expect(bands).toMatchObject({ counted: 200, paths: 200 })
 		expect(withdrawalsView(null, chance).chance).toEqual({
-			share: "96.50%",
+			share: "96.5%",
 			succeeded: 193,
 			paths: 200,
-			horizon: "31 Dec 2053",
+			lasts: "Lasts to 2053 in 193 of 200 markets.",
 		})
 	})
 

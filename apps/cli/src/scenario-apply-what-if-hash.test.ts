@@ -59,6 +59,21 @@ describe("scenario apply --set, with --if-hash", () => {
 		expect((await stored(home)).row).toEqual(moved.row)
 	})
 
+	it("reports a stale hash before a --set it would otherwise refuse", async () => {
+		const home = await projectionHome()
+		const before = await stored(home)
+		await apply(home, ["base", "--set", "economy.inflation=100"])
+		const res = await apply(home, [
+			"base",
+			"--set",
+			"flows.rnet.amount=1",
+			"--if-hash",
+			before.contentHash,
+		])
+		expect(res.code).toBe(5)
+		expect(errorOf(res)).toMatchObject({ code: "scenario_changed", path: "--if-hash" })
+	})
+
 	it("refuses a hash for a plan that is not stored, with storedHash null", async () => {
 		const home = scenarioHome()
 		const res = await apply(home, ["ghost", "--set", "flows.rent.amount=1", "--if-hash", STALE])

@@ -2,10 +2,13 @@ import { beforeEach, describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
+import { snapshotLoader } from "../../client/browser"
 import { preferences } from "../../client/preferences.svelte.js"
+import { replaceSnapshot } from "../../client/snapshot.svelte"
+import type { Snapshot } from "../../lib/contract"
+import { LOADING } from "../../lib/view/state"
 import SiteLink from "../ui/SiteLink.svelte"
 import DisplayOptions from "./DisplayOptions.svelte"
-import PlanSwitcher from "./PlanSwitcher.svelte"
 import PreferenceControls from "./PreferenceControls.svelte"
 import SiteBrand from "./SiteBrand.svelte"
 import SiteNavLinks from "./SiteNavLinks.svelte"
@@ -16,20 +19,56 @@ const noop = () => {}
 describe("SiteNavLinks", () => {
 	beforeEach(() => setTestUrl("http://127.0.0.1/net-worth/"))
 
-	test("groups the pages under their headings, in order, in one labelled navigation", () => {
+	test("lists the nine top-level entries under their headings, in order, in one labelled navigation", () => {
 		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
 		expect(body).toContain('<nav aria-label="Pages"')
+		const order = [
+			"Overview",
+			"Net worth",
+			"Plan",
+			"Milestones",
+			"Compare plans",
+			"Reports",
+			"Cash flow",
+			"Chance of success",
+			"Tax",
+			"Optimize",
+			"Tax allowances",
+			"Withdrawals",
+			"Estate",
+			"Records",
+			"Ledger",
+			"Health",
+			"Settings",
+			"Tax profile",
+			"Assumptions",
+		]
 		const at = (text: string) => body.indexOf(text)
-		expect(at("Overview")).toBeGreaterThan(-1)
-		expect(at("Net worth")).toBeGreaterThan(at("Overview"))
-		expect(at(">Plan<")).toBeGreaterThan(at("Net worth"))
-		expect(at("Projection")).toBeGreaterThan(at(">Plan<"))
-		expect(at("FI date")).toBeGreaterThan(at("Projection"))
-		expect(at("Compare")).toBeGreaterThan(at("FI date"))
-		expect(at("Tax")).toBeGreaterThan(at("Compare"))
-		expect(at(">Records<")).toBeGreaterThan(at("Tax"))
-		expect(at("Ledger")).toBeGreaterThan(at(">Records<"))
-		expect(at("Health")).toBeGreaterThan(at("Ledger"))
+		for (const [index, text] of order.entries()) {
+			expect(at(text), text).toBeGreaterThan(-1)
+			if (index > 0) expect(at(text), text).toBeGreaterThan(at(order[index - 1] ?? ""))
+		}
+	})
+
+	test("makes each heading a button that says whether its group is open", () => {
+		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
+		expect(body).toMatch(/<button[^>]*aria-expanded="true"[^>]*aria-controls="nav-pages-plan"/)
+		expect(body).toMatch(/<button[^>]*aria-expanded="true"[^>]*aria-controls="nav-pages-optimize"/)
+		expect(body).toMatch(/<button[^>]*aria-expanded="false"[^>]*aria-controls="nav-pages-records"/)
+		expect(body).toMatch(/<button[^>]*aria-expanded="false"[^>]*aria-controls="nav-pages-settings"/)
+	})
+
+	test("keeps a closed group's list hidden, and shows the open groups' lists", () => {
+		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
+		expect(body).toMatch(/<ul id="nav-pages-plan"[^>]*>/)
+		expect(body).toMatch(/<ul id="nav-pages-records"[^>]*\bhidden\b/)
+	})
+
+	test("keeps a group holding the current page open, though it starts closed", () => {
+		const { body } = render(SiteNavLinks, { props: { current: "/health/", onNavigate: noop } })
+		expect(body).toMatch(/<button[^>]*aria-expanded="true"[^>]*aria-controls="nav-pages-records"/)
+		expect(body).not.toMatch(/<ul id="nav-pages-records"[^>]*\bhidden\b/)
+		expect(body).toMatch(/<a[^>]*href="\/health\/"[^>]*aria-current="page"/)
 	})
 
 	test("marks the current page with aria-current, and only that page", () => {
@@ -49,16 +88,34 @@ describe("SiteNavLinks", () => {
 		expect(body).toContain('href="/projection/?demo=1&amp;scenario=retire-early"')
 	})
 
-	test("lists the Income, Expenses and Assets and debts pages only when the plan's document is held", () => {
-		const shown = render(SiteNavLinks, { props: { current: "/", onNavigate: noop } }).body
-		expect(shown).toContain('href="/income/"')
-		expect(shown).toContain('href="/assets-and-debts/"')
-		const hidden = render(SiteNavLinks, {
-			props: { current: "/", onNavigate: noop, planDocument: false },
-		}).body
-		expect(hidden).not.toContain('href="/income/"')
-		expect(hidden).not.toContain('href="/expenses/"')
-		expect(hidden).toContain('href="/fi/"')
+	test("does not list the pages that left the navigation, though their routes stay", () => {
+		const { body } = render(SiteNavLinks, { props: { current: "/", onNavigate: noop } })
+		for (const path of ["/income/", "/expenses/", "/assets-and-debts/", "/fi/", "/routing/"]) {
+			expect(body).not.toContain(`href="${path}"`)
+		}
+	})
+
+	test("says on the Records heading how many of the ledger's health checks failed", () => {
+		const checks = [{ name: "writable", status: "fail", detail: "not writable" }]
+		const doctor = {
+			ok: false,
+			cliVersion: "0.0.0",
+			directory: { path: "~/.traj", exists: true, writable: false },
+			database: { path: "~/.traj/traj.db", exists: true, bytes: 0, schemaVersion: 2, head: 2 },
+			rows: { entity: 0, account: 0, tx: 0, posting: 0, scenario: 0 },
+			checks,
+		}
+		const snapshot = {
+			reads: { doctor: { ok: true, argv: ["doctor"], data: doctor } },
+		} as unknown as Snapshot
+		try {
+			replaceSnapshot(snapshot)
+			const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
+			expect(body).toContain('aria-label="1 thing to check"')
+			expect(body).toContain("bg-accent")
+		} finally {
+			snapshotLoader.replace(LOADING)
+		}
 	})
 
 	test("lists the Milestones page only when the selected plan's projection has milestones", () => {
@@ -69,32 +126,6 @@ describe("SiteNavLinks", () => {
 		}).body
 		expect(hidden).not.toContain('href="/milestones/"')
 		expect(hidden).toContain('href="/projection/"')
-	})
-})
-
-describe("PlanSwitcher", () => {
-	beforeEach(() => setTestUrl("http://127.0.0.1/net-worth/"))
-
-	test("lists each Scenario name and marks the one the pages show", () => {
-		const { body } = render(PlanSwitcher, {
-			props: { names: ["base", "retire-early"], selected: "retire-early", onChange: noop },
-		})
-		expect(body).toContain("Plans")
-		expect(body.match(/<button[^>]*aria-current="true"[^>]*>\s*retire-early/)).not.toBeNull()
-		expect(body.match(/aria-current="true"/g)).toHaveLength(1)
-		expect(body).toMatch(/>\s*base\s*</)
-	})
-
-	test("is hidden when the Snapshot names no Scenario", () => {
-		const { body } = render(PlanSwitcher, { props: { names: [], selected: "", onChange: noop } })
-		expect(body).not.toContain("Plans")
-	})
-
-	test("links to every plan side by side, whether or not the server answers Edits", () => {
-		const { body } = render(PlanSwitcher, {
-			props: { names: ["base"], selected: "base", onChange: noop },
-		})
-		expect(body).toMatch(/href="\/plans\/"[\s\S]*?See every plan/)
 	})
 })
 
@@ -163,29 +194,5 @@ describe("SiteLink", () => {
 		setTestUrl("http://127.0.0.1/net-worth/")
 		const { body } = render(SiteLink, { props: { href: "/ledger/", children: label } })
 		expect(body).toContain('href="/ledger/"')
-	})
-})
-
-describe("the plan actions", () => {
-	test("are offered only when the server answers Edits, never in the Demo snapshot", () => {
-		const names = ["base"]
-		const readOnly = render(PlanSwitcher, { props: { names, selected: "base", onChange: noop } })
-		expect(readOnly.body).not.toContain("Copy plan")
-		expect(readOnly.body).not.toContain("Delete plan")
-		expect(readOnly.body).not.toContain("New plan")
-		const rows = [{ name: "base", contentHash: "h", main: false, hasNotes: false, projected: true }]
-		const editing = render(PlanSwitcher, {
-			props: { names, selected: "base", onChange: noop, editable: true, rows },
-		})
-		for (const words of [
-			"Rename",
-			"Notes",
-			"Make this my main plan",
-			"Copy plan",
-			"Delete plan",
-			"New plan",
-		]) {
-			expect(editing.body).toContain(words)
-		}
 	})
 })

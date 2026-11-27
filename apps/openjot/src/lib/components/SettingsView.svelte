@@ -1463,8 +1463,8 @@
         </section>
         <p class="px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
           {lang === "th"
-            ? `OpenJot${appVersion ? ` ${appVersion}` : ""} เผยแพร่โดย Trajectonomics ภายใต้สัญญาอนุญาต MIT ข้อความกฎหมายฉบับภาษาอังกฤษเป็นฉบับที่มีผล`
-            : `OpenJot${appVersion ? ` ${appVersion}` : ""} is published by Trajectonomics under the MIT License. The English legal text is the official version.`}
+            ? `OpenJot${appVersion ? ` ${appVersion}` : ""} เผยแพร่โดย Trajectonomics ภายใต้สัญญาอนุญาต AGPL-3.0-only ข้อความกฎหมายฉบับภาษาอังกฤษเป็นฉบับที่มีผล`
+            : `OpenJot${appVersion ? ` ${appVersion}` : ""} is published by Trajectonomics under the GNU Affero General Public License v3.0 only (AGPL-3.0-only). The English legal text is the official version.`}
         </p>
 
       {:else if subPage === "terms"}
