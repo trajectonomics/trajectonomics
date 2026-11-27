@@ -23,7 +23,7 @@ OpenJot อ่านสลิปที่แอปธนาคารบันท
 • รู้ว่าเป็นการโอนเข้าบัญชีตัวเอง จึงไม่นับเป็นรายจ่ายซ้ำ
 • สรุปตามหมวดหรือแท็ก เทียบย้อนหลัง 6 เดือน และงบที่บอกว่ายังใช้ได้อีกวันละเท่าไหร่
 • นำเข้า e-Statement บัตรเครดิต (PDF ที่ล็อกรหัส) ของ KBank, SCB, KTC, Krungsri, BBL, ttb, UOB และ AEON
-• ส่งออก CSV หรือ JSON ได้ตลอด ใช้ได้ทั้งไทยและอังกฤษ เลือกธีมชมพูขาวหรือดำส้ม
+• ส่งออก CSV หรือ JSON ได้ตลอด ใช้ได้ทั้งไทยและอังกฤษ เลือกธีมได้ 3 แบบ: ชมพูขาว ดำส้ม หรือธีมเข้ม Trajectonomics
 
 ความเป็นส่วนตัว
 • บัญชีรายรับรายจ่ายเก็บในมือถือคุณ ไม่มีบัญชีผู้ใช้ และไม่มีเซิร์ฟเวอร์ของ OpenJot ที่เก็บรายการของคุณ
@@ -54,7 +54,7 @@ What Moo can do
 • Spots transfers between your own accounts, so they aren't counted as spending
 • Summaries by category or tag, a 6-month comparison, and budgets that show what you can still spend per day
 • Imports password-protected credit card e-statements (PDF) from KBank, SCB, KTC, Krungsri, BBL, ttb, UOB and AEON
-• Export to CSV or JSON any time. Thai or English, pink and white or black and orange
+• Export to CSV or JSON any time. Thai or English, with three themes: pink and white, black and orange, or the dark Trajectonomics theme
 
 Private by design
 • Your ledger is stored on your phone. There's no OpenJot account, and no OpenJot server holds your records
