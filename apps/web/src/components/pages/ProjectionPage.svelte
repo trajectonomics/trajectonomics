@@ -22,12 +22,12 @@ interface Props {
 	onChart: (id: string) => void
 }
 
-/** The Projection: one Scenario, year by year, in nominal and real terms, with its notes and tax status. */
+/** The Plan: one Scenario, year by year, in nominal and real terms, with its notes and tax status. */
 let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = $props()
 </script>
 
 <PageShell
-	title="Projection"
+	title="Plan"
 >
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}

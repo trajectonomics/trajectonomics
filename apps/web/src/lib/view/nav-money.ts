@@ -1,6 +1,6 @@
 import type { NavGroup } from "./routes"
 
-/** Cash flow, and Where money goes after it: where each year's money went, and the order it goes in. */
+/** Cash flow, Chance of success and Tax: the pages about the money a year moves and the money it costs. */
 export const MONEY_GROUP: NavGroup = {
 	heading: null,
 	routes: [
@@ -11,12 +11,7 @@ export const MONEY_GROUP: NavGroup = {
 			icon: "workflow",
 			needsCashflow: true,
 		},
-		{
-			path: "/routing/",
-			label: "Where money goes",
-			page: "RoutingPage",
-			icon: "workflow",
-			needsDocument: true,
-		},
+		{ path: "/chance/", label: "Chance of success", page: "ChancePage", icon: "target" },
+		{ path: "/tax/", label: "Tax", page: "TaxPage", icon: "receipt" },
 	],
 }
