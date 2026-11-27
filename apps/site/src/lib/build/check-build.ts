@@ -28,7 +28,7 @@ import { checkPageText } from "./page-text"
 import { checkPageWeight } from "./page-weight"
 import { checkContentSecurityPolicy } from "./policy"
 import { checkReleaseFacts } from "./release"
-import { checkReservedPreloadPath } from "./reserved-path"
+import { checkReservedPaths } from "./reserved-path"
 import { checkRobots } from "./robots"
 import { checkShareImage } from "./share-image"
 import { checkSiteContent } from "./site-content"
@@ -47,7 +47,7 @@ import { checkThemeColour } from "./theme-colour"
 const FILE_RULES = [
 	checkStructure,
 	checkPageLinks,
-	checkReservedPreloadPath,
+	checkReservedPaths,
 	checkContentSecurityPolicy,
 	checkExternalAssets,
 	checkLandmarks,

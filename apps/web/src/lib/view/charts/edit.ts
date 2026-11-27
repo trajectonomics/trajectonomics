@@ -1,3 +1,4 @@
+import { seriesWords } from "./series-ids"
 import { type ChartDef, type ChartKind, MAX_CHARTS, MAX_NAME } from "./types"
 
 /** An id from a name, unique among the ones taken: "My chart", then "my-chart-2". */
@@ -25,6 +26,19 @@ export function defaultName(seriesNames: readonly string[]): string {
 	const first = seriesNames[0] ?? "My chart"
 	const more = seriesNames.length - 1
 	return (more > 0 ? `${first} and ${more} more` : first).slice(0, MAX_NAME)
+}
+
+/**
+ * The name a chart is saved under: the one typed, or the default from its series ids, read through a name index
+ * without the plan's labels. The name is the same on every plan, so a saved chart fits all of them.
+ */
+export function savedName(
+	typed: string,
+	series: readonly string[],
+	names: ReadonlyMap<string, string>,
+): string {
+	const chosen = typed.trim()
+	return chosen === "" ? defaultName(series.map((id) => names.get(id) ?? seriesWords(id))) : chosen
 }
 
 /** Adds a chart, or replaces the one with the same id. Refused (null) when the list is full. */

@@ -4,6 +4,7 @@ import type { Terms } from "../projection/terms"
 import { dashLater, linesOf, tableOf } from "./lines"
 import { chartNotes, type Drawn } from "./notes"
 import { reasonFor } from "./reasons"
+import { seriesWords } from "./series-ids"
 import type { ChartDef, Resolved } from "./types"
 import { periodText } from "./year"
 
@@ -73,7 +74,7 @@ export function chartView(
 			.filter((item) => !item.series)
 			.map((item) => ({
 				id: item.id,
-				name: names.get(item.id) ?? item.id,
+				name: names.get(item.id) ?? seriesWords(item.id),
 				reason: reasonFor(item.id, has),
 			})),
 		notes: chartNotes({

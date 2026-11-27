@@ -4,6 +4,12 @@ status: accepted
 
 # The Site serves OpenJot at /openjot/
 
+> 2026-11-27: `openjot.trajectonomics.com` is deprecated. The `moojot-site` Worker's downloads,
+> `/go` links, `/api/release`, `/ingest` and the comparison page now answer under
+> `https://trajectonomics.com/openjot/` by zone routes, the Site's download buttons use
+> `/openjot/download`, and the old hosts only redirect, except `/ingest`. The old-host passage below
+> is the state this record left; `apps/openjot/site/README.md` has the current one.
+
 OpenJot's landing page lived on its own host, `openjot.trajectonomics.com`, built from
 `apps/openjot/site` as plain HTML. The owner retired that address on 2026-11-26: the page moves to
 the Site, at **`https://trajectonomics.com/openjot/`**, under the Site's design, and the old host

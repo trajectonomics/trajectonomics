@@ -1,6 +1,6 @@
 import type { ProjectionRun } from "../../contract"
 import { lineKey, lineLabel } from "../cashflow/cashflow-labels"
-import { type ItemNames, itemNames } from "../item-names"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { annualRowsOf } from "../projection/annual"
 import type { Resolved } from "./types"
 import { periodsOf, pointAt } from "./year"
@@ -23,15 +23,19 @@ function lineHeader(
 	return { id: `cash:${lineKey(line)}`, name: `${prefix}: ${lineLabel(line, names)}` }
 }
 
-/** The cash-flow lines by Flow and by category, each as one series that follows its line from year to year. */
-export function cashflowFigures(
-	run: ProjectionRun,
-	accountNames: ReadonlyMap<string, string>,
-): Resolved[] {
-	const names = itemNames(accountNames, null)
+/** A series while it is collected, with the points its lines add. */
+interface Collected extends Resolved {
+	readonly nominal: Resolved["nominal"][number][]
+}
+
+/**
+ * The cash-flow lines by Flow and by category, each as one series that follows its line from year to year. A series
+ * is named through the shown plan's item names, so a labelled Flow reads its label (web ADR 0029).
+ */
+export function cashflowFigures(run: ProjectionRun, names: ItemNames = NO_ITEM_NAMES): Resolved[] {
 	const ends = new Map(annualRowsOf(run).map((row) => [row.index, row.to]))
 	const periods = periodsOf(run)
-	const byKey = new Map<string, Resolved & { nominal: Resolved["nominal"][number][] }>()
+	const byKey = new Map<string, Collected>()
 	const lines = run.tables.flatMap((table) => (table.name === "cashflow" ? table.rows : []))
 	for (const line of lines) {
 		const head = lineHeader(line, names)
@@ -46,14 +50,17 @@ export function cashflowFigures(
 		found.nominal.push(pointAt(end, line.amount, periods.get(end) ?? null))
 		byKey.set(head.id, found)
 	}
-	return [...byKey.values()]
+	return [...byKey.values()].map((item) => ({
+		id: item.id,
+		name: item.name,
+		group: item.group,
+		nominal: item.nominal,
+		real: item.real,
+	}))
 }
 
 /** Each Account's value at the close of each year, nominal and real (`--accounts`). */
-export function accountFigures(
-	run: ProjectionRun,
-	accountNames: ReadonlyMap<string, string>,
-): Resolved[] {
+export function accountFigures(run: ProjectionRun, names: ItemNames = NO_ITEM_NAMES): Resolved[] {
 	const periods = periodsOf(run)
 	const byAccount = new Map<
 		string,
@@ -72,7 +79,7 @@ export function accountFigures(
 	}
 	return [...byAccount].map(([account, points]) => ({
 		id: `account:${account}`,
-		name: `Value of ${accountNames.get(account) ?? account}`,
+		name: `Value of ${names.accounts.get(account) ?? account}`,
 		group: "net-worth" as const,
 		...points,
 	}))

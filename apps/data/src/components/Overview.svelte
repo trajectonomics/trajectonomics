@@ -5,6 +5,7 @@ import { OverviewState } from "../client/overview.svelte"
 import { freshness } from "../lib/freshness"
 import { readAsOf } from "../lib/query"
 import { chartSeries } from "../lib/series"
+import { DATA_PATH } from "../lib/site"
 import { usageTable } from "../lib/table"
 import UsageChart from "./UsageChart.svelte"
 import UsageTable from "./UsageTable.svelte"
@@ -40,7 +41,7 @@ const fresh = $derived(state.health === null ? null : freshness(state.health))
 	{#if state.requestedAsOf !== null && state.usage !== null}
 		<p class="as-of">
 			<span>As of {state.requestedAsOf} · method v{state.usage.methodVersion}</span>
-			<a href="/">Live view</a>
+			<a href={DATA_PATH}>Live view</a>
 		</p>
 	{/if}
 

@@ -1,5 +1,11 @@
 /** Stable codes for every way a Crawler file or an Answer engine file can fail verification. One code per rule. */
 export type CrawlerFailureCode =
+	| "ROBOTS_MISSING"
+	| "ROBOTS_AGENT_MISSING"
+	| "ROBOTS_ALLOW_MISSING"
+	| "ROBOTS_DISALLOW_PRESENT"
+	| "ROBOTS_SITEMAP_MISSING"
+	| "ROBOTS_SITEMAP_TARGET"
 	| "ROBOTS_NAMED_AGENT_MISSING"
 	| "ROBOTS_NAMED_ALLOW_MISSING"
 	| "JSON_LD_CLAIM_PRESENT"

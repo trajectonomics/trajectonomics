@@ -28,7 +28,11 @@ function probeEnv(): Record<string, string> {
 	return { ...env, WRANGLER_SEND_METRICS: "false", BROWSER: "none" }
 }
 
-/** Start `wrangler dev` for the Site on the two given ports. */
+/**
+ * Start `wrangler dev` for the Site on the two given ports. The deployed apex route would otherwise
+ * make the Worker see `trajectonomics.com` in a local run and set the production cookie Domain, so
+ * the local origin stays the one the probe requests.
+ */
 export function startDevServer(port: number, inspectorPort: number): DevServer {
 	return Bun.spawn({
 		cmd: [
@@ -40,6 +44,7 @@ export function startDevServer(port: number, inspectorPort: number): DevServer {
 			String(port),
 			"--inspector-port",
 			String(inspectorPort),
+			"--infer-origin-from-routes=false",
 			"--show-interactive-dev-session=false",
 		],
 		cwd: ROOT,

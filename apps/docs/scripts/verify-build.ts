@@ -3,7 +3,7 @@ import { checkBuild } from "../src/lib/build"
 import { readReleaseLine } from "../src/lib/release-line-source"
 import { readBuildFiles } from "./adapters/build-files"
 
-/** The Worker's assets root: Astro builds into `dist`, and the Worker serves that directory. */
+/** The Worker's assets root: Astro builds into `dist`, and `assets.base_path` serves its root at `/docs` (ADR 0017). */
 const BUILD_ROOT = "dist"
 
 /** Check the built Docs Portal on disk, returning the process exit code. */

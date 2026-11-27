@@ -2,7 +2,7 @@
 # bootstrap from an inline script and set inline style attributes, so script-src allows inline
 # scripts and style-src-attr allows inline style attributes; no page carries an inline <style>
 # element, so style-src stays 'self' only. Every other source is the Site's own origin. The
-# Site's own pages keep no policy, because the router injects an inline style and script
-# (ADR 0002, ADR 0031).
+# Site's own pages keep no policy: nothing injects one any more, but this change leaves them as
+# they are (ADR 0031, ADR 0033).
 /demo/*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'

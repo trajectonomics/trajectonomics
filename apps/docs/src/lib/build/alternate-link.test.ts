@@ -3,7 +3,7 @@ import { checkAlternateLinks } from "./alternate-link"
 import type { BuiltFile } from "./built-files"
 
 /** The head link that names a page's Markdown twin. */
-const ALTERNATE = '<link rel="alternate" type="text/markdown" href="/cli.md">'
+const ALTERNATE = '<link rel="alternate" type="text/markdown" href="/docs/cli.md">'
 
 /** One built page with a twin, and the alternate link in or outside its head. */
 function page(path: string, link: string | null = ALTERNATE): BuiltFile {
@@ -34,7 +34,7 @@ describe("the alternate Markdown link of a built page", () => {
 	})
 
 	test("a link to another twin does not count", () => {
-		const link = '<link rel="alternate" type="text/markdown" href="/contribute.md">'
+		const link = '<link rel="alternate" type="text/markdown" href="/docs/contribute.md">'
 
 		expect(
 			checkAlternateLinks([page("cli/index.html", link)]).map((failure) => failure.code),
@@ -47,7 +47,7 @@ describe("the alternate Markdown link of a built page", () => {
 			{ path: "404.html", content: "<html><body><h1>Page not found</h1></body></html>" },
 			{
 				path: "operators/index.html",
-				content: '<html><meta http-equiv="refresh" content="0;url=/cli/"></html>',
+				content: '<html><meta http-equiv="refresh" content="0;url=/docs/cli/"></html>',
 			},
 		]
 

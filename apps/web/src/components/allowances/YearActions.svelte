@@ -5,8 +5,11 @@ import type { ScenarioDocument } from "../../lib/contract"
 import {
 	documentWithSuggestions,
 	suggestionAdditions,
+	unplacedOf,
 	type YearView,
 } from "../../lib/view/allowances"
+import type { PersonNames } from "../../lib/view/item-names"
+import ItemWords from "../ui/ItemWords.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 
@@ -14,9 +17,15 @@ interface Props {
 	year: YearView
 	/** The plan the suggestions go into: its name, the hash the page read and its items as stored. */
 	plan: { name: string; contentHash: string; doc: ScenarioDocument }
+	/** The household's people, so two unplaced items of one name name each one's Filer. */
+	people: PersonNames
+	/** The recorded `claimsHolder`, so a departed Filer reads here as the profile's tables name it. */
+	claimsHolder: string | null
 }
 
-let { year, plan }: Props = $props()
+let { year, plan, people, claimsHolder }: Props = $props()
+/** The year's suggestions with no Account, told apart by their Filer when two share a name. */
+const unplaced = $derived(unplacedOf(year, people, claimsHolder))
 /** True when a what-if of this plan is open: Add to plan waits for it, a what-if of another plan does not. */
 const planOpen = $derived(whatIfSession.active && whatIfSession.whatIf?.plan === plan.name)
 const button =
@@ -50,14 +59,14 @@ async function addToPlan(): Promise<void> {
 		</div>
 		{#if planOpen}<p class="text-sm text-muted-foreground">Apply or revert the what-if first, then Add to plan.</p>{/if}
 	{/if}
-	{#if year.unplaced.length > 0}
+	{#if unplaced.length > 0}
 		<div class="text-sm">
 			<p>
 				Add an asset Account for {year.addable ? "these as well" : "these first"}, in
 				<SiteLink href="/assets-and-debts/" class="underline">Assets and debts</SiteLink>:
 			</p>
 			<ul class="mt-1 list-disc space-y-1 pl-5 text-muted-foreground">
-				{#each year.unplaced as one (one.name)}<li>{one.name}: <span data-cli>{one.hint}</span></li>{/each}
+				{#each unplaced as one (one.key)}<li>{one.name}{#if one.filer !== null}{" ("}<ItemWords label={one.filer} />){/if}: <span data-cli>{one.hint}</span></li>{/each}
 			</ul>
 		</div>
 	{/if}

@@ -1,23 +1,21 @@
 import { describe, expect, test } from "bun:test"
-import { PortalOriginError, portalOrigin } from "./portal-origin"
+import { SiteOriginError, siteOrigin } from "./site-origin"
 
-/** The refusal `portalOrigin` answers a build with, or `undefined` when it names one. */
+/** The refusal `siteOrigin` answers a build with, or `undefined` when it names one. */
 function refusalOf(site: URL | undefined): { code: string; field: string } | undefined {
 	try {
-		portalOrigin(site)
+		siteOrigin(site)
 		return undefined
 	} catch (error) {
-		return error instanceof PortalOriginError
+		return error instanceof SiteOriginError
 			? { code: error.code, field: error.field }
-			: { code: "not-a-portal-origin-error", field: "" }
+			: { code: "not-a-site-origin-error", field: "" }
 	}
 }
 
-describe("the Portal's origin at the build boundary", () => {
+describe("the Site's origin at the build boundary", () => {
 	test("is the origin of the site astro.config.ts declares", () => {
-		expect(portalOrigin(new URL("https://docs.trajectonomics.com/"))).toBe(
-			"https://docs.trajectonomics.com",
-		)
+		expect(siteOrigin(new URL("https://trajectonomics.com/"))).toBe("https://trajectonomics.com")
 	})
 
 	test("is refused as SITE_MISSING when the build declares no site, so no twin links absolutely", () => {

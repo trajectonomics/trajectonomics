@@ -2,8 +2,8 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
 import { faviconSet } from "./scripts/favicon-set"
 
-// The router mounts the Site at `/`, so there is no `base` and the build lands in the assets
-// root the Worker serves ([ADR 0002](./docs/adr/0002-site-worker-with-static-assets.md)).
+// The Site owns `/` on its own host, so there is no `base` and the build lands in the assets
+// root the Worker serves ([ADR 0033](./docs/adr/0033-one-host-serves-the-site-docs-blog-and-data.md)).
 export default defineConfig({
 	output: "static",
 	outDir: "./dist",

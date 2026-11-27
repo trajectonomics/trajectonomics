@@ -12,6 +12,7 @@ import { dirname } from "node:path"
 import { chromium, type Page } from "@playwright/test"
 import { waitForSettledPage } from "../e2e/docs-portal"
 import { TEST_VIEWPORT_HEIGHT_PX } from "../e2e/viewports"
+import { DOCS_BASE_PATH } from "../src/lib/tabs"
 import { type CuratedShot, curatedShots } from "./screenshot-pages"
 
 /** The port this script serves the built site on; not the e2e suite's, so both can run at once. */
@@ -64,7 +65,7 @@ async function serve(): Promise<() => void> {
 /** Poll until the served site answers, or give up after two minutes. */
 async function waitForServer(): Promise<void> {
 	for (let attempt = 0; attempt < 240; attempt += 1) {
-		const answer = await fetch(`${BASE_URL}/cli/`).catch(() => null)
+		const answer = await fetch(`${BASE_URL}${DOCS_BASE_PATH}/cli/`).catch(() => null)
 		if (answer?.ok === true) {
 			return
 		}
