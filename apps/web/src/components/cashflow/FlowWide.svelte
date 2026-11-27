@@ -18,16 +18,15 @@ interface Props {
 	label: string
 	/** True when a stacked layout stands in below the `md` breakpoint, so this one is hidden there. */
 	stacked?: boolean
+	/** The page's one always-drawn probe, so a name is fitted at the size it draws even while this diagram is hidden. */
+	probe: SVGTextElement | null
 }
 
 /** The wide flow diagram of one year, from a medium screen up. Each band is a control: a click, or Enter or Space, picks its table row. */
-let { layout, picked, onPick, label, stacked = false }: Props = $props()
+let { layout, picked, onPick, label, stacked = false, probe }: Props = $props()
 
 const uid = $props.id()
-
-/** The page's own font, read from the drawing, so each name is fitted at the size it is drawn. */
-let diagram = $state<SVGSVGElement | null>(null)
-const measure = $derived(flowMeasure(diagram))
+const measure = $derived(flowMeasure(probe))
 
 const shown = (amount: string): string =>
 	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
@@ -36,14 +35,12 @@ const shown = (amount: string): string =>
 <!-- The figures are the CLI's strings. A band is drawn by its share of the taller column; the table below repeats each one. -->
 <div class={cx("max-w-full overflow-x-auto rounded-lg border border-border", stacked && "hidden md:block")}>
 	<svg
-		bind:this={diagram}
 		viewBox={`0 0 ${layout.width} ${layout.height}`}
 		role="group"
 		aria-label={label}
 		text-rendering="geometricPrecision"
 		class="h-auto min-w-[640px] w-full text-xs"
 	>
-		<text data-flow-probe visibility="hidden" aria-hidden="true" class="fill-foreground"></text>
 		{#each layout.links as link (link.key)}
 			<path
 				d={link.d}

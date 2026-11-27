@@ -3,6 +3,7 @@ import { openDemo } from "./demo"
 import { HOME_LOAN, NETFLIX, SUBSCRIPTIONS } from "./flow-label-cases"
 import { measureLabelClips } from "./flow-label-clip"
 import { measureFlowLabels } from "./flow-label-fit"
+import { measureFittedNames } from "./flow-label-fits"
 import { longFlowLabels, serveFlowLabels } from "./flow-labels"
 
 const NS = "http://www.w3.org/2000/svg"
@@ -41,41 +42,6 @@ function expectWholeCapitals(labels: readonly string[], width: number): void {
 	for (const text of whole) expect(labels, `${text} at ${width}px`).toContain(text)
 }
 
-/**
- * Faults in the phone list at the minimum font: a name that fits its room is drawn whole. The room is
- * read from `layoutStack` and the drawn width from the SVG itself, so the check does not trust the fitter.
- */
-function listFaults(page: Page): Promise<string[]> {
-	return page.evaluate((namespace) => {
-		const svg = [...document.querySelectorAll<SVGSVGElement>('svg[role="group"]')].find(
-			(element) => element.getBoundingClientRect().width > 0,
-		)
-		if (svg === undefined) return ["no flow diagram is drawn"]
-		if (Math.round(svg.viewBox.baseVal.width) !== 320) return ["the wide diagram is drawn"]
-		const measure = (text: string): number => {
-			const probe = document.createElementNS(namespace, "text") as SVGTextElement
-			probe.setAttribute("class", "fill-foreground")
-			probe.textContent = text
-			svg.append(probe)
-			const width = probe.getComputedTextLength()
-			probe.remove()
-			return width
-		}
-		const faultsOf = (label: SVGGraphicsElement): string[] => {
-			const shown = label.textContent ?? ""
-			const amount = label.nextElementSibling?.textContent ?? ""
-			const aria = label.closest("g")?.getAttribute("aria-label") ?? ""
-			const suffix = `, ${amount}`
-			if (!aria.endsWith(suffix)) return [`"${aria}" does not end with its amount "${amount}"`]
-			const full = aria.slice(0, -suffix.length)
-			const room = 320 - 2 * 8 - 8 - measure(amount)
-			const cut = measure(full) <= room && shown !== full
-			return cut ? [`"${full}" fits ${room.toFixed(1)} units but is drawn as "${shown}"`] : []
-		}
-		return [...svg.querySelectorAll<SVGGraphicsElement>("[data-flow-label]")].flatMap(faultsOf)
-	}, NS)
-}
-
 // Chromium is launched with `--blink-settings=minimumFontSize=24` by the `min-font` project. The browser
 // then states 24px for the 12px diagram text but the SVG still draws it at 12px, so a measure that read the
 // stated size would cut every name far too short and collapse the twins. The phone list is where the
@@ -92,7 +58,7 @@ for (const width of [360, 1280] as const) {
 		expect(await drawnWidth(page, "MMMMM"), "the SVG still draws 12px").toBeLessThan(60)
 		expect(await measureFlowLabels(page)).toEqual([])
 		expect(await measureLabelClips(page)).toEqual([])
-		if (width === 360) expect(await listFaults(page)).toEqual([])
+		expect(await measureFittedNames(page)).toEqual([])
 		const labels = await page.locator("[data-flow-label]:visible").allTextContents()
 		expectWholeCapitals(labels, width)
 		for (const start of ["Consulting (a", "Saving (a", "Withdraw (a"]) {
