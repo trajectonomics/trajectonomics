@@ -46,6 +46,20 @@ describe("an Edit against the real traj", () => {
 	)
 
 	test(
+		"an Edit the CLI refused leaves the editor free, so the next Edit runs rather than being refused as running",
+		async () => {
+			const refused = await postEdit(copy("e2e-lock-missing", "no-such-plan"))
+			expect(refused.status).toBe(200)
+			expect(refused.answer.ok).toBe(false)
+			if (!refused.answer.ok) expect(refused.answer.error.code).toBe("not_found")
+			const next = await postEdit(copy("e2e-lock-next"))
+			expect(next.status).toBe(200)
+			expect(next.answer.ok).toBe(true)
+		},
+		SLOW_MS,
+	)
+
+	test(
 		"a body that is not an Edit of the list is refused with 400, before anything runs",
 		async () => {
 			const editing = await setupEditor()
