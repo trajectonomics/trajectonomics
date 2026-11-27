@@ -26,17 +26,15 @@ function pageFileOf(pathname: string): string | undefined {
 	return path === "" || path.endsWith("/") ? `${path}index.html` : `${path}/index.html`
 }
 
-/** Every redirect line in `_redirects`: `from to status`. */
+/** Every redirect line in `_redirects`: `from to [status]` (Cloudflare defaults status to 302). */
 function parsedRedirects(text: string): readonly ParsedRule[] {
 	return text
 		.split(/\r?\n/)
 		.map((line) => line.trim())
 		.filter((line) => line !== "" && !line.startsWith("#"))
 		.flatMap((line) => {
-			const [from, to, status] = line.split(/\s+/)
-			return from !== undefined && to !== undefined && status !== undefined
-				? [{ from, to, status }]
-				: []
+			const [from, to, status = "302"] = line.split(/\s+/)
+			return from !== undefined && to !== undefined ? [{ from, to, status }] : []
 		})
 }
 

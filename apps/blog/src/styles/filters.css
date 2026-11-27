@@ -66,6 +66,7 @@
 }
 
 /* Author display rules must not override the hidden attribute when a filter hides an entry. */
+.filter-bar[hidden],
 .featured[hidden],
 .post-grid[hidden],
 .post-grid > li[hidden],

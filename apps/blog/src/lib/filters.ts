@@ -12,11 +12,18 @@ export const FILTER_GROUPS = Object.freeze(["type", "language", "product"] as co
 export type FilterGroupName = (typeof FILTER_GROUPS)[number]
 
 /** Every value each group can take, in the blog's order. */
-const GROUP_VALUES: Readonly<Record<FilterGroupName, readonly string[]>> = Object.freeze({
+export const GROUP_VALUES: Readonly<Record<FilterGroupName, readonly string[]>> = Object.freeze({
 	type: POST_TYPES,
 	language: LANGUAGES,
 	product: PRODUCTS,
 })
+
+/** Whether a string names one of the front page's filter groups. */
+export function isFilterGroup(value: string | null | undefined): value is FilterGroupName {
+	return (
+		value !== null && value !== undefined && (FILTER_GROUPS as readonly string[]).includes(value)
+	)
+}
 
 /** The facts of a Post the filters read. */
 export interface Filterable {
@@ -66,33 +73,4 @@ export function matchesFilters(values: FilterValues, chosen: ChosenFilters): boo
 		const value = chosen[name]
 		return value === undefined || values[name].includes(value)
 	})
-}
-
-/** The values an address chose: one known value per group, and nothing else. */
-export function chosenFilters(search: URLSearchParams): ChosenFilters {
-	const chosen: Partial<Record<FilterGroupName, string>> = {}
-	for (const name of FILTER_GROUPS) {
-		const value = search.get(name)
-		if (value !== null && GROUP_VALUES[name].includes(value)) chosen[name] = value
-	}
-	return Object.freeze(chosen)
-}
-
-/**
- * The query an option links to: the current choice with one group set to a value, or cleared when
- * the value is `undefined`. It is empty when nothing is chosen, and lists the groups in bar order.
- */
-export function filterQuery(
-	chosen: ChosenFilters,
-	name: FilterGroupName,
-	value: string | undefined,
-): string {
-	const next: ChosenFilters = { ...chosen, [name]: value }
-	const search = new URLSearchParams()
-	for (const group of FILTER_GROUPS) {
-		const chosenValue = next[group]
-		if (chosenValue !== undefined) search.set(group, chosenValue)
-	}
-	const query = search.toString()
-	return query === "" ? "" : `?${query}`
 }

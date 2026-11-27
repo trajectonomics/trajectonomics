@@ -54,7 +54,9 @@ Translation of a Post carries the same `products` list.
 
 ## Compare Page
 
-A Post of type `compare`: two **Subjects** set against each other, rendered from one content entry.
+A structured template for a `compare` Post: two **Subjects** set against each other in a spec table
+with an owner-written **Verdict**, rendered from one content entry. General comparison Posts (such
+as multi-way tier or budget breakdowns) also use Post Type `compare`.
 
 ## Subject
 

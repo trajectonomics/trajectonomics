@@ -9,9 +9,9 @@ export interface MovedPost {
 }
 
 /**
- * Every Post that changed type after it was published. Its old address keeps answering with a
- * permanent redirect in every Language Tree, so no link anyone shared breaks. Add a line here when a
- * Post's `type` changes; never remove one.
+ * Every Post that changed type after it was published, in chronological order. Its old addresses
+ * keep answering with a permanent redirect to its current address in every Language Tree, so no
+ * link anyone shared breaks. Append a line here when a Post's `type` changes; never remove one.
  */
 export const MOVED_POSTS: readonly MovedPost[] = Object.freeze([
 	// 2026-11-28: the Post Types grew from compare, guide and news to five.
@@ -30,13 +30,30 @@ export interface Redirect {
 	readonly to: string
 }
 
+/** Collapses a chronological move history per slug into every former type -> latest type. */
+function resolvedMoves(moved: readonly MovedPost[]): readonly MovedPost[] {
+	const history = new Map<string, { sources: Set<PostType>; current: PostType }>()
+	for (const move of moved) {
+		const entry = history.get(move.slug) ?? { sources: new Set<PostType>(), current: move.to }
+		entry.sources.add(move.from)
+		entry.sources.add(move.to)
+		entry.current = move.to
+		history.set(move.slug, entry)
+	}
+	return [...history.entries()].flatMap(([slug, { sources, current }]) =>
+		[...sources]
+			.filter((from) => from !== current)
+			.map((from) => Object.freeze({ slug, from, to: current })),
+	)
+}
+
 /**
- * The redirects the moved Posts need: in every Language Tree, the old address with and without its
- * trailing slash goes to the new one.
+ * The redirects the moved Posts need: in every Language Tree, every former address (with and
+ * without its trailing slash) points straight to the Post's current address.
  */
 export function movedPostRedirects(moved: readonly MovedPost[]): readonly Redirect[] {
 	return Object.freeze(
-		moved.flatMap((post) =>
+		resolvedMoves(moved).flatMap((post) =>
 			LANGUAGES.flatMap((language) => {
 				const from = treePath(language, postPath({ slug: post.slug, type: post.from }))
 				const to = treePath(language, postPath({ slug: post.slug, type: post.to }))

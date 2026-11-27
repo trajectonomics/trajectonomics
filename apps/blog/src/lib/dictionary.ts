@@ -32,6 +32,8 @@ export interface Dictionary {
 	readonly filterGroups: Readonly<Record<FilterGroupName, string>>
 	/** The line the front page shows when no Post matches the chosen filters. */
 	readonly noMatches: string
+	/** Live-region announcement written after a filter changes. */
+	readonly filterResults: (count: number) => string
 	readonly minutesRead: (minutes: number) => string
 	readonly byline: string
 	readonly availableIn: string

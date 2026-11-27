@@ -2,7 +2,8 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import { dictionaryFor } from "../lib/dictionary"
-import { type FilterGroup, type FilterGroupName, filterQuery } from "../lib/filters"
+import { filterQuery } from "../lib/filter-query"
+import type { FilterGroup, FilterGroupName } from "../lib/filters"
 import { type Language, treePath } from "../lib/languages"
 import type { PostType } from "../lib/posts"
 import { type Product, productName } from "../lib/products"
@@ -39,6 +40,8 @@ function optionLabel(group: FilterGroupName, value: string): string {
 			aria-label={words.filterLabel}
 			data-filter-bar
 			data-base-path={basePath}
+			data-language={language}
+			hidden
 		>
 			{groups.map((group) => (
 				<div class="filter-group" role="group" aria-labelledby={`filter-group-${group.name}`}>

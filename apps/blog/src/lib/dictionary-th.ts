@@ -13,7 +13,7 @@ export const TH: Dictionary = Object.freeze({
 	languageSwitchLabel: "ไทย",
 	frontTitle: "บล็อก · Trajectonomics",
 	frontDescription: "บทเปรียบเทียบ อัปเดต คู่มือ มุมมอง และข่าวจาก Trajectonomics ผู้สร้าง traj และ OpenJot",
-	frontHeading: "บทเปรียบเทียบ อัปเดต และคู่มือ",
+	frontHeading: "บทความทั้งหมด",
 	noPosts: "ยังไม่มีบทความ",
 	postTitleSuffix: "บล็อก Trajectonomics",
 	typeLabels: Object.freeze({
@@ -27,6 +27,8 @@ export const TH: Dictionary = Object.freeze({
 	filterAll: "ทั้งหมด",
 	filterGroups: Object.freeze({ type: "ประเภท", language: "ภาษา", product: "ผลิตภัณฑ์" }),
 	noMatches: "ไม่มีบทความที่ตรงกับตัวกรองนี้",
+	filterResults: (count: number) =>
+		count === 0 ? "ไม่มีบทความที่ตรงกับตัวกรองนี้" : `แสดง ${count} บทความ`,
 	minutesRead: (minutes: number) => `อ่าน ${minutes} นาที`,
 	byline: "โดยทีม Trajectonomics",
 	availableIn: "อ่านได้ในภาษา",

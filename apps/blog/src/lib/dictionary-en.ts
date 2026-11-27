@@ -14,7 +14,7 @@ export const EN: Dictionary = Object.freeze({
 	frontTitle: "Blog · Trajectonomics",
 	frontDescription:
 		"Comparisons, releases, guides, essays and news from Trajectonomics — makers of traj and OpenJot.",
-	frontHeading: "Comparisons, releases and guides",
+	frontHeading: "All posts",
 	noPosts: "No posts yet.",
 	postTitleSuffix: "Trajectonomics Blog",
 	typeLabels: Object.freeze({
@@ -28,6 +28,8 @@ export const EN: Dictionary = Object.freeze({
 	filterAll: "All",
 	filterGroups: Object.freeze({ type: "Type", language: "Language", product: "Product" }),
 	noMatches: "No post matches these filters.",
+	filterResults: (count: number) =>
+		count === 0 ? "No post matches these filters." : count === 1 ? "1 post." : `${count} posts.`,
 	minutesRead: (minutes: number) => `${minutes} min read`,
 	byline: "By the Trajectonomics team",
 	availableIn: "Available in",

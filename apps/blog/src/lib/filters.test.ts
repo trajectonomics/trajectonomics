@@ -1,11 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import {
-	chosenFilters,
 	FILTER_GROUPS,
 	type Filterable,
 	filterGroups,
-	filterQuery,
 	filterValues,
+	isFilterGroup,
 	matchesFilters,
 } from "./filters"
 
@@ -16,8 +15,11 @@ const POSTS: readonly Filterable[] = [
 ]
 
 describe("filter groups", () => {
-	test("lists groups in bar order", () => {
+	test("lists groups in bar order and validates group names", () => {
 		expect(FILTER_GROUPS).toEqual(["type", "language", "product"])
+		expect(isFilterGroup("type")).toBe(true)
+		expect(isFilterGroup("unknown")).toBe(false)
+		expect(isFilterGroup(null)).toBe(false)
 	})
 
 	test("keeps only values present on at least one Post, in canonical order", () => {
@@ -56,19 +58,5 @@ describe("matching filters", () => {
 		expect(matchesFilters(values, { type: "essay", language: "en", product: "traj" })).toBe(true)
 		expect(matchesFilters(values, { type: "compare" })).toBe(false)
 		expect(matchesFilters(values, { type: "essay", product: "openjot" })).toBe(false)
-	})
-})
-
-describe("filter query parameters", () => {
-	test("reads only known values and drops unknown ones", () => {
-		const search = new URLSearchParams("type=compare&language=fr&product=traj&extra=1")
-		expect(chosenFilters(search)).toEqual({ type: "compare", product: "traj" })
-	})
-
-	test("writes combined queries in bar order and returns empty when cleared", () => {
-		expect(filterQuery({}, "product", "traj")).toBe("?product=traj")
-		expect(filterQuery({ product: "traj" }, "type", "essay")).toBe("?type=essay&product=traj")
-		expect(filterQuery({ type: "essay", product: "traj" }, "type", undefined)).toBe("?product=traj")
-		expect(filterQuery({ product: "traj" }, "product", undefined)).toBe("")
 	})
 })

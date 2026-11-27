@@ -161,13 +161,31 @@ describe("the built blog", () => {
 		expect(checkBuild(files, expected)).toEqual([])
 	})
 
-	test("a _redirects rule targeting an unbuilt page or colliding with a built page fails", () => {
+	test("a _redirects rule targeting an unbuilt page fails", () => {
+		const files: readonly BuiltFile[] = [
+			...GOOD,
+			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/missing/ 301\n" },
+		]
+		expect(codes(files)).toEqual(["redirect-target-unbuilt"])
+	})
+
+	test("a _redirects rule colliding with a built page fails", () => {
+		const essay = POST.replace("/blog/guides/a/", "/blog/essays/a/")
 		const files: readonly BuiltFile[] = [
 			...GOOD,
 			{ path: "guides/a/index.html", text: POST },
-			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/missing/ 301\n" },
+			{ path: "essays/a/index.html", text: essay },
+			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/a/ 301\n" },
 		]
-		expect(codes(files)).toEqual(["redirect-target-unbuilt", "redirect-source-built"])
+		expect(codes(files)).toEqual(["redirect-source-built"])
+	})
+
+	test("a two-token _redirects rule without a status is still checked", () => {
+		const files: readonly BuiltFile[] = [
+			...GOOD,
+			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/missing/\n" },
+		]
+		expect(codes(files)).toEqual(["redirect-target-unbuilt"])
 	})
 
 	test("a _redirects file missing an expected rule fails", () => {
