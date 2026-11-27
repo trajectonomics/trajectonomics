@@ -33,8 +33,9 @@ exact version is required: plugin names and packages change between releases.
 - **Tokens are audience-bound.** Each server in `platform` mode registers with the platform for
   free and receives its own audience (`aud`), an absolute resource URI. An access JWT for the data
   server is rejected by the relay and by every other server, so a self-hosted server cannot replay
-  a user's token against the hosted relay. The access JWT lives fifteen minutes; the refresh token
-  lives thirty days. The device-flow client registers with the device-code grant, the
+  a user's token against the hosted relay. The access JWT lives fifteen minutes; a refresh token
+  lives thirty days, and no grant may outlive ninety days from its original approval (ADR 0002).
+  The device-flow client registers with the device-code grant, the
   `refresh_token` grant and the `offline_access` scope: without the grant Better Auth omits the
   refresh token even when the scope asks for it (spike finding). An OIDC access token also carries
   the userinfo endpoint in `aud`, so a server checks that its own URI is present rather than
@@ -63,11 +64,11 @@ exact version is required: plugin names and packages change between releases.
 - In production no signed-in user can create an OAuth client (`clientPrivileges`), and a client can
   request only the resources it is linked to (`enforcePerClientResources`). Clients are registered
   and linked server-side.
-- **Known gap, a gate for the service slice:** Better Auth 1.7.28 puts every requested `resource`
-  into one token's `aud`, and a grant approved with no resource can be refreshed into a token for a
-  resource the person never saw. Until a before-hook rejects more than one `resource` per request
-  and a refresh that adds a resource, each registered client is linked to exactly one resource, so
-  per-client enforcement keeps every token to that one audience.
+- **Closed by the service slice (2026-11-27).** Better Auth 1.7.28 puts every requested `resource`
+  into one token's `aud`, and a grant approved with no resource could be refreshed into a token for
+  a resource the person never saw. A before-hook now rejects more than one `resource` per request
+  and a refresh that adds a resource, and every registered client is linked to exactly one
+  resource. See [ADR 0002](0002-oauth-grants-are-server-registered-single-audience-and-revocable.md).
 - Every server that wants audience-bound tokens registers a resource URI; a client that requests a
   resource it is not linked to is rejected once per-client resource enforcement is on.
 - The auth Worker is on the request path only for sign-in and token refresh. Resource servers cache

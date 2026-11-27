@@ -29,11 +29,28 @@ describe("authOptions", () => {
 		expect(options.emailAndPassword?.enabled).toBe(true)
 	})
 
-	it("installs the JWT, passkey, OAuth provider and device plugins exactly once", () => {
+	it("installs the JWT, passkey, OAuth provider, device and grant plugins exactly once", () => {
 		const ids = authOptions({ env: env() })
 			.plugins?.map((plugin) => plugin.id)
 			.sort()
-		expect(ids).toEqual(["device-authorization", "jwt", "oauth-provider", "passkey"])
+		expect(ids).toEqual([
+			"device-authorization",
+			"grant-management",
+			"jwt",
+			"oauth-provider",
+			"passkey",
+		])
+	})
+
+	it("enables rate limiting explicitly and stores it in D1", () => {
+		const options = authOptions({ env: env() })
+		expect(options.rateLimit?.enabled).toBe(true)
+		expect(options.rateLimit?.storage).toBe("database")
+		// The provider's own token rule is 20/min; the custom rule must not be looser.
+		expect(options.rateLimit?.customRules?.["/oauth2/token"]).toEqual({ window: 60, max: 20 })
+		expect(options.rateLimit?.customRules?.["/device"]).toEqual({ window: 60, max: 5 })
+		expect(options.rateLimit?.customRules?.["/device/deny"]).toEqual({ window: 60, max: 5 })
+		expect(options.advanced?.ipAddress?.ipAddressHeaders).toEqual(["cf-connecting-ip"])
 	})
 
 	it("turns on a social provider only when both halves exist", () => {
@@ -59,9 +76,10 @@ describe("authOptions", () => {
 		expect(requireSecret("x".repeat(32))).toBe("x".repeat(32))
 	})
 
-	it("trusts only its own origin in production and disables /token", () => {
+	it("trusts only its own origin in production and disables /token and delete-consent", () => {
 		const options = authOptions({ env: env() })
 		expect(options.trustedOrigins).toEqual(["https://auth.example.test"])
 		expect(options.disabledPaths).toContain("/token")
+		expect(options.disabledPaths).toContain("/oauth2/delete-consent")
 	})
 })
