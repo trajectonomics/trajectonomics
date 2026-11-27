@@ -2,6 +2,15 @@ import type { AccountNames } from "../account-names"
 import { apart } from "./series-apart"
 import { seriesWords } from "./series-ids"
 
+const ACCOUNT = "account:"
+
+/** A removed Account's twin suffix names it by its words, so a tie takes a number rather than its id. */
+function twinLabelOf(id: string, accounts: AccountNames): string | undefined {
+	if (!id.startsWith(ACCOUNT)) return undefined
+	const account = id.slice(ACCOUNT.length)
+	return accounts.get(account) ?? account
+}
+
 /**
  * The names of the series a plan does not state, built from their ids and then told apart exactly as the drawn
  * names are: a tie takes its group, item, category and Account, then " (2)", " (3)" in sorted-id order (web ADR
@@ -14,7 +23,11 @@ export function missingNames(
 	accounts: AccountNames = new Map(),
 	taken: readonly string[] = [],
 ): ReadonlyMap<string, string> {
-	const items = ids.map((id) => ({ id, name: names.get(id) ?? seriesWords(id, accounts) }))
+	const items = ids.map((id) => ({
+		id,
+		name: names.get(id) ?? seriesWords(id, accounts),
+		twinLabel: twinLabelOf(id, accounts),
+	}))
 	const others = taken.map((name, index) => ({ id: `\u0000taken:${index}`, name }))
 	const named = ids.filter((id) => names.has(id))
 	const fixed = new Set([...others.map((item) => item.id), ...named])

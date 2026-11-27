@@ -29,7 +29,7 @@ describe("removed series are told apart", () => {
 			cashSeries("expense", "gone", null, null),
 			cashSeries("income", "gone", null, null),
 		])
-		expect(names).toEqual(["Expense: gone (no category)", "Income: gone (no category)"])
+		expect(names).toEqual(["Expense: gone (no category)", "Income: gone"])
 		expect(new Set(names).size).toBe(2)
 	})
 
@@ -67,6 +67,17 @@ describe("removed series are told apart", () => {
 		])
 		expect(names).toEqual(['Spending on: "no category"', "Spending on: no category"])
 		expect(new Set(names).size).toBe(2)
+	})
+
+	test("two removed Accounts the ledger names alike take numbers in sorted-id order, never their ids", () => {
+		const accounts = new Map([
+			["a", "Savings"],
+			["b", "Savings"],
+		])
+		const ids = ["account:a", "account:b"]
+		const named = missingNames(ids, new Map(), accounts)
+		expect(ids.map((id) => named.get(id))).toEqual(["Value of Savings", "Value of Savings (2)"])
+		expect([...named.values()].join("\n")).not.toContain("account:")
 	})
 
 	test("a twin suffix that only repeats the name is dropped for a number", () => {
@@ -150,5 +161,25 @@ describe("a missing name never repeats a listed or drawn name", () => {
 				.size,
 		).toBe(2)
 		expect(listed).toContain("Expense: old (rent)")
+	})
+
+	test("a listed twin the chart does not draw still keeps the removed line apart from it", () => {
+		const run = withCashLines([
+			{ group: "expense", id: "rent" },
+			{ group: "expense", id: "old" },
+			{ group: "expense", id: "food" },
+		])
+		const names = planNames([{ id: "rent", displayLabel: "old" }])
+		const listed = buildCatalogue([run], run, names).flatMap((group) =>
+			group.entries.map((entry) => entry.name),
+		)
+		const drawn = cashSeries("expense", "food", null, null)
+		const removed = cashSeries("expense", "old", null, "rent")
+		const available = new Map(resolveSeries(run, names).map((item) => [item.id, item]))
+		const chart: ChartDef = { id: "rents", name: "Rents", kind: "line", series: [drawn, removed] }
+		const view = chartView(chart, available, seriesNames([run], run, names), "nominal")
+		expect(listed).toContain("Expense: old (rent)")
+		expect(view.series.map((line) => line.name)).toEqual(["Expense: food"])
+		expect(view.missing.map((item) => item.name)).toEqual(["Expense: old (rent) (2)"])
 	})
 })

@@ -29,9 +29,7 @@ describe("words from a series id", () => {
 		expect(seriesWords(cash("expense", "gone", null, null), accounts)).toBe(
 			"Expense: gone (no category)",
 		)
-		expect(seriesWords(cash("income", "gone", null, null), accounts)).toBe(
-			"Income: gone (no category)",
-		)
+		expect(seriesWords(cash("income", "gone", null, null), accounts)).toBe("Income: gone")
 		expect(seriesWords(cash("contribution", "save", "a", null), accounts)).toBe(
 			"Saving: save into cash",
 		)
@@ -40,7 +38,8 @@ describe("words from a series id", () => {
 		)
 	})
 
-	test("only an income or expense line states a category, so the others carry no (no category)", () => {
+	test("only an expense line states a category, so the others carry no (no category)", () => {
+		expect(seriesWords(cash("income", "salary", null, null))).toBe("Income: salary")
 		expect(seriesWords(cash("category", "Food", null, null))).toBe("Spending on: Food")
 		expect(seriesWords(cash("category", null, null, null))).toBe("Spending on: no category")
 		expect(seriesWords(cash("contribution", "save", "a", "Home"))).toBe("Saving: save into a")

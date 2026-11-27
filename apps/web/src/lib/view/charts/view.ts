@@ -70,12 +70,10 @@ export function chartView(
 	const lines = chart.kind === "line" ? drawn.map(dashLater) : drawn
 	const has = new Set(available.keys())
 	const absent = found.flatMap((item) => (item.series ? [] : [item.id]))
-	const missing = missingNames(
-		absent,
-		names,
-		accounts,
-		present.map((item) => item.name),
-	)
+	const missing = missingNames(absent, names, accounts, [
+		...names.values(),
+		...present.map((item) => item.name),
+	])
 	return {
 		series: lines.map(lineOf),
 		table: tableOf(lines),

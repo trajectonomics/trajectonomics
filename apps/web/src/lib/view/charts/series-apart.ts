@@ -1,42 +1,23 @@
 import type { AccountNames } from "../account-names"
-import { seriesAccount, seriesCategory, seriesLabelId } from "./series-ids"
-import { clashing, numbered, type Series } from "./series-numbering"
+import { seriesLabelId } from "./series-ids"
+import { numbered, type Series } from "./series-numbering"
+import { clashGroups, TWIN_STEPS, tellGroup, twin } from "./series-twins"
 
-/** The twin steps a clash takes before a number: "(item)", "(item, category)", "(item, category, Account)". */
-const TWIN_STEPS = 3
-
-const WORDS = /[\p{L}\p{N}]+/gu
-
-/** The words a name says, in lower case, so a suffix that only repeats them adds no information. */
-function wordsOf(text: string): ReadonlySet<string> {
-	return new Set(text.toLowerCase().match(WORDS) ?? [])
-}
-
-/** Whether a twin suffix says a word the name does not already say. */
-function informs(name: string, suffix: string): boolean {
-	const said = wordsOf(name)
-	return (suffix.toLowerCase().match(WORDS) ?? []).some((word) => !said.has(word))
-}
-
-/** The first twin level above `from` that adds information, or `from` when every form only repeats the name. */
-function toldApart(item: Series, from: number, category: boolean, accounts: AccountNames): number {
-	for (let level = from + 1; level <= TWIN_STEPS; level += 1)
-		if (informs(item.name, twin(item, level, category, accounts))) return level
-	return from
-}
-
-/**
- * The twin form a name takes at a step: "(item)", then "(item, category)", then "(item, category, Account)";
- * past those the item repeats, so a tie nothing tells apart falls to a number.
- */
-function twin(item: Series, level: number, category: boolean, accounts: AccountNames): string {
-	const label = seriesLabelId(item.id)
-	if (level < 1) return ""
-	const kind = seriesCategory(item.id)
-	if (!category || level === 1 || kind === null) return ` (${label})`.repeat(level)
-	const account = level >= 3 ? seriesAccount(item.id, accounts) : null
-	if (account !== null) return ` (${label}, ${kind}, ${account})${` (${label})`.repeat(level - 3)}`
-	return ` (${label}, ${kind})${` (${label})`.repeat(level - 2)}`
+/** Raises the level each item of one clash group takes. */
+function raiseLevels<T extends Series>(
+	items: readonly T[],
+	levels: number[],
+	name: string,
+	indexes: readonly number[],
+	category: readonly boolean[],
+	fixed: ReadonlySet<string>,
+	accounts: AccountNames,
+): void {
+	const moving = indexes.filter((index) => !fixed.has(items[index]?.id ?? ""))
+	if (moving.length === 0) return
+	const from = Math.max(...moving.map((index) => levels[index] ?? 0))
+	for (const [index, level] of tellGroup(name, items, moving, from, category, accounts))
+		levels[index] = level
 }
 
 /**
@@ -57,11 +38,10 @@ export function apart<T extends Series>(
 			(item, index) =>
 				`${item.name}${twin(item, levels[index] ?? 0, category[index] === true, accounts)}`,
 		)
-		const clash = clashing(names)
-		if (!clash.some(Boolean)) break
-		for (const [index, item] of items.entries())
-			if (clash[index] === true && !fixed.has(item.id))
-				levels[index] = toldApart(item, levels[index] ?? 0, category[index] === true, accounts)
+		const groups = clashGroups(names)
+		if (groups.length === 0) break
+		for (const [name, indexes] of groups)
+			raiseLevels(items, levels, name, indexes, category, fixed, accounts)
 	}
 	const told = numbered(items, names, fixed)
 	return items.map((item, index) => ({ ...item, name: told[index] ?? item.name }))

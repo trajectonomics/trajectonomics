@@ -1,5 +1,9 @@
-/** A series by id and the name it reads, before names are told apart. */
-export type Series = { readonly id: string; readonly name: string }
+/** A series by id and the name it reads, before names are told apart. A `twinLabel` names a twin suffix instead of the id's label. */
+export type Series = {
+	readonly id: string
+	readonly name: string
+	readonly twinLabel?: string
+}
 
 function countNames(names: readonly string[]): Map<string, number> {
 	const counts = new Map<string, number>()

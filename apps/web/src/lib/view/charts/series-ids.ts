@@ -5,8 +5,11 @@ const CASH = "cash:"
 const ACCOUNT = "account:"
 const NO_CATEGORY = "no category"
 
-/** The groups whose line names a category; a category line, a contribution and a withdrawal name none by design. */
-const CATEGORY_GROUPS: ReadonlySet<string> = new Set(["income", "expense"])
+/**
+ * The groups whose line names a category; an income line names none (its category is always null), and neither
+ * does a category line, a contribution or a withdrawal.
+ */
+const CATEGORY_GROUPS: ReadonlySet<string> = new Set(["expense"])
 
 /** The word each cash-flow group names its series by, as `resolve-flows.ts` does. */
 const GROUP_WORDS: Readonly<Record<string, string>> = {
