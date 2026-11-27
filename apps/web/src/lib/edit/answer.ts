@@ -17,17 +17,17 @@ const refusedAnswer = z.strictObject({ ok: z.literal(false), error: errorBody })
  * plan write dropped, and whether it replaced a plan of its name made while it ran.
  */
 const stated = {
+	// What a write that states figures answered (`record-values`): the page shows it as traj stated it.
 	result: accountValues.optional(),
+	// The household anchors a plan write dropped, because the document no longer holds their item (cli ADR-0048).
 	droppedAnchors: z.array(z.string()).optional(),
+	// The household Owners it dropped for the same reason (cli ADR-0076).
 	droppedOwners: z.array(z.string()).optional(),
 	replaced: z.literal(true).optional(),
 }
 
 /** The Edit answer: the Snapshot after the Edit, or the error that stopped it, with what the write stated. */
 export const editAnswer = z.discriminatedUnion("ok", [
-	// `result` is what a write that states figures answered (`record-values`): the page shows it as traj stated it.
-	// `droppedAnchors` names the household anchors a plan write dropped, because the document no longer holds their item (cli ADR-0048).
-	// `droppedOwners` names the household Owners it dropped for the same reason (cli ADR-0076).
 	z.strictObject({ ok: z.literal(true), snapshot, ...stated }),
 	// A refusal; or a write that landed while the read after it failed (`written_reread_failed`), with what it stated.
 	z.strictObject({ ok: z.literal(false), error: errorBody, ...stated }),
