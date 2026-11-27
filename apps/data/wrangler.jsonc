@@ -3,14 +3,22 @@
 	"name": "data",
 	"main": "src/worker.ts",
 	"compatibility_date": "2026-11-01",
-	// The only host is data.trajectonomics.com; the *.workers.dev copy stays off.
+	// The data site lives at trajectonomics.com/data/; the old host keeps its API and ingest and
+	// redirects its pages (ADR 0006). The *.workers.dev copy stays off.
 	"workers_dev": false,
-	"routes": [{ "pattern": "data.trajectonomics.com", "custom_domain": true }],
+	"routes": [
+		// The zone route takes the data paths from the Site's Custom Domain on the same hostname.
+		{ "pattern": "trajectonomics.com/data*", "zone_name": "trajectonomics.com" },
+		// The old host stays on this Worker so its API and ingest keep working.
+		{ "pattern": "data.trajectonomics.com", "custom_domain": true }
+	],
 	"assets": {
 		// Astro's build: the static overview and method pages, the islands and the brand files.
 		"directory": "./dist",
-		// The API and ingest go to the Worker; every other path is an asset.
-		"run_worker_first": ["/api/*", "/ingest"]
+		// The build's root is served at /data/; nothing is emitted at the host root.
+		"base_path": "/data",
+		// The API and ingest go to the Worker; every other path under /data/ is an asset.
+		"run_worker_first": ["/data/api/*", "/data/ingest"]
 	},
 	"d1_databases": [
 		{

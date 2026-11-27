@@ -52,16 +52,16 @@ const VISITOR_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 const COOKIE_ATTRIBUTES = "Path=/; Secure; SameSite=Lax"
 
 /**
- * The registrable domain the consent cookies are scoped to on production. The Docs Portal is served on
- * `docs.trajectonomics.com` (docs ADR 0013), a different host, and a host-only cookie on the apex
- * would never reach it.
+ * The registrable domain the consent cookies are scoped to on production. The Docs Portal and the
+ * blog are paths on the apex now, but this zone still serves subdomains such as OpenJot's, and a
+ * domain cookie keeps one answer across all of them, including the one stored before the move.
  */
 export const CONSENT_COOKIE_DOMAIN = "trajectonomics.com"
 
 /**
  * The `Domain` a consent cookie names for a request host: the registrable domain on production and
- * any of its subdomains, so the Docs Portal reads the same answer, and none elsewhere. A preview,
- * `workers.dev` or `localhost` host would refuse a cookie for a domain it is not under.
+ * any of its subdomains, so every app under the zone reads the same answer, and none elsewhere. A
+ * preview, `workers.dev` or `localhost` host would refuse a cookie for a domain it is not under.
  */
 export function cookieDomainFor(hostname: string): string | undefined {
 	if (hostname === CONSENT_COOKIE_DOMAIN || hostname.endsWith(`.${CONSENT_COOKIE_DOMAIN}`)) {
@@ -100,7 +100,7 @@ export function consentFromRequest(signals: ConsentSignals): ConsentState {
 	return { kind: "undecided" }
 }
 
-/** The `Set-Cookie` value of the visitor id: readable by the Docs Portal, so not `HttpOnly`. */
+/** The `Set-Cookie` value of the visitor id: readable by every app on the host, so not `HttpOnly`. */
 export function visitorCookie(visitorId: string, domain?: string): string {
 	return `${VISITOR_COOKIE}=${visitorId}; ${attributes(domain)}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`
 }

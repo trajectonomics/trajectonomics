@@ -54,8 +54,11 @@ const MOVED_PREFIX = 10
 const MOVED_DEEP_PREFIX = 12
 const ENGLISH_MISS = 16
 const RESERVED_PRELOAD = 17
-const SITEMAP = 18
-const ROBOTS = 19
+const RESERVED_DOCS = 18
+const RESERVED_BLOG = 19
+const RESERVED_DATA = 20
+const SITEMAP = 21
+const ROBOTS = 22
 
 /** The clean answers with the answer at `index` replaced by `answer`. */
 function withAnswer(index: number, answer: Partial<ProbeResponse>): readonly ProbeResponse[] {
@@ -165,6 +168,16 @@ describe("the answers the local Worker gives", () => {
 	it("fails when the Reserved preload path is served instead of missing", () => {
 		expect(codes(withAnswer(RESERVED_PRELOAD, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
 	})
+
+	for (const [name, index] of [
+		["docs", RESERVED_DOCS],
+		["blog", RESERVED_BLOG],
+		["data", RESERVED_DATA],
+	] as const) {
+		it(`fails when the Site serves a page at the ${name} mount`, () => {
+			expect(codes(withAnswer(index, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
+		})
+	}
 
 	it("fails a response that carries a content security policy", () => {
 		expect(

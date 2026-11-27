@@ -116,7 +116,7 @@ The APK, AAB and `SHA256SUMS` are attached to the run as an artifact for 7 days.
 
 **Publish a release:**
 
-1. Set the same version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`, and merge that change.
+1. Set the same version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`, add the release's entry to `src/lib/whatsNew.ts` (a unit test requires one), and merge that change. The new entry changes the `settings-whats-new` screenshot, which lists every release, so take that baseline from the PR's failed `Screenshots` job (`tests/screenshots/README.md`) before merging.
 2. Tag `main` and push the tag:
 
    ```bash
@@ -137,8 +137,8 @@ The APK, AAB and `SHA256SUMS` are attached to the run as an artifact for 7 days.
 The asset names don't change between releases, and the Worker picks the newest `openjot-v*` release, so these links always point at it. Use them on the landing page at <https://trajectonomics.com/openjot/>:
 
 - Landing page: `https://trajectonomics.com/openjot/`
-- APK: `https://openjot.trajectonomics.com/download`
-- Checksums: `https://openjot.trajectonomics.com/download/checksums`
+- APK: `https://trajectonomics.com/openjot/download`
+- Checksums: `https://trajectonomics.com/openjot/download/checksums`
 - Release page: `https://github.com/trajectonomics/trajectonomics/releases?q=openjot-v`
 
 The build is arm64 only (`aarch64`), which covers current Android phones.

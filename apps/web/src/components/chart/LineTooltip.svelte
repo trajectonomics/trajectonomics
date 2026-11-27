@@ -22,7 +22,7 @@ const flip = $derived(x > width / 2)
 >
 	<p class="font-medium">{xLabel}</p>
 	<ul class="mt-1 space-y-0.5">
-		{#each rows as row (row.name)}
+		{#each rows as row, index (index)}
 			<li class="flex items-baseline justify-between gap-3 tabular-nums">
 				<span class="text-muted-foreground">{row.name}</span>
 				<span>{row.display}</span>

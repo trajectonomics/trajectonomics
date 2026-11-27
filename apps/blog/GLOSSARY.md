@@ -25,8 +25,8 @@ The Language the Shell and a page's labels are read in. Each one has a **Diction
 
 ## Language Tree
 
-Every page of the blog in one Interface Language: English at the root, every other Language under
-its own prefix, such as `/th/`. Every Post has a page in every tree.
+Every page of the blog in one Interface Language: English at the blog's base (`/blog/`), every
+other Language under its own prefix, such as `/blog/th/`. Every Post has a page in every tree.
 
 ## Dictionary
 
@@ -79,7 +79,7 @@ The token `[OWNER TO WRITE]`, standing for an Owner-written Value not written ye
 
 ## Docs Portal
 
-The product documentation at `https://docs.trajectonomics.com/`, which the header's Docs link names.
+The product documentation at `/docs/` on the Site, which the header's Docs link names.
 
 ## Shell
 

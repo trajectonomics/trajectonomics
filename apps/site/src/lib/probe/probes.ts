@@ -2,6 +2,7 @@ import { CONSENT_COOKIE, VISITOR_COOKIE } from "../analytics/consent"
 import { ROBOTS_FILE } from "../crawl/robots"
 import { SITEMAP_FILE } from "../crawl/sitemap"
 import { LANGUAGE_CHOICE_COOKIE } from "../language/stored-choice"
+import { BLOG_PATH, DATA_PATH, DOCS_PATH } from "../site"
 import { OPENJOT_PATH } from "../site/openjot"
 import type { Probe } from "./probe"
 import {
@@ -46,6 +47,9 @@ export const PROBES: readonly Probe[] = Object.freeze([
 	moved("/th/anything"),
 	answered("/no-such-page", 404, "en", PAGE_MEDIA),
 	answered("/__mf-preload.js", 404, null, PAGE_MEDIA),
+	answered(DOCS_PATH, 404, null, PAGE_MEDIA),
+	answered(BLOG_PATH, 404, null, PAGE_MEDIA),
+	answered(DATA_PATH, 404, null, PAGE_MEDIA),
 	answered(`/${SITEMAP_FILE}`, 200, null, SITEMAP_MEDIA),
 	answered(`/${ROBOTS_FILE}`, 200, null, ROBOTS_MEDIA),
 	consent("granted"),

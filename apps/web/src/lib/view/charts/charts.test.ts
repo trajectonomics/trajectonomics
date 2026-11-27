@@ -1,13 +1,17 @@
 import { describe, expect, test } from "bun:test"
-import { buildCatalogue } from "./catalogue"
-import { defaultName, duplicateOf, mergeCharts, saveChart, uniqueId } from "./edit"
+import { type ItemNames, itemNames } from "../item-names"
+import { buildCatalogue, defaultNameIndex } from "./catalogue"
+import { defaultName, duplicateOf, mergeCharts, saveChart, savedName, uniqueId } from "./edit"
 import { plain, withTax } from "./fixtures.test-support"
+import { planNames, withExpenseFlows } from "./flow-fixtures.test-support"
 import { resolveSeries } from "./resolve"
 import { parseCharts, readCharts, serializeCharts } from "./stored"
 import type { ChartDef } from "./types"
 import { periodText } from "./year"
 
 const NAMES = new Map([["savings", "Savings"]])
+const NO_NAMES = itemNames(NAMES, null)
+
 const CHART: ChartDef = {
 	id: "spend",
 	name: "Spend",
@@ -16,7 +20,7 @@ const CHART: ChartDef = {
 }
 
 function byId(run = withTax()) {
-	return new Map(resolveSeries(run, NAMES).map((item) => [item.id, item]))
+	return new Map(resolveSeries(run, NO_NAMES).map((item) => [item.id, item]))
 }
 
 describe("the series catalogue", () => {
@@ -35,6 +39,48 @@ describe("the series catalogue", () => {
 		expect(byId().get("account:savings")?.name).toBe("Value of Savings")
 		expect(byId().get("net-worth")?.real?.[0]?.amount).toBe("1200000.00")
 		expect(byId().get("income")?.real).toBeNull()
+	})
+
+	test("names a cash-flow series by the plan's label, the id when it states none, and twins with the id", () => {
+		const series = (names: ItemNames) =>
+			resolveSeries(withTax(), names).find((item) => item.id.startsWith("cash:"))?.name
+		expect(series(NO_NAMES)).toBe("Income: salary")
+		expect(series(planNames([{ id: "salary", displayLabel: "Salary" }]))).toBe("Income: Salary")
+		expect(series(planNames([{ id: "salary" }]))).toBe("Income: salary")
+		expect(
+			series(
+				planNames([
+					{ id: "salary", displayLabel: "Salary" },
+					{ id: "bonus", displayLabel: "Salary" },
+				]),
+			),
+		).toBe("Income: Salary (salary)")
+	})
+
+	test("adds the id when a label reads the same as an id, so the series can be told apart", () => {
+		const run = withExpenseFlows(["a", "rent"])
+		const names = planNames([{ id: "a", displayLabel: "rent" }, { id: "rent" }])
+		const namesOfRun = resolveSeries(run, names)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.name)
+		expect(namesOfRun).toEqual(["Expense: rent (a)", "Expense: rent (rent)"])
+	})
+
+	test("adds the id when a label equals another Flow's twin form", () => {
+		const run = withExpenseFlows(["a", "b", "rent"])
+		const names = planNames([
+			{ id: "a", displayLabel: "rent" },
+			{ id: "rent", displayLabel: "rent" },
+			{ id: "b", displayLabel: "rent (a)" },
+		])
+		const namesOfRun = resolveSeries(run, names)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.name)
+		expect(namesOfRun).toEqual([
+			"Expense: rent (a) (a)",
+			"Expense: rent (a) (b)",
+			"Expense: rent (rent)",
+		])
 	})
 
 	test("keeps the CLI's strings and places a point at the day its period ends", () => {
@@ -64,7 +110,7 @@ describe("the series catalogue", () => {
 	})
 
 	test("greys out what the selected plan lacks, with the reason", () => {
-		const groups = buildCatalogue([withTax(), plain()], plain(), NAMES)
+		const groups = buildCatalogue([withTax(), plain()], plain(), NO_NAMES)
 		const tax = groups.find((group) => group.id === "tax")
 		expect(
 			tax?.entries.every((entry) => !entry.available && entry.reason === "this plan has no tax"),
@@ -139,5 +185,18 @@ describe("storage", () => {
 		expect(uniqueId("My chart!", new Set(["my-chart"]))).toBe("my-chart-2")
 		expect(duplicateOf([CHART], CHART)).toMatchObject({ id: "spend-2", name: "Spend (copy)" })
 		expect(defaultName(["Income", "Expenses"])).toBe("Income and 1 more")
+	})
+
+	test("a new chart's default name reads the series ids, so it fits every plan", () => {
+		const run = withExpenseFlows(["salary"])
+		const alpha = planNames([{ id: "salary", displayLabel: "Alpha job" }])
+		const bravo = planNames([{ id: "salary", displayLabel: "Bravo job" }])
+		const series = resolveSeries(run, alpha)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.id)
+		expect(series).toHaveLength(1)
+		expect(savedName("", series, defaultNameIndex([run], alpha))).toBe("Expense: salary")
+		expect(savedName("", series, defaultNameIndex([run], bravo))).toBe("Expense: salary")
+		expect(savedName("  Mine  ", series, defaultNameIndex([run], alpha))).toBe("Mine")
 	})
 })

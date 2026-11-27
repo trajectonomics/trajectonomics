@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { CatalogueGroup } from "../../lib/view/charts/catalogue"
-import { defaultName } from "../../lib/view/charts/edit"
+import { savedName } from "../../lib/view/charts/edit"
 import {
 	CHART_KINDS,
 	type ChartDef,
@@ -16,12 +16,14 @@ interface Props {
 	initial: ChartDef | null
 	groups: readonly CatalogueGroup[]
 	names: ReadonlyMap<string, string>
+	/** The series names with no plan label, for a default chart name that fits every plan. */
+	defaultNames: ReadonlyMap<string, string>
 	/** Saves the chart: its name (empty for the default), kind and series. */
 	onSave: (draft: { name: string; kind: ChartKind; series: readonly string[] }) => void
 	onCancel: () => void
 }
 
-let { initial, groups, names, onSave, onCancel }: Props = $props()
+let { initial, groups, names, defaultNames, onSave, onCancel }: Props = $props()
 // The form starts from the chart it is opened on and is made afresh each time (a keyed block in the drawer).
 // svelte-ignore state_referenced_locally
 let name = $state(initial?.name ?? "")
@@ -30,7 +32,6 @@ let kind = $state<string>(initial?.kind ?? "line")
 // svelte-ignore state_referenced_locally
 let series = $state<readonly string[]>(initial?.series ?? [])
 const kinds = CHART_KINDS.map((value) => ({ value, label: KIND_LABELS[value] }))
-const label = (id: string) => names.get(id) ?? id
 
 function toggle(id: string): void {
 	series = series.includes(id) ? series.filter((item) => item !== id) : [...series, id]
@@ -42,7 +43,7 @@ function toggle(id: string): void {
 	onsubmit={(event) => {
 		event.preventDefault()
 		onSave({
-			name: name.trim() || defaultName(series.map(label)),
+			name: savedName(name, series, defaultNames),
 			kind: CHART_KINDS.find((value) => value === kind) ?? "line",
 			series,
 		})

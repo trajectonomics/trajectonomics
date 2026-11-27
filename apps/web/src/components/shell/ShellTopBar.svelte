@@ -36,7 +36,7 @@ const BUTTON = cx(
 			class={cx(BUTTON, "lg:hidden")}
 			aria-controls="page-menu"
 			aria-expanded={shellPanels.menu}
-			onclick={() => (shellPanels.menu = true)}
+			onclick={() => shellPanels.openMenu()}
 		>
 			<NavIcon name="menu" />
 			<span class="sr-only">Open the menu</span>
@@ -46,7 +46,7 @@ const BUTTON = cx(
 			type="button"
 			class={BUTTON}
 			aria-haspopup="dialog"
-			onclick={() => (shellPanels.options = true)}
+			onclick={() => shellPanels.openOptions()}
 		>
 			<NavIcon name="sliders-horizontal" />
 			Display options

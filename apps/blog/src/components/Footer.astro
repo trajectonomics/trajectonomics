@@ -5,11 +5,11 @@ import { dictionaryFor } from "../lib/dictionary"
 import { type Language, treePath } from "../lib/languages"
 import {
 	BLOG_PATH,
-	DOCS_URL,
+	DOCS_PATH,
 	GITHUB_ORG_URL,
 	ISSUES_URL,
 	LICENCE_URL,
-	SITE_HOME_URL,
+	SITE_HOME_PATH,
 	SITE_NAME,
 	SOURCE_URL,
 } from "../lib/site"
@@ -28,8 +28,8 @@ const columns = [
 		label: words.footerRead,
 		links: [
 			{ text: words.footerBlog, href: treePath(language, BLOG_PATH) },
-			{ text: words.footerDocs, href: DOCS_URL },
-			{ text: words.footerSiteHome, href: SITE_HOME_URL },
+			{ text: words.footerDocs, href: DOCS_PATH },
+			{ text: words.footerSiteHome, href: SITE_HOME_PATH },
 		],
 	},
 	{

@@ -3,8 +3,9 @@ import type { BuiltFile } from "./built-files"
 import { checkLandingPage, LANDING_PAGE_FILE } from "./landing-page"
 import { SEARCH_INDEX_FILE } from "./search-index"
 
-const OPERATOR_LINK = '<a href="/cli/">For Operators: install and run the CLI</a>'
-const CONTRIBUTE_LINK = '<a href="/contribute/">For Contributors: help make the tax rules right</a>'
+const OPERATOR_LINK = '<a href="/docs/cli/">For Operators: install and run the CLI</a>'
+const CONTRIBUTE_LINK =
+	'<a href="/docs/contribute/">For Contributors: help make the tax rules right</a>'
 
 function landingPage(body: string, head = ""): BuiltFile {
 	return {
@@ -42,11 +43,13 @@ const TWO_ENTRIES = landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`, `<p>${RELE
 
 describe("the built Landing Page", () => {
 	test("a page with one link to each Tab and no redirect reports no failure", () => {
-		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/cli"])], RELEASE_LINE)).toEqual([])
+		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs/cli"])], RELEASE_LINE)).toEqual(
+			[],
+		)
 	})
 
 	test("a page that is a meta refresh is reported as LANDING_PAGE_REDIRECT", () => {
-		const stub = landingPage(TWO_ENTRIES, '<meta http-equiv="refresh" content="0;url=/cli/">')
+		const stub = landingPage(TWO_ENTRIES, '<meta http-equiv="refresh" content="0;url=/docs/cli/">')
 
 		expect(codesOf([stub])).toEqual(["LANDING_PAGE_REDIRECT"])
 	})
@@ -56,7 +59,7 @@ describe("the built Landing Page", () => {
 	})
 
 	test("a page with a third link into a Tab is reported as LANDING_PAGE_LINKS", () => {
-		const extra = '<a href="/cli/installation/">Installation</a>'
+		const extra = '<a href="/docs/cli/installation/">Installation</a>'
 
 		expect(
 			codesOf([landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}${extra}`))]),
@@ -75,14 +78,16 @@ describe("the built Landing Page", () => {
 		expect(codesOf([landingPage(`<header>${title}</header>${TWO_ENTRIES}`)])).toEqual([])
 	})
 
-	test("a search index with an entry for / is reported as LANDING_PAGE_INDEXED", () => {
-		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/cli", "/"])])).toEqual([
+	test("a search index with an entry for the Landing Page is reported as LANDING_PAGE_INDEXED", () => {
+		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs/cli", "/docs/"])])).toEqual([
 			"LANDING_PAGE_INDEXED",
 		])
 	})
 
-	test("a search index with the bare landing id is reported as LANDING_PAGE_INDEXED", () => {
-		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex([""])])).toEqual(["LANDING_PAGE_INDEXED"])
+	test("a search index with the landing page id is reported as LANDING_PAGE_INDEXED", () => {
+		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs"])])).toEqual([
+			"LANDING_PAGE_INDEXED",
+		])
 	})
 
 	test("a page that does not state the release line is reported as LANDING_PAGE_RELEASE_LINE", () => {
@@ -106,6 +111,6 @@ describe("the built Landing Page", () => {
 	})
 
 	test("a missing page is left to the required-pages check", () => {
-		expect(codesOf([searchIndex(["/cli"])])).toEqual([])
+		expect(codesOf([searchIndex(["/docs/cli"])])).toEqual([])
 	})
 })

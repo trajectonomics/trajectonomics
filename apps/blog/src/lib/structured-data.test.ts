@@ -5,9 +5,9 @@ const POST: BlogPostingInput = {
 	headline: "A guide to traj",
 	description: "How traj works, with every number from a test.",
 	datePublished: "2026-11-20",
-	image: "https://blog.trajectonomics.com/posts/a/cover.webp",
+	image: "https://trajectonomics.com/blog/posts/a/cover.webp",
 	inLanguage: "en",
-	url: "https://blog.trajectonomics.com/guides/a/",
+	url: "https://trajectonomics.com/blog/guides/a/",
 }
 
 describe("the BlogPosting a Post page states", () => {
@@ -56,12 +56,12 @@ describe("the WebSite the front page states", () => {
 		const node = website({
 			description: "Comparisons, guides and news about traj.",
 			inLanguage: "th",
-			url: "https://blog.trajectonomics.com/th/",
+			url: "https://trajectonomics.com/blog/th/",
 		})
 		expect(node["@type"]).toBe("WebSite")
 		expect(node.name).toBe("Trajectonomics")
 		expect(node.inLanguage).toBe("th")
-		expect(node.url).toBe("https://blog.trajectonomics.com/th/")
+		expect(node.url).toBe("https://trajectonomics.com/blog/th/")
 		expect(node.publisher).toEqual({
 			"@type": "Organization" as const,
 			name: "Trajectonomics",

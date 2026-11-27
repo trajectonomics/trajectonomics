@@ -1,5 +1,5 @@
 import { treeOf, treePath } from "../languages"
-import { SITE_HOME_URL, SITE_ORIGIN } from "../site"
+import { BLOG_BASE, SITE_HOME_PATH, SITE_ORIGIN } from "../site"
 import { checkLlmsFile, checkPostStructuredData } from "./answer-engines"
 import { type BuiltFile, type Failure, failure } from "./failures"
 import { alternatesOf, canonicalOf, images, isNoindex, linkTargets, titleOf } from "./html"
@@ -7,12 +7,22 @@ import { alternatesOf, canonicalOf, images, isNoindex, linkTargets, titleOf } fr
 /** The blog's own Not-found Page, which the Worker's `404-page` handling finds for a miss. */
 const NOT_FOUND_PAGE = "404.html"
 
+/** The build path a public path under the blog's base names, or `undefined` when it is outside it. */
+function buildPathOf(pathname: string): string | undefined {
+	if (pathname === BLOG_BASE) return ""
+	if (!pathname.startsWith(`${BLOG_BASE}/`)) return undefined
+	return pathname.slice(BLOG_BASE.length + 1)
+}
+
 /** Every image the page shows is a built file, and says what it shows. */
 function checkImages(path: string, html: string, built: ReadonlySet<string>): Failure[] {
 	return images(html).flatMap(({ src, alt }) => {
 		const failures: Failure[] = []
-		if (src.startsWith("/") && !built.has(src.slice(1))) {
-			failures.push(failure("page-image-missing", path, `shows ${src}, which the build lacks`))
+		if (src.startsWith("/")) {
+			const file = buildPathOf(src)
+			if (file === undefined || !built.has(file)) {
+				failures.push(failure("page-image-missing", path, `shows ${src}, which the build lacks`))
+			}
 		}
 		if (alt === undefined) {
 			failures.push(failure("page-image-alt-missing", path, `shows ${src} with no alt text`))
@@ -22,12 +32,13 @@ function checkImages(path: string, html: string, built: ReadonlySet<string>): Fa
 }
 
 /**
- * The built file an absolute URL on the blog's host answers with, or `undefined` when the URL is on
- * another host. A path that ends in a slash answers with its folder's `index.html`.
+ * The built file an absolute URL under the blog's base answers with, or `undefined` when the URL is
+ * on another host or outside the base. A path that ends in a slash answers with its `index.html`.
  */
 function builtFileOf(url: string): string | undefined {
 	if (!url.startsWith(`${SITE_ORIGIN}/`)) return undefined
-	const path = new URL(url).pathname.slice(1)
+	const path = buildPathOf(new URL(url).pathname)
+	if (path === undefined) return undefined
 	return path === "" || path.endsWith("/") ? `${path}index.html` : path
 }
 
@@ -66,8 +77,8 @@ function checkPage(path: string, html: string): Failure[] {
 		failures.push(failure("page-canonical-missing", path, "is indexable and names no canonical"))
 	}
 	const targets = linkTargets(html)
-	if (!targets.includes(SITE_HOME_URL)) {
-		failures.push(failure("shell-home-link-missing", path, `has no link to ${SITE_HOME_URL}`))
+	if (!targets.includes(SITE_HOME_PATH)) {
+		failures.push(failure("shell-home-link-missing", path, `has no link to ${SITE_HOME_PATH}`))
 	}
 	const front = treePath(treeOf(path), "/")
 	if (!targets.includes(front)) {

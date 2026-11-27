@@ -1,12 +1,12 @@
 /* OpenJot landing page. Colours mirror the app's default pink & white theme
    (src/app.css), whatever the visitor's system light/dark setting. */
 
-@font-face { font-family: "Noto Sans Thai"; font-weight: 400; font-display: swap; src: url(/fonts/noto-sans-thai-thai-400-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
-@font-face { font-family: "Noto Sans Thai"; font-weight: 700; font-display: swap; src: url(/fonts/noto-sans-thai-thai-700-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
-@font-face { font-family: "Noto Sans Thai"; font-weight: 800; font-display: swap; src: url(/fonts/noto-sans-thai-thai-800-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
-@font-face { font-family: "Noto Sans Thai"; font-weight: 400; font-display: swap; src: url(/fonts/noto-sans-thai-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Noto Sans Thai"; font-weight: 700; font-display: swap; src: url(/fonts/noto-sans-thai-latin-700-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Noto Sans Thai"; font-weight: 800; font-display: swap; src: url(/fonts/noto-sans-thai-latin-800-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Noto Sans Thai"; font-weight: 400; font-display: swap; src: url(/openjot/meowjot-alternative/fonts/noto-sans-thai-thai-400-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
+@font-face { font-family: "Noto Sans Thai"; font-weight: 700; font-display: swap; src: url(/openjot/meowjot-alternative/fonts/noto-sans-thai-thai-700-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
+@font-face { font-family: "Noto Sans Thai"; font-weight: 800; font-display: swap; src: url(/openjot/meowjot-alternative/fonts/noto-sans-thai-thai-800-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
+@font-face { font-family: "Noto Sans Thai"; font-weight: 400; font-display: swap; src: url(/openjot/meowjot-alternative/fonts/noto-sans-thai-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Noto Sans Thai"; font-weight: 700; font-display: swap; src: url(/openjot/meowjot-alternative/fonts/noto-sans-thai-latin-700-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Noto Sans Thai"; font-weight: 800; font-display: swap; src: url(/openjot/meowjot-alternative/fonts/noto-sans-thai-latin-800-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 
 :root {
   color-scheme: light;
@@ -159,7 +159,7 @@ html[data-release="soon"] .js-download { opacity: 0.92; }
 .moo-hero { position: absolute; left: -26px; bottom: 6px; width: 46%; height: auto; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.28)); }
 .hero-wave { position: relative; display: block; width: 100%; height: 56px; margin-top: -40px; fill: var(--hero-wave); }
 
-/* Coming-soon note: shown by #coming-soon (no JS) or when /api/release has nothing */
+/* Coming-soon note: shown by #coming-soon (no JS) or when /openjot/api/release has nothing */
 .soon-note { display: none; padding: 8px 0 0; }
 .soon-note:target, html[data-release="soon"] .soon-note { display: block; }
 .soon-card {

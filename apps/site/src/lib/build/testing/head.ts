@@ -2,7 +2,7 @@ import { shippedThemes } from "../../design/shipped-themes"
 import { themePaints } from "../../design/theme-paint"
 import type { Language } from "../../language/language"
 import { ABSOLUTE_CLEAN_URL, languageEntry, otherLanguages } from "../../language/languages"
-import { SITE_NAME } from "../../site"
+import { SITE_BRAND_NAME } from "../../site"
 import { structuredDataJson } from "../../site/structured-data"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../../social/layout"
 import { absoluteShareImageUrl, shareImageAlt } from "../../social/share-advert"
@@ -22,7 +22,7 @@ function cardOf(language: Language): readonly string[] {
 			(other) => `<meta property="og:locale:alternate" content="${other.locale}">`,
 		),
 		'<meta property="og:type" content="website">',
-		`<meta property="og:site_name" content="${SITE_NAME}">`,
+		`<meta property="og:site_name" content="${SITE_BRAND_NAME}">`,
 		`<meta property="og:image" content="${image}">`,
 		`<meta property="og:image:width" content="${SHARE_IMAGE_WIDTH}">`,
 		`<meta property="og:image:height" content="${SHARE_IMAGE_HEIGHT}">`,

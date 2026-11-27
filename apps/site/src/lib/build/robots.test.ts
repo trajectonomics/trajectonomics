@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { NAMED_AGENTS, ROBOTS } from "../crawl/robots"
+import { NAMED_AGENTS, ROBOTS, ROBOTS_SITEMAPS } from "../crawl/robots"
 import { checkRobots } from "./robots"
 import { codes, edited } from "./testing/crawl-files"
 
@@ -46,16 +46,18 @@ describe("the Robots file of the host", () => {
 		).toEqual(["ROBOTS_DISALLOW_PRESENT"])
 	})
 
-	it("fails a Robots file that names no Sitemap", () => {
-		expect(codes(checkRobots, edited("robots.txt", /^Sitemap: .*\n/m, ""))).toEqual([
-			"ROBOTS_SITEMAP_MISSING",
-		])
-	})
+	for (const url of ROBOTS_SITEMAPS) {
+		it(`fails a Robots file that names no Sitemap at ${url}`, () => {
+			expect(
+				codes(checkRobots, edited("robots.txt", new RegExp(`^Sitemap: ${url}\\n`, "m"), "")),
+			).toEqual(["ROBOTS_SITEMAP_MISSING"])
+		})
+	}
 
-	it("fails a Sitemap line that is not the absolute Sitemap URL", () => {
+	it("fails a Sitemap line that is not one of the host's absolute Sitemap URLs", () => {
 		expect(
 			codes(checkRobots, edited("robots.txt", /^Sitemap: .*/m, "Sitemap: /sitemap.xml")),
-		).toEqual(["ROBOTS_SITEMAP_TARGET"])
+		).toEqual(["ROBOTS_SITEMAP_MISSING", "ROBOTS_SITEMAP_TARGET"])
 	})
 
 	it("reads no rule out of a comment", () => {

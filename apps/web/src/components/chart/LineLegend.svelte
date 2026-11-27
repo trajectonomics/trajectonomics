@@ -11,7 +11,7 @@ let { items }: Props = $props()
 
 <!-- The series of a chart, each with a swatch that shows its dash as well as its colour. -->
 <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-	{#each items as item (item.name)}
+	{#each items as item, index (index)}
 		<li class="flex items-center gap-2">
 			<svg width={24} height={8} aria-hidden="true" focusable="false">
 				<line
