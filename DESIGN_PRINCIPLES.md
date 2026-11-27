@@ -62,6 +62,7 @@ Words are the right rung when:
 
 ## Skills that apply this
 
+- **`visual-first`**, our own skill, for any screen or page. It runs the passes: critique, distill, visualize, clarify and onboard. Each has a completion test, and the pull request shows the screen before and after.
 - **`tufte`**, for every chart, KPI tile and table of figures. It labels data directly, chooses the chart type and removes chart junk. Where it conflicts with this repository, these rules decide:
   - Charts are hand-drawn SVG in Svelte with no chart library, so use its HTML/SVG preset and leave out its React preset.
   - Colours come from the brand's `--ds-*` tokens, in place of its red accent.

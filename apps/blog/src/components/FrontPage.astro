@@ -6,6 +6,7 @@ import Layout from "../layouts/Layout.astro"
 import { dictionaryFor } from "../lib/dictionary"
 import { DEFAULT_LANGUAGE, LANGUAGES, type Language, perLanguage, treePath } from "../lib/languages"
 import { BLOG_PATH } from "../lib/site"
+import CoverImage from "./CoverImage.astro"
 import PostMeta from "./PostMeta.astro"
 
 interface Props {
@@ -37,47 +38,41 @@ const alternates = [
 	indexed={true}
 	isFrontPage={true}
 >
-	<section class="masthead" aria-labelledby="masthead-title">
-		<p class="meta-label">{words.mastheadLabel}</p>
-		<h1 id="masthead-title" class="masthead-title">{words.mastheadTitle}</h1>
-		<p class="masthead-lede">{words.mastheadLede}</p>
-	</section>
-	<section class="posts" aria-labelledby="posts-title">
-		<h2 id="posts-title" class="meta-label posts-title">{words.latest}</h2>
+	<section class="posts" aria-labelledby="front-title">
+		<header class="front-head">
+			<h1 id="front-title" class="front-title">{words.frontHeading}</h1>
+		</header>
 		{
 			featured === undefined ? (
 				<p class="empty-state">{words.noPosts}</p>
 			) : (
 				<a class="featured" href={featured.path}>
-					<img
-						class="featured-image"
-						src={featured.translation.cover.src}
-						alt=""
-						width={featured.translation.cover.width}
-						height={featured.translation.cover.height}
-					/>
+					<CoverImage cover={featured.translation.cover} />
 					<div class="featured-text">
 						<PostMeta post={featured.post} translation={featured.translation} language={language} />
-						<span class="featured-title" lang={featured.translation.language}>
+						<h2 class="featured-title" lang={featured.translation.language}>
 							{featured.translation.entry.data.title}
-						</span>
-						<span class="featured-description" lang={featured.translation.language}>
+						</h2>
+						<p class="featured-description" lang={featured.translation.language}>
 							{featured.translation.entry.data.description}
-						</span>
+						</p>
 					</div>
 				</a>
 			)
 		}
 		{
 			rest.length === 0 ? null : (
-				<ul class="post-rows">
+				<ul class="post-grid">
 					{rest.map((entry) => (
 						<li>
-							<a class="post-row" href={entry.path}>
-								<PostMeta post={entry.post} translation={entry.translation} language={language} />
-								<span class="post-row-title" lang={entry.translation.language}>
-									{entry.translation.entry.data.title}
-								</span>
+							<a class="post-card" href={entry.path}>
+								<CoverImage cover={entry.translation.cover} lazy={true} />
+								<div class="post-card-body">
+									<PostMeta post={entry.post} translation={entry.translation} language={language} />
+									<h2 class="post-card-title" lang={entry.translation.language}>
+										{entry.translation.entry.data.title}
+									</h2>
+								</div>
 							</a>
 						</li>
 					))}

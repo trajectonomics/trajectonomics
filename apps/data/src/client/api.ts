@@ -1,11 +1,12 @@
 import { API_PATH } from "../lib/site"
-import type { Health, UsagePayload } from "../lib/types"
+import type { Health, PeaksPayload, UsagePayload } from "../lib/types"
 import type { DayWindow } from "../lib/window"
 
-/** The two reads the overview needs. */
+/** The three reads the overview needs; peaks may be absent when that read fails. */
 export type OverviewPayload = {
 	usage: UsagePayload
 	health: Health
+	peaks: PeaksPayload | null
 }
 
 async function readJson<T>(path: string): Promise<T> {
@@ -20,14 +21,29 @@ function usagePath(window: DayWindow, asOf: string | null): string {
 	return `${API_PATH}/usage?${params.toString()}`
 }
 
-/** Fetches the window's rollups and the freshness report; the only module that calls `fetch`. */
+function peaksPath(asOf: string | null): string {
+	if (asOf === null) return `${API_PATH}/peaks`
+	return `${API_PATH}/peaks?${new URLSearchParams({ asOf }).toString()}`
+}
+
+/** Reads the peaks; a failure hides its section and leaves the rest of the page up. */
+async function readPeaks(asOf: string | null): Promise<PeaksPayload | null> {
+	try {
+		return await readJson<PeaksPayload>(peaksPath(asOf))
+	} catch {
+		return null
+	}
+}
+
+/** Fetches the window's rollups, the peaks and the freshness report; the only fetch module. */
 export async function loadOverview(
 	window: DayWindow,
 	asOf: string | null,
 ): Promise<OverviewPayload> {
-	const [usage, health] = await Promise.all([
+	const [usage, health, peaks] = await Promise.all([
 		readJson<UsagePayload>(usagePath(window, asOf)),
 		readJson<Health>(`${API_PATH}/health`),
+		readPeaks(asOf),
 	])
-	return { usage, health }
+	return { usage, health, peaks }
 }
