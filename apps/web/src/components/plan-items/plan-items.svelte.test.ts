@@ -53,7 +53,7 @@ describe("the household's anchored dates on the planner pages", () => {
 		expect(body).toContain("at you, age 60")
 	})
 
-	test("the Flow form disables a pinned date and links to the household card", () => {
+	test("the Flow form disables a pinned date and links to the household page", () => {
 		const salary = planDocument().flows.find((flow) => flow.id === "salary")
 		const body = render(FlowFields, {
 			props: {
@@ -67,13 +67,13 @@ describe("the household's anchored dates on the planner pages", () => {
 		}).body
 		expect(body).toMatch(/<input[^>]*id="flow-end"[^>]*disabled/)
 		expect(body).not.toMatch(/<input[^>]*id="flow-start"[^>]*disabled/)
-		expect(body).toContain('href="/projection/?scenario=base#household"')
+		expect(body).toContain('href="/household/?scenario=base"')
 	})
 
-	test("the link to the household card keeps the address's other parameters", () => {
+	test("the link to the household page keeps the address's other parameters", () => {
 		setTestUrl("http://127.0.0.1/income/?terms=real&demo=1&scenario=base")
 		const body = render(AnchoredNote, { props: { anchor: "at me, age 60", plan: "base" } }).body
-		expect(body).toContain('href="/projection/?terms=real&amp;demo=1&amp;scenario=base#household"')
+		expect(body).toContain('href="/household/?terms=real&amp;demo=1&amp;scenario=base"')
 		setTestUrl("http://127.0.0.1/")
 	})
 })

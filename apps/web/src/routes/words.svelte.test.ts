@@ -58,7 +58,7 @@ describe("a page of the Demo Snapshot", () => {
 	test("the Demo's six pages say the new words, and a card is one link with no Open text", () => {
 		const words: Readonly<Record<string, readonly string[]>> = {
 			"/": ["Today's money", "Money lasts to the end of the plan", "Tax for", "Due", "chance"],
-			"/projection/": ["Future money", "Today's money", "Money lasts"],
+			"/projection/": ["Future money", "Today's money", "Stop working", "Year by year"],
 			"/chance/": ["chance", "Lasts to"],
 			"/tax/": ["Tax for", "Due"],
 			"/fi/": ["Future money"],

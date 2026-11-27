@@ -41,7 +41,7 @@ describe("netWorthSeries", () => {
 		expect(nominal?.points).toHaveLength(ANNUAL_ROWS.length)
 	})
 
-	test("puts the first person's age under each year, and every person's age in the tooltip's title", () => {
+	test("puts the first person's age on the axis and the year under it, and every person's age in the tooltip", () => {
 		const run = projectionRunFixture()
 		const [first, ...rest] = ANNUAL_ROWS
 		if (first === undefined) throw new Error("the fixture has rows")
@@ -55,14 +55,14 @@ describe("netWorthSeries", () => {
 		}
 		const [nominal] = netWorthSeries(withAges, "nominal", NO_PEOPLE)
 		expect(nominal?.points[0]).toMatchObject({
-			xLabel: "2027",
+			xLabel: "me 37",
 			xTitle: "2027, me 37, partner 35",
-			subLabel: "me 37",
+			subLabel: "2027",
 		})
 		expect(nominal?.points[1]?.subLabel).toBeUndefined()
 	})
 
-	test("names the ages by the household's words, so the axis under a year reads You 37", () => {
+	test("names the age by the household's words, so the axis reads You 37 above the year", () => {
 		const run = projectionRunFixture()
 		const [first, ...rest] = ANNUAL_ROWS
 		if (first === undefined) throw new Error("the fixture has rows")
@@ -84,8 +84,9 @@ describe("netWorthSeries", () => {
 		}
 		const [nominal] = netWorthSeries(withAges, "nominal", personNames(household))
 		expect(nominal?.points[0]).toMatchObject({
+			xLabel: "You 37",
 			xTitle: "2027, You 37, Your partner 35",
-			subLabel: "You 37",
+			subLabel: "2027",
 		})
 	})
 

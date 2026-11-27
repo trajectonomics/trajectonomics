@@ -5,7 +5,7 @@ import type { ChartDef } from "../../lib/view/charts/types"
 const NEW = "__new"
 
 interface Props {
-	/** The chart's heading id, which the section is named by. */
+	/** The picker's id, so its label points at its select. */
 	id: string
 	charts: readonly ChartDef[]
 	/** The id of the chosen custom chart, or "" for the net worth chart. */
@@ -27,14 +27,14 @@ function choose(event: Event & { currentTarget: HTMLSelectElement }): void {
 }
 </script>
 
-<!-- The chart's title is its picker: the net worth chart, the person's own charts, then a new one. -->
-<h2 {id} class="max-w-full min-w-0 text-base font-semibold">
-	<label class="sr-only" for="{id}-select">Chart</label>
+<!-- The chart picker: the net worth chart, the person's own charts, then a new one. -->
+<div class="space-y-1">
+	<label class="block text-xs font-medium text-muted-foreground" for="{id}-select">Chart</label>
 	<select
 		id="{id}-select"
 		{value}
 		onchange={choose}
-		class="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card px-2 py-1 text-base font-semibold outline-none focus-visible:outline-2 focus-visible:outline-ring"
+		class="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card px-2 py-1 text-sm font-semibold text-foreground focus-visible:outline-2 focus-visible:outline-ring"
 	>
 		<option value="">Net worth by year</option>
 		{#if charts.length > 0}
@@ -46,4 +46,4 @@ function choose(event: Event & { currentTarget: HTMLSelectElement }): void {
 		{/if}
 		<option value={NEW}>New chart…</option>
 	</select>
-</h2>
+</div>
