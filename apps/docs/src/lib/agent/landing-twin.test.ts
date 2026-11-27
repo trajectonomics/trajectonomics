@@ -29,9 +29,9 @@ describe("the Landing Page's Markdown twin", () => {
 				"",
 				`- [Contribute](${PORTAL_ORIGIN}/contribute.md): Report a wrong figure, add a tax year or a country, and check your change.`,
 				"",
-				"## Every page reads as Markdown",
+				"## For Agents",
 				"",
-				`- The Docs index: Every page once, in Tab order, with its description and Markdown URL. \`${PORTAL_ORIGIN}/llms.txt\``,
+				`- The Docs index: Every page once, with its Markdown URL. \`${PORTAL_ORIGIN}/llms.txt\``,
 			].join("\n"),
 		)
 	})

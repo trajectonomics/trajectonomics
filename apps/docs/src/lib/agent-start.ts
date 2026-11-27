@@ -15,11 +15,10 @@ export const INSTALLATION_PAGE_PATH = `${DOCS_BASE_PATH}/${OPERATOR_TAB_CONTENT}
 export const AGENT_START_HEADING = "Start with your Agent"
 
 /** The line under that heading: what the reader does with the prompt. */
-export const AGENT_START_LEAD =
-	"Paste this into Claude Code, Codex, Cursor or any Agent that can read a URL and run a command. It reads the docs, installs the setup skill and asks you about your goal before it runs anything."
+export const AGENT_START_LEAD = "Paste this into any Agent that can read a URL and run a command."
 
 /** The heading of the Landing Page section on the ways an Agent reads the Portal on its own. */
-export const AGENT_ROUTES_HEADING = "Every page reads as Markdown"
+export const AGENT_ROUTES_HEADING = "For Agents"
 
 /** The copy control's label before it copies, after it copies, and when the browser refuses. */
 export const COPY_PROMPT_LABEL = "Copy prompt"
@@ -51,18 +50,17 @@ export function agentRoutes(origin: string): readonly [AgentRoute, AgentRoute, A
 	return [
 		{
 			title: "The Docs index",
-			description: "Every page once, in Tab order, with its description and Markdown URL.",
+			description: "Every page once, with its Markdown URL.",
 			snippet: `${origin}${DOCS_INDEX_PATH}`,
 		},
 		{
 			title: "Any page as Markdown",
-			description:
-				"Put .md in place of a page's trailing slash. The Landing Page is /docs/index.md.",
+			description: "Swap a page's trailing slash for .md.",
 			snippet: twinUrl(origin, INSTALLATION_PAGE_PATH),
 		},
 		{
 			title: "Ask for Markdown",
-			description: "Send Accept: text/markdown to any page URL and get its Markdown twin back.",
+			description: "Send Accept: text/markdown to any page URL.",
 			snippet: `curl -H "Accept: text/markdown" ${origin}${INSTALLATION_PAGE_PATH}`,
 		},
 	]
