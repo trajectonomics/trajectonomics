@@ -4,9 +4,9 @@ import { baseFlags, dateFlags, errorOf, projection, projectionHome } from "./pro
 import { setHousehold } from "./scenario-household-support"
 
 /*
- * A stored household is parsed only by the reads that state ages (cli ADR-0048): a corrupt row is
- * the CLI's `internal` failure there, never a throw, and a compare, which does not read it, keeps
- * working.
+ * A stored household is parsed by the reads that may use it (run, path, fi and chance; cli ADR-0048):
+ * a corrupt row is the CLI's `internal` failure there, never a throw. A compare and the allowances
+ * read, which never use it, skip it and keep working.
  */
 
 const VALID = {
@@ -44,6 +44,14 @@ describe("a stored household that does not parse", () => {
 	it("never fails a compare, which does not read the household", async () => {
 		const home = await corrupted("{not json")
 		const res = await projection(home, ["compare", "base", "base", ...dateFlags()])
+		expect(res.err).toBe("")
+		expect(res.code).toBe(0)
+	})
+
+	it("never fails a what-if compare either, whose second side is the same plan with a Set", async () => {
+		const home = await corrupted("{not json")
+		const argv = ["compare", "base", "--set", "flows.salary.amount=9000000", ...dateFlags()]
+		const res = await projection(home, argv)
 		expect(res.err).toBe("")
 		expect(res.code).toBe(0)
 	})
