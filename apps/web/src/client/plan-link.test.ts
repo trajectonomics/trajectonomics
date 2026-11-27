@@ -6,11 +6,12 @@ import { HASH } from "./what-if.test-support"
 
 /** A click on a link, with the parts of it a browser reads: a modified one opens the link elsewhere. */
 function click(
-	overrides: Partial<Pick<MouseEvent, "button" | "ctrlKey" | "metaKey" | "shiftKey">> = {},
+	overrides: Partial<Pick<MouseEvent, "altKey" | "button" | "ctrlKey" | "metaKey" | "shiftKey">> = {},
 ) {
 	let prevented = false
 	const event = {
 		button: 0,
+		altKey: false,
 		ctrlKey: false,
 		metaKey: false,
 		shiftKey: false,
@@ -59,6 +60,7 @@ describe("a link that names a plan", () => {
 			{ ctrlKey: true },
 			{ metaKey: true },
 			{ shiftKey: true },
+			{ altKey: true },
 			{ button: 1 },
 		]) {
 			const { event, prevented } = click(modified)
