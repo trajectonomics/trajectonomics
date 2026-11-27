@@ -17,7 +17,7 @@ export const WRITTEN_REREAD_FAILED = "written_reread_failed"
 
 /** The sentence the server and the page say for a write that landed but could not be read again. */
 export const WRITTEN_REREAD_FAILED_MESSAGE =
-	"Your change was saved, but the page could not read the plan again. Reload to see it."
+	"Your change was saved, but the page could not show it. Reload to see it."
 
 /** The error a write that landed answers when the Snapshot read after it failed: never the read's own error. */
 export function writtenRereadFailed(): ErrorBody {

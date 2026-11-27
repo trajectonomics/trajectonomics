@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import DroppedAnchorsNotice from "../components/ui/DroppedAnchorsNotice.svelte"
+import { writtenRereadFailed } from "../lib/edit/failure"
 import { dismissDropped, dropped } from "./dropped-anchors.svelte.js"
 import { editSession } from "./edit.svelte.js"
 import { selectPlan } from "./select-plan.svelte.js"
@@ -18,6 +19,7 @@ beforeEach(() => {
 })
 afterEach(() => {
 	editSession.token = null
+	editSession.savedUnread = false
 	dismissDropped()
 	globalThis.fetch = realFetch
 })
@@ -122,6 +124,20 @@ describe("a new plan that replaced one made while the Edit ran", () => {
 		await editSession.run(EDIT)
 		expect(dropped.replaced).toBe(false)
 		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
+	})
+
+	test("is said even when the read after the write failed", async () => {
+		globalThis.fetch = (async () =>
+			new Response(
+				JSON.stringify({ ok: false, error: writtenRereadFailed(), replaced: true }),
+			)) as unknown as typeof fetch
+		const edit = { kind: "apply-plan", name: "fresh", template: { asOf: "2026-10-31" } } as const
+		expect(await editSession.run(edit)).toBe(true)
+		expect(editSession.savedUnread).toBe(true)
+		expect(dropped.replaced).toBe(true)
+		expect(render(DroppedAnchorsNotice).body).toContain(
+			"A plan named fresh was made while this change ran, and this change replaced it.",
+		)
 	})
 })
 
