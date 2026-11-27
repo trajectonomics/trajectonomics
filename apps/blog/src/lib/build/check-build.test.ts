@@ -144,4 +144,45 @@ describe("the built blog", () => {
 		const [failure] = checkBuild(withFrontPage(PAGE.replace("<footer></footer>", "")))
 		expect(failure?.path).toBe("index.html")
 	})
+
+	test("a build missing expected redirects fails", () => {
+		const expected = [{ from: "/blog/guides/a/", to: "/blog/essays/a/" }]
+		expect(checkBuild(GOOD, expected).map((entry) => entry.code)).toEqual(["redirects-missing"])
+	})
+
+	test("a _redirects rule whose target is built and source is gone passes", () => {
+		const essay = POST.replace("/blog/guides/a/", "/blog/essays/a/")
+		const expected = [{ from: "/blog/guides/a/", to: "/blog/essays/a/" }]
+		const files: readonly BuiltFile[] = [
+			...GOOD,
+			{ path: "essays/a/index.html", text: essay },
+			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/a/ 301\n" },
+		]
+		expect(checkBuild(files, expected)).toEqual([])
+	})
+
+	test("a _redirects rule targeting an unbuilt page or colliding with a built page fails", () => {
+		const files: readonly BuiltFile[] = [
+			...GOOD,
+			{ path: "guides/a/index.html", text: POST },
+			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/missing/ 301\n" },
+		]
+		expect(codes(files)).toEqual(["redirect-target-unbuilt", "redirect-source-built"])
+	})
+
+	test("a _redirects file missing an expected rule fails", () => {
+		const essay = POST.replace("/blog/guides/a/", "/blog/essays/a/")
+		const expected = [
+			{ from: "/blog/guides/a/", to: "/blog/essays/a/" },
+			{ from: "/blog/guides/a", to: "/blog/essays/a/" },
+		]
+		const files: readonly BuiltFile[] = [
+			...GOOD,
+			{ path: "essays/a/index.html", text: essay },
+			{ path: "_redirects", text: "/blog/guides/a/ /blog/essays/a/ 301\n" },
+		]
+		expect(checkBuild(files, expected).map((entry) => entry.code)).toEqual([
+			"redirect-rule-missing",
+		])
+	})
 })

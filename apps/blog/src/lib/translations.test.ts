@@ -7,6 +7,7 @@ function translation(overrides: Partial<TranslationFacts> = {}): TranslationFact
 		slug: "a",
 		language: "en",
 		type: "guide",
+		products: [],
 		publishedOn: new Date("2026-11-22"),
 		draft: false,
 		cover: { src: "/posts/a/cover.webp", width: 1200, height: 630 },
@@ -47,9 +48,18 @@ describe("grouping Translations into Posts", () => {
 		])
 	})
 
+	test("normalizes Products into the blog's order across Translations", () => {
+		const [post] = groupTranslations([
+			translation({ products: ["openjot", "traj"] }),
+			translation({ language: "th", products: ["traj", "openjot"] }),
+		])
+		expect(post?.products).toEqual(["traj", "openjot"])
+	})
+
 	test("refuses Translations that disagree on a shared fact", () => {
 		const cases: readonly [Partial<TranslationFacts>, string][] = [
 			[{ type: "news" }, "type"],
+			[{ products: ["traj"] }, "products"],
 			[{ publishedOn: new Date("2026-11-23") }, "publishedOn"],
 			[{ draft: true }, "draft"],
 			[{ cover: { src: "/posts/a/other.webp", width: 1200, height: 630 } }, "cover.src"],

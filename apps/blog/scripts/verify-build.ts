@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs"
 import { resolve } from "node:path"
 import { checkBuild } from "../src/lib/build/check-build"
+import { MOVED_POSTS, movedPostRedirects } from "../src/lib/moved-posts"
 import { readBuiltFiles } from "./read-built-files"
 
 /** The Worker's assets root, where Astro builds the blog. */
@@ -12,7 +13,7 @@ export async function main(root: string): Promise<number> {
 		console.error(`verify:build: ${root}/ is missing. Run \`bun run build\` first.`)
 		return 1
 	}
-	const failures = checkBuild(await readBuiltFiles(resolve(root)))
+	const failures = checkBuild(await readBuiltFiles(resolve(root)), movedPostRedirects(MOVED_POSTS))
 	for (const failure of failures) {
 		console.error(`${failure.code} ${failure.path}: ${failure.message}`)
 	}

@@ -1,5 +1,6 @@
 import { inBlogOrder, isLanguage, type Language } from "./languages"
 import type { PostType } from "./posts"
+import { inProductOrder, type Product } from "./products"
 
 /**
  * One Translation's place: `<slug>/<language>.md` under `src/content/posts/`, which the content
@@ -21,6 +22,7 @@ export interface TranslationFacts {
 	readonly slug: string
 	readonly language: Language
 	readonly type: PostType
+	readonly products: readonly Product[]
 	readonly publishedOn: Date
 	readonly draft: boolean
 	readonly cover: { readonly src: string; readonly width: number; readonly height: number }
@@ -30,15 +32,24 @@ export interface TranslationFacts {
 export interface PostGroup<T extends TranslationFacts> {
 	readonly slug: string
 	readonly type: PostType
+	readonly products: readonly Product[]
 	readonly publishedOn: Date
 	readonly draft: boolean
 	readonly languages: readonly Language[]
 	readonly translations: ReadonlyMap<Language, T>
 }
 
+/** Whether two Product lists name the same Products, regardless of order or duplicates. */
+function sameProducts(a: readonly Product[], b: readonly Product[]): boolean {
+	const left = inProductOrder(a)
+	const right = inProductOrder(b)
+	return left.length === right.length && left.every((product, index) => product === right[index])
+}
+
 /** The first shared fact two Translations of one Post disagree on, or `undefined`. */
 function disagreement(a: TranslationFacts, b: TranslationFacts): string | undefined {
 	if (a.type !== b.type) return "type"
+	if (!sameProducts(a.products, b.products)) return "products"
 	if (a.publishedOn.getTime() !== b.publishedOn.getTime()) return "publishedOn"
 	if (a.draft !== b.draft) return "draft"
 	if (a.cover.src !== b.cover.src) return "cover.src"
@@ -71,6 +82,7 @@ export function groupTranslations<T extends TranslationFacts>(
 			return Object.freeze({
 				slug,
 				type: first.type,
+				products: inProductOrder(first.products),
 				publishedOn: first.publishedOn,
 				draft: first.draft,
 				languages,

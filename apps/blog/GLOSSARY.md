@@ -12,7 +12,7 @@ exactly one **Post Type**.
 ## Translation
 
 One Post written in one **Post Language**: `src/content/posts/<slug>/<language>.md`. A Post's
-Translations share its type, publication date, draft flag and cover image.
+Translations share its type, Products, publication date, draft flag and cover image.
 
 ## Post Language
 
@@ -44,8 +44,13 @@ The header's links to the same page in every Language Tree, each named in its ow
 
 ## Post Type
 
-What kind of Post it is: `compare`, `guide` or `news`. The front page filters by it, in one place
-only.
+What kind of Post it is, in the front page's order: `compare`, `release`, `guide`, `essay` or
+`news`. The front page filters by Post Type, Post Language and Product, in one bar.
+
+## Product
+
+One of our products a Post is about (`traj` or `openjot`); empty for general posts. Every
+Translation of a Post carries the same `products` list.
 
 ## Compare Page
 

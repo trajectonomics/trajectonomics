@@ -4,9 +4,11 @@
 import { postPagePath, readPosts, shownTranslation } from "../content/read-posts"
 import Layout from "../layouts/Layout.astro"
 import { dictionaryFor } from "../lib/dictionary"
+import { filterGroups } from "../lib/filters"
 import { DEFAULT_LANGUAGE, LANGUAGES, type Language, perLanguage, treePath } from "../lib/languages"
 import { BLOG_PATH } from "../lib/site"
 import CoverImage from "./CoverImage.astro"
+import FilterBar from "./FilterBar.astro"
 import PostMeta from "./PostMeta.astro"
 
 interface Props {
@@ -21,6 +23,7 @@ const entries = (await readPosts()).map((post) => {
 	const translation = shownTranslation(post, language)
 	return { post, translation, path: postPagePath(post, language) }
 })
+const groups = filterGroups(entries.map((entry) => entry.post))
 const [featured, ...rest] = entries
 const languagePaths = perLanguage((tree) => treePath(tree, BLOG_PATH))
 const alternates = [
@@ -42,11 +45,19 @@ const alternates = [
 		<header class="front-head">
 			<h1 id="front-title" class="front-title">{words.frontHeading}</h1>
 		</header>
+		<FilterBar groups={groups} language={language} />
 		{
 			featured === undefined ? (
 				<p class="empty-state">{words.noPosts}</p>
 			) : (
-				<a class="featured" href={featured.path}>
+				<a
+					class="featured"
+					href={featured.path}
+					data-filter-item
+					data-type={featured.post.type}
+					data-language={featured.post.languages.join(" ")}
+					data-product={featured.post.products.join(" ")}
+				>
 					<CoverImage cover={featured.translation.cover} />
 					<div class="featured-text">
 						<PostMeta post={featured.post} translation={featured.translation} language={language} />
@@ -62,9 +73,14 @@ const alternates = [
 		}
 		{
 			rest.length === 0 ? null : (
-				<ul class="post-grid">
+				<ul class="post-grid" data-filter-grid>
 					{rest.map((entry) => (
-						<li>
+						<li
+							data-filter-item
+							data-type={entry.post.type}
+							data-language={entry.post.languages.join(" ")}
+							data-product={entry.post.products.join(" ")}
+						>
 							<a class="post-card" href={entry.path}>
 								<CoverImage cover={entry.translation.cover} lazy={true} />
 								<div class="post-card-body">
@@ -79,5 +95,104 @@ const alternates = [
 				</ul>
 			)
 		}
+		{
+			entries.length === 0 ? null : (
+				<p class="empty-state" data-filter-empty hidden role="status">
+					{words.noMatches}
+				</p>
+			)
+		}
 	</section>
 </Layout>
+
+<script>
+	import {
+		type ChosenFilters,
+		chosenFilters,
+		FILTER_GROUPS,
+		type FilterGroupName,
+		type FilterValues,
+		filterQuery,
+		matchesFilters,
+	} from "../lib/filters"
+
+	function wordsOf(raw: string | null): readonly string[] {
+		if (raw === null || raw.trim() === "") return []
+		return raw.trim().split(/\s+/)
+	}
+
+	function isFilterGroup(value: string | null): value is FilterGroupName {
+		return value !== null && (FILTER_GROUPS as readonly string[]).includes(value)
+	}
+
+	function itemValues(element: HTMLElement): FilterValues {
+		return {
+			type: wordsOf(element.getAttribute("data-type")),
+			language: wordsOf(element.getAttribute("data-language")),
+			product: wordsOf(element.getAttribute("data-product")),
+		}
+	}
+
+	const bar = document.querySelector<HTMLElement>("[data-filter-bar]")
+	if (bar !== null) {
+		const basePath = bar.getAttribute("data-base-path") ?? window.location.pathname
+		const options = [...bar.querySelectorAll<HTMLAnchorElement>("[data-filter-option]")]
+		const items = [...document.querySelectorAll<HTMLElement>("[data-filter-item]")]
+		const grid = document.querySelector<HTMLElement>("[data-filter-grid]")
+		const empty = document.querySelector<HTMLElement>("[data-filter-empty]")
+
+		let current: ChosenFilters = {}
+
+		const apply = (chosen: ChosenFilters): void => {
+			current = chosen
+			let visible = 0
+			for (const item of items) {
+				const show = matchesFilters(itemValues(item), chosen)
+				item.hidden = !show
+				if (show) visible += 1
+			}
+			if (grid !== null) {
+				const gridItems = [...grid.querySelectorAll<HTMLElement>("[data-filter-item]")]
+				grid.hidden = gridItems.every((item) => item.hidden)
+			}
+			if (empty !== null) {
+				empty.hidden = visible > 0
+			}
+			for (const option of options) {
+				const group = option.getAttribute("data-filter-group")
+				if (!isFilterGroup(group)) continue
+				const rawValue = option.getAttribute("data-filter-value") ?? ""
+				const value = rawValue === "" ? undefined : rawValue
+				const active = chosen[group] === value
+				if (active) option.setAttribute("aria-current", "true")
+				else option.removeAttribute("aria-current")
+				const targetValue = value !== undefined && active ? undefined : value
+				option.href = `${basePath}${filterQuery(chosen, group, targetValue)}`
+			}
+		}
+
+		for (const option of options) {
+			option.addEventListener("click", (event) => {
+				if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+					return
+				}
+				const group = option.getAttribute("data-filter-group")
+				if (!isFilterGroup(group)) return
+				event.preventDefault()
+				const rawValue = option.getAttribute("data-filter-value") ?? ""
+				const value = rawValue === "" ? undefined : rawValue
+				const nextValue = value !== undefined && current[group] === value ? undefined : value
+				const query = filterQuery(current, group, nextValue)
+				const next = chosenFilters(new URLSearchParams(query))
+				window.history.pushState(null, "", `${basePath}${query}`)
+				apply(next)
+			})
+		}
+
+		window.addEventListener("popstate", () => {
+			apply(chosenFilters(new URLSearchParams(window.location.search)))
+		})
+
+		apply(chosenFilters(new URLSearchParams(window.location.search)))
+	}
+</script>
