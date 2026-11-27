@@ -15,12 +15,14 @@ interface Props {
 	onPick: (key: string) => void
 	/** Names the diagram for a screen reader, such as "Cash flow, 31 Oct 2026 to 30 Oct 2027". */
 	label: string
+	/** The page's one always-drawn probe, shared by both layouts so a hidden one still fits at the drawn size. */
+	probe: SVGTextElement | null
 }
 
 /** The flow diagram of one year: the wide one from a medium screen up, the stacked one below, and one table for a screen reader. */
-let { layout, stack, picked, onPick, label }: Props = $props()
+let { layout, stack, picked, onPick, label, probe }: Props = $props()
 </script>
 
-<FlowWide {layout} {picked} {onPick} {label} stacked={stack !== undefined} />
-{#if stack}<FlowStack layout={stack} {picked} {onPick} {label} />{/if}
+<FlowWide {layout} {picked} {onPick} {label} {probe} stacked={stack !== undefined} />
+{#if stack}<FlowStack layout={stack} {picked} {onPick} {label} {probe} />{/if}
 <FlowTable {layout} {label} />
