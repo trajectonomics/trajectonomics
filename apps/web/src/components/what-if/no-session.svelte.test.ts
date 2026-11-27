@@ -48,10 +48,10 @@ function bodyOf(component: Component<any>, props: Record<string, unknown>): stri
 
 const MARK = "<i>content</i>"
 
-/** The page's frame (its heading and intro) with `content` where the page puts its own. */
-function framed(title: string, intro: string, content: string): string {
+/** The page's frame (its heading) with `content` where the page puts its own. */
+function framed(title: string, content: string): string {
 	const mark = createRawSnippet(() => ({ render: () => MARK }))
-	return shown(bodyOf(PageShell, { title, intro, children: mark })).replace(MARK, shown(content))
+	return shown(bodyOf(PageShell, { title, children: mark })).replace(MARK, shown(content))
 }
 
 /**
@@ -84,13 +84,7 @@ describe("with no session, a page is its content and nothing more", () => {
 	test("Net worth", () => {
 		const content = `<div class="space-y-8">${bodyOf(RecordValues, { snapshot: DEMO })}${bodyOf(NetWorthContent, { view: netWorthPageView(DEMO) })}</div>`
 		const page = bodyOf(NetWorthPage, { scenario: "base" })
-		expect(shown(page)).toBe(
-			framed(
-				"Net worth",
-				"Net worth at the As-of, its assets and liabilities by account, and its month-end history.",
-				content,
-			),
-		)
+		expect(shown(page)).toBe(framed("Net worth", content))
 	})
 
 	test("Compare", () => {
@@ -101,13 +95,7 @@ describe("with no session, a page is its content and nothing more", () => {
 			onTerms: () => {},
 		})
 		const page = bodyOf(ComparePage, { terms: "nominal", onTerms: () => {} })
-		expect(shown(page)).toBe(
-			framed(
-				"Compare",
-				"A is drawn solid and B dashed everywhere on this page. Each difference is B minus A, as the CLI states it.",
-				content,
-			),
-		)
+		expect(shown(page)).toBe(framed("Compare", content))
 	})
 
 	test("Home", () => {
@@ -115,6 +103,6 @@ describe("with no session, a page is its content and nothing more", () => {
 		if (hero === null) throw new Error("the Demo has no hero")
 		const content = `<div class="space-y-4">${bodyOf(OverviewHero, { hero })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
-		expect(shown(page)).toBe(framed("Overview", "The headline figures of your ledger.", content))
+		expect(shown(page)).toBe(framed("Overview", content))
 	})
 })

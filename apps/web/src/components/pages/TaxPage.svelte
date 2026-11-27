@@ -16,7 +16,6 @@ let { scenario, onScenario }: Props = $props()
 <!-- Tax: per Levy and tax year, what is owed, what was prepaid, and whether it is settled. -->
 <PageShell
 	title="Tax"
-	intro="Each Levy's settlement period: what is due, prepaid and owed, and whether it is settled."
 >
 	{#snippet children(snapshot)}
 		<TaxPanel

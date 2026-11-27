@@ -19,7 +19,7 @@ let { scenario = "" }: Props = $props()
 </script>
 
 <!-- The Overview: the headline figures, each card linking to its page with its Details. -->
-<PageShell title="Overview" intro="The headline figures of your ledger.">
+<PageShell title="Overview">
 	{#snippet children(snapshot)}
 		{@const plan = homePlan(snapshot, scenario)}
 		{@const hero = heroOf(snapshot, scenario)}

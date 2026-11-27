@@ -24,7 +24,7 @@ import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones
 import { chooseScenario, projectedRows, scenarioNames } from "../lib/view/plan"
 import { documentRead } from "../lib/view/plan-items/document"
 import { printHeading } from "../lib/view/print-header"
-import { navPath, pageTitle } from "../lib/view/routes"
+import { navPath } from "../lib/view/routes"
 import { isDemo } from "../lib/view/snapshot-url"
 
 let { children }: { children: Snippet } = $props()
@@ -33,7 +33,6 @@ const names = $derived(scenarioNames(currentSnapshot()))
 // What the Snapshot says of each plan the pages can show: the Main tag, the notes icon and the menus.
 const rows = $derived(projectedRows(currentSnapshot()))
 const selected = $derived(chooseScenario(names, queryParam("scenario", "")) ?? "")
-const title = $derived(pageTitle(page.url.pathname))
 // Edit controls show only when the server answered the token, and never in the Demo snapshot.
 const editable = $derived(editsShown(editSession.token, page.url.search))
 // The planner pages are listed only when the Snapshot holds the selected plan's read of its items.
@@ -84,7 +83,7 @@ $effect(() => {
 <PlanDrawer />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col print:pl-0 lg:pl-60">
-	<ShellTopBar {title} />
+	<ShellTopBar />
 	<WhatIfBar />
 	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 print:px-0">
 		<PrintHeader heading={printed} />
