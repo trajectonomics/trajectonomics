@@ -316,4 +316,5 @@ user identifier.
   same response; a replay after it revokes the family. The CLI should retry a failed refresh once
   inside a minute before falling back to a new device flow.
 - **Migrations before deploy.** `0002_rate_limit.sql` and `0003_oauth_clients.sql` must be applied
-  before the Worker starts; the deploy workflow will do that when the auth app joins it.
+  before the Worker starts; `.github/workflows/deploy.yml` applies `migrations/` before it deploys
+  the auth Worker.
