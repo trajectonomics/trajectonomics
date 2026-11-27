@@ -57,6 +57,22 @@ export function setAt(node: unknown, steps: readonly Step[], value: unknown): un
 	return { ...object, [String(step)]: setAt(object[String(step)], rest, value) }
 }
 
+/**
+ * A copy of `node` with the key `steps` ends at dropped, not set to `undefined`: `check()` asks
+ * `Object.hasOwn`, so a key left in place would still count as stated. A path that does not end at
+ * an object key is returned as it is.
+ */
+export function withoutAt(node: unknown, steps: readonly Step[]): unknown {
+	const [step, ...rest] = steps
+	if (step === undefined) return node
+	if (typeof step === "number" && Array.isArray(node)) {
+		return node.map((item, index) => (index === step ? withoutAt(item, rest) : item))
+	}
+	if (!isPlainObject(node)) return node
+	if (rest.length > 0) return { ...node, [String(step)]: withoutAt(node[String(step)], rest) }
+	return Object.fromEntries(Object.entries(node).filter(([key]) => key !== String(step)))
+}
+
 /** The document path a refusal names: `document` plus the address, list positions as numbers. */
 export function documentPathOf(steps: readonly Step[]): string {
 	return ["document", ...steps.map(String)].join(".")
