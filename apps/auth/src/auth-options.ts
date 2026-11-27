@@ -11,6 +11,7 @@ import {
 	type OAuthHookOptions,
 	oauthAfterHook,
 	oauthBeforeHook,
+	spikeHoldEnabled,
 	testClockEnabled,
 } from "./oauth-hooks"
 
@@ -21,18 +22,33 @@ export type CreateAuthInput = {
 	baseURL?: string
 }
 
+function devSignInFor(input: CreateAuthInput): boolean {
+	return devSignInAllowed({
+		environment: input.env.ENVIRONMENT,
+		devOnly: input.env.DEV_ONLY,
+		baseUrl: input.baseURL ?? input.env.BETTER_AUTH_URL,
+	})
+}
+
+/**
+ * What the OAuth hooks are given. The spike's hold and clock headers are honoured only where the
+ * dev sign-in is: a development environment, DEV_ONLY and a loopback origin.
+ */
+export function oauthHookOptions(input: CreateAuthInput): OAuthHookOptions {
+	const devSignIn = devSignInFor(input)
+	return {
+		absoluteLifetimeSeconds: REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS,
+		testClock: testClockEnabled(devSignIn),
+		spikeHold: spikeHoldEnabled(devSignIn),
+		database: input.env.DB,
+	}
+}
+
 /** The options without constructing the instance, so the schema generator can read them. */
 export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 	const baseURL = input.baseURL ?? input.env.BETTER_AUTH_URL
-	const devSignIn = devSignInAllowed({
-		environment: input.env.ENVIRONMENT,
-		devOnly: input.env.DEV_ONLY,
-		baseUrl: baseURL,
-	})
-	const hookOptions: OAuthHookOptions = {
-		absoluteLifetimeSeconds: REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS,
-		testClock: testClockEnabled(devSignIn),
-	}
+	const devSignIn = devSignInFor(input)
+	const hookOptions = oauthHookOptions(input)
 	return {
 		appName: "Trajectonomics",
 		baseURL,
@@ -45,7 +61,9 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		// `/token` mints a JWT with the name and email for auth's own origin; nothing needs it.
 		// `/oauth2/delete-consent` deletes the consent but leaves the grant's tokens alive, and a
 		// later approval would revive them. `/oauth2/grants/revoke` is the only revocation path.
-		disabledPaths: ["/token", "/oauth2/delete-consent"],
+		// `/oauth2/update-consent` raises a consent's scopes without the hooks or the consent page,
+		// so the next authorize would issue a code for scopes the person never saw.
+		disabledPaths: ["/token", "/oauth2/delete-consent", "/oauth2/update-consent"],
 		emailAndPassword: {
 			enabled: devSignIn,
 			minPasswordLength: 12,
@@ -88,7 +106,7 @@ export function authOptions(input: CreateAuthInput): BetterAuthOptions {
 		},
 		plugins: buildPlugins({
 			baseURL,
-			db: input.env.DB,
+			database: input.env.DB,
 			passkeyRpID: input.env.PASSKEY_RP_ID ?? new URL(baseURL).hostname,
 			passkeyOrigin: input.env.PASSKEY_ORIGIN ?? new URL(baseURL).origin,
 			requiresMarketingConsent: async (userId) =>

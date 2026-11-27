@@ -1,9 +1,18 @@
-/** Expiring a grant's approval record, for the consent after-hook and the authorize before-hook. */
+/**
+ * Expiring a grant's approval record.
+ *
+ * The check runs on every path that can issue an authorization code: a GET to
+ * `/oauth2/authorize`, the internal re-dispatch of authorize after a sign-in, and
+ * `/oauth2/continue`. It reads only the signed-in user's consent for that client. An anonymous
+ * request has no grant to expire and must never scan the client's other users.
+ */
+import { getSessionFromCtx } from "better-auth/api"
 import { grantLifetimeRejection } from "../core/resource-request"
-import { deleteConsentRow, deletePendingAuthorizationCodes, deleteTokenFamily } from "./family"
+import { deleteConsentRow, deleteTokenFamily } from "./family"
 import { hookNow, type OAuthHookOptions } from "./request"
-import { adapterOf, type StoredConsent } from "./store"
+import { findConsents, type StoredConsent } from "./store"
 import { asDate } from "./values"
+import { deletePendingAuthorizationCodes } from "./verification-sql"
 
 /** True when the consent is past the grant's absolute lifetime, or has no readable approval. */
 export function consentExpired(
@@ -21,36 +30,53 @@ export function consentExpired(
 }
 
 /**
- * Deletes every expired consent for a client, with its token family, before the
- * authorization-code flow reuses it. 1.7.28's `/oauth2/consent` updates a found consent in place
- * and keeps its old `createdAt`; without this pass, signing in again after ninety days updates the
- * expired row and the first refresh still fails. The scan is per client and only touches grants
- * already outside their absolute lifetime.
+ * Deletes the signed-in user's expired consent for a client, with its token family and pending
+ * authorization codes, before the authorization-code flow can reuse it. 1.7.28's
+ * `/oauth2/consent` updates a found consent in place and keeps its old `createdAt`; without this
+ * pass, signing in again after ninety days updates the expired row and the first refresh still
+ * fails. A live consent is left alone, and a dead duplicate is removed without touching the live
+ * grant's tokens.
  */
-export async function expireConsentsForClient(
+export async function expireConsentForSession(
 	ctx: { context: unknown; headers?: Headers | undefined },
 	clientId: string,
 	options: OAuthHookOptions,
 ): Promise<void> {
-	const adapter = adapterOf(ctx)
-	const consents = (await adapter.findMany({
-		model: "oauthConsent",
-		where: [{ field: "clientId", value: clientId }],
-	})) as StoredConsent[]
-	for (const consent of consents) {
-		if (typeof consent.userId !== "string" || consent.userId === "") continue
-		if (!consentExpired(ctx, consent, options)) continue
-		try {
-			await deleteConsentRow(ctx, consent.id)
-			await deleteTokenFamily(ctx, { userId: consent.userId, clientId })
-			await deletePendingAuthorizationCodes(ctx, { userId: consent.userId, clientId })
-		} catch (error) {
-			loggerOf(ctx).error("failed to expire an old grant consent", error)
-		}
-	}
+	await expireSignedInConsent(ctx, clientId, options, false)
 }
 
-function loggerOf(ctx: { context: unknown }): { error: (...args: unknown[]) => void } {
-	const context = ctx.context as { logger?: { error: (...args: unknown[]) => void } }
-	return context.logger ?? { error: () => undefined }
+/**
+ * The `/oauth2/consent` preparation: the same expiry as above, plus the leftover token family
+ * when no consent exists at all. The library is about to create a fresh approval; a token from
+ * the previous one must not attach to it.
+ */
+export async function prepareConsentForApproval(
+	ctx: { context: unknown; headers?: Headers | undefined },
+	clientId: string,
+	options: OAuthHookOptions,
+): Promise<void> {
+	await expireSignedInConsent(ctx, clientId, options, true)
+}
+
+async function expireSignedInConsent(
+	ctx: { context: unknown; headers?: Headers | undefined },
+	clientId: string,
+	options: OAuthHookOptions,
+	cleanupWhenAbsent: boolean,
+): Promise<void> {
+	const session = await getSessionFromCtx(ctx as Parameters<typeof getSessionFromCtx>[0])
+	const userId = session?.user?.id
+	if (typeof userId !== "string" || userId === "") return
+	const owner = { clientId, userId }
+	const rows = await findConsents(ctx, clientId, userId)
+	const live = rows.filter((consent) => !consentExpired(ctx, consent, options))
+	for (const consent of rows) {
+		if (live.includes(consent)) continue
+		// A live approval is the grant; dead duplicate rows go without touching its token family.
+		await deleteConsentRow(ctx, consent.id)
+	}
+	if (live.length > 0) return
+	if (rows.length === 0 && !cleanupWhenAbsent) return
+	await deleteTokenFamily(ctx, owner)
+	await deletePendingAuthorizationCodes(options.database, owner)
 }

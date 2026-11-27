@@ -39,11 +39,15 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    untracked. `.dev.vars.example` holds placeholders only.
 8. Gate 1 and gate 3 are closed by `src/oauth/hooks.ts`: a request may carry one `resource` at most,
    read from the query, the raw body (exact media type, so a lying `Content-Type` cannot hide a JSON
-   array) and `ctx.body`, and a refresh may not add a resource the grant did not have. `grant_type`
-   is trimmed as Better Auth trims it, and a padded value is rejected with `invalid_request` so it
-   cannot skip the refresh checks. Every OAuth client is seeded from `src/core/clients.ts` and
-   linked to exactly one resource. `clientPrivileges` is always closed and
-   `enforcePerClientResources` is always on; never relax either.
+   array) and `ctx.body`, and a refresh may not add a resource the grant did not have. A body the
+   hook cannot read fails closed. `/oauth2/authorize` accepts GET only: its POST body is parsed
+   before the hook, so a repeated `resource` would collapse. `/device/code` accepts only the exact
+   form media type and a non-empty scope. A device consent is recorded in the `/device/approve`
+   before-hook, before the code becomes redeemable. `grant_type` is trimmed as Better Auth trims it,
+   and a padded value is rejected with `invalid_request` so it cannot skip the refresh checks. Every
+   OAuth client is seeded from `src/core/clients.ts` and linked to exactly one resource.
+   `clientPrivileges` is always closed and `enforcePerClientResources` is always on; never relax
+   either.
 9. Done means `bun run check` passes here: Biome with zero warnings, `tsc`, the unit tests and
    `wrangler deploy --dry-run`. The spike (`bun run spike`) starts its own local Worker and is not
    part of `check`.
