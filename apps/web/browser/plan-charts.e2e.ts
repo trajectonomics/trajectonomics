@@ -67,3 +67,23 @@ test("a chart saved or deleted gives the Charts button its focus back", async ({
 	await expect(page.getByRole("heading", { name: "Net worth by year", level: 2 })).toBeVisible()
 	await expect(button).toBeFocused()
 })
+
+test("New chart closed without saving gives the Charts button its focus, and one Escape closes it", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await openDemo(page, "/projection/?scenario=base", { theme: "light" })
+
+	const button = page.getByRole("button", { name: "Charts", exact: true })
+	const dialog = page.getByRole("dialog", { name: "New chart" })
+	for (const close of ["Escape", "Cancel"] as const) {
+		await button.click()
+		await page.getByRole("combobox", { name: "Chart" }).selectOption("__new")
+		await expect(dialog).toBeVisible()
+		await expect(button).toHaveAttribute("aria-expanded", "false")
+		if (close === "Escape") await page.keyboard.press("Escape")
+		else await dialog.getByRole("button", { name: "Cancel" }).click()
+		await expect(dialog, close).toBeHidden()
+		await expect(button, close).toBeFocused()
+	}
+})

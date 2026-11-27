@@ -72,7 +72,17 @@ $effect(() => {
 			id={panelId}
 			class="absolute right-0 z-20 mt-2 w-64 max-w-[calc(100vw-2rem)] space-y-3 rounded-lg border border-border bg-card p-3 shadow-lg"
 		>
-			<ChartPicker id={`${panelId}-chart`} {charts} {value} {onChange} {onNew} />
+			<ChartPicker
+				id={`${panelId}-chart`}
+				{charts}
+				{value}
+				{onChange}
+				onNew={() => {
+					// The drawer takes over: the panel shuts first, so the drawer's first Escape closes the drawer.
+					open = false
+					onNew()
+				}}
+			/>
 			<ChartFiles {hasCharts} {onExport} {onImport} />
 		</div>
 	{/if}

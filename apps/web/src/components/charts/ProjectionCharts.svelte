@@ -85,7 +85,10 @@ function remove(id: string): void {
 					onEdit={() => (drawer = chosen)}
 					onDuplicate={() => {
 						const id = chartStore.duplicate(chosen.id)
-						if (id !== null) charts.onChart(id)
+						if (id !== null) {
+							charts.onChart(id)
+							focusCharts += 1
+						}
 					}}
 					onDelete={() => remove(chosen.id)}
 				/>
@@ -96,5 +99,9 @@ function remove(id: string): void {
 		{/if}
 	</section>
 	<ChartNotices problem={chartStore.problem} unsaved={chartStore.unsaved} notice={chartStore.notice} />
-	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={() => (drawer = null)} />
+	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={() => {
+		// Closing New chart without saving leaves no chart control to return to: the Charts button takes focus.
+		if (drawer === "new") focusCharts += 1
+		drawer = null
+	}} />
 </div>
