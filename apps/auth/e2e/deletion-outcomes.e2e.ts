@@ -25,7 +25,7 @@ function userRows(id: string): readonly { id: string }[] {
 test("a refused deletion whose sign-out also fails keeps the account page", async ({ page }) => {
 	const user = await signUp(page)
 	await answerConsent(page)
-	const refuse = { status: 500, contentType: "application/json", body: '{"message":"unavailable"}' }
+	const refuse = { status: 403, contentType: "application/json", body: '{"message":"forbidden"}' }
 	let signOuts = 0
 	await page.route("**/api/auth/delete-user", (route) => route.fulfill(refuse))
 	await page.route("**/api/auth/sign-out", (route) => {

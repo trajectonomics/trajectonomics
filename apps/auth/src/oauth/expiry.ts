@@ -68,6 +68,7 @@ async function expireSignedInConsent(
 	const userId = session?.user?.id
 	if (typeof userId !== "string" || userId === "") return
 	const owner = { clientId, userId }
+	const readAt = hookNow(ctx, options)
 	const rows = await findConsents(ctx, clientId, userId)
 	const live = rows.filter((consent) => !consentExpired(ctx, consent, options))
 	for (const consent of rows) {
@@ -77,6 +78,6 @@ async function expireSignedInConsent(
 	}
 	if (live.length > 0) return
 	if (rows.length === 0 && !cleanupWhenAbsent) return
-	await deleteTokenFamily(ctx, owner)
+	await deleteTokenFamily(ctx, owner, readAt)
 	await deletePendingAuthorizationCodes(options.database, owner)
 }

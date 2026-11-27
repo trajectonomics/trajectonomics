@@ -5,7 +5,7 @@
  */
 import { type ConsentRow, FakeConsentDatabase } from "./fake-consent-database"
 
-type Where = Array<{ field: string; value: unknown }>
+type Where = Array<{ field: string; value: unknown; operator?: "eq" | "lt" }>
 type AdapterInput = { model: string; where: Where }
 
 export const NOW = "2026-11-28T00:00:00.000Z"
@@ -14,6 +14,8 @@ const DATA = "https://trajectonomics.com/data"
 
 export class FakeConsentAdapter {
 	readonly consents = new FakeConsentDatabase()
+	/** Access and refresh tokens, each tagged with the model it belongs to. */
+	tokens: Array<ConsentRow & { model: string }> = []
 	/** Runs once an insert landed: a concurrent approval joining it. */
 	afterInsert: ((rows: ConsentRow[]) => void) | undefined
 	/** Runs after each consent read: whatever lands before this request writes. */
@@ -45,7 +47,10 @@ export class FakeConsentAdapter {
 		return null
 	}
 
-	deleteMany = async (): Promise<unknown> => null
+	deleteMany = async ({ model, where }: AdapterInput): Promise<unknown> => {
+		this.tokens = this.tokens.filter((row) => row.model !== model || !matches(row, where))
+		return null
+	}
 }
 
 /** Another approval's row for the same grant. */
@@ -81,7 +86,19 @@ export function consentSetup(rows: ConsentRow[] = []) {
 }
 
 function matches(row: ConsentRow, where: Where): boolean {
-	return where.every((clause) => row[clause.field] === clause.value)
+	return where.every((clause) => matchesClause(row[clause.field], clause))
+}
+
+function matchesClause(value: unknown, clause: Where[number]): boolean {
+	if (clause.operator === "lt") return before(value, clause.value)
+	return value === columnText(clause.value)
+}
+
+/** The D1 adapter binds a `Date` as its ISO text, so the comparison is text against text. */
+function before(value: unknown, limit: unknown): boolean {
+	const text = columnText(value)
+	const bound = columnText(limit)
+	return typeof text === "string" && typeof bound === "string" && text < bound
 }
 
 function columnText(value: unknown): unknown {

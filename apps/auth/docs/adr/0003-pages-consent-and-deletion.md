@@ -70,8 +70,28 @@ value that fails is ignored and `/account/` is used.
 A cancelled or failed social sign-in returns to the page it started on: `errorCallbackURL` is that
 page's own path and search, still holding the signed query or `?next=`, with `error=1` appended
 (`src/lib/sign-in-retry.ts`). The page says the sign-in failed, and a retry continues the same flow.
-When Better Auth cannot read its own state, its error page redirects to `/?error=…` in production;
-`/` forwards that to `/sign-in/?error=1` in the page's language.
+When Better Auth cannot read its own state, `onAPIError.errorURL` sends the browser to `/sign-in/`
+with the library's own `?error=<code>`, and the page shows its failed state. `/` still forwards an
+`?error=` it receives to that page in the page's language. Nothing renders the library's own error
+page: a Worker never sets `NODE_ENV=production`, so without `errorURL` that unstyled HTML would be
+the answer.
+
+### The OIDC `claims` parameter is refused
+
+`/oauth2/authorize` refuses any request whose query or body carries OIDC's `claims` parameter with
+`400 invalid_request` and `the claims parameter is not supported`. Any value counts, including an
+empty one. The provider issues the claims its scopes and client already define and never resolves a
+request's claims object, so the parameter cannot change a token; refusing it tells the client that
+instead of silently ignoring what it asked for. The pure rule is `claimsParameterRejection` in
+`src/core/oauth-request.ts`.
+
+Better Auth 1.7.28 advertises `claims_parameter_supported: true` in its discovery document as a
+hard-coded value, and it offers no option to change it: `advertisedMetadata` covers only
+`scopes_supported`, `claims_supported` and `token_endpoint_auth_methods_supported`, and an extension
+metadata contribution only fills a key the base document does not already hold. Discovery therefore
+overstates support; the endpoint rule is what enforces the decision, and the spike's
+`claimsParameterRejected` check proves both the refusal and that a request without the parameter
+still reaches the flow.
 
 ### The first-sign-in question
 
@@ -119,10 +139,11 @@ A page opened without a `client_id` says it only works from an app.
   true row, so the history keeps both.
 - **Sign out.**
 - **Delete account:** a danger zone. The person types their own email to enable Delete. A failure
-  says only what is known. If the server refused, the page signs out and reads the session back:
-  without one it says the person was signed out and links to sign in; with one, or one it cannot
-  read, it says to try again. If no answer arrived, it says the deletion could not be confirmed and
-  offers Reload.
+  says only what is known. If the server refused (a 4xx), the page signs out and reads the session
+  back: without one it says the person was signed out and links to sign in; with one, or one it
+  cannot read, it says to try again. If a 5xx arrived, or no answer arrived at all, it says the
+  deletion could not be confirmed and offers Reload. A 5xx is unconfirmed on purpose: the deletion
+  may have happened before the answer failed.
 
 All Better Auth calls live in `src/client/auth.ts`; the account and OAuth flow wrappers in
 `src/client/account.ts` and `src/client/oauth.ts` use the one request helper, so `createAuthClient`
@@ -194,10 +215,11 @@ no auth change.
 signed in through the dev-only email path, and covers: the three sign-in buttons, the unticked first
 answer recorded as `optedIn=false`, a device code approved end to end followed by a successful CLI
 token poll, the grant listed and revoked on `/account`, a withdrawal appended and the earlier row
-kept, and a deleted account leaving one unacknowledged `pendingDeletion` row with no user or
-consent rows. `e2e/accessibility.e2e.ts` runs axe on every page at 360 px and 1280 px, in light and
-dark, in English and Thai, and fails on a violation or a rule axe could not judge. Screenshots for
-the pull request are in `e2e/screenshots/`.
+kept, a deleted account leaving one unacknowledged `pendingDeletion` row with no user or consent
+rows, and a real `state_mismatch` landing on the styled sign-in page in its failed state instead of
+Better Auth's own error HTML. `e2e/accessibility.e2e.ts` runs axe on every page at 360 px and
+1280 px, in light and dark, in English and Thai, and fails on a violation or a rule axe could not
+judge. Screenshots for the pull request are in `e2e/screenshots/`.
 
 ## Consequences
 

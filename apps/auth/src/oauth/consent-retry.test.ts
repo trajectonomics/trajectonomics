@@ -33,7 +33,6 @@ describe("mergeRetriesWhenRowVanishes", () => {
 			kind: "merged",
 			id: "other",
 			previousScopes: `["profile"]`,
-			previousUpdatedAt: "2026-11-27T00:00:01.000Z",
 		})
 		expect(adapter.consents.rows[0]?.["scopes"]).toBe(`["profile","openid"]`)
 	})

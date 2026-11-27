@@ -51,6 +51,25 @@ export function deviceApproveBodyRejection(body: unknown): DeviceApproveBodyReje
 	return Object.keys(body).every((key) => key === "userCode") ? null : "unexpected-field"
 }
 
+export type ClaimsParameterRejection = "claims-parameter"
+
+/**
+ * OIDC's `claims` request parameter is not supported. The provider issues the claims its scopes
+ * and client define and never resolves a request's claims object, so carrying the parameter
+ * changes nothing; refusing it says that instead of silently ignoring what the client asked for.
+ * Any value counts, including an empty one, and every source that can hold the field is read.
+ */
+export function claimsParameterRejection(
+	...sources: readonly unknown[]
+): ClaimsParameterRejection | null {
+	return sources.some(carriesClaims) ? "claims-parameter" : null
+}
+
+function carriesClaims(source: unknown): boolean {
+	if (source instanceof URLSearchParams) return source.has("claims")
+	return typeof source === "object" && source !== null && Object.hasOwn(source, "claims")
+}
+
 export type AuthorizeMethodRejection = "post-authorize"
 
 /**

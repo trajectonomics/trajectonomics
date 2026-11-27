@@ -23,12 +23,14 @@ export async function deleteConsentRow(ctx: { context: unknown }, id: string): P
 export async function deleteAccessTokens(
 	ctx: { context: unknown },
 	owner: GrantOwner,
+	before: Date,
 ): Promise<void> {
 	await adapterOf(ctx).deleteMany({
 		model: "oauthAccessToken",
 		where: [
 			{ field: "clientId", value: owner.clientId },
 			{ field: "userId", value: owner.userId },
+			{ field: "createdAt", value: before, operator: "lt" },
 		],
 	})
 }
@@ -36,20 +38,28 @@ export async function deleteAccessTokens(
 export async function deleteRefreshTokens(
 	ctx: { context: unknown },
 	owner: GrantOwner,
+	before: Date,
 ): Promise<void> {
 	await adapterOf(ctx).deleteMany({
 		model: "oauthRefreshToken",
 		where: [
 			{ field: "clientId", value: owner.clientId },
 			{ field: "userId", value: owner.userId },
+			{ field: "createdAt", value: before, operator: "lt" },
 		],
 	})
 }
 
+/**
+ * Deletes the token family as it stood before `before`, the read that found no live consent. Only
+ * tokens created before that read are leftovers; a token another approval minted after it is
+ * live and must survive, even though no consent row was visible to that read.
+ */
 export async function deleteTokenFamily(
 	ctx: { context: unknown },
 	owner: GrantOwner,
+	before: Date,
 ): Promise<void> {
-	await deleteAccessTokens(ctx, owner)
-	await deleteRefreshTokens(ctx, owner)
+	await deleteAccessTokens(ctx, owner, before)
+	await deleteRefreshTokens(ctx, owner, before)
 }

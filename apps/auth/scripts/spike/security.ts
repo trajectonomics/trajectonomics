@@ -1,6 +1,7 @@
 import type { Session } from "./http"
 import { checkSignedApprovalBodyRejected } from "./security-approval-body"
 import { checkFailedDoubleApproveKeepsConsent } from "./security-approval-race"
+import { checkClaimsParameterRejected } from "./security-claims"
 import { checkExpiredPollCreatesNoConsent, checkOldTokenNotRevived } from "./security-consent"
 import {
 	checkDashedUserCode,
@@ -59,6 +60,7 @@ export async function runSecurityChecks(
 			scratch,
 		),
 		postAuthorizeRejected: await checkPostAuthorizeRejected(session, scratch),
+		claimsParameterRejected: await checkClaimsParameterRejected(session, scratch),
 		expiredConsentNeverIssuesCode: await checkExpiredConsentNeverIssuesCode(session, scratch),
 		deviceConsentExistsBeforeRedeem: await checkDeviceConsentExistsBeforeRedeem(session, scratch),
 		revokeRemovesDuplicateConsents: await checkRevokeRemovesDuplicateConsents(session, scratch),

@@ -84,17 +84,18 @@ approve. A code nobody has claimed yet is not refused there: the endpoint answer
 "not claimed", and the after-hook takes that consent back.
 
 The before-hook remembers what its write changed: a row it created, with the `updatedAt` it
-stamped, or the previous scopes, resources and `updatedAt` of the row it merged into. An
-**after**-hook on `/device/approve` takes that write back only when the endpoint failed. It first
-reads the endpoint's answer from the hook context (`context.returned`). Anything but an `Error`
-(an `APIError` is one) is a success, and the write is kept without reading the code: the device may
+stamped, or the previous scopes and resources of the row it merged into. An **after**-hook on
+`/device/approve` takes that write back only when the endpoint failed. It first reads the
+endpoint's answer from the hook context (`context.returned`). Anything but an `Error` (an
+`APIError` is one) is a success, and the write is kept without reading the code: the device may
 have polled and redeemed it already, which deletes the row, and undoing then would leave a live
 token for a grant that is not listed. After an error, the final device-code status decides. When it
 is `approved` and its user is the approving user, the write is kept, so a refused second submit of
 an already-approved code undoes nothing. Otherwise the after-hook runs one conditional statement: a
-delete of the created row, or an update restoring the merged row's previous scopes, resources and
-`updatedAt`, each filtered by the `updatedAt` its write stamped. Zero changed rows means someone
-else owns the row now and it is left alone; the read-then-write this replaced could always be raced.
+delete of the created row, or an update restoring the merged row's previous scopes and resources
+with a new `updatedAt`, each filtered by the `updatedAt` its write stamped. Zero changed rows means
+someone else owns the row now and it is left alone; the read-then-write this replaced could always
+be raced.
 
 Only the request whose own insert created the surviving row may record a row to delete. Two
 concurrent approvals can both find no consent; both insert, and the second one's re-read merges the
@@ -109,6 +110,17 @@ row holds its scopes and resources. After three passes it deletes its own insert
 changed that row, and fails the request with `500 server_error`, so an approval never succeeds
 without its consent. The write it records, `created` or `merged`, is the one that happened on the
 last pass.
+
+Every write that sets a consent row's `updatedAt` stamps `max(now, previous + 1 ms)`, where
+`previous` is the latest `updatedAt` it read. An insert also moves past every expired row it
+replaced, a merge past the row it merged into, and a restore past the `updatedAt` the failed write
+had stamped. Two writes in one millisecond therefore never share a stamp, and the first request's
+undo, still filtered by the exact `updatedAt` its write stored, cannot match the row the second
+write now owns. The restored `updatedAt` is a fresh stamp, not the value from before the merge:
+`updatedAt` is the undo guard, not part of the grant's state.
+
+Undoing a merge restores the keeper's previous scopes and resources; the duplicate rows the merge
+deleted stay deleted. The undo can therefore only remove grants, never add one.
 
 An endpoint that throws something other than an `APIError` skips the after-hook entirely, and its
 consent is then left without an approval. It grants nothing: no token is issued without an
@@ -157,8 +169,10 @@ grants, and the operator cannot see who the request belongs to until they sign i
 auto-consent path compares scopes and resources but not the approval age, so deleting the expired
 row is what makes every code-issuing path fail closed into the consent page.
 
-Whenever a consent is newly created, any leftover access and refresh tokens for that user and
-client are deleted first, so an old token can never attach to the new approval.
+Whenever a consent is newly created, the access and refresh tokens for that user and client that
+were created before the read that found no consent are deleted first, so an old token can never
+attach to the new approval. A token another approval minted after that read survives the delete:
+that approval's consent is live even though this read could not see it.
 
 `src/oauth-grants.ts` adds two session-scoped endpoints:
 
@@ -194,7 +208,9 @@ sign-in, where the real request is the sign-in and the authorization parameters 
 the hook tells the two apart by the request's pathname. `/device/code` rejects any `Content-Type`
 whose media type merely contains `application/x-www-form-urlencoded`: the library form-parses such
 a body while the hook reads it as JSON, and the two disagree about the resources it names. A body
-the hook cannot read fails closed rather than counting as no resource.
+the hook cannot read fails closed rather than counting as no resource. `/oauth2/authorize` also
+refuses OIDC's `claims` request parameter with any value; the decision and its discovery caveat are
+in [ADR 0003](0003-pages-consent-and-deletion.md).
 
 The provider's `/oauth2/delete-consent` is in `disabledPaths`. It deletes the consent but leaves
 the tokens alive, and a later approval would revive them. `/oauth2/grants/revoke` is the only

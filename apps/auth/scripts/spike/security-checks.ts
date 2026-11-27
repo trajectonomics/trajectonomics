@@ -19,6 +19,7 @@ export function securityChecks(gates: SecurityEvidence): Record<string, boolean>
 		updateConsentPathDisabled: gates.updateConsentPathDisabled,
 		deviceCodeContentTypeSmugglingRejected: gates.deviceCodeContentTypeSmugglingRejected,
 		postAuthorizeRejected: gates.postAuthorizeRejected,
+		claimsParameterRejected: gates.claimsParameterRejected,
 		expiredConsentNeverIssuesCode: gates.expiredConsentNeverIssuesCode,
 		deviceConsentExistsBeforeRedeem: gates.deviceConsentExistsBeforeRedeem,
 		revokeRemovesDuplicateConsents: gates.revokeRemovesDuplicateConsents,

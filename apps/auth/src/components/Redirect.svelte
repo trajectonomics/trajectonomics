@@ -11,8 +11,8 @@ const account = $derived(pagePath(language, "account"))
 const signIn = $derived(pagePath(language, "sign-in"))
 
 onMount(async () => {
-	// In production Better Auth's error page redirects here with `?error=`, which the sign-in page
-	// turns into words.
+	// A failed sign-in now goes straight to the sign-in page with `?error=`. This forwarding stays
+	// for an older `/?error=` link; the sign-in page turns the marker into words.
 	if (new URLSearchParams(window.location.search).has("error")) {
 		window.location.replace(`${signIn}?error=1`)
 		return
