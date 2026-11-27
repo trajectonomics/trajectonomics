@@ -27,23 +27,15 @@ interface Props {
 /** The Plan's chart: the net worth chart or one the person made, with its picker behind the Charts button. */
 let { run, terms, onTerms, charts }: Props = $props()
 let drawer = $state<"new" | ChartDef | null>(null)
-/** Bumped when the Charts button takes focus back, after a save or a delete. */
+/** Bumped when the Charts button takes focus back: after a save, a delete, a duplicate or New chart closed. */
 let focusCharts = $state(0)
 const chosen = $derived(chartStore.charts.find((chart) => chart.id === charts.chart))
 const groups = $derived(buildCatalogue(charts.runs, run, charts.names))
 const names = $derived(seriesNames(charts.runs, run, charts.names, ALWAYS_NAMES))
 /** The same names with no plan label, so a default chart name reads the ids and fits every plan. */
 const defaultNames = $derived(defaultNameIndex(charts.runs, charts.names))
-const view = $derived(
-	chosen &&
-		chartView(
-			chosen,
-			seriesById(run, charts.names),
-			names,
-			parseTerms(terms),
-			charts.names.accounts,
-		),
-)
+const byId = $derived(seriesById(run, charts.names))
+const view = $derived(chosen && chartView(chosen, byId, names, parseTerms(terms), charts.names.accounts))
 const title = $derived(chosen && view ? chosen.name : "Net worth by year")
 /** The chart is taller from `md` (Tailwind's 48rem) up, and shorter on a phone. */
 const height = $derived(screen.medium ? 320 : 220)
@@ -53,6 +45,11 @@ function save(draft: { name: string; kind: ChartKind; series: readonly string[] 
 	if (chartStore.save({ id, ...draft })) charts.onChart(id)
 	drawer = null
 	focusCharts += 1
+}
+
+function closeDrawer(): void {
+	if (drawer === "new") focusCharts += 1
+	drawer = null
 }
 
 function remove(id: string): void {
@@ -99,9 +96,5 @@ function remove(id: string): void {
 		{/if}
 	</section>
 	<ChartNotices problem={chartStore.problem} unsaved={chartStore.unsaved} notice={chartStore.notice} />
-	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={() => {
-		// Closing New chart without saving leaves no chart control to return to: the Charts button takes focus.
-		if (drawer === "new") focusCharts += 1
-		drawer = null
-	}} />
+	<ChartDrawer open={drawer} {groups} {names} {defaultNames} accounts={charts.names.accounts} onSave={save} onClose={closeDrawer} />
 </div>
