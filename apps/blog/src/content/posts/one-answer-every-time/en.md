@@ -4,7 +4,7 @@ description: Ask an agent the same money question twice and you can get two diff
 type: guide
 publishedOn: 2026-11-22
 cover:
-  src: /posts/one-answer-every-time/cover.webp
+  src: /blog/posts/one-answer-every-time/cover.webp
   alt: Three cream robots with orange eyes wave from sand dunes under an orange sun, beside the words "One answer, every time. Deterministic by design."
   width: 1024
   height: 1024
@@ -13,7 +13,7 @@ cover:
 An AI agent is good at the parts of a financial plan that need judgement. It asks what you earn, notices what you forgot, and explains a result in your own words. It is less good at being the calculator. A language model writes its answer by sampling, so the same agent, asked the same money question twice, can give you two different numbers.
 
 <figure>
-  <img src="/posts/one-answer-every-time/alone.webp" alt="Three identical robots on sand dunes each hold up a card with a different bar chart, and glance at each other's cards." width="1600" height="900" loading="lazy" />
+  <img src="/blog/posts/one-answer-every-time/alone.webp" alt="Three identical robots on sand dunes each hold up a card with a different bar chart, and glance at each other's cards." width="1600" height="900" loading="lazy" />
   <figcaption>The same agent, the same question, three answers.</figcaption>
 </figure>
 
@@ -24,7 +24,7 @@ That is fine for a paragraph of advice. It is not fine for a retirement plan you
 traj splits the work in two. Your agent supplies the judgement: it asks you for the facts, decides what to run, and reads the result back to you. The arithmetic happens in `traj`, a command line that [never calls a model](https://github.com/trajectonomics/trajectonomics/blob/main/apps/cli/docs/adr/0001-agent-first-no-llm.md). So every number your agent quotes is one `traj` returned, and `traj` returns the same one each time you ask.
 
 <figure>
-  <img src="/posts/one-answer-every-time/with-traj.webp" alt="Three identical robots stand in a row on sand dunes, each holding the same bar chart, joined by a thin orange line." width="1600" height="900" loading="lazy" />
+  <img src="/blog/posts/one-answer-every-time/with-traj.webp" alt="Three identical robots stand in a row on sand dunes, each holding the same bar chart, joined by a thin orange line." width="1600" height="900" loading="lazy" />
   <figcaption>The same agents with traj: one question, one answer.</figcaption>
 </figure>
 
@@ -88,7 +88,7 @@ dd9bc2f0dd33caed788ad28b92742748ed95c3f683e332af577a6f466fb807ad
 Every run also gave the same closing net worth on 30 March 2056: 43,504,723.86 THB, or 17,924,821.75 THB in real terms after the plan's 3% inflation. Run it on your machine and you should see the same hash, down to the last satang. If you don't, that is a bug, and we want to hear about it.
 
 <figure>
-  <img src="/posts/one-answer-every-time/same-output.webp" alt="A robot drops blocks into a small cream machine, which prints a card with a bar chart; a row of identical cards lies on the sand beside it." width="1600" height="900" loading="lazy" />
+  <img src="/blog/posts/one-answer-every-time/same-output.webp" alt="A robot drops blocks into a small cream machine, which prints a card with a bar chart; a row of identical cards lies on the sand beside it." width="1600" height="900" loading="lazy" />
   <figcaption>Same inputs in, the same card out, every time.</figcaption>
 </figure>
 
@@ -100,4 +100,4 @@ Deterministic is not the same as right. `traj` computes exactly what your plan s
 
 ## Try it
 
-Install `traj` and give your agent the setup skill. The commands are on the [installation page](https://docs.trajectonomics.com/cli/installation/). Then ask your agent a question about your money twice, and compare the answers.
+Install `traj` and give your agent the setup skill. The commands are on the [installation page](/docs/cli/installation/). Then ask your agent a question about your money twice, and compare the answers.

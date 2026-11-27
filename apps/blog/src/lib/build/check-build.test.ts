@@ -3,9 +3,9 @@ import { checkBuild } from "./check-build"
 import type { BuiltFile, FailureCode } from "./failures"
 
 /** A page that meets every rule; each test breaks one. */
-const HEAD = `<title>Blog</title><link rel="canonical" href="https://blog.trajectonomics.com/">`
-const IMAGE = `<img src="/posts/a/cover.webp" alt="Three robots">`
-const SHELL = `<a href="https://trajectonomics.com/">Home</a><a href="/">Blog</a><footer></footer>`
+const HEAD = `<title>Blog</title><link rel="canonical" href="https://trajectonomics.com/blog/">`
+const IMAGE = `<img src="/blog/posts/a/cover.webp" alt="Three robots">`
+const SHELL = `<a href="/">Home</a><a href="/blog/">Blog</a><footer></footer>`
 const PAGE = `<html><head>${HEAD}</head><body>${IMAGE}${SHELL}</body></html>`
 const NOT_FOUND = `<html><head><title>Not found</title><meta name="robots" content="noindex"></head><body>${SHELL}</body></html>`
 
@@ -19,7 +19,7 @@ const GOOD: readonly BuiltFile[] = [
 
 /** A Post page: an article that states its BlogPosting in one JSON-LD block. */
 const BLOG_POSTING = `<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"A"}</script>`
-const POST = `<html><head><title>A</title><link rel="canonical" href="https://blog.trajectonomics.com/guides/a/"><meta property="og:type" content="article">${BLOG_POSTING}</head><body>${SHELL}</body></html>`
+const POST = `<html><head><title>A</title><link rel="canonical" href="https://trajectonomics.com/blog/guides/a/"><meta property="og:type" content="article">${BLOG_POSTING}</head><body>${SHELL}</body></html>`
 
 /** The codes a build fails with. */
 function codes(files: readonly BuiltFile[]): readonly FailureCode[] {
@@ -70,25 +70,25 @@ describe("the built blog", () => {
 	})
 
 	test("an image from another host is not looked for in the build", () => {
-		const html = PAGE.replace("/posts/a/cover.webp", "https://example.com/a.webp")
+		const html = PAGE.replace("/blog/posts/a/cover.webp", "https://example.com/a.webp")
 		expect(codes(withFrontPage(html))).toEqual([])
 	})
 
 	test("a page with no link to the Site Home fails", () => {
-		const html = PAGE.replace('<a href="https://trajectonomics.com/">Home</a>', "")
+		const html = PAGE.replace('<a href="/">Home</a>', "")
 		expect(codes(withFrontPage(html))).toEqual(["shell-home-link-missing"])
 	})
 
 	test("a page with no link to the blog's front page fails", () => {
-		expect(codes(withFrontPage(PAGE.replace('<a href="/">Blog</a>', "")))).toEqual([
+		expect(codes(withFrontPage(PAGE.replace('<a href="/blog/">Blog</a>', "")))).toEqual([
 			"shell-blog-link-missing",
 		])
 	})
 
 	test("a page in a prefixed tree links to its own tree's front page", () => {
-		const thai = PAGE.replace('<a href="/">Blog</a>', '<a href="/th/">บล็อก</a>').replace(
-			'href="https://blog.trajectonomics.com/"',
-			'href="https://blog.trajectonomics.com/th/"',
+		const thai = PAGE.replace('<a href="/blog/">Blog</a>', '<a href="/blog/th/">บล็อก</a>').replace(
+			'href="https://trajectonomics.com/blog/"',
+			'href="https://trajectonomics.com/blog/th/"',
 		)
 		expect(codes([...GOOD, { path: "th/index.html", text: thai }])).toEqual([])
 		expect(codes([...GOOD, { path: "th/index.html", text: PAGE }])).toEqual([
@@ -98,8 +98,8 @@ describe("the built blog", () => {
 
 	test("a canonical the build lacks fails", () => {
 		const html = PAGE.replace(
-			"https://blog.trajectonomics.com/",
-			"https://blog.trajectonomics.com/guides/gone/",
+			"https://trajectonomics.com/blog/",
+			"https://trajectonomics.com/blog/guides/gone/",
 		)
 		expect(codes(withFrontPage(html))).toEqual(["page-canonical-unbuilt"])
 	})
@@ -107,8 +107,8 @@ describe("the built blog", () => {
 	test("an alternate the build lacks fails, and one it has passes", () => {
 		const alternate = (href: string) =>
 			PAGE.replace("</head>", `<link rel="alternate" hreflang="th" href="${href}"></head>`)
-		expect(codes(withFrontPage(alternate("https://blog.trajectonomics.com/")))).toEqual([])
-		expect(codes(withFrontPage(alternate("https://blog.trajectonomics.com/th/")))).toEqual([
+		expect(codes(withFrontPage(alternate("https://trajectonomics.com/blog/")))).toEqual([])
+		expect(codes(withFrontPage(alternate("https://trajectonomics.com/blog/th/")))).toEqual([
 			"page-alternate-unbuilt",
 		])
 	})

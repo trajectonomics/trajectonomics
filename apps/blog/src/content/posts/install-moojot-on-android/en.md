@@ -4,7 +4,7 @@ description: MooJot reads the payment slips your Thai banking apps save and logs
 type: guide
 publishedOn: 2026-11-23
 cover:
-  src: /posts/install-moojot-on-android/cover.webp
+  src: /blog/posts/install-moojot-on-android/cover.webp
   alt: A pink banner with the MooJot pig waving beside a phone showing a month's spending by category, over the Thai line "โอนปุ๊บ มูจดให้ปั๊บ", "Free Android app, reads Thai bank slips" and moojot.trajectonomics.com.
   width: 1200
   height: 630
@@ -15,7 +15,7 @@ cover:
 It isn't on Google Play yet, so you install it from its APK file. That takes about a minute, and the [two-minute video tutorial](https://youtu.be/OIfqAEZv6_M) shows every tap. The video is in Thai. The same steps are written out below.
 
 <figure>
-  <img src="/posts/install-moojot-on-android/steps.webp" alt="Three phone screens: Chrome asking whether to download moojot-android-arm64.apk anyway, Android asking whether to install moojot, and MooJot's home screen with the pig and the month's total, with the list of transactions blurred." width="1440" height="1070" loading="lazy" />
+  <img src="/blog/posts/install-moojot-on-android/steps.webp" alt="Three phone screens: Chrome asking whether to download moojot-android-arm64.apk anyway, Android asking whether to install moojot, and MooJot's home screen with the pig and the month's total, with the list of transactions blurred." width="1440" height="1070" loading="lazy" />
   <figcaption>Download anyway, Install, then Moo reads your slips. The real transactions are blurred.</figcaption>
 </figure>
 
