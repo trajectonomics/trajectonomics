@@ -7,8 +7,8 @@ import { allowancesView } from "./years"
 /** One Return's saving on the Home card: the CLI's own figure, and the words the household gives its Filer. */
 export interface AllowancesSaving {
 	readonly key: string
-	/** "You", "Your partner", or the label the household states; null when the read states one Return. */
-	readonly name: ItemLabel | null
+	/** "You", "Your partner", or the label the household states; "Your joint Return" as plain text; null when the read states one Return. */
+	readonly name: ItemLabel | string | null
 	readonly saving: string
 }
 

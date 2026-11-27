@@ -49,7 +49,7 @@ export function sourceTier(
 /**
  * One estimated cell. A measured figure is a lower bound on that tier's limit, and the vendor
  * states limit(picked) = limit(from) × ratio, so measured × ratio is a lower bound on the picked
- * tier's limit. Both figures are "at least" figures, never a claim about the exact limit.
+ * tier's limit. Both figures are lower bounds, never a claim about the exact limit.
  */
 export function estimateCell(
 	picked: CatalogTier,

@@ -55,7 +55,8 @@ export function niceMax(value: number): number {
 export function chartAriaLabel(series: readonly ChartSeries[], from: string, to: string): string {
 	const days = series[0]?.points.length ?? 0
 	const names = series.map((line) => line.name).join(", ")
-	return `Line chart of total tokens per UTC day for ${days} days, ${from} to ${to}. Plans: ${names}.`
+	const unit = days === 1 ? "day" : "days"
+	return `Line chart of total tokens per UTC day for ${days} ${unit}, ${from} to ${to}. Plans: ${names}.`
 }
 
 function xTicks(days: readonly string[], xFor: (index: number) => number): XTick[] {

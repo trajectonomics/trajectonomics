@@ -63,9 +63,11 @@ export function usageStaleCacheKey(request: Request): Request {
 /**
  * The shape of the peaks body. A change to the body bumps it, so a cached body of the old shape is
  * never served to a page built for the new one: on 2026-11-27 a cached body without `measured`
- * broke the overview for hours after the deploy that added it.
+ * broke the overview for hours after the deploy that added it. Shape 3 leaves cache reads out of
+ * the token figure and adds `cacheRead` beside it; shape 4 adds each window's `limits` estimate
+ * from the plan's usage meter.
  */
-export const PEAKS_SHAPE = "2"
+export const PEAKS_SHAPE = "4"
 
 function peaksUrl(request: Request): URL {
 	const url = normalizedReadUrl(request, PEAKS_PARAMS)

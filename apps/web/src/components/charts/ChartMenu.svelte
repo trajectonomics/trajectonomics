@@ -10,7 +10,7 @@ interface Props {
 let { name, onEdit, onDuplicate, onDelete }: Props = $props()
 let asking = $state(false)
 const BUTTON =
-	"rounded-md border border-border px-3 py-1.5 text-sm outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+	"rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 </script>
 
 <!-- What a person does with a chart of their own: edit it, copy it, or delete it after a question. -->

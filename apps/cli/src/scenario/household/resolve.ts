@@ -5,6 +5,7 @@ import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, canonicalHousehold, type Household } from "./model"
 import { resolveOwners } from "./owner-held"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
+import { refusesWithout } from "./required"
 import { storedHousehold } from "./stored"
 
 /**
@@ -34,12 +35,13 @@ function conflict(
 	date: string,
 	at: readonly Step[],
 	value: unknown,
+	document: unknown,
 ) {
 	const path = documentPathOf(at)
 	return fail("invalid_input", {
 		path,
 		message: `${path}: ${anchor.path} is anchored to ${date} by the household, and this value differs`,
-		hint: hint(anchor),
+		hint: hint(refusesWithout(document, at)),
 		details: { anchor, anchored: date, value },
 	})
 }
@@ -62,7 +64,7 @@ function resolveOne(
 	const locus = locate(document, segments)
 	if (locus.kind === "missing") return { dropped: true }
 	if (locus.kind === "found") {
-		if (locus.value !== date) return conflict(hint, anchor, date, locus.at, locus.value)
+		if (locus.value !== date) return conflict(hint, anchor, date, locus.at, locus.value, document)
 		return { document }
 	}
 	return { document: fillFollowers(setAt(document, locus.at, date), segments, date, pinned) }

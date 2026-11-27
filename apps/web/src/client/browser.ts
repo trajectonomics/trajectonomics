@@ -43,6 +43,15 @@ export function focusById(id: string): void {
 	document.getElementById(id)?.focus()
 }
 
+/**
+ * Gives an element focus after the page has finished its current update, such as a dialog closing: a
+ * dialog puts focus back as it closes, so a focus set in the same update would be taken from it again.
+ */
+export function focusOnNextFrame(element: HTMLElement | undefined): void {
+	if (element === undefined) return
+	requestAnimationFrame(() => element.focus())
+}
+
 /** Stores a value. A refused write is ignored: the setting then lasts only for this page. */
 export function writeStored(key: string, value: string): void {
 	try {

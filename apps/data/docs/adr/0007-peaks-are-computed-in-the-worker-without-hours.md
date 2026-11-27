@@ -5,6 +5,10 @@
 Accepted, 2026-11-27. Slice 1 of issue #739. It narrows the read path in ADR 0001: the API now
 also answers `/data/api/peaks` (and the old host's `/api/peaks`).
 
+Partly superseded by [ADR 0009](0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md), 2026-11-27: figures leave cache reads out, Claude's 5 hours are anchored to activity, and "≥" is gone (measured figures read "Most we used").
+
+Amended by [ADR 0010](0010-data-starts-when-collecting-starts.md), 2026-11-27: a window shows its figure only once the collected span covers the window's full length.
+
 ## Context
 
 The site asks what each plan gives. Until #599 records quota samples, the only honest answer is

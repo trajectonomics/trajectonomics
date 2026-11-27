@@ -70,6 +70,21 @@ describe("columnLayout", () => {
 		expect(layout?.markers[1]?.x).toBeCloseTo((second ?? 0) + slot / 2)
 	})
 
+	test("each x tick carries the age and, under it, the year its point states", () => {
+		const series: LineSeries = {
+			name: "Net worth",
+			points: [
+				{ x: 0, xLabel: "You 37", subLabel: "2027", y: 10, display: "10.00" },
+				{ x: 1, xLabel: "You 38", subLabel: "2028", y: 20, display: "20.00" },
+			],
+		}
+		const layout = columnLayout([series], PLOT, "bars")
+		expect(layout?.xTicks.map((tick) => [tick.label, tick.sub])).toEqual([
+			["You 37", "2027"],
+			["You 38", "2028"],
+		])
+	})
+
 	test("stacked bars rise from one another and the axis takes in the stack", () => {
 		const layout = columnLayout([line("A", [10]), line("B", [10])], PLOT, "stacked-bars")
 		const [a, b] = layout?.series ?? []

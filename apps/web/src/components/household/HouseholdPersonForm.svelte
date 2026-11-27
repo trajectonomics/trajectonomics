@@ -10,6 +10,7 @@ import { RELATION_CHOICES, ROLE_CHOICES } from "../../lib/view/plan-items/option
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
 import ItemActions from "../plan-items/ItemActions.svelte"
+import FormAlert from "../ui/FormAlert.svelte"
 import ItemName from "../ui/ItemName.svelte"
 
 interface Props {
@@ -34,11 +35,16 @@ const initial = () => personDraftOf(existing, household === null ? "holder" : ""
 let draft: PersonDraft = $state(initial())
 let problems: Problems = $state({})
 const FIELDS = ["name", "displayLabel", "role", "relation", "born", "lifeExpectancy", "joins"]
-const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
+/** The whole path of the person the form edits, so a refusal at another person is the form's own problem. */
+let item = $state<readonly string[]>(["people"])
+const shown = $derived(
+	shownProblems(problems, editSession.failure, editSession.error, FIELDS, item),
+)
 const taken = $derived((household?.people ?? []).map((person) => person.id))
 
 /** Saves the household as one Edit; the drawer closes only when it ran. */
-async function commit(next: HouseholdDocument): Promise<void> {
+async function commit(next: HouseholdDocument, index: number): Promise<void> {
+	item = ["people", String(index)]
 	if (await saveHousehold(name, householdHash, next)) onDone()
 }
 
@@ -51,13 +57,18 @@ async function save(event: SubmitEvent): Promise<void> {
 		return
 	}
 	problems = {}
-	await commit(householdWithPerson(household, result.person))
+	const next = householdWithPerson(household, result.person)
+	await commit(
+		next,
+		next.people.findIndex((person) => person.id === result.person.id),
+	)
 }
 
 /** Removes the person from the household. The anchors that name them stay, and traj refuses that. */
 async function removePerson(): Promise<void> {
 	if (household === null || existing === undefined) return
-	await commit(householdWithoutPerson(household, existing.id))
+	const index = household.people.findIndex((person) => person.id === existing.id)
+	await commit(householdWithoutPerson(household, existing.id), index)
 }
 </script>
 
@@ -77,6 +88,6 @@ async function removePerson(): Promise<void> {
 	{#if draft.role === "partner"}
 		<Field id="person-joins" label="Joins the plan" hint="The month, YYYY-MM, or empty when the partner is in the plan from the start" bind:value={draft.joins} problem={shown.at("joins")} />
 	{/if}
-	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
+	{#if shown.general}<FormAlert message={shown.general} />{/if}
 	<ItemActions id={existing?.id} kind="person" onDelete={removePerson} />
 </form>

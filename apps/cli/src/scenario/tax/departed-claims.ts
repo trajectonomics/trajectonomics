@@ -13,10 +13,9 @@ import type { ReturnClaims, TaxRequest } from "./flags"
  * `kept` keeps a set for a person with no Return only when it claims something. A plan with no
  * household to judge by gives none.
  */
-export function departedClaimants(kept: TaxRequest, household: string | null): string[] {
+export function departedClaimants(kept: TaxRequest, household: Household | null): string[] {
 	if (household === null) return []
-	const { people } = JSON.parse(household) as Household
-	const present = new Set(people.map((person) => person.id))
+	const present = new Set(household.people.map((person) => person.id))
 	return Object.keys(kept.returns ?? {})
 		.filter((id) => !present.has(id))
 		.sort()

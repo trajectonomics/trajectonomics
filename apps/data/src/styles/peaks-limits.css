@@ -1,0 +1,10 @@
+/* A limit estimated from the plan's meter: fewer than three points of movement reads quieter. */
+
+.peaks-figure-rough {
+	font-weight: 400;
+	color: var(--ds-color-muted-foreground);
+}
+
+.peaks-bar-rough {
+	background: var(--ds-color-muted-foreground);
+}

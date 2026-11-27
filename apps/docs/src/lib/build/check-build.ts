@@ -10,6 +10,7 @@ import { checkImportTemplate } from "./import-template"
 import { checkInstallationPage } from "./installation-page"
 import { checkLandingPage } from "./landing-page"
 import { checkMarkdownTwins } from "./markdown-twins"
+import { checkMascotAssets } from "./mascot-assets"
 import { checkNotFoundPage } from "./not-found"
 import { checkPlaceholderCopy } from "./placeholder-copy"
 import { checkRedirects } from "./redirects"
@@ -39,6 +40,7 @@ export function checkBuild(
 		...checkAlternateLinks(files),
 		...checkHeadTags(files),
 		...checkLandingPage(files, releaseLine),
+		...checkMascotAssets(files),
 		...checkRedirects(files),
 		...checkTabAliases(files),
 		...checkHeaderTabs(files),

@@ -1,8 +1,10 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import type { TaxPlanner } from "../../store"
 import type { ScenarioDocument } from "../document"
+import type { Household } from "../household/model"
+import { storedHousehold } from "../household/stored"
 import { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
-import { coupleOf, holderIdOf } from "./couple"
+import { type Couple, coupleOf, holderIdOf } from "./couple"
 import type { TaxRequest } from "./flags"
 import { holdsTaxLevy } from "./holds"
 import type { FlowLabel } from "./labels"
@@ -14,12 +16,34 @@ import { canonicalTax, parsedTax, storedTaxOf } from "./stored"
 /** What a write that wrote a Levy leaves for the reply. */
 export type Written = TaxLevyWritten
 
+/** The request a mode that builds on the stored profile maps to, or the reason it cannot. */
+function storedRequest(
+	mode: Exclude<TaxMode, { kind: "write" | "remove" }>,
+	stored: string | null,
+	document: ScenarioDocument,
+	couple: Couple | null,
+	household: Household | null,
+): TaxRequest | AppError {
+	const profile = parsedTax(stored)
+	if (profile === null) {
+		return noStoredProfile(
+			mode.kind === "merge" ? "--merge" : "--from-stored",
+			holdsTaxLevy(document),
+		)
+	}
+	const holder = holderIdOf(household)
+	const filing = { couple, holder }
+	return mode.kind === "merge"
+		? mergedRequest(profile, mode.flags, filing)
+		: fromStoredRequest(profile, filing)
+}
+
 /** The request a mode states for this plan: its own flags, or the stored profile they build on. */
 function requestFor(
 	mode: Exclude<TaxMode, { kind: "remove" }>,
 	document: ScenarioDocument,
 	stored: string | null,
-	household: string | null,
+	household: Household | null,
 ): TaxRequest | AppError {
 	const couple = coupleOf(household)
 	if (mode.kind === "write") {
@@ -30,17 +54,20 @@ function requestFor(
 		}
 		return request
 	}
-	const profile = parsedTax(stored)
-	if (profile === null) {
-		return noStoredProfile(
-			mode.kind === "merge" ? "--merge" : "--from-stored",
-			holdsTaxLevy(document),
-		)
-	}
-	const filing = { couple, holder: holderIdOf(household) }
-	return mode.kind === "merge"
-		? mergedRequest(profile, mode.flags, filing)
-		: fromStoredRequest(profile, filing)
+	return storedRequest(mode, stored, document, couple, household)
+}
+
+/** The Levy a mode other than remove writes, and the request it resolved, for the reply. */
+function planned(
+	mode: Exclude<TaxMode, { kind: "remove" }>,
+	document: ScenarioDocument,
+	stored: string | null,
+	household: Household | null,
+	labels: readonly FlowLabel[],
+): Written | AppError {
+	const request = requestFor(mode, document, stored, household)
+	if (isAppError(request)) return request
+	return withTaxLevy(document, request, labels, household)
 }
 
 /**
@@ -54,9 +81,9 @@ export function plannerOf(
 ): TaxPlanner {
 	return (document, stored, household) => {
 		if (mode.kind === "remove") return { document: withoutTaxLevy(document) ?? document, tax: null }
-		const request = requestFor(mode, document, stored, household)
-		if (isAppError(request)) return request
-		const next = withTaxLevy(document, request, labels, household)
+		const held = household === null ? null : storedHousehold(household)
+		if (isAppError(held)) return held
+		const next = planned(mode, document, stored, held, labels)
 		if (isAppError(next)) return next
 		done(next)
 		return { document: next.document, tax: canonicalTax(storedTaxOf(next.request)) }
