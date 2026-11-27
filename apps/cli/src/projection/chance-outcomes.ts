@@ -79,6 +79,7 @@ export function outcomesOf(
 				outcome.runsOut === undefined
 					? null
 					: { date: outcome.runsOut.date, unmet: money(outcome.runsOut.unmet) },
+			...(outcome.milestones === undefined ? {} : { milestones: { ...outcome.milestones } }),
 		})),
 		representative: {
 			p10: atRank(ascending, LEVELS.p10),

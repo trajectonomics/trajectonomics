@@ -135,3 +135,9 @@ twenty's community link uses. It is not a disclosure, so it lists no rows and of
 The Language menu stays the header's only disclosure. The amendments above that describe the Star menu's
 trigger, its panel and its rows are superseded by this one. The snapshot still counts the one repository;
 the link prints that count.
+
+## Amendment (2026-11-27, owner): the licence line reads AGPL-3.0-only
+
+The owner relicensed the repository under AGPL-3.0-only. The hero pill's second run now reads
+`AGPL-3.0 · open source`, and the licence line this record describes is a historical statement of
+what it read when the design shipped.

@@ -2,6 +2,7 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
+import { chanceMilestones } from "./projection-chance-milestones"
 import { projectionShape } from "./projection-shape"
 
 /** One net-worth Percentile across Market paths at a roll-up end: its level and its money string. */
@@ -83,6 +84,7 @@ const pathOutcome = z.strictObject({
 	lowestNetWorth: money,
 	lowestYear: dateString,
 	runsOut: z.strictObject({ date: dateString, unmet: money }).nullable(),
+	milestones: z.record(z.string(), dateString).optional(),
 })
 
 /** The path indexes to open first, with `--outcomes`: the 10th, 50th and 90th Percentile, the earliest to run out, the lowest. */
@@ -119,5 +121,7 @@ export const projectionChance = z.strictObject({
 	// Present only with --outcomes (cli ADR-0069).
 	outcomes: z.array(pathOutcome).optional(),
 	representative: representative.optional(),
+	// Present only with --milestone-dates (cli ADR-0081).
+	milestones: chanceMilestones.optional(),
 })
 export type ProjectionChance = z.infer<typeof projectionChance>

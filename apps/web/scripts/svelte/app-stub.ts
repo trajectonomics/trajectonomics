@@ -15,3 +15,6 @@ export const navigations: string[] = []
 export async function goto(url?: string): Promise<void> {
 	if (url !== undefined) navigations.push(url)
 }
+
+/** Registers a callback after each navigation: the tests render one page and never navigate, so it never runs. */
+export function afterNavigate(_callback: () => void): void {}

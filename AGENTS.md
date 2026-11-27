@@ -36,6 +36,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 10. UI frameworks: an app with a client-side interface is written in Svelte 5 (`apps/web`). React is allowed only in `apps/docs`, and there only because Fumadocs needs it; do not add React to another package. `apps/site` ships static HTML with no UI framework.
 11. One host: every static site is served under `trajectonomics.com` (owner, 2026-11-27). A product's landing page is built in `apps/site`; the docs, the blog and the data site keep their own Workers and are mounted at `/docs`, `/blog` and `/data` by zone routes, with no router Worker. Only a single-page app gets a subdomain of its own. A retired subdomain stays attached to redirect to its new path, and keeps answering, without a redirect, any endpoint that clients already shipped still call (the data site's `/api/*` and `/ingest`, OpenJot's `/ingest`), because a redirect would turn their POST into a GET.
 12. Visual first: when you build, change or review anything a person looks at (a screen, a chart, a landing page, a doc page or a pull request), read [`DESIGN_PRINCIPLES.md`](DESIGN_PRINCIPLES.md) first. Show the answer as a picture, and use words only where a picture cannot carry it.
+13. The repository is AGPL-3.0-only. A new package ships the root `LICENSE` text and `"license": "AGPL-3.0-only"`. Vendored third-party code keeps its own licence and is listed in `THIRD_PARTY_NOTICES.md`.
 
 ## Organisation goals
 

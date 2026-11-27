@@ -1,4 +1,5 @@
 import type { ColumnHint, RenderHint } from "../table"
+import { milestoneBlocks } from "./chance-milestones-human"
 import { OUTCOME_EXTRA, outcomesShown } from "./chance-outcomes-human"
 import { SUCCESS_NOTE_PREFIX } from "./chance-view"
 
@@ -60,6 +61,7 @@ export const chanceHint: RenderHint = {
 	},
 	// With --outcomes: the paths `representative` names, then every path's outcome, worst first (cli ADR-0069).
 	extra: OUTCOME_EXTRA,
+	blocks: milestoneBlocks,
 	display: shown,
 	note: "notes",
 }

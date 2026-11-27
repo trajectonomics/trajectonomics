@@ -32,7 +32,7 @@ OpenJot อ่านสลิปที่แอปธนาคารบันท
 • การอ่านข้อความภาษาอังกฤษบนสลิปใช้ ML Kit ของ Google ซึ่งส่งสถิติการใช้งานของตัวเองให้ Google (ไม่ส่งรูปหรือข้อความในสลิป)
 
 โอเพนซอร์ส
-โค้ดของ OpenJot เปิดให้ดูได้ทุกบรรทัด ภายใต้สัญญาอนุญาต MIT: https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot
+โค้ดของ OpenJot เปิดให้ดูได้ทุกบรรทัด ภายใต้สัญญาอนุญาต AGPL-3.0-only: https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot
 
 OpenJot ไม่มีส่วนเกี่ยวข้องกับธนาคารหรือวอลเล็ตใด ชื่อธนาคารและชื่อแอปเป็นของเจ้าของแต่ละราย
 ```
@@ -63,7 +63,7 @@ Private by design
 • To read English text on slips, OpenJot uses Google ML Kit, which sends Google its own usage metrics (not your photos or their text)
 
 Open source
-OpenJot's code is open source under the MIT license: https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot
+OpenJot's code is open source under the AGPL-3.0-only license: https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot
 
 OpenJot isn't affiliated with any bank or e-wallet. Bank and app names belong to their owners.
 ```

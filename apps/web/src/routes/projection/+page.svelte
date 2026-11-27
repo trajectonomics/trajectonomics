@@ -8,7 +8,7 @@ import { editsShown } from "../../lib/edit/shown"
 </script>
 
 <svelte:head>
-	<title>Projection · Dashboard</title>
+	<title>Plan · Dashboard</title>
 </svelte:head>
 
 <ProjectionPage

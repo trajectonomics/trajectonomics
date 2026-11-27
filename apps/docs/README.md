@@ -3,7 +3,7 @@
 Trajectonomics documentation portal (Fumadocs + Astro) served at trajectonomics.com/docs/
 
 [![CI](https://github.com/trajectonomics/trajectonomics/actions/workflows/ci.yml/badge.svg)](https://github.com/trajectonomics/trajectonomics/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: AGPL-3.0-only](https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg)](./LICENSE)
 
 Part of the [Trajectonomics](https://github.com/trajectonomics) ecosystem.
 
@@ -110,4 +110,4 @@ bun run lint
 
 ## License
 
-[MIT](./LICENSE)
+[AGPL-3.0-only](./LICENSE)
