@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { openDemo } from "./demo"
+import { outlineStyle, tabTo } from "./shell"
 
 // The Overview opens on one focus point (#704): the answer is the largest text on the page, its whole
 // sentence is in the heading a screen reader reads, one primary action sits under the chart, and the
@@ -16,18 +17,28 @@ test("the answer on the chart is the largest text in main, and the focus point f
 		Number.parseFloat(getComputedStyle(element).fontSize),
 	)
 	const largest = await page.evaluate(() => {
-		let size = 0
-		for (const element of document.querySelectorAll("main *")) {
+		const answer = document.querySelector("[data-focus-answer]")
+		/** Whether an element is the answer, holds it, or sits inside it. */
+		const isAnswer = (element: Element): boolean =>
+			answer !== null &&
+			(element === answer || element.contains(answer) || answer.contains(element))
+		/** Whether the element draws text of its own, and draws it. */
+		const drawsText = (element: Element): boolean => {
 			const shown = getComputedStyle(element)
-			if (shown.display === "none" || shown.visibility === "hidden") continue
-			const hasText = [...element.childNodes].some(
+			if (shown.display === "none" || shown.visibility === "hidden") return false
+			const own = [...element.childNodes].some(
 				(node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim() !== "",
 			)
-			if (hasText) size = Math.max(size, Number.parseFloat(shown.fontSize))
+			return own && Number.parseFloat(shown.fontSize) > 0
+		}
+		let size = 0
+		for (const element of document.querySelectorAll("main *")) {
+			if (isAnswer(element) || !drawsText(element)) continue
+			size = Math.max(size, Number.parseFloat(getComputedStyle(element).fontSize))
 		}
 		return size
 	})
-	expect(answerSize, "the answer's font size").toBe(largest)
+	expect(answerSize, "the answer's font size").toBeGreaterThan(largest)
 
 	await expect(page.locator("[data-focus-heading]")).toContainText(
 		"You could stop working in Oct 2040, when you are 50 and your partner is 48.",
@@ -50,6 +61,28 @@ test("the answer on the chart is the largest text in main, and the focus point f
 	).toBeLessThanOrEqual(800)
 })
 
+test("the answer, the notes chip and the primary action each draw a solid focus ring", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await openDemo(page, "/", { theme: "light" })
+	const chip = page.locator("[data-focus-chip]")
+	await expect(chip).toBeVisible()
+	const targets = [
+		["the answer", page.locator("[data-focus-answer]")],
+		["the chip", chip],
+		["the primary action", page.locator("[data-primary-action]")],
+	] as const
+	for (const [name, target] of targets) {
+		await tabTo(page, target)
+		expect(await outlineStyle(target), `${name}'s focus ring`).toBe("solid")
+		const width = await target.evaluate((element) =>
+			Number.parseFloat(getComputedStyle(element).outlineWidth),
+		)
+		expect(width, `${name}'s ring width`).toBeGreaterThanOrEqual(2)
+	}
+})
+
 test("a phone shows the summary in two columns", async ({ page }) => {
 	await page.setViewportSize({ width: 360, height: 800 })
 	await openDemo(page, "/", { theme: "light" })
@@ -58,4 +91,18 @@ test("a phone shows the summary in two columns", async ({ page }) => {
 		return template.split(" ").filter((part) => part !== "").length
 	})
 	expect(columns).toBe(2)
+})
+
+test("a phone keeps the whole answer off the page and never scrolls sideways", async ({ page }) => {
+	await page.setViewportSize({ width: 360, height: 800 })
+	await openDemo(page, "/", { theme: "light" })
+	const heading = await page.locator("[data-focus-heading]").boundingBox()
+	expect(heading, "the hidden heading is laid out").not.toBeNull()
+	expect(heading?.width ?? 0, "the heading is screen-reader only").toBeLessThanOrEqual(1)
+	expect(heading?.height ?? 0, "the heading is screen-reader only").toBeLessThanOrEqual(1)
+	const fit = await page.evaluate(() => ({
+		scrollWidth: document.documentElement.scrollWidth,
+		clientWidth: document.documentElement.clientWidth,
+	}))
+	expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.clientWidth)
 })

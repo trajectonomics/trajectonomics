@@ -15,15 +15,17 @@ const filled = $derived(toChartNumber(share.replace("%", "")) / 100)
 
 <svg aria-hidden="true" viewBox="0 0 28 28" class="size-7 shrink-0">
 	<circle cx="14" cy="14" r={RADIUS} fill="none" stroke-width="4" class="stroke-border" />
-	<circle
-		cx="14"
-		cy="14"
-		r={RADIUS}
-		fill="none"
-		stroke-width="4"
-		stroke-linecap="round"
-		transform="rotate(-90 14 14)"
-		stroke-dasharray={`${filled * CIRCUMFERENCE} ${CIRCUMFERENCE}`}
-		class="stroke-accent print:stroke-foreground"
-	/>
+	{#if filled > 0}
+		<circle
+			data-chance-arc
+			cx="14"
+			cy="14"
+			r={RADIUS}
+			fill="none"
+			stroke-width="4"
+			transform="rotate(-90 14 14)"
+			stroke-dasharray={`${filled * CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+			class="stroke-accent print:stroke-foreground"
+		/>
+	{/if}
 </svg>

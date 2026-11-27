@@ -12,6 +12,8 @@ interface Props {
 	argv?: readonly string[]
 	/** Raw provenance beside the command, such as the tax rules an id names. */
 	details?: Snippet | undefined
+	/** The heading's level: a page's section heading is h2, and a card inside a section is h3. */
+	level?: 2 | 3
 	/** A summary card draws no fill, so the focus point above it stays the loudest thing on the page. */
 	quiet?: boolean
 	/** Classes for the card itself, such as the grid span of a wide card. */
@@ -19,7 +21,8 @@ interface Props {
 	children: Snippet
 }
 
-let { title, href, argv, details, quiet = false, className, children }: Props = $props()
+let { title, href, argv, details, level = 2, quiet = false, className, children }: Props = $props()
+const heading = $derived(level === 3 ? "h3" : "h2")
 </script>
 
 <section
@@ -30,7 +33,7 @@ let { title, href, argv, details, quiet = false, className, children }: Props = 
 	)}
 >
 	<header class="flex items-baseline justify-between gap-3">
-		<h2 class="text-base font-semibold">
+		<svelte:element this={heading} class="text-base font-semibold">
 			{#if href}
 				<SiteLink
 					{href}
@@ -40,7 +43,7 @@ let { title, href, argv, details, quiet = false, className, children }: Props = 
 			{:else}
 				{title}
 			{/if}
-		</h2>
+		</svelte:element>
 	</header>
 	<div
 		class="mt-4 flex-1 [&_[role=alert]]:relative [&_[role=alert]]:z-10 [&_[title]]:relative [&_[title]]:z-10 [&_pre]:relative [&_pre]:z-10"

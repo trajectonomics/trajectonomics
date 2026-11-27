@@ -1,8 +1,8 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { healthWarning } from "../../lib/view/health/warning"
 import { householdOf, personNames } from "../../lib/view/item-names"
 import { focusOf } from "../../lib/view/overview/focus"
+import { heroOf } from "../../lib/view/overview/hero"
 import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
@@ -27,8 +27,8 @@ let { scenario = "" }: Props = $props()
 		{@const projection = plan === null ? undefined : snapshot.reads.projections[plan]}
 		{@const run = projection?.ok === true ? projection.data : null}
 		{@const focus = focusOf(snapshot, scenario)}
+		{@const hero = heroOf(snapshot, scenario)}
 		{@const people = personNames(householdOf(snapshot, plan))}
-		{@const warning = healthWarning(snapshot)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
 		<WhatIfAbove open={lens !== null} gap="space-y-4">
 			{#snippet whatIf()}
@@ -41,7 +41,13 @@ let { scenario = "" }: Props = $props()
 				{/if}
 			{/snippet}
 			<div class="space-y-6">
-				<OverviewFocus {focus} {run} {people} {warning} />
+				<OverviewFocus
+					{focus}
+					{run}
+					{people}
+					warnings={hero?.warnings ?? []}
+					warningsLabel={hero?.warningsLabel ?? null}
+				/>
 				<OverviewGrid view={overviewView(snapshot, scenario)} />
 			</div>
 		</WhatIfAbove>

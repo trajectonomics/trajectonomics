@@ -197,6 +197,7 @@ describe("the notes and the Home card", () => {
 			currency: "THB",
 			noCost: false,
 			short: false,
+			notes: base.run.notes,
 		})
 		const bare = demoPlan("retire-early")
 		expect(estateSummaryOf(bare.run, bare.doc, bare.household)?.noCost).toBe(true)

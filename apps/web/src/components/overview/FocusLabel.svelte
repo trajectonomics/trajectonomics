@@ -5,38 +5,39 @@ import SiteLink from "../ui/SiteLink.svelte"
 
 interface Props {
 	focus: FocusView
-	/** The dot's x, in the chart's pixels. The label is placed beside it. */
+	/** The box's left edge, in the chart's pixels. */
 	x: number
-	/** The label's middle, in the chart's pixels. */
+	/** The box's top edge, in the chart's pixels. */
 	y: number
-	side: "left" | "right" | "center"
+	/** The box's measured size, so the chart can keep its whole box clear of the line. */
+	onmeasure?: ((box: { width: number; height: number }) => void) | undefined
 }
 
-/** The answer written on the chart, with the household's faces beside it. */
-let { focus, x, y, side }: Props = $props()
+/** The answer written on the chart, with the household's faces beside it, over a halo in the page's colour. */
+let { focus, x, y, onmeasure }: Props = $props()
 const ANSWER =
 	"block font-bold tracking-tight whitespace-nowrap leading-none text-[clamp(1.875rem,4vw,2.75rem)]"
-const transform = $derived(
-	side === "left"
-		? "translate(-100%, -50%)"
-		: side === "center"
-			? "translate(-50%, -50%)"
-			: "translate(0, -50%)",
-)
-/** The label sits 10px beside the dot, so the dot stays visible against the answer's first letter. */
-const left = $derived(side === "right" ? x + 10 : side === "left" ? x - 10 : x)
+const HALO =
+	"[text-shadow:0_0_3px_var(--ds-color-background),0_0_6px_var(--ds-color-background),0_0_2px_var(--ds-color-background)]"
+let width = $state(0)
+let height = $state(0)
+$effect(() => {
+	if (width > 0 && height > 0) onmeasure?.({ width, height })
+})
 </script>
 
 <div
-	class="pointer-events-none absolute z-10"
-	style:left="{left}px"
+	data-focus-label
+	bind:clientWidth={width}
+	bind:clientHeight={height}
+	class="pointer-events-none absolute z-10 {HALO}"
+	style:left="{x}px"
 	style:top="{y}px"
-	style:transform={transform}
 >
 	<div
 		class="flex flex-col gap-1 md:flex-row md:items-center"
-		class:items-center={side === "center"}
-		class:items-start={side !== "center"}
+		class:items-center={focus.plan === null}
+		class:items-start={focus.plan !== null}
 	>
 		{#if focus.plan}
 			<SiteLink

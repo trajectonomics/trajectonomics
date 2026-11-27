@@ -20,6 +20,8 @@ export interface ChanceSummary {
 	/** "Lasts to 2028 in 174 of 200 markets." */
 	readonly lasts: string
 	readonly currency: string
+	/** The CLI's own sentences, which a person should read beside the figures. */
+	readonly notes: readonly string[]
 }
 
 /** One failing-path count at one roll-up, with the year on every fifth bar and a title for each. */
@@ -48,8 +50,6 @@ export interface ChanceView extends ChanceSummary {
 	readonly runsOut: readonly RunsOutBar[]
 	/** The CLI's Bands table: a few roll-up ends, for the visually hidden table beside the charts. */
 	readonly bandRows: readonly BandRow[]
-	/** The CLI's plain sentences, which a person should read beside the figures. */
-	readonly notes: readonly string[]
 	/** Where the Return model came from: the plan's own Accounts, or a file (web ADR 0018). */
 	readonly source: ChanceSource
 }
@@ -62,6 +62,7 @@ export function chanceSummaryOf(read: ProjectionChance): ChanceSummary {
 		paths: read.paths,
 		lasts: chanceLasts(read.succeeded, read.paths, read.horizon),
 		currency: read.currency,
+		notes: read.notes,
 	}
 }
 

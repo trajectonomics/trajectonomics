@@ -15,11 +15,13 @@ interface Props {
 	body: Snippet<[T]>
 	/** Extra provenance for the card's Details, such as the tax rules its figures came from. */
 	details?: Snippet<[ScenarioView<T>]> | undefined
+	/** The heading's level: a page's section heading is h2, and a card inside a section is h3. */
+	level?: 2 | 3
 	/** Classes for the card itself, such as the grid span of a wide card. */
 	className?: string | undefined
 }
 
-let { title, href, label, scenario, body, details, className }: Props = $props()
+let { title, href, label, scenario, body, details, level = 2, className }: Props = $props()
 /** The words a card says when the Snapshot holds no read for its plan, or no plan at all. */
 const missing = $derived(
 	scenario.status === "none"
@@ -32,7 +34,7 @@ const missing = $derived(
 
 <!-- A card for one plan's Read: it links to its page while the Read answers, and says what is missing otherwise. -->
 {#if scenario.status !== "ready"}
-	<Card quiet {title} {className}>
+	<Card quiet {title} {level} {className}>
 		<p class="text-sm text-muted-foreground">{missing}</p>
 	</Card>
 {:else}
@@ -40,6 +42,7 @@ const missing = $derived(
 	<Card
 		quiet
 		{title}
+		{level}
 		{className}
 		href={scenario.read.ok ? href : undefined}
 		argv={scenario.read.argv}

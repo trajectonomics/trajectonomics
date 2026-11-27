@@ -11,6 +11,8 @@ export interface EstateSummary {
 	/** The plan states no settlement cost, so the figure is everything owned less debts, which the card says. */
 	readonly noCost: boolean
 	readonly short: boolean
+	/** The CLI's own sentences about the run. */
+	readonly notes: readonly string[]
 }
 
 /** The card's figures for the default date, or null when the run states no estate. */
@@ -29,5 +31,6 @@ export function estateSummaryOf(
 		currency: figures.currency,
 		noCost: doc === null || noCostNote(doc) !== null,
 		short: figures.shortfall !== null,
+		notes: run.notes,
 	}
 }

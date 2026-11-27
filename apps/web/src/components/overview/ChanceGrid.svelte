@@ -16,7 +16,7 @@ const squares = $derived(Array.from({ length: counts.paths }, (_, index) => inde
 			<span
 				class={index < counts.succeeded
 					? "size-1 bg-accent print:bg-foreground/20"
-					: "size-1 border border-border"}
+					: "size-1 border border-muted-foreground/40"}
 			></span>
 		{/each}
 	</div>

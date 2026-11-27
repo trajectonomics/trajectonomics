@@ -9,6 +9,8 @@ export interface WithdrawalsSummary {
 	/** The first Rule year's month, such as "Jun 2050". */
 	readonly month: string
 	readonly currency: string
+	/** The CLI's own sentences about the run. */
+	readonly notes: readonly string[]
 }
 
 /** The card's figures, or null when the plan states no rule year (no rule Flow, or it never starts inside the horizon). */
@@ -20,5 +22,6 @@ export function withdrawalsSummaryOf(run: ProjectionRun): WithdrawalsSummary | n
 		share: first.share,
 		month: formatMonth(first.date),
 		currency: run.currency,
+		notes: run.notes,
 	}
 }

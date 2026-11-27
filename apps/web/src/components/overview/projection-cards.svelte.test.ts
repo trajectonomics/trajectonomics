@@ -62,4 +62,16 @@ describe("TaxCard", () => {
 		expect(body).toContain("Due 31 Mar 2027")
 		expect(body).toContain('href="/tax/"')
 	})
+
+	test("calls a negative owed a refund, keeps the CLI's string and does not colour it as a debt", () => {
+		const run = projectionRun({ taxYears: [taxYear("2026-01-01", "2026-12-31", "-12000.00")] })
+		const read = okRead(["projection"], taxView(run))
+		const { body } = render(TaxCard, {
+			props: { scenario: { status: "ready", name: "base", read } },
+		})
+		expect(body).toContain("Refund for 2026")
+		expect(body).not.toContain("Tax for 2026")
+		expect(body).toContain("−12k")
+		expect(body).not.toContain("text-destructive")
+	})
 })

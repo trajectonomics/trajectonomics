@@ -7,10 +7,10 @@ import { replaceSnapshot } from "../../client/snapshot.svelte"
 import { useSessionHooks } from "../../client/what-if.test-support"
 import type { ProjectionRun } from "../../lib/contract"
 import { parseTerms } from "../../lib/view/compare"
-import { healthWarning } from "../../lib/view/health/warning"
 import { householdOf, personNames } from "../../lib/view/item-names"
 import { netWorthPageView } from "../../lib/view/net-worth/page"
 import { focusOf } from "../../lib/view/overview/focus"
+import { heroOf } from "../../lib/view/overview/hero"
 import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { LOADING } from "../../lib/view/state"
@@ -109,8 +109,8 @@ describe("with no session, a page is its content and nothing more", () => {
 		const focus = focusOf(DEMO, "")
 		const run = projection?.ok === true ? projection.data : null
 		const people = personNames(householdOf(DEMO, plan))
-		const warning = healthWarning(DEMO)
-		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warning })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
+		const hero = heroOf(DEMO, "")
+		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
 		expect(shown(page)).toBe(framed("Overview", content))
 	})

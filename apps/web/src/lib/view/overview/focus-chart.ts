@@ -1,8 +1,8 @@
 import { linePath, type PathPoint } from "../../chart/path"
 import { type ChartRow, type Phase, type PlotBox, phasePaths, placeRows } from "./focus-chart-paths"
+import type { LabelSide } from "./focus-label-layout"
 
-/** Where the answer label goes: to the right of the stop, to its left, or in the middle of an empty chart. */
-export type LabelSide = "left" | "right" | "center"
+export type { LabelSide } from "./focus-label-layout"
 
 /** The 10px bar a shortfall draws under zero, from the run-out date to the plan's last year. */
 export interface BarSpan {
@@ -24,6 +24,8 @@ export interface FocusChartGeometry {
 	readonly bar: BarSpan | null
 	readonly first: PathPoint | null
 	readonly last: PathPoint | null
+	/** The annual closes the line joins, in the plot's pixels. */
+	readonly points: readonly PathPoint[]
 }
 
 const MARGIN = { left: 12, right: 12, top: 16, bottom: 56 }
@@ -66,6 +68,7 @@ export function focusChart(
 					},
 		first,
 		last,
+		points: placement.points,
 	}
 }
 

@@ -61,6 +61,7 @@ describe("what the rule pays, year by year", () => {
 			share: "3.99%",
 			month: "Jun 2050",
 			currency: "THB",
+			notes: run.notes,
 		})
 	})
 

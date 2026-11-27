@@ -1,11 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { type Read, type Snapshot, snapshot } from "../src/lib/contract"
-import { SUCCESS_NOTE_PREFIX } from "../src/lib/view/overview/hero"
 import { isWarningNote } from "../src/lib/view/overview/warning-notes"
 import { demoSnapshotJson } from "./demo-snapshot"
 
-/** The CLI's success sentence, anchored to the prefix the hero quotes (web ADR 0001). */
-const SUCCESS_NOTE = new RegExp(`^${SUCCESS_NOTE_PREFIX}`)
+/** The CLI's success sentence, which Home's answer never quotes below the chart (web ADR 0001). */
+const SUCCESS_NOTE = /^The plan holds to /
 
 /** The notes a Read states, or none when it did not answer. */
 function notesOf(read: Read<{ notes: string[] }> | null | undefined): string[] {

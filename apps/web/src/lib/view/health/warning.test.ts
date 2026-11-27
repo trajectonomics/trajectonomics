@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { Snapshot } from "../../contract"
-import { healthWarning, healthWarningLabel } from "./warning"
+import { healthWarningLabel } from "./warning"
 
 /** A Snapshot holding one doctor read, with the given check statuses. */
 function snapshot(statuses: readonly string[]): Snapshot {
@@ -26,14 +26,6 @@ describe("healthWarningLabel", () => {
 		expect(healthWarningLabel(snapshot(["fail", "fail"]))).toBe("2 things to check")
 	})
 
-	test("states the count the focus point's chip shows", () => {
-		expect(healthWarning(snapshot(["fail", "fail"]))).toEqual({
-			count: 2,
-			label: "2 things to check",
-		})
-		expect(healthWarning(snapshot(["pass"]))).toBeNull()
-	})
-
 	test("says nothing when every check passes", () => {
 		expect(healthWarningLabel(snapshot(["pass", "skipped"]))).toBeNull()
 	})
@@ -41,6 +33,5 @@ describe("healthWarningLabel", () => {
 	test("says nothing when the Snapshot holds no doctor read", () => {
 		const failed = { reads: { doctor: { ok: false } } } as unknown as Snapshot
 		expect(healthWarningLabel(failed)).toBeNull()
-		expect(healthWarning(failed)).toBeNull()
 	})
 })

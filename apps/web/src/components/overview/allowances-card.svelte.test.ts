@@ -96,7 +96,7 @@ describe("the Home card: tax you could still save this year", () => {
 		} finally {
 			preferences.hidden = false
 		}
-		expect(body.match(/•••••/g)).toHaveLength(2)
+		expect(body.match(/•••••/g)).toHaveLength(4)
 		expect(body).not.toContain("84,950.00")
 		expect(body).not.toContain("4,600.00")
 	})

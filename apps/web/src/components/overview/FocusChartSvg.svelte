@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { FocusView } from "../../lib/view/overview/focus"
 import { type FocusChartGeometry, placeholderPath } from "../../lib/view/overview/focus-chart"
+import FocusAxisAge from "./FocusAxisAge.svelte"
 import FocusBar from "./FocusBar.svelte"
 import FocusFlag from "./FocusFlag.svelte"
 
@@ -45,6 +46,7 @@ let { focus, chart, width, height, unmet, firstAge, lastAge }: Props = $props()
 			/>
 			<path
 				d={chart.accent.line}
+				data-focus-line
 				fill="none"
 				stroke-width="2"
 				stroke-linejoin="round"
@@ -54,6 +56,7 @@ let { focus, chart, width, height, unmet, firstAge, lastAge }: Props = $props()
 		<path d={chart.foreground.area} fill-opacity="0.06" class="fill-foreground" />
 		<path
 			d={chart.foreground.line}
+			data-focus-line
 			fill="none"
 			stroke-width="2"
 			stroke-linejoin="round"
@@ -73,17 +76,16 @@ let { focus, chart, width, height, unmet, firstAge, lastAge }: Props = $props()
 		<circle cx={chart.stop.x} cy={chart.stop.y} r="3.5" class="fill-accent print:fill-foreground" />
 	{/if}
 	{#if focus.kind === "reachable" && chart.flag}
-		<FocusFlag x={chart.flag.x} y={chart.flag.y} year={focus.horizonYear ?? ""} />
+		<FocusFlag
+			x={chart.flag.x}
+			y={chart.flag.y}
+			year={focus.horizonYear ?? ""}
+			points={chart.points}
+			plot={chart.plot}
+		/>
 	{/if}
 	{#if focus.kind === "runsOut" && chart.bar}
 		<FocusBar bar={chart.bar} {unmet} />
 	{/if}
-	{#if firstAge}
-		<text x={chart.plot.left} y={height - 6} class="fill-muted-foreground text-xs">{firstAge}</text>
-	{/if}
-	{#if lastAge}
-		<text x={chart.plot.right} y={height - 6} text-anchor="end" class="fill-muted-foreground text-xs"
-			>{lastAge}</text
-		>
-	{/if}
+	<FocusAxisAge plot={chart.plot} {height} first={firstAge} last={lastAge} />
 </svg>

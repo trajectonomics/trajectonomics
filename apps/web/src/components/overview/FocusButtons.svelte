@@ -1,20 +1,28 @@
 <script lang="ts">
-import type { HealthWarning } from "../../lib/view/health/warning"
+import { currentSearch } from "../../client/location.svelte.js"
+import { withSearch } from "../../lib/view/links"
 import type { FocusButton } from "../../lib/view/overview/focus"
+import type { HeroWarning } from "../../lib/view/overview/hero"
 import SiteLink from "../ui/SiteLink.svelte"
 
 interface Props {
 	button: FocusButton
-	/** The health checks that failed, when the ledger has any. */
-	warning: HealthWarning | null
+	/** The CLI's notes worth checking, in their order. */
+	warnings: readonly HeroWarning[]
+	/** "1 thing to check", "2 things to check", or null when the CLI states none. */
+	warningsLabel: string | null
 }
 
-/** The focus point's one primary action, and beside it the count of health checks worth checking. */
-let { button, warning }: Props = $props()
+/** The focus point's one primary action, and beside it the notes the CLI asks the reader to check. */
+let { button, warnings, warningsLabel }: Props = $props()
 const PRIMARY =
 	"inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const CHIP =
 	"inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-accent hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring print:text-foreground"
+/** The first note's anchor, on the FI page, with the address's query string kept before the hash. */
+const noteHref = $derived(
+	warnings[0] === undefined ? "" : `${withSearch("/fi/", currentSearch())}#${warnings[0].anchor}`,
+)
 </script>
 
 <!-- The warning triangle is Lucide's triangle-alert (ISC), drawn here as SVG elements. -->
@@ -24,8 +32,8 @@ const CHIP =
 	{:else}
 		<SiteLink data-primary-action href={button.href} class={PRIMARY}>{button.label}</SiteLink>
 	{/if}
-	{#if warning}
-		<SiteLink href="/health/" aria-label={warning.label} class={CHIP}>
+	{#if warnings.length > 0 && warningsLabel !== null}
+		<a data-focus-chip href={noteHref} aria-label={warningsLabel} class={CHIP}>
 			<svg
 				aria-hidden="true"
 				viewBox="0 0 24 24"
@@ -40,7 +48,7 @@ const CHIP =
 				<path d="M12 9v4" />
 				<path d="M12 17h.01" />
 			</svg>
-			<span class="tabular-nums">{warning.count}</span>
-		</SiteLink>
+			<span class="tabular-nums">{warnings.length}</span>
+		</a>
 	{/if}
 </div>
