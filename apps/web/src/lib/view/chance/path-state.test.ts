@@ -99,6 +99,24 @@ describe("resolvePath", () => {
 		})
 	})
 
+	test("does not call the Dashboard's own Read errors the CLI's", () => {
+		for (const code of ["traj_unavailable", "contract_mismatch", "unparsed_error"]) {
+			const error = { code, exitCode: 1, message: "Not the CLI's words." }
+			const stored = resolvePath(input({ stored: { "2": { argv: [], ok: false, error } } }))
+			expect(stored.state).toEqual({
+				kind: "failed",
+				message: "Not the CLI's words.",
+				fromCli: false,
+			})
+			const chance = resolvePath(input({ chance: { argv: [], ok: false, error }, canRead: true }))
+			expect(chance.state).toEqual({
+				kind: "no-chance",
+				message: "Not the CLI's words.",
+				fromCli: false,
+			})
+		}
+	})
+
 	test("an index outside the run's paths, or a chance that failed or is missing, is said and never read", () => {
 		expect(resolvePath(input({ index: "6", canRead: true })).state).toMatchObject({
 			kind: "bad-index",

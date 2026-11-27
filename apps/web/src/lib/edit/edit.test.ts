@@ -32,8 +32,8 @@ describe("the Edit list", () => {
 			{ kind: "copy-plan", from: "base", name: "early", sets: [], removals: [], additions: [] },
 			{ kind: "apply-plan", name: "early", contentHash: HASH, document: {} },
 			{ kind: "delete-plan", name: "early" },
-			{ kind: "set-household", name: "early", contentHash: HASH, household: { schemaVersion: 1 } },
-			{ kind: "remove-household", name: "early", contentHash: HASH },
+			{ kind: "set-household", name: "early", householdHash: HASH, household: {} },
+			{ kind: "remove-household", name: "early", householdHash: HASH },
 			{ kind: "merge-tax", name: "early", contentHash: HASH, flags: { children: "2" } },
 			{ kind: "set-tax", name: "early", contentHash: HASH, flags: { filingStatus: "single" } },
 			{ kind: "remove-tax", name: "early", contentHash: HASH },
@@ -57,8 +57,8 @@ describe("the Edit list", () => {
 			{ kind: "copy-plan", from: "--help", name: "early" },
 			{ kind: "apply-plan", name: "-h", contentHash: HASH, document: {} },
 			{ kind: "delete-plan", name: "--dry-run" },
-			{ kind: "set-household", name: "--file", contentHash: HASH, household: {} },
-			{ kind: "remove-household", name: "--none", contentHash: HASH },
+			{ kind: "set-household", name: "--file", householdHash: HASH, household: {} },
+			{ kind: "remove-household", name: "--none", householdHash: HASH },
 			{ kind: "delete-plan", name: "a\nb" },
 			{ kind: "merge-tax", name: "--none", contentHash: HASH, flags: { children: "2" } },
 			{ kind: "set-tax", name: "-h", contentHash: HASH, flags: { filingStatus: "single" } },
@@ -70,9 +70,9 @@ describe("the Edit list", () => {
 
 	test("a plan-changing Edit names the hash the page read; a missing or flag-shaped one is refused", () => {
 		expect(editSchema.safeParse({ kind: "remove-household", name: "early" }).success).toBe(false)
-		for (const contentHash of ["--dry-run", "jcs1:sha256:short"]) {
+		for (const householdHash of ["--dry-run", "jcs1:sha256:short"]) {
 			expect(
-				editSchema.safeParse({ kind: "remove-household", name: "early", contentHash }).success,
+				editSchema.safeParse({ kind: "remove-household", name: "early", householdHash }).success,
 			).toBe(false)
 		}
 	})
@@ -130,7 +130,7 @@ describe("the household Edits", () => {
 	const household = { schemaVersion: 1, people: [], anchors: [] }
 
 	test("set-household is scenario household --file -, with the document on stdin, and --dry-run first", () => {
-		const edit: Edit = { kind: "set-household", name: "early", contentHash: HASH, household }
+		const edit: Edit = { kind: "set-household", name: "early", householdHash: HASH, household }
 		expect(writeCommand(edit, false)).toEqual({
 			argv: ["scenario", "household", "early", "--file", "-", "--if-hash", HASH, "--json"],
 			stdin: JSON.stringify(household),
@@ -152,7 +152,7 @@ describe("the household Edits", () => {
 	})
 
 	test("remove-household is scenario household --none, with and without --dry-run", () => {
-		const edit: Edit = { kind: "remove-household", name: "early", contentHash: HASH }
+		const edit: Edit = { kind: "remove-household", name: "early", householdHash: HASH }
 		expect(writeCommand(edit, false)).toEqual({
 			argv: ["scenario", "household", "early", "--none", "--if-hash", HASH, "--json"],
 		})
@@ -163,10 +163,14 @@ describe("the household Edits", () => {
 
 	test("neither changes the list of plans the Snapshot projects", () => {
 		expect(
-			followPlan(["base", "early"], { kind: "remove-household", name: "early", contentHash: HASH }),
+			followPlan(["base", "early"], {
+				kind: "remove-household",
+				name: "early",
+				householdHash: HASH,
+			}),
 		).toEqual(["base", "early"])
 		expect(
-			followPlan([], { kind: "set-household", name: "early", contentHash: HASH, household }),
+			followPlan([], { kind: "set-household", name: "early", householdHash: HASH, household }),
 		).toEqual([])
 	})
 })

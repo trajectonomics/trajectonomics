@@ -1,4 +1,5 @@
 import type { ProjectionChance, ProjectionPath, Read } from "../../contract"
+import { isCliError } from "../../edit/failure"
 import { pathKey, type RunOf, sameRun } from "../../snapshot/paths"
 
 /** What the page holds of a path it read live: the run it was read for, and whether it is in flight, in, or failed. */
@@ -65,7 +66,8 @@ const ANOTHER_RUN =
 
 /** A read held against the chance: its path when it is of that chance, else the sentence of why not. */
 function checked(chance: ProjectionChance, read: Read<ProjectionPath>): PathState {
-	if (!read.ok) return { kind: "failed", message: read.error.message, fromCli: true }
+	if (!read.ok)
+		return { kind: "failed", message: read.error.message, fromCli: isCliError(read.error) }
 	if (!sameRun(chance, read.data)) return { kind: "failed", message: ANOTHER_RUN, fromCli: false }
 	return { kind: "ready", path: read.data, argv: read.argv, chance }
 }
@@ -76,11 +78,15 @@ function refusal(
 ): { state: PathState; chance: ProjectionChance; index: number } | PathResolution {
 	const { chance } = input
 	if (chance === undefined || !chance.ok) {
+		const failed = chance?.ok === false ? chance : null
 		const message =
-			chance?.ok === false
-				? chance.error.message
-				: "This plan has no chance of success to open a future of."
-		return { state: { kind: "no-chance", message, fromCli: chance?.ok === false }, wanted: null }
+			failed === null
+				? "This plan has no chance of success to open a future of."
+				: failed.error.message
+		return {
+			state: { kind: "no-chance", message, fromCli: failed !== null && isCliError(failed.error) },
+			wanted: null,
+		}
 	}
 	const index = indexOf(input.index, chance.data.paths)
 	if (index !== null) return { state: { kind: "loading" }, chance: chance.data, index }

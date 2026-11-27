@@ -35,6 +35,7 @@ const notesShape = z
 /** What `scenario show` prints beside the document: its household, tax profile, notes and mark. */
 export type ShownScenario = ScenarioView & {
 	household: HouseholdDocument
+	householdHash: string
 	tax: StoredTax | null
 	taxed: boolean
 	taxAllowances?: TaxProfileView | undefined
@@ -47,6 +48,11 @@ export const scenarioWithHousehold: z.ZodType<ShownScenario> = z.strictObject({
 	...summaryShape,
 	document: documentShape,
 	household: householdShape,
+	householdHash: z
+		.string()
+		.describe(
+			"jcs1:sha256 of the stored document and household together: what `scenario household --if-hash` compares (cli ADR-0055).",
+		),
 	tax: storedTax
 		.nullable()
 		.describe(

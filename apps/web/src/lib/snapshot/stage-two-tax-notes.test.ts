@@ -9,6 +9,7 @@ function shown(tax: ScenarioShow["scenario"]["tax"]): ScenarioShow {
 			id: "id",
 			name: "base",
 			contentHash: "hash",
+			householdHash: "hash-household",
 			forkedFrom: null,
 			version: 1,
 			createdAt: "2026-01-01T00:00:00.000Z",

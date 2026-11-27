@@ -1,5 +1,6 @@
 import type { LineMarker, LineSeries } from "../../chart"
 import type { Fi, ProjectionChance, ProjectionRun, Read, Snapshot } from "../../contract"
+import { isCliError } from "../../edit/failure"
 import { formatMonth, formatShare } from "../../format"
 import { agesText } from "../household/model"
 import { type ItemLabel, itemLabel, type PersonNames, snapshotItemNames } from "../item-names"
@@ -46,6 +47,8 @@ export interface PlanCard {
 	readonly milestones: readonly CardMilestone[]
 	/** The CLI's message when the plan's projection could not be read; null otherwise. */
 	readonly problem: string | null
+	/** Whether that message is the CLI's own words, rather than the Dashboard's. */
+	readonly problemFromCli: boolean
 }
 
 /** The ages a reachable FI answer states: "age 54", or each person's when the household has several. */
@@ -85,6 +88,7 @@ export function planCard(snapshot: Snapshot, row: PlanRow, range: Range): PlanCa
 	const run = reads.projections[row.name]
 	const names = snapshotItemNames(snapshot, row.name)
 	const chart: PlanChart | null = run?.ok ? planChart(run.data, range, names) : null
+	const failure = run !== undefined && !run.ok ? run.error : null
 	return {
 		row,
 		notes: notesPreview(shown?.ok ? shown.data.scenario.notes : null),
@@ -97,7 +101,8 @@ export function planCard(snapshot: Snapshot, row: PlanRow, range: Range): PlanCa
 			label: itemLabel(names, "milestone", milestone.id),
 			date: milestone.date,
 		})),
-		problem: run !== undefined && !run.ok ? run.error.message : null,
+		problem: failure?.message ?? null,
+		problemFromCli: failure !== null && isCliError(failure),
 	}
 }
 
