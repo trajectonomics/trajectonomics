@@ -1,5 +1,5 @@
 import { compactCount, displayCount } from "./format"
-import { usdLabel } from "./money"
+import { compactUsd, usdLabel } from "./money"
 import type { PlanBar, PlanUnit } from "./plan-bars"
 import type { PeakWindowKey } from "./types"
 
@@ -23,7 +23,7 @@ export function unitValue(unit: PlanUnit, value: number): string {
 
 /** One figure in a unit's words, compact for a label on the chart. */
 export function unitFigure(unit: PlanUnit, value: number): string {
-	return unit === "usd" ? usdLabel(value) : compactCount(value)
+	return unit === "usd" ? compactUsd(value) : compactCount(value)
 }
 
 /** A bar's exact figure for the hidden table; a plan with no figure gets a dash. */
