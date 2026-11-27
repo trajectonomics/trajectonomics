@@ -66,7 +66,7 @@ async function addToPlan(): Promise<void> {
 				<SiteLink href="/assets-and-debts/" class="underline">Assets and debts</SiteLink>:
 			</p>
 			<ul class="mt-1 list-disc space-y-1 pl-5 text-muted-foreground">
-				{#each unplaced as one (one.key)}<li>{one.name}{#if one.filer !== null} (<ItemWords label={one.filer} />){/if}: <span data-cli>{one.hint}</span></li>{/each}
+				{#each unplaced as one (one.key)}<li>{one.name}{#if one.filer !== null}{" ("}<ItemWords label={one.filer} />){/if}: <span data-cli>{one.hint}</span></li>{/each}
 			</ul>
 		</div>
 	{/if}

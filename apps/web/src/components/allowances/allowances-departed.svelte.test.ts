@@ -146,12 +146,12 @@ describe("a joint Return with an unplaced RMF for each Filer", () => {
 				claimsHolder: "me",
 			},
 		}).body
-		expect(body.match(/RMF(?:<!--.*?-->)*\(/g)).toHaveLength(2)
+		expect(body.match(/RMF(?:<!--.*?-->)* \(/g)).toHaveLength(2)
 		expect(body).toMatch(
-			/RMF(?:<!--.*?-->)*\((?:<!--.*?-->)*<span[^>]*data-item="me"[^>]*>The earlier holder<\/span>/,
+			/RMF(?:<!--.*?-->)* \((?:<!--.*?-->)*<span[^>]*data-item="me"[^>]*>The earlier holder<\/span>/,
 		)
 		expect(body).toMatch(
-			/RMF(?:<!--.*?-->)*\((?:<!--.*?-->)*<span[^>]*data-item="partner"[^>]*>You<\/span>/,
+			/RMF(?:<!--.*?-->)* \((?:<!--.*?-->)*<span[^>]*data-item="partner"[^>]*>You<\/span>/,
 		)
 	})
 })
