@@ -33,7 +33,7 @@ describe("the Plan's tab strip", () => {
 	})
 
 	test("counts a home's loan once, on the home's card, as the tab draws it", () => {
-		const read = DEMO.reads.documents.base
+		const read = DEMO.reads.documents["base"]
 		if (read?.ok !== true) throw new Error("the Demo reads its base plan")
 		// Bank, Fund, the condo (with its loan on its card) and the car loan.
 		expect(planTabs(read.data.scenario.document).find((tab) => tab.id === "assets")?.count).toBe(4)
