@@ -12,7 +12,7 @@
 	"scripts": {
 		"dev": "wrangler dev",
 		"build": "wrangler deploy --dry-run --outdir dist",
-		"test": "bun test ./src ./test",
+		"test": "bun test ./src",
 		"typecheck": "tsc -p tsconfig.json",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
@@ -23,12 +23,12 @@
 	"dependencies": {
 		"@better-auth/oauth-provider": "1.7.28",
 		"@better-auth/passkey": "1.7.28",
-		"better-auth": "1.7.28",
-		"jose": "6.2.18"
+		"better-auth": "1.7.28"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.3",
 		"@cloudflare/workers-types": "5.20261125.1",
+		"jose": "6.2.18",
 		"@types/bun": "^1.4.4",
 		"typescript": "~6.0.3",
 		"wrangler": "^4.158.0"

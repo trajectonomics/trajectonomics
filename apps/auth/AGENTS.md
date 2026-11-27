@@ -23,6 +23,9 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    can satisfy none of the three.
 7. No secret in the repository: client ids and secrets are Worker secrets, and `.dev.vars` is
    untracked. `.dev.vars.example` holds placeholders only.
-8. Done means `bun run check` passes here: Biome with zero warnings, `tsc`, the unit tests and
+8. Every OAuth client is linked to exactly one resource until a before-hook rejects multi-resource
+   requests and resource widening on refresh (ADR 0001, known gap). Never relax `clientPrivileges`
+   or `enforcePerClientResources` outside the dev sign-in gate.
+9. Done means `bun run check` passes here: Biome with zero warnings, `tsc`, the unit tests and
    `wrangler deploy --dry-run`. The spike (`bun run spike`) starts its own local Worker and is not
    part of `check`.

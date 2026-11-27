@@ -17,9 +17,3 @@ export type Env = {
 	PASSKEY_RP_ID?: string
 	PASSKEY_ORIGIN?: string
 }
-
-/** The cookie and bearer inputs the Worker reads, injected so a test can replace them. */
-export type RequestInput = {
-	request: Request
-	env: Env
-}

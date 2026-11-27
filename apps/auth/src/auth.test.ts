@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { authOptions } from "./auth"
+import { authOptions, requireSecret } from "./auth"
 import type { Env } from "./env"
 
 function env(overrides: Partial<Env> = {}): Env {
@@ -44,5 +44,24 @@ describe("authOptions", () => {
 		})
 		expect(withGoogle.socialProviders?.["google"]).toBeDefined()
 		expect(withGoogle.socialProviders?.["github"]).toBeUndefined()
+	})
+
+	it("treats an empty social placeholder as absent", () => {
+		const options = authOptions({ env: env({ GITHUB_CLIENT_ID: "", GITHUB_CLIENT_SECRET: "" }) })
+		expect(options.socialProviders).toEqual({})
+	})
+
+	it("refuses a missing or short secret instead of using the library default", () => {
+		expect(() =>
+			authOptions({ env: env({ BETTER_AUTH_SECRET: undefined as unknown as string }) }),
+		).toThrow()
+		expect(() => requireSecret("too-short")).toThrow()
+		expect(requireSecret("x".repeat(32))).toBe("x".repeat(32))
+	})
+
+	it("trusts only its own origin in production and disables /token", () => {
+		const options = authOptions({ env: env() })
+		expect(options.trustedOrigins).toEqual(["https://auth.example.test"])
+		expect(options.disabledPaths).toContain("/token")
 	})
 })

@@ -12,7 +12,8 @@
 	"vars": {
 		// Production is the committed default. The dev-only password path also requires a loopback
 		// base URL, so setting DEV_ONLY in production cannot enable it.
-		"ENVIRONMENT": "production"
+		"ENVIRONMENT": "production",
+		"BETTER_AUTH_URL": "https://auth.trajectonomics.com"
 	},
 	"d1_databases": [
 		{

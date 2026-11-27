@@ -32,8 +32,8 @@ and then:
 5. signs in as the test user, claims the code at `GET /api/auth/device`, and approves it at
    `POST /api/auth/device/approve`, then waits the advertised five-second polling interval;
 6. polls `POST /api/auth/oauth2/token` with `grant_type=urn:ietf:params:oauth:grant-type:device_code`;
-6. uses the refresh token at the same endpoint with `grant_type=refresh_token`;
-7. fetches `/jwks` and verifies the access JWT with `jose` against it, including `aud` and `iss`.
+7. uses the refresh token at the same endpoint with `grant_type=refresh_token`;
+8. fetches `/jwks` and verifies the access JWT with `jose` against it, including `aud` and `iss`.
 
 This is the OAuth provider's device grant, not the standalone `deviceAuthorization()` plugin. The
 standalone plugin's `/device/token` mints a Better Auth **session token**: no refresh token, no

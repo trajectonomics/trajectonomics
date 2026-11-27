@@ -57,8 +57,17 @@ exact version is required: plugin names and packages change between releases.
 
 - `traj-auth` holds people and credentials; `traj-data` holds numbers and the auth user id. A leak
   of the data database cannot expose an email or a name.
-- The owner must create the Google OAuth client, the GitHub OAuth app, the D1 database `traj-auth`
-  and the `auth.trajectonomics.com` route before the Worker deploys.
+- The owner must create the Google OAuth client, the GitHub OAuth app, the D1 database `traj-auth`,
+  the `BETTER_AUTH_SECRET` Worker secret (at least 32 random characters; the Worker refuses to start
+  without it) and the `auth.trajectonomics.com` route before the Worker deploys.
+- In production no signed-in user can create an OAuth client (`clientPrivileges`), and a client can
+  request only the resources it is linked to (`enforcePerClientResources`). Clients are registered
+  and linked server-side.
+- **Known gap, a gate for the service slice:** Better Auth 1.7.28 puts every requested `resource`
+  into one token's `aud`, and a grant approved with no resource can be refreshed into a token for a
+  resource the person never saw. Until a before-hook rejects more than one `resource` per request
+  and a refresh that adds a resource, each registered client is linked to exactly one resource, so
+  per-client enforcement keeps every token to that one audience.
 - Every server that wants audience-bound tokens registers a resource URI; a client that requests a
   resource it is not linked to is rejected once per-client resource enforcement is on.
 - The auth Worker is on the request path only for sign-in and token refresh. Resource servers cache
