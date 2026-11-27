@@ -20,7 +20,6 @@ let { scenario }: Props = $props()
 <!-- Net worth: the headline, the month-end history, the composition by account and every row. -->
 <PageShell
 	title="Net worth"
-	intro="Net worth at the As-of, its assets and liabilities by account, and its month-end history."
 >
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}

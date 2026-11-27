@@ -16,7 +16,7 @@ let { kind, scenario, editable }: Props = $props()
 const page = $derived(PLAN_PAGES[kind])
 </script>
 
-<PageShell title={page.title} intro={page.intro}>
+<PageShell title={page.title}>
 	{#snippet children(snapshot)}
 		<PlanItemsBody {snapshot} {kind} {scenario} {editable} />
 	{/snippet}
