@@ -1,23 +1,9 @@
-/* On a 360 px phone the four nav links, the repository count and the Language menu share one row. */
+/*
+ * The Site's phone case: the repository link keeps its count but drops its arrow, the hairline goes,
+ * and the count stands 6 px from the GitHub mark. The shared header frame already gives the middle
+ * column what is left and tightens the gaps at this breakpoint.
+ */
 @media (max-width: 30rem) {
-	.header-bar {
-		grid-template-columns: auto minmax(0, 1fr) auto;
-		column-gap: 0.5rem;
-		padding-inline: 0.75rem;
-	}
-
-	.header-nav {
-		gap: 0.625rem;
-	}
-
-	.header-nav-link {
-		font-size: 11px;
-	}
-
-	.header-end {
-		gap: 0.5rem;
-	}
-
 	.header-sep,
 	.header-repo-out {
 		display: none;

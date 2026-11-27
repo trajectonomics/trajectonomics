@@ -85,5 +85,21 @@ query-time view, not a frozen snapshot (ADR 0003).
 ## Plan Table
 
 The collector's hand-kept list of plans (`collector/src/plans.ts`): stable plan ids, display names,
-active dates and matching rules. No prices in this slice. The Worker accepts a plan id only when it
-exists in that table.
+active dates and matching rules. Prices do not live here; they live in the dated price catalogue
+(`collector/src/price-catalog.ts`). The Worker accepts a plan id only when it exists in that table.
+
+## Tokens per $1
+
+A plan's weekly token figure divided by its weekly subscription price. The weekly price is the
+vendor's monthly USD price × 12 / 52. A free plan has no price to divide by and no figure.
+
+## API value per $1
+
+The week's tokens times the plan's blended API list price per token, divided by the weekly price.
+The blend prices the plan's own usage over the window at each model's list price and divides by the
+tokens without cache reads. Rows for models with no list price are left out.
+
+## Cache rate
+
+Cache reads as a share of all tokens: `cache read ÷ (tokens + cache read)`, the same measure shown
+beside a peak. A source that reports no cache split has no cache rate.

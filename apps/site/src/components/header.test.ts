@@ -121,13 +121,13 @@ describe("the Header component in every Language, current or not", () => {
 				const header = headerOf(page)
 				expect(header.tag).toBe("header")
 				const classes = (header.attributes["class"] ?? "").split(/\s+/)
-				// The header is fixed, and keeps bg-background for the no-scroll-timeline fallback.
+				// The header is fixed, and takes the shared frame every static site draws.
 				expect(classes).toContain("fixed")
-				expect(classes).toContain("bg-background")
+				expect(classes).toContain("ds-header")
 				const nav = elementsByTag(page, "nav")[0]
 				if (nav === undefined) throw new Error("no nav rendered")
 				expect(nav.ancestors.includes(header)).toBe(true)
-				expect((nav.attributes["class"] ?? "").split(/\s+/)).toContain("header-bar")
+				expect((nav.attributes["class"] ?? "").split(/\s+/)).toContain("ds-header-inner")
 				expect(headings(page)).toEqual([])
 			})
 
@@ -178,9 +178,9 @@ describe("the Header component in every Language, current or not", () => {
 				const menu = menus(page)[0]
 				if (menu === undefined) throw new Error("no Language menu rendered")
 				const end = page.elements.find((element) =>
-					(element.attributes["class"] ?? "").split(/\s+/).includes("header-end"),
+					(element.attributes["class"] ?? "").split(/\s+/).includes("ds-header-end"),
 				)
-				if (end === undefined) throw new Error("no header-end group rendered")
+				if (end === undefined) throw new Error("no ds-header-end group rendered")
 				expect(link.ancestors.includes(end)).toBe(true)
 				expect(menu.ancestors.includes(end)).toBe(true)
 				expect(page.elements.indexOf(menu)).toBeGreaterThan(page.elements.indexOf(link))

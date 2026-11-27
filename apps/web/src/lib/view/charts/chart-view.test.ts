@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { itemNames } from "../item-names"
 import { plain, withTax } from "./fixtures.test-support"
+import { withAccountValues } from "./flow-fixtures.test-support"
 import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
+import { seriesNames } from "./series-names"
 import type { ChartDef } from "./types"
 import { chartView } from "./view"
 
@@ -118,6 +120,37 @@ describe("a chart on a plan", () => {
 		expect(reasonFor("tax:th-cgt:due", new Set(["tax:th-pit:due"]))).toBe(
 			"this plan has no tax for th-cgt",
 		)
+		expect(reasonFor("tax:th-pit", new Set(["tax:th-pit:due"]))).toBe(
+			"this plan has no tax for th-pit",
+		)
+	})
+
+	test("a removed Account sharing a drawn Account's name takes a number, not its id", () => {
+		const run = withAccountValues(["a"])
+		const accounts = itemNames(
+			new Map([
+				["a", "Savings"],
+				["b", "Savings"],
+			]),
+			null,
+		)
+		const available = new Map(resolveSeries(run, accounts).map((item) => [item.id, item]))
+		const chart: ChartDef = {
+			id: "accounts",
+			name: "Accounts",
+			kind: "line",
+			series: ["account:b"],
+		}
+		const view = chartView(
+			chart,
+			available,
+			seriesNames([run], run, accounts),
+			"nominal",
+			accounts.accounts,
+		)
+		expect(view.missing).toEqual([
+			{ id: "account:b", name: "Value of Savings (2)", reason: "this plan has no such Account" },
+		])
 	})
 
 	test("no two series of a many-series line chart share a colour and a dash", () => {

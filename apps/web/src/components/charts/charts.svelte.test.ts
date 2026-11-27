@@ -80,8 +80,9 @@ describe("the Projection's charts", () => {
 			"both",
 			names,
 		)
-		expect(body).toContain("Expense: rent (a)")
-		expect(body).toContain("Expense: rent (rent)")
+		expect(body).toContain("Expense: rent (a) (future money)")
+		expect(body).toContain("Expense: rent (future money)")
+		expect(body).not.toContain("Expense: rent (rent)")
 	})
 
 	test("on a plan without tax it draws what it can and says what is missing", () => {

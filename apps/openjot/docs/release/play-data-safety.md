@@ -45,6 +45,12 @@ If the optional AksonOCR key stays in the product, also declare that photos may 
 - Alternative: the in-app picker uses `ACTION_GET_CONTENT`, so a user can import one slip or one PDF without granting album access.
 - `Camera` and `Screenshots` folders are not scanned. Shared albums are off unless the user opts in, and a slip QR is required before OCR.
 
+Paste this into the Play Console declaration ("Read media images: describe why the Android photo picker does not fully support your app's core functionality"):
+
+```text
+OpenJot is an expense tracker whose core feature is reading the payment slips that Thai banking apps (K PLUS, SCB EASY, Krungthai NEXT and others) save to the phone after every transfer. When the user taps Scan or pulls to refresh, OpenJot finds the new slips in those banks' albums and records each payment. People make several transfers a day, so picking every slip by hand in the photo picker would defeat the feature. OpenJot reads only bank-slip albums, never Camera or Screenshots, and reads the images on the device. Without this permission, users can still import a single slip with the system picker.
+```
+
 ## Listing assets
 
 - App icon: `src-tauri/gen/android/app/src/main/res/mipmap-*/`

@@ -1,0 +1,110 @@
+/* The page frame: a sticky section nav at 960px and up, and the section column beside it. */
+
+.data-shell {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	align-items: start;
+}
+
+.data-column {
+	min-width: 0;
+}
+
+.data-nav {
+	max-width: 100%;
+	margin: 0 0 8px;
+	border-top: 1px solid var(--ds-color-border);
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.data-nav-list {
+	display: flex;
+	max-width: 100%;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	list-style: none;
+	scrollbar-width: none;
+}
+
+.data-nav-list::-webkit-scrollbar {
+	display: none;
+}
+
+.data-nav-link {
+	display: inline-flex;
+	min-height: 44px;
+	align-items: center;
+	padding: 0 10px;
+	border-bottom: 2px solid transparent;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-wrap: nowrap;
+	color: var(--ds-color-muted-foreground);
+	text-decoration: none;
+}
+
+.data-nav-link:hover {
+	color: var(--ds-color-foreground);
+}
+
+.data-nav-link[aria-current] {
+	border-bottom-color: var(--ds-color-primary);
+	color: var(--ds-color-foreground);
+}
+
+.data-nav-link:focus-visible {
+	border-radius: var(--ds-radius-sm);
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: -2px;
+}
+
+.data-nav-log {
+	margin-left: auto;
+}
+
+@media (min-width: 60rem) {
+	.data-shell {
+		grid-template-columns: 13rem minmax(0, 1fr);
+		gap: 40px;
+	}
+
+	.data-nav {
+		position: sticky;
+		top: 5.5rem;
+		margin: 10px 0 0;
+		border-top: 0;
+		border-bottom: 0;
+	}
+
+	.data-nav-list {
+		flex-direction: column;
+		gap: 2px;
+		overflow: visible;
+	}
+
+	.data-nav-link {
+		min-height: 32px;
+		padding: 4px 0;
+		border-bottom: 0;
+		font-size: 12px;
+		letter-spacing: 0.02em;
+		text-transform: none;
+	}
+
+	.data-nav-link[aria-current] {
+		border-bottom: 0;
+		text-decoration: underline;
+		text-underline-offset: 4px;
+	}
+
+	.data-nav-log {
+		margin: 10px 0 0;
+		padding-top: 10px;
+		border-top: 1px solid var(--ds-color-border);
+	}
+}

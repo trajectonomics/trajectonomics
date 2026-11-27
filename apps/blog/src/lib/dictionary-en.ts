@@ -8,9 +8,9 @@ export const EN: Dictionary = Object.freeze({
 	languageNames: Object.freeze({ en: "English", th: "Thai" }),
 	skipLink: "Skip to content",
 	blogMarker: "Blog",
-	docsLink: "Docs",
 	homeLabel: (siteName: string) => `${siteName} home`,
 	languageMenuLabel: "Language",
+	languageSwitchLabel: "EN",
 	frontTitle: "Blog · Trajectonomics",
 	frontDescription:
 		"Comparisons, guides and news about traj, the free, open-source financial simulation tool for AI agents.",
