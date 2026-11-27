@@ -1,0 +1,26 @@
+/* The method page's price tables: hand-kept figures with their dated public source. */
+
+.method h3 {
+	margin: 28px 0 8px;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The price tables keep their columns on a phone by scrolling inside the frame. */
+.price-table-wrap {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.price-table {
+	min-width: 40rem;
+}
+
+.price-table td {
+	text-wrap: wrap;
+	overflow-wrap: anywhere;
+}

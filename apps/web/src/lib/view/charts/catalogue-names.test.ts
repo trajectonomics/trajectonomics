@@ -16,8 +16,8 @@ describe("the picker never lists two choices that read alike", () => {
 			buildCatalogue([withExpenseFlows(["a"]), withExpenseFlows(["rent"]), both], both, names),
 		)
 		expect(listed).toContain("Expense: rent (a)")
-		expect(listed).toContain("Expense: rent (rent)")
-		expect(listed.filter((name) => name === "Expense: rent")).toEqual([])
+		expect(listed.filter((name) => name === "Expense: rent")).toHaveLength(1)
+		expect(listed.join("\n")).not.toContain("Expense: rent (rent)")
 		expect(new Set(listed).size).toBe(listed.length)
 	})
 
@@ -27,7 +27,7 @@ describe("the picker never lists two choices that read alike", () => {
 			buildCatalogue([withExpenseFlows(["a"]), withExpenseFlows(["rent"])], null, names),
 		)
 		expect(listed).toContain("Expense: rent (a)")
-		expect(listed).toContain("Expense: rent (rent)")
+		expect(listed).toContain("Expense: rent")
 	})
 })
 

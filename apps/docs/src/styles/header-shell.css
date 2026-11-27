@@ -1,0 +1,74 @@
+/*
+ * The Docs Portal's header geometry that is not the one-row frame: the centred Tabs on the Landing
+ * Page too, and the search in the header's right slot on every page. Colours, radius and type come
+ * from the seam (theme-seam.css); see
+ * docs/adr/0009-shell-spans-the-page-one-header-row-and-twentys-sidebar.md.
+ */
+
+/* The Landing Page's header row carries the same centred Tabs from lg up (ADR 0009). */
+#nd-nav nav {
+	position: relative;
+}
+
+#nd-nav [data-shell-tabs] {
+	position: absolute;
+	inset-inline-start: 50%;
+	translate: -50% 0;
+}
+
+/* One search target at one size in every header: 34px tall, the field 15rem wide on every page. */
+#nd-nav :is([data-search], [data-search-full]),
+#nd-subnav :is([data-search], [data-search-full]) {
+	height: 2.125rem;
+	align-items: center;
+	gap: 0.5rem;
+	padding-inline: 0.625rem;
+}
+
+#nd-nav [data-search],
+#nd-subnav [data-search] {
+	width: 2.125rem;
+	justify-content: center;
+	padding-inline: 0;
+}
+
+#nd-nav [data-search-full],
+#nd-subnav [data-search-full] {
+	width: 15rem;
+}
+
+/*
+ * The notebook row renders its full search trigger between the brand and the right group, so the
+ * shell lifts it to the bar's end, at the same inset the other static sites give their tools.
+ */
+#nd-subnav [data-header-body] > [data-search-full] {
+	position: absolute;
+	inset-inline-end: 2.5rem;
+	top: 50%;
+	translate: 0 -50%;
+}
+
+@media (max-width: 30rem) {
+	#nd-subnav [data-header-body] > [data-search-full] {
+		inset-inline-end: 0.75rem;
+	}
+}
+
+/*
+ * From lg up the full field shows; below it the library's icon trigger is the one on screen, and
+ * between md and lg the library would hide its wrapper, so the shell keeps it on the row.
+ */
+@media (max-width: 63.999rem) {
+	#nd-subnav [data-header-body] div:has(> [data-search]) {
+		display: flex;
+	}
+
+	/*
+	 * Fumadocs pulls its phone controls 6px past the bar's inset. The other sites keep the inset on
+	 * the right slot at every width, so the shell keeps it too.
+	 */
+	#nd-nav nav > div:last-child,
+	#nd-subnav [data-header-body] > div:last-child > div:has(> [data-search]) > :last-child {
+		margin-inline-end: 0;
+	}
+}

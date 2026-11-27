@@ -44,6 +44,25 @@ describe("scenario apply --if-hash", () => {
 		expect(await shown(home)).toEqual(stored)
 	})
 
+	it("quotes a plan name with a space in the stale-hash hint", async () => {
+		const home = scenarioHome()
+		await applyScenario(home, "my plan", SCENARIO_DOCUMENT)
+		const before = await shown(home, "my plan")
+		await applyScenario(home, "my plan", {
+			...SCENARIO_DOCUMENT,
+			economy: { inflation: 100 },
+		})
+		const stored = await shown(home, "my plan")
+		const res = await applyScenario(home, "my plan", SCENARIO_DOCUMENT, [
+			"--if-hash",
+			before.contentHash,
+		])
+		expect(res.code).toBe(5)
+		expect(errorOf(res).hint).toBe(
+			`The stored contentHash of "my plan" is ${stored.contentHash}. Run "traj scenario show 'my plan'" to read the plan again, then write the change to what it prints.`,
+		)
+	})
+
 	it("refuses a dry run over a moved plan the same way, and rolls nothing forward", async () => {
 		const home = scenarioHome()
 		const before = await seedBase(home)

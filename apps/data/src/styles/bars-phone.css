@@ -1,0 +1,35 @@
+/* The SVG scales to the column; a phone needs larger user units to keep the labels legible. */
+
+@media (max-width: 40rem) {
+	.bars-axis {
+		font-size: 18px;
+	}
+
+	.bars-value {
+		font-size: 19px;
+	}
+
+	.bars-meta {
+		font-size: 16px;
+	}
+
+	.bars-name {
+		padding: 0 1px;
+		font-size: 7.5px;
+		letter-spacing: -0.01em;
+		line-height: 1.15;
+	}
+
+	.bars-tier {
+		font-size: 6.5px;
+		line-height: 1.2;
+	}
+
+	.bars-note {
+		font-size: 6px;
+	}
+
+	.bars-label {
+		padding: 0;
+	}
+}
