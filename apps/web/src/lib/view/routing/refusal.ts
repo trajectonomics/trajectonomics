@@ -5,6 +5,7 @@
  * names the same place in `details.documentPath` and puts `--set` in `path`. The message is the CLI's, shown as it is.
  */
 import type { ErrorBody } from "../../contract"
+import { localPath, splitPath } from "../document-path"
 import type { ListName } from "./entries"
 
 /** A row of a routing list: its list, its position and the field its path ends in. */
@@ -22,8 +23,9 @@ export function documentPathOf(error: ErrorBody | null): string[] {
 		typeof details === "object" && details !== null && "documentPath" in details
 			? String((details as { documentPath: unknown }).documentPath)
 			: ""
-	const path = /^document\./.test(error?.path ?? "") ? (error?.path ?? "") : fromDetails
-	return path === "" ? [] : path.split(".").slice(1)
+	const named = error?.path ?? ""
+	const path = named === "" || splitPath(named)[0] !== "document" ? fromDetails : named
+	return path === "" ? [] : [...localPath(splitPath(path))]
 }
 
 /** The field a path ends in; a path through `derive` or `growth` names the field the form shows it at. */

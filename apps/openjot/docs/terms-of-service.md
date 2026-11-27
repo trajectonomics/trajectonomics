@@ -42,13 +42,13 @@ If you save an AksonOCR API key in the local database, and the app then sends a 
 
 ## 6. The source code license is separate
 
-The OpenJot source code is licensed under the MIT License, copyright 2026 Trajectonomics. That license covers copying, modifying, and distributing the source code. These terms cover use of the app we publish.
+The OpenJot source code is licensed under the GNU Affero General Public License v3.0 only (AGPL-3.0-only), copyright 2026 Trajectonomics. That license covers copying, modifying, and distributing the source code, and it requires anyone who offers a modified version as a network service to offer its source code. These terms cover use of the app we publish.
 
-If these terms and the MIT License ever disagree about copying the source code, the MIT License controls that copying. These terms do not remove the MIT License. A fork of the source code is still the fork's own app, and these terms do not automatically bind people who only receive source code from someone else.
+If these terms and the AGPL-3.0-only license ever disagree about copying the source code, the AGPL-3.0-only license controls that copying. These terms do not remove the AGPL-3.0-only license. A fork of the source code is still the fork's own app, and these terms do not automatically bind people who only receive source code from someone else.
 
-The published app also contains third-party components under their own licenses. One of them, Google ML Kit, is not open source. Google provides it under the ML Kit Terms of Service (<https://developers.google.com/ml-kit/terms>), which include the Google APIs Terms of Service. The MIT License covers OpenJot's own source code, not ML Kit.
+The published app also contains third-party components under their own licenses. One of them, Google ML Kit, is not open source. Google provides it under the ML Kit Terms of Service (<https://developers.google.com/ml-kit/terms>), which include the Google APIs Terms of Service. The AGPL-3.0-only license covers OpenJot's own source code, not ML Kit.
 
-The pig artwork, the name OpenJot, and the way the app is presented are part of this project. The MIT License still applies to the source as stated in the LICENSE file. Do not present a modified app as the official OpenJot build from Trajectonomics.
+The pig artwork, the name OpenJot, and the way the app is presented are part of this project. The AGPL-3.0-only license still applies to the source as stated in the LICENSE file. Do not present a modified app as the official OpenJot build from Trajectonomics.
 
 ## 7. Acceptable use
 
@@ -129,7 +129,7 @@ We do not require private arbitration. There is no arbitration provider appointe
 
 If a court holds one sentence unenforceable, the rest of these terms stay in effect.
 
-These terms, the Privacy Policy, and the MIT License are the whole agreement between you and Trajectonomics about the published app and the source code. They replace earlier statements about those subjects. A marketing line in the app, including "local-first" or "on-device", does not add a warranty. Where a marketing line is shorter than these terms, these terms control.
+These terms, the Privacy Policy, and the AGPL-3.0-only license are the whole agreement between you and Trajectonomics about the published app and the source code. They replace earlier statements about those subjects. A marketing line in the app, including "local-first" or "on-device", does not add a warranty. Where a marketing line is shorter than these terms, these terms control.
 
 You may not assign these terms. We may assign them to a person or project that continues OpenJot.
 

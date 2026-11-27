@@ -13,25 +13,32 @@ interface Props {
 	scenario: ScenarioView<T>
 	/** Renders the data of the Scenario's Read. */
 	body: Snippet<[T]>
+	/** Extra provenance for the card's Details, such as the tax rules its figures came from. */
+	details?: Snippet<[ScenarioView<T>]> | undefined
 }
 
-let { title, href, label, scenario, body }: Props = $props()
+let { title, href, label, scenario, body, details }: Props = $props()
 </script>
 
-<!-- A card for one plan's Read: it names the plan, and says what is missing when there is none. -->
+<!-- A card for one plan's Read: it links to its page, and says what is missing when there is none. -->
 {#if scenario.status === "none"}
 	<Card {title} {href}>
-		<p class="text-sm text-muted-foreground">The Snapshot names no plan.</p>
+		<p class="text-sm text-muted-foreground">No plan is named in these figures.</p>
 	</Card>
 {:else if scenario.status === "unread"}
 	<Card {title} {href}>
 		<p class="text-sm text-muted-foreground">
-			The Snapshot holds no {label} read for plan {scenario.name}.
+			These figures hold no {label} read for plan {scenario.name}.
 		</p>
 	</Card>
 {:else}
-	<Card {title} {href} argv={scenario.read.argv}>
-		<p class="mb-3 text-sm text-muted-foreground">Plan {scenario.name}</p>
+	{#snippet cardDetails()}{@render details?.(scenario)}{/snippet}
+	<Card
+		{title}
+		{href}
+		argv={scenario.read.argv}
+		details={details === undefined ? undefined : cardDetails}
+	>
 		<ReadView read={scenario.read} {label}>
 			{#snippet children(data)}
 				{@render body(data)}

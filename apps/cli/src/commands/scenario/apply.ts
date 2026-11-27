@@ -48,7 +48,9 @@ export const apply: Leaf = defineCommand({
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 		decimal: decimalFlag,
 		ifHash: IF_HASH,
-		set: setFlag,
+		set: setFlag.describe(
+			`${setFlag.description ?? ""} Applied to the stored plan, the Set is saved.`,
+		),
 		without: withoutFlag.describe(
 			"Take one list item out by its id, such as flows.gym, before any --set. Applied to the stored plan, the removal is saved.",
 		),
@@ -57,7 +59,7 @@ export const apply: Leaf = defineCommand({
 		),
 	}),
 	document: DOCUMENT,
-	note: "The --decimal form ships in 0.8.0, and so do --if-hash and the what-if form with --set and --without. --add ships in 0.8.0 as well.",
+	note: "The --decimal form ships in 0.8.0, and so do --if-hash, the what-if form with --set and --without, --add, and the droppedAnchors it reports.",
 	output: z.union([z.string(), applyResult, whatIfResult]),
 	examples: APPLY_EXAMPLES,
 	errorCodes: [

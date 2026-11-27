@@ -16,7 +16,7 @@ describe("taxView", () => {
 		expect(view.first).toEqual({
 			levy: "th-2026-pit",
 			owed: "89000.00",
-			period: "1 Jan 2026 to 31 Dec 2026",
+			period: "2026",
 			settlement: "31 Mar 2027",
 			settled: true,
 			partial: false,

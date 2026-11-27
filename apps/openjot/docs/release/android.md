@@ -2,6 +2,12 @@
 
 The version lives in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`. The Android `versionName` comes from the Tauri build. `versionCode` is `major * 1000000 + minor * 1000 + patch`, which the Tauri CLI writes to `tauri.properties` (1.0.0 → 1000000, 1.2.0 → 1002000). `build.gradle.kts` falls back to the same formula if that file is missing. It must go up with every release, or Android and Play refuse the update.
 
+## Package name
+
+The package name (Gradle `applicationId`) is `com.trajectonomics.openjot` from the first release after 1.6.0, and it never changes again. Releases up to 1.6.0 used `app.moojot.android`, so Android treats them as a separate app: the new version installs alongside the old one, not over it.
+
+A user on a version up to 1.6.0 moves by exporting a backup from the old app, installing the new one, restoring the backup, then uninstalling the old app. Export is in My Moo → Backup & Local OCR → Export & Backup → Export JSON (Thai: มูของฉัน → สำรองข้อมูลและ OCR ออฟไลน์ → ส่งออก & สำรองข้อมูล → ส่งออก JSON). Restore is not built yet (trajectonomics/trajectonomics#578), so until it ships the new app starts empty. Keep the old app installed: uninstalling it deletes its records.
+
 ## Signing key
 
 Create the keystore once, on a machine you control, outside the repo. Do not commit it.
@@ -79,7 +85,7 @@ find /tmp/openjot-apk/lib -name '*.so' -print0 |
 
 ## Third-party notices
 
-The app shows an "Open-source licenses" page (My Moo → About). It displays `static/third-party-notices.txt`, a generated list of everything bundled in the app (Rust crates, web packages, Android libraries, ONNX Runtime, the OCR model and the fonts: Noto Sans Thai, Inter and Azeret Mono) with each copyright notice and license text. MIT, Apache-2.0, BSD and OFL all require those to ship with copies of the software.
+The app shows an "Open-source licenses" page (My Moo → About). It displays `static/third-party-notices.txt`, a generated list of everything bundled in the app (Rust crates, web packages, Android libraries, ONNX Runtime, the OCR model and the fonts: Noto Sans Thai, Inter and Azeret Mono) with each copyright notice and license text. OpenJot's own entry states the AGPL-3.0-only licence; the dependencies' MIT, Apache-2.0, BSD and OFL licences all require their notices to ship with copies of the software.
 
 **Regenerate it before each release**, and whenever a dependency changes (`Cargo.lock`, `bun.lock`, `build.gradle.kts`):
 

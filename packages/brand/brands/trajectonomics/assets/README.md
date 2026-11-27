@@ -4,7 +4,7 @@ Owner-supplied Trajectonomics brand art, the source for this brand's logo, wordm
 
 - `svg/`: the source files. Every SVG has a `viewBox` and outlined paths (no live text). `mark.svg`, `wordmark.svg` and `lockup.svg` use `currentColor`; the `-on-light` files are black and the `-on-dark` files are white. `mark-tile.svg` is the mark on its filled tile and `favicon.svg` is the favicon silhouette on the same tile: both carry their own `prefers-color-scheme` rule, which swaps the tile and the mark between schemes.
 - `webp/`: lossless raster copies of the same art, for places that cannot use SVG.
-- `NOTICE`: the licence for these files (all rights reserved). It is not MIT, unlike the rest of the repository.
+- `NOTICE`: the licence for these files (all rights reserved). It is not AGPL-3.0-only, unlike the rest of the repository.
 - `INTER-OFL-1.1.txt`: the licence of the typeface the wordmark was outlined from.
 
 Provenance: the mark was traced from the owner's JPEG logo (`trajectonomics-logo-light.jpeg` and `trajectonomics-logo-1024.jpeg`, 99.95% pixel match); the wordmark is "Trajectonomics" in Inter SemiBold, outlined, generated at the owner's request on 2026-11-12. The owner approved both.

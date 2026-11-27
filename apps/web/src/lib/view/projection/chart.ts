@@ -7,11 +7,11 @@ import type { PersonNames } from "../item-names"
 import { type AnnualRow, annualRowsOf } from "./annual"
 import type { Terms } from "./terms"
 
-/** The name of the nominal series, as the chart's legend shows it. */
-export const NOMINAL_NAME = "Nominal net worth"
+/** The name of the future-money series, as the chart's legend shows it. */
+export const NOMINAL_NAME = "Net worth in future money"
 
-/** The name of the real series: net worth in As-of terms. Drawn dashed, so it is told apart. */
-export const REAL_NAME = "Real net worth, in As-of terms"
+/** The name of the today's-money series. Drawn dashed, so it is told apart. */
+export const REAL_NAME = "Net worth in today's money"
 
 /**
  * The net worth series of a projection, one point per annual row. The x position is the row's
@@ -61,13 +61,13 @@ function yearOf(date: string): string {
 	return date.slice(0, 4)
 }
 
-/** The x label of a row: its year, with the first person's age under it and every person's age in the tooltip. */
+/** The x label of a row: the first person's age, with the year under it and every person's age in the tooltip. */
 function agePart(
 	row: AnnualRow,
 	people: PersonNames,
 ): Pick<LineSeries["points"][number], "xLabel" | "xTitle" | "subLabel"> {
 	const year = yearOf(row.to)
-	const sub = axisAge(row.ages, people)
-	if (sub === null) return { xLabel: year }
-	return { xLabel: year, xTitle: `${year}, ${agesText(row.ages, people)}`, subLabel: sub }
+	const age = axisAge(row.ages, people)
+	if (age === null) return { xLabel: year }
+	return { xLabel: age, xTitle: `${year}, ${agesText(row.ages, people)}`, subLabel: year }
 }

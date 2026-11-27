@@ -10,7 +10,7 @@ tax. Your ledger stays on your machine, in `~/.traj`.
 
 [Website](https://trajectonomics.com/) · [Docs](https://trajectonomics.com/docs/) ·
 [Blog](https://trajectonomics.com/blog/) ·
-[Releases](https://github.com/trajectonomics/trajectonomics/releases) · MIT licence
+[Releases](https://github.com/trajectonomics/trajectonomics/releases) · AGPL-3.0-only licence
 
 ![Terminal demo with a fictional ledger: traj records three accounts, shows net worth of 1,340,000 THB, then answers when its owner can stop working, which is financial independence on 2037-09-01.](docs/demo/traj-demo.gif)
 
@@ -61,6 +61,12 @@ agent can learn the tool from the tool.
 | [`apps/blog`](apps/blog) | The blog at trajectonomics.com/blog |
 | [`apps/data`](apps/data) | The data site at trajectonomics.com/data |
 | [`apps/site`](apps/site) | The website at trajectonomics.com |
+
+## Licence
+
+Trajectonomics is licensed under the GNU Affero General Public License v3.0 only (AGPL-3.0-only). Copyright (c) 2026 Trajectonomics.
+
+You can use, modify and self-host it freely. If you offer a modified version as a network service, you must publish its source.
 
 ## Contributing
 

@@ -1,10 +1,12 @@
 import { expect, test } from "@playwright/test"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
+import { maskedAmountEdit } from "./masked-amount"
 import { SLOW, setsAndClears } from "./shared-interest"
+import { taxLabelAlert } from "./tax-label-alert"
 
-// The Tax profile page of the editable scratch Dashboard (cli ADR-0075): the shared home-loan interest is a field on a
-// separate filing, a save sends `--mortgage-interest shared=<amount>`, and an emptied field clears the stored one.
+// The write checks of the editable scratch Dashboard (cli ADR-0075): the shared home-loan interest of the Tax profile
+// page, a masked amount in the Income drawer (#761), and the Tax labels form's refusal alert (#761).
 
 // The server runs one Edit at a time, so every check here takes turns rather than racing for it.
 test.describe.configure({ mode: "serial" })
@@ -74,4 +76,19 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	const column = headers.findIndex((text) => text.trim() === "Your partner")
 	expect(column, "the claims table names the earlier holder's column").toBeGreaterThan(0)
 	await expect(home.locator("td").nth(column - 1)).toContainText(`${LOCKED.homeLoan} THB`)
+})
+
+// Hide amounts must not let a masked amount be appended to, and a refusal must keep focus where the person put it.
+test("typing into a masked amount replaces it, and a click selects the whole value", async ({
+	page,
+}) => {
+	test.setTimeout(180_000)
+	await maskedAmountEdit(page)
+})
+
+test("a refusal keeps its message and never takes focus again when the Flow select moves", async ({
+	page,
+}) => {
+	test.setTimeout(180_000)
+	await taxLabelAlert(page)
 })

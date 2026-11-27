@@ -41,3 +41,15 @@ export function quotaSample(overrides: Partial<QuotaSample> = {}): QuotaSample {
 		...overrides,
 	}
 }
+
+/** A row whose total is the only token figure, so a synthetic sum is not checked against parts. */
+export function withTotal(total: number, overrides: Partial<UsageRow> = {}): UsageRow {
+	return usageRow({
+		tokensIn: null,
+		tokensOut: null,
+		cacheRead: null,
+		cacheWrite: null,
+		tokensTotal: total,
+		...overrides,
+	})
+}

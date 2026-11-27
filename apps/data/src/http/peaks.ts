@@ -1,5 +1,5 @@
 import { parsePeaksQuery } from "../core/peaks-query"
-import { readPeaks } from "../db/read"
+import { readPeaks, readQuotaSamples } from "../db/read"
 import type { Env, RequestContext } from "../env"
 import { peaksCacheKey, peaksStaleCacheKey } from "./cache"
 import { peaksPayload } from "./peaks-payload"
@@ -22,12 +22,15 @@ export async function handlePeaks(
 	const parsed = parsePeaksQuery(new URL(request.url), context.nowMs)
 	if (!parsed.ok) return cachedInvalid(context.cache, key, parsed.error)
 	try {
-		const rows = await readPeaks(env.DB, parsed.query.asOf)
+		const [rows, quota] = await Promise.all([
+			readPeaks(env.DB, parsed.query.asOf),
+			readQuotaSamples(env.DB, parsed.query.asOf),
+		])
 		return await cachedFresh(
 			context.cache,
 			key,
 			peaksStaleCacheKey(request),
-			peaksPayload(parsed.query.asOf, rows),
+			peaksPayload(parsed.query.asOf, rows, quota),
 		)
 	} catch (error) {
 		console.error("data: peaks read failed", error)

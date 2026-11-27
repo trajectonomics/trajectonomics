@@ -11,6 +11,7 @@ import { SITE_HOME_PATH } from "../src/lib/site-home"
 import { DOCS_BASE_PATH, TABS, tabUrl } from "../src/lib/tabs"
 import { openSearch, otherTab, searchTerm, waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
+import { TEST_VIEWPORT_HEIGHT_PX } from "./viewports"
 
 const LANDING_PATH = `${DOCS_BASE_PATH}/`
 
@@ -33,10 +34,33 @@ test("the /docs mount reaches the Landing Page", async ({ page }) => {
 	await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
 })
 
-test("the Landing Page has one entry per audience, each linking to its Tab", async ({ page }) => {
+test("the hero picture keeps its column clear of the prompt at 1024px", async ({ page }) => {
+	await page.setViewportSize({ width: 1024, height: TEST_VIEWPORT_HEIGHT_PX })
 	await page.goto(LANDING_PATH)
 
-	const entries = page.getByRole("main").getByRole("link", { name: /^For / })
+	const edges = await page.evaluate(() => {
+		const picture = document.querySelector('ol[aria-label="How a question gets its answer"]')
+		const prompt = document.querySelector('section[aria-labelledby="agent-start-heading"]')
+		return picture === null || prompt === null
+			? null
+			: {
+					pictureRight: picture.getBoundingClientRect().right,
+					promptLeft: prompt.getBoundingClientRect().left,
+				}
+	})
+	if (edges === null) throw new Error("the hero picture or the prompt panel is missing")
+
+	expect(edges.pictureRight, "the hero picture ends before the prompt begins").toBeLessThanOrEqual(
+		edges.promptLeft,
+	)
+})
+
+test("the Landing Page has one entry per Tab, each linking to its Tab", async ({ page }) => {
+	await page.goto(LANDING_PATH)
+
+	const entries = page
+		.getByRole("main")
+		.locator(TABS.map((tab) => `a[href="${tabUrl(tab)}"]`).join(", "))
 	await expect(entries).toHaveCount(TABS.length)
 	for (const tab of TABS) {
 		await expect(page.getByRole("link", { name: tab.entry, exact: true })).toHaveAttribute(

@@ -40,7 +40,7 @@ describe("snapshotFacts", () => {
 	test("counts the history dates and states the two versions", () => {
 		const facts = snapshotFacts(demo)
 		expect(valueAt(facts, "History dates")).toBe(`${demo.params.historyDates.length} month-ends`)
-		expect(valueAt(facts, "Snapshot version")).toBe("1")
+		expect(valueAt(facts, "Version of these figures")).toBe("1")
 		expect(valueAt(facts, "traj version")).toBe(demo.cliVersion)
 	})
 })

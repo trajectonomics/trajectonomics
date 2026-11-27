@@ -5,10 +5,8 @@ import { labelsEscaping, measureOverflow } from "./fit"
 import { DEMO_SNAPSHOT, failures, logRequests, openHosted, snapshotsRead, strays } from "./hosted"
 import { PAGES, pageName } from "./pages"
 
-// The hosted Demo (web ADR 0028), served under /demo/ as the Site will serve it: every page at a phone (360px) and a
-// desktop (1280px). Besides the fit rules of the loopback Demo, it checks the hosted promise: no request leaves the build
-// (only GETs of its own pages and assets), the Demo snapshot is the only Snapshot read, every Edit control that stays is
-// switched off and says so, and a click on any control that is still on sends nothing.
+// The hosted Demo (web ADR 0028), served under /demo/ as the Site serves it: every page at a phone and a desktop,
+// with the fit rules of the loopback Demo plus the hosted promise: only own GETs, only the Demo snapshot, all Edits off.
 const WIDTHS_PX = [360, 1280] as const
 const HEIGHT_PX = 800
 
@@ -16,9 +14,9 @@ const HEIGHT_PX = 800
 const EDIT_PAGES: readonly string[] = [
 	"/assets-and-debts/",
 	"/expenses/",
+	"/household/",
 	"/income/",
 	"/plans/",
-	"/projection/",
 	"/routing/",
 	"/settings/assumptions/",
 	"/settings/tax/",
@@ -67,7 +65,7 @@ for (const path of PAGES) {
 			links.filter((href) => href.startsWith("/") && !href.startsWith(`${HOSTED_PREFIX}/`)),
 		).toEqual([])
 
-		const off = page.locator("main :disabled[title], div:has(> #plan-switcher) :disabled[title]")
+		const off = page.locator('main :disabled[title], [role="menu"] :disabled[title]')
 		const titles = await off.evaluateAll((controls) =>
 			controls.map((c) => c.getAttribute("title") ?? ""),
 		)

@@ -1,0 +1,52 @@
+/*
+ * The Agent routes picture: one source on the left, three chips branching off it from lg up. The
+ * hairlines are decoration the text already carries, and they vanish when the columns stack.
+ */
+
+.agent-routes {
+	position: relative;
+}
+
+@media (min-width: 64rem) {
+	.agent-source {
+		position: relative;
+	}
+
+	/* The hairline from the source card to the branch trunk, so the tree reads as one picture. */
+	.agent-source::after {
+		content: "";
+		position: absolute;
+		inset-inline-end: -2.625rem;
+		inset-block-start: 50%;
+		inline-size: 2.625rem;
+		block-size: 1px;
+		background-color: var(--color-fd-border);
+	}
+
+	.agent-routes {
+		padding-inline-start: 2rem;
+	}
+
+	.agent-routes::before {
+		content: "";
+		position: absolute;
+		inset-inline-start: 0.625rem;
+		inset-block: 1.75rem;
+		inline-size: 1px;
+		background-color: var(--color-fd-border);
+	}
+
+	.agent-routes > li {
+		position: relative;
+	}
+
+	.agent-routes > li::before {
+		content: "";
+		position: absolute;
+		inset-inline-start: -1.375rem;
+		inset-block-start: 50%;
+		inline-size: 1.375rem;
+		block-size: 1px;
+		background-color: var(--color-fd-border);
+	}
+}

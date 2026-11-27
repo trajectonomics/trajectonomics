@@ -53,7 +53,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 		"Every command describes its own input and output with traj schema, so an agent never guesses a flag.",
 		"Same input, same answer. The CLI never calls a model, so every result is repeatable.",
 		"Runs on your machine. No accounts, no dashboards, no subscriptions.",
-		"Free and MIT licensed. Read the code that computes your future.",
+		"Free and AGPL-3.0 licensed. Read the code that computes your future.",
 		"Tax is applied only when you ask for it, and every figure says whether it includes tax.",
 	] as const),
 	faqEyebrow: "FAQ",
@@ -69,7 +69,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 		"How do I install or update it?",
 	] as const),
 	faqAnswers: Object.freeze([
-		"Yes. The CLI and its skills are free and MIT licensed. There is no account to create and nothing to subscribe to.",
+		"Yes. The CLI and its skills are free and AGPL-3.0 licensed. There is no account to create and nothing to subscribe to.",
 		"The CLI keeps your ledger in one file on your machine, ~/.traj/traj.db, and computes everything there. What you tell your agent, and the results it reads back from traj, go to the model provider you chose, so share only what you are comfortable sharing.",
 		"Any coding agent that can run commands in a terminal, such as Claude Code, Codex or Cursor. The agent reads the traj skill, asks what it needs, then runs the CLI for you.",
 		"The first releases model Thailand: amounts in Thai baht, and Thai personal income tax when you ask for it. Other currencies are not supported yet.",

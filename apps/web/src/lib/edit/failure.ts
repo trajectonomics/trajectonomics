@@ -1,12 +1,32 @@
 /**
- * Whether an error is the CLI's own words, which alone the page marks as `data-cli`. The loopback server's
- * refusals are the page's words: the request guards ([guard.ts](guard.ts)), a taken name (`serve-apply.ts`), a
+ * Whether an error is the CLI's own words, which alone the page marks as `data-cli`. The loopback server's own
+ * answers are the page's words: the request guards ([guard.ts](guard.ts)), a taken name (`serve-apply.ts`), a
  * body it cannot read (`serve-edit-answer.ts`), an Account it does not hold (`serve-record-values.ts`), a CLI
- * it cannot start (`run-traj.ts`), and a holder swap (`tax-swap.ts`). So are the Dashboard's own Reads
- * (`contract_mismatch`, `unparsed_error`), its parameters' codes and a preview it cannot send (`unreachable`).
+ * it cannot start (`run-traj.ts`), a holder swap (`tax-swap.ts`), and a write that landed while the Snapshot
+ * read that answers it failed. So are the Dashboard's own Reads (`contract_mismatch`, `unparsed_error`), its
+ * parameters' codes and a preview it cannot send (`unreachable`).
  */
 import type { ErrorBody } from "../contract"
 import { CONTRACT_MISMATCH } from "../snapshot/decode-read"
+
+/**
+ * The code the server answers when a write landed but the Snapshot read that answers it failed. Distinct from
+ * the read's own error, because the ledger did change: the plan the page shows is the one that is out of date.
+ */
+export const WRITTEN_REREAD_FAILED = "written_reread_failed"
+
+/** The sentence the server and the page say for a write that landed but could not be read again. */
+export const WRITTEN_REREAD_FAILED_MESSAGE =
+	"Your change was saved, but the page could not read the plan again. Reload to see it."
+
+/** The error a write that landed answers when the Snapshot read after it failed: never the read's own error. */
+export function writtenRereadFailed(): ErrorBody {
+	return {
+		code: WRITTEN_REREAD_FAILED,
+		exitCode: 1,
+		message: WRITTEN_REREAD_FAILED_MESSAGE,
+	}
+}
 
 /** The error codes the Dashboard's own server or client answers with, never the CLI. */
 export const SERVER_CODES: ReadonlySet<string> = new Set([
@@ -20,6 +40,7 @@ export const SERVER_CODES: ReadonlySet<string> = new Set([
 	"invalid_edit",
 	"invalid_what_if",
 	"invalid_reread",
+	WRITTEN_REREAD_FAILED,
 	"no_accounts",
 	"unknown_account",
 	"tax_claims_recorded_elsewhere",

@@ -47,17 +47,43 @@ describe("the tax label form", () => {
 		expect(labelEdit(target, { flow: "salary", label: "allowance.retirement.rmf" }).ok).toBe(false)
 	})
 
-	test("a refusal whose path ends in label lands on the label field, any other on the form", () => {
+	test("a refusal whose path names the Flow lands on the label field, any other on the form", () => {
 		const refusal = (path: string) => ({
 			code: "invalid_input",
 			exitCode: 2,
 			message: "the CLI's words",
 			path,
 		})
-		const at = labelShown({}, refusal("document.flows.salary.label"), "the CLI's words")
+		const flows = ["salary", "bonus", "side-gig"]
+		const at = labelShown(
+			{},
+			refusal("document.flows.salary.label"),
+			"the CLI's words",
+			"salary",
+			flows,
+		)
 		expect(at.at("label")).toBe("the CLI's words")
 		expect(at.general).toBeUndefined()
-		expect(labelShown({}, refusal("document"), "the CLI's words").general).toBe("the CLI's words")
-		expect(labelShown({ label: "own" }, null, null).at("label")).toBe("own")
+		const other = labelShown(
+			{},
+			refusal("document.flows.bonus.label"),
+			"the CLI's words",
+			"salary",
+			flows,
+		)
+		expect(other.at("label")).toBeUndefined()
+		expect(other.general).toBe("the CLI's words")
+		const positional = labelShown(
+			{},
+			refusal("document.flows.2.label"),
+			"the CLI's words",
+			"side-gig",
+			flows,
+		)
+		expect(positional.at("label")).toBe("the CLI's words")
+		expect(labelShown({}, refusal("document"), "the CLI's words", "salary", flows).general).toBe(
+			"the CLI's words",
+		)
+		expect(labelShown({ label: "own" }, null, null, "salary", flows).at("label")).toBe("own")
 	})
 })

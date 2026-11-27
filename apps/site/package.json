@@ -2,7 +2,7 @@
 	"name": "@trajectonomics/site",
 	"version": "0.0.0-development",
 	"description": "The Trajectonomics Site at the root of trajectonomics.com: static Astro served by a Worker with Static Assets. Never published to npm.",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/trajectonomics/trajectonomics.git",

@@ -2,7 +2,7 @@
 	"name": "@trajectonomics/docs",
 	"version": "0.0.0-development",
 	"description": "Trajectonomics Docs Portal (Fumadocs + Astro), deployed at trajectonomics.com/docs/ on Cloudflare Workers Static Assets. Never published to npm.",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
@@ -43,7 +43,8 @@
 		"@types/react-dom": "^19.3.0",
 		"tailwindcss": "^4.3.5",
 		"typescript": "~6.0.3",
-		"wrangler": "^4.158.0"
+		"wrangler": "^4.158.0",
+		"zod": "^4.6.7"
 	},
 	"private": true,
 	"dependencies": {

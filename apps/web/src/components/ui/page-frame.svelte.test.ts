@@ -13,9 +13,9 @@ function frame(state: SnapshotState) {
 }
 
 describe("PageFrame", () => {
-	test("shows the loading state while the Snapshot is read", () => {
+	test("shows the loading state while the figures are read", () => {
 		const html = frame({ status: "loading" }).body
-		expect(html).toContain("Loading the Snapshot.")
+		expect(html).toContain("Loading…")
 		expect(html).not.toContain("body")
 	})
 
@@ -45,19 +45,21 @@ describe("PageFrame", () => {
 		expect(html).toContain("the last day to plan to")
 	})
 
-	test("says why a file is not a Snapshot, and lists the first problems", () => {
+	test("says the figures could not be read, and lists the first problems", () => {
 		const html = frame({
 			status: "invalid",
 			url: "/snapshot.json",
-			reason: "is Snapshot version 2; this Dashboard reads version 1",
+			reason: "is version 2; this Dashboard reads version 1",
 			details: ["params.asOf: Required"],
 		}).body
-		expect(html).toContain("The Snapshot at /snapshot.json is Snapshot version 2")
+		expect(html).toContain("These figures could not be read")
+		expect(html).toContain("/snapshot.json is version 2")
 		expect(html).toContain('role="alert"')
 		expect(html).toContain("params.asOf: Required")
+		expect(html).toContain("traj dashboard --as-of YYYY-MM-DD --horizon YYYY-MM-DD")
 	})
 
-	test("renders the body with the ready Snapshot, and the heading", () => {
+	test("renders the body with the ready figures, and the heading", () => {
 		const ready = { status: "ready", url: "/snapshot.json", snapshot: {} as Snapshot } as const
 		const html = frame(ready).body
 		expect(html).toContain("<p>body</p>")

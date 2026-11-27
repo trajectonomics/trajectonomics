@@ -30,7 +30,7 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 </script>
 
 {#if name === null || read === undefined}
-	<EmptyState title="No chance of success in this Snapshot">
+	<EmptyState title="No chance of success for this plan">
 		<p>
 			Set the market paths and the seed on <SiteLink href="/settings/assumptions/" class="underline">Assumptions</SiteLink>,
 			or start the Dashboard with <code>--paths N</code> and <code>--seed HEX</code>. The chance is built from your plan's own

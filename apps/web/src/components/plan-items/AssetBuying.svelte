@@ -21,8 +21,8 @@ let { draft = $bindable(), shown, anchor, plan }: Props = $props()
 <fieldset class="space-y-4 border-t border-border pt-4">
 	<legend class="text-sm font-semibold text-foreground">Buying it</legend>
 	<AnchoredDate id="asset-purchase-date" label="Bought on" bind:value={draft.purchaseDate} problem={shown.at("purchaseDate")} {anchor} {plan} />
-	<Field id="asset-price" label="Price" inputmode="decimal" hint="A decimal number, such as 1500000.00" bind:value={draft.price} problem={shown.at("price")} />
-	<Field id="asset-buy-cost" label="Buying costs" inputmode="decimal" hint="An amount, or empty for none" bind:value={draft.buyCost} problem={shown.at("buyCost")} />
+	<Field id="asset-price" label="Price" inputmode="decimal" money hint="A decimal number, such as 1500000.00" bind:value={draft.price} problem={shown.at("price")} />
+	<Field id="asset-buy-cost" label="Buying costs" inputmode="decimal" money hint="An amount, or empty for none" bind:value={draft.buyCost} problem={shown.at("buyCost")} />
 	<Field id="asset-paying" label="Paying for it" options={PAYING_CHOICES} bind:value={draft.paying} problem={shown.at("paying")} />
 	{#if draft.paying === "loan"}
 		<LoanTermsFields bind:draft={draft.loan} {shown} prefix="loan." />

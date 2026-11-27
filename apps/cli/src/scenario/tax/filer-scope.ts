@@ -5,7 +5,7 @@ import type { Household, Owner } from "../household/model"
 import { SHARED } from "../household/model"
 import { resolveOwners } from "../household/owner-held"
 import { ownedSegments } from "../household/owner-rules"
-import { type Couple, coupleOf } from "./couple"
+import { type Couple, coupleIn } from "./couple"
 import { relabelled, taxSlots } from "./filer-labels"
 import { ownerless, unfitFiler } from "./filer-refusals"
 import type { ThFilingStatus } from "./flags"
@@ -27,14 +27,15 @@ export type FilerScope = {
 }
 
 /** The Filers of a Return, or `null` when the plan keeps bare labels. */
-type Decided = { pair: Couple; owners: readonly Owner[] }
+type Decided = { pair: Couple; owners: readonly Owner[]; household: Household }
 
 /** The plan's two people and Owners, or null when it has no partner or no Owners. */
-function decided(household: string | null, document: ScenarioDocument): Decided | null {
-	const pair = coupleOf(household)
-	if (pair === null || household === null) return null
-	const owners = resolveOwners(JSON.parse(household) as Household, document).owners ?? []
-	return owners.length === 0 ? null : { pair, owners }
+function decided(household: Household | null, document: ScenarioDocument): Decided | null {
+	if (household === null) return null
+	const pair = coupleIn(household)
+	if (pair === null) return null
+	const owners = resolveOwners(household, document).owners ?? []
+	return owners.length === 0 ? null : { pair, owners, household }
 }
 
 /**
@@ -43,12 +44,12 @@ function decided(household: string | null, document: ScenarioDocument): Decided 
  * taxed item is theirs or `shared`; a taxed item with no Owner is refused.
  */
 export function filerScopeOf(
-	stored: string | null,
+	household: Household | null,
 	document: ScenarioDocument,
 	status: ThFilingStatus,
 ): FilerScope | AppError | null {
 	if (status !== "married_joint" && status !== "married_separate") return null
-	const held = decided(stored, document)
+	const held = decided(household, document)
 	if (held === null) return null
 	const ownerOf = new Map(
 		held.owners.flatMap((owner) => {
@@ -64,9 +65,8 @@ export function filerScopeOf(
 		(id) => owned.has(id) || owned.has(SHARED),
 	)
 	if (filers.length === 0) return null
-	const household = JSON.parse(stored as string) as Household
 	return (
-		unfitFiler(household, status, filers) ?? {
+		unfitFiler(held.household, status, filers) ?? {
 			kind: status === "married_separate" ? "separate" : "joint",
 			filers,
 			ownerOf,

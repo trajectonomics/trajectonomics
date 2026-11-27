@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import type { ScenarioDocument, ScenarioShow, TaxProfile } from "../../lib/contract"
+import { brandHouseholdHash } from "../../lib/contract/household-hash.test-support"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { blankDraft } from "../../lib/view/tax-settings/draft"
 import TaxProfileCard from "./TaxProfileCard.svelte"
@@ -30,7 +31,7 @@ function show(extra: { tax?: TaxProfile | null; taxed?: boolean }): ScenarioShow
 		id: "id",
 		name: "base",
 		contentHash: HASH,
-		householdHash: HASH,
+		householdHash: brandHouseholdHash(HASH),
 		forkedFrom: null,
 		version: 1,
 		createdAt: "2026-11-01T00:00:00Z",
@@ -60,9 +61,9 @@ describe("the tax profile card", () => {
 		expect(body).toMatch(/<button[^>]*>\s*Remove tax\s*<\/button>/)
 	})
 
-	test("a plan with no profile and no Levy is not taxed: nothing is shown, and no Remove", () => {
+	test("a plan with no profile and no tax rules is not taxed: nothing is shown, and no Remove", () => {
 		const body = card({ tax: null, taxed: false })
-		expect(body).toContain("Plan base is not taxed")
+		expect(body).toContain("base is not taxed")
 		expect(body).toMatch(/<button[^>]*>\s*Set the tax profile\s*<\/button>/)
 		expect(body).not.toContain("Remove tax")
 		expect(body).not.toContain("Married")

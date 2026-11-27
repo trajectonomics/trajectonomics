@@ -132,7 +132,7 @@ describe("what the date states", () => {
 		if (gross === undefined || heirs === undefined) throw new Error("the lines exist")
 		expect(shownUnder(gross, "real")).toEqual({
 			amount: "16775132.11",
-			tag: "Nominal",
+			tag: "Future money",
 			aside: null,
 		})
 		expect(shownUnder(heirs, "real")).toEqual({

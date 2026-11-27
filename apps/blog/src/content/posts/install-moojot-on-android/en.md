@@ -41,7 +41,7 @@ Tap **เริ่มจดเลย** (Start) on the last screen. Moo reads the
 
 ## Updating and checking the file
 
-To update, download the new file from the same page and install it over the old one. Your records stay, because every release is signed with the same key. Each release also ships a [`SHA256SUMS`](https://github.com/trajectonomics/moojot/releases/latest/download/SHA256SUMS) file, and the [landing page](https://trajectonomics.com/openjot/#install) prints the signing key's fingerprint. Don't install a MooJot APK whose fingerprint is different.
+To update, download the new file from the same page and install it over the old one. Your records stay, because every release is signed with the same key. The one exception is OpenJot 1.7.0: it has a new package name, so it installs as a separate app and starts empty. Your old app keeps its records until you uninstall it, and you can export them first (My Moo → Backup & Local OCR → Export & Backup → Export JSON). Each release also ships a [`SHA256SUMS`](https://github.com/trajectonomics/moojot/releases/latest/download/SHA256SUMS) file, and the [landing page](https://trajectonomics.com/openjot/#install) prints the signing key's fingerprint. Don't install a MooJot APK whose fingerprint is different.
 
 ## What leaves your phone
 

@@ -9,13 +9,8 @@
 import type { ItemLabel, PersonNames } from "../item-names"
 import { ANOTHER_PERSON_LABEL, EARLIER_HOLDER } from "./flat-claims"
 
-/** The words of one Return over no Filer: the page's own, and no id, so they never show in code. */
-export const JOINT_RETURN: ItemLabel = {
-	text: "Your joint Return",
-	named: true,
-	id: "",
-	kind: "person",
-}
+/** The words of one Return over no Filer: the page's own, as plain text, since they name no id. */
+export const JOINT_RETURN = "Your joint Return"
 
 /** One Return's Filer in the household's words, its id in code when no household names it, and never an id as a name. */
 export function returnLabel(

@@ -1,9 +1,12 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import { parsePath } from "../set-parse"
+import type { ConflictHint } from "./conflict-hint"
 import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, canonicalHousehold, type Household } from "./model"
 import { resolveOwners } from "./owner-held"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
+import { refusesWithout } from "./required"
+import { storedHousehold } from "./stored"
 
 /**
  * The resolution of a stored household's anchors onto an incoming Scenario document, for `apply`
@@ -27,17 +30,18 @@ export type ResolvedAnchors = {
  * and the household that would move it.
  */
 function conflict(
-	owner: string,
+	hint: ConflictHint,
 	anchor: Anchor,
 	date: string,
 	at: readonly Step[],
 	value: unknown,
+	document: unknown,
 ) {
 	const path = documentPathOf(at)
 	return fail("invalid_input", {
 		path,
 		message: `${path}: ${anchor.path} is anchored to ${date} by the household, and this value differs`,
-		hint: `Run "traj scenario household ${owner} --file <path>" to move the anchor, or remove the value so the anchor fills it.`,
+		hint: hint(refusesWithout(document, at)),
 		details: { anchor, anchored: date, value },
 	})
 }
@@ -50,7 +54,7 @@ function resolveOne(
 	pinned: readonly (readonly string[])[],
 	anchor: Anchor,
 	document: unknown,
-	owner: string,
+	hint: ConflictHint,
 ): Outcome | AppError {
 	const segments = parsePath(anchor.path, 0)
 	if (isAppError(segments)) return segments
@@ -60,7 +64,7 @@ function resolveOne(
 	const locus = locate(document, segments)
 	if (locus.kind === "missing") return { dropped: true }
 	if (locus.kind === "found") {
-		if (locus.value !== date) return conflict(owner, anchor, date, locus.at, locus.value)
+		if (locus.value !== date) return conflict(hint, anchor, date, locus.at, locus.value, document)
 		return { document }
 	}
 	return { document: fillFollowers(setAt(document, locus.at, date), segments, date, pinned) }
@@ -94,15 +98,17 @@ function fillFollowers(
 export function resolveHousehold(
 	stored: string,
 	document: unknown,
-	owner: string,
+	hint: ConflictHint,
 ): ResolvedAnchors | AppError {
-	const household = JSON.parse(stored) as Household
+	// A row written by `scenario household` always parses; a corrupt one is the internal failure.
+	const household = storedHousehold(stored)
+	if (isAppError(household)) return household
 	const pinned = anchoredSegments(household.anchors)
 	let current: unknown = document
 	const kept: Anchor[] = []
 	const dropped: string[] = []
 	for (const anchor of household.anchors) {
-		const outcome = resolveOne(household, pinned, anchor, current, owner)
+		const outcome = resolveOne(household, pinned, anchor, current, hint)
 		if (isAppError(outcome)) return outcome
 		if ("dropped" in outcome) {
 			dropped.push(anchor.path)

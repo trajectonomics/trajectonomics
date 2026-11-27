@@ -1,15 +1,15 @@
 ---
 title: Agent
 description: What the Agent asks you for, where the tool stops, and what this release does.
+mascot: hello
 ---
 
-An Operator rarely types every `traj` command alone: an Agent runs them. `traj` is the deterministic
-tool and the Agent supplies the judgement, so every number it gives you is one `traj` returned,
-because the tool never calls a model.
+```flow
+You: a question -> Agent: asks for facts, picks the command -> traj: computes with --json -> Agent: answers in your words
+```
 
-This page describes the latest `traj` release, like the rest of these pages. It covers the division
-of labour, the facts the Agent will ask you for, where the tool stops, and what this release does.
-[Installation](/cli/installation/) has the commands.
+An Agent runs `traj` for you, and this page follows the latest release: the tool computes, the Agent
+judges.
 
 ## Who computes, who judges
 

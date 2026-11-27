@@ -14,7 +14,7 @@ import { withStore } from "../../with-store"
 export const show: Leaf = defineCommand({
 	name: "show",
 	summary: "Show one Scenario with its document, household and owners",
-	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark and the tax allowances.",
+	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark, the tax allowances and the household with its householdHash.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().describe("The Scenario's exact name or its id."),
@@ -44,12 +44,14 @@ export const show: Leaf = defineCommand({
 			const plain = view(row)
 			const shown = printedRow(plain, input.decimal === true)
 			if (isAppError(shown)) return shown
+			const household = householdOf(row)
+			if (isAppError(household)) return household
 			const tax = taxOf(row)
 			const taxAllowances = taxAllowancesOf(tax, plain.document)
 			return ok({
 				scenario: {
 					...shown,
-					household: householdOf(row),
+					household,
 					householdHash: householdHash(row.document, row.household),
 					tax,
 					taxed: isTaxed(shown.document),

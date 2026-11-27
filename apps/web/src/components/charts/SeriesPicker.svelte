@@ -38,7 +38,7 @@ const full = $derived(chosen.length >= MAX_SERIES)
 						class="mt-0.5"
 					/>
 					<span>
-						{entry.name}{entry.real ? "" : " (nominal only)"}
+						{entry.name}{entry.real ? "" : " (future money only)"}
 						{#if !entry.available}<span class="block text-xs">{entry.reason}</span>{/if}
 					</span>
 				</label>
@@ -48,7 +48,7 @@ const full = $derived(chosen.length >= MAX_SERIES)
 	{/each}
 	{#if unlisted.length > 0}
 		<fieldset class="space-y-1.5">
-			<legend class="text-sm font-medium">Not in this Snapshot</legend>
+			<legend class="text-sm font-medium">Not in this plan</legend>
 			{#each unlisted as id (id)}
 				<label class="flex items-start gap-2 text-sm text-muted-foreground">
 					<input type="checkbox" checked onchange={() => onToggle(id)} class="mt-0.5" />

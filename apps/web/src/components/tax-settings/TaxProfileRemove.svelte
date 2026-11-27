@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import FormAlert from "../ui/FormAlert.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 
 interface Props {
@@ -31,7 +32,7 @@ async function remove(): Promise<void> {
 			<p class="text-sm text-foreground">Putting tax back then needs a tax label on each income Flow ({income.join(", ")}), which you set under Tax labels on this page.</p>
 		{/if}
 		{#if editSession.source === "remove-tax"}
-			{#if editSession.error}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
+			{#if editSession.error}<FormAlert message={editSession.error} />{/if}
 			<StaleNotice />
 		{/if}
 		<div class="flex flex-wrap gap-2">

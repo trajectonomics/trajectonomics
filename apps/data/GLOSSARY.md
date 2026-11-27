@@ -31,9 +31,34 @@ identity is machine, plan, model, bucket and source, so replaying it is an upser
 One observation of a plan window's meter: the percentage used and the reset time, at a UTC hour.
 Claude and OpenCode Go are the plans with a readable meter.
 
+## Limit estimate
+
+The tokens a plan window would hold at 100%, estimated from its own usage meter: tokens we used
+between two readings ÷ the percentage points the meter moved × 100. Readings that share a reset
+period form one segment; a reset, a change of reset time or a fall in the meter starts a new one.
+Whole-percent rounding widens the range by one point per segment. Only the estimate, its range and
+its evidence are published, never a reading or its time (ADR 0011).
+
 ## Window
 
 The period a quota percentage covers: `five_hour`, `weekly`, or `monthly`.
+
+## Anchored Window
+
+A 5-hour window that starts at the first UTC hour with activity, instead of sliding over the clock.
+Claude's session starts with its first message, so only `claude` uses anchored windows; the next
+window starts at the first activity at least five hours after the previous start.
+
+## Cache Read
+
+Tokens a provider serves from its prompt cache, stored in `cache_read`. They cost far less than
+input, output or cache writes, so the peaks count them apart and leave them out of the headline
+figure.
+
+## Derived Month
+
+The 30-day figure for a plan whose vendor states no monthly window: `floor(week × 30/7)`. Claude
+and Antigravity have one; every other plan shows its measured 30-day peak.
 
 ## Rollup
 
@@ -44,6 +69,13 @@ One UTC day's totals for one plan and model, summed from that day's Usage Rows a
 
 The provenance of a set of rollups. The org's series is `measured-by-us`; a community series is a
 separate series, never mixed into ours.
+
+## Collecting since
+
+The first UTC day the `measured-by-us` series holds a rollup for, and per plan the first day that
+plan holds one. `/api/health` serves them as `collectingSince` and `planSince`, as days only. A
+peaks window longer than the collected span shows its days so far instead of a figure
+(ADR 0010).
 
 ## asOf
 

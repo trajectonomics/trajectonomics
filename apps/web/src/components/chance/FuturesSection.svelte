@@ -18,7 +18,7 @@ let { futures, plan, currency }: Props = $props()
 	<section aria-labelledby="chance-futures" class="space-y-2">
 		<h2 id="chance-futures" class="text-base font-semibold">Every future</h2>
 		<p class="text-sm text-muted-foreground">
-			This Snapshot does not list the futures. A live dashboard, started with <code>traj dashboard</code>, lists every future
+			These figures do not list the futures. A live dashboard, started with <code>traj dashboard</code>, lists every future
 			and opens each one year by year.
 		</p>
 	</section>

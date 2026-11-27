@@ -1,9 +1,10 @@
 import { SITE_HOME_LOAD, SITE_HOME_PATH } from "../../lib/site-home"
+import { Mascot } from "../mascot"
 
 /** The Source link's destination: the Docs Portal's package in the monorepo. */
 const SOURCE_URL = "https://github.com/trajectonomics/trajectonomics/tree/main/apps/docs"
 
-/** The License link's destination: the MIT license the Docs Portal ships. */
+/** The License link's destination: the AGPL-3.0-only license the Docs Portal ships. */
 const LICENSE_URL = "https://github.com/trajectonomics/trajectonomics/blob/main/apps/docs/LICENSE"
 
 /**
@@ -13,7 +14,10 @@ const LICENSE_URL = "https://github.com/trajectonomics/trajectonomics/blob/main/
  */
 export function LandingEnding() {
 	return (
-		<div className="mt-auto border-t pt-6">
+		<div className="relative mt-auto border-t pt-6">
+			{/* The Mascot stands on the ending's hairline at the far end, at rest and out of the
+			    links' way (docs ADR 0018). It is below the first view, so it loads lazily. */}
+			<Mascot pose="wave" className="absolute right-0 bottom-full mb-px w-12 lg:w-[52px]" />
 			<ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-fd-muted-foreground">
 				<li>
 					<a

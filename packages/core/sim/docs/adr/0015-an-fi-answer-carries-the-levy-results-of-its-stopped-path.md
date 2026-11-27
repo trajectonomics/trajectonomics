@@ -5,7 +5,8 @@ Status: accepted
 A survival answer names the earliest month whose stopped path survives (ADR 0004). The walk charges
 each Levy only on what is left after earned income stops, but it threw the tallies away, so a caller
 that wanted the tax the answer implies had to run `project()` on the Scenario. That run keeps earned
-income going to the horizon, so it describes a different path from the one the answer names (cli#255).
+income as the Scenario states it, with no stop at the FI date, so it describes a different path from
+the one the answer names (cli#255).
 
 ## Decision
 

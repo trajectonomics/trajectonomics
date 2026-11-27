@@ -8,7 +8,7 @@ interface Props {
 	/** The argv of each Read a figure came from, in the order shown, as commands a person could paste. */
 	commands: readonly (readonly string[])[]
 	/** Raw provenance a result states beside its command, such as hashes or the figures behind a ratio. */
-	details?: Snippet
+	details?: Snippet | undefined
 }
 
 let { name, commands, details }: Props = $props()

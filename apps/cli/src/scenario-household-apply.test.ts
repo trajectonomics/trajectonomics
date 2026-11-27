@@ -1,8 +1,20 @@
 import { describe, expect, it } from "bun:test"
 import { HOUSEHOLD, seedBase, setHousehold, shown } from "./scenario-household-support"
-import { applyScenario, errorOf, resultOf, scenario, scenarioHome } from "./scenario-test-support"
+import {
+	applyScenario,
+	errorOf,
+	resultOf,
+	rowOf,
+	scenario,
+	scenarioHome,
+	summariesOf,
+} from "./scenario-test-support"
 import { SCENARIO_DOCUMENT } from "./store/testing"
 import { capture } from "./test-support"
+
+/** The conditional hint the document form gives at every anchorable path (cli ADR-0048). */
+const ANCHOR_HINT =
+	'If this plan\'s household anchors this date ("traj scenario show <name>" lists its anchors), write the date that command shows for this item, because any other date is refused; otherwise write the real date.'
 
 describe("scenario household, and the writes that keep it", () => {
 	it("refuses an apply that changes an anchored date, and names the anchor", async () => {
@@ -25,7 +37,9 @@ describe("scenario household, and the writes that keep it", () => {
 				anchored: "2050-06-30",
 			},
 		})
-		expect(error.hint).toContain("traj scenario household base")
+		expect(error.hint).toBe(
+			'Run "traj scenario household base --file <path>" to move the anchor, or remove the value so the anchor fills it.',
+		)
 	})
 
 	it("fills an anchored date an apply leaves out, and drops the anchor of a Flow it removes", async () => {
@@ -43,6 +57,65 @@ describe("scenario household, and the writes that keep it", () => {
 		})
 	})
 
+	it("hints at the household when an apply leaves out a required anchored date", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, {
+			...HOUSEHOLD,
+			anchors: [{ path: "flows.salary.start", person: "me", age: 36 }],
+		})
+		const document = (await shown(home)).document
+		const { start: _start, ...salary } = document.flows[0] as Record<string, unknown>
+		const res = await applyScenario(home, "base", {
+			...document,
+			flows: [salary, document.flows[1]],
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "document.flows.0.start",
+		})
+		expect(errorOf(res).hint).toContain(ANCHOR_HINT)
+		expect(errorOf(res).hint).not.toContain("This date is anchored by the household")
+	})
+
+	it("takes the anchored date the hint points to, and refuses any other", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, {
+			...HOUSEHOLD,
+			anchors: [{ path: "flows.salary.start", person: "me", age: 36 }],
+		})
+		const document = (await shown(home)).document
+		const salary = document.flows[0] as Record<string, unknown>
+		const same = await applyScenario(home, "base", document)
+		expect(same.code).toBe(0)
+		const other = await applyScenario(home, "base", {
+			...document,
+			flows: [{ ...salary, start: "1999-01-01" }, document.flows[1]],
+		})
+		expect(other.code).toBe(2)
+		expect(errorOf(other).path).toBe("document.flows.0.start")
+	})
+
+	it("gives the same conditional anchor hint on a plan with no household", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		const document = (await shown(home)).document
+		const { start: _start, ...salary } = document.flows[0] as Record<string, unknown>
+		const res = await applyScenario(home, "base", {
+			...document,
+			flows: [salary, document.flows[1]],
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "document.flows.0.start",
+		})
+		expect(errorOf(res).hint).toContain(ANCHOR_HINT)
+		expect(errorOf(res).hint).not.toContain("This date is anchored by the household")
+	})
+
 	it("copies the household on a fork, and refuses a --set that moves an anchored date", async () => {
 		const home = scenarioHome()
 		await seedBase(home)
@@ -58,7 +131,40 @@ describe("scenario household, and the writes that keep it", () => {
 			'flows.salary.end="2030-01-01"',
 		])
 		expect(moved.code).toBe(2)
-		expect(errorOf(moved)).toMatchObject({ code: "invalid_input", path: "document.flows.0.end" })
+		const error = errorOf(moved)
+		expect(error).toMatchObject({ code: "invalid_input", path: "document.flows.0.end" })
+		expect(error.hint).toBe(
+			'Remove the --set so the household sets the date, or run "traj scenario fork base late" first, then "traj scenario household late --file <path>" to move the anchor.',
+		)
+	})
+
+	it("refuses a taken fork name before an anchored --set, and writes nothing", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, HOUSEHOLD)
+		const early = rowOf(resultOf(await scenario(home, ["fork", "base", "early"])))
+		const res = await scenario(home, [
+			"fork",
+			"base",
+			"early",
+			"--set",
+			'flows.salary.end="2030-01-01"',
+		])
+		expect(res.code).toBe(5)
+		expect(errorOf(res)).toMatchObject({
+			code: "scenario_name_taken",
+			path: "name",
+			details: { scenarioId: early.id },
+		})
+		expect(
+			summariesOf(resultOf(await scenario(home, ["list"])))
+				.map((one) => one.name)
+				.sort(),
+		).toEqual(["base", "early"])
+		expect(rowOf(resultOf(await scenario(home, ["show", "early"])))).toMatchObject({
+			contentHash: early.contentHash,
+			version: early.version,
+		})
 	})
 
 	it("publishes the household's document schema with one labelled example", async () => {
