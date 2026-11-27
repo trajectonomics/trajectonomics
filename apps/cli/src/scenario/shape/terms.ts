@@ -54,7 +54,7 @@ export const YEARLY_UNITS: string = `${MINOR_UNITS_HEAD}, and a Spending rule's 
 /**
  * The unit of a Spending rule's rate field: basis points as the engine states them. The decimal form
  * (cli ADR-0047) writes these fields, and no other rate, as percent strings (cli ADR-0063), so the
- * head is its own and `money-fields.ts` finds these fields by it.
+ * head is its own and `field-paths.ts` finds these fields by it.
  */
 export const RULE_RATE_UNITS =
 	"Integer basis points of a Spending rule (1 bps = 0.01%), so 4% is 400. The rate is the caller's own figure: `traj` ships none."

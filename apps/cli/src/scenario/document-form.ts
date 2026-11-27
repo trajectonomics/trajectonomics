@@ -25,12 +25,16 @@ const moneyPaths = moneyPathsOf({ properties })
 export const scenarioDocument: z.ZodType<unknown> = z
 	.unknown()
 	.superRefine((value, ctx) => {
-		for (const problem of scenarioProblems(value)) {
+		const problems = scenarioProblems(value)
+		// A money field holding the decimal form names the flag that reads it. The envelope shows only the
+		// first problem's hint, so every problem carries the sentence when any money field is in that form.
+		const decimal = problems
+			.map((problem) => decimalAmountHint(value, problem, moneyPaths))
+			.find((hint) => hint !== undefined)
+		for (const problem of problems) {
 			const refusal = refusalOf(problem, "document")
 			// A code the refusal table words states its sentence and way out, then the schema hint (ADR-0052).
 			const said = wordsOf(problem)
-			// A money field holding the decimal form names the flag that reads it, before the schema hint.
-			const decimal = decimalAmountHint(value, problem, moneyPaths)
 			ctx.addIssue({
 				code: "custom",
 				message: said?.message ?? refusal.message,

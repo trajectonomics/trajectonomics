@@ -59,7 +59,8 @@ describe("scenario apply of a decimal document without --decimal", () => {
 	for (const [label, amount] of notDecimal) {
 		it(`carries no decimal hint for ${label}`, async () => {
 			const home = scenarioHome()
-			const document = withFirstAmount(await shownDecimal(home), amount)
+			// The minor-unit document, so no other money field holds the decimal form.
+			const document = withFirstAmount(SCENARIO_DOCUMENT as Doc, amount)
 			const res = await applyScenario(home, "base", document)
 			expect(errorOf(res).code).toBe("invalid_input")
 			const details = errorOf(res).details as { code?: string }[]
@@ -67,6 +68,21 @@ describe("scenario apply of a decimal document without --decimal", () => {
 			expect(errorOf(res).hint).toBe(SCHEMA_HINT)
 		})
 	}
+
+	it("names --decimal even when a percent field is refused before the money fields", async () => {
+		const home = scenarioHome()
+		const shown = await shownDecimal(home)
+		const accounts = shown["accounts"] as Doc[]
+		// An Account's fee in the decimal form is a percent string, and Accounts are checked before Flows.
+		const withFee = [
+			{ ...accounts[0], fee: { bps: "1.50", rounding: "halfUp" } },
+			...accounts.slice(1),
+		]
+		const res = await applyScenario(home, "base", { ...shown, accounts: withFee })
+		expect(errorOf(res).code).toBe("invalid_input")
+		expect(errorOf(res).path).toBe("document.accounts.0.fee.bps")
+		expect(errorOf(res).hint).toBe(`${DECIMAL_HINT} ${SCHEMA_HINT}`)
+	})
 
 	it("carries no decimal hint on a field --decimal does not convert, such as inflation", async () => {
 		const home = scenarioHome()
