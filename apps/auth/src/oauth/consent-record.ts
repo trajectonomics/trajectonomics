@@ -20,6 +20,7 @@ type Recording = {
 	/** The row this request inserted, once it has. */
 	inserted?: Inserted | undefined
 }
+type Read = { rows: StoredConsent[]; live: StoredConsent[]; now: Date }
 
 /**
  * Writes one approval to the consent row, merging any duplicates. A live consent keeps its
@@ -39,6 +40,10 @@ type Recording = {
  * Another request can change or delete a row between this one's read and its merge. The merge then
  * writes nothing and the step runs again from a fresh read. After three such passes it throws, so
  * the approval fails instead of succeeding without its consent.
+ *
+ * The family is read only when the first read finds no live consent, and the consents are read
+ * again after it: a live consent in the second read is another approval that landed in between,
+ * and it owns the family, so this pass merges into it and deletes no token.
  */
 export async function recordConsent(
 	ctx: Recording["ctx"],
@@ -65,38 +70,41 @@ export async function recordConsent(
 /** One pass. `null` means a row moved on between the read and the write. */
 async function recordOnce(recording: Recording): Promise<ConsentWrite | null> {
 	if (recording.inserted !== undefined) return finishCreate(recording, recording.inserted)
-	const { rows, live, now, family } = await readConsents(recording)
-	if (live.length > 0) return merge(recording, rows, live, now)
-	const inserted = await insertFresh(recording, rows, family, now)
+	const read = await readConsents(recording)
+	if (read.live.length > 0) return merge(recording, read)
+	// Snapshot before the read that decides the delete, so a token another approval mints
+	// afterwards survives. Only this miss path reads the family; a live consent never does.
+	const ids = await snapshotTokenFamily(recording.options.database, recording.input)
+	const after = await readConsents(recording)
+	// An approval that landed since the first read is live now. It owns the family, so this
+	// approval merges into it rather than deleting the tokens it is about to use.
+	if (after.live.length > 0) return merge(recording, after)
+	const inserted = await insertFresh(recording, after.rows, ids, after.now)
 	if (inserted === null) return NONE
 	recording.inserted = inserted
 	return finishCreate(recording, inserted)
 }
 
-async function readConsents({ ctx, input, options }: Recording) {
-	// The token family as it stood before the read: a token another approval mints after this
-	// snapshot is not this pass's to delete, even when the read cannot see its consent.
-	const family = await snapshotTokenFamily(ctx, input)
+/**
+ * The grant's consent rows and the clock. No token query: the family is read only after this read
+ * finds no live consent, because a live consent goes straight to the merge.
+ */
+async function readConsents({ ctx, input, options }: Recording): Promise<Read> {
 	const now = hookNow(ctx, options)
 	const rows = await findConsents(ctx, input.clientId, input.userId)
-	return { rows, live: rows.filter((row) => !consentExpired(ctx, row, options)), now, family }
+	return { rows, live: rows.filter((row) => !consentExpired(ctx, row, options)), now }
 }
 
-function merge(
-	{ ctx, input, options }: Recording,
-	rows: readonly StoredConsent[],
-	live: readonly StoredConsent[],
-	now: Date,
-): Promise<ConsentWrite | null> {
+function merge({ ctx, input, options }: Recording, read: Read): Promise<ConsentWrite | null> {
 	const { scopes, resources } = input
-	return mergeIntoKeeper(ctx, options.database, { rows, live, scopes, resources, now })
+	return mergeIntoKeeper(ctx, options.database, { ...read, scopes, resources })
 }
 
 /**
  * A newly created consent never attaches to tokens from an earlier grant. Never move `createdAt`
- * without deleting the family. Only the tokens the snapshot taken before the read listed go: a
- * token another approval minted after that snapshot is that approval's, not a leftover, and the
- * snapshot's ids keep it safe from the whole-second `createdAt` the library stores.
+ * without deleting the family. Only the tokens the snapshot taken before the second read listed
+ * go: a token another approval minted after that snapshot is that approval's, not a leftover, and
+ * the snapshot's ids keep it safe from the whole-second `createdAt` the library stores.
  */
 async function insertFresh(
 	{ ctx, input, options }: Recording,
@@ -106,7 +114,7 @@ async function insertFresh(
 ): Promise<Inserted | null> {
 	const owner = { clientId: input.clientId, userId: input.userId }
 	for (const row of expired) await deleteConsentRow(ctx, row.id)
-	await deleteTokenFamily(ctx, ids)
+	await deleteTokenFamily(options.database, ids)
 	await deletePendingAuthorizationCodes(options.database, owner)
 	const updatedAt = nextConsentUpdatedAt(now, ...expired.map((row) => row.updatedAt))
 	const created = (await adapterOf(ctx).create({
@@ -128,11 +136,11 @@ async function finishCreate(
 	recording: Recording,
 	inserted: Inserted,
 ): Promise<ConsentWrite | null> {
-	const { rows, live, now } = await readConsents(recording)
+	const read = await readConsents(recording)
 	// Another request inserted its own row and this one merges with it. That approval is not this
 	// request's to undo, whichever row is the keeper.
-	if (live.length > 1) return (await merge(recording, rows, live, now)) === null ? null : NONE
-	const only = live[0]
+	if (read.live.length > 1) return (await merge(recording, read)) === null ? null : NONE
+	const only = read.live[0]
 	if (only?.id === inserted.id) return { kind: "created", ...inserted }
 	if (only !== undefined && consentCovers(only, recording.input)) return NONE
 	// The inserted row is gone and no row holds this approval: start from the top.

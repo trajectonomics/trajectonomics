@@ -54,7 +54,7 @@ describe("mergeRetriesWhenRowVanishes", () => {
 		adapter.afterInsert = (rows) => rows.push(concurrentConsent("other", EARLIER))
 		adapter.afterRead = (rows, read) => {
 			// The other approval fails and deletes its row after this request read both.
-			if (read === 2)
+			if (read === 3)
 				rows.splice(
 					rows.findIndex((row) => row.id === "other"),
 					1,

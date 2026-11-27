@@ -14,21 +14,21 @@ export const EARLIER = "2026-11-01T00:00:00.000Z"
 const DATA = "https://trajectonomics.com/data"
 
 export class FakeConsentAdapter {
+	/** Consent rows and the family's token rows, the one store the fake D1 statements touch. */
 	readonly consents = new FakeConsentDatabase()
-	/** Access and refresh tokens, each tagged with the model it belongs to. */
-	tokens: Array<ConsentRow & { model: string }> = []
 	/** Runs once an insert landed: a concurrent approval joining it. */
 	afterInsert: ((rows: ConsentRow[]) => void) | undefined
 	/** Runs after each consent read: whatever lands before this request writes. */
 	afterRead: ((rows: ConsentRow[], read: number) => void) | undefined
-	/** The `where` of every `deleteMany`, for a check that reads the statement's shape. */
-	readonly deleted: Where[] = []
+	/** Every model this adapter read or wrote, in order: one entry per statement it issued. */
+	readonly models: string[] = []
 	private reads = 0
 	private inserts = 0
 
 	findOne = async (): Promise<unknown> => null
 
 	findMany = async ({ model, where, limit, sortBy }: AdapterInput): Promise<unknown[]> => {
+		this.models.push(model)
 		// The copies are made before the read hook runs, so a row it changes is only seen next time.
 		const found = this.rowsOf(model)
 			.filter((row) => matches(row, where))
@@ -43,6 +43,7 @@ export class FakeConsentAdapter {
 	}
 
 	create = async ({ data }: { data: Record<string, unknown> }): Promise<unknown> => {
+		this.models.push("oauthConsent")
 		this.inserts += 1
 		const text = Object.entries(data).map(([key, value]) => [key, columnText(value)])
 		const row = { ...Object.fromEntries(text), id: `consent-${this.inserts}` } as ConsentRow
@@ -52,19 +53,16 @@ export class FakeConsentAdapter {
 	}
 
 	delete = async ({ where }: AdapterInput): Promise<unknown> => {
+		this.models.push("oauthConsent")
 		this.consents.rows = this.consents.rows.filter((row) => !matches(row, where))
-		return null
-	}
-
-	deleteMany = async ({ model, where }: AdapterInput): Promise<unknown> => {
-		this.deleted.push(where)
-		this.tokens = this.tokens.filter((row) => row.model !== model || !matches(row, where))
 		return null
 	}
 
 	/** Consent rows, or the tokens tagged with the model, as the adapter would list them. */
 	private rowsOf = (model: string): readonly ConsentRow[] =>
-		model === "oauthConsent" ? this.consents.rows : this.tokens.filter((row) => row.model === model)
+		model === "oauthConsent"
+			? this.consents.rows
+			: this.consents.tokens.filter((row) => row.model === model)
 }
 
 /** Another approval's row for the same grant. */

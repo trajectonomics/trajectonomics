@@ -1,11 +1,12 @@
 import { describe, expect, it } from "bun:test"
 import { recordConsent } from "./consent-record"
-import { concurrentConsent, consentSetup, NOW } from "./fake-consent-adapter"
+import { concurrentConsent, consentSetup, EARLIER, NOW } from "./fake-consent-adapter"
+import type { TokenRow } from "./fake-consent-database"
 
 const READ = "2026-11-28T00:00:00.500Z"
 
 /** A token row as the library stores one: the model it belongs to, and a whole-second createdAt. */
-function token(model: string, id: string, createdAt: string) {
+function token(model: string, id: string, createdAt: string): TokenRow {
 	return { model, id, clientId: "traj-data-collector", userId: "user-1", createdAt }
 }
 
@@ -52,24 +53,42 @@ describe("recordConsent", () => {
 		const { adapter, options, input } = setup
 		// The read lands mid-second. The library stamps a token's createdAt at the start of the
 		// second, so a token minted after the snapshot still carries an earlier createdAt.
-		const ctx = {
-			...setup.ctx,
-			headers: new Headers({ "x-spike-now": READ }),
-		}
-		adapter.tokens.push(
+		const ctx = { ...setup.ctx, headers: new Headers({ "x-spike-now": READ }) }
+		adapter.consents.tokens.push(
 			token("oauthAccessToken", "old-access", "2026-11-27T23:59:59.999Z"),
 			token("oauthRefreshToken", "old-refresh", "2026-11-27T23:59:59.999Z"),
 		)
 		// Another approval mints its token after this request's snapshot and before its delete.
-		adapter.afterRead = (_rows, read) => {
-			if (read !== 1) return
-			adapter.tokens.push(
+		adapter.consents.afterSnapshot = () => {
+			adapter.consents.tokens.push(
 				token("oauthAccessToken", "fresh-access", "2026-11-28T00:00:00.000Z"),
 				token("oauthRefreshToken", "fresh-refresh", "2026-11-28T00:00:00.000Z"),
 			)
 		}
 		await recordConsent(ctx, input, options)
 		// The pre-snapshot tokens are gone; the token the snapshot never saw survives the delete.
-		expect(adapter.tokens.map((row) => row.id).sort()).toEqual(["fresh-access", "fresh-refresh"])
+		expect(adapter.consents.tokens.map((row) => row.id).sort()).toEqual([
+			"fresh-access",
+			"fresh-refresh",
+		])
+	})
+
+	it("deletes nothing when an approval lands between the snapshot and the second read", async () => {
+		const { adapter, ctx, options, input } = consentSetup()
+		adapter.consents.tokens.push(
+			token("oauthAccessToken", "old-access", EARLIER),
+			token("oauthRefreshToken", "old-refresh", EARLIER),
+		)
+		// The other approval writes its live consent after this request listed the family.
+		adapter.consents.afterSnapshot = () => {
+			adapter.consents.rows.push(concurrentConsent("other"))
+		}
+		const write = await recordConsent(ctx, input, options)
+		// The second read sees that consent: it owns the family, so this approval merges into it.
+		expect(write).toMatchObject({ kind: "merged", id: "other" })
+		expect(adapter.consents.tokens.map((row) => row.id).sort()).toEqual([
+			"old-access",
+			"old-refresh",
+		])
 	})
 })

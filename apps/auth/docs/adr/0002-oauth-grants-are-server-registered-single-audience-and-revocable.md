@@ -171,14 +171,24 @@ grants, and the operator cannot see who the request belongs to until they sign i
 auto-consent path compares scopes and resources but not the approval age, so deleting the expired
 row is what makes every code-issuing path fail closed into the consent page.
 
-Whenever a consent is newly created, the read that found no live consent first snapshots the ids
-of that user's and that client's access and refresh tokens, and only those tokens are deleted. An
-old token can therefore never attach to the new approval, and a token another approval mints after
-the snapshot survives the delete, because that approval's consent is live even though this read
-could not see it. The ids, not a timestamp, are the boundary: the library stores a token's
-`createdAt` in whole seconds, so a token minted later in the second a read lands in carries an
-earlier `createdAt` than that read, and a filter on the read's clock would delete a live token. The
-delete is one `in` statement per hundred ids, D1's bound-parameter limit.
+A request that finds no live consent deletes the old token family before it writes its own. It
+reads the consents first; only when that read finds no live consent does it snapshot the ids of that
+user's and that client's access and refresh tokens, in one statement, and then read the consents
+again. A live consent in the second read is another approval that landed in between: that approval
+owns the family, so this request merges into it and deletes no token. Otherwise it deletes exactly
+the snapshotted ids, in one D1 batch of two statements, each an `in (select value from json_each(?1))`
+over one bound JSON array, access tokens first because `oauthAccessToken.refreshId` references the
+refresh row. The ids, not a timestamp, are the boundary: the library stores a token's `createdAt` in
+whole seconds, so a token minted later in the second a read lands in carries an earlier `createdAt`
+than that read, and a filter on the read's clock would delete a live token. Any token the snapshot
+did not list survives, and a family of thousands of rotated rows costs the same statements as a family
+of one: no scan, no chunk, a constant well inside D1's fifty-query cap for one invocation.
+
+An in-flight rotation of the old refresh token is the one way a token of the previous grant can still
+attach to a new approval: a refresh whose checks passed a moment before a revoke, or in the narrow
+window around the ninety-day expiry, can insert its rotated row just after the snapshot, and that row
+then survives and is checked against the new consent. The window is one rotation wide, and the next
+re-approval deletes the row.
 
 `src/oauth-grants.ts` adds two session-scoped endpoints:
 
