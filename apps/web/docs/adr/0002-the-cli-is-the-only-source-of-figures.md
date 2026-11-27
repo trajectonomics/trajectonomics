@@ -24,6 +24,12 @@ The FI reference's multiple is the one figure the page reduces. The CLI states i
 
 This is the first place the page rounds a CLI figure, and the only one allowed. It formats a ratio: no money is added, subtracted or rounded, and the page still shows the CLI's decimal strings as they are.
 
+## Amendment (2026-11-27): a card may shorten a money string, cutting digits and never rounding up
+
+A card is read at a glance, so `formatCompact` in `src/lib/format/compact.ts` shortens a CLI money string by string operations only, keeping the leading digits and dropping the rest, truncated toward zero. "1214900.00" becomes "1.21M", "184000.00" becomes "184k", and "999999.99" becomes "999k", never "1M": a card never states more than the CLI did.
+
+`formatCompact` is used on cards only. The exact string stays in the accessible text, in the hover title, in Details and in every table, form and input. No money is added, subtracted or rounded up.
+
 ## Considered Options
 
 - **Compute the deltas and the totals in the page.** Rejected. The point of `traj` is that its arithmetic is the one answer. A second implementation in the page would drift from it without any test noticing.

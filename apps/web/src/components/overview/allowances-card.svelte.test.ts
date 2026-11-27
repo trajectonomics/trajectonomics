@@ -38,7 +38,8 @@ describe("the Home card: tax you could still save this year", () => {
 	test("states the saving and links to the Tax allowances page", () => {
 		const body = card(allowancesSummaryOf(GOLDEN_ALLOWANCES))
 		expect(body).toContain("Tax you could still save this year")
-		expect(body).toContain("28,100.00")
+		expect(body).toContain("28.1k")
+		expect(body).toContain('title="28,100.00"')
 		expect(body).toContain("/optimize/allowances/")
 	})
 
@@ -46,8 +47,9 @@ describe("the Home card: tax you could still save this year", () => {
 		const body = card(summaryOf("separate"), "separate")
 		expect(body).toContain(">You<")
 		expect(body).toContain(">Your partner<")
-		expect(body).toContain("84,950.00")
-		expect(body).toContain("4,600.00")
+		expect(body).toContain("84.9k")
+		expect(body).toContain("4.6k")
+		expect(body).toContain('title="84,950.00"')
 	})
 
 	test("still shows a partner's saving when the holder's Return saves nothing", () => {
@@ -62,13 +64,15 @@ describe("the Home card: tax you could still save this year", () => {
 		const body = card(allowancesSummaryOf(holderSavesNothing, people), "separate")
 		expect(body).toContain("Tax you could still save this year")
 		expect(body).toContain(">Your partner<")
-		expect(body).toContain("4,600.00")
+		expect(body).toContain("4.6k")
+		expect(body).toContain('title="4,600.00"')
 	})
 
 	test("a joint Return keeps one unnamed figure", () => {
 		const body = card(summaryOf("joint"), "joint")
-		expect(body).toContain("148,200.00")
-		expect(body).not.toContain("4,600.00")
+		expect(body).toContain("148k")
+		expect(body).toContain('title="148,200.00"')
+		expect(body).not.toContain("4.6k")
 		expect(body).not.toContain(">You<")
 	})
 

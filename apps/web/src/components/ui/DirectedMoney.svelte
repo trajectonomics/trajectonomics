@@ -1,6 +1,6 @@
 <script lang="ts">
 import { preferences } from "../../client/preferences.svelte.js"
-import { formatMoney, maskMoney } from "../../lib/format"
+import { formatCompact, formatMoney, maskMoney } from "../../lib/format"
 import { type AmountKind, directedAmount } from "../../lib/format/direction"
 
 interface Props {
@@ -12,12 +12,15 @@ interface Props {
 	currency?: string | undefined
 	/** Overrides the hide-amounts switch. Left out, the switch decides. */
 	hidden?: boolean | undefined
+	/** A card's short form, truncated toward zero; the exact figure stays in the title and accessible text. */
+	compact?: boolean
 }
 
-let { amount, kind, currency, hidden }: Props = $props()
+let { amount, kind, currency, hidden, compact = false }: Props = $props()
 const shown = $derived(directedAmount(amount, kind))
 const isHidden = $derived(hidden ?? preferences.hidden)
 const ledger = $derived(formatMoney(amount))
+const digits = $derived(compact ? formatCompact(shown.digits) : formatMoney(shown.digits))
 </script>
 
 <!-- A money amount with a direction word, which zero leaves out. The ledger's signed figure stays in the title; hidden, its digits mask. -->
@@ -26,9 +29,10 @@ const ledger = $derived(formatMoney(amount))
 	title={isHidden ? undefined : `The ledger states ${ledger}${currency ? ` ${currency}` : ""}`}
 >
 	{#if shown.word}<span class="text-muted-foreground">{shown.word}</span>{/if}
-	<span class:ml-1={shown.word !== null} aria-hidden={isHidden ? "true" : undefined}
-		>{isHidden ? maskMoney(shown.digits) : formatMoney(shown.digits)}</span
-	>{#if isHidden}<span class="sr-only"> amount hidden</span>{/if}{#if currency}<span
+	<span class:ml-1={shown.word !== null} aria-hidden={isHidden || compact ? "true" : undefined}
+		>{isHidden ? maskMoney(shown.digits) : digits}</span
+	>{#if isHidden}<span class="sr-only"> amount hidden</span
+		>{:else if compact}<span class="sr-only">{formatMoney(shown.digits)}</span>{/if}{#if currency}<span
 			class="ml-1 text-xs text-muted-foreground">{currency}</span
 		>{/if}
 </span>

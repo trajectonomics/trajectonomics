@@ -2,6 +2,7 @@
 export { abbreviate } from "./abbreviate"
 export { formatArgv } from "./argv"
 export { formatBps, parseBps } from "./bps"
+export { formatCompact } from "./compact"
 export { formatDate, formatMonth } from "./date"
 export { type AmountKind, type DirectedAmount, directedAmount } from "./direction"
 export { AMOUNT_MASK, maskMoney } from "./mask"
