@@ -1,4 +1,4 @@
-# ADR 0013: Limits are priced and counted with cache
+# ADR 0014: Limits are priced and counted with cache
 
 ## Status
 

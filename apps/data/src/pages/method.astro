@@ -10,7 +10,7 @@ const ESTIMATE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0008-estima
 const PEAKS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md`
 const COLLECTING_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0010-data-starts-when-collecting-starts.md`
 const LIMITS_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0011-limits-are-estimated-from-the-usage-meter.md`
-const LIMITS_CACHE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0013-limits-are-priced-and-counted-with-cache.md`
+const LIMITS_CACHE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0014-limits-are-priced-and-counted-with-cache.md`
 const VALUE_ADR_URL = `${SOURCE_URL}/blob/main/apps/data/docs/adr/0012-prices-enter-with-a-dated-source.md`
 
 const planPriceRows = Object.entries(PLAN_PRICES).flatMap(([plan, prices]) =>
@@ -171,7 +171,7 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 			cache reads count at their real weight; an hour holding a model with no list price makes that
 			hour's dollars unknown, so the window has no dollar figure. An estimate is rough until it has
 			three points of meter over at least 24 hours. The reasoning is in
-			<a href={LIMITS_ADR_URL}>ADR 0011</a> and <a href={LIMITS_CACHE_ADR_URL}>ADR 0013</a>.
+			<a href={LIMITS_ADR_URL}>ADR 0011</a> and <a href={LIMITS_CACHE_ADR_URL}>ADR 0014</a>.
 		</p>
 
 		<h2>Estimated tiers</h2>

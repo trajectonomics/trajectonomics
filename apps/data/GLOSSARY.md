@@ -40,7 +40,7 @@ kind at its model's list price). Readings that share a reset period form one seg
 change of reset time or a fall in the meter starts a new one. Whole-percent rounding widens the
 range by one point per segment. An estimate is rough until it has three points of meter over at
 least 24 hours. Only the estimates, their ranges and their evidence are published, never a reading
-or its time (ADR 0011, ADR 0013).
+or its time (ADR 0011, ADR 0014).
 
 ## Window
 

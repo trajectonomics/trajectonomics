@@ -3,7 +3,7 @@
 ## Status
 
 Accepted, 2026-11-27. Extended by
-[ADR 0013](0013-limits-are-priced-and-counted-with-cache.md). Follow-up to
+[ADR 0014](0014-limits-are-priced-and-counted-with-cache.md). Follow-up to
 [ADR 0007](0007-peaks-are-computed-in-the-worker-without-hours.md),
 [ADR 0009](0009-peaks-count-cache-reads-apart-and-anchor-claude-sessions.md) and
 [ADR 0010](0010-data-starts-when-collecting-starts.md). It adds a figure beside the peaks; it does
