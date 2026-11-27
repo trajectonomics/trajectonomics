@@ -66,7 +66,10 @@ export function peaksPayload(
 		const current = entry.tiers.find((peaks) => peaks.tier === tier)
 		const limits = planLimits(
 			entry.plan,
-			readings.get(entry.plan) ?? [],
+			// Only readings taken on the current tier: another tier's meter measures another limit.
+			(readings.get(entry.plan) ?? []).filter(
+				(reading) => tierOn(entry.plan, reading.sampledAt.slice(0, 10))?.name === tier,
+			),
 			hourly.get(entry.plan) ?? new Map(),
 		)
 		return {

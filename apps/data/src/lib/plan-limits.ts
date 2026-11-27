@@ -79,7 +79,7 @@ export function limitCell(
 	collecting: CollectingWindow | null,
 ): LimitCell | null {
 	if (limit === null || limit === undefined) return null
-	const notes = [limitRange(limit)]
+	const notes = limit.rough ? ["rough", limitRange(limit)] : [limitRange(limit)]
 	if (limit.derived === true) notes.push("week × 30/7")
 	notes.push("from the meter")
 	return {

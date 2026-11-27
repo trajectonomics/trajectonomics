@@ -9,17 +9,24 @@ export type QuotaReading = {
 
 const MINUTE_MS = 60_000
 
-/** A reset time in the minute it falls in, so the API's jittery seconds compare equal. */
-function resetMinute(value: string | null): number | null {
+/** A reset time in epoch milliseconds, or null when absent or unreadable. */
+function resetMs(value: string | null): number | null {
 	if (value === null) return null
 	const ms = Date.parse(value)
-	return Number.isNaN(ms) ? null : Math.floor(ms / MINUTE_MS)
+	return Number.isNaN(ms) ? null : ms
 }
 
 /** Whether a reading continues the previous one's reset period. */
 function samePeriod(previous: QuotaReading, next: QuotaReading): boolean {
 	if (next.usedPct < previous.usedPct) return false
-	if (resetMinute(next.resetsAt) !== resetMinute(previous.resetsAt)) return false
+	const nextReset = resetMs(next.resetsAt)
+	const previousReset = resetMs(previous.resetsAt)
+	// The API jitters a reset by seconds, so two resets under a minute apart are the same reset.
+	if (nextReset === null || previousReset === null) {
+		if (nextReset !== previousReset) return false
+	} else if (Math.abs(nextReset - previousReset) >= MINUTE_MS) {
+		return false
+	}
 	if (previous.resetsAt === null) return true
 	return Date.parse(next.sampledAt) < Date.parse(previous.resetsAt)
 }

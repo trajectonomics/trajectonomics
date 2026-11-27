@@ -46,6 +46,7 @@ describe("limitCell", () => {
 		const cell = limitCell(limit({ points: 2, rough: true }), FIVE_HOURS, null, null)
 		expect(cell?.figure).toBe("≈ 13.8M at 100%")
 		expect(cell?.share).toBe(0)
+		expect(cell?.meta).toBe("rough · 13–15M · from the meter")
 		expect(cell?.spoken).toBe(
 			"Rough estimate: About 13,800,000 tokens at 100% of the 5-hour limit, between 12,900,000 and 14,700,000, from 2 percentage points of meter readings",
 		)

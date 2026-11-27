@@ -50,7 +50,11 @@ export function estimateLimit(
 	for (const segment of segmentsOf(readings)) {
 		const moved = segment.last.usedPct - segment.first.usedPct
 		if (moved <= 0) continue
-		tokens += tokensBetween(hourlyTokens, segment.first.sampledAt, segment.last.sampledAt)
+		// A segment with no hourly tokens behind it (day rows only, or use we never collected)
+		// says nothing about the limit, so it adds no points either.
+		const used = tokensBetween(hourlyTokens, segment.first.sampledAt, segment.last.sampledAt)
+		if (used <= 0) continue
+		tokens += used
 		points += moved
 		segments += 1
 		count += segment.readings
