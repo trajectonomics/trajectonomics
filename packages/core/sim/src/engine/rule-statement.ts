@@ -1,7 +1,6 @@
 import { countedDays } from "../calendar/counted"
-import { deflate } from "../money/growth"
+import { deflateBy, type Inflation } from "../money/inflation"
 import type {
-	BasisPoints,
 	DateString,
 	Projection,
 	ProjectionProblem,
@@ -12,6 +11,7 @@ import type {
 import { isRuled } from "../types"
 import { isSafeInteger, overflow } from "./overflow"
 import type { RuleBook, RuleYear } from "./rule-book"
+import { inflationOf } from "./run-scenario"
 
 type YearOutcome = { readonly year: SpendingRuleYear } | { readonly problem: ProjectionProblem }
 
@@ -21,11 +21,11 @@ type YearOutcome = { readonly year: SpendingRuleYear } | { readonly problem: Pro
  * inflation, so every figure is checked as an estate figure is: one that leaves the safe integers is
  * `VALUE_OVERFLOW` on the Rule year's date (#387).
  */
-function statedYear(year: RuleYear, inflation: BasisPoints, start: DateString): YearOutcome {
+function statedYear(year: RuleYear, inflation: Inflation, start: DateString): YearOutcome {
 	const days = countedDays(start, year.date)
 	const real = {
-		amount: deflate(year.amount, inflation, days),
-		paid: deflate(year.paid, inflation, days),
+		amount: deflateBy(year.amount, inflation, days),
+		paid: deflateBy(year.paid, inflation, days),
 	}
 	const rate = year.portfolio === 0n ? undefined : (year.amount * 10_000n) / year.portfolio
 	const figures = [year.portfolio, year.amount, year.paid, real.amount, real.paid, rate ?? 0n]
@@ -58,7 +58,7 @@ export function ruleStatements(
 		if (!isRuled(flow)) continue
 		const years: SpendingRuleYear[] = []
 		for (const year of book?.get(flow.id)?.years ?? []) {
-			const stated = statedYear(year, scenario.economy.inflation, start)
+			const stated = statedYear(year, inflationOf(scenario), start)
 			if ("problem" in stated) return stated
 			years.push(stated.year)
 		}

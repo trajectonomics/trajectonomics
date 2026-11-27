@@ -4,6 +4,7 @@ import type { LevySet } from "./levy-set"
 import { minBigInt } from "./min"
 import { mutate } from "./mutate"
 import { routedAt } from "./routed"
+import { inflationOf } from "./run-scenario"
 import type { StateMap } from "./state"
 import { addTracked, NO_ROUTING } from "./tracked"
 import { valuation } from "./value"
@@ -41,7 +42,7 @@ function fillStep(
 	const room =
 		step.upTo === undefined
 			? want
-			: routedAt(step.upTo, state, date, scenario.economy.inflation) - valuation(state, date)
+			: routedAt(step.upTo, state, date, inflationOf(scenario)) - valuation(state, date)
 	let fill = 0n
 	if (room > 0n) fill = minBigInt(want, room)
 	if (fill === 0n) return { remaining, filled: 0n, problem: undefined }

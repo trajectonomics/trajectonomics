@@ -1,5 +1,6 @@
 import type { EngineSnapshot } from "../engine/snapshot"
-import type { BasisPoints, Timeline } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { Timeline } from "../types"
 import type { ProjectionBalance, ProjectionProblem, ProjectionRow } from "../types/projection"
 import { realValues } from "./real"
 import type { RuleMap } from "./rules"
@@ -22,7 +23,7 @@ export function buildRows(
 	snapshots: readonly EngineSnapshot[],
 	timeline: Timeline,
 	rules: RuleMap,
-	inflation: BasisPoints,
+	inflation: Inflation,
 ): RowsOutcome {
 	const rows: ProjectionRow[] = []
 	for (const snapshot of snapshots) {

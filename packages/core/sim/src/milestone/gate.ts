@@ -2,6 +2,7 @@ import { addMonthsClamped } from "../calendar/arith"
 import type { ResolvedCalendar } from "../calendar/business"
 import type { DatedEvent } from "../engine/events"
 import { compareIds } from "../engine/order"
+import { inflationOf } from "../engine/run-scenario"
 import type { StateMap } from "../engine/state"
 import { isFee } from "../fee/flows"
 import type { DateString, Flow, MilestoneResult, Scenario, Timeline } from "../types"
@@ -74,12 +75,9 @@ export class MilestoneGate {
 			: dayEvents
 		const landing = (flow: Flow): boolean => state.stop?.(flow) !== true
 		if (fired.length === 0) return kept
-		const injected = onceEventsOn(
-			state.deferred,
-			fired,
-			date,
-			state.scenario.economy.inflation,
-		).filter((event) => landing(event.flow) && landsAt(state.fires, event.flow, date))
+		const injected = onceEventsOn(state.deferred, fired, date, inflationOf(state.scenario)).filter(
+			(event) => landing(event.flow) && landsAt(state.fires, event.flow, date),
+		)
 		return injected.length === 0 ? kept : [...kept, ...injected].sort(byFlowId)
 	}
 

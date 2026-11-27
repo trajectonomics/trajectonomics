@@ -1,10 +1,9 @@
 import { countedDays } from "../calendar/counted"
 import { leftOutOfAccessible } from "../engine/accessible"
 import type { AccountState, StateMap } from "../engine/state"
-import { deflate } from "../money/growth"
+import { deflateBy, type Inflation } from "../money/inflation"
 import type {
 	AccountId,
-	BasisPoints,
 	DateString,
 	Metric,
 	MetricName,
@@ -17,7 +16,7 @@ export interface Figures {
 	readonly date: DateString
 	readonly states: StateMap
 	readonly start: DateString
-	readonly inflation: BasisPoints
+	readonly inflation: Inflation
 	/** An Account's value on `date` in the requested terms. */
 	readonly account: (state: AccountState, terms: MilestoneTerms) => bigint
 	/** An expense window in the requested terms; `undefined` when the window is partial. */
@@ -29,11 +28,11 @@ export function termed(
 	value: bigint,
 	date: DateString,
 	start: DateString,
-	inflation: BasisPoints,
+	inflation: Inflation,
 	terms: MilestoneTerms,
 ): bigint {
 	if (terms !== "real") return value
-	return deflate(value, inflation, date < start ? 0 : countedDays(start, date))
+	return deflateBy(value, inflation, date < start ? 0 : countedDays(start, date))
 }
 
 /** The sign each named balance gives an Account: 0 leaves it out. */

@@ -12,6 +12,7 @@ import type { ProjectionOptions } from "../types/statement"
 import type { Returns } from "./returns"
 import { withRules } from "./rule-statement"
 import { runEngine } from "./run"
+import { runScenarioOf } from "./run-scenario"
 
 /** Report rows, the period ends the annual roll-ups close on, and the statement month ends. */
 function observationDates(timeline: Timeline, statements: boolean): readonly DateString[] {
@@ -44,7 +45,7 @@ export function projectChecked(
 	returns?: Returns,
 ): ProjectionResult {
 	const statements = options.liabilityStatements === true
-	const scenario = withPayouts(declared)
+	const scenario = runScenarioOf(withPayouts(declared), returns)
 	const observed = observationDates(timeline, statements)
 	const breakdown = options.cashflowBreakdown === true
 	const result = runEngine(baseline, scenario, timeline, observed, returns, {

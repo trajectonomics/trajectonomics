@@ -50,11 +50,27 @@ function milestoneValue(label: string, change: Change, names: ItemNames): string
 	return `${label.slice(0, label.length - tail.length)} set to ${words}`
 }
 
+/** Whether a path's last field is a Flow's Account: the `source` it moves from or the `target` it moves to. */
+function namesAccount(path: string): boolean {
+	const field = path.slice(path.lastIndexOf(".") + 1)
+	return field === "source" || field === "target"
+}
+
+/** A Set of a Flow's source or target shows the Account's ledger name in place of the id it stores. */
+function accountValue(label: string, change: Change, names: ItemNames): string {
+	if (change.kind !== "set" || !namesAccount(change.path)) return label
+	const tail = ` set to ${change.value}`
+	if (!label.endsWith(tail)) return label
+	const from = label.slice(0, label.length - tail.length)
+	return `${from} set to ${itemText(names, "account", change.value)}`
+}
+
 /**
  * The change's label, with the name of the Account (or of the loan or asset group's Account) the ledger gives it, and
  * the `displayLabel` the plan's document states for a Flow or a Milestone. A `salary:` group names its salary's Flow in
  * place of the id. An item with no name keeps its id. A `startAt` or `endAt` Set shows the Milestone's name in place of
- * the id it stores, and a Flow's `start` or `end` Set (or an Account's `lockedUntil`) shows its date as the Dashboard prints dates.
+ * the id it stores, a Flow's `start` or `end` Set (or an Account's `lockedUntil`) shows its date as the Dashboard prints
+ * dates, and a Flow's `source` or `target` shows the Account's name.
  */
 export function labelWithNames(change: Change, names: ItemNames): string {
 	if (change.kind === "group" && change.path.startsWith("salary:")) {
@@ -73,5 +89,6 @@ export function labelWithNames(change: Change, names: ItemNames): string {
 		item === null || !change.label.startsWith(leading(item.id))
 			? change.label
 			: `${itemText(names, kindOf(item.list), item.id)}${change.label.slice(leading(item.id).length)}`
-	return dateValue(milestoneValue(named, change, names), change)
+	const dated = dateValue(milestoneValue(named, change, names), change)
+	return accountValue(dated, change, names)
 }

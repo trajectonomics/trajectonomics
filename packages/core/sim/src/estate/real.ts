@@ -1,5 +1,4 @@
-import { deflate } from "../money/growth"
-import type { BasisPoints } from "../types"
+import { deflateBy, type Inflation } from "../money/inflation"
 
 export interface RealFigures {
 	readonly net: bigint
@@ -16,11 +15,11 @@ export function realFigures(
 	costs: readonly bigint[],
 	gifts: readonly bigint[],
 	toHeirs: bigint,
-	inflation: BasisPoints,
+	inflation: Inflation,
 	days: number,
 ): RealFigures {
 	const taken = (amounts: readonly bigint[]) =>
-		amounts.reduce((sum, amount) => sum + deflate(amount, inflation, days), 0n)
+		amounts.reduce((sum, amount) => sum + deflateBy(amount, inflation, days), 0n)
 	const net = realNetWorth - taken(costs)
 	if (toHeirs === 0n) return { net, toHeirs: 0n }
 	const left = net - taken(gifts)

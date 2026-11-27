@@ -18,6 +18,9 @@ _Avoid_: Snapshot, current state
 The one connector between the ledger and the simulation: it turns balances at an as-of date into a baseline. Neither core imports the other, so the mapping lives here.
 _Avoid_: Adapter, bridge, sync
 
+**Run-rate**:
+What an income or expense Account ran at over a window of whole recorded months, per month or per year, as `baseline rates` states it. _Avoid_: average, budget, estimate.
+
 **Scenario**:
 A named set of assumptions about the future: economy, accounts, streams, events and cash flow rules. FI settings and the horizon are not part of it; a command takes them (ADR-0030).
 _Avoid_: Forecast, model
