@@ -124,12 +124,12 @@ function chooseKey(event: KeyboardEvent, plan: string) {
 				{#each chart.yTicks as tick}
 					<line
 						class="bars-grid"
-						x1="56"
+						x1="64"
 						x2={chart.width - 16}
 						y1={tick.y}
 						y2={tick.y}
 					></line>
-					<text class="bars-axis" x="48" y={tick.y} text-anchor="end" dominant-baseline="middle">
+					<text class="bars-axis" x="56" y={tick.y} text-anchor="end" dominant-baseline="middle">
 						{tick.label}
 					</text>
 				{/each}
@@ -214,7 +214,8 @@ function chooseKey(event: KeyboardEvent, plan: string) {
 						<text
 							class="bars-meta"
 							x={labelX}
-							y={Math.max(10, mark.valueY - 12)}
+							y={mark.valueY}
+							dy="-1.35em"
 							text-anchor={mark.openHigh ? openSide : "middle"}>rough</text
 						>
 					{/if}

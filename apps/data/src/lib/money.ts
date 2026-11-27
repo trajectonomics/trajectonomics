@@ -19,9 +19,12 @@ export function usdLabel(value: number): string {
 	return USD.format(value)
 }
 
-/** A dollar figure on an axis, where a thousandth can matter and trailing zeros never do. */
+/**
+ * A dollar figure on an axis, where a thousandth can matter and trailing zeros never do. A
+ * thousand and up is compact (`$1.5K`), so the tick fits the axis gutter on a phone.
+ */
 export function usdTick(value: number): string {
-	return TICK.format(value)
+	return value >= 1_000 ? `$${compactCount(value)}` : TICK.format(value)
 }
 
 /**

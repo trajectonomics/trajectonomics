@@ -4,7 +4,7 @@ import { type TickKind, tickText } from "./tick-label"
 export const BAR_WIDTH = 720
 export const BAR_HEIGHT = 340
 
-const PADDING = Object.freeze({ top: 44, right: 16, bottom: 12, left: 56 })
+const PADDING = Object.freeze({ top: 44, right: 16, bottom: 12, left: 64 })
 const PLOT_WIDTH = BAR_WIDTH - PADDING.left - PADDING.right
 const PLOT_HEIGHT = BAR_HEIGHT - PADDING.top - PADDING.bottom
 const MAX_RATIOS = [1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]

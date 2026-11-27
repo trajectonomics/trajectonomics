@@ -20,6 +20,10 @@ describe("usdTick", () => {
 	test("drops trailing zeros", () => {
 		expect(usdTick(100)).toBe("$100")
 	})
+
+	test("is compact from a thousand, so it fits a phone's axis gutter", () => {
+		expect(usdTick(1_500)).toBe("$1.5K")
+	})
 })
 
 describe("compactUsd", () => {
