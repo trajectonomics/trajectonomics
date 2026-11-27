@@ -4,6 +4,7 @@ import { checkedAsOf } from "../date"
 import { type AppError, fail, isAppError } from "../errors"
 import { withLedger } from "../report/with-ledger"
 import { baselineTemplateOf } from "./baseline-template"
+import { toDecimalForm } from "./decimal"
 import { acceptedScenarioSchemaVersion } from "./document"
 
 /**
@@ -30,6 +31,12 @@ const TEMPLATE_DOCUMENT = {
 	cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },
 } as const
 
+/** What the caller adds to `--template`: a history window, and the decimal form (cli ADR-0082). */
+export type TemplateOptions = {
+	history?: { months: number } | undefined
+	decimal: boolean
+}
+
 /**
  * The template text, stamped with the version the pinned core accepts, or `undefined` when the pin
  * accepts none inside the scan's bound. `JSON.stringify` keeps the literal's key order, the text
@@ -42,17 +49,34 @@ export function scenarioTemplate(): string | undefined {
 	return JSON.stringify({ schemaVersion: version, ...TEMPLATE_DOCUMENT }, null, 2)
 }
 
+/** The same document with every amount as a decimal string of the currency's major unit. */
+function decimalText(text: string): string | AppError {
+	const converted = toDecimalForm(JSON.parse(text) as Record<string, unknown>)
+	return isAppError(converted) ? converted : JSON.stringify(converted, null, 2)
+}
+
 /**
  * `scenario apply --template`: the minimal document with no As-of, which opens no data directory,
  * or the Baseline's pre-fill at one As-of, which reads the Ledger and writes nothing (ADR-0044).
- * The As-of is checked before the store opens, so a bad date wins over a corrupt row (ADR-0029).
+ * With `history` the Streams are the Ledger's own run-rates (cli ADR-0082). The As-of is checked
+ * before the store opens, so a bad date wins over a corrupt row (ADR-0029).
  */
-export function printTemplate(ctx: Context, asOf: string | undefined): Result<string> | AppError {
+export function printTemplate(
+	ctx: Context,
+	asOf: string | undefined,
+	options: TemplateOptions,
+): Result<string> | AppError {
 	if (asOf === undefined) {
 		const template = scenarioTemplate()
-		return template === undefined ? fail("internal") : ok(template)
+		if (template === undefined) return fail("internal")
+		const text = options.decimal ? decimalText(template) : template
+		return isAppError(text) ? text : ok(text)
 	}
 	const checked = checkedAsOf(asOf)
 	if (isAppError(checked)) return checked
-	return withLedger(ctx, (ledger) => baselineTemplateOf(ledger, asOf))
+	return withLedger(ctx, (ledger) => {
+		const printed = baselineTemplateOf(ledger, asOf, options.history)
+		if (isAppError(printed)) return printed
+		return options.decimal ? decimalText(printed) : printed
+	})
 }

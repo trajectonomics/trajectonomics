@@ -1,3 +1,5 @@
+import { documentRead } from "../lib/view/plan-items/document"
+import { employerShareIds } from "../lib/view/plan-items/employer"
 import type { Addition } from "../lib/what-if/additions"
 import type { WhatIfAnswer } from "../lib/what-if/answer"
 import { type LensReads, lensFor, lensReadsOf, type WhatIfLens } from "../lib/what-if/lens"
@@ -10,6 +12,7 @@ import {
 	type WhatIf,
 } from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
+import { currentSnapshot } from "./snapshot.svelte.js"
 import { readWhatIf } from "./what-if-remote.js"
 
 /** The state of the What-if session: its plan and changes, its last reads, and any question to the person. */
@@ -53,9 +56,13 @@ export class WhatIfState {
 		if (this.asking === from) this.asking = to
 	}
 
-	/** The changes, as the bar lists them. */
+	/** The changes, as the bar lists them, with the plan's own employer shares read from its document. */
 	get changes(): Change[] {
-		return this.whatIf === null ? [] : changesOf(this.whatIf)
+		if (this.whatIf === null) return []
+		const read = documentRead(currentSnapshot(), this.whatIf.plan)
+		const shares =
+			read?.ok === true ? employerShareIds(read.data.scenario.document.flows) : new Set<string>()
+		return changesOf(this.whatIf, shares)
 	}
 
 	/** Reads the session's four reads after the debounce, so a run of quick changes reads once. */
