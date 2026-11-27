@@ -6,7 +6,7 @@ import { writeCommand } from "../src/lib/edit/edit"
 import { type RecordValuesEdit, unknownAccountIds } from "../src/lib/edit/record-values"
 import { type RunContext, runTraj } from "./run-traj"
 import { answerPreview, failure } from "./serve-edit-answer"
-import { answerOf } from "./serve-snapshot-answer"
+import { answerWritten } from "./serve-snapshot-answer"
 import type { SnapshotRun } from "./snapshot-run"
 
 /** What the run needs: how to run traj, the Snapshot the page reads, and how to read it again. */
@@ -25,7 +25,8 @@ function write(run: RecordValuesRun, edit: RecordValuesEdit, dryRun: boolean) {
 /**
  * Runs the Edit: an account the Snapshot does not hold is refused before anything runs (400), a refusal
  * of the batch is answered as data with nothing written, and a write that held answers the new Snapshot
- * with the batch's own result. A preview stops after the dry run and answers its result: nothing is written.
+ * with the batch's own result, or, when the read after it failed, `written_reread_failed` with that result.
+ * A preview stops after the dry run and answers its result: nothing is written.
  */
 export async function recordValues(
 	run: RecordValuesRun,
@@ -45,5 +46,5 @@ export async function recordValues(
 	if (edit.preview) return answerPreview(dry.data)
 	const real = await write(run, edit, false)
 	if (!real.ok) return failure(200, real.error)
-	return answerOf(await run.refresh(), { result: real.data })
+	return answerWritten(await run.refresh(), { result: real.data })
 }

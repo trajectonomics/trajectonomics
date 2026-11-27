@@ -22,6 +22,8 @@ export function createEditor(options: EditorOptions): Editor {
 	let params = options.params
 	let body: string | null = null
 	let held: Snapshot | null = null
+	// True after a whole read failed, as after a write that landed: until a whole read succeeds, no reread keeps reads from before it.
+	let behind = false
 	const gate = createEditGate()
 
 	/** Keeps a Snapshot that ran as the served body and as the one a later reread may keep reads of. */
@@ -34,7 +36,9 @@ export function createEditor(options: EditorOptions): Editor {
 	}
 
 	async function refresh(): Promise<SnapshotRun> {
-		return keep(await runSnapshot(options.traj, options.cliVersion, params, options.records))
+		const run = keep(await runSnapshot(options.traj, options.cliVersion, params, options.records))
+		behind = !run.ok
+		return run
 	}
 
 	/** The Edit's own run: dry first, then the real write, then the Snapshot read again. */
@@ -67,7 +71,8 @@ export function createEditor(options: EditorOptions): Editor {
 		params = paramsAfter(params, read.reread, stored)
 		const changed = changedBy(read.reread)
 		// Only those inputs changed: run only the reads that depend on them, if nothing else moved (run-reread.ts).
-		if ((!changed.allowances && !changed.chance) || held === null) return answerOf(await refresh())
+		if ((!changed.allowances && !changed.chance) || held === null || behind)
+			return answerOf(await refresh())
 		const { traj, cliVersion, records } = options
 		return answerOf(keep(await rereadInputs(traj, cliVersion, params, held, records, changed)))
 	}

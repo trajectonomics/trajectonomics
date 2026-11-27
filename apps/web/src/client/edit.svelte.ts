@@ -1,7 +1,7 @@
 import type { AccountValues, ErrorBody } from "../lib/contract"
-import { type EditAnswer, editAnswer, type PreviewAnswer } from "../lib/edit/answer"
+import { editAnswer, type PreviewAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
-import { WRITTEN_REREAD_FAILED } from "../lib/edit/failure"
+import { type EditOutcome, editOutcome } from "../lib/edit/outcome"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
@@ -26,8 +26,8 @@ class EditSession {
 	failure = $state<ErrorBody | null>(null)
 	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
 	stale = $state(false)
-	/** True while the last Edit's error says its write landed and the Snapshot after it could not be read. */
-	savedUnread = $derived(this.failure?.code === WRITTEN_REREAD_FAILED)
+	/** True from a write that landed while the read after it failed, until the page shows a Snapshot read since. `clear()` leaves it. */
+	savedUnread = $state(false)
 	/** What the last Edit that ran stated, as the CLI stated it: the batch of `record-values`. Null for any other. */
 	result = $state<AccountValues | null>(null)
 	private opened: Promise<void> | null = null
@@ -55,7 +55,8 @@ class EditSession {
 		dismissDropped()
 		try {
 			const answer = editAnswer.safeParse(await postEdit(this.token, edit))
-			return this.settle(answer.success ? answer.data : null, "name" in edit ? edit.name : null)
+			const outcome = editOutcome(answer.success ? answer.data : null)
+			return this.settle(outcome, "name" in edit ? edit.name : null)
 		} catch {
 			this.error = "The Dashboard could not reach traj. Try again."
 			return false
@@ -102,27 +103,28 @@ class EditSession {
 		this.error = null
 		const answer = await postReread(this.token, body)
 		this.busy = false
+		if (answer.ok) this.savedUnread = false
 		if (answer.ok) this.clear()
 		else this.error = answer.message
 		return answer.ok
 	}
 
-	private settle(answer: EditAnswer | null, plan: string | null): boolean {
-		if (answer === null) {
+	private settle(outcome: EditOutcome, plan: string | null): boolean {
+		if (outcome.kind === "unreadable") {
 			this.error = "The Dashboard could not read the answer to the Edit."
 			return false
 		}
-		if (!answer.ok) {
-			this.failure = answer.error
-			// A plan that moved on, or a write that landed and could not be read again, has its own sentence and a
-			// Reload action; no form repeats either text.
-			if (answer.error.code === "scenario_changed") this.stale = true
-			else if (answer.error.code !== WRITTEN_REREAD_FAILED) this.error = answer.error.message
+		if (outcome.kind === "refused") {
+			this.failure = outcome.error
+			// A plan that moved on has its own sentence and a Reload action; no form repeats the CLI's text.
+			if (outcome.error.code === "scenario_changed") this.stale = true
+			else this.error = outcome.error.message
 			return false
 		}
-		this.result = answer.result ?? null
-		showDropped(plan, answer)
-		replaceSnapshot(answer.snapshot)
+		this.result = outcome.result
+		showDropped(plan, outcome)
+		if (outcome.snapshot !== null) replaceSnapshot(outcome.snapshot)
+		this.savedUnread = outcome.snapshot === null
 		return true
 	}
 

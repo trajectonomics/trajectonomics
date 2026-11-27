@@ -1,0 +1,15 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import Redirect from "../components/Redirect.svelte"
+import Layout from "../layouts/Layout.astro"
+import { dictionaryFor, pagePath } from "../lib/language"
+
+const language = "en"
+const words = dictionaryFor(language)
+---
+
+<Layout language={language} page="home" title="Trajectonomics" description={words.redirectDescription}>
+	<Redirect client:load language={language} />
+	<noscript><p class="redirect"><a href={pagePath(language, "sign-in")}>{words.signInTitle}</a></p></noscript>
+</Layout>
