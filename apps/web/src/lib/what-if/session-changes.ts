@@ -51,7 +51,10 @@ function tryWhat(path: string): string {
 }
 
 /** The changes, in the order `traj` applies them: removals first, then Additions, then Sets, and each group as one. */
-export function changesOf(whatIf: WhatIf): Change[] {
+export function changesOf(
+	whatIf: WhatIf,
+	employerShares: ReadonlySet<string> = new Set(),
+): Change[] {
 	const own = (path: string) => !whatIf.groups.some((group) => inGroup(group, path))
 	const hiding = (path: string) => isHeld(whatIf, path)
 	// A Set under a tried group is that group's one change; one under a switched-off group is sent when the plan keeps
@@ -91,8 +94,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 					value: set.value,
 				}
 			}
-			const field = set.path.split(".").slice(2).join(".")
-			return { kind: "set", path: set.path, ...fieldChange(set.path, field, set.value) }
+			return { kind: "set", path: set.path, ...fieldChange(set.path, set.value, employerShares) }
 		})
 	return [...removals, ...additions, ...sets, ...groupChanges(whatIf)]
 }

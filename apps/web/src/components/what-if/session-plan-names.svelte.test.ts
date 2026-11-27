@@ -25,6 +25,30 @@ const RULE = {
 	rounding: "halfUp" as const,
 }
 
+/** The Demo with a salary's employer share in its base document, the shape the form writes (web ADR 0017). */
+function withEmployerShare(fund: string): Snapshot {
+	const next = structuredClone(DEMO)
+	const read = next.reads.documents["base"]
+	if (read?.ok !== true) throw new Error("the Demo reads base")
+	const document = read.data.scenario.document
+	document.flows.push({
+		id: "salary-employer",
+		kind: "contribution",
+		frequency: "monthly",
+		start: "2026-01-01",
+		target: fund,
+		funding: "employer",
+		derive: {
+			measures: [
+				{ id: "pay", op: "flow", flow: "salary" },
+				{ id: "share", op: "scale", of: "pay", num: 700, den: 10000, rounding: "floor" },
+			],
+			result: "share",
+		},
+	})
+	return next
+}
+
 /** The Demo's plan under two names, each stating a different label for the same spending Flow. */
 function twoPlans(): Snapshot {
 	const next = structuredClone(DEMO)
@@ -60,20 +84,25 @@ describe("the What-if bar words a change by its session plan", () => {
 		expect(body).not.toContain("Beta spending")
 	})
 
-	test("an Account a Flow moves to reads as its ledger name, and the employer share's Account too", () => {
-		replaceSnapshot(DEMO)
+	test("an Account a Flow moves to reads as its ledger name, and only a real employer share says account", () => {
 		const accounts = DEMO.reads.accounts
 		if (!accounts.ok) throw new Error("the Demo reads its accounts")
 		const fund = accounts.data.accounts.find((account) => account.name === "Fund")
 		if (fund === undefined) throw new Error("the Demo has a Fund Account")
+		replaceSnapshot(withEmployerShare(fund.id))
 		whatIfSession.whatIf = withSet(
-			withSet(startWhatIf("base", HASH), "flows.fund.target", fund.id),
-			"flows.salary-employer.target",
+			withSet(
+				withSet(startWhatIf("base", HASH), "flows.fund.target", fund.id),
+				"flows.salary-employer.target",
+				fund.id,
+			),
+			"flows.paid-by-employer.target",
 			fund.id,
 		)
 		const body = render(WhatIfChanges, { props: {} }).body
 		expect(body).toContain("move to set to Fund")
 		expect(body).toContain("account set to Fund")
+		expect(body).toContain("paid-by-employer move to set to Fund")
 		expect(body).not.toContain(fund.id)
 	})
 })

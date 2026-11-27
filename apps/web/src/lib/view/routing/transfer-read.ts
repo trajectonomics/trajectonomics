@@ -5,10 +5,13 @@
  */
 import { z } from "zod"
 import type { ScenarioFlow } from "../../contract"
-import { formatBps } from "../../format"
+import { formatBps, percentWords } from "../../format"
 import { SHARE_DEN } from "../plan-items/employer"
 
-export type Moves = { how: "all" } | { how: "share"; share: string } | { how: "amount" } | null
+export type Moves = DerivedMoves | { how: "amount" }
+
+/** How a `derive` moves money: all of the source, a share of it, or null when the shape is another. */
+export type DerivedMoves = { how: "all" } | { how: "share"; share: string } | null
 
 const held = z.looseObject({ id: z.string(), op: z.literal("account"), account: z.string() })
 const scale = z.looseObject({
@@ -21,16 +24,28 @@ const scale = z.looseObject({
 const all = z.looseObject({ measures: z.tuple([held]), result: z.string() })
 const part = z.looseObject({ measures: z.tuple([held, scale]), result: z.string() })
 
-/** How much a transfer moves, or null when its amount is a shape the page does not write. */
-export function movesOf(flow: ScenarioFlow): Moves {
-	if (flow.derive === undefined) return flow.amount === undefined ? null : { how: "amount" }
-	const one = all.safeParse(flow.derive)
+/** How a derive moves money, or null when it is a shape the page does not write. */
+export function movesFrom(derive: unknown): DerivedMoves {
+	const one = all.safeParse(derive)
 	if (one.success && one.data.result === one.data.measures[0].id) return { how: "all" }
-	const two = part.safeParse(flow.derive)
+	const two = part.safeParse(derive)
 	if (!two.success) return null
 	const [source, share] = two.data.measures
 	const reads = share.of === source.id && two.data.result === share.id
 	return reads ? { how: "share", share: formatBps(share.num) } : null
+}
+
+/** What a transfer's `derive` says in words, as its card reads it: "all of the source", or "10.00% of the source". */
+export function moveWords(derive: unknown): string | null {
+	const moves = movesFrom(derive)
+	if (moves === null) return null
+	return moves.how === "all" ? "all of the source" : `${percentWords(moves.share)}% of the source`
+}
+
+/** How much a transfer moves, or null when its amount is a shape the page does not write. */
+export function movesOf(flow: ScenarioFlow): Moves {
+	if (flow.derive === undefined) return flow.amount === undefined ? null : { how: "amount" }
+	return movesFrom(flow.derive)
 }
 
 /** The derive of "all of the source". */

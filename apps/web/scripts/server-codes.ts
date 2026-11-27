@@ -1,84 +1,106 @@
 /**
- * The codes a Dashboard source writes, read from every way the page writes one: a `code` field, a refusal, a `fail`
- * call, a constant, a ternary's two arms and a type union. A value it cannot read is reported, so the guard fails on it
- * unless the file states why it passes one through. Pure: the test passes the sources and the allow-list in.
+ * The codes a Dashboard source writes, read from its TypeScript tree: an object's `code` (or shorthand), a type member
+ * named `code`, and the code argument of `refused`, `refusal` and `fail`. An expression the scan cannot read fails the
+ * guard, unless its file and exact text are on the allow-list with a reason. Pure: the test passes the sources in.
  */
-import { argumentCode, readValue, type Source } from "./server-code-values"
+import ts from "typescript"
+import { type CodeContext, contextOf } from "./server-code-context"
+import { parseSource, type Source, walk } from "./server-code-source"
+import { typeCodes } from "./server-code-types"
+import type { Value } from "./server-code-value"
+import { valueCodes } from "./server-code-values"
 
-export { allConstants, type Source } from "./server-code-values"
+export type { Source } from "./server-code-source"
 
-/** One source's codes, and the values it states no plain code for, each as `file: value`. */
+/** A source's codes, and each unreadable expression as `file: text`. */
 export interface Scan {
 	readonly codes: string[]
 	readonly hidden: string[]
 }
 
-/** A `code` field or shorthand, after `{`, a comma or a line start; with its value when it states one. */
-const CODE_SITE = /(?:\{\s*|,\s*|\n\s*)(?:readonly\s+)?code(?:\s*:\s*([^,;}\n]+?))?\s*(?=[,;}\n])/g
+/** The call names whose argument may be a code. */
+const HELPERS: ReadonlySet<string> = new Set(["refused", "refusal", "fail"])
 
-/** A refusal's or a `fail` call's code argument, which may be a literal or a named constant. */
-const REFUSAL = /\brefus(?:al|ed)\(\s*[^,)]*,\s*([^,)]+)/g
-const FAIL = /\bfail\(\s*([^,)]+)/g
-
-/** Each `code` site's codes, and the value at a site the scan cannot read. */
-function siteCodes(
-	source: Source,
-	constants: ReadonlyMap<string, string>,
-	codes: string[],
-	hidden: string[],
-): void {
-	for (const match of source.text.matchAll(CODE_SITE)) {
-		const value = match[1]?.trim()
-		if (value === undefined) {
-			hidden.push(`${source.file}: a code shorthand`)
-			continue
-		}
-		const read = readValue(value, constants)
-		codes.push(...read.codes)
-		if (!read.read) hidden.push(`${source.file}: ${value}`)
-	}
+/** One scan's finds: every code, and each unreadable expression once. */
+interface Found {
+	readonly codes: string[]
+	readonly hidden: Set<string>
 }
 
-/** One pattern's code arguments, each a literal or a named constant. */
-function patternCodes(
-	text: string,
-	pattern: RegExp,
+/** Whether a property, type member or binding is named `code`. */
+function codeName(name: ts.PropertyName): boolean {
+	return (ts.isIdentifier(name) || ts.isStringLiteral(name)) && name.text === "code"
+}
+
+/** A value's codes, and its exact text when the scan cannot read it. */
+function record(value: Value, text: string, file: string, found: Found): void {
+	found.codes.push(...value.codes)
+	if (!value.read) found.hidden.add(`${file}: ${text}`)
+}
+
+/** An object's `code: …`, read from its value. */
+function property(
+	node: ts.PropertyAssignment,
 	file: string,
-	constants: ReadonlyMap<string, string>,
-	codes: string[],
-	hidden: string[],
+	context: CodeContext,
+	found: Found,
 ): void {
-	for (const match of text.matchAll(pattern)) {
-		const argument = match[1]
-		if (argument === undefined) continue
-		const read = argumentCode(argument, constants)
-		if (read === null) continue
-		codes.push(...read.codes)
-		if (!read.read) hidden.push(`${file}: ${argument.trim()}`)
-	}
+	if (!codeName(node.name)) return
+	record(valueCodes(node.initializer, context), node.initializer.getText(), file, found)
 }
 
-/** Each refusal's and `fail`'s code argument, and the one the scan cannot read. */
-function callCodes(
-	source: Source,
-	constants: ReadonlyMap<string, string>,
-	codes: string[],
-	hidden: string[],
+/** A type member's `code: …`, read from its type: a union's members, or the alias it names. */
+function member(
+	node: ts.PropertySignature,
+	file: string,
+	context: CodeContext,
+	found: Found,
 ): void {
-	for (const pattern of [REFUSAL, FAIL]) {
-		patternCodes(source.text, pattern, source.file, constants, codes, hidden)
-	}
+	if (!codeName(node.name) || node.type === undefined) return
+	record(typeCodes(node.type, context), node.type.getText(), file, found)
 }
 
-/** One source's codes, and the `code` values it hides, unless the file says why it passes one through. */
-export function scan(
-	source: Source,
-	constants: ReadonlyMap<string, string>,
-	allowed: ReadonlySet<string>,
-): Scan {
-	const codes: string[] = []
-	const hidden: string[] = []
-	siteCodes(source, constants, codes, hidden)
-	callCodes(source, constants, codes, hidden)
-	return { codes, hidden: allowed.has(source.file) ? [] : hidden }
+/** `{ code }` states no code of its own, so it is reported unless the file says why it passes one through. */
+function shorthand(node: ts.ShorthandPropertyAssignment, file: string, found: Found): void {
+	if (node.name.text === "code") found.hidden.add(`${file}: ${node.getText()}`)
+}
+
+/** The code argument of a `refused`, `refusal` or `fail` call; a call whose definition names no code is skipped. */
+function call(node: ts.CallExpression, file: string, context: CodeContext, found: Found): void {
+	const callee = node.expression
+	if (!ts.isIdentifier(callee) || !HELPERS.has(callee.text)) return
+	const index = context.argIndex(file, callee.text)
+	if (index === null) return
+	const argument = node.arguments[index]
+	if (argument === undefined) {
+		found.hidden.add(`${file}: ${node.getText()}`)
+		return
+	}
+	record(valueCodes(argument, context), argument.getText(), file, found)
+}
+
+/** One node of a source, for what it states. */
+function visit(node: ts.Node, file: string, context: CodeContext, found: Found): void {
+	if (ts.isPropertyAssignment(node)) property(node, file, context, found)
+	else if (ts.isShorthandPropertyAssignment(node)) shorthand(node, file, found)
+	else if (ts.isPropertySignature(node)) member(node, file, context, found)
+	if (ts.isCallExpression(node)) call(node, file, context, found)
+}
+
+/** Every source's codes, and the ones it hides, unless the file and the exact text are allowed. */
+export function scan(sources: readonly Source[], allowed: ReadonlySet<string>): Scan {
+	const parsed = sources.map(parseSource)
+	const context = contextOf(parsed)
+	const found: Found = { codes: [], hidden: new Set() }
+	for (const source of parsed) {
+		for (const tree of source.trees) {
+			walk(tree, (node) => visit(node, source.file, context, found))
+		}
+	}
+	return { codes: found.codes, hidden: [...found.hidden].filter((key) => !allowed.has(key)) }
+}
+
+/** Every named code of every source, so a constant a file imports still reads as the code it holds. */
+export function allConstants(sources: readonly Source[]): Map<string, string> {
+	return new Map(contextOf(sources.map(parseSource)).constants)
 }

@@ -41,7 +41,7 @@ const names = $derived.by(() => {
 		: snapshotItemNames(state.snapshot, plan)
 })
 
-/** The fields whose Set is money, which hiding amounts masks: an amount, or a spending level's principal. */
+/** The fields whose Set is money, which hiding amounts masks: an amount, or a Contribution level payment's principal. */
 const MONEY_FIELDS: ReadonlySet<string> = new Set(["amount", "level"])
 
 /** Whether a Set changes a figure, which hiding amounts masks. A name, a date, a percent or an Account's id is not money. */

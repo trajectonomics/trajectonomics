@@ -47,6 +47,18 @@ describe("the What-if bar's changes", () => {
 		expect(html).not.toContain("90000.00")
 	})
 
+	test("masks a Contribution level payment's principal when amounts are hidden", () => {
+		preferences.hidden = true
+		whatIfSession.whatIf = withSet(startWhatIf("base", HASH), "flows.loan.level", {
+			principal: "120000.00",
+			payments: 240,
+			rounding: "floor",
+		})
+		const html = body()
+		expect(html).toContain("loan level set to •••••")
+		expect(html).not.toContain("120000.00")
+	})
+
 	test("hides only money: a name, how often, a category and an Account stay", () => {
 		preferences.hidden = true
 		const shown: [string, string, string][] = [
