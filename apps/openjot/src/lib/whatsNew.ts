@@ -25,6 +25,24 @@ export interface WhatsNewRelease {
 /** Newest first. Add an entry for every release: a unit test fails when the newest one is older than package.json. */
 export const CHANGELOG: WhatsNewRelease[] = [
   {
+    version: "1.6.0",
+    date: "2026-11-27",
+    items: [
+      {
+        id: "trajectonomics-theme",
+        icon: "sparkles",
+        title: {
+          en: "A new Trajectonomics theme",
+          th: "ธีมใหม่ Trajectonomics",
+        },
+        body: {
+          en: "A dark theme with the Trajectonomics robot. Pick it under Theme in My Moo. Pink & White and Black & Orange are still there.",
+          th: "ธีมสีเข้มพร้อมหุ่นยนต์ของ Trajectonomics เลือกได้ที่ธีมในมูของฉัน ธีมชมพูขาวและดำส้มยังอยู่เหมือนเดิม",
+        },
+      },
+    ],
+  },
+  {
     version: "1.5.0",
     date: "2026-11-25",
     items: [
