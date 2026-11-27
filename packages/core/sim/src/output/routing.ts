@@ -1,5 +1,6 @@
 import { isSafeInteger, overflow } from "../engine/overflow"
 import { routedValue } from "../engine/routed"
+import { inflationOf } from "../engine/run-scenario"
 import type { ProjectionRouting, RoutedAmount, RoutedResolved, Scenario, Timeline } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 
@@ -29,7 +30,7 @@ export function usesGrownTarget(scenario: Scenario): boolean {
 export function buildRouting(scenario: Scenario, timeline: Timeline): RoutingOutcome {
 	if (!usesGrownTarget(scenario)) return { fields: {}, problem: undefined }
 	const { start, horizon } = timeline
-	const { inflation } = scenario.economy
+	const inflation = inflationOf(scenario)
 	let unsafe = false
 	const resolve = (target: RoutedAmount | undefined): RoutedResolved | null => {
 		if (target === undefined) return null

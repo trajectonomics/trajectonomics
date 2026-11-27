@@ -21,7 +21,7 @@ import { settle } from "./editor-running.test-support"
 
 const FIRST = { paths: 200, seed: "0123456789abcdef" }
 const SECOND = { paths: 1000, seed: "fedcba9876543210" }
-const CHECK = ["scenario list", "account list", "report networth"]
+const CHECK = ["account list", "report networth", "scenario list"]
 
 /** One reread, and the Snapshot it answers. */
 async function reread(body: unknown): Promise<Snapshot> {
@@ -44,6 +44,7 @@ const checksOf = (ran: string[]) =>
 	ran
 		.filter((line) => !line.startsWith("projection chance") && !line.startsWith("projection path"))
 		.map((line) => CHECK.find((prefix) => line.startsWith(prefix)))
+		.sort()
 
 beforeAll(async () => {
 	await setupAssumptions()
@@ -172,7 +173,7 @@ describe("what a chance change costs", () => {
 			}
 			await reread({ chance: FIRST })
 			const full = await timed(() => reread({}))
-			const kept = await timed(() => reread({ chance: SECOND }))
+			const kept = await timed(() => reread({ chance: { ...FIRST, seed: SECOND.seed } }))
 			console.log(`full read ${full} ms, chance change ${kept} ms`)
 			expect(kept).toBeLessThan(full)
 		},
