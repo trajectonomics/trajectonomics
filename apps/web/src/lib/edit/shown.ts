@@ -8,3 +8,12 @@ import { isDemo } from "../view/snapshot-url"
 export function editsShown(token: string | null, search: string): boolean {
 	return token !== null && !isDemo(search)
 }
+
+/**
+ * Whether a drawer a person opens from a compact card shows the item's form under its facts. On loopback the
+ * drawer can save, so it does; the hosted Demo has no write path, so its drawer is a read of the facts
+ * ([ADR 0028](../../../docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
+ */
+export function drawerEditsShown(): boolean {
+	return true
+}

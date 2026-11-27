@@ -19,10 +19,13 @@ interface Props {
 	/** The custom chart the address bar names, and the setter that writes it. */
 	chart: string
 	onChart: (id: string) => void
+	/** The item tab the address bar names, and the setter that writes it. */
+	items: string
+	onItems: (value: string) => void
 }
 
 /** The Plan: its people, the three figures, and its chart. The household and the years have their own pages. */
-let { scenario, editable, terms, onTerms, chart, onChart }: Props = $props()
+let { scenario, editable, terms, onTerms, chart, onChart, items, onItems }: Props = $props()
 </script>
 
 <PageShell
@@ -35,6 +38,7 @@ let { scenario, editable, terms, onTerms, chart, onChart }: Props = $props()
 			<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} {terms} keys={ALL_YEAR_FIGURES} />
 		{/if}
 		<ProjectionView
+			{snapshot}
 			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
 			{scenario}
@@ -46,6 +50,8 @@ let { scenario, editable, terms, onTerms, chart, onChart }: Props = $props()
 			{onTerms}
 			{chart}
 			{onChart}
+			{items}
+			{onItems}
 		/>
 	{/snippet}
 </PageShell>
