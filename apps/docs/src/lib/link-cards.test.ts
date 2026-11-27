@@ -11,6 +11,11 @@ const link = (href: string, name: string): HastNode => ({
 })
 const item = (...children: HastNode[]): HastNode => ({ type: "element", tagName: "li", children })
 const list = (...children: HastNode[]): HastNode => ({ type: "element", tagName: "ul", children })
+const code = (value: string): HastNode => ({
+	type: "element",
+	tagName: "code",
+	children: [text(value)],
+})
 
 /** Run the plugin over one node, returning its replacement. */
 function run(node: HastNode): HastNode | undefined {
@@ -26,6 +31,12 @@ function run(node: HastNode): HastNode | undefined {
 function classesOf(node: HastNode): readonly unknown[] {
 	const classes = node.properties?.["className"]
 	return Array.isArray(classes) ? classes : []
+}
+
+/** The text of a hast subtree. */
+function textOf(node: HastNode): string {
+	if (node.type === "text") return node.value ?? ""
+	return (node.children ?? []).map(textOf).join("")
 }
 
 describe("a list whose items start with a link and say more", () => {
@@ -73,6 +84,42 @@ describe("a list whose items start with a link and say more", () => {
 
 		expect(classesOf(run(spaced) as HastNode)).toEqual(["docs-link-cards"])
 	})
+
+	test("matches the Quickstart's What next shape", () => {
+		const marked = run(
+			list(
+				item(
+					link("/cli/installation/", "Installation"),
+					text(": the three install channels, the agent skill, release\n  pinning and uninstall."),
+				),
+				item(link("/cli/data/", "Your data"), text(": the data directory and backups")),
+			),
+		)
+
+		expect(classesOf(marked as HastNode)).toEqual(["docs-link-cards"])
+	})
+
+	test("keeps every space and every colon after the first one", () => {
+		const marked = run(
+			list(
+				item(
+					link("/cli/configuration/", "Alpha"),
+					text(": flags "),
+					code("--a"),
+					text(" "),
+					code("--b"),
+					text(" set "),
+					code("TRAJ_HOME"),
+					text(": the directory."),
+				),
+			),
+		)
+		const line = (marked?.children ?? [])[0]?.children?.[1]
+
+		expect(line?.tagName).toBe("span")
+		expect(textOf(line as HastNode)).toBe("flags --a --b set TRAJ_HOME: the directory.")
+		expect((line?.children ?? [])[0]?.value).toBe("flags ")
+	})
 })
 
 describe("a list that is not a set of link cards", () => {
@@ -92,5 +139,42 @@ describe("a list that is not a set of link cards", () => {
 		}
 
 		expect(run(ordered)).toBeUndefined()
+	})
+
+	test("an item that only starts with a sentence does not match", () => {
+		const sentence = item(text("Read "), link("/x", "Alpha"), text(" before anything."))
+
+		expect(run(list(sentence))).toBeUndefined()
+	})
+
+	test("an item carrying a second link does not match", () => {
+		const second = item(
+			link("/x", "Alpha"),
+			text(": then read "),
+			link("/y", "Beta"),
+			text(" too."),
+		)
+
+		expect(run(list(second))).toBeUndefined()
+	})
+
+	test("an item whose line is only a nested list does not match", () => {
+		const nested = item(link("/x", "Alpha"), text(": "), {
+			type: "element",
+			tagName: "ul",
+			children: [item(text("Beta"))],
+		})
+
+		expect(run(list(nested))).toBeUndefined()
+	})
+
+	test("a block element after the colon does not match", () => {
+		const paragraph = item(link("/x", "Alpha"), text(": "), {
+			type: "element",
+			tagName: "p",
+			children: [text("the words")],
+		})
+
+		expect(run(list(paragraph))).toBeUndefined()
 	})
 })

@@ -58,7 +58,11 @@ describe("the flow fence plugin", () => {
 		const list = run(fence("flow", "You: a question -> Agent: asks -> traj: 879.50 THB"))
 
 		expect(list?.tagName).toBe("ol")
-		expect(list?.properties).toEqual({ className: ["docs-flow"], ariaLabel: "Flow" })
+		expect(list?.properties).toEqual({
+			className: ["docs-flow"],
+			ariaLabel: "Steps: You, Agent, traj",
+			role: "list",
+		})
 		const items = list?.children ?? []
 		expect(items.map((item) => item.tagName)).toEqual(["li", "li", "li"])
 		const results = items.map((item) => {

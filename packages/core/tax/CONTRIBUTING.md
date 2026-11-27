@@ -1,7 +1,7 @@
 # Contributing tax rules
 
 ```flow
-Pick a rule: wrong figure or new year -> Cite the source: SOURCES.md -> Change the parameters -> Add a corpus case -> Check: bun run check:th-sources -> Review
+Pick a rule -> Cite the source: SOURCES.md -> Change the parameters -> Add a corpus case -> Check: bun run check
 ```
 
 This guide is for people who know a country's or a state's tax rules and want the code to follow

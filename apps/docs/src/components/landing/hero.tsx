@@ -48,6 +48,7 @@ export function Hero({ releaseLine }: { readonly releaseLine?: string | undefine
 				number comes from the tool.
 			</p>
 			<p {...rise(4)} className="flex flex-wrap items-center gap-2 text-xs">
+				<span className="text-xs text-fd-muted-foreground">Agents start at</span>
 				<a href={DOCS_INDEX_PATH} {...AGENT_LINE_LOAD} className={AGENT_FILE_LINK}>
 					llms.txt
 				</a>

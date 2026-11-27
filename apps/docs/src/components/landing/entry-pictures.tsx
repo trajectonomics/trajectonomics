@@ -1,4 +1,9 @@
 import { Fragment } from "react"
+import {
+	QUICKSTART_AS_OF,
+	QUICKSTART_CURRENCY,
+	QUICKSTART_NET_WORTH,
+} from "../../lib/quickstart-figure"
 
 /**
  * The audience entries' pictures: each is decoration for the eye only (aria-hidden), because the
@@ -21,8 +26,10 @@ export function TerminalPicture() {
 			aria-hidden="true"
 			className="rounded-md border bg-fd-secondary p-3 font-mono text-xs text-fd-muted-foreground"
 		>
-			<p>$ traj balance</p>
-			<p className="mt-1 text-fd-foreground">879.50 THB</p>
+			<p>$ traj balance --as-of {QUICKSTART_AS_OF}</p>
+			<p className="mt-1 text-fd-foreground">
+				{QUICKSTART_NET_WORTH} {QUICKSTART_CURRENCY}
+			</p>
 		</div>
 	)
 }

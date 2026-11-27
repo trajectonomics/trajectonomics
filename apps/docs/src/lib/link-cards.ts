@@ -6,12 +6,18 @@
 
 import type { HastNode, HastPlugin } from "./hast"
 
-/** A colon that introduces the line after a link, as `- [Page](/url): the words` writes it. */
-const LEADING_COLON = /^\s*:\s*/
+/** The colon a card's line opens with, as `- [Page](/url): the words` writes it. */
+const LEADING_COLON = /^\s*:/
+
+/** The colon and the whitespace around it, dropped where the link becomes the card's title. */
+const COLON_WITH_SPACE = /^\s*:\s*/
 
 /** The classes the plugin adds to the list and to each card. */
 const LIST_CLASS = "docs-link-cards"
 const LINE_CLASSES = ["docs-link-card-line", "text-sm"] as const
+
+/** Elements that start a block: an item carrying one says more than its card's one line. */
+const BLOCK_TAGS = new Set(["ul", "ol", "p", "pre", "div", "table", "blockquote"])
 
 /** A node's class names, whether it has any or not. */
 function classesOf(node: HastNode): readonly string[] {
@@ -29,47 +35,51 @@ function withClasses(node: HastNode, names: readonly string[]): HastNode {
 	}
 }
 
-/** The link a list item starts with, or undefined when it starts with anything else. */
-function leadingLink(item: HastNode): HastNode | undefined {
-	if (item.tagName !== "li") return undefined
-	const first = (item.children ?? []).find((child) => child.type === "element")
-	return first?.tagName === "a" ? first : undefined
+/** Whether `node`, or any node below it, is a link or a block element. */
+function hasLinkOrBlock(node: HastNode): boolean {
+	if (node.type !== "element") return false
+	if (node.tagName === "a" || BLOCK_TAGS.has(node.tagName ?? "")) return true
+	return (node.children ?? []).some(hasLinkOrBlock)
 }
 
-/** Whether every item starts with a link and then says something after it. */
+/** The index of the item's leading link when the item is a card, or undefined when it is not. */
+function leadingLinkIndex(item: HastNode): number | undefined {
+	if (item.tagName !== "li") return undefined
+	const children = item.children ?? []
+	const first = children.findIndex(
+		(child) => !(child.type === "text" && (child.value ?? "").trim() === ""),
+	)
+	if (children[first]?.tagName !== "a") return undefined
+	const colon = children[first + 1]
+	if (colon?.type !== "text" || !LEADING_COLON.test(colon.value ?? "")) return undefined
+	return children.slice(first + 1).some(hasLinkOrBlock) ? undefined : first
+}
+
+/** Whether every item starts with a link and the colon that introduces its line. */
 function isLinkList(node: HastNode): boolean {
 	if (node.tagName !== "ul") return false
 	const items = (node.children ?? []).filter((child) => child.type === "element")
 	if (items.length === 0) return false
-	return items.every((item) => {
-		const link = leadingLink(item)
-		if (link === undefined) return false
-		const children = item.children ?? []
-		return children.slice(children.indexOf(link) + 1).some((child) => child.type === "text")
-	})
+	return items.every((item) => leadingLinkIndex(item) !== undefined)
 }
 
 /** One item as a card: its link, then the line after it without the colon, as one span. */
 function cardItem(item: HastNode): HastNode {
 	const children = [...(item.children ?? [])]
-	const at = children.findIndex((child) => child.tagName === "a")
-	const link = children[at]
-	if (link === undefined) return item
+	const at = leadingLinkIndex(item)
+	if (at === undefined) return item
 	const line = children
 		.slice(at + 1)
-		.map((child) =>
-			child.type === "text"
-				? { ...child, value: (child.value ?? "").replace(LEADING_COLON, "") }
-				: child,
+		.map((child, offset) =>
+			offset === 0 ? { ...child, value: (child.value ?? "").replace(COLON_WITH_SPACE, "") } : child,
 		)
-		.filter((child) => child.type !== "text" || (child.value ?? "").trim() !== "")
 	const body: HastNode = {
 		type: "element",
 		tagName: "span",
 		properties: { className: [...LINE_CLASSES] },
 		children: line,
 	}
-	return withClasses({ ...item, children: [link, body] }, ["rounded-md"])
+	return withClasses({ ...item, children: [...children.slice(0, at + 1), body] }, ["rounded-md"])
 }
 
 /** The hast plugin that marks every such list and shapes each item as a card. */

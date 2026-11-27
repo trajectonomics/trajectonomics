@@ -3,21 +3,23 @@
  * columns of hairline link cards. Both stay real lists; only their shape changes.
  */
 
-/* A step rail: a counter in a circle, joined by a hairline. */
-#nd-page .prose ol:not(.docs-flow) {
-	counter-reset: docs-step;
+/*
+ * A step rail: the list's own number in a circle, joined by a hairline. The number comes from the
+ * list-item counter, so a list's `start`, an item's `value` and a `reversed` list all read right.
+ * A footnote list keeps its own numbering, so the rail never draws over one.
+ */
+#nd-page .prose ol:not(.docs-flow):not(:where([data-footnotes] ol)) {
 	list-style: none;
 	padding-inline-start: 0;
 }
 
-#nd-page .prose ol:not(.docs-flow) > li {
-	counter-increment: docs-step;
+#nd-page .prose ol:not(.docs-flow):not(:where([data-footnotes] ol)) > li {
 	position: relative;
 	padding-inline-start: 2.5rem;
 }
 
-#nd-page .prose ol:not(.docs-flow) > li::before {
-	content: counter(docs-step);
+#nd-page .prose ol:not(.docs-flow):not(:where([data-footnotes] ol)) > li::before {
+	content: counter(list-item);
 	position: absolute;
 	inset-inline-start: 0;
 	inset-block-start: 0.125rem;
@@ -30,7 +32,7 @@
 	clip-path: circle(50%);
 }
 
-#nd-page .prose ol:not(.docs-flow) > li::after {
+#nd-page .prose ol:not(.docs-flow):not(:where([data-footnotes] ol)) > li::after {
 	content: "";
 	position: absolute;
 	inset-inline-start: 0.75rem;
@@ -40,7 +42,7 @@
 	background-color: var(--color-fd-border);
 }
 
-#nd-page .prose ol:not(.docs-flow) > li:last-child::after {
+#nd-page .prose ol:not(.docs-flow):not(:where([data-footnotes] ol)) > li:last-child::after {
 	content: none;
 }
 
@@ -67,20 +69,20 @@
 	border-color: var(--color-fd-accent);
 }
 
-#nd-page .prose ul.docs-link-cards a {
+#nd-page .prose ul.docs-link-cards > li > a {
 	display: block;
 	color: var(--color-fd-card-foreground);
 	font-weight: 600;
 	text-decoration: none;
 }
 
-#nd-page .prose ul.docs-link-cards a::after {
+#nd-page .prose ul.docs-link-cards > li > a::after {
 	content: "";
 	position: absolute;
 	inset: 0;
 }
 
-#nd-page .prose ul.docs-link-cards a:focus-visible {
+#nd-page .prose ul.docs-link-cards > li > a:focus-visible {
 	outline: 2px solid var(--color-fd-ring);
 	outline-offset: 4px;
 }

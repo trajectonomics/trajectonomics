@@ -70,7 +70,11 @@ export function flowElement(nodes: readonly FlowNode[]): HastNode {
 	return {
 		type: "element",
 		tagName: "ol",
-		properties: { className: ["docs-flow"], ariaLabel: "Flow" },
+		properties: {
+			className: ["docs-flow"],
+			ariaLabel: `Steps: ${nodes.map((node) => node.label).join(", ")}`,
+			role: "list",
+		},
 		children: nodes.map((node, at) => nodeElement(node, at === 0, at === nodes.length - 1)),
 	}
 }
