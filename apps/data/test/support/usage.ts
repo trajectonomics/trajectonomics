@@ -5,8 +5,12 @@ import { NOW_MS } from "./fixtures"
 import { get, type harness, ingestRequest } from "./http"
 
 /** Seeds rows through the real ingest route, failing loudly if the seed is rejected. */
-export async function seed(context: ReturnType<typeof harness>, rows: unknown[]): Promise<void> {
-	const response = await handleRequest(ingestRequest({ usage: rows }), context.env, {
+export async function seed(
+	context: ReturnType<typeof harness>,
+	rows: unknown[],
+	quota: unknown[] = [],
+): Promise<void> {
+	const response = await handleRequest(ingestRequest({ usage: rows, quota }), context.env, {
 		nowMs: NOW_MS,
 		cache: context.cache,
 	})
