@@ -39,7 +39,7 @@ const choices = LANGUAGES.map((entry) => ({
 >
 	<Fragment slot="end">
 		<LanguageMenu
-			summaryLabel={words.languageMenuLabel}
+			summaryLabel={`${words.languageMenuLabel}: ${words.languageSwitchLabel}`}
 			currentLabel={words.languageSwitchLabel}
 			choices={choices}
 		/>

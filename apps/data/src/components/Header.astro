@@ -16,7 +16,7 @@ const { current } = Astro.props
 <SiteHeader
 	homeHref={SITE_HOME_URL}
 	homeLabel={`${SITE_NAME} home`}
-	marker={{ href: DATA_PATH, label: "Data", current: current === "overview" }}
+	marker={{ href: DATA_PATH, label: "Data", current: false }}
 	class="data-header"
 	navLabel="Main"
 >
