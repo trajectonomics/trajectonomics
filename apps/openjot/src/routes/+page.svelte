@@ -53,6 +53,7 @@
     triggerAndroidDownloadOrShare,
   } from "$lib/api";
   import { formatBaht } from "$lib/format";
+  import { homeGestureStart } from "$lib/homeGesture";
   import { localDateKey, reminderConfig } from "$lib/reminder";
   import {
     loadFeedbackCard,
@@ -479,18 +480,24 @@
   let homeMain = $state<HTMLElement | null>(null);
   let monthDrag = $state(0);
   let monthDragging = $state(false);
-  let gesture: { x: number; y: number; axis: "undecided" | "h" | "v" } | null = null;
+  let gesture: {
+    x: number;
+    y: number;
+    axis: "undecided" | "h" | "v";
+    monthSwipe: boolean;
+  } | null = null;
   let periodRequest = 0;
 
   function onHomeTouchStart(e: TouchEvent) {
     if (activeTab !== "home" || anyModalOpen || isScanning) return;
-    const target = e.target;
-    if (target instanceof Element && target.closest("[data-swipe-row], button, a, input")) return;
+    const start = homeGestureStart(e.target instanceof Element ? e.target : null);
+    if (!start.pull && !start.monthSwipe) return;
     if (e.touches.length !== 1) return;
     gesture = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
       axis: "undecided",
+      monthSwipe: start.monthSwipe,
     };
     pullDistance = 0;
     pullArmed = false;
@@ -505,6 +512,12 @@
     if (gesture.axis === "undecided") {
       if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
       gesture.axis = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+      if (gesture.axis === "h" && !gesture.monthSwipe) {
+        // The drag began on a record row, button or link: its own horizontal
+        // swipe-to-delete owns it, and the month must not move.
+        gesture = null;
+        return;
+      }
     }
     if (gesture.axis === "h") {
       monthDragging = true;

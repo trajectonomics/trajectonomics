@@ -6,7 +6,7 @@ import lightTheme from "@trajectonomics/brand/current/light.css?raw"
 import Footer from "../components/Footer.astro"
 import Header from "../components/Header.astro"
 import { canonicalUrl } from "../lib/page-url"
-import { SITE_NAME } from "../lib/site"
+import { assetPath, SITE_NAME } from "../lib/site"
 import { themeRole } from "../lib/theme-role"
 import { FALLBACK_THEME, themeScript } from "../lib/themes"
 import "../styles/global.css"
@@ -50,9 +50,9 @@ const themeColours = [
 				/>
 			))
 		}
-		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
-		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
-		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+		<link rel="icon" href={assetPath("/favicon/favicon.svg")} type="image/svg+xml" />
+		<link rel="icon" href={assetPath("/favicon/favicon.ico")} sizes="16x16 32x32 48x48" />
+		<link rel="apple-touch-icon" href={assetPath("/favicon/apple-touch-icon.png")} />
 	</head>
 	<body class="data-body">
 		<a class="skip-link" href="#main">Skip to content</a>

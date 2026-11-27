@@ -37,8 +37,8 @@ export function brandFile(folder: string, file: string): string {
 }
 
 /**
- * Copies the brand's fonts and Favicon Set into `public/`, so the build serves them from the root.
- * A missing file stops the build rather than shipping a page that asks for a file it cannot serve.
+ * Copies the brand's fonts and Favicon Set into `public/`, so the build serves them under the blog's
+ * base. A missing file stops the build rather than shipping a page that asks for a file it cannot serve.
  */
 export async function copyBrandAssets(publicRoot: string): Promise<number> {
 	for (const [folder, file] of BRAND_ASSETS) {

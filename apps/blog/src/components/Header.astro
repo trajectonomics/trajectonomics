@@ -5,7 +5,7 @@ import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import { dictionaryFor } from "../lib/dictionary"
 import { type Language, treePath } from "../lib/languages"
 import { decorativeMark } from "../lib/mark"
-import { BLOG_PATH, DOCS_URL, SITE_HOME_URL, SITE_NAME } from "../lib/site"
+import { BLOG_PATH, DOCS_PATH, SITE_HOME_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
 
 interface Props {
@@ -25,7 +25,7 @@ const artwork = decorativeMark(mark)
 <header class="blog-header">
 	<nav class="blog-header-inner" aria-label="Main">
 		<div class="blog-header-brand">
-			<a class="brand" href={SITE_HOME_URL} aria-label={words.homeLabel(SITE_NAME)}>
+			<a class="brand" href={SITE_HOME_PATH} aria-label={words.homeLabel(SITE_NAME)}>
 				<span class="brand-tile"><Fragment set:html={artwork} /></span>
 			</a>
 			<a class="blog-marker" href={treePath(language, BLOG_PATH)} aria-current={current ? "page" : undefined}>
@@ -34,7 +34,7 @@ const artwork = decorativeMark(mark)
 		</div>
 		<div class="blog-header-end">
 			<LanguageMenu language={language} languagePaths={languagePaths} />
-			<a class="header-nav-link" href={DOCS_URL}>{words.docsLink}</a>
+			<a class="header-nav-link" href={DOCS_PATH}>{words.docsLink}</a>
 		</div>
 	</nav>
 </header>

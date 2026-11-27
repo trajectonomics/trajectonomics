@@ -6,24 +6,7 @@
  * put the `<code>` element back, so `rehypeCode` can colour the block before it renders.
  */
 
-interface HastNode {
-	readonly type: string
-	readonly tagName?: string
-	readonly properties?: Record<string, unknown>
-	readonly children?: HastNode[]
-}
-
-interface HastVisitorContext {
-	replaceNode(node: HastNode, newNode: HastNode | readonly HastNode[]): void
-}
-
-interface HastPlugin {
-	readonly name: string
-	readonly element: {
-		readonly filter: string[]
-		visit(node: HastNode, context: HastVisitorContext): void
-	}
-}
+import type { HastNode, HastPlugin } from "./hast"
 
 const LANGUAGE_CLASS_PREFIX = "language-"
 

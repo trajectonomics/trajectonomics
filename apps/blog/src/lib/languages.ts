@@ -1,9 +1,12 @@
+import { BLOG_BASE } from "./site"
+
 /**
  * Every Language the blog knows. Two things use the list, and they are kept apart:
  *
  * - the Interface Language, the Language the Shell and the page's labels are read in. Each one has a
- *   Language Tree: English at the root, every other Language under its own prefix (`/th/`). Every
- *   Post has a page in every tree, so adding an Interface Language costs one Dictionary.
+ *   Language Tree: English at the blog's base (`/blog/`), every other Language under its own prefix
+ *   (`/blog/th/`). Every Post has a page in every tree, so adding an Interface Language costs one
+ *   Dictionary.
  * - a Post Language, a Language a Post is written in: one Translation, one Markdown file. A Post has
  *   only the Translations someone wrote, so most Posts are not in every Language.
  */
@@ -25,12 +28,15 @@ export const PREFIXED_LANGUAGES: readonly Language[] = Object.freeze(
 	LANGUAGES.filter((language) => language !== DEFAULT_LANGUAGE),
 )
 
-/** The address of a page in a Language Tree: the default tree has no prefix, the others have theirs. */
+/**
+ * The public address of a page in a Language Tree: the blog's base, then the default tree's path or
+ * the prefixed tree's. The route itself stays relative to the base, so `path` is `/` for the front.
+ */
 export function treePath(language: Language, path: string): string {
 	if (!path.startsWith("/")) {
 		throw new Error(`treePath: "${path}" is not an absolute path`)
 	}
-	return language === DEFAULT_LANGUAGE ? path : `/${language}${path}`
+	return `${BLOG_BASE}${language === DEFAULT_LANGUAGE ? path : `/${language}${path}`}`
 }
 
 /** The Language Tree a built page or a path belongs to, read from its first segment. */

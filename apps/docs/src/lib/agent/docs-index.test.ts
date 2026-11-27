@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN, SITE_ORIGIN } from "../site"
 import { TABS } from "../tabs"
 import { buildDocsIndex, type DocsIndexTab } from "./docs-index"
 
@@ -13,12 +13,12 @@ const TABS_PAGES: readonly DocsIndexTab[] = [
 			{
 				title: "Quickstart",
 				description: "Install traj, then record your first transaction.",
-				url: "/cli",
+				url: "/docs/cli",
 			},
 			{
 				title: "tx",
 				description: "Manage ledger transactions.",
-				url: "/cli/commands/tx",
+				url: "/docs/cli/commands/tx",
 			},
 		],
 	},
@@ -28,7 +28,7 @@ const TABS_PAGES: readonly DocsIndexTab[] = [
 			{
 				title: "Overview",
 				description: "The packages and how they fit together.",
-				url: "/developers",
+				url: "/docs/developers",
 			},
 		],
 	},
@@ -58,10 +58,10 @@ describe("the Docs index", () => {
 
 	test("lists every page once, by title, at its absolute twin URL, with its description", () => {
 		expect(bullets(buildDocsIndex(TABS_PAGES, ORIGIN))).toEqual([
-			"- [Trajectonomics Docs](https://docs.trajectonomics.com/index.md): Documentation for running the Trajectonomics CLI and helping make its tax rules right.",
-			"- [Quickstart](https://docs.trajectonomics.com/cli.md): Install traj, then record your first transaction.",
-			"- [tx](https://docs.trajectonomics.com/cli/commands/tx.md): Manage ledger transactions.",
-			"- [Overview](https://docs.trajectonomics.com/developers.md): The packages and how they fit together.",
+			`- [Trajectonomics Docs](${PORTAL_ORIGIN}/index.md): Documentation for running the Trajectonomics CLI and helping make its tax rules right.`,
+			`- [Quickstart](${PORTAL_ORIGIN}/cli.md): Install traj, then record your first transaction.`,
+			`- [tx](${PORTAL_ORIGIN}/cli/commands/tx.md): Manage ledger transactions.`,
+			`- [Overview](${PORTAL_ORIGIN}/developers.md): The packages and how they fit together.`,
 		])
 	})
 })

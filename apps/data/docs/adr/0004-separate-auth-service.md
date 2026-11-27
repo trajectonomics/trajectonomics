@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted as the design, 2026-11-25. The service ships in a later slice.
+Accepted as the design, 2026-11-25. The service ships in a later slice. The ingest path moved to
+`/data/ingest` ([ADR 0006](0006-the-data-site-is-served-under-the-sites-host.md)); the old host
+keeps `/ingest`.
 
 ## Context
 

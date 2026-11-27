@@ -4,7 +4,7 @@ description: "เทียบแพ็กเกจ AI Subscription ตามง�
 type: guide
 publishedOn: 2026-11-25
 cover:
-  src: /posts/ai-subscription-by-budget/cover.webp
+  src: /blog/posts/ai-subscription-by-budget/cover.webp
   alt: หุ่นยนต์สีครีมสองตัวตาสีส้มยืนบนเนินทรายลายไม้ใต้ท้องฟ้าสีเข้มและแสงตะวันสีส้ม มองแท่นขั้นบันไดลายไม้ห้าระดับที่มีลูกบาศก์เรืองแสงสีส้มวางเรียงสูงขึ้นตามลำดับ
   width: 1024
   height: 1024
@@ -30,7 +30,7 @@ cover:
 
 ก่อนลงรายละเอียดทีละงบ ดูกราฟที่ [Pawel Huryn (productcompass.pm)](https://x.com/PawelHuryn/status/2125000511892099273) วัดไว้เมื่อวันที่ **19–23 พ.ย. 2026** (ChatGPT Pro และ Muse วัด 1 ต.ค. 2026) โดยวัดโควตาจริงของแต่ละแพ็กเกจแล้วตีเป็นมูลค่าตามราคา API สาธารณะของแต่ละค่าย:
 
-![กราฟจาก Pawel Huryn: How much more AI usage does a subscription buy than the API? วัดวันที่ 19–23 พฤศจิกายน 2026](/posts/ai-subscription-by-budget/pawel-huryn-2026-11-19.webp)
+![กราฟจาก Pawel Huryn: How much more AI usage does a subscription buy than the API? วัดวันที่ 19–23 พฤศจิกายน 2026](/blog/posts/ai-subscription-by-budget/pawel-huryn-2026-11-19.webp)
 
 *เครดิตกราฟ: [Pawel Huryn — โพสต์ 23 พ.ย. 2026 (วัด 19–23 พ.ย. 2026)](https://x.com/PawelHuryn/status/2125000511892099273) (`productcompass.pm`) ตัวเลขตัวคูณหมายถึงมูลค่า API ที่แพ็กเกจนั้นซื้อได้เทียบกับราคาจ่ายรายเดือน (เช่น `46.4×` แปลว่าจ่าย `$100/เดือน` ได้ปริมาณงานเทียบเท่าจ่าย API `$4,640/เดือน`)*
 
@@ -83,7 +83,7 @@ cover:
 **Gemini 4 Neon vs Claude Opus 5.5 จากประสบการณ์ใช้งานจริง:**
 ในการใช้งานทั่วไปและการเขียนโค้ด **Gemini 4 Neon เก่งสูสีกับ Claude Opus 5.5 มาก** จุดที่ Opus 5.5 ยังเหนือกว่าอยู่เล็กน้อยคือความอึดใน **งานรันยาวแบบอัตโนมัติ (long-running autonomous task)** — แต่ข้อได้เปรียบที่ชัดเจนของ Google AI Pro คือ **ได้ทั้งสร้างภาพและวิดีโอมาครบในแพลนเดียว** ในขณะที่ฝั่ง [Claude](https://claude.com/pricing) เน้นโมเดลข้อความและโค้ด โดยไม่ได้รวมเครื่องมือสร้างภาพและวิดีโอไว้ในแพ็กเกจเหมือน Google Flow
 
-*(หากต้องการเทียบทางเลือกงบ 1,000 บาทแบบแยกทีละงาน เขียนโค้ด / เอเจนต์ / ครีเอทีฟ อ่านเพิ่มได้ที่ [งบ 1,000 บาท Subscribe อะไร?](/th/guides/ai-subscribe-1000-baht/))*
+*(หากต้องการเทียบทางเลือกงบ 1,000 บาทแบบแยกทีละงาน เขียนโค้ด / เอเจนต์ / ครีเอทีฟ อ่านเพิ่มได้ที่ [งบ 1,000 บาท Subscribe อะไร?](/blog/th/guides/ai-subscribe-1000-baht/))*
 
 ---
 
@@ -133,15 +133,15 @@ cover:
 | **[Claude Fable 5.2](https://platform.claude.com/docs/en/about-claude/pricing)** | **$8.00** | **$0.20** | **$40.00** |
 
 **สูตรจัดทัพ API สำหรับองค์กร:**
-1. **งานส่วนใหญ่ประจำวัน → ส่งให้ GPT (`GPT-6.2 Sol`):** ราคา API ถูกกว่า Claude Opus 5.5 **ครึ่งหนึ่งทุกช่อง** (`$2/$0.10/$10` เทียบกับ `$4/$0.20/$20`) และถูกกว่า Fable 5.2 ถึง **4 เท่า**ในช่อง Input และ Output (และ 2 เท่าในช่อง Cached Input) แถมบนกราฟ [Artificial Analysis](/th/guides/ai-model-tier-breakdown/) ยังอยู่กลางโซนคุ้มค่าที่สุด (`~$1/task` เทียบกับ Opus 5.5 ที่ `~$10/task`) ใช้คุมงานฟีเจอร์ประจำวัน รีวิว PR และ pipeline อัตโนมัติได้โดยไม่เผาเงิน
+1. **งานส่วนใหญ่ประจำวัน → ส่งให้ GPT (`GPT-6.2 Sol`):** ราคา API ถูกกว่า Claude Opus 5.5 **ครึ่งหนึ่งทุกช่อง** (`$2/$0.10/$10` เทียบกับ `$4/$0.20/$20`) และถูกกว่า Fable 5.2 ถึง **4 เท่า**ในช่อง Input และ Output (และ 2 เท่าในช่อง Cached Input) แถมบนกราฟ [Artificial Analysis](/blog/th/guides/ai-model-tier-breakdown/) ยังอยู่กลางโซนคุ้มค่าที่สุด (`~$1/task` เทียบกับ Opus 5.5 ที่ `~$10/task`) ใช้คุมงานฟีเจอร์ประจำวัน รีวิว PR และ pipeline อัตโนมัติได้โดยไม่เผาเงิน
 2. **เฉพาะโจทย์ที่ยากที่สุด → ค่อยส่งให้ Claude (`Opus 5.5` หรือ `Fable 5.2`):** เก็บ Claude ไว้สำหรับงานออกแบบสถาปัตยกรรมที่ซับซ้อน บั๊กเรื้อรัง หรือ agent ที่ต้องคิดต่อเนื่องยาว ๆ จุดที่ความแม่นยำและความอึดช่วยประหยัดเวลาวิศวกรได้คุ้มค่ากว่าส่วนต่างราคา token
 
 ---
 
 ## อ่านต่อ
 
-- อยากรู้วิธีแบ่งโมเดล 3 Tier ตามความยากของงาน (พร้อมกราฟ Artificial Analysis ตัวเต็ม): [เลือก AI Model ยังไงไม่ให้จ่ายแพงเกิน? 3 Tier ที่ผมใช้ทำงานจริง](/th/guides/ai-model-tier-breakdown/)
-- อยากเทียบงบ 1,000 บาทแบบเลือกทีละงาน (เขียนโค้ด vs เอเจนต์ vs ครีเอทีฟ): [งบ 1,000 บาท Subscribe อะไร?](/th/guides/ai-subscribe-1000-baht/)
-- ดูวิธีนำโมเดลหลายค่ายมาทำงานร่วมกันในระบบอัตโนมัติ: [เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR](/th/guides/software-factory/)
+- อยากรู้วิธีแบ่งโมเดล 3 Tier ตามความยากของงาน (พร้อมกราฟ Artificial Analysis ตัวเต็ม): [เลือก AI Model ยังไงไม่ให้จ่ายแพงเกิน? 3 Tier ที่ผมใช้ทำงานจริง](/blog/th/guides/ai-model-tier-breakdown/)
+- อยากเทียบงบ 1,000 บาทแบบเลือกทีละงาน (เขียนโค้ด vs เอเจนต์ vs ครีเอทีฟ): [งบ 1,000 บาท Subscribe อะไร?](/blog/th/guides/ai-subscribe-1000-baht/)
+- ดูวิธีนำโมเดลหลายค่ายมาทำงานร่วมกันในระบบอัตโนมัติ: [เบื้องหลัง Software Factory: สถาปัตยกรรม AI ที่รันจริงในโปรเจกต์ 850+ PR](/blog/th/guides/software-factory/)
 
 ดูโค้ด open source ของเราได้ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory) และ [trajectonomics/trajectonomics](https://github.com/trajectonomics/trajectonomics) ถ้ามีประโยชน์ ฝากกดดาวให้ทั้งสอง repo ด้วยนะครับ

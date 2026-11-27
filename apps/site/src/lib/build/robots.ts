@@ -1,5 +1,4 @@
-import { ROBOTS_FILE } from "../crawl/robots"
-import { SITEMAP_URL } from "../crawl/sitemap"
+import { ROBOTS_FILE, ROBOTS_SITEMAPS } from "../crawl/robots"
 import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
@@ -31,7 +30,7 @@ function wildcardFailures(parsed: ParsedRobots): readonly BuildFailure[] {
 	]
 }
 
-/** The file carries no `Disallow:`. `/docs` on this host redirects to the Docs Portal. */
+/** The file carries no `Disallow:`, because it speaks for the whole host and other Workers serve under it. */
 function disallowFailures(parsed: ParsedRobots): readonly BuildFailure[] {
 	return parsed.directives
 		.filter((directive) => directive.field === "disallow")
@@ -44,21 +43,22 @@ function disallowFailures(parsed: ParsedRobots): readonly BuildFailure[] {
 		)
 }
 
-/** The Sitemap is named, once, at the absolute URL the build serves it from. */
+/** Every Sitemap is named at the absolute URL the build serves it from, and no other is. */
 function sitemapFailures(parsed: ParsedRobots): readonly BuildFailure[] {
 	const sitemaps = parsed.directives.filter((directive) => directive.field === "sitemap")
-	if (sitemaps.length === 0) {
-		return [buildFailure("ROBOTS_SITEMAP_MISSING", ROBOTS_FILE, "names no Sitemap for a crawler.")]
-	}
-	return sitemaps
-		.filter((sitemap) => sitemap.value !== SITEMAP_URL)
+	const missing = ROBOTS_SITEMAPS.filter(
+		(url) => !sitemaps.some((sitemap) => sitemap.value === url),
+	).map((url) => buildFailure("ROBOTS_SITEMAP_MISSING", ROBOTS_FILE, `names no Sitemap at ${url}.`))
+	const unknown = sitemaps
+		.filter((sitemap) => !ROBOTS_SITEMAPS.includes(sitemap.value))
 		.map((one) =>
 			buildFailure(
 				"ROBOTS_SITEMAP_TARGET",
 				ROBOTS_FILE,
-				`names the Sitemap at ${one.value || "nothing"}, not ${SITEMAP_URL}.`,
+				`names the Sitemap at ${one.value || "nothing"}, which is no Sitemap of this host.`,
 			),
 		)
+	return [...missing, ...unknown]
 }
 
 /** Every rule the Robots file breaks: every agent may read every path, and the Sitemap is named. */

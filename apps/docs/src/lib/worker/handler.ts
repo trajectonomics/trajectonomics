@@ -1,5 +1,5 @@
 import { acceptsMarkdown } from "./accepts-markdown"
-import { legacyDocsLocation } from "./legacy-docs-path"
+import { legacyHostLocation } from "./legacy-host"
 import { pageTwinPath } from "./page-twin-path"
 import { retiredPathTarget } from "./retired-paths"
 
@@ -45,16 +45,16 @@ function markdownResponse(request: Request, twin: Response): Response {
 	})
 }
 
-/** A permanent redirect to `location`, for a retired path a reader or a search result still reaches. */
+/** A permanent redirect to `location`, for an old host or a retired path a reader still reaches. */
 function permanentRedirect(location: string): Response {
 	return new Response(null, { status: 301, headers: { location } })
 }
 
-/** Answer one request: a retired path's redirect, a page's Markdown twin when its client asks for it, the assets otherwise. */
+/** Answer one request: the old host's redirect, a retired path's redirect, a page's Markdown twin when its client asks for it, the assets otherwise. */
 export async function handleRequest(request: Request, assets: AssetsBinding): Promise<Response> {
 	const read = request.method === "GET" || request.method === "HEAD"
 	const url = new URL(request.url)
-	const legacy = read ? legacyDocsLocation(url) : null
+	const legacy = read ? legacyHostLocation(url) : null
 	if (legacy !== null) return permanentRedirect(legacy)
 	const { pathname } = url
 	const retired = read ? retiredPathTarget(pathname) : null

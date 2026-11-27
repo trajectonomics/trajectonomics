@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { API_PATH, SITE_ORIGIN } from "../src/core/urls"
 import { handleRequest } from "../src/http/router"
 import { NOW_MS, usageRow } from "./support/fixtures"
 import { harness } from "./support/http"
@@ -95,7 +96,7 @@ describe("GET /api/usage", () => {
 
 	test("accepts GET only", async () => {
 		const context = harness()
-		const request = new Request("https://data.test/api/usage", { method: "POST" })
+		const request = new Request(`${SITE_ORIGIN}${API_PATH}/usage`, { method: "POST" })
 		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
 		expect(response.status).toBe(405)
 		expect(response.headers.get("allow")).toBe("GET")

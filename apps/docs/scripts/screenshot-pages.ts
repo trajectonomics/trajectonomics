@@ -7,6 +7,7 @@ import { join } from "node:path"
 import type { Page } from "@playwright/test"
 import { openSearch, openSidebarDrawer } from "../e2e/docs-portal"
 import { TEST_WIDTHS_PX } from "../e2e/viewports"
+import { DOCS_BASE_PATH } from "../src/lib/tabs"
 
 /** Fumadocs' copy control on a code block: the "Copy Text" button in the block's figure. */
 const COPY_CONTROL = "#nd-page figure button[aria-live='polite']"
@@ -42,45 +43,57 @@ async function hoverCopyControl(page: Page): Promise<void> {
  * because the phone reaches the search and the Tab dropdown through it (docs#91). Both Tab pages are here, because the shell reaches every Tab page.
  */
 const PAGES: readonly CuratedPage[] = [
-	{ path: "/", name: "landing-page", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
 	{
-		path: "/no-such-page/",
+		path: `${DOCS_BASE_PATH}/`,
+		name: "landing-page",
+		widthsPx: TEST_WIDTHS_PX,
+		drive: null,
+		fullPage: true,
+	},
+	{
+		path: `${DOCS_BASE_PATH}/no-such-page/`,
 		name: "not-found",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,
 	},
-	{ path: "/cli/", name: "cli", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
 	{
-		path: "/contribute/",
+		path: `${DOCS_BASE_PATH}/cli/`,
+		name: "cli",
+		widthsPx: TEST_WIDTHS_PX,
+		drive: null,
+		fullPage: true,
+	},
+	{
+		path: `${DOCS_BASE_PATH}/contribute/`,
 		name: "contribute",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,
 	},
 	{
-		path: "/cli/commands/tx/",
+		path: `${DOCS_BASE_PATH}/cli/commands/tx/`,
 		name: "cli-commands-tx",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,
 	},
 	{
-		path: "/cli/",
+		path: `${DOCS_BASE_PATH}/cli/`,
 		name: "cli-hover",
 		widthsPx: [1280],
 		drive: hoverCopyControl,
 		fullPage: true,
 	},
 	{
-		path: "/cli/",
+		path: `${DOCS_BASE_PATH}/cli/`,
 		name: "search-dialog",
 		widthsPx: [1280],
 		drive: openSearch,
 		fullPage: false,
 	},
 	{
-		path: "/cli/",
+		path: `${DOCS_BASE_PATH}/cli/`,
 		name: "sidebar-drawer",
 		widthsPx: [390],
 		drive: openSidebarDrawer,

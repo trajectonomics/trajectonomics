@@ -46,7 +46,7 @@ let {
 let closeButton: HTMLButtonElement | undefined = $state()
 
 function close(): void {
-	shellPanels.menu = false
+	shellPanels.closeMenu()
 }
 
 // On a narrow screen the menu drawer takes focus when it opens, so a keyboard reader can reach it.

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { SHARE_IMAGE_URL } from "../head-tags"
-import { SITE_ORIGIN } from "../site"
+import { PORTAL_ORIGIN } from "../site"
 import type { BuiltFile } from "./built-files"
 import { checkHeadTags } from "./head-tags"
 
@@ -32,10 +32,10 @@ function page(path: string, headHtml: string): BuiltFile {
 	}
 }
 
-const LANDING = page("index.html", head(`${SITE_ORIGIN}/`, "Trajectonomics Docs", "Landing."))
+const LANDING = page("index.html", head(`${PORTAL_ORIGIN}/`, "Trajectonomics Docs", "Landing."))
 const DEEP = page(
 	"cli/install/index.html",
-	head(`${SITE_ORIGIN}/cli/install/`, "Install the CLI", "How to install traj."),
+	head(`${PORTAL_ORIGIN}/cli/install/`, "Install the CLI", "How to install traj."),
 )
 
 function codesOf(files: readonly BuiltFile[]): readonly string[] {
@@ -54,7 +54,7 @@ describe("the canonical link and share tags of the built Docs Portal", () => {
 	})
 
 	test("a page whose canonical names another page is reported as HEAD_TAG_MISMATCH", () => {
-		const content = DEEP.content.replace(`${SITE_ORIGIN}/cli/install/`, `${SITE_ORIGIN}/cli/`)
+		const content = DEEP.content.replace(`${PORTAL_ORIGIN}/cli/install/`, `${PORTAL_ORIGIN}/cli/`)
 		const failures = checkHeadTags([{ ...DEEP, content }])
 
 		expect(failures.map((failure) => failure.code)).toEqual(["HEAD_TAG_MISMATCH"])

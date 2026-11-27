@@ -3,9 +3,9 @@ import {
 	buildDocsIndex,
 	type DocsIndexTab,
 	pageWords,
-	portalOrigin,
 	runBuildStep,
 	sidebarPageUrls,
+	siteOrigin,
 } from "../lib/agent"
 import { source } from "../lib/source"
 import { isTabPath, TABS } from "../lib/tabs"
@@ -24,7 +24,7 @@ export const GET: APIRoute = ({ site }) =>
 			tab,
 			pages: ordered.filter((page) => isTabPath(tab, page.url)).map(pageWords),
 		}))
-		return new Response(buildDocsIndex(tabs, portalOrigin(site)), {
+		return new Response(buildDocsIndex(tabs, siteOrigin(site)), {
 			headers: { "content-type": "text/plain; charset=utf-8" },
 		})
 	})

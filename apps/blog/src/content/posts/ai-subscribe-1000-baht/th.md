@@ -4,7 +4,7 @@ description: "ถ้ามีงบ 1,000 บาทแล้วต้องเ�
 type: guide
 publishedOn: 2026-11-25
 cover:
-  src: /posts/ai-subscribe-1000-baht/cover.webp
+  src: /blog/posts/ai-subscribe-1000-baht/cover.webp
   alt: หุ่นยนต์สีครีมสามตัวตาสีส้มยืนบนเนินทรายใต้พระอาทิตย์สีส้ม ตัวหนึ่งถือแผ่นเรียบ ตัวกลางถือลูกกลมสองลูก อีกตัวถือกรอบรูปเปล่า
   width: 1024
   height: 1024
@@ -31,7 +31,7 @@ Claude Pro รายปีอยู่ที่ $17 ต่อเดือน แ
 [Claude Pro](https://claude.com/pricing) ราคาป้าย $20 ถ้าจ่ายรายเดือน หรือ $17 ต่อเดือนเมื่อจ่ายรายปี $200 ล่วงหน้า [หน้าช่วยเหลือของ Claude](https://support.claude.com/en/articles/8325606-what-is-the-pro-plan) บอกว่าราคาท้องถิ่นอาจต่างจากราคาดอลลาร์ และ Pro รวมการใช้งาน Claude Code
 
 <figure>
-  <img src="/posts/ai-subscribe-1000-baht/claude-pro.webp" alt="หน้าราคาของ Claude แสดงแผน Free ($0), Pro ($17 ต่อเดือนเมื่อจ่ายรายปี $200 หรือ $20 ต่อเดือนเมื่อจ่ายรายเดือน รวม Claude Code), Max ($100) และ Ultra ($200)" width="1440" height="810" loading="lazy" />
+  <img src="/blog/posts/ai-subscribe-1000-baht/claude-pro.webp" alt="หน้าราคาของ Claude แสดงแผน Free ($0), Pro ($17 ต่อเดือนเมื่อจ่ายรายปี $200 หรือ $20 ต่อเดือนเมื่อจ่ายรายเดือน รวม Claude Code), Max ($100) และ Ultra ($200)" width="1440" height="810" loading="lazy" />
   <figcaption>หน้าราคาแผนบุคคลของ Claude: แผน Pro ราคา $20 ต่อเดือนเมื่อจ่ายรายเดือน และรวม Claude Code</figcaption>
 </figure>
 
@@ -42,7 +42,7 @@ Claude Pro รายปีอยู่ที่ $17 ต่อเดือน แ
 ตัวที่เสียเงินในงานนี้คือ [OpenCode Go](https://opencode.ai/console/go) แผน Go ราคา **$10 ต่อเดือน** ([เอกสาร Go](https://opencode.ai/docs/console/go/)) ที่เรตเดียวกันคือ 339.44 บาท
 
 <figure>
-  <img src="/posts/ai-subscribe-1000-baht/opencode-go.webp" alt="หน้าเอกสาร OpenCode Go แสดงตารางราคาสามแผน: Go ($10 ต่อเดือน), Go Plus ($40 ต่อเดือน) และ Go Teams ($20 ต่อคนต่อเดือน ขั้นต่ำ 2 คน) พร้อมวิธีเชื่อมต่อคีย์" width="1440" height="810" loading="lazy" />
+  <img src="/blog/posts/ai-subscribe-1000-baht/opencode-go.webp" alt="หน้าเอกสาร OpenCode Go แสดงตารางราคาสามแผน: Go ($10 ต่อเดือน), Go Plus ($40 ต่อเดือน) และ Go Teams ($20 ต่อคนต่อเดือน ขั้นต่ำ 2 คน) พร้อมวิธีเชื่อมต่อคีย์" width="1440" height="810" loading="lazy" />
   <figcaption>หน้าเอกสาร OpenCode Go: แผน Go เริ่มต้น $10 ต่อเดือน</figcaption>
 </figure>
 
@@ -53,7 +53,7 @@ Claude Pro รายปีอยู่ที่ $17 ต่อเดือน แ
 [Hermes Agent](https://hermes-agent.nousresearch.com/) ของ Nous Research เปิดซอร์สสัญญาอนุญาต MIT หน้าเว็บระบุว่าตัวเอเจนต์ฟรี และคีย์ OpenCode Go ใช้เป็นผู้ให้บริการโมเดลได้ ([เปรียบเทียบกับ OpenCode](https://hermes-agent.nousresearch.com/compare/opencode)) หน้า Go เองก็บอกว่า Hermes เป็นไคลเอนต์ที่ตรวจแล้ว แม้จะไม่รับประกันว่าจะใช้ได้ตลอดไป
 
 <figure>
-  <img src="/posts/ai-subscribe-1000-baht/hermes-agent.webp" alt="หน้าแรกของ Hermes Agent จาก Nous Research แสดงหัวข้อ The Agent That Grows With You พร้อมคำสั่งติดตั้งผ่านเทอร์มินัลสำหรับ macOS, Linux และ Windows" width="1440" height="810" loading="lazy" />
+  <img src="/blog/posts/ai-subscribe-1000-baht/hermes-agent.webp" alt="หน้าแรกของ Hermes Agent จาก Nous Research แสดงหัวข้อ The Agent That Grows With You พร้อมคำสั่งติดตั้งผ่านเทอร์มินัลสำหรับ macOS, Linux และ Windows" width="1440" height="810" loading="lazy" />
   <figcaption>หน้าแรกของ Hermes Agent (Nous Research) พร้อมคำสั่งติดตั้งผ่านเทอร์มินัล</figcaption>
 </figure>
 
@@ -64,7 +64,7 @@ Nous Portal ของ Hermes มีแผนเสียเงินเริ่
 [MausBot](https://mausbot.com/) แอปเดสก์ท็อปฟรี สัญญาอนุญาต Apache 2.0 หน้าแรกบอกว่าข้อมูลอยู่ที่ `~/.openmausbot` [เอกสารเอนจิน](https://docs.openmausbot.com/docs/providers) ระบุ OpenCode และ Hermes เป็นเอนจินที่ใช้ได้ แผนคลาวด์ของ MausBot เริ่มที่ $15 ต่อเดือน ([หน้าราคา](https://mausbot.com/pricing)) อันนั้นเป็นทางเลือกเพิ่ม ไม่ใช่ตัวที่อยู่ในงบก้อนนี้
 
 <figure>
-  <img src="/posts/ai-subscribe-1000-baht/mausbot.webp" alt="หน้าแรกของ MausBot แสดงข้อความว่าฟรีและเปิดซอร์ส นำบัญชี AI หรือ API key มาใช้เองได้ พร้อมตัวอย่างหน้าต่างแอปเดสก์ท็อป" width="1440" height="810" loading="lazy" />
+  <img src="/blog/posts/ai-subscribe-1000-baht/mausbot.webp" alt="หน้าแรกของ MausBot แสดงข้อความว่าฟรีและเปิดซอร์ส นำบัญชี AI หรือ API key มาใช้เองได้ พร้อมตัวอย่างหน้าต่างแอปเดสก์ท็อป" width="1440" height="810" loading="lazy" />
   <figcaption>หน้าแรกของ MausBot แอปเดสก์ท็อปฟรีและเปิดซอร์ส นำบัญชี AI หรือ API key มาใช้เองได้</figcaption>
 </figure>
 
@@ -73,7 +73,7 @@ Nous Portal ของ Hermes มีแผนเสียเงินเริ่
 แผนที่สมัครสำหรับงานภาพและวิดีโอคือ **Google AI Pro** ราคาป้าย **$19.99 ต่อเดือน** บน [หน้าแผนภาษาอังกฤษของสหรัฐ](https://one.google.com/intl/en_us/about/google-ai-plans/) ที่เรตวันที่ 24 พ.ย. คือ 678.54 บาท
 
 <figure>
-  <img src="/posts/ai-subscribe-1000-baht/google-ai-pro.webp" alt="หน้าแผน Google AI ฝั่งสหรัฐ แสดงสามแผน: Google AI Plus ($4.99 ต่อเดือน), Google AI Pro ($19.99 ต่อเดือน รวม Gemini 4 Neon และพื้นที่ 5 TB) และ Google AI Ultra (เริ่มต้น $99.99 ต่อเดือน)" width="1440" height="810" loading="lazy" />
+  <img src="/blog/posts/ai-subscribe-1000-baht/google-ai-pro.webp" alt="หน้าแผน Google AI ฝั่งสหรัฐ แสดงสามแผน: Google AI Plus ($4.99 ต่อเดือน), Google AI Pro ($19.99 ต่อเดือน รวม Gemini 4 Neon และพื้นที่ 5 TB) และ Google AI Ultra (เริ่มต้น $99.99 ต่อเดือน)" width="1440" height="810" loading="lazy" />
   <figcaption>หน้าแผน Google AI ฝั่งสหรัฐ: แผน Google AI Pro ราคาป้าย $19.99 ต่อเดือน</figcaption>
 </figure>
 
@@ -91,4 +91,4 @@ Nous Portal ของ Hermes มีแผนเสียเงินเริ่
 
 ซื้อทั้งสามในเดือนเดียวกันไม่ได้ ด้วยราคาป้ายชุดนี้ รวมแล้ว 1,696.86 บาท แม้แต่ Claude Pro กับ OpenCode Go พร้อมกันก็อยู่ที่ $30 หรือ 30 × 33.9440 = **1,018.32 บาท** เกินงบ 1,000 บาทเล็กน้อยก่อนภาษี ถ้าจะเอาทั้งคู่ ต้องแยกเดือนหรือยอมจ่ายเกิน
 
-ถ้าอยากดูว่าผมแบ่งโมเดลตามความยากของงานอย่างไร ไม่ใช่ตามใบสมัคร อ่าน [เลือก AI Model ยังไงไม่ให้จ่ายแพงเกิน](/th/guides/ai-model-tier-breakdown/)
+ถ้าอยากดูว่าผมแบ่งโมเดลตามความยากของงานอย่างไร ไม่ใช่ตามใบสมัคร อ่าน [เลือก AI Model ยังไงไม่ให้จ่ายแพงเกิน](/blog/th/guides/ai-model-tier-breakdown/)

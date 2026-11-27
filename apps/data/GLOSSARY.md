@@ -3,6 +3,17 @@
 The vocabulary of the `data` Worker. The collector's own terms are in
 [`collector/README.md`](collector/README.md).
 
+## Base Path
+
+The data site's address under the one host: `/data`. The assets binding serves the build's root
+there, and the API and ingest sit under it (`/data/api/...`, `/data/ingest`).
+
+## Old Host
+
+The data site's former hostname, still a Custom Domain on the `data` Worker. It answers `/api/*` and
+`/ingest` for the collector, and every other GET or HEAD redirects to the same path under the apex's
+base path (ADR 0006).
+
 ## Contributor
 
 The owner of a set of usage rows. The pilot has one, `trajectonomics`, an `org`; `community`

@@ -3,7 +3,7 @@ import {
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
-	SITE_NAME,
+	SITE_BRAND_NAME,
 	SITE_ORIGIN,
 } from "../site"
 
@@ -32,7 +32,7 @@ export function organization(): OrganizationNode {
 	return Object.freeze({
 		"@type": "Organization",
 		"@id": ORGANIZATION_ID,
-		name: SITE_NAME,
+		name: SITE_BRAND_NAME,
 		url: SITE_ORIGIN,
 		logo: APPLE_TOUCH_ICON_URL,
 		sameAs: SAME_AS,

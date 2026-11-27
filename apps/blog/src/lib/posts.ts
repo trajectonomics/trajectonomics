@@ -13,6 +13,11 @@ const TYPE_FOLDERS: Readonly<Record<PostType, string>> = Object.freeze({
 	news: "news",
 })
 
+/** The folder a Post Type's addresses live under, as a page route names it. */
+export function typeFolder(type: PostType): string {
+	return TYPE_FOLDERS[type]
+}
+
 /** The facts about a Post the lists and its address need. */
 export interface PostSummary {
 	readonly slug: string
