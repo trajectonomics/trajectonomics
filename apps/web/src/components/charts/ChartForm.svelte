@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { AccountNames } from "../../lib/view/account-names"
 import type { CatalogueGroup } from "../../lib/view/charts/catalogue"
 import { savedName } from "../../lib/view/charts/edit"
 import {
@@ -16,6 +17,8 @@ interface Props {
 	initial: ChartDef | null
 	groups: readonly CatalogueGroup[]
 	names: ReadonlyMap<string, string>
+	/** The ledger's Account names, so a removed series reads its Account's name. */
+	accounts: AccountNames
 	/** The series names with no plan label, for a default chart name that fits every plan. */
 	defaultNames: ReadonlyMap<string, string>
 	/** Saves the chart: its name (empty for the default), kind and series. */
@@ -23,7 +26,7 @@ interface Props {
 	onCancel: () => void
 }
 
-let { initial, groups, names, defaultNames, onSave, onCancel }: Props = $props()
+let { initial, groups, names, accounts, defaultNames, onSave, onCancel }: Props = $props()
 // The form starts from the chart it is opened on and is made afresh each time (a keyed block in the drawer).
 // svelte-ignore state_referenced_locally
 let name = $state(initial?.name ?? "")
@@ -43,7 +46,7 @@ function toggle(id: string): void {
 	onsubmit={(event) => {
 		event.preventDefault()
 		onSave({
-			name: savedName(name, series, defaultNames),
+			name: savedName(name, series, defaultNames, accounts),
 			kind: CHART_KINDS.find((value) => value === kind) ?? "line",
 			series,
 		})
@@ -51,7 +54,7 @@ function toggle(id: string): void {
 >
 	<Field id="chart-name" label="Name" bind:value={name} hint="Optional, up to {MAX_NAME} characters. Left empty, it is named after its series." />
 	<Field id="chart-kind" label="Kind" bind:value={kind} options={kinds} />
-	<SeriesPicker {groups} chosen={series} {names} onToggle={toggle} />
+	<SeriesPicker {groups} chosen={series} {names} {accounts} onToggle={toggle} />
 	<div class="flex gap-2">
 		<button type="submit" disabled={series.length === 0} class="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50">
 			{initial ? "Save chart" : "Create chart"}

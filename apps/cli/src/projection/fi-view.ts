@@ -78,7 +78,7 @@ export const fiAnswer: z.ZodType<FiAnswer> = z.union([
 export const fiLeafAnswer: z.ZodType<FiLeafAnswer> = z.union([
 	reachableAnswer.extend({
 		ages: personAges.describe(
-			"Each household person's age on fiDate, in household order; empty without a household.",
+			"Each household person's age on fiDate, in household order; empty without a household. A partner is left out before the first day of their `joins` month, and a person before the last day of their birth month.",
 		),
 	}),
 	noCandidateAnswer,

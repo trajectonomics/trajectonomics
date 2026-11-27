@@ -13,5 +13,5 @@ export const personAges: z.ZodType<PersonAge[]> = z
 		}),
 	)
 	.describe(
-		"Each household person's age on the row's date, in household order; empty without a household. An annual row states the ages on its last day, `to`.",
+		"Each household person's age on the row's date, in household order; empty without a household. An annual row states the ages on its last day, `to`. A partner is left out before the first day of their `joins` month, and a person before the last day of their birth month.",
 	)

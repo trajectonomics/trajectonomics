@@ -20,7 +20,7 @@ const read = $derived(name === null ? undefined : snapshot.reads.documents[name]
 {#if name !== null && read !== undefined}
 	<ReadView {read} label={`The household of ${name}`}>
 		{#snippet children(data)}
-			<HouseholdCard {name} doc={data.scenario.document} household={data.scenario.household} contentHash={data.scenario.contentHash} {editable} />
+			<HouseholdCard {name} doc={data.scenario.document} household={data.scenario.household} householdHash={data.scenario.householdHash} {editable} />
 		{/snippet}
 	</ReadView>
 {/if}

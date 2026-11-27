@@ -130,7 +130,7 @@ describe("CashFlowView", () => {
 			expect(stacked).toContain(`>${amount}<`)
 		}
 		// Each bar is a control with the name and the amount, and picks the same row as the wide one.
-		expect(stacked).toContain('aria-label="salary, 120,000.00"')
+		expect(stacked).toContain('aria-label="Salary, 120,000.00"')
 		expect(stacked.match(/role="button"/g)?.length).toBe(
 			body.slice(0, body.indexOf("md:hidden")).match(/role="button"/g)?.length ?? -1,
 		)
@@ -152,6 +152,13 @@ describe("CashFlowView", () => {
 	})
 
 	test("a Flow the plan does not label keeps its id, in code, and in the bar's accessible name", () => {
+		const base = structuredClone(DEMO)
+		const doc = base.reads.documents["base"]
+		if (doc?.ok !== true) throw new Error("the Demo reads base")
+		const salary = doc.data.scenario.document.flows.find((flow) => flow.id === "salary")
+		if (salary === undefined) throw new Error("the Demo earns a salary")
+		delete salary.displayLabel
+		replaceSnapshot({ ...base, reads: { ...base.reads, accounts: ACCOUNTS } })
 		const body = renderView({ base: okRun(cashflowRunFixture()) })
 		expect(body).toContain('aria-label="salary, 120,000.00"')
 		expect(body).toMatch(/<code[^>]*data-item="salary"[^>]*>salary<\/code>/)

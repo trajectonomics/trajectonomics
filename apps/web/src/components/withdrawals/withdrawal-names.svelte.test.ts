@@ -19,6 +19,7 @@ function namesOf(labels: Record<string, string>): ItemNames {
 	const read = DEMO.reads.documents["base"]
 	if (read?.ok !== true) throw new Error("the Demo reads base")
 	const doc = structuredClone(read.data.scenario.document)
+	for (const flow of doc.flows) delete flow.displayLabel
 	for (const [id, label] of Object.entries(labels)) {
 		const flow = doc.flows.find((one) => one.id === id)
 		if (flow === undefined) {

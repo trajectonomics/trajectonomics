@@ -1,9 +1,8 @@
 import type { Baseline, Scenario, Timeline } from "@trajectonomics/core/sim"
 import { BASELINE_CURRENCY } from "../baseline/kind"
-import { type AppError, fail, isAppError } from "../errors"
+import { type AppError, isAppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"
 import { scenarioNotFound } from "../scenario/errors"
-import { householdDocument } from "../scenario/household/document"
 import type { Household } from "../scenario/household/model"
 import { applyScenarioSets } from "../scenario/set-apply"
 import type { AppliedOverride } from "../scenario/set-error"
@@ -13,6 +12,7 @@ import { contentHash, supportedCurrency } from "../store"
 import { canonicalJson } from "../store/canonical"
 import { guard } from "../store/guard"
 import { hasAnyLevy } from "./levies"
+import { householdFor } from "./prepare-household"
 import type { ScenarioEcho, TaxStatus } from "./view"
 import { withoutHeldAccount } from "./without-held"
 
@@ -36,7 +36,10 @@ export type Prepared = {
 	tax: TaxStatus
 	/** The input field the Scenario's name came from, so a stored record names the flag. */
 	scenarioPath: string
-	/** The Scenario's household, parsed from its stored text; null when none is set (cli ADR-0048). */
+	/**
+	 * The Scenario's household, parsed from its stored text; null when none is set or the caller
+	 * does not read it (cli ADR-0048).
+	 */
 	household: Household | null
 }
 
@@ -61,6 +64,11 @@ export type PrepareInput = {
 	add?: readonly string[] | undefined
 	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
 	decimal?: boolean | undefined
+	/**
+	 * Whether the leaf reads household ages: a compare never does, so `false` skips parsing the
+	 * stored household and a corrupt row cannot fail a command that never used it (cli ADR-0048).
+	 */
+	readHousehold?: boolean | undefined
 }
 
 /**
@@ -100,7 +108,7 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 	if (isAppError(applied)) return applied
 	const unsupported = unprojectable(applied.document)
 	if (unsupported !== null) return unsupported
-	const household = householdOfRow(row.household)
+	const household = householdFor(row.household, input.readHousehold)
 	if (isAppError(household)) return household
 	const mapped = input.baseline()
 	if (isAppError(mapped)) return mapped
@@ -132,14 +140,4 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		scenarioPath: input.scenarioPath,
 		household,
 	}
-}
-
-/** A stored household, parsed again: a row written by `scenario household` always parses. */
-function householdOfRow(stored: string | null): Household | null | AppError {
-	if (stored === null) return null
-	const parsed = householdDocument.safeParse(JSON.parse(stored))
-	if (!parsed.success) {
-		return fail("internal", { message: "The stored household does not parse as a household." })
-	}
-	return parsed.data
 }

@@ -30,11 +30,12 @@ export function scenarioChanged(
 	name: string,
 	expectedHash: string,
 	storedHash: string | null,
+	hashName = "contentHash",
 ): AppError {
 	const stored =
 		storedHash === null
 			? `No scenario named "${name}" is stored now. Run "traj scenario list" to see the scenarios.`
-			: `The stored contentHash of "${name}" is ${storedHash}. Run "traj scenario show ${name}" to read the plan again, then write the change to what it prints.`
+			: `The stored ${hashName} of "${name}" is ${storedHash}. Run "traj scenario show ${name}" to read the plan again, then write the change to what it prints.`
 	return fail("scenario_changed", {
 		path: "--if-hash",
 		message: `The scenario changed since it was read: the write expected ${expectedHash}.`,

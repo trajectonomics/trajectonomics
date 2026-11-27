@@ -42,6 +42,7 @@ function show(
 		id: "id",
 		name: "base",
 		contentHash: HASH,
+		householdHash: HASH,
 		forkedFrom: null,
 		version: 1,
 		createdAt: "2026-11-01T00:00:00Z",

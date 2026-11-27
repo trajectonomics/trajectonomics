@@ -1,6 +1,7 @@
 <script lang="ts">
+import type { AccountNames } from "../../lib/view/account-names"
 import type { CatalogueGroup } from "../../lib/view/charts/catalogue"
-import { seriesWords } from "../../lib/view/charts/series-ids"
+import { missingNames } from "../../lib/view/charts/series-missing"
 import { MAX_SERIES } from "../../lib/view/charts/types"
 
 interface Props {
@@ -9,12 +10,15 @@ interface Props {
 	chosen: readonly string[]
 	/** The name of a chosen id the plan does not list, so it can still be taken off. */
 	names: ReadonlyMap<string, string>
+	/** The ledger's Account names, so a removed series reads its Account's name. */
+	accounts: AccountNames
 	onToggle: (id: string) => void
 }
 
-let { groups, chosen, names, onToggle }: Props = $props()
+let { groups, chosen, names, accounts, onToggle }: Props = $props()
 const listed = $derived(new Set(groups.flatMap((group) => group.entries.map((entry) => entry.id))))
 const unlisted = $derived(chosen.filter((id) => !listed.has(id)))
+const unlistedNames = $derived(missingNames(unlisted, names, accounts))
 const full = $derived(chosen.length >= MAX_SERIES)
 </script>
 
@@ -48,7 +52,7 @@ const full = $derived(chosen.length >= MAX_SERIES)
 			{#each unlisted as id (id)}
 				<label class="flex items-start gap-2 text-sm text-muted-foreground">
 					<input type="checkbox" checked onchange={() => onToggle(id)} class="mt-0.5" />
-					<span>{names.get(id) ?? seriesWords(id)}</span>
+					<span>{unlistedNames.get(id) ?? id}</span>
 				</label>
 			{/each}
 		</fieldset>
