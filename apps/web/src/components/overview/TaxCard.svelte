@@ -26,7 +26,7 @@ let { scenario }: Props = $props()
 						{view.first.period}
 					</p>
 					<p class="text-2xl font-semibold tracking-tight">
-						<Money amount={view.first.owed} currency={view.currency} />
+						<Money amount={view.first.owed} currency={view.currency} compact />
 					</p>
 					<p class="text-sm">Settles {view.first.settlement}</p>
 					<p class="text-sm text-muted-foreground">Levy {view.first.levy}</p>

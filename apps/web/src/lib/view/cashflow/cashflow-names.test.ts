@@ -104,4 +104,16 @@ describe("the cash flow diagram's labels", () => {
 			"salary",
 		)
 	})
+
+	test("`flowOf` keeps the twin's id in the label", () => {
+		const names = plan({ invest: "Saving", extra: "Saving", borrow: "Drawn" })
+		const rollup = rollupsOf(cashflowRunFixture())[0]
+		if (rollup === undefined) throw new Error("the fixture has a first year")
+		const flow = flowOf(rollup, names)
+		const saving = flow.uses.filter((band) => band.kind === "saving")
+		expect(saving.map((band) => band.label)).toEqual([
+			"Saving (invest) into Investments",
+			"Saving (extra) into Investments",
+		])
+	})
 })

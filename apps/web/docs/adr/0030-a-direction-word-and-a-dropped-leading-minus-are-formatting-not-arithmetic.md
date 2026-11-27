@@ -23,6 +23,6 @@ The Overview and the Net worth page read the ledger's signs, not a person's ([#3
 ## Consequences
 
 - A new surface that shows money to a person reads it through `DirectedMoney` (`src/components/ui/DirectedMoney.svelte`), which takes the amount and its kind; the signed CLI string and the mask come with it. A new kind of amount adds a pair of words to `directedAmount` rather than a word to a component.
-- The three surfaces still show the CLI's figure: the visible digits are the CLI's digits, and the title is the CLI's signed string.
+- The three surfaces still show the CLI's figure: the visible digits are the CLI's digits (the Overview's Profit and loss total shortens them under ADR 0002's 2026-11-27 amendment), and the title is the CLI's signed string.
 - The sign decides the word, so a refund of an expense reads as money in, a reversal of income reads as money out, and an overpaid liability reads as money owed to you. A zero reads as its digits alone, because it has no direction.
 - `grep -rn "as the ledger books them\|as the ledger states them" apps/web/browser apps/web/src/routes` finds nothing, so no browser test or screenshot text matches the removed sentences.

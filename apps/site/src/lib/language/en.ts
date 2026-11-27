@@ -36,6 +36,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		] as const),
 		docsLink: "Docs",
 		blogLink: "Blog",
+		dataLink: "Data",
 		openjotLink: "OpenJot",
 		repoLinkLabel: "GitHub stars",
 		cliInstallLink: "Install the CLI directly",

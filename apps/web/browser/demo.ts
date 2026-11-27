@@ -23,6 +23,8 @@ export interface Choices {
 	readonly theme: Theme
 	/** Whether amounts are hidden (`traj.hideAmounts`), which swaps each figure for a mask. */
 	readonly hideAmounts?: boolean
+	/** The browser's own font size, in pixels, when a check wants a larger root than the default 16px. */
+	readonly rootFontSize?: number
 }
 
 /**
@@ -38,14 +40,38 @@ export async function openDemo(page: Page, path: string, choices: Choices): Prom
 	await settle(page, choices.theme)
 }
 
-/** Sets a person's choices in `localStorage` before the page's own script reads them. */
+/**
+ * Sets a person's choices in `localStorage`, and the one measured font on the body, before the page's own
+ * script reads them. The font is pinned here and not after the load because the diagram measures its labels
+ * in that font as it draws, and a font applied later would not be the one it measured.
+ */
 export async function chooseBeforeLoad(page: Page, choices: Choices): Promise<void> {
 	await page.addInitScript(
-		({ theme, hidden }) => {
+		({ theme, hidden, font, rootPx }) => {
 			localStorage.setItem("traj.theme", theme)
 			localStorage.setItem("traj.hideAmounts", hidden ? "1" : "0")
+			const pin = () => {
+				const root = document.documentElement
+				if (root === null) return false
+				if (rootPx !== null) root.style.setProperty("font-size", `${rootPx}px`, "important")
+				const body = document.body
+				if (body === null) return false
+				body.style.setProperty("font-family", `"${font}"`, "important")
+				return true
+			}
+			if (!pin()) {
+				const observer = new MutationObserver(() => {
+					if (pin()) observer.disconnect()
+				})
+				observer.observe(document, { childList: true, subtree: true })
+			}
 		},
-		{ theme: choices.theme, hidden: choices.hideAmounts === true },
+		{
+			theme: choices.theme,
+			hidden: choices.hideAmounts === true,
+			font: PINNED_FONT,
+			rootPx: choices.rootFontSize ?? null,
+		},
 	)
 }
 

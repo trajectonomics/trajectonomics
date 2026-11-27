@@ -21,10 +21,9 @@ function chosenPlan(body: string): string | undefined {
 	return body.match(/aria-current="true"[^>]*>\s*([^<]+?)\s*</)?.[1]
 }
 
-/** The page's label in the top bar. */
-function topBarTitle(body: string): string | undefined {
-	const header = body.match(/<header class="print:hidden[^"]*"[^>]*>[\s\S]*?<\/header>/)?.[0]
-	return header?.match(/<p class="min-w-0[^"]*">([^<]*)<\/p>/)?.[1]
+/** The top bar's markup. */
+function topBar(body: string): string {
+	return body.match(/<header class="print:hidden[^"]*"[^>]*>[\s\S]*?<\/header>/)?.[0] ?? ""
 }
 
 /** The button that opens the menu drawer, with its attributes. */
@@ -56,9 +55,11 @@ describe("the shell's wiring", () => {
 		expect(chosenPlan(renderLayout())).toBe("base")
 	})
 
-	test("names the page with the label routeAt gives its path", () => {
+	test("leaves the page's label to its h1: the top bar does not print it", () => {
 		setTestUrl("http://127.0.0.1/net-worth/")
-		expect(topBarTitle(renderLayout())).toBe(routeAt("/net-worth/")?.label)
+		const label = routeAt("/net-worth/")?.label ?? ""
+		expect(label).not.toBe("")
+		expect(topBar(renderLayout())).not.toContain(`>${label}<`)
 	})
 
 	test("says on the menu button whether the menu drawer is open", () => {

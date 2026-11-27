@@ -5,6 +5,9 @@ const ELLIPSIS_PX = 12
 /** The width of the ellipsis in the chart's 11px monospace text, in pixels. */
 const CODE_ELLIPSIS_PX = 7
 
+/** Measures text in the page's own font, so a fit uses the face the diagram draws. The estimate when absent. */
+export type TextMeasure = (text: string) => number
+
 /** A label's words and the room they take: an estimated width, so a row reserves the label's real box. */
 export interface LabelText {
 	readonly text: string
@@ -13,12 +16,18 @@ export interface LabelText {
 
 /** The label shortened with an ellipsis to fit `room` pixels; the whole label when it fits, none when even the
  * ellipsis does not. It cuts between graphemes, so a Thai cluster keeps its tone mark and an emoji its pair. */
-export function fitted(label: string, room: number, code: boolean): LabelText {
+export function fitted(
+	label: string,
+	room: number,
+	code: boolean,
+	measure?: TextMeasure,
+): LabelText {
 	const parts = graphemes(label, code)
-	const whole = parts.reduce((sum, part) => sum + part.width, 0)
+	const whole =
+		measure === undefined ? parts.reduce((sum, part) => sum + part.width, 0) : measure(label)
 	if (whole <= room) return { text: label, width: whole }
-	const ellipsis = code ? CODE_ELLIPSIS_PX : ELLIPSIS_PX
-	const kept = prefix(parts, room, ellipsis)
+	const ellipsis = ellipsisWidth(code, measure)
+	const kept = prefix(parts, room, ellipsis, measure)
 	if (kept.text === "") return kept
 	return { text: `${kept.text}…`, width: kept.width + ellipsis }
 }
@@ -26,11 +35,41 @@ export function fitted(label: string, room: number, code: boolean): LabelText {
 /** The label's bare first grapheme, the last thing tried in a crowded place; none when even that does not fit. */
 export function stub(label: string, room: number, code: boolean): LabelText {
 	const [first] = graphemes(label, code)
-	return first !== undefined && first.width <= room ? first : { text: "", width: 0 }
+	const width = first === undefined ? 0 : textWidth(first.text, code)
+	return first !== undefined && width <= room ? { text: first.text, width } : { text: "", width: 0 }
+}
+
+/** The width of `text` in the chart's text, in pixels: measured when the page can, else its graphemes' widths. */
+export function textWidth(text: string, code: boolean, measure?: TextMeasure): number {
+	if (measure !== undefined) return measure(text)
+	return graphemes(text, code).reduce((sum, part) => sum + part.width, 0)
+}
+
+/** The width of the ellipsis the chart draws after a cut label, in the text's own font. */
+function ellipsisWidth(code: boolean, measure?: TextMeasure): number {
+	if (measure !== undefined) return measure("…")
+	return code ? CODE_ELLIPSIS_PX : ELLIPSIS_PX
 }
 
 /** The longest prefix of whole graphemes that fits `room` beside the ellipsis. */
-function prefix(parts: readonly Grapheme[], room: number, ellipsis: number): LabelText {
+function prefix(
+	parts: readonly Grapheme[],
+	room: number,
+	ellipsis: number,
+	measure?: TextMeasure,
+): LabelText {
+	if (measure !== undefined) {
+		let text = ""
+		let kept = ""
+		for (const part of parts) {
+			const next = `${text}${part.text}`
+			const candidate = next.trimEnd()
+			if (measure(candidate) + ellipsis > room) break
+			text = next
+			kept = candidate
+		}
+		return { text: kept, width: measure(kept) }
+	}
 	let width = 0
 	let kept = 0
 	for (const part of parts) {
