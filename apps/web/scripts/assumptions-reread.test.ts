@@ -179,6 +179,8 @@ describe("what a chance change runs", () => {
 			expect(chanceRuns(kept)).toHaveLength(1)
 			expect(kept.some((line) => line.startsWith("projection run"))).toBe(false)
 			expect(full.some((line) => line.startsWith("projection run"))).toBe(true)
+			// The three stage-one checks and the one chance read, and nothing else (ADR 0018).
+			expect(kept).toHaveLength(CHECK.length + 1)
 			expect(kept.length).toBeLessThan(full.length)
 		},
 		SLOW_MS,

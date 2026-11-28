@@ -18,7 +18,7 @@ import { applyScenario } from "./scenario-test-support"
  * chance lists for a path is the one the replay of that path reaches, for every path of a run.
  */
 
-/** Each test replays all 200 paths: about 3 s alone, so under CI load it needs more than Bun's 5 s default. */
+/** The two tests replay all 200 paths: about 3 s together alone, and one took 5.3 s under CI load, past Bun's 5 s default. */
 const ALL_PATHS_MS = 20_000
 
 /** A decimal money string as satang, to order and compare figures without a float. */
