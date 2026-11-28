@@ -164,6 +164,14 @@
     onReplayOnboarding?: () => void;
   } = $props();
 
+  // The selected mascot card wears the current theme's accent, like the theme cards above it.
+  const mascotSelected = $derived(
+    theme === "pink-white"
+      ? "border-[#FF4D94] bg-[#FF4D94]/10 ring-1 ring-[#FF4D94]"
+      : theme === "orange-black"
+        ? "border-[#FF6B1A] bg-[#FF6B1A]/15 ring-1 ring-[#FF6B1A]"
+        : "border-[#EA580C] bg-[#EA580C]/10 ring-1 ring-[#EA580C]"
+  );
   const initialSettings = untrack(() => settings);
   let draft = $state<AppSettings>({
     ...initialSettings,
@@ -943,7 +951,7 @@
               onclick={() => onChangeMascot("robot")}
               aria-pressed={mascot === "robot"}
               class="flex items-center gap-2.5 rounded-2xl p-3.5 border text-left transition-all {mascot === 'robot'
-                ? 'border-[var(--brand)] bg-[var(--brand-soft)] ring-1 ring-[var(--brand)]'
+                ? mascotSelected
                 : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
             >
               <img
@@ -961,7 +969,7 @@
               onclick={() => onChangeMascot("moo")}
               aria-pressed={mascot === "moo"}
               class="flex items-center gap-2.5 rounded-2xl p-3.5 border text-left transition-all {mascot === 'moo'
-                ? 'border-[var(--brand)] bg-[var(--brand-soft)] ring-1 ring-[var(--brand)]'
+                ? mascotSelected
                 : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
             >
               <img
