@@ -77,7 +77,24 @@ describe("the unlabelled-income hint on a household with a partner", () => {
 		const item = itemOf(await shown(home), "unlabelled-income")
 		expect(item?.hint).toContain('flows.salary.label="income.section40_1@<person>"')
 		expect(item?.hint).toContain(
-			"with the Filer suffix of whoever earns it (@<person>: one of me, partner)",
+			"with the Filer suffix of whoever earns it (@<person>: one of me, partner, shared)",
 		)
+	})
+
+	it("offers shared, and the set form with shared clears the item", async () => {
+		const home = await couple(COUPLE_PLAN, coupleHousehold(COUPLE_OWNERS))
+		expect((await taxCouple(home, "married_joint")).code).toBe(0)
+		const owners = (COUPLE_OWNERS ?? []).filter((owner) => owner.path !== "flows.salary")
+		expect((await setHousehold(home, coupleHousehold(owners))).code).toBe(0)
+		await unlabel(home, "salary")
+		const item = itemOf(await shown(home), "unlabelled-income")
+		const command = (
+			item?.hint?.match(/^Run "(traj .+?)" (?:for a salary|to write)/)?.[1] ?? ""
+		).replace("@<person>", "@shared")
+		expect(command).toContain("income.section40_1@shared")
+		expect((await capture([...argvOf(command).slice(1), "--json"], { TRAJ_HOME: home })).code).toBe(
+			0,
+		)
+		expect(itemOf(await shown(home), "unlabelled-income")).toBeUndefined()
 	})
 })

@@ -50,9 +50,9 @@ nothing is there to state. A `tax-figure` carries tax-core's value, status and n
 its `hint` is null because a figure is cleared by sourcing it, not by a command. A fixable item's
 `hint` is the one command that states it, and it quotes a plan name the way ADR-0048's hints do:
 
-- `unlabelled-income`: `Run "traj scenario apply <name> --set 'flows.<id>.label="income.section40_1"'" for a salary, or name another label from "traj schema scenario apply".`
-- `unstated-allowance` for `retirementContributions` and `thaiEsg`: `Add a contribution Flow with its label: run "traj scenario apply <name> --add flows=<json>"; "traj schema scenario apply" shows the shape.`
-- `unstated-allowance` for any other class: `Run "traj scenario tax <name> --merge" with this allowance's flag to state it; "traj schema scenario tax" lists the flags.`
+- `unlabelled-income`: `Run "traj scenario apply <name> --set 'flows.<id>.label="income.section40_1@<owner>"'" for a salary, or name another label from "traj schema scenario apply".` A Levy over Filers reads only the suffixes it tallies, so when it does not read the Owner's, the hint is `Run "traj scenario tax <name> --from-stored --label <id>=income.section40_1" to write every unlabelled income Flow's salary label with its Owner's Filer suffix, or name another label from "traj schema scenario apply".`, with one `--label` for every unlabelled income Flow; a Flow with no Owner names the suffixes the Levies read, including `shared` when they tally it, or takes that form too.
+- `unstated-allowance` for `retirementContributions` and `thaiEsg`: `Add a contribution Flow with its label: run "traj scenario apply <name> --add flows=<json>"; "traj schema scenario apply" shows the shape, and its target must be in cashflow.contribute.` On a Levy over Filers it adds that the label needs the Owner's Filer suffix (`@<owner>`) and the household must give the Flow that Owner.
+- `unstated-allowance` for any other class: `Run "traj scenario tax <name> --merge" with this allowance's flag added right after --merge to state it; "traj schema scenario tax" lists the flags. --merge needs every income Flow labelled first.` When the name follows `--`, the hint says the flag goes before it.
 
 The human block prints `- <path> (income with no tax label)`, `- <path> (tax allowance not stated)`
 and `- <path> = <value> (<status> tax figure): <note>`, with the hint on the line under a fixable

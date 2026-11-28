@@ -22,7 +22,7 @@ export function assumedOf(
 ): AssumedItem[] {
 	return [
 		...unlabelledIncomeItems(row.name, plain, household),
-		...unstatedAllowanceItems(row.name, taxAllowances),
+		...unstatedAllowanceItems(row.name, taxAllowances, plain),
 		...taxFigureItems(plain),
 	]
 }

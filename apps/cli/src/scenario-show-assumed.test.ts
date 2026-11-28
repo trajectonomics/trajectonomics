@@ -81,7 +81,7 @@ describe("scenario show states what a plan assumes", () => {
 			'Add a contribution Flow with its label: run "traj scenario apply base --add flows=<json>"; "traj schema scenario apply" shows the shape, and its target must be in cashflow.contribute.',
 		)
 		expect(items.find((item) => item.path === "taxAllowances.lifeInsurance")?.hint).toBe(
-			'Run "traj scenario tax base --merge" with this allowance\'s flag to state it; "traj schema scenario tax" lists the flags. --merge needs every income Flow labelled first.',
+			'Run "traj scenario tax base --merge" with this allowance\'s flag added right after --merge to state it; "traj schema scenario tax" lists the flags. --merge needs every income Flow labelled first.',
 		)
 	})
 
