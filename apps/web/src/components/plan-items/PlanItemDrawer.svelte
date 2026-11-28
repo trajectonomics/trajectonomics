@@ -61,7 +61,9 @@ const existingAccount = $derived(doc.accounts.find((account) => account.id === d
 /** Closes the drawer, and offers the Tax labels page a just-saved new income in a taxed plan needs. */
 function flowDone(taxLabelFlow?: string): void {
 	onClose()
-	if (taxLabelFlow !== undefined) taxLabelNotice.offer({ plan: name, flow: taxLabelFlow })
+	if (taxLabelFlow !== undefined) {
+		taxLabelNotice.offer({ plan: name, flow: taxLabelFlow, origin: "drawer", taxed: true })
+	}
 }
 </script>
 

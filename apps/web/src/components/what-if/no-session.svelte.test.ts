@@ -124,7 +124,7 @@ describe("with no session, a page is its content and nothing more", () => {
 		const run = projection?.ok === true ? projection.data : null
 		const people = personNames(householdOf(DEMO, plan))
 		const hero = heroOf(DEMO, "")
-		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
+		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}<div role="status"></div>${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
 		expect(shown(page)).toBe(framed("Overview", content))
 	})

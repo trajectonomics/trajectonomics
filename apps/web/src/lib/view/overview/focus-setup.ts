@@ -10,7 +10,13 @@ export interface FocusButton {
 	readonly external: boolean
 }
 
-/** This app's setup action: a new plan, on the Plans page. */
-export function setupButton(): FocusButton {
+/** Which setup the page is in: no plan at all, or a plan its reads cannot answer from yet. */
+export type SetupAction = "first" | "plan"
+
+/** This app's setup action: the guided page with no plan, else a new plan, on the Plans page. */
+export function setupButton(action: SetupAction = "plan"): FocusButton {
+	if (action === "first") {
+		return { label: "Set up a first plan", href: "/plans/new/", external: false }
+	}
 	return { label: "Start a plan", href: "/plans/", external: false }
 }

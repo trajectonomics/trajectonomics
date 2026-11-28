@@ -1,3 +1,4 @@
+import { withSearch } from "../lib/view/links"
 import type { TaxLabelOffer } from "../lib/view/plan-items/tax-label"
 import { withParam } from "./query-string"
 
@@ -18,9 +19,9 @@ class TaxLabelNotice {
 	}
 }
 
-/** The Tax labels page for a plan, keeping the rest of the query of the page the notice shows on. */
+/** The Tax profile page for a plan, keeping the rest of the query of the page the notice shows on. */
 export function taxLabelsHref(search: string, plan: string): string {
-	return `/settings/tax/${withParam(search, "scenario", plan)}`
+	return withSearch("/settings/tax/", withParam(search, "scenario", plan))
 }
 
 /** The notice one page holds: the plan and Flow of the last saved income, or null. */

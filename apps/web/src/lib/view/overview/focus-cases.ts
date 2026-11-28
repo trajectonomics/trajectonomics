@@ -3,7 +3,7 @@ import { formatMonth, yearOf } from "../../format"
 import type { PersonNames } from "../item-names"
 import { annualRowsOf } from "../projection/annual"
 import { facesOf } from "./focus-faces"
-import { setupButton } from "./focus-setup"
+import { type SetupAction, setupButton } from "./focus-setup"
 import { type FocusView, SEE_PLAN, SEE_RUNS_OUT } from "./focus-types"
 import { chanceSentence, runsOutSentence, SETUP_ANSWER, SETUP_SENTENCE } from "./focus-words"
 
@@ -12,12 +12,12 @@ export function dataOf<T>(read: Read<T> | undefined): T | null {
 	return read?.ok === true ? read.data : null
 }
 
-export function setupFocus(): FocusView {
+export function setupFocus(action: SetupAction = "plan"): FocusView {
 	return {
 		kind: "setup",
 		answer: SETUP_ANSWER,
 		sentence: SETUP_SENTENCE,
-		button: setupButton(),
+		button: setupButton(action),
 		plan: null,
 		stopDate: null,
 		horizonYear: null,

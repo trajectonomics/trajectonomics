@@ -2,11 +2,14 @@ import { goto } from "$app/navigation"
 import type { Snapshot } from "../lib/contract"
 import { guidedEditOf } from "../lib/view/guided/compose"
 import { withSearch } from "../lib/view/links"
+import { firstTaxLabelOffer } from "../lib/view/plan-items/tax-label"
 import { editSession } from "./edit.svelte.js"
 import { GuidedPlanState } from "./guided-plan-state.svelte.js"
 import { currentSearch } from "./location.svelte.js"
 import { withParam } from "./query-string.js"
 import { selectPlan } from "./select-plan.svelte.js"
+import { currentSnapshot } from "./snapshot.svelte.js"
+import { taxLabelNotice } from "./tax-label-notice.svelte.js"
 
 /** The guided first plan with its one Edit: Save, and the Reload a moved ledger asks for. */
 class GuidedPlanSession extends GuidedPlanState {
@@ -33,6 +36,7 @@ class GuidedPlanSession extends GuidedPlanState {
 		this.hint = null
 		this.reloadable = false
 		if (await editSession.run(made.edit)) {
+			this.offerTaxLabel(made.edit.name)
 			if (selectPlan(made.edit.name)) {
 				const search = withParam(currentSearch(), "scenario", made.edit.name)
 				this.cancel()
@@ -52,6 +56,15 @@ class GuidedPlanSession extends GuidedPlanState {
 		this.reloadable = failure?.code === "guided_ledger_changed"
 		// A plan saved without its household is in the ledger already: read again so Plans lists it.
 		if (failure?.code === "guided_plan_half_saved") await editSession.addPlan(made.edit.name)
+	}
+
+	/** Offers the Tax labels link for the plan a Save made, when its income still has no label. */
+	private offerTaxLabel(plan: string): void {
+		taxLabelNotice.clear()
+		const state = currentSnapshot()
+		if (state.status !== "ready") return
+		const offer = firstTaxLabelOffer(state.snapshot, plan)
+		if (offer !== null) taxLabelNotice.offer(offer)
 	}
 
 	/** Opens the plan a Save wrote while a What-if held the page, once the What-if is settled. */

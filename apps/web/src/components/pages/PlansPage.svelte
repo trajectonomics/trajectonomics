@@ -1,6 +1,7 @@
 <script lang="ts">
 import { notProjected, planCards } from "../../lib/view/plans/card"
 import { parseRange, RANGES } from "../../lib/view/plans/range"
+import FirstPlanLink from "../plans/FirstPlanLink.svelte"
 import NotProjected from "../plans/NotProjected.svelte"
 import PlanCard from "../plans/PlanCard.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
@@ -26,18 +27,25 @@ const options = RANGES.map((one) => ({ value: one.id, label: one.label }))
 >
 	{#snippet children(snapshot)}
 		{@const cards = planCards(snapshot, chosen)}
+		{@const firstPlan = snapshot.params.scenarios.length === 0}
 		<div class="space-y-6">
-			<SegmentedControl name="plan-range" label="Range" {options} value={chosen.id} onChange={onRange} />
-			{#if cards.length === 0}
-				<EmptyState title="No plan is projected in this dashboard" />
+			{#if firstPlan}
+				<EmptyState title="No plan yet">
+					<FirstPlanLink />
+				</EmptyState>
 			{:else}
-				<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-					{#each cards as card (card.row.name)}
-						<PlanCard {card} {editable} />
-					{/each}
-				</div>
+				<SegmentedControl name="plan-range" label="Range" {options} value={chosen.id} onChange={onRange} />
+				{#if cards.length === 0}
+					<EmptyState title="No plan is projected in this dashboard" />
+				{:else}
+					<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+						{#each cards as card (card.row.name)}
+							<PlanCard {card} {editable} />
+						{/each}
+					</div>
+				{/if}
+				<NotProjected rows={notProjected(snapshot)} {editable} />
 			{/if}
-			<NotProjected rows={notProjected(snapshot)} {editable} />
 		</div>
 	{/snippet}
 </PageShell>

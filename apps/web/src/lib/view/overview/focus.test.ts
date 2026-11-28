@@ -23,21 +23,32 @@ function withoutAges(): Snapshot {
 }
 
 describe("focusOf, one case per row of the table", () => {
-	test("case 1: no plan, or no FI read, asks for a plan", () => {
+	test("case 1: no plan asks for the guided first plan", () => {
 		const noPlan: Snapshot = { ...DEMO, params: { ...DEMO.params, scenarios: [], compare: null } }
-		for (const focus of [focusOf(noPlan), focusOf(withoutFi(DEMO))]) {
-			expect(focus).toMatchObject({
-				kind: "setup",
-				answer: "Set up your plan",
-				button: { label: "Start a plan", href: "/plans/", external: false },
-				plan: null,
-				stopDate: null,
-				faces: [],
-			})
-			expect(focus.sentence).toBe(
-				"Where do you stand? Add your income, spending and savings, and traj answers when you could stop working.",
-			)
-		}
+		const focus = focusOf(noPlan)
+		expect(focus).toMatchObject({
+			kind: "setup",
+			answer: "Set up your plan",
+			button: { label: "Set up a first plan", href: "/plans/new/", external: false },
+			plan: null,
+			stopDate: null,
+			faces: [],
+		})
+		expect(focus.sentence).toBe(
+			"Where do you stand? Add your income, spending and savings, and traj answers when you could stop working.",
+		)
+	})
+
+	test("case 1: no FI read on a plan asks for a new plan on the Plans page", () => {
+		const focus = focusOf(withoutFi(DEMO))
+		expect(focus).toMatchObject({
+			kind: "setup",
+			answer: "Set up your plan",
+			button: { label: "Start a plan", href: "/plans/", external: false },
+			plan: null,
+			stopDate: null,
+			faces: [],
+		})
 	})
 
 	test("case 2: the projection's run-out wins, with the holder's age from the year row", () => {

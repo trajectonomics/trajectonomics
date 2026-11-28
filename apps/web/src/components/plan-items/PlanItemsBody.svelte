@@ -32,7 +32,7 @@ const projection = $derived(name === null ? undefined : snapshot.reads.projectio
 {:else}
 	<ReadView {read} label={`The plan of ${name}`}>
 		{#snippet children(data)}
-			{#if kind === "income"}<TaxLabelNotice plan={name} doc={data.scenario.document} />{/if}
+			{#if kind === "income"}<TaxLabelNotice plan={name} doc={data.scenario.document} source="drawer" />{/if}
 			<PlanItemsList
 				{kind}
 				{name}
