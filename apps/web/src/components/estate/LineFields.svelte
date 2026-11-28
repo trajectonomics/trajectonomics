@@ -39,7 +39,7 @@ const id = (field: string) => `estate-${prefix.replaceAll(".", "-")}-${field}`
 	{/if}
 	<Field id={id("rounding")} label="Rounding" options={ROUNDING_CHOICES} bind:value={line.rounding} problem={at("rounding")} />
 {:else if line.how === "fixed"}
-	<Field id={id("amount")} label="Amount" inputmode="decimal" hint="In the money of the plan's start, such as 50000.00" bind:value={line.amount} problem={at("amount")} />
+	<Field id={id("amount")} label="Amount" money inputmode="decimal" hint="In the money of the plan's start, such as 50000.00" bind:value={line.amount} problem={at("amount")} />
 	<Field id={id("growth")} label="How it grows each year" options={BOUND_GROWTH_CHOICES} bind:value={line.growth} problem={at("growth")} />
 	{#if line.growth === "fixed"}
 		<Field id={id("rate")} label="Percent a year" inputmode="decimal" bind:value={line.rate} problem={at("rate")} />

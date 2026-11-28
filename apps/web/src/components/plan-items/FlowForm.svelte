@@ -11,7 +11,7 @@ import { flowFormStart } from "../../lib/view/plan-items/flow-try-draft"
 import { categoriesOf, type FlowKind } from "../../lib/view/plan-items/flows"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { namedRefusal } from "../../lib/view/plan-items/refusal"
-import { newIncomeTaxNote } from "../../lib/view/plan-items/tax-label"
+import { newIncomeNeedsTaxLabel } from "../../lib/view/plan-items/tax-label"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import TryNotice from "./TryNotice.svelte"
@@ -67,9 +67,8 @@ const refusal = $derived(namedRefusal(editSession.failure, sent))
 const shown = $derived(
 	shownProblems(problems, refusal, editSession.error, FLOW_FIELDS, item, employerPath),
 )
-const note = $derived(newIncomeTaxNote(name, doc, kind, existing))
 /** True while the form shows the note for a new income in a taxed plan, so the fields say what the save leaves undone. */
-const needsTaxLabel = $derived(note !== null)
+const needsTaxLabel = $derived(newIncomeNeedsTaxLabel(doc, kind, existing))
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
@@ -89,7 +88,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	cleared = saved.cleared
 	sent = saved.sent
 	const added = saved.sent.find((id) => !before.has(id))
-	const taxLabelFlow = note === null ? undefined : added
+	const taxLabelFlow = needsTaxLabel ? added : undefined
 	if (saved.done) onDone(tryValue ? undefined : taxLabelFlow)
 }
 
