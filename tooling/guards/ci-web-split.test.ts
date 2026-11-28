@@ -41,14 +41,22 @@ describe("the CI split of the web check", () => {
 		expect(web.scripts["test:scripts"]).toBe("bun test --parallel=2 --no-isolate ./scripts")
 	})
 
-	it("runs lint, typecheck, test:src and build in the web job, and the scripts in shards", () => {
-		const command = commandsOf(workflow.jobs["web"] as Job)
-		const tokens = command.split(/\s+/)
-		const tasks = tokens.slice(
-			tokens.indexOf("run") + 1,
-			tokens.findIndex((t) => t.startsWith("--")),
-		)
-		expect(tasks.sort()).toEqual(["build", "lint", "test:src", "typecheck"])
+	it("runs typecheck in a step of its own before lint, test:src and build, and the scripts in shards", () => {
+		// `svelte-kit sync` (typecheck) and `vite build` both rewrite `.svelte-kit/` and the generated
+		// `node_modules/$app/tsconfig.json`, so one step at a time owns them (#864): typecheck first,
+		// then lint, test:src and build together.
+		const runs = (workflow.jobs["web"] as Job).steps?.map((step) => step.run ?? "") ?? []
+		const tasksOf = (run: string) => {
+			const tokens = run.split(/\s+/)
+			return tokens.slice(
+				tokens.indexOf("run") + 1,
+				tokens.findIndex((t) => t.startsWith("--")),
+			)
+		}
+		const typecheck = runs.findIndex((run) => tasksOf(run).join(" ") === "typecheck")
+		const rest = runs.findIndex((run) => tasksOf(run).sort().join(" ") === "build lint test:src")
+		expect(typecheck).toBeGreaterThanOrEqual(0)
+		expect(rest).toBeGreaterThan(typecheck)
 		const shard = workflow.jobs["web-scripts"] as Job
 		expect(commandsOf(shard)).toContain("test:scripts")
 		expect(commandsOf(shard)).toContain("--shard=")
@@ -104,16 +112,20 @@ describe("the CI split of the web check", () => {
 		expect(Object.keys(web.devDependencies)).toContain("@playwright/test")
 	})
 
-	it("builds the web package for the browser job without arguments, so the build is a cache hit", () => {
+	it("builds the web package and the hosted Demo for the browser job in separate steps, without arguments", () => {
 		// Arguments after `--` are hashed into every task of the graph (the same rule as the shards, #464).
+		// The two builds share `node_modules/$app/tsconfig.json`, so they are separate steps (#864).
 		const runs = ((workflow.jobs["web-browser"] as Job).steps ?? []).map((step) => step.run ?? "")
-		const build = runs.find((run) => run.includes("turbo run"))
-		expect(build).toBeDefined()
-		expect(build?.split(/\s+/)).toContain("@trajectonomics/cli#build")
-		expect(build?.split(/\s+/)).toContain("@trajectonomics/web#build")
-		expect(build).not.toMatch(/\s--(\s|$)/)
+		const build = runs.findIndex((run) => run.includes("turbo run @trajectonomics/cli#build"))
+		expect(build).toBeGreaterThanOrEqual(0)
+		expect(runs[build]?.split(/\s+/)).toContain("@trajectonomics/web#build")
+		const hosted = runs.findIndex((run) => run.includes("@trajectonomics/web#build:hosted"))
+		expect(hosted).toBeGreaterThan(build)
+		for (const index of [build, hosted]) {
+			expect(runs[index]).not.toMatch(/\s--(\s|$)/)
+		}
 		const test = runs.findIndex((run) => run.includes("test:browser"))
-		expect(test).toBeGreaterThan(runs.indexOf(build ?? ""))
+		expect(test).toBeGreaterThan(hosted)
 	})
 
 	it("uploads the screenshots whether or not the checks passed", () => {
