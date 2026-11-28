@@ -17,8 +17,14 @@ test("hosted: the notice's three feedback faces are visible at a phone width and
 		.getByRole("note", { name: "About this demo" })
 		.getByRole("group", { name: "Feedback on this demo" })
 	for (const label of FACES) {
-		const link = group.getByRole("link", { name: `Feedback: ${label}`, exact: true })
+		const link = group.getByRole("link", {
+			name: `Feedback: ${label}, opens GitHub in a new tab`,
+			exact: true,
+		})
 		await expect(link).toBeVisible()
+		const box = await link.boundingBox()
+		expect(box?.width ?? 0, `${label} tap width`).toBeGreaterThanOrEqual(24)
+		expect(box?.height ?? 0, `${label} tap height`).toBeGreaterThanOrEqual(24)
 		const href = await link.getAttribute("href")
 		expect(href, label).toContain(FORM)
 		expect(href, label).toContain("page=%2Fdemo%2F")

@@ -11,7 +11,7 @@ let { pathname }: { pathname: string } = $props()
 			href={feedbackIssueUrl(choice.label, pathname)}
 			target="_blank"
 			rel="noopener"
-			aria-label="Feedback: {choice.label}"
+			aria-label="Feedback: {choice.label}, opens GitHub in a new tab"
 			title={choice.label}
 			class="inline-flex size-6 items-center justify-center rounded text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 		>

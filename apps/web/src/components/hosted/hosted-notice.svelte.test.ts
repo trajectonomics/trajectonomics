@@ -35,9 +35,9 @@ describe("the hosted notice's feedback faces", () => {
 	test("name the face each link opens, and switch nothing on", () => {
 		setTestUrl("http://127.0.0.1/demo/")
 		const body = render(HostedNotice).body
-		expect(body).toContain('aria-label="Feedback: Like it"')
-		expect(body).toContain('aria-label="Feedback: It\'s okay"')
-		expect(body).toContain('aria-label="Feedback: Confusing"')
+		expect(body).toContain('aria-label="Feedback: Like it, opens GitHub in a new tab"')
+		expect(body).toContain('aria-label="Feedback: It\'s okay, opens GitHub in a new tab"')
+		expect(body).toContain('aria-label="Feedback: Confusing, opens GitHub in a new tab"')
 		expect(body).toContain('title="Like it"')
 		expect(body).toContain('title="Confusing"')
 		expect(body).toContain('role="note"')
