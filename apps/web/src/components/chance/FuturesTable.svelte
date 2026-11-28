@@ -3,6 +3,7 @@ import { currentSearch } from "../../client/location.svelte.js"
 import type { Future } from "../../lib/view/chance/futures"
 import { type Order, pageOfFutures } from "../../lib/view/chance/futures-page"
 import { futureHref } from "../../lib/view/chance/links"
+import { MONEY_LABELS } from "../../lib/view/chance/money"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
@@ -15,10 +16,12 @@ interface Props {
 	ranOut: number
 	plan: string
 	currency: string
+	/** Whether the caption says the figures are in future money. */
+	futureMoney: boolean
 }
 
 /** Every Market path, one row each: sorted by closing net worth, optionally only the ones that ran out, 25 to a page. */
-let { futures, ranOut, plan, currency }: Props = $props()
+let { futures, ranOut, plan, currency, futureMoney }: Props = $props()
 let order = $state<Order>("worst")
 let onlyRanOut = $state(false)
 let page = $state(1)
@@ -83,7 +86,7 @@ const columns: Column<Future>[] = [
 		</label>
 	</div>
 	<DataTable
-		caption={`Every future, by closing net worth, in ${currency}`}
+		caption={`Every future, by closing net worth, in ${currency}${futureMoney ? `. ${MONEY_LABELS.future}` : ""}`}
 		{columns}
 		rows={shown.rows}
 		rowKey={(future) => String(future.index)}

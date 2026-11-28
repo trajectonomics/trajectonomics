@@ -59,7 +59,13 @@ export const scenarioDocument = z.looseObject({
 	// Where the money goes: the routing forms (cli ADR-0070). Optional so a document without it still decodes, and kept as it is.
 	cashflow: scenarioCashflow.optional(),
 	// The assumptions of the whole plan: inflation per year in basis points, which is an integer in the decimal form too.
-	economy: z.looseObject({ inflation: z.number().int() }).optional(),
+	// The inflation swing is optional (cli ADR-0085), and the page only shows it: its Edit field is a later issue.
+	economy: z
+		.looseObject({
+			inflation: z.number().int(),
+			inflationVolatility: z.number().int().optional(),
+		})
+		.optional(),
 	// The Levies the plan is taxed under; the page reads only whether there is one, so each is kept as it is.
 	levies: z.array(z.unknown()).optional(),
 	// The costs and gifts of the estate, when the plan states them (cli ADR 0064); none is shipped, each is the person's own.

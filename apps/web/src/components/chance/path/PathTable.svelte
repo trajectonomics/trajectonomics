@@ -8,12 +8,14 @@ interface Props {
 	rows: readonly PathRow[]
 	/** The name of each Account that has a return column, in column order. */
 	accounts: readonly string[]
+	/** Whether the CLI stated each roll-up's inflation, so the table shows its Inflation column (cli ADR-0085). */
+	inflation: boolean
 	terms: Terms
 	currency: string
 }
 
-/** One row per year: the age, each Account's return, income, spending and net worth. */
-let { rows, accounts, terms, currency }: Props = $props()
+/** One row per year: the age, the inflation drawn, each Account's return, income, spending and net worth. */
+let { rows, accounts, inflation, terms, currency }: Props = $props()
 const head = "border-b border-border px-3 py-2 font-medium text-muted-foreground"
 </script>
 
@@ -24,6 +26,7 @@ const head = "border-b border-border px-3 py-2 font-medium text-muted-foreground
 			<tr>
 				<th scope="col" class={`${head} text-left`}>Year ending</th>
 				<th scope="col" class={`${head} text-left`}>Age</th>
+				{#if inflation}<th scope="col" class={`${head} text-right`}>Inflation</th>{/if}
 				{#each accounts as name (name)}
 					<th scope="col" class={`${head} text-right`}>{name} return</th>
 				{/each}
@@ -43,6 +46,7 @@ const head = "border-b border-border px-3 py-2 font-medium text-muted-foreground
 						{/each}
 					</td>
 					<td class="px-3 py-2 align-top">{row.ages || "—"}</td>
+					{#if inflation}<td class="px-3 py-2 text-right align-top tabular-nums">{row.inflation ?? "—"}</td>{/if}
 					{#each row.returns as text, index (index)}
 						<td class="px-3 py-2 text-right align-top tabular-nums">{text ?? "—"}</td>
 					{/each}
