@@ -1,11 +1,15 @@
 <script lang="ts">
+import { currentSearch } from "../../client/location.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
+import { assumedCard } from "../../lib/view/assumed/card"
+import { planAssumed } from "../../lib/view/assumed/snapshot"
 import { householdOf, personNames } from "../../lib/view/item-names"
 import { focusOf } from "../../lib/view/overview/focus"
 import { heroOf } from "../../lib/view/overview/hero"
 import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
+import AssumedCard from "../assumed/AssumedCard.svelte"
 import OverviewFocus from "../overview/OverviewFocus.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
 import TaxLabelNotice from "../plan-items/TaxLabelNotice.svelte"
@@ -21,7 +25,8 @@ interface Props {
 let { scenario = "" }: Props = $props()
 </script>
 
-<!-- The Overview: one focus point with the answer written on its chart, then the step after a guided save, then the quiet cards. -->
+<!-- The Overview: one focus point with the answer written on its chart, then the step after a guided save, then what the
+plan assumes and the quiet cards. -->
 <PageShell title="Overview">
 	{#snippet children(snapshot)}
 		{@const plan = homePlan(snapshot, scenario)}
@@ -32,6 +37,9 @@ let { scenario = "" }: Props = $props()
 		{@const hero = heroOf(snapshot, scenario)}
 		{@const people = personNames(householdOf(snapshot, plan))}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
+		{@const search = currentSearch()}
+		{@const assumed = planAssumed(snapshot, plan, search)}
+		{@const card = assumed === null ? null : assumedCard(assumed.items, assumed.groups, search)}
 		<WhatIfAbove open={lens !== null} gap="space-y-4">
 			{#snippet whatIf()}
 				{#if lens && plan !== null}
@@ -58,6 +66,7 @@ let { scenario = "" }: Props = $props()
 						next
 					/>
 				{/if}
+				<AssumedCard view={card} />
 				<OverviewGrid view={overviewView(snapshot, scenario)} />
 			</div>
 		</WhatIfAbove>
