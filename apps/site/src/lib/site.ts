@@ -34,6 +34,20 @@ export const ONBOARDING_SKILL_URL = `${SKILLS_RAW_PATH}/traj-onboarding/SKILL.md
 export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and follow it.`
 
 /**
+ * The commands the demo window shows the agent running before the demo command: a fresh `traj` has
+ * no ledger and no Scenario, so the example first writes the CLI's own template to `base.json`,
+ * fills it with the user's numbers, and applies it as the `base` Scenario the demo command reads.
+ * `--as-of` pre-fills the document from the ledger's Baseline at the demo's as-of date, so the plan
+ * names the user's own accounts. The balance itself goes in the ledger. A product fixture, the same
+ * text in every Language, and not copy.
+ */
+export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
+	"traj init",
+	"traj scenario apply --template --as-of 2026-03-31 > base.json",
+	"traj scenario apply base --file base.json",
+])
+
+/**
  * The command the demo window shows the agent running, taken from the CLI's own `traj fi`
  * examples. A product fixture, the same text in every Language, and not copy.
  */

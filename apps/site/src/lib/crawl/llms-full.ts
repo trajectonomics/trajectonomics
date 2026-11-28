@@ -1,7 +1,13 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import { openJotDictionaryFor } from "../language/openjot-dictionary"
-import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, INSTALL_PROMPT, SKILLS_LICENCE_URL } from "../site"
+import {
+	FI_DEMO_COMMAND,
+	FI_DEMO_OUTPUT,
+	FI_DEMO_SETUP_COMMANDS,
+	INSTALL_PROMPT,
+	SKILLS_LICENCE_URL,
+} from "../site"
 import { ABSOLUTE_OPENJOT_URL } from "../site/openjot"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
@@ -20,8 +26,42 @@ const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent
 /** The pill's two runs: the licence and the release, both facts the page prints. */
 const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 
-/** The demo the page shows: the command an agent runs, and the abridged JSON it answers with. */
-const DEMO = ["```bash", FI_DEMO_COMMAND, "```", "", "```json", ...FI_DEMO_OUTPUT, "```"]
+/**
+ * The comment above each setup command, in order: what happens before it, named because the window
+ * shortens the setup. The template's `--as-of` reads the ledger, so the balance is recorded first.
+ */
+const SETUP_NOTES: readonly string[] = [
+	"# First-time setup:",
+	"# Record your balance in the ledger first: an opening on or before the as-of date.",
+	"# Fill base.json with your numbers, then apply it.",
+]
+
+/** The setup commands, each under the comment that says what comes before it. */
+const SETUP_LINES = FI_DEMO_SETUP_COMMANDS.flatMap((command, at) => {
+	const note = SETUP_NOTES[at]
+	return note === undefined ? [command] : [note, command]
+})
+
+/** The line above the demo command: the question that command answers. */
+const ASK_NOTE = "# Ask when you reach financial independence:"
+
+/**
+ * The demo the page shows: the first-time setup, the command an agent runs, and the abridged JSON it
+ * answers with. The setup label is there because `scenario apply base --file` replaces an existing
+ * `base` plan, so the three commands are a one-time setup and not a repeatable script.
+ */
+const DEMO = [
+	"```bash",
+	...SETUP_LINES,
+	"",
+	ASK_NOTE,
+	FI_DEMO_COMMAND,
+	"```",
+	"",
+	"```json",
+	...FI_DEMO_OUTPUT,
+	"```",
+]
 
 /** A line of one transcript: the speaker the page aligns, then what they say. */
 const line = (speaker: string, said: string) => `- ${speaker}: ${said}`

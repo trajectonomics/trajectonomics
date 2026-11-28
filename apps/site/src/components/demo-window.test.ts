@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, type HtmlElement, textOf } from "../lib/build/html"
+import { unescapeText } from "../lib/build/html-tag"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
 import {
 	DEMO_APP_NAME,
@@ -7,6 +8,7 @@ import {
 	FI_DEMO_COMMAND,
 	FI_DEMO_DATE,
 	FI_DEMO_OUTPUT,
+	FI_DEMO_SETUP_COMMANDS,
 } from "../lib/site"
 import DemoWindow from "./DemoWindow.astro"
 import { chatOf, exchangeOf } from "./testing/demo"
@@ -122,7 +124,7 @@ describe("the demo window in every Language", () => {
 				`${dictionary.actionAgent} ${dictionary.actionNeedMore}`,
 				`${dictionary.actionYou} ${dictionary.actionData}`,
 			])
-			expect(spoken[4]).toContain(dictionary.actionSkillLine)
+			expect(unescapeText(spoken[4] ?? "")).toContain(dictionary.actionSkillLine)
 			expect(spoken[4]).toContain(FI_DEMO_COMMAND)
 			expect(spoken[4]).toContain(dictionary.actionExampleNote)
 			expect(spoken[5]).toBe(
@@ -142,8 +144,15 @@ describe("the demo window in every Language", () => {
 			}
 		})
 
-		it(`shows the CLI command and its JSON one line per element (${language})`, async () => {
+		it(`shows the setup, the CLI command and its JSON one line per element (${language})`, async () => {
 			const page = await render()
+			const commands = withClass(page, "terminal-command").map((element) =>
+				unescapeText(textOf(page, element)),
+			)
+			expect(commands).toEqual([
+				...FI_DEMO_SETUP_COMMANDS.map((command) => `$ ${command}`),
+				`$ ${FI_DEMO_COMMAND}`,
+			])
 			const lines = withClass(page, "terminal-line").map((element) => textOf(page, element))
 			expect(lines).toHaveLength(FI_DEMO_OUTPUT.length)
 			expect(lines.join("\n")).toContain(FI_DEMO_DATE)

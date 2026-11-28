@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor, languageBuildUrl } from "../language/languages"
-import { FI_DEMO_COMMAND, INSTALL_PROMPT } from "../site"
+import { FI_DEMO_COMMAND, FI_DEMO_SETUP_COMMANDS, INSTALL_PROMPT } from "../site"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "./llms-full"
 import { linkCount } from "./llms-markdown"
 
@@ -51,8 +51,22 @@ describe("the full Answer engine file", () => {
 		}
 	})
 
-	it("prints the demo command and its answer as fenced code, not as a link", () => {
-		expect(LLMS_FULL_TXT).toContain(`\`\`\`bash\n${FI_DEMO_COMMAND}\n\`\`\``)
+	it("walks the demo from the first-time setup to the command and the answer it prints", () => {
+		expect(LLMS_FULL_TXT).toContain(
+			[
+				"```bash",
+				"# First-time setup:",
+				FI_DEMO_SETUP_COMMANDS[0],
+				"# Record your balance in the ledger first: an opening on or before the as-of date.",
+				FI_DEMO_SETUP_COMMANDS[1],
+				"# Fill base.json with your numbers, then apply it.",
+				FI_DEMO_SETUP_COMMANDS[2],
+				"",
+				"# Ask when you reach financial independence:",
+				FI_DEMO_COMMAND,
+				"```",
+			].join("\n"),
+		)
 		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
 	})
 

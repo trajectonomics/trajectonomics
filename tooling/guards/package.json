@@ -2,7 +2,7 @@
 	"name": "@trajectonomics/guards",
 	"version": "0.0.0",
 	"private": true,
-	"description": "Repository guards that run in `bun run check`: links to archived repositories, a notice for every vendored upstream skill, ADR numbers that are unique within a directory, the licence every workspace declares, and no static site keeping its own copy of the shared header frame. They read every tracked file, so `turbo.json` here keeps turbo from caching them.",
+	"description": "Repository guards that run in `bun run check`: links to archived repositories, a notice for every vendored upstream skill, ADR numbers that are unique within a directory, the licence every workspace declares, no static site keeping its own copy of the shared header frame, and the commands the Site's demo prints, which must name commands and flags the CLI defines. They read every tracked file, so `turbo.json` here keeps turbo from caching them.",
 	"license": "AGPL-3.0-only",
 	"type": "module",
 	"packageManager": "bun@1.4.4",
