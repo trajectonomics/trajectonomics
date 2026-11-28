@@ -34,6 +34,10 @@ const href = $derived(held ? taxLabelsHref(currentSearch(), plan) : null)
 const untaxed = $derived(next && offer?.taxed === false)
 const LINK =
 	"underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+/** Following the drawer note clears it, as on #796. The guided step stays until every income of its plan is labelled. */
+function follow(): void {
+	if (!next) taxLabelNotice.clear()
+}
 </script>
 
 <!-- A saved income in a taxed plan has no label yet, and the tax rules read only labelled income. The status stays
@@ -41,12 +45,12 @@ const LINK =
 <div role="status">
 	{#if href !== null && untaxed}
 		<p class="text-sm text-muted-foreground">
-			Next: set up tax in <a {href} onclick={() => taxLabelNotice.clear()} class={LINK}>Tax profile</a>.
+			Next: set up tax in <a {href} onclick={follow} class={LINK}>Tax profile</a>.
 		</p>
 	{:else if href !== null}
 		<p class="text-sm text-muted-foreground">
 			{next ? "Next: give your income its tax labels in" : "Give this income a label in"}
-			<a {href} onclick={() => taxLabelNotice.clear()} class={LINK}>Tax labels</a>.
+			<a {href} onclick={follow} class={LINK}>Tax labels</a>.
 		</p>
 	{/if}
 </div>
