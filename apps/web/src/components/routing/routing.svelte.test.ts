@@ -47,7 +47,6 @@ describe("the Where money goes page at phone width", () => {
 		expect(opened.slice(0, opened.indexOf("</details>"))).toContain(
 			"The last step must take everything that is left.",
 		)
-		expect(html).toMatch(/<svg[^>]*viewBox="0 0 10 20"[^>]*aria-hidden="true"/)
 	})
 
 	test("has Up and Down for each row, the first Up and the last Down turned off", () => {

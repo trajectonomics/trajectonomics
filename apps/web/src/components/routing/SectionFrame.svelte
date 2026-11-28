@@ -23,24 +23,7 @@ let { id, title, intro, children, figure }: Props = $props()
 			<summary class="cursor-pointer hover:text-foreground">How this list works</summary>
 			<p>{intro}</p>
 		</details>
-		<div class="flex gap-2">
-			<!-- The list is read top to bottom, so the arrow points down it. -->
-			<svg
-				viewBox="0 0 10 20"
-				aria-hidden="true"
-				focusable="false"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="1.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="h-5 w-2.5 shrink-0 text-muted-foreground"
-			>
-				<path d="M5 1v16" />
-				<path d="M1 13l4 4 4-4" />
-			</svg>
-			<div class="min-w-0 flex-1">{@render children()}</div>
-		</div>
+		{@render children()}
 	</div>
 	<div class="min-w-0 space-y-2">
 		<h3 class="text-sm font-medium">What it did over the plan</h3>
