@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test"
 import { openDemo } from "./demo"
 import { focusPointProblems } from "./focus-point"
-import { expectFocusOnAPhone, expectMaskedFocus, FOCUS_PAGES } from "./focus-point-pages"
+import {
+	expectFocusOnAPhone,
+	expectMaskedFocus,
+	FOCUS_PAGES,
+	MASKED_FOCUS_PAGES,
+} from "./focus-point-pages"
 import { PAGES, pageName } from "./pages"
 
 /**
@@ -9,18 +14,14 @@ import { PAGES, pageName } from "./pages"
  * yet, or break the rule, so this list can only shrink: a route that starts passing fails its own check until
  * it is removed here.
  */
-export const PENDING_707: Readonly<Record<string, "b" | "c">> = {
+export const PENDING_707: Readonly<Record<string, "c">> = {
 	"/assets-and-debts/": "c",
-	"/cash-flow/": "b",
 	"/chance/path/": "c",
 	"/compare/": "c",
 	"/expenses/": "c",
 	"/fi/": "c",
-	"/health/": "b",
 	"/household/": "c",
 	"/income/": "c",
-	"/ledger/": "b",
-	"/milestones/": "b",
 	"/plans/": "c",
 	"/projection/": "c",
 	"/projection/years/": "c",
@@ -85,7 +86,7 @@ for (const path of FOCUS_PAGES) {
 	})
 }
 
-for (const path of FOCUS_PAGES) {
+for (const path of MASKED_FOCUS_PAGES) {
 	test(`${pageName(path)} masks its focus amount with Hide amounts on`, async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 })
 		await openDemo(page, path, { theme: "light" })
