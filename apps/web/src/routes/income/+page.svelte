@@ -6,10 +6,6 @@ import PlanItemsPage from "../../components/pages/PlanItemsPage.svelte"
 import { editsShown } from "../../lib/edit/shown"
 </script>
 
-<svelte:head>
-	<title>Income · Dashboard</title>
-</svelte:head>
-
 <PlanItemsPage
 	kind="income"
 	scenario={queryParam("scenario", "")}

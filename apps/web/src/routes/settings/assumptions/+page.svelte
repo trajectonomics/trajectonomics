@@ -6,10 +6,6 @@ import AssumptionsPage from "../../../components/pages/AssumptionsPage.svelte"
 import { editsShown } from "../../../lib/edit/shown"
 </script>
 
-<svelte:head>
-	<title>Assumptions · Dashboard</title>
-</svelte:head>
-
 <AssumptionsPage
 	scenario={queryParam("scenario", "")}
 	editable={editsShown(editSession.token, page.url.search)}

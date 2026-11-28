@@ -43,6 +43,7 @@ describe("the hosted twins", () => {
 		expect(pageTitle("/demo/net-worth/")).toBe("Net worth")
 		expect(pageTitle("/net-worth/")).toBe("Net worth")
 		expect(pageTitle("/demo/plans/")).toBe("Plans")
+		expect(pageTitle("/demo/plans/new/")).toBe("New plan")
 	})
 
 	test("draw the Edit controls, and refuse every Edit with no request", async () => {
