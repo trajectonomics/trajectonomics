@@ -26,10 +26,12 @@ export function netWorthSeries(
 	const rows = annualRowsOf(run)
 	const nominal: LineSeries = {
 		name: NOMINAL_NAME,
+		short: "Future money",
 		points: rows.map((row) => nominalPoint(row, people)),
 	}
 	const real: LineSeries = {
 		name: REAL_NAME,
+		short: "Today's money",
 		dashed: true,
 		points: rows.map((row) => realPoint(row, people)),
 	}

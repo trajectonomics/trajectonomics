@@ -4,13 +4,15 @@ import type { LegendItem } from "./types"
 
 interface Props {
 	items: readonly LegendItem[]
+	/** Keeps the legend off the screen but in the page, when each line's end already names it. */
+	srOnly?: boolean
 }
 
-let { items }: Props = $props()
+let { items, srOnly = false }: Props = $props()
 </script>
 
 <!-- The series of a chart, each with a swatch that shows its dash as well as its colour. -->
-<ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+<ul class={srOnly ? "sr-only" : "mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm"}>
 	{#each items as item, index (index)}
 		<li class="flex items-center gap-2">
 			<svg width={24} height={8} aria-hidden="true" focusable="false">

@@ -5,6 +5,7 @@ import LineChart from "./LineChart.svelte"
 
 const net: LineSeries = {
 	name: "Net worth",
+	short: "Future money",
 	points: [
 		{ x: 0, xLabel: "Jan 2026", y: 93000, display: "93,000.00" },
 		{ x: 1, xLabel: "Feb 2026", y: 1082000, display: "1,082,000.00" },
@@ -13,10 +14,11 @@ const net: LineSeries = {
 
 const plan: LineSeries = {
 	name: "Plan",
+	short: "Today's money",
 	dashed: true,
 	points: [
 		{ x: 0, xLabel: "Jan 2026", y: 120000, display: "120,000.00" },
-		{ x: 1, xLabel: "Feb 2026", y: 900000, display: "900,000.00" },
+		{ x: 1, xLabel: "Feb 2026", y: 600000, display: "600,000.00" },
 	],
 }
 
@@ -54,6 +56,32 @@ describe("LineChart", () => {
 			props: { label: "Net worth and plan", series: [net, plan], hidden: false },
 		})
 		expect(body).toContain('stroke-dasharray="6 4"')
+	})
+
+	test("names each line at its end, and keeps the full names in a legend for screen readers", () => {
+		const { body } = render(LineChart, {
+			props: {
+				label: "Net worth and plan",
+				series: [net, plan],
+				hidden: false,
+				height: 320,
+				endLabels: true,
+			},
+		})
+		expect(body).toMatch(/<text[^>]*>Future money<\/text>/)
+		expect(body).toMatch(/<text[^>]*>Today's money<\/text>/)
+		expect(body).toContain('class="sr-only"')
+		expect(body).toContain(">Plan<")
+	})
+
+	test("keeps the visible legend when the end labels would collide", () => {
+		const flat = { ...plan, points: plan.points.map((point) => ({ ...point, y: 1082000 })) }
+		const { body } = render(LineChart, {
+			props: { label: "Net worth", series: [net, flat], hidden: false, endLabels: true },
+		})
+		expect(body).not.toMatch(/<text[^>]*>Future money<\/text>/)
+		expect(body).toContain(">Plan<")
+		expect(body).not.toContain('class="sr-only"')
 	})
 
 	test("draws at the height the page asks for, so the Plan's chart is taller than the default", () => {

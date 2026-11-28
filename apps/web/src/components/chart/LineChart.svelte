@@ -6,24 +6,15 @@ import {
 	columnXs,
 	type LineMarker,
 	type LineSeries,
+	endLabels as lineEndLabels,
 	lineLayout,
 	type StepLine,
 	withStepLine,
 } from "../../lib/chart"
 import EmptyState from "../ui/EmptyState.svelte"
-import { HEIGHT, MARGIN } from "./geometry"
+import { FALLBACK_WIDTH, HEIGHT, MARGIN, MIN_WIDTH, RIGHT_AXIS_MARGIN, SUB_LINE } from "./geometry"
+import LineChartLegend from "./LineChartLegend.svelte"
 import LineHover from "./LineHover.svelte"
-import LineLegend from "./LineLegend.svelte"
-import { legendItems } from "./legend-items"
-
-/** The narrowest a chart is drawn, so its axis labels never collide. */
-const MIN_WIDTH = 240
-/** The room on the right for the labels of a second axis, in pixels. */
-const RIGHT_AXIS_MARGIN = 48
-/** The room a second line of x labels (the ages) takes under the dates, in pixels. */
-const SUB_LINE = 14
-/** The width before the chart is measured, which is also what a prerender would show. */
-const FALLBACK_WIDTH = 640
 
 interface Props {
 	/** What the chart shows, read out by a screen reader, such as "Net worth by month". */
@@ -43,6 +34,8 @@ interface Props {
 	step?: StepLine | undefined
 	/** The chart's height in pixels. Left out, the default line chart's height. */
 	height?: number | undefined
+	/** Places each series' short name at its line's end, and keeps the legend for screen readers. */
+	endLabels?: boolean
 }
 
 let {
@@ -55,6 +48,7 @@ let {
 	wide = false,
 	step,
 	height,
+	endLabels = false,
 }: Props = $props()
 let clientWidth = $state(0)
 let active = $state<number | null>(null)
@@ -81,6 +75,7 @@ const layout = $derived(
 			? withStepLine(columns, step, columnXs(series), plot)
 			: columns,
 )
+const ends = $derived(endLabels && !step && layout ? lineEndLabels(layout, series, plot) : null)
 </script>
 
 <!-- A line chart with hover, keyboard and abbreviated axis labels, and a tooltip of each series' own string. -->
@@ -93,12 +88,11 @@ const layout = $derived(
 			height={chartHeight}
 			{masked}
 			{active}
+			labels={ends}
 			onActive={(index) => (active = index)}
 		/>
+		<LineChartLegend {layout} {series} {step} srOnly={ends !== null} />
 	{:else}
 		<EmptyState title="Nothing to chart yet" />
-	{/if}
-	{#if layout && (series.length > 1 || step)}
-		<LineLegend items={legendItems(step ? [...series, step.line] : series, layout.palette === "wide")} />
 	{/if}
 </div>

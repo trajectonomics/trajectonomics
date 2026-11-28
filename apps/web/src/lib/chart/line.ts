@@ -15,6 +15,8 @@ export interface LinePoint {
 /** One series of a line chart. A dashed series is told apart from a solid one without colour. */
 export interface LineSeries {
 	readonly name: string
+	/** A name short enough to sit at the line's end, used instead of a legend when the chart has room. */
+	readonly short?: string
 	readonly dashed?: boolean
 	/** A second dash, for a chart of many series: with `dashed` it is a dash and dot pattern. */
 	readonly dotted?: boolean
