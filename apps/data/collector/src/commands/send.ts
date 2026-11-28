@@ -28,7 +28,7 @@ async function readInput(files: readonly string[]): Promise<string> {
 const postFetch: FetchLike = (url, init) => fetch(url, init)
 const authFetch: AuthFetch = (url, init) => fetch(url, init)
 
-/** Reads the rows, then the credentials, posts them, and exits non-zero on any failure. */
+/** Reads the rows, then (only if there are any) the credentials, posts them, and exits non-zero on any failure. */
 export async function runSendCommand(
 	argv: readonly string[],
 	deps: SendCommandDeps = realSendCommandDeps(),
@@ -40,6 +40,11 @@ export async function runSendCommand(
 	} catch (error) {
 		deps.log(`send: ${errorMessage(error)}`)
 		deps.exit(1)
+		return
+	}
+	if (text.trim().length === 0) {
+		deps.log("send: nothing to send")
+		deps.exit(0)
 		return
 	}
 	try {

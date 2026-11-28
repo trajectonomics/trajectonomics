@@ -1,3 +1,4 @@
+import { requireSecureIssuer } from "./config"
 import type { Credentials } from "./credentials"
 import type { AuthFetch } from "./http"
 import { type RefreshOutcome, refreshOnce } from "./refresh"
@@ -30,6 +31,7 @@ export const REFRESH_RETRY_MS = 2_000
  * access token leaves this function.
  */
 export async function accessToken(credentials: Credentials, deps: SessionDeps): Promise<string> {
+	requireSecureIssuer(credentials.issuer)
 	await deps.save(credentials)
 	for (let attempt = 1; attempt <= REFRESH_ATTEMPTS; attempt += 1) {
 		const outcome: RefreshOutcome = await refreshOnce(credentials, deps.fetch)

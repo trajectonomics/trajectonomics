@@ -1,4 +1,5 @@
 import { errorMessage } from "../message"
+import { requireSecureIssuer } from "./config"
 import type { Credentials } from "./credentials"
 import { type AuthFetch, postForm } from "./http"
 
@@ -18,6 +19,7 @@ export type LogoutOutcome = { exitCode: 0 | 1 }
 
 async function revoke(credentials: Credentials, deps: LogoutDeps): Promise<boolean> {
 	try {
+		requireSecureIssuer(credentials.issuer)
 		const response = await postForm(deps.fetch, `${credentials.issuer}/api/auth/oauth2/revoke`, {
 			token: credentials.refreshToken,
 			token_type_hint: "refresh_token",

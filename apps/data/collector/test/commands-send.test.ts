@@ -131,4 +131,20 @@ describe("runSendCommand wiring", () => {
 		expect(run.events).toEqual([])
 		expect(run.exits).toEqual([1])
 	})
+
+	test("empty input exits 0 without reading credentials or refreshing", async () => {
+		const fetched = queueFetch([])
+		const run = makeDeps({
+			fetch: fetched.fetch,
+			credentials: credentials(),
+			readInput: async () => "\n  \n",
+		})
+
+		await runSendCommand([], run.deps)
+
+		expect(run.printed).toEqual(["send: nothing to send"])
+		expect(run.events).toEqual([])
+		expect(fetched.calls).toHaveLength(0)
+		expect(run.exits).toEqual([0])
+	})
 })

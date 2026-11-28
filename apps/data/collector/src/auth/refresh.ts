@@ -19,8 +19,9 @@ function parseTokens(body: unknown): TokenSet | null {
 }
 
 /**
- * Posts one refresh grant. Only a lost response, a timeout, a 5xx or a 2xx body that does not
- * parse is retryable; `invalid_grant` and every other 4xx mean the grant is gone.
+ * Posts one refresh grant. A lost response, a timeout, a 429, a 5xx or a 2xx body that does not
+ * parse is retryable inside auth's reuse window; `invalid_grant` means the grant is gone, and any
+ * other 4xx stops the run.
  */
 export async function refreshOnce(
 	credentials: Credentials,
@@ -47,6 +48,6 @@ export async function refreshOnce(
 		return { kind: "tokens", tokens }
 	}
 	const message = `token refresh failed: HTTP ${response.status}`
-	if (response.status >= 500) return { kind: "retry", message }
+	if (response.status === 429 || response.status >= 500) return { kind: "retry", message }
 	throw new Error(message)
 }

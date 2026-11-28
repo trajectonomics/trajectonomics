@@ -9,10 +9,19 @@ export type FetchResponse = {
 	json: () => Promise<unknown>
 }
 
-/** The POST-only fetch signature the sender needs; tests inject a fake. */
+/** How long one ingest POST may take before the batch counts as failed. */
+export const INGEST_TIMEOUT_MS = 30_000
+
+/** The POST-only fetch signature the sender needs: no redirects, bounded in time. */
 export type FetchLike = (
 	url: string,
-	init: { method: "POST"; headers: Record<string, string>; body: string },
+	init: {
+		method: "POST"
+		headers: Record<string, string>
+		body: string
+		signal: AbortSignal
+		redirect: "error"
+	},
 ) => Promise<FetchResponse>
 
 /** One batch's outcome with the rows it carried. */
@@ -85,6 +94,9 @@ export async function sendRows(
 					"Content-Type": "application/json",
 				},
 				body: batch.body,
+				// A redirect would turn the POST into a GET whose 200 looks like accepted rows.
+				redirect: "error",
+				signal: AbortSignal.timeout(INGEST_TIMEOUT_MS),
 			})
 		} catch (error) {
 			options.log(`send: request failed: ${errorMessage(error)}`)

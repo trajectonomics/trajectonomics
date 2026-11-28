@@ -16,7 +16,7 @@ export const FILE_DEPS: CredentialDeps = {
 	writeExclusive: (path, text, mode) => {
 		const fd = fs.openSync(path, "wx", mode)
 		try {
-			fs.writeSync(fd, text)
+			fs.writeFileSync(fd, text)
 			fs.fsyncSync(fd)
 		} finally {
 			fs.closeSync(fd)

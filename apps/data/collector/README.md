@@ -145,14 +145,19 @@ bun apps/data/collector/src/cli.ts logout
 `~/.config/traj-data/credentials.json` (mode 600 in a mode-700 directory, written atomically). A
 transient auth or network failure during polling only waits longer; a declined or expired code
 fails. `whoami` prints the account id, the issuer and `Sign in again within at most N day(s)`,
-without any network call. `logout` revokes the grant when auth is reachable and deletes the file
-either way, even a malformed one.
+without any network call. `logout` revokes this machine's refresh token when auth is reachable and
+deletes the file either way, even a malformed one.
 
 Auth allows at most 30 days without use and 90 days from the consent's original approval. Running
-`login` again on a live grant keeps that original date, so it does not renew the 90 days. To renew
-early, revoke the grant on the account page at `<issuer>/account/` (by default
-https://auth.trajectonomics.com/account/), then run `login`; the new consent starts a new 90-day
-clock.
+`login` again over an existing credentials file keeps that original date, so it does not renew
+the 90 days. To renew early:
+
+1. Run `logout` on every machine that runs the collector. It revokes that machine's refresh token
+   and deletes its file; the consent and its date stay on auth.
+2. Revoke the collector on the account page at `<issuer>/account/` (by default
+   https://auth.trajectonomics.com/account/). This ends the consent for every machine at once.
+3. Run `login` on each machine. With no file left, the new consent starts a new 90-day clock and
+   `whoami` counts from it.
 
 `TRAJ_AUTH_URL` and `login --issuer <url>` must use https. A loopback host (`localhost`,
 `127.0.0.1`, `[::1]`) may use http for local development; every other value is refused before any

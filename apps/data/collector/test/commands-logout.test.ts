@@ -104,4 +104,18 @@ describe("logout", () => {
 		expect(await logout(run.deps)).toEqual({ exitCode: 1 })
 		expect(run.printed).toEqual(["logout: synthetic permission denied"])
 	})
+
+	test("never sends the refresh token to a stored plain-http issuer, and still deletes", async () => {
+		const fetched = queueFetch([])
+		const run = makeDeps(fetched.fetch, {
+			credentials: credentials({ issuer: "http://auth.synthetic.test" }),
+		})
+
+		const outcome = await logout(run.deps)
+
+		expect(outcome).toEqual({ exitCode: 0 })
+		expect(fetched.calls).toHaveLength(0)
+		expect(run.removed).toEqual(["removed"])
+		expect(run.printed).toEqual(["Signed out.", hint("http://auth.synthetic.test")])
+	})
 })
