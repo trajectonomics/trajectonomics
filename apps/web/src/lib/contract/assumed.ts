@@ -1,12 +1,25 @@
 import { z } from "zod"
 
 /**
- * The kinds of Assumed value a `scenario show` states (cli ADR-0083), the closed list the page
- * branches on. `template-default` joins it with the stored column in #689 part 2.
+ * The kinds of Assumed value a `scenario show` states (cli ADR-0083, ADR-0084), the closed list the
+ * page branches on.
  */
-export const ASSUMED_KINDS = ["unlabelled-income", "unstated-allowance", "tax-figure"] as const
+export const ASSUMED_KINDS = [
+	"template-default",
+	"unlabelled-income",
+	"unstated-allowance",
+	"tax-figure",
+] as const
 
 export type AssumedKind = (typeof ASSUMED_KINDS)[number]
+
+/** A value `traj` wrote into the document that no edit has touched since (cli ADR-0084). */
+const templateDefault = z.strictObject({
+	kind: z.literal("template-default"),
+	path: z.string(),
+	value: z.union([z.number(), z.string()]),
+	hint: z.string(),
+})
 
 /** An income Flow with no string `label`, in a plan that holds a Levy. */
 const unlabelledIncome = z.strictObject({
@@ -36,6 +49,7 @@ const taxFigure = z.strictObject({
 
 /** One value a plan assumes that nobody stated, told apart by its `kind` (cli ADR-0083). */
 export const assumedItem = z.discriminatedUnion("kind", [
+	templateDefault,
 	unlabelledIncome,
 	unstatedAllowance,
 	taxFigure,

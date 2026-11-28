@@ -7,6 +7,7 @@ import { schemaV2 } from "./schema-v2"
 import { schemaV3 } from "./schema-v3"
 import { schemaV4 } from "./schema-v4"
 import { schemaV5 } from "./schema-v5"
+import { schemaV6 } from "./schema-v6"
 
 /** Ordered, forward-only steps. Step `n` takes the database from version `n` to `n + 1`. */
 const STEPS: readonly ((db: Database) => void)[] = [
@@ -15,6 +16,7 @@ const STEPS: readonly ((db: Database) => void)[] = [
 	schemaV3,
 	schemaV4,
 	schemaV5,
+	schemaV6,
 ]
 
 /** The schema version this build writes: `PRAGMA user_version` after every step has run. */

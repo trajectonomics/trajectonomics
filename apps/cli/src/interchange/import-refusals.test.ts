@@ -23,10 +23,10 @@ describe("importJsonl refusals", () => {
 
 	it("refuses an unknown or malformed header before writing any row", async () => {
 		const golden = await goldenJsonl()
-		const header = '{"record":"header","formatVersion":1,"schemaVersion":5}'
+		const header = '{"record":"header","formatVersion":1,"schemaVersion":6}'
 		const cases: [string, string][] = [
 			['{"record":"header","formatVersion":2,"schemaVersion":5}', "line.1.formatVersion"],
-			['{"record":"header","formatVersion":1,"schemaVersion":6}', "line.1.schemaVersion"],
+			['{"record":"header","formatVersion":1,"schemaVersion":7}', "line.1.schemaVersion"],
 			['{"record":"header","formatVersion":1,"schemaVersion":1}', "line.1.schemaVersion"],
 			['{"record":"header","formatVersion":1,"schemaVersion":0}', "line.1.schemaVersion"],
 			['{"record":"header","schemaVersion":5,"formatVersion":1}', "line.1"],

@@ -108,13 +108,13 @@ describe("a household through backup and restore", () => {
 
 	it("restores a version 2 backup, which has no household column, with the household null", async () => {
 		const current = await goldenWithoutNotes()
-		const alone = /,"household":.*?,"tax":null,"notes":null,"main":false\}/g
+		const alone = /,"household":.*?,"tax":null,"notes":null,"main":false,"unstated":null\}/g
 		const noHousehold = current.replaceAll(
 			alone,
-			',"household":null,"tax":null,"notes":null,"main":false}',
+			',"household":null,"tax":null,"notes":null,"main":false,"unstated":null}',
 		)
 		const version2 = noHousehold
-			.replace('"schemaVersion":5', '"schemaVersion":2')
+			.replace('"schemaVersion":6', '"schemaVersion":2')
 			.replaceAll(alone, "}")
 		const store = mustOpen(ledgerHome())
 		expect(must(importJsonl(version2, store))).toEqual({

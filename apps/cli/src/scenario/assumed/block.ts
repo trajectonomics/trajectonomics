@@ -16,13 +16,18 @@ function itemsOf(data: Record<string, unknown>): AssumedItem[] {
 }
 
 /** An array prints the way `assumptionLines` prints one; everything else as it is. */
-function valueText(value: number | number[]): string {
+function valueText(value: number | number[] | string): string {
 	return Array.isArray(value) ? `[${value.join(", ")}]` : String(value)
 }
 
 /** The words for one item, and the hint line under it when it has one. */
 function itemLines(item: AssumedItem): string[] {
 	switch (item.kind) {
+		case "template-default":
+			return [
+				`- ${item.path} = ${valueText(item.value)} (template default)`,
+				`  hint: ${item.hint}`,
+			]
 		case "unlabelled-income":
 			return [`- ${item.path} (income with no tax label)`, `  hint: ${item.hint}`]
 		case "unstated-allowance":

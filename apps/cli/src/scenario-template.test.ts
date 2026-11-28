@@ -78,9 +78,21 @@ describe("scenario apply --template", () => {
 	it("refuses a form that does not take --template, at the field to drop", async () => {
 		const home = scenarioHome()
 		const cases: [string[], string, string][] = [
-			[["--template", "--dry-run"], "--dry-run", "--template takes no --dry-run"],
-			[["base", "--template"], "name", "--template takes no name"],
-			[["base", "--template", "--dry-run"], "--dry-run", "--template takes no --dry-run"],
+			[
+				["--template", "--dry-run"],
+				"--dry-run",
+				"--template without a name prints a document and writes nothing",
+			],
+			[
+				["base", "--template"],
+				"--as-of",
+				"Writing a template under a name needs the date to pre-fill it from",
+			],
+			[
+				["base", "--template", "--dry-run"],
+				"--as-of",
+				"Writing a template under a name needs the date to pre-fill it from",
+			],
 		]
 		for (const [argv, path, message] of cases) {
 			const res = await capture(["scenario", "apply", ...argv, "--json"], { TRAJ_HOME: home })

@@ -71,6 +71,7 @@ export type ScenarioDraft = {
 	household: string | null
 	tax: string | null
 	notes: string | null
+	unstated: string | null
 }
 
 export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
@@ -78,8 +79,8 @@ export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 	const id = ctx.newId(at)
 	ctx.db.run(
 		`INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from, household,
-		tax, notes, version, created_at, updated_at)
-		VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 1, ?10, ?10)`,
+		tax, notes, unstated, version, created_at, updated_at)
+		VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 1, ?11, ?11)`,
 		[
 			id,
 			ctx.entityId,
@@ -90,14 +91,15 @@ export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 			draft.household,
 			draft.tax,
 			draft.notes,
+			draft.unstated,
 			iso(at),
 		],
 	)
 	return liveScenario(ctx, "id", id)!
 }
 
-/** What a write leaves beside a Scenario's document: the household and the tax profile, or null. */
-export type Siblings = { household: string | null; tax: string | null }
+/** What a write leaves beside a Scenario's document: the household, the tax profile and unstated, or null. */
+export type Siblings = { household: string | null; tax: string | null; unstated: string | null }
 
 /** Replaces a live Scenario's document and its siblings; every one is canonical text or null. */
 export function replaceScenario(
@@ -108,13 +110,14 @@ export function replaceScenario(
 ): ScenarioRow {
 	ctx.db.run(
 		`UPDATE scenario SET document = ?2, content_hash = ?3, household = ?4, tax = ?5,
-		version = version + 1, updated_at = ?6 WHERE id = ?1`,
+		unstated = ?6, version = version + 1, updated_at = ?7 WHERE id = ?1`,
 		[
 			current.id,
 			document,
 			contentHash(document),
 			siblings.household,
 			siblings.tax,
+			siblings.unstated,
 			iso(ctx.clock()),
 		],
 	)

@@ -76,6 +76,8 @@ export type ScenarioRow = {
 	notes: string | null
 	/** True for the ledger's main plan, at most one live Scenario (cli ADR-0071). */
 	main: boolean
+	/** The paths `traj` wrote, as canonical JSON sorted by path, or null when none is unstated (cli ADR-0084). */
+	unstated: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

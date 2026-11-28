@@ -5,22 +5,23 @@ import type { TaxProfileView } from "../tax/profile"
 import { unstatedAllowanceItems } from "./allowances"
 import type { AssumedItem } from "./shape"
 import { taxFigureItems } from "./tax-figures"
+import { templateDefaultItems } from "./template-default"
 import { unlabelledIncomeItems } from "./unlabelled"
 
 /**
- * The values a plan assumes that nobody stated, in the fixed kind order (cli ADR-0083): unlabelled
- * income, then unstated allowances, then unconfirmed tax figures. Every derived kind reads `plain`,
- * the stored document. `_printed` is the `--decimal` form, which the `template-default` kind reads
- * when it arrives with the stored column in #689 part 2.
+ * The values a plan assumes that nobody stated, in the fixed kind order (cli ADR-0083, ADR-0084):
+ * template defaults, then unlabelled income, unstated allowances and unconfirmed tax figures. The
+ * stored kinds read `plain`; `template-default` reads `printed` for the value and the hint.
  */
 export function assumedOf(
 	row: ScenarioRow,
 	plain: ScenarioDocument,
-	_printed: ScenarioDocument,
+	printed: ScenarioDocument,
 	taxAllowances: TaxProfileView | undefined,
 	household: Household | null,
 ): AssumedItem[] {
 	return [
+		...templateDefaultItems(row, plain, printed),
 		...unlabelledIncomeItems(row.name, plain, household),
 		...unstatedAllowanceItems(row.name, taxAllowances, plain),
 		...taxFigureItems(plain),

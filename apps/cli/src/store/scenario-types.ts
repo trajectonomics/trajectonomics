@@ -8,8 +8,17 @@ import type { WriteOptions } from "./types"
 /**
  * `expectedHash`, when given, is the content hash of the stored Scenario the caller read. A different
  * one, or none when no Scenario of the name is stored, refuses the write (cli ADR-0055).
+ * `unstated` seeds the column on a create, `stated` names the paths the write's Sets state, and
+ * `createOnly` refuses a name a live Scenario holds with `scenario_name_taken` (cli ADR-0084).
  */
-export type NewScenario = { name: string; document: unknown; expectedHash?: string | undefined }
+export type NewScenario = {
+	name: string
+	document: unknown
+	expectedHash?: string | undefined
+	unstated?: string | null | undefined
+	stated?: readonly string[] | undefined
+	createOnly?: boolean | undefined
+}
 /**
  * `droppedAnchors` names the household anchors whose item the written document no longer holds;
  * the household no longer keeps them (cli ADR-0048); `droppedOwners` names the Owners dropped for the
@@ -103,5 +112,12 @@ export type TaxOptions = WriteOptions & { expectedHash?: string | undefined }
  */
 export type ScenarioTransform = (document: ScenarioDocument) => ScenarioDocument | AppError
 
-/** `notes: false` leaves the copy without the source's notes (cli ADR-0071). */
-export type ForkOptions = WriteOptions & { transform?: ScenarioTransform; notes?: boolean }
+/**
+ * `notes: false` leaves the copy without the source's notes (cli ADR-0071). `stated` names the paths
+ * the fork's Sets state, read after `transform` ran, so a copy's Set clears what it names (cli ADR-0084).
+ */
+export type ForkOptions = WriteOptions & {
+	transform?: ScenarioTransform
+	notes?: boolean
+	stated?: () => readonly string[]
+}

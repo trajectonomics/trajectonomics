@@ -3,7 +3,8 @@ import { type AppError, fail } from "../errors"
 import { decimalDocument } from "./decimal-schema"
 import { scenarioDocument } from "./document-form"
 import { historyRefusal } from "./history-flags"
-import { WHAT_IF_FLAG_FORM } from "./what-if-form"
+import { templateRefusal } from "./template-refusal"
+import { WHAT_IF_FLAG_FORM, WHAT_IF_HINT } from "./what-if-form"
 
 /** The input fields `scenario apply` reads; the forms share one input schema. */
 export type ApplyFlags = {
@@ -37,10 +38,6 @@ export const WHAT_IF_NAME: RequiredDocumentField = {
 const FORM_HINT =
 	'Run "traj scenario apply --template --as-of <date>" to print a Scenario pre-filled from the Baseline, or "traj scenario apply <name> --file <path>" to apply a document.'
 
-/** The form `--set`, `--without` and `--add` take instead of a document, and what it writes (cli ADR-0057, ADR-0062). */
-export const WHAT_IF_HINT =
-	'Run "traj scenario apply <name> --set <path=value>" to apply a what-if to the stored Scenario, with no document; --without <id> takes a list item out and --add <list=json> puts a new one in.'
-
 export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	flag: "file",
 	schema: scenarioDocument,
@@ -62,43 +59,6 @@ export function isWhatIf(input: ApplyFlags): boolean {
  * their paths and sentences stay CLI-owned; `--file` beside `--template` or a what-if flag is refused
  * earlier, by the document form's own exclusivity check (ADR-0020, ADR-0033, cli ADR-0057).
  */
-/** `--template` takes none of the flags that write, and names each one it refuses (ADR-0033). */
-function templateWritesRefusal(input: ApplyFlags): AppError | undefined {
-	if (input.dryRun === true) {
-		return fail("invalid_input", {
-			path: "dryRun",
-			message: "dryRun: --template takes no --dry-run",
-		})
-	}
-	if (input.ifHash !== undefined) {
-		return fail("invalid_input", {
-			path: "ifHash",
-			message: "ifHash: --template writes nothing, so it takes no --if-hash",
-		})
-	}
-	if (input.name !== undefined) {
-		return fail("invalid_input", { path: "name", message: "name: --template takes no name" })
-	}
-	return undefined
-}
-
-/** `--template` prints a document, so it takes no Set or removal: the what-if form does (cli ADR-0057). */
-function whatIfTemplateRefusal(input: ApplyFlags): AppError | undefined {
-	if (!isWhatIf(input)) return undefined
-	const path =
-		(input.set?.length ?? 0) > 0 ? "set" : (input.without?.length ?? 0) > 0 ? "without" : "add"
-	return fail("invalid_input", {
-		path,
-		message: `${path}: --template prints a document, so it takes no --set, --without or --add`,
-		hint: WHAT_IF_HINT,
-	})
-}
-
-function templateRefusal(input: ApplyFlags): AppError | undefined {
-	if (input.template !== true) return undefined
-	return templateWritesRefusal(input) ?? whatIfTemplateRefusal(input)
-}
-
 export function exclusive(input: ApplyFlags): AppError | undefined {
 	const history = historyRefusal(input)
 	if (history !== undefined) return history

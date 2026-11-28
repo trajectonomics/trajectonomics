@@ -23,8 +23,14 @@ const BASE = {
 }
 
 describe("the Assumed values a scenario show states", () => {
-	it("decodes each of the three kinds", () => {
+	it("decodes each of the four kinds", () => {
 		const items = [
+			{
+				kind: "template-default",
+				path: "economy.inflation",
+				value: 0,
+				hint: "Run",
+			},
 			{ kind: "unlabelled-income", path: "flows.bonus.label", value: null, hint: "Run" },
 			{
 				kind: "unstated-allowance",
@@ -61,8 +67,8 @@ describe("the Assumed values a scenario show states", () => {
 
 	it("refuses a kind the contract does not list", () => {
 		const unknown = {
-			kind: "template-default",
-			path: "economy.inflation",
+			kind: "run-rate",
+			path: "flows.salary.amount",
 			value: 0,
 			hint: "Run",
 		}

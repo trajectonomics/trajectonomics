@@ -24,6 +24,7 @@ export type FieldKind =
 	| "household?"
 	| "tax?"
 	| "notes?"
+	| "unstated?"
 	| "flag"
 	| "correction"
 
@@ -53,8 +54,11 @@ export const RECORD_ORDER: readonly RecordType[] = [
 
 const SYNC = { version: "int", createdAt: "time", updatedAt: "time" } as const
 
+/** A Scenario record's fields, which each layout below narrows to the columns it had. */
+type ScenarioFields = Fields<ScenarioRow>
+
 /** A Scenario's columns before the household (schema version 2). */
-const SCENARIO_V2: Omit<Fields<ScenarioRow>, "household" | "tax" | "notes" | "main"> = {
+const SCENARIO_V2: Omit<ScenarioFields, "household" | "tax" | "notes" | "main" | "unstated"> = {
 	id: "text",
 	entityId: "text",
 	name: "text",
@@ -66,16 +70,26 @@ const SCENARIO_V2: Omit<Fields<ScenarioRow>, "household" | "tax" | "notes" | "ma
 }
 
 /** A Scenario's columns with the household and before the tax profile (schema version 3). */
-const SCENARIO_V3: Omit<Fields<ScenarioRow>, "tax" | "notes" | "main"> = {
+const SCENARIO_V3: Omit<ScenarioFields, "tax" | "notes" | "main" | "unstated"> = {
 	...SCENARIO_V2,
 	household: "household?",
 }
 
 /** A Scenario's columns with the tax profile beside the household (schema version 4). */
-const SCENARIO_V4: Omit<Fields<ScenarioRow>, "notes" | "main"> = { ...SCENARIO_V3, tax: "tax?" }
+const SCENARIO_V4: Omit<ScenarioFields, "notes" | "main" | "unstated"> = {
+	...SCENARIO_V3,
+	tax: "tax?",
+}
 
 /** A Scenario's columns with the notes and the main-plan flag after the tax profile (schema version 5). */
-const SCENARIO_V5: Fields<ScenarioRow> = { ...SCENARIO_V4, notes: "notes?", main: "flag" }
+const SCENARIO_V5: Omit<ScenarioFields, "unstated"> = {
+	...SCENARIO_V4,
+	notes: "notes?",
+	main: "flag",
+}
+
+/** A Scenario's columns with the paths `traj` wrote after the main-plan flag (schema version 6). */
+const SCENARIO_V6: ScenarioFields = { ...SCENARIO_V5, unstated: "unstated?" }
 
 /**
  * The writer's declared key order for each record, after its leading `"record"` key. The reader
@@ -112,7 +126,7 @@ export const FIELDS: { readonly [T in RecordType]: Fields<RecordRows[T]> } = {
 		currency: "text",
 		dimensions: "dimensions",
 	},
-	scenario: SCENARIO_V5,
+	scenario: SCENARIO_V6,
 }
 
 /**
@@ -126,5 +140,6 @@ export const READABLE_LAYOUTS: Readonly<Record<number, Layout>> = {
 	2: { ...FIELDS, scenario: SCENARIO_V2 },
 	3: { ...FIELDS, scenario: SCENARIO_V3 },
 	4: { ...FIELDS, scenario: SCENARIO_V4 },
-	5: FIELDS,
+	5: { ...FIELDS, scenario: SCENARIO_V5 },
+	6: FIELDS,
 }
