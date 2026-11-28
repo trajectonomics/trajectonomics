@@ -18,7 +18,7 @@ function makeConfig(fetch: FetchLike) {
 	const logs: string[] = []
 	return {
 		logs,
-		config: { url: URL, key: "synthetic-key", fetch, log: (line: string) => logs.push(line) },
+		config: { url: URL, bearer: "synthetic-bearer", fetch, log: (line: string) => logs.push(line) },
 	}
 }
 
@@ -50,5 +50,19 @@ describe("sendText", () => {
 
 		await expect(sendText("{", config)).rejects.toThrow("line 1 is not JSON")
 		expect(bodies).toHaveLength(0)
+	})
+
+	test("posts without following redirects and with a timeout", async () => {
+		const inits: Parameters<FetchLike>[1][] = []
+		const fetch: FetchLike = async (_url, init) => {
+			inits.push(init)
+			return { ok: true, status: 200, json: async () => ({ accepted: 1 }) }
+		}
+		const { config } = makeConfig(fetch)
+		await sendText(JSON.stringify(usageRow()), config)
+
+		expect(inits).toHaveLength(1)
+		expect(inits[0]!.redirect).toBe("error")
+		expect(inits[0]!.signal).toBeInstanceOf(AbortSignal)
 	})
 })

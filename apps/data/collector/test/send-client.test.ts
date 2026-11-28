@@ -3,7 +3,7 @@ import { type FetchLike, formatIngestFailure, sendRows } from "../src/send/clien
 import { usageRow } from "./support/rows"
 
 const URL = "https://synthetic.test/data/ingest"
-const KEY = "synthetic-ingest-key"
+const BEARER = "synthetic-ingest-bearer"
 
 type Reply = { status: number; body: unknown; jsonThrows?: boolean } | Error
 
@@ -28,7 +28,7 @@ function makeConfig(fetch: FetchLike) {
 	const logs: string[] = []
 	return {
 		logs,
-		config: { url: URL, key: KEY, fetch, log: (line: string) => logs.push(line) },
+		config: { url: URL, bearer: BEARER, fetch, log: (line: string) => logs.push(line) },
 	}
 }
 
@@ -41,7 +41,7 @@ describe("sendRows", () => {
 		expect(report.ok).toBe(true)
 		expect(report.batches).toHaveLength(1)
 		expect(calls[0]?.url).toBe(URL)
-		expect(calls[0]?.init.headers["Authorization"]).toBe(`Bearer ${KEY}`)
+		expect(calls[0]?.init.headers["Authorization"]).toBe(`Bearer ${BEARER}`)
 		expect(JSON.parse(calls[0]?.init.body ?? "{}").usage).toHaveLength(2)
 		expect(logs).toContain("send: accepted 2/2 row(s) in 1 batch(es)")
 	})
@@ -62,7 +62,7 @@ describe("sendRows", () => {
 		expect(report.ok).toBe(false)
 		expect(logs).toHaveLength(2)
 		expect(logs[0]).toBe("send: HTTP 400 invalid_batch: PLAN_UNKNOWN, MACHINE_ALIAS_INVALID")
-		expect(logs.join("\n")).not.toContain(KEY)
+		expect(logs.join("\n")).not.toContain(BEARER)
 	})
 
 	test("formats a response with no error codes", () => {

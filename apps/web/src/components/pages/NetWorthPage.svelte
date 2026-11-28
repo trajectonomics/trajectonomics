@@ -4,6 +4,7 @@ import { netWorthPageView } from "../../lib/view/net-worth/page"
 import { chooseScenario } from "../../lib/view/plan"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
+import NetWorthFocus from "../net-worth/NetWorthFocus.svelte"
 import PnlCard from "../net-worth/PnlCard.svelte"
 import RecordValues from "../record-values/RecordValues.svelte"
 import PageShell from "../ui/PageShell.svelte"
@@ -18,7 +19,7 @@ interface Props {
 let { scenario }: Props = $props()
 </script>
 
-<!-- Net worth: the headline, the month-end history, the composition by account and every row. -->
+<!-- Net worth: the focus point, then the profit and loss, the composition by account and every row. -->
 <PageShell
 	title="Net worth"
 >
@@ -26,17 +27,20 @@ let { scenario }: Props = $props()
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
 		{@const view = netWorthPageView(snapshot)}
-		<WhatIfAbove open={lens !== null}>
-			{#snippet whatIf()}
-				{#if lens && plan !== null}
-					<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} terms="nominal" keys={["closingNetWorth"]} />
-				{/if}
-			{/snippet}
-			<div class="space-y-8">
-				<PnlCard pnl={view.pnl} />
-				<RecordValues {snapshot} />
-				<NetWorthContent {view} />
-			</div>
-		</WhatIfAbove>
+		<div class="space-y-8">
+			<NetWorthFocus read={view.netWorth} history={view.history} />
+			<WhatIfAbove open={lens !== null}>
+				{#snippet whatIf()}
+					{#if lens && plan !== null}
+						<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} terms="nominal" keys={["closingNetWorth"]} />
+					{/if}
+				{/snippet}
+				<div class="space-y-8">
+					<PnlCard pnl={view.pnl} />
+					<RecordValues {snapshot} />
+					{#if view.netWorth.ok}<NetWorthContent {view} />{/if}
+				</div>
+			</WhatIfAbove>
+		</div>
 	{/snippet}
 </PageShell>

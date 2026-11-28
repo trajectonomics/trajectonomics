@@ -20,6 +20,26 @@ The owner of a set of usage rows. The pilot has one, `trajectonomics`, an `org`;
 contributors arrive later. A contributor may carry an auth user id and an opt-in handle, but never
 an email or a name in `traj-data`.
 
+## Tombstone
+
+One row in `contributor_tombstone`: the SHA-256 hex of a deleted auth user id, never the id itself.
+It answers "was this account deleted?", so an access token issued before the deletion cannot send
+again, and it stays behind after the contributor's rows are gone (ADR 0015).
+
+## Org binding
+
+The auth user id in `contributor.auth_user_id` on the `trajectonomics` row. The first verified
+ingest whose `sub` equals `ORG_AUTH_USER_ID` while the row is unbound sets it, inside the ingest's
+own batch. After that the binding alone decides; the secret stops mattering, and deleting that
+account unbinds the row instead of deleting the org's series (ADR 0015).
+
+## Web Session
+
+A signed-in browser on the data site. `web_session` stores the SHA-256 hex of a random session id,
+never the id itself, with the auth user id and an 8-hour expiry. The id lives only in an HttpOnly,
+Secure, SameSite=Lax cookie on `/data`; signing out deletes the row, and deleting the account
+removes that user's sessions in the same batch as the tombstone (ADR 0015).
+
 ## Usage Row
 
 One machine's usage for one plan, model and UTC hour (or UTC day for the Mistral console export):

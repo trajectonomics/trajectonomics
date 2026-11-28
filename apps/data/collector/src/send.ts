@@ -9,15 +9,15 @@ export { readIngestKey } from "./send/key"
 /** The data Worker's ingest endpoint on the apex host. */
 export const DEFAULT_INGEST_URL = "https://trajectonomics.com/data/ingest"
 
-/** Where the sender reads the ingest key unless another path is given. */
+/** Where the sender reads the temporary ingest key unless another path is given. */
 export function defaultKeyFile(home: string): string {
 	return join(home, ".config/traj-data/ingest.key")
 }
 
-/** Where and how one send runs; the key is never logged. */
+/** Where and how one send runs; the bearer is never logged. */
 export type SendConfig = {
 	url: string
-	key: string
+	bearer: string
 	fetch: FetchLike
 	log: (line: string) => void
 }

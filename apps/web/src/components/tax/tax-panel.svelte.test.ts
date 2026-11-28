@@ -23,6 +23,15 @@ describe("TaxPanel: the plan", () => {
 		expect(body).toContain("The Scenario is empty.")
 		expect(body).toContain('name="scenario"')
 	})
+
+	test("keeps the plan picker when the chosen plan has no Read at all", () => {
+		const body = panel({ base: ok(withLevy) }, "retire-early", {}, {}, {}, "", [
+			"base",
+			"retire-early",
+		])
+		expect(body).toContain("No Projection to read")
+		expect(body).toContain('name="scenario"')
+	})
 })
 
 describe("TaxPanel: the Returns of a separate filing", () => {
@@ -124,17 +133,12 @@ describe("TaxPanel: the Returns of a separate filing", () => {
 })
 
 describe("TaxPanel: the tax years", () => {
-	test("the headline says Tax for a positive figure", () => {
-		const body = panel({ base: ok(withLevy) })
-		expect(body).toContain(">Tax<")
-		expect(body).toContain("89,000.00")
-	})
-
-	test("a negative owed is a refund, in words, with its sign kept", () => {
+	test("a negative owed is a refund in the table's words, with its sign kept", () => {
 		const refund = year({ owed: "-12000.00", due: "0.00", prepaid: "12000.00" })
 		const body = panel({ base: ok(projectionRun({ taxYears: [refund] })) })
 		expect(body).toContain(">Refund<")
 		expect(body).toContain("−12,000.00")
+		expect(body).toContain(">Owed<")
 	})
 
 	test("settled and partial marks come with their explanations in the CLI's words", () => {

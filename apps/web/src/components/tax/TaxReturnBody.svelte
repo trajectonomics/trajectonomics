@@ -3,7 +3,6 @@ import type { TaxBody } from "../../lib/view/tax"
 import TaxBracketChart from "./TaxBracketChart.svelte"
 import TaxChart from "./TaxChart.svelte"
 import TaxCurrent from "./TaxCurrent.svelte"
-import TaxHeadline from "./TaxHeadline.svelte"
 import TaxRateTable from "./TaxRateTable.svelte"
 import TaxTable from "./TaxTable.svelte"
 
@@ -18,9 +17,8 @@ interface Props {
 let { body, currency }: Props = $props()
 </script>
 
-<!-- One Return: its headline, its walk, its years and rates. The page places no figure; each is the CLI's. -->
+<!-- One Return: its walk, its years, its chart and its rates. The page places no figure; each is the CLI's. -->
 <div class="space-y-8">
-	<TaxHeadline headline={body.headline} {currency} />
 	{#if body.current}<TaxCurrent year={body.current} {currency} />{/if}
 	<TaxTable rows={body.rows} {currency} />
 	{#if body.chart}

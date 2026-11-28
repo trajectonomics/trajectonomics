@@ -33,7 +33,7 @@ let { view, terms, names, title, spends = true }: Props = $props()
 	{#if view.chance}
 		<section aria-label="In good and bad markets" class="space-y-4">
 			<h3 class="text-base font-semibold">In good and bad markets</h3>
-			<p class="text-sm"><span class="text-2xl font-semibold tracking-tight tabular-nums">{view.chance.share}</span> chance. {view.chance.lasts}</p>
+			<p class="text-sm"><span class="text-lg font-semibold tracking-tight tabular-nums">{view.chance.share}</span> chance. {view.chance.lasts}</p>
 			{#if view.bands}<BandsSection bands={view.bands} currency={view.currency} />{:else if view.rules.length === 0}<p class="text-sm text-muted-foreground">{spends ? "A level amount has no rule years and no Bands: it pays the same in every market, so only the chance of success moves." : "There is no spending rule in this plan yet. Use \"Set how you spend in retirement\" above to add one."}</p>{/if}
 		</section>
 	{/if}

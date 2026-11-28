@@ -1,10 +1,14 @@
 import { routeRequest } from "../core/route"
 import type { Env, RequestContext } from "../env"
+import { handleAuthCallback } from "./auth-callback"
 import { handleHealth } from "./health"
 import { handleIngest } from "./ingest"
+import { handleDeleteContributor } from "./internal"
+import { handleMeCollectors } from "./me"
 import { handlePeaks } from "./peaks"
 import { json, methodNotAllowed, permanentRedirect } from "./responses"
 import { handleUsage } from "./usage"
+import { handleSignIn, handleSignOut } from "./web-auth"
 
 /**
  * Routes the requests the assets binding sends to the Worker, at the address they arrived on:
@@ -31,6 +35,16 @@ export function handleRequest(
 			return handleHealth(request, env, context)
 		case "ingest":
 			return handleIngest(request, env, context)
+		case "delete_contributor":
+			return handleDeleteContributor(request, env, context)
+		case "sign_in":
+			return handleSignIn(request, env, context)
+		case "auth_callback":
+			return handleAuthCallback(request, env, context)
+		case "sign_out":
+			return handleSignOut(request, env, context)
+		case "me_collectors":
+			return handleMeCollectors(request, env, context)
 		case "redirect":
 			return Promise.resolve(permanentRedirect(route.location))
 		case "method_not_allowed":

@@ -61,6 +61,36 @@ describe("the migration constraints", () => {
 		).toThrow()
 	})
 
+	test("enforces foreign keys as D1 does", () => {
+		const { database } = harness()
+		expect(() =>
+			database
+				.prepare(
+					"INSERT INTO ingest_log (contributor_id, received_at, rows, status) VALUES (?, ?, 1, 'accepted')",
+				)
+				.run("missing", NOW_ISO),
+		).toThrow()
+	})
+
+	test("stores one tombstone per deleted account hash", () => {
+		const { database } = harness()
+		const insert = database.prepare(
+			"INSERT INTO contributor_tombstone (auth_user_hash, deleted_at) VALUES (?, ?)",
+		)
+		insert.run("a".repeat(64), NOW_ISO)
+		expect(() => insert.run("a".repeat(64), NOW_ISO)).toThrow()
+	})
+
+	test("keeps one web session per session hash", () => {
+		const { database } = harness()
+		const insert = database.prepare(
+			`INSERT INTO web_session (session_hash, auth_user_id, created_at, expires_at)
+			 VALUES (?, ?, ?, ?)`,
+		)
+		insert.run("b".repeat(64), "user-synthetic-1", NOW_ISO, NOW_ISO)
+		expect(() => insert.run("b".repeat(64), "user-synthetic-2", NOW_ISO, NOW_ISO)).toThrow()
+	})
+
 	test("accepts only 0 or 1 as the best_effort flag", () => {
 		const { database } = harness()
 		const insertUsage = database.prepare(
