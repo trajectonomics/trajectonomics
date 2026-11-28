@@ -20,18 +20,16 @@
 	gap: 8px;
 }
 
-@media (min-width: 40rem) {
-	.flow-link {
-		flex-direction: column;
-		gap: 4px;
-	}
-}
-
 .flow-link .flow-arrow {
 	transform: rotate(90deg);
 }
 
 @media (min-width: 40rem) {
+	.flow-link {
+		flex-direction: column;
+		gap: 4px;
+	}
+
 	.flow-link .flow-arrow {
 		transform: none;
 	}

@@ -29,7 +29,7 @@
 	flex-direction: column;
 	gap: 12px;
 	padding: 16px;
-	border-radius: var(--ds-radius-lg, 16px);
+	border-radius: var(--ds-radius-lg);
 }
 
 .flow-local {
@@ -59,13 +59,14 @@
 	flex-wrap: wrap;
 	gap: 12px 16px;
 	margin: 0;
-	padding: 0;
 	list-style: none;
 }
 
 .method .flow-sources {
 	flex-direction: row;
-	padding-left: 0;
+	gap: 12px 16px;
+	margin: 0;
+	padding: 0;
 }
 
 .flow-source {
@@ -78,7 +79,7 @@
 .flow-collector {
 	margin: 0;
 	padding: 10px 14px;
-	border-radius: var(--ds-radius-md, 12px);
+	border-radius: var(--ds-radius-md);
 	background: var(--ds-color-primary);
 	color: var(--ds-color-primary-foreground);
 	font-weight: 500;
