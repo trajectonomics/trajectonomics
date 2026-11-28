@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0035
 ---
 
 # The Site serves the hosted Demo as static assets, with one scoped policy

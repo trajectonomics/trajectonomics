@@ -9,7 +9,6 @@ import Consent from "./Consent.astro"
 import Faq from "./Faq.astro"
 import Features from "./Features.astro"
 import Hero from "./Hero.astro"
-import LiveDemo from "./LiveDemo.astro"
 
 interface Props {
 	readonly language: Language
@@ -22,7 +21,6 @@ const dictionary = dictionaryFor(language)
 
 <Layout language={language} title={dictionary.documentTitle} description={dictionary.description} indexed={true}>
 	<Hero dictionary={dictionary} />
-	<LiveDemo dictionary={dictionary} />
 	<Features dictionary={dictionary} />
 	<Faq dictionary={dictionary} />
 	<Closing dictionary={dictionary} />

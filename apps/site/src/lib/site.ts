@@ -40,8 +40,8 @@ export const FI_DEMO_AS_OF = "2026-03-31"
 export const FI_DEMO_HORIZON = "2066-03-31"
 
 /**
- * The commands the demo window shows the agent running before the demo command: a fresh `traj` has
- * no ledger and no Scenario, so the example first writes the CLI's own template to `base.json`,
+ * The commands the Answer engine file shows the agent running before the demo command: a fresh `traj`
+ * has no ledger and no Scenario, so the example first writes the CLI's own template to `base.json`,
  * fills it with the user's numbers, and applies it as the `base` Scenario the demo command reads.
  * `--as-of` pre-fills the document from the ledger's Baseline at the demo's as-of date, so the plan
  * names the user's own accounts. The balance itself goes in the ledger. A product fixture, the same
@@ -54,24 +54,19 @@ export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
 ])
 
 /**
- * The command the demo window shows the agent running, taken from the CLI's own `traj fi`
+ * The command the Answer engine file shows the agent running, taken from the CLI's own `traj fi`
  * examples. A product fixture, the same text in every Language, and not copy.
  */
 export const FI_DEMO_COMMAND =
 	"traj fi --scenario base --as-of 2026-03-31 --horizon 2066-03-31 --json"
-
-/** The name on the demo window's title bar: the app a visitor's agent runs in, drawn rather than embedded. */
-export const DEMO_APP_NAME = "Claude"
-
-/** What the visitor types before the question to hand it to the traj skill: the skill's own name, the same in every Language. */
-export const DEMO_SKILL_COMMAND = "/traj"
 
 /** The earliest month the demo's survival answer says earned income could stop: the figure it repeats. */
 export const FI_DEMO_DATE = "2041-08-01"
 
 /**
  * The abridged JSON `traj fi --json` prints for the demo, one line each: the echo of the date it read,
- * the tax status and the answer. A product fixture in the CLI's own field names, not copy.
+ * the tax status and the answer, which the Answer engine file carries. A product fixture in the CLI's
+ * own field names, not copy.
  */
 export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
 	"{",

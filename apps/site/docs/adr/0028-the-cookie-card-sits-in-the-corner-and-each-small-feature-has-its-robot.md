@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0035
 ---
 
 # The cookie card sits in the corner, and each small feature has its robot

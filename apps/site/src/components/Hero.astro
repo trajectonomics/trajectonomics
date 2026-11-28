@@ -3,9 +3,8 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import { DEMO_PATH } from "../lib/site"
 import CopyPrompt from "./CopyPrompt.astro"
-import DemoWindow from "./DemoWindow.astro"
+import LiveWindow from "./LiveWindow.astro"
 import Mascot from "./Mascot.astro"
 import Badge from "./ui/Badge.astro"
 import Separator from "./ui/Separator.astro"
@@ -62,17 +61,16 @@ const subline = sublineParts(dictionary.heroSubline)
 			<CopyPrompt dictionary={dictionary} />
 		</div>
 	</div>
-	{/* The demonstration is the product itself in a window, in the landing view, as twenty.com's hero is. */}
-	<div class="hero-app relative mx-auto w-full max-w-[67rem] px-5 pb-16 sm:px-6 sm:pb-24">
+	{/*
+		The hero's window is the live Dashboard itself, in the landing view, as twenty.com's hero is
+		(ADR 0035). `#demo` stays here, because the window now is what the anchor names.
+	*/}
+	<div id="demo" class="hero-app relative mx-auto w-full max-w-[67rem] px-5 pb-16 sm:px-6 sm:pb-24">
 		{/* The mascot peeks over the window's top edge, clipped so it climbs up from behind it (mascot.css). */}
 		<div class="mascot-peek" aria-hidden="true">
 			<Mascot pose="peek" />
 		</div>
-		<DemoWindow dictionary={dictionary} />
-		{/* The window is a picture of the app; this is the way into the real Demo it draws (ADR 0031). */}
-		<p class="hero-demo">
-			<a class="hero-demo-link" href={DEMO_PATH}>{dictionary.demoLink}</a>
-		</p>
+		<LiveWindow dictionary={dictionary} />
 	</div>
 </section>
 
@@ -81,7 +79,7 @@ const subline = sublineParts(dictionary.heroSubline)
 	response to the visitor, never ambient — nothing follows the pointer — and a visitor who asks for less
 	motion gets none. The notes live here rather than inside the script because every byte of an inline
 	script ships against the page's 10,000 (ADR 0005): a control keeps its click, so the prompt, the pill,
-	the links and the demo window make no ripple, and the attribute is taken off and put back after a reflow so a second
+	the links and the live window make no ripple, and the attribute is taken off and put back after a reflow so a second
 	click restarts the ring.
 */}
 <script is:inline>
@@ -92,7 +90,7 @@ const subline = sublineParts(dictionary.heroSubline)
 		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
 		hero.addEventListener("click", (event) => {
-			if (event.target instanceof Element && event.target.closest("a, button, summary, code, [data-app]")) return
+			if (event.target instanceof Element && event.target.closest("a, button, summary, code, [data-live]")) return
 			const box = ripple.getBoundingClientRect()
 			ripple.style.setProperty("--ripple-x", `${event.clientX - box.left}px`)
 			ripple.style.setProperty("--ripple-y", `${event.clientY - box.top}px`)

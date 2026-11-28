@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0035
 ---
 
 # The sections' motion plays once, and the static page is the whole story

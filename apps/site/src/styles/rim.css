@@ -2,12 +2,13 @@
 
 /*
  * The rim (ADR 0017) is the field one size up and about twice as strong, and it is held away from the copy
- * so the headline stays the first thing the visitor reads. The band leaves the hero's first 12% empty,
- * where the fixed header's links sit, and the clearing is wider than the copy: the headline is at most
+ * so the headline stays the first thing the visitor reads. The band leaves the hero's first 38% empty,
+ * where the fixed header's links and the copy sit, and the clearing is wider than the copy: the headline is at most
  * 56 rem wide and the subline and the install window 36 rem, so a 480 px radius holds every viewport, and
  * the phone, whose copy fills the hero, keeps no rim beside it at all. This layer sits in the drift
- * wrapper, which is inset 6%. The stage is now the copy and the demo window under it (ADR 0022), so the band
- * runs from a fifth of its height to three quarters of it, beside the window's top, and the clearing sits on the copy.
+ * wrapper, which is inset 6%. The stage is now the copy and the live window under it (ADR 0035), which is
+ * shorter than the drawn window was, so the band starts below the install row, at 38% of the layer, peaks
+ * beside the window's top and fades by 80%, and the clearing's centre sits at 30%, on the copy.
  */
 .hero-blast-rim {
 	position: absolute;
@@ -17,13 +18,13 @@
 		linear-gradient(
 			to bottom,
 			transparent 0%,
-			transparent 22%,
-			var(--ds-color-foreground) 38%,
-			var(--ds-color-foreground) 54%,
-			transparent 74%
+			transparent 38%,
+			var(--ds-color-foreground) 50%,
+			var(--ds-color-foreground) 62%,
+			transparent 80%
 		),
 		radial-gradient(
-			ellipse 480px 330px at 50% 22%,
+			ellipse 480px 330px at 50% 30%,
 			transparent 0%,
 			transparent 85%,
 			var(--ds-color-foreground) 100%
@@ -32,13 +33,13 @@
 		linear-gradient(
 			to bottom,
 			transparent 0%,
-			transparent 22%,
-			var(--ds-color-foreground) 38%,
-			var(--ds-color-foreground) 54%,
-			transparent 74%
+			transparent 38%,
+			var(--ds-color-foreground) 50%,
+			var(--ds-color-foreground) 62%,
+			transparent 80%
 		),
 		radial-gradient(
-			ellipse 480px 330px at 50% 22%,
+			ellipse 480px 330px at 50% 30%,
 			transparent 0%,
 			transparent 85%,
 			var(--ds-color-foreground) 100%

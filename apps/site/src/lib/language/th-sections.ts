@@ -3,7 +3,6 @@ import { THAI_LIVE_DEMO } from "./th-live-demo"
 
 export const THAI_SECTIONS = Object.freeze({
 	...THAI_LIVE_DEMO,
-	actionEyebrow: "เทียบกันให้เห็น",
 	actionHeading: "ดูการทำงานจริง",
 	actionLede:
 		"เอเจนต์เดี่ยวตอบจากความจำ ส่วนเอเจนต์ที่ใช้ traj จะถามข้อมูลที่ยังขาด สั่งสกิลและ CLI แล้วอ่านตัวเลขกลับมาให้",
@@ -11,9 +10,7 @@ export const THAI_SECTIONS = Object.freeze({
 	actionYou: "คุณ",
 	actionAgent: "เอเจนต์",
 	actionWithoutLabel: "ถามเอเจนต์เฉยๆ",
-	actionWithoutNote: "เดาไปเรื่อย แล้วยอมรับเมื่อถูกถาม ไม่มีแหล่งที่มา ไม่มีวันที่ ไม่มีอะไรให้ตรวจ",
 	actionWithLabel: "เอเจนต์ + สกิล traj",
-	actionWithNote: "ตัวเลขมาจาก CLI พร้อมวันที่ที่คำนวณ ไม่มีอะไรถูกแต่งขึ้น",
 	actionGuesses: Object.freeze(["น่าจะราวปี 2040 ถ้าตลาดเป็นใจ", "ใกล้ปี 2046 มากกว่า ตอบยาก"] as const),
 	actionReask: "ลองอีกครั้ง",
 	actionExplain: "คุณได้ตัวเลขนี้มาอย่างไร สรุปให้ฟังหน่อย",
@@ -28,13 +25,7 @@ export const THAI_SECTIONS = Object.freeze({
 	actionData: "ตอนนี้มีเงินเก็บ 1.2 ล้าน และออมเดือนละ 25,000",
 	actionSkillLine: "สกิล traj บันทึกยอดเงิน กรอก base.json แล้วรัน CLI:",
 	actionProvenance: "traj fi · ณ วันที่ 31 มี.ค. 2026",
-	replay: "เล่นอีกครั้ง",
 	actionExampleNote: "ตัวอย่างผลลัพธ์แบบย่อ",
-	appNewChat: "แชตใหม่",
-	appRecents: "ล่าสุด",
-	appTitleWithout: "ประเมินอายุเกษียณ",
-	appTitleWith: "วันที่เป็นอิสระทางการเงิน",
-	appPlaceholder: "วันนี้ให้ช่วยอะไรดี",
 	featuresEyebrow: "คุณสมบัติ",
 	featuresHeading: "สร้างมาเพื่อเอเจนต์ และพร้อมให้ตรวจสอบ",
 	featureTitles: Object.freeze([

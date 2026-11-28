@@ -1,7 +1,7 @@
 /* The landing page's hero (ADR 0007): the stage, the pill, and the display headline. The headline holds still: its accent is colour, not motion (ADR 0012). */
 
 /*
- * The hero is no longer a full viewport. It is only as tall as its copy and the demo window it carries,
+ * The hero is no longer a full viewport. It is only as tall as its copy and the live window it carries,
  * so the demonstration sits on the page the visitor lands on and the sections below follow close behind.
  */
 
@@ -26,36 +26,4 @@
 	width: 8px;
 	height: 8px;
 	background: var(--ds-color-accent);
-}
-
-/*
- * The way from the hero's drawn window to the hosted Demo, under the window. It is a quiet meta link,
- * the same 12 px meta face as the install row's way out, so it does not compete with the CTA (ADR 0031).
- */
-.hero-demo {
-	margin: 0;
-	text-align: center;
-}
-
-.hero-demo-link {
-	display: inline-flex;
-	min-height: 2.5rem;
-	align-items: center;
-	padding: 8px 4px;
-	font-family: var(--font-meta);
-	font-size: 12px;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	color: var(--ds-color-foreground);
-	text-decoration: none;
-}
-
-.hero-demo-link:hover {
-	text-decoration: underline;
-	text-underline-offset: 4px;
-}
-
-.hero-demo-link:focus-visible {
-	outline: 2px solid var(--ds-color-ring);
-	outline-offset: 4px;
 }

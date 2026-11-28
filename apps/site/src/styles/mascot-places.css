@@ -4,25 +4,6 @@
  */
 
 /*
- * The demo's traj chat: the robot waves over the verdict's top hairline at the right, its hand on the line, and lands
- * with the verdict (ADR 0028). The transcript ends with room for it, so it never covers a word of the answer.
- */
-.app-chat[data-chat="with"] .app-scroll {
-	padding-bottom: 40px;
-}
-
-.app-verdict[data-tone="good"] {
-	position: relative;
-}
-
-.mascot-hello {
-	position: absolute;
-	right: 16px;
-	bottom: calc(100% - 1px);
-	width: 48px;
-}
-
-/*
  * The four small Features cards (ADR 0029): each robot acts out its card's feature, and each takes a different place,
  * so the row reads as four scenes rather than one corner repeated four times.
  */
