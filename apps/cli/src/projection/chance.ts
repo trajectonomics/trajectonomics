@@ -79,7 +79,7 @@ function viewOf(
 		notes: [
 			...echo.notes,
 			`${SUCCESS_NOTE_PREFIX}${placed.timeline.horizon} on ${chance.succeeded} of ${chance.paths} seeded Market paths: a success share of ${shareText(chance.successBps)}.`,
-			`The chance is over the Return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal${realBands === undefined ? "" : " except the median in today's money"}.`,
+			`The chance is over the Return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal${realBands === undefined ? "" : " except the Bands stated in today's money"}.`,
 			...(plan === undefined ? [] : planNotes(plan)),
 			...spending.notes,
 			...(outcomes === undefined ? [] : [outcomesNote(chance.paths)]),

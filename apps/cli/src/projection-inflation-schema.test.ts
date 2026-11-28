@@ -45,6 +45,9 @@ describe("traj schema names the inflation output", () => {
 	it("leaves every inflation field out of required, so each is optional", async () => {
 		const home = await projectionHome()
 
+		const model = await schemaOf(home, "model")
+		expect(model.required).not.toContain("inflation")
+
 		const chance = await schemaOf(home, "chance")
 		expect(chance.required).not.toContain("realBands")
 		expect(chance.properties?.["returnModel"]?.required).not.toContain("inflation")

@@ -108,7 +108,7 @@ describe("the chance's notes with an inflation factor", () => {
 		const home = await inflationHome()
 		const body = chanceBody(await projection(home, planFlags("inflationary")))
 		const note = body.notes.find((entry) => entry.startsWith("The chance is over the Return model"))
-		expect(note).toContain("and every figure is nominal except the median in today's money.")
+		expect(note).toContain("and every figure is nominal except the Bands stated in today's money.")
 	})
 
 	it("keeps the nominal sentence when the model has no inflation factor", async () => {

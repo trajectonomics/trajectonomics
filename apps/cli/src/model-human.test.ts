@@ -21,6 +21,21 @@ describe("the projection model's inflation line", () => {
 		])
 	})
 
+	it("rounds a half of a basis point up, as the line did before it was weighted", () => {
+		const half = TWO_32 / 2
+		const line = (a: number, b: number) =>
+			modelHint.blocks?.({
+				inflation: {
+					buckets: [
+						{ rateBps: a, weight: half },
+						{ rateBps: b, weight: half },
+					],
+				},
+			})
+		expect(line(2, 3)).toEqual(["Inflation: 2 buckets, mean 3 bps, from 2 to 3 bps a year"])
+		expect(line(-3, -2)).toEqual(["Inflation: 2 buckets, mean -2 bps, from -3 to -2 bps a year"])
+	})
+
 	it("states no line without a factor, as the model without one prints as before", () => {
 		expect(modelHint.blocks?.({})).toEqual([])
 	})
