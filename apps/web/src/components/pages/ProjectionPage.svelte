@@ -4,6 +4,7 @@ import { householdOf } from "../../lib/view/item-names"
 import { chooseScenario } from "../../lib/view/plan"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import { ALL_YEAR_FIGURES } from "../../lib/view/what-if/years"
+import AssumedSection from "../assumed/AssumedSection.svelte"
 import ProjectionView from "../projection/ProjectionView.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import ProjectionWhatIf from "../what-if/ProjectionWhatIf.svelte"
@@ -53,5 +54,6 @@ let { scenario, editable, terms, onTerms, chart, onChart, items, onItems }: Prop
 			{items}
 			{onItems}
 		/>
+		<AssumedSection {snapshot} {plan} {editable} />
 	{/snippet}
 </PageShell>

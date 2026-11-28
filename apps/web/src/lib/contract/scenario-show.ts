@@ -99,9 +99,8 @@ export const scenarioShow = z.strictObject({
 		// The stored tax profile, whether the plan is taxed and which deduction classes it states (cli ADR-0066, ADR-0073).
 		...taxShown,
 		/**
-		 * The values the plan assumes that nobody stated, in kind order (cli ADR-0083), empty when it
-		 * assumes none. `template-default` arrives with #689 part 2, and the field is absent in an
-		 * older Snapshot.
+		 * The values the plan assumes that nobody stated, in kind order (cli ADR-0083, ADR-0084), empty
+		 * when it assumes none. The field is absent in an older Snapshot.
 		 */
 		assumed: z.array(assumedItem).optional(),
 		/** The notes kept on the plan, or null when it has none (cli ADR-0071); absent in an older Snapshot. */

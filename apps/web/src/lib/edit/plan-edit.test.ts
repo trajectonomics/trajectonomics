@@ -25,8 +25,19 @@ describe("each plan Edit is one scenario write", () => {
 		{ kind: "apply-plan", name: "fresh", template: { asOf: "2026-11-25" } },
 	])("%o", (edit) => {
 		const parsed = singleWriteEditSchema.parse(edit)
-		expect(writeCommand(parsed, false, "{}").argv[0]).toBe("scenario")
-		expect(writeCommand(parsed, true, "{}").argv).toContain("--dry-run")
+		expect(writeCommand(parsed, false).argv[0]).toBe("scenario")
+		expect(writeCommand(parsed, true).argv).toContain("--dry-run")
+	})
+
+	test("a new plan is one template write: no document on stdin, no hash, no template read first", () => {
+		const parsed = singleWriteEditSchema.parse({
+			kind: "apply-plan",
+			name: "fresh",
+			template: { asOf: "2026-11-25" },
+		})
+		expect(writeCommand(parsed, false)).toEqual({
+			argv: ["scenario", "apply", "fresh", "--template", "--as-of", "2026-11-25", "--json"],
+		})
 	})
 })
 

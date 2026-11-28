@@ -79,7 +79,7 @@ export const SERVER_CODES: ReadonlySet<string> = new Set([
 /**
  * Whether an error is the CLI's own, so a page may mark it as the CLI's text. Null is no error.
  * `scenario_name_taken` is both: the CLI names its `path` as `name`, and the server's own refusal of a
- * new plan (`serve-apply.ts`) names none.
+ * guided plan (`serve-guided.ts`) names none.
  */
 export function isCliError(error: Pick<ErrorBody, "code" | "path"> | null): boolean {
 	if (error === null) return false
