@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { AppError } from "../errors"
 import { isPlainObject } from "../json"
 import type { ScenarioRow } from "../store"
+import type { Household } from "./household/model"
 import { storedHousehold } from "./household/stored"
 
 /** The row's metadata without its document: what `scenario list` prints. */
@@ -116,7 +117,7 @@ export function view(row: ScenarioRow): ScenarioView {
  * The household a row keeps, parsed from its stored canonical text. A corrupt row returns the
  * `internal` failure rather than throwing out of the command (cli ADR-0048).
  */
-export function householdOf(row: ScenarioRow): HouseholdDocument | AppError {
+export function householdOf(row: ScenarioRow): Household | null | AppError {
 	if (row.household === null) return null
 	return storedHousehold(row.household)
 }

@@ -35,9 +35,9 @@ export function flowsOf(document: ScenarioDocument): JsonRecord[] {
 	return records(document["flows"])
 }
 
-/** A `--label flow=label` value, or the reason it cannot be read. */
+/** A `--label flow=label` value, or the reason it cannot be read. The Flow's id may hold an `=`. */
 export function flowLabelOf(value: string): FlowLabel | AppError {
-	const at = value.indexOf("=")
+	const at = value.lastIndexOf("=")
 	if (at <= 0 || at === value.length - 1) {
 		return fail("invalid_input", {
 			message: "--label reads <flow>=<label>, such as salary=income.section40_1.",

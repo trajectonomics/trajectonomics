@@ -1,13 +1,8 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { isPositionalList, positionOf } from "./positional"
-import {
-	beginnableKeysAt,
-	beginsKey,
-	beginsWithdrawFloor,
-	isBeginnableBlock,
-	unbegunBlock,
-} from "./set-begin"
+import { isBeginnableBlock, unbegunBlock } from "./set-begin"
+import { beginnableKeysAt, beginsKey, beginsWithdrawFloor } from "./set-begin-keys"
 import {
 	ambiguousSegment,
 	identityFailure,
@@ -43,7 +38,7 @@ function replaceInObject(
 		rest === ctx.segments.length &&
 		beginsKey(node, segment, prefix)
 	) {
-		// The keys a Set adds to an item: an asset Account's volatility (cli ADR-0068), a surplus step's share or cap (cli ADR-0070).
+		// The keys a Set adds to an item: an asset Account's volatility (cli ADR-0068), a Flow's label (cli ADR-0083), a surplus step's share or cap (cli ADR-0070).
 		return { ...node, [segment]: ctx.value }
 	}
 	if (!Object.hasOwn(node, segment)) {

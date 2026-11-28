@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test"
-import { vocabularyProblems, wordsAt } from "./vocabulary"
+import { unionWordsAt, vocabularyProblems, wordsAt } from "./vocabulary"
 
 const SCHEMA = { a: { b: { enum: ["x", "y"] }, c: "text", d: { enum: [1, 2] } } }
+const UNION = {
+	kinds: {
+		oneOf: [{ properties: { kind: { const: "a" } } }, { properties: { kind: { const: "b" } } }],
+	},
+}
 
 describe("wordsAt", () => {
 	test("reads the words at a path", () => {
@@ -13,6 +18,18 @@ describe("wordsAt", () => {
 		expect(wordsAt(SCHEMA, "a.c")).toBeNull()
 		expect(wordsAt(SCHEMA, "a.d.enum")).toBeNull()
 		expect(wordsAt(null, "a")).toBeNull()
+	})
+})
+
+describe("unionWordsAt", () => {
+	test("reads a union's discriminator words in branch order", () => {
+		expect(unionWordsAt(UNION, "kinds.oneOf")).toEqual(["a", "b"])
+	})
+
+	test("is null when the path is gone, or a branch names no word", () => {
+		expect(unionWordsAt(UNION, "kinds")).toBeNull()
+		expect(unionWordsAt(UNION, "kinds.oneOf.nope")).toBeNull()
+		expect(unionWordsAt({ oneOf: [{ properties: {} }] }, "oneOf")).toBeNull()
 	})
 })
 

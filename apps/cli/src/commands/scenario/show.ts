@@ -2,6 +2,8 @@ import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand, ok } from "../../command"
 import { isAppError } from "../../errors"
+import { assumedBlock, assumedShownBody } from "../../scenario/assumed/block"
+import { assumedOf } from "../../scenario/assumed/of"
 import { printedRow } from "../../scenario/decimal"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { scenarioNotFound } from "../../scenario/errors"
@@ -14,7 +16,7 @@ import { withStore } from "../../with-store"
 export const show: Leaf = defineCommand({
 	name: "show",
 	summary: "Show one Scenario with its document, household and owners",
-	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark, the tax allowances and the household with its householdHash.",
+	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark, the tax allowances, the household with its householdHash and the assumed values.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().describe("The Scenario's exact name or its id."),
@@ -23,6 +25,7 @@ export const show: Leaf = defineCommand({
 	output: z.strictObject({
 		scenario: scenarioWithHousehold,
 	}),
+	render: { display: assumedShownBody, blocks: assumedBlock },
 	examples: [
 		{ command: "traj scenario show base", description: "Show a Scenario by name." },
 		{
@@ -48,6 +51,7 @@ export const show: Leaf = defineCommand({
 			if (isAppError(household)) return household
 			const tax = taxOf(row)
 			const taxAllowances = taxAllowancesOf(tax, plain.document)
+			const assumed = assumedOf(row, plain.document, shown.document, taxAllowances, household)
 			return ok({
 				scenario: {
 					...shown,
@@ -56,6 +60,7 @@ export const show: Leaf = defineCommand({
 					tax,
 					taxed: isTaxed(shown.document),
 					...(taxAllowances === undefined ? {} : { taxAllowances }),
+					assumed,
 					notes: row.notes,
 					main: row.main,
 				},
