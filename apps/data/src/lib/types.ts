@@ -1,10 +1,12 @@
 import type { Collector } from "../core/collectors"
+import type { Meter } from "../core/meters"
 
-export type { Collector }
+export type { Collector, Meter }
 
 /** The body of the signed-in collectors read. */
 export type CollectorsPayload = {
 	collectors: Collector[]
+	meters: Meter[]
 }
 
 /** One row of the usage API; it carries no machine, contributor or hour. */

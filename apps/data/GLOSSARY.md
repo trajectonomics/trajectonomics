@@ -51,6 +51,13 @@ identity is machine, plan, model, bucket and source, so replaying it is an upser
 One observation of a plan window's meter: the percentage used and the reset time, at a UTC hour.
 Claude, OpenCode Go, Antigravity, Cursor and Meta (Muse) are the plans with a readable meter.
 
+## Usage meter freshness
+
+Whether the sampler read a metered plan's quota lately, as the signed-in page shows it: `fresh`
+under three hours, `stale` at three hours or more, and `missing` when the plan was used in the last
+seven days but its meter was never read. A meter goes stale when the tool's sign-in on the
+collecting machine expires, because the sampler then skips that plan and only logs it.
+
 ## Limit estimate
 
 The tokens a plan window would hold at 100%, estimated from its own usage meter: the tokens we used
