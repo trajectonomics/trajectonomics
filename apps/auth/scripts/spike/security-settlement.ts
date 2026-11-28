@@ -7,10 +7,13 @@ import { requestResult } from "./request"
 import { countConsents, parkedApproval, waitUntil } from "./security-hold"
 import { COLLECTOR, DATA, DEFAULT_SCOPE, reset, revokeAll, sql } from "./security-shared"
 
+type ConsentRow = { scopes: string; resources: string | null; updatedAt: string }
+
 /**
  * An approval that fails leaves nothing behind. The code is denied while the approval is parked
  * after its consent write, so the endpoint refuses it. A created consent is deleted; a merged one
- * gets its previous scopes, resources and `updatedAt` back, byte for byte.
+ * gets its previous scopes and resources back, with an `updatedAt` later than the one before the
+ * merge.
  */
 export async function checkFailedApprovalUndoesConsent(
 	session: Session,
@@ -29,23 +32,33 @@ export async function checkFailedApprovalUndoesConsent(
 			resources: [DATA],
 		})
 		await approveDevice(session, base.user_code)
-		const before = consentBytes(database)
-		const wroteMerge = () => consentBytes(database).includes("data:ingest")
+		const before = consentRow(database)
+		const wroteMerge = () => (consentRow(database)?.scopes ?? "").includes("data:ingest")
 		const merged = await denyWhileParked(session, "openid data:ingest", wroteMerge)
-		const after = consentBytes(database)
+		const after = consentRow(database)
 		const listed = (await listGrants(session)).grants.flatMap((grant) => grant.scopes)
 		await revokeAll(session)
 		return (
 			created &&
 			leftAfterCreate === 0 &&
 			merged &&
-			before !== "[]" &&
-			after === before &&
+			before !== undefined &&
+			restored(after, before) &&
 			!listed.includes("data:ingest")
 		)
 	} finally {
 		database.close()
 	}
+}
+
+/** True when the previous scopes and resources are back and the stamp moved forward. */
+function restored(after: ConsentRow | undefined, before: ConsentRow): boolean {
+	return (
+		after !== undefined &&
+		after.scopes === before.scopes &&
+		after.resources === before.resources &&
+		after.updatedAt > before.updatedAt
+	)
 }
 
 /** True when the parked write showed, the deny landed and the endpoint then refused the code. */
@@ -72,12 +85,8 @@ async function denyWhileParked(
 	)
 }
 
-function consentBytes(database: Database): string {
-	return JSON.stringify(
-		database
-			.query(
-				"select id, scopes, resources, createdAt, updatedAt from oauthConsent where clientId = ?",
-			)
-			.all(COLLECTOR),
-	)
+function consentRow(database: Database): ConsentRow | undefined {
+	return database
+		.query("select scopes, resources, updatedAt from oauthConsent where clientId = ?")
+		.get(COLLECTOR) as ConsentRow | undefined
 }

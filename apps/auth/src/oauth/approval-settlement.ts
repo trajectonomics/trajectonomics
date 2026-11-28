@@ -18,12 +18,13 @@ import { findDeviceCode } from "./store"
 export async function settleDeviceApproval(
 	ctx: { context: unknown },
 	database: D1Database,
+	now: Date,
 ): Promise<void> {
 	const approval = takeDeviceApproval(ctx)
 	if (approval === null || approval.write.kind === "none") return
 	if (!endpointFailed(ctx)) return
 	if (await approvalHeld(ctx, approval)) return
-	await undoConsentWrite(database, approval.write)
+	await undoConsentWrite(database, approval.write, now)
 }
 
 /**

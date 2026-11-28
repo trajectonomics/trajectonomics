@@ -33,7 +33,6 @@ describe("mergeRetriesWhenRowVanishes", () => {
 			kind: "merged",
 			id: "other",
 			previousScopes: `["profile"]`,
-			previousUpdatedAt: "2026-11-27T00:00:01.000Z",
 		})
 		expect(adapter.consents.rows[0]?.["scopes"]).toBe(`["profile","openid"]`)
 	})
@@ -55,7 +54,7 @@ describe("mergeRetriesWhenRowVanishes", () => {
 		adapter.afterInsert = (rows) => rows.push(concurrentConsent("other", EARLIER))
 		adapter.afterRead = (rows, read) => {
 			// The other approval fails and deletes its row after this request read both.
-			if (read === 2)
+			if (read === 3)
 				rows.splice(
 					rows.findIndex((row) => row.id === "other"),
 					1,

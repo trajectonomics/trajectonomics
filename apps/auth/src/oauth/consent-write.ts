@@ -21,7 +21,6 @@ export type ConsentWrite =
 			id: string
 			previousScopes: unknown
 			previousResources: unknown
-			previousUpdatedAt: unknown
 			writtenAt: Date
 	  }
 
@@ -41,7 +40,11 @@ export async function mergeConsent(
 }
 
 /** Undoes one approval's write, unless a later one has updated the same row since. */
-export async function undoConsentWrite(database: D1Database, write: ConsentWrite): Promise<void> {
+export async function undoConsentWrite(
+	database: D1Database,
+	write: ConsentWrite,
+	now: Date,
+): Promise<void> {
 	if (write.kind === "none") return
 	const writtenAt = sqlInstant(write.writtenAt)
 	if (writtenAt === null) return
@@ -52,7 +55,7 @@ export async function undoConsentWrite(database: D1Database, write: ConsentWrite
 	await updateUnchanged(database, write.id, writtenAt, {
 		scopes: write.previousScopes,
 		resources: write.previousResources,
-		updatedAt: write.previousUpdatedAt,
+		updatedAt: nextConsentUpdatedAt(now, writtenAt),
 	})
 }
 
@@ -74,6 +77,28 @@ async function updateUnchanged(
 		)
 		.run()
 	return result.meta.changes > 0
+}
+
+/**
+ * The `updatedAt` a write stamps: strictly later than the latest value it read. Two writes to one
+ * row in the same millisecond would otherwise share a stamp, and the first undo, keyed on that
+ * stamp, would match the row the second write now owns. A stamp later than the clock also keeps
+ * the column monotonic when the clock repeats or steps back.
+ */
+export function nextConsentUpdatedAt(now: Date, ...previous: readonly unknown[]): Date {
+	let latest = Number.NEGATIVE_INFINITY
+	for (const value of previous) {
+		const instant = instantMs(value)
+		if (instant !== null && instant > latest) latest = instant
+	}
+	return new Date(Math.max(now.getTime(), latest + 1))
+}
+
+function instantMs(value: unknown): number | null {
+	if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value.getTime()
+	if (typeof value !== "string") return null
+	const parsed = Date.parse(value)
+	return Number.isFinite(parsed) ? parsed : null
 }
 
 /**

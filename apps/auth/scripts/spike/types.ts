@@ -66,6 +66,7 @@ export type SecurityEvidence = {
 	updateConsentPathDisabled: boolean
 	deviceCodeContentTypeSmugglingRejected: boolean
 	postAuthorizeRejected: boolean
+	claimsParameterRejected: boolean
 	expiredConsentNeverIssuesCode: boolean
 	deviceConsentExistsBeforeRedeem: boolean
 	revokeRemovesDuplicateConsents: boolean

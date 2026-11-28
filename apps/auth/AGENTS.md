@@ -98,3 +98,8 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    page's security headers and that no page scrolls sideways at either width, and writes the pull
    request's screenshots to `e2e/screenshots/`. A new page adds itself to the review list.
 9. Done still means `bun run check` here; for a page change it also means `bun run test:e2e` passes.
+10. A Worker never sets `NODE_ENV=production`, so Better Auth would render its own unstyled `/error`
+    page. `src/auth-options.ts` sets `onAPIError.errorURL` to `/sign-in/`; the library appends its own
+    `?error=<code>`, which the sign-in page reads as its failed state. Never remove it, and never
+    give it a query string of its own: the library appends the error, so a configured `?error=1`
+    would produce a second one.

@@ -11,6 +11,19 @@ import {
 	signedOutPerson,
 } from "./social"
 
+test("a real state mismatch lands on the styled sign-in page", async ({ page }) => {
+	await page.goto(`${BASE_URL}/api/auth/callback/github?state=bogus&code=x`)
+	await page.waitForURL(
+		(url) => url.pathname === "/sign-in/" && url.searchParams.get("error") === "state_mismatch",
+	)
+	// One `error` parameter, not two: Better Auth appends its code to errorURL itself.
+	expect(new URL(page.url()).searchParams.getAll("error")).toEqual(["state_mismatch"])
+	await expect(page.getByRole("alert")).toHaveText(FAILED)
+	await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible()
+	await expect(page).not.toHaveTitle("Error")
+	await expect(page.getByText("We encountered an unexpected error")).toHaveCount(0)
+})
+
 test("a cancelled social sign-in keeps the signed query, and a retry reaches consent", async ({
 	page,
 }) => {

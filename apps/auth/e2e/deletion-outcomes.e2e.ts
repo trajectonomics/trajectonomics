@@ -25,7 +25,7 @@ function userRows(id: string): readonly { id: string }[] {
 test("a refused deletion whose sign-out also fails keeps the account page", async ({ page }) => {
 	const user = await signUp(page)
 	await answerConsent(page)
-	const refuse = { status: 500, contentType: "application/json", body: '{"message":"unavailable"}' }
+	const refuse = { status: 403, contentType: "application/json", body: '{"message":"forbidden"}' }
 	let signOuts = 0
 	await page.route("**/api/auth/delete-user", (route) => route.fulfill(refuse))
 	await page.route("**/api/auth/sign-out", (route) => {
@@ -40,6 +40,29 @@ test("a refused deletion whose sign-out also fails keeps the account page", asyn
 	await expect(page.getByRole("switch", { name: "Email updates" })).toBeVisible()
 	await expect(page.getByRole("button", { name: "Delete my account" })).toBeEnabled()
 	expect(userRows(user.id)).toHaveLength(1)
+})
+
+test("a refused deletion whose sign-out succeeds says so and offers a new sign-in", async ({
+	page,
+}) => {
+	const user = await signUp(page)
+	await answerConsent(page)
+	const refuse = { status: 403, contentType: "application/json", body: '{"message":"forbidden"}' }
+	await page.route("**/api/auth/delete-user", (route) => route.fulfill(refuse))
+	await pressDelete(page, user.email)
+	await expect(page.getByRole("alert")).toHaveText(
+		"The account was not deleted. You were signed out; sign in again to try again.",
+	)
+	await expect(page.getByRole("alert")).toBeFocused()
+	// The deletion was refused, so the account survives and nothing offers the controls of a
+	// signed-in session again.
+	expect(userRows(user.id)).toHaveLength(1)
+	await expect(page.getByRole("switch", { name: "Email updates" })).toHaveCount(0)
+	await expect(page.getByRole("button", { name: "Delete my account" })).toHaveCount(0)
+	await expect(page.getByRole("main").getByRole("link", { name: "Sign in" })).toBeVisible()
+	// The sign-out really landed: a fresh read of the account page redirects to sign-in.
+	await page.goto("/account/")
+	await page.waitForURL(/\/sign-in\//)
 })
 
 test("a lost response claims nothing, and Reload shows what happened", async ({ page }) => {
