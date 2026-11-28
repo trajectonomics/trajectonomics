@@ -1,6 +1,7 @@
 <script lang="ts">
-import type { LineLayout } from "../../lib/chart"
+import type { EndLabel, LineLayout } from "../../lib/chart"
 import LineAxis from "./LineAxis.svelte"
+import LineEndLabels from "./LineEndLabels.svelte"
 import LineMarks from "./LineMarks.svelte"
 import LineRules from "./LineRules.svelte"
 import { dashPattern, fillClass, fillOpacity, strokeClass } from "./series-style"
@@ -15,9 +16,11 @@ interface Props {
 	masked: boolean
 	/** The hovered index, or null. */
 	index: number | null
+	/** The short names of the lines, placed at their ends; null when the legend names them instead. */
+	labels: readonly EndLabel[] | null
 }
 
-let { label, layout, width, height, masked, index }: Props = $props()
+let { label, layout, width, height, masked, index, labels }: Props = $props()
 
 /** The room a date label needs on each side of its tick, so the last one is not cut off at the edge. */
 const HALF_LABEL = 36
@@ -78,6 +81,9 @@ function anchorAt(x: number): "start" | "middle" | "end" {
 		/>
 	{/each}
 	<LineRules {layout} {width} {height} />
+	{#if labels !== null}
+		<LineEndLabels {labels} />
+	{/if}
 	{#if index !== null}
 		<LineMarks {layout} {index} {height} />
 	{/if}

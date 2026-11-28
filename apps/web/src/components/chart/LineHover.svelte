@@ -1,5 +1,5 @@
 <script lang="ts">
-import { keyTarget, type LineLayout, nearestIndex } from "../../lib/chart"
+import { type EndLabel, keyTarget, type LineLayout, nearestIndex } from "../../lib/chart"
 import { describeIndex, tooltipRows } from "./hover-text"
 import LineSvg from "./LineSvg.svelte"
 import LineTooltip from "./LineTooltip.svelte"
@@ -12,10 +12,12 @@ interface Props {
 	masked: boolean
 	/** The hovered or focused index into the layout's x positions, or null for none. */
 	active: number | null
+	/** The short names of the lines, placed at their ends; null when the legend names them instead. */
+	labels: readonly EndLabel[] | null
 	onActive: (index: number | null) => void
 }
 
-let { label, layout, width, height, masked, active, onActive }: Props = $props()
+let { label, layout, width, height, masked, active, labels, onActive }: Props = $props()
 const count = $derived(layout.xPixels.length)
 const index = $derived(active !== null && active < count ? active : null)
 const valueText = $derived(
@@ -52,7 +54,7 @@ function onKeyDown(event: KeyboardEvent): void {
 	onkeydown={onKeyDown}
 	class="relative rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 >
-	<LineSvg {label} {layout} {width} {height} {masked} {index} />
+	<LineSvg {label} {layout} {width} {height} {masked} {index} {labels} />
 	{#if index !== null}
 		<LineTooltip
 			x={layout.xPixels[index] ?? 0}

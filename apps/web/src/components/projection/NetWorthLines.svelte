@@ -27,7 +27,13 @@ const reached = $derived(milestoneView(run)?.reached ?? [])
 </script>
 
 <div class="space-y-3">
-	<LineChart label="Net worth at the close of each year" {series} {markers} {height} />
+	<LineChart
+		label="Net worth at the close of each year"
+		{series}
+		{markers}
+		{height}
+		endLabels
+	/>
 	{#if reached.length > 0}
 		<!-- The marks above in words: a phone has no hover to name a shortened or unlabelled rule, so the list
 		shows below the chart there unless the page lists them itself. A screen reader gets it at any width. -->
