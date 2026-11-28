@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { FocusView } from "../../lib/view/overview/focus"
 import { cx } from "../ui/cx"
+import { ANSWER_TEXT } from "../ui/focus"
 import SiteLink from "../ui/SiteLink.svelte"
 
 interface Props {
@@ -15,8 +16,6 @@ interface Props {
 
 /** The answer written on the chart, with the household's faces beside it, over a halo in the page's colour. */
 let { focus, x, y, onmeasure }: Props = $props()
-const ANSWER =
-	"block font-bold tracking-tight whitespace-nowrap leading-none text-[clamp(1.875rem,4vw,2.75rem)]"
 const HALO =
 	"[text-shadow:0_0_3px_var(--ds-color-background),0_0_6px_var(--ds-color-background),0_0_2px_var(--ds-color-background)]"
 let width = $state(0)
@@ -44,13 +43,14 @@ $effect(() => {
 				data-focus-answer
 				href="/fi/"
 				class={cx(
-					ANSWER,
+					"block whitespace-nowrap",
+					ANSWER_TEXT,
 					"pointer-events-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
 					focus.kind === "runsOut" ? "text-accent print:text-foreground" : "text-foreground",
 				)}>{focus.answer}</SiteLink
 			>
 		{:else}
-			<span data-focus-answer class={cx(ANSWER, "text-foreground")}>{focus.answer}</span>
+			<span data-focus-answer class={cx("block", ANSWER_TEXT, "text-foreground")}>{focus.answer}</span>
 		{/if}
 		{#if focus.faces.length > 0}
 			<ul aria-hidden="true" class="flex items-center gap-2">

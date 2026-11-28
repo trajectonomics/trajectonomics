@@ -1,3 +1,12 @@
+import type { Collector } from "../core/collectors"
+
+export type { Collector }
+
+/** The body of the signed-in collectors read. */
+export type CollectorsPayload = {
+	collectors: Collector[]
+}
+
 /** One row of the usage API; it carries no machine, contributor or hour. */
 export type UsageRow = {
 	day: string

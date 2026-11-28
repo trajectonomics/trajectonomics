@@ -1,5 +1,5 @@
 <script lang="ts">
-import { queryParam } from "../../client/query-param.svelte.js"
+import { queryParam, setQueryParam } from "../../client/query-param.svelte.js"
 import { selectPlan } from "../../client/select-plan.svelte.js"
 import TaxPage from "../../components/pages/TaxPage.svelte"
 </script>
@@ -8,4 +8,9 @@ import TaxPage from "../../components/pages/TaxPage.svelte"
 	<title>Tax · Dashboard</title>
 </svelte:head>
 
-<TaxPage scenario={queryParam("scenario", "")} onScenario={selectPlan} />
+<TaxPage
+	scenario={queryParam("scenario", "")}
+	onScenario={selectPlan}
+	returned={queryParam("return", "")}
+	onReturn={(value) => setQueryParam("return", value)}
+/>

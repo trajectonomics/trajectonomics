@@ -95,6 +95,14 @@ deletions and posts each one to `https://data.internal/internal/contributors/del
   and discards both tokens. It then creates its own session: a random id in an HttpOnly, Secure,
   SameSite=Lax cookie on `/data`, stored only as a hash in `web_session` with the auth user id and
   an 8-hour expiry. Deletion also removes that user's sessions.
+- A deleted user's `sub` never starts a session: the insert writes nothing while
+  `contributor_tombstone` holds its hash, and the callback answers `?signin=failed`.
+- The cookies keep their `/data` paths and no `__Host-` prefix, which would need `Path=/`. The
+  accepted cost: a hostile host under `trajectonomics.com` could plant a `Domain=` cookie that
+  shadows ours, and so show a person someone else's collector list or sign them in as another user.
+  Every subdomain is ours, and the only view is read-only.
+- The token request uses `redirect: "manual"`, and any 3xx fails the sign-in. workerd refuses
+  `"error"`, and `"manual"` has the same effect, because the request never follows a redirect.
 - `/data/me/` lists "my collectors": each machine label the signed-in contributor has sent from,
   with its first and last UTC day, its row count and its last send. `GET /data/api/me/collectors`
   answers `Cache-Control: private, no-store` and never enters rollups or any public read.

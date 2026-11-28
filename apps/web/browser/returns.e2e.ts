@@ -19,6 +19,7 @@ test("the Tax page switches between the two Returns of a separate filing at 360p
 	await expect(page.getByRole("group", { name: "Return" })).toBeVisible()
 	await expect(page.getByRole("radio", { name: "You", exact: true })).toBeChecked()
 	await expect(page.locator("main")).toContainText("th-2026-pit@me")
+	await expect(page.locator("[data-focus-heading]")).toContainText("90k THB")
 	await fits(page)
 	// The radio is visually hidden; its label is the control a person clicks.
 	await page
@@ -27,6 +28,7 @@ test("the Tax page switches between the two Returns of a separate filing at 360p
 		.click()
 	await expect(page.getByRole("radio", { name: "Your partner" })).toBeChecked()
 	await expect(page.locator("main")).toContainText("th-2026-pit@partner,")
+	await expect(page.locator("[data-focus-heading]")).toContainText("4.6k THB")
 	// The headline names the Return on screen; the projection's notes still name both Levies.
 	await expect(page.locator("main")).not.toContainText("th-2026-pit@me,")
 	await fits(page)

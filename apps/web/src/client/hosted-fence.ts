@@ -26,6 +26,9 @@ const READ_CONTROLS = [
 	'input[name="memo"]',
 	// The plan menu's choices only pick the plan the pages show; "New plan" beside them is an Edit.
 	'[role="menuitemradio"]',
+	// The guided first plan computes nothing and writes nothing until Save, which a hosted page never draws: its
+	// steps, fields and switches only fill the form in this browser's memory.
+	"[data-guided] :is(input, select, button)",
 ].join(",")
 
 /** Where the fence applies: the page, and the plan menu in the top bar, which sits outside `main`. A dialog is left alone: a switched-off control is the only way to open an Edit drawer, and the charts' own drawer keeps a person's charts in their own browser. */

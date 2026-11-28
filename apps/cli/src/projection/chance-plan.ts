@@ -22,17 +22,18 @@ export type PlanModel = { model: ReturnModel; view: PlanModelView; notes: string
 /** The sizes the engine takes, in the words a refusal prints. */
 const BUCKET_SIZES = "16, 32, 64, 128, 256, 512 or 1024"
 
-/** The way out of a plan with no volatility: the field, and the command that writes a document. */
+/** The way out of a plan with neither kind of swing: each field, and the command that writes a document. */
 const NO_VOLATILITY_HINT =
-	"Give an asset Account a `volatility` in basis points (the standard deviation of its yearly return, so 15% is 1500): write it into the Scenario with traj scenario apply (traj scenario apply --template prints a document to start from), or test it as a what-if with --set accounts.<id>.volatility=1500."
+	"Give an asset Account a `volatility` in basis points (the standard deviation of its yearly return, so 15% is 1500): write it into the Scenario with traj scenario apply (traj scenario apply --template prints a document to start from), or test it as a what-if with --set accounts.<id>.volatility=1500. Or state inflation's yearly spread with --set economy.inflationVolatility=150, the standard deviation of one year's inflation in basis points."
 
 /** The way out that only `projection chance` has: a Return model file in place of the plan's own. */
 const FILE_HINT = " Or give projection chance a Return model file with --return-model."
 
 /**
  * The Return model the plan implies at `buckets`, or the refusal: a bucket count the engine does not
- * take, or a plan with no asset Account that has a `volatility` above 0, where every Market path would
- * be the same path. `by` names the flag the refusal points at.
+ * take, or a plan with no asset Account that has a `volatility` above 0 and no
+ * `economy.inflationVolatility` above 0, where every Market path would be the same path. `by` names
+ * the flag the refusal points at.
  */
 export function planModelOf(
 	scenario: Scenario,
@@ -52,10 +53,11 @@ export function planModelOf(
 			details: built.problems.map((problem) => ({ code: problem.code, path: "--buckets" })),
 		})
 	}
-	if (built.model.accounts.length === 0) {
+	const volatility = scenario.economy.inflationVolatility ?? 0
+	if (built.model.accounts.length === 0 && volatility <= 0) {
 		return fail("invalid_input", {
 			path: by.path,
-			message: `${by.label}: no Account of the Scenario has a volatility, so every Market path would be the same path.`,
+			message: `${by.label}: no Account of the Scenario has a volatility and the Scenario states no economy.inflationVolatility, so every Market path would be the same path.`,
 			hint: `${NO_VOLATILITY_HINT}${by.hintSuffix ?? ""}`,
 		})
 	}
@@ -65,11 +67,25 @@ export function planModelOf(
 			? [{ id, rate: account.rate, volatility: account.volatility }]
 			: []
 	})
-	const notes = built.notes.map(
-		(note) =>
-			`The plan's Return model clamped ${note.clamped} of its ${buckets} buckets of the Account "${note.account}" to the range a Return model states, from -9999 to 10000 basis points a month.`,
-	)
-	return { model: built.model, view: { source: "plan", buckets, accounts }, notes }
+	const notes = [
+		...built.notes.map(
+			(note) =>
+				`The plan's Return model clamped ${note.clamped} of its ${buckets} buckets of the Account "${note.account}" to the range a Return model states, from -9999 to 10000 basis points a month.`,
+		),
+		...(built.inflationClamped === undefined
+			? []
+			: [
+					`The plan's Return model clamped ${built.inflationClamped} of its ${buckets} buckets of inflation to the range from -9999 to 10000 basis points a year.`,
+				]),
+	]
+	const inflation = volatility > 0 ? { rate: scenario.economy.inflation, volatility } : undefined
+	const view = {
+		source: "plan" as const,
+		buckets,
+		accounts,
+		...(inflation === undefined ? {} : { inflation }),
+	}
+	return { model: built.model, view, notes }
 }
 
 /** `--return-model`: a file, `-`, or the reserved word `plan`. */

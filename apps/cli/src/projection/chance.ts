@@ -5,6 +5,7 @@ import { milestonesOf } from "./chance-milestones"
 import { modelHashOf } from "./chance-model"
 import { outcomesOf } from "./chance-outcomes"
 import { type ModelSource, type PlanModel, planModelOf } from "./chance-plan"
+import { realBandsOf, withRealMedian } from "./chance-real"
 import { chanceRefusal } from "./chance-refusal"
 import { shareText } from "./chance-share"
 import { percentilesOf, shownRows, spendingOf } from "./chance-spending"
@@ -63,7 +64,11 @@ function viewOf(
 		to: band.to,
 		netWorth: percentilesOf(band.netWorth, money),
 	}))
-	const rows = shownRows(bands, (band) => band.netWorth)
+	const realBands = realBandsOf(chance.realBands, money)
+	const rows = withRealMedian(
+		shownRows(bands, (band) => band.netWorth),
+		realBands,
+	)
 	// A plan with a spending rule adds its Bands, its lowest year and what they count (cli ADR-0063).
 	const spending = spendingOf(chance, money)
 	const echo = echoOf(placed)
@@ -86,6 +91,7 @@ function viewOf(
 		succeeded: chance.succeeded,
 		successBps: chance.successBps,
 		bands,
+		...(realBands === undefined ? {} : { realBands }),
 		runsOut: chance.runsOut.map((row) => ({ index: row.index, to: row.to, paths: row.paths })),
 		...spending.fields,
 		...outcomes,
@@ -99,10 +105,11 @@ function planNotes(plan: PlanModel): string[] {
 	const accounts = plan.view.accounts
 		.map((a) => `${a.id} (rate ${a.rate} bps, volatility ${a.volatility} bps)`)
 		.join(", ")
-	return [
-		`The Return model is the plan's own, built in ${plan.view.buckets} buckets from the Accounts that swing: ${accounts}. Every Account without a volatility keeps its rate.`,
-		...plan.notes,
-	]
+	const built =
+		plan.view.accounts.length === 0
+			? `The Return model is the plan's own, built in ${plan.view.buckets} buckets from the Scenario's inflation spread; every Account keeps its rate.`
+			: `The Return model is the plan's own, built in ${plan.view.buckets} buckets from the Accounts that swing: ${accounts}. Every Account without a volatility keeps its rate.`
+	return [built, ...plan.notes]
 }
 
 /** What `--outcomes` lists, and the command that opens one path (cli ADR-0040, ADR-0069). */

@@ -67,6 +67,7 @@ export function pathOf(
 			index: rollup.index,
 			from: rollup.from,
 			to: rollup.to,
+			...(rollup.inflationBps === undefined ? {} : { inflationBps: rollup.inflationBps }),
 			accounts: rollup.accounts.map((entry) => ({
 				account: entry.account,
 				returnBps: entry.returnBps,

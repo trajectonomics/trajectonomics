@@ -55,7 +55,7 @@ function measuredBy(next: LabelBox): void {
 }
 </script>
 
-<div bind:clientWidth class="relative w-full">
+<div bind:clientWidth data-focus-visual class="relative w-full">
 	<FocusChartSvg
 		{focus}
 		chart={layout.chart}

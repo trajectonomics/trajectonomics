@@ -1,4 +1,5 @@
 import type { TaxYear } from "../../contract"
+import { formatDate } from "../../format"
 import { type BracketBar, bracketBars } from "./bracket-bars"
 import { rateWords } from "./rate-words"
 import { periodOf } from "./tax-rows"
@@ -16,6 +17,10 @@ export interface WalkLine {
 export interface CurrentYear {
 	readonly levy: string
 	readonly period: string
+	/** What the year owes, or refunds when negative, as the CLI states it. */
+	readonly owed: string
+	/** The date the year settles, written out. */
+	readonly settles: string
 	/** The CLI's own notes for this year, such as the minimum tax applying; shown above the brackets. */
 	readonly notes: readonly string[]
 	readonly walk: readonly WalkLine[] | null
@@ -66,6 +71,8 @@ export function currentYear(years: readonly TaxYear[], asOf: string): CurrentYea
 	return {
 		levy: year.levy,
 		period: periodOf(year),
+		owed: year.owed,
+		settles: formatDate(year.settlementDate),
 		notes: year.notes ?? [],
 		walk: walkLines(year),
 		bars: year.brackets ? bracketBars(year.brackets) : null,
