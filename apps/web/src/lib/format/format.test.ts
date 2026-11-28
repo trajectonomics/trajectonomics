@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { abbreviate } from "./abbreviate"
 import { formatArgv } from "./argv"
 import { formatDate, formatMonth, periodWords } from "./date"
-import { AMOUNT_MASK, maskMoney } from "./mask"
+import { AMOUNT_MASK, draftAfterInput, maskMoney } from "./mask"
 import { formatMoney } from "./money"
 import { formatShare } from "./share"
 
@@ -119,6 +119,15 @@ describe("maskMoney", () => {
 	test("keeps the sign of a negative amount in front of the mask", () => {
 		expect(maskMoney("−184,000.00")).toBe(`−${AMOUNT_MASK}`)
 		expect(maskMoney("-184000.00")).toBe(`−${AMOUNT_MASK}`)
+	})
+})
+
+describe("draftAfterInput", () => {
+	test("keeps the held draft when Undo puts the mask back, and takes the digits a person types", () => {
+		expect(draftAfterInput("6000", AMOUNT_MASK)).toBe("6000")
+		expect(draftAfterInput("6000", `−${AMOUNT_MASK}`)).toBe("6000")
+		expect(draftAfterInput("6000", "7000")).toBe("7000")
+		expect(draftAfterInput("", "12")).toBe("12")
 	})
 })
 

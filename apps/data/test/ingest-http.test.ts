@@ -2,7 +2,7 @@ import { describe, expect, spyOn, test } from "bun:test"
 import type { D1Database } from "@cloudflare/workers-types"
 import { INGEST_PATH, SITE_ORIGIN } from "../src/core/urls"
 import { handleRequest } from "../src/http/router"
-import { NOW_MS, quotaSample, usageRow } from "./support/fixtures"
+import { NOW_MS, quotaSample, TEST_KEY, usageRow } from "./support/fixtures"
 import { get, harness, ingestRequest } from "./support/http"
 import { silenceConsoleError } from "./support/log"
 
@@ -66,6 +66,18 @@ describe("POST /ingest", () => {
 		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }, ""), context.env, {
 			nowMs: NOW_MS,
 		})
+		expect(response.status).toBe(401)
+		expect(count(context, "usage_hourly")).toBe(0)
+	})
+
+	test("rejects a bearer prefix with no space", async () => {
+		const context = harness()
+		const request = new Request(`${SITE_ORIGIN}${INGEST_PATH}`, {
+			method: "POST",
+			headers: { authorization: `Bearer${TEST_KEY}`, "content-type": "application/json" },
+			body: JSON.stringify({ usage: [usageRow()] }),
+		})
+		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
 		expect(response.status).toBe(401)
 		expect(count(context, "usage_hourly")).toBe(0)
 	})
