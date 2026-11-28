@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs"
-import { copyFile, mkdir } from "node:fs/promises"
+import { copyFile, mkdir, readFile } from "node:fs/promises"
 import { createRequire } from "node:module"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -47,7 +47,15 @@ export function faviconSet(): Plugin {
 			const source = dirname(require.resolve(`${ASSETS_PACKAGE}/favicon/favicon.svg`))
 			const target = join(app, "public", DESTINATION)
 			await mkdir(target, { recursive: true })
-			for (const favicon of FAVICONS) await copyFile(join(source, favicon), join(target, favicon))
+			for (const favicon of FAVICONS) {
+				const from = join(source, favicon)
+				const to = join(target, favicon)
+				// A file that already holds the same bytes is left alone, so the two build targets running at once never
+				// read an icon the other is rewriting. The folder is gitignored and rewritten each build, so turbo needs
+				// no input or output for it: a brand change reaches the build's hash through `^build`.
+				if (existsSync(to) && (await readFile(to)).equals(await readFile(from))) continue
+				await copyFile(from, to)
+			}
 			console.log(`copied the Favicon Set into public/${DESTINATION}/`)
 		},
 	}
