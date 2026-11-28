@@ -19,7 +19,6 @@ export const household: Leaf = defineCommand({
 	name: "household",
 	summary:
 		"Set the people whose ages pin a Scenario's dates and who owns its items, or remove them",
-	note: "The household ships in 0.8.0, and so do --if-hash and the owners of a version 2 household.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().min(1).optional().describe("The Scenario's exact name or its id."),

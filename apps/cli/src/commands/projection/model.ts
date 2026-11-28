@@ -22,7 +22,6 @@ import { withStore } from "../../with-store"
 export const model: Leaf = defineCommand({
 	name: "model",
 	summary: "Print the Return model a Scenario implies, as JSON",
-	note: "Printing the plan's Return model ships in 0.8.0.",
 	description:
 		"Builds the Return model `projection chance --return-model plan` draws its Market paths from (cli ADR-0068): every asset Account with a `volatility` above 0 moves with one shared market factor around its own `rate`, and every other Account keeps its rate. When the Scenario states an `economy.inflationVolatility` above 0, the model carries an `inflation` factor too, drawn per year on each Market path (cli ADR-0085). The result is the model itself, in the sim format, so `--json > model.json` saves it and `projection chance --return-model model.json` gives the same chance as `--return-model plan`. It reads no Ledger and takes no date.",
 	positionals: [],
