@@ -1,16 +1,7 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import {
-	COLLECTORS_BAR_HEIGHT,
-	COLLECTORS_BAR_LEFT,
-	COLLECTORS_BAR_RIGHT,
-	COLLECTORS_BAR_Y,
-	COLLECTORS_ROW_HEIGHT,
-	COLLECTORS_TOP,
-	type CollectorsGeometry,
-	collectorsAriaLabel,
-} from "../lib/collectors"
+import { type CollectorsGeometry, collectorsAriaLabel } from "../lib/collectors"
 
 let { geometry }: { geometry: CollectorsGeometry } = $props()
 
@@ -18,59 +9,34 @@ const label = $derived(collectorsAriaLabel(geometry.bars))
 </script>
 
 <figure class="collectors-figure">
-	<svg
-		class="collectors-svg"
-		viewBox={`0 0 ${geometry.width} ${geometry.height}`}
-		role="img"
-		aria-label={label}
-	>
-		<title>{label}</title>
-		{#each geometry.bars as bar, index (bar.machine)}
-			{@const top = COLLECTORS_TOP + index * COLLECTORS_ROW_HEIGHT}
-			{@const end = bar.x + bar.width}
-			<g>
-				<title>{`${bar.machine}: ${bar.state}, last send ${bar.ageLabel}`}</title>
-				<text class="collectors-machine" x="0" y={top + 22}>{bar.machine}</text>
-				<circle
-					class={`collectors-dot collectors-dot-${bar.state}`}
-					cx={COLLECTORS_BAR_LEFT - 14}
-					cy={top + COLLECTORS_BAR_Y + COLLECTORS_BAR_HEIGHT / 2}
-					r="4"
-				/>
-				<rect
-					class={`collectors-bar collectors-bar-${bar.state}`}
-					x={bar.x}
-					y={top + COLLECTORS_BAR_Y}
-					width={bar.width}
-					height={COLLECTORS_BAR_HEIGHT}
-					rx="2"
-				/>
-				<!-- The state is a word as well as a colour, for anyone who cannot tell the dots apart. -->
-				<text class="collectors-age" x={end + 8} y={top + 22}
-					>{bar.state === "ok" ? bar.ageLabel : `${bar.state} · ${bar.ageLabel}`}</text
-				>
-			</g>
-		{/each}
-		<line
-			class="collectors-axis-line"
-			x1={COLLECTORS_BAR_LEFT}
-			x2={COLLECTORS_BAR_RIGHT}
-			y1={geometry.height - 24}
-			y2={geometry.height - 24}
-		/>
-		<text class="collectors-axis" x={COLLECTORS_BAR_LEFT} y={geometry.height - 8}>
-			{geometry.from}
-		</text>
-		<text
-			class="collectors-axis"
-			x={COLLECTORS_BAR_RIGHT}
-			y={geometry.height - 8}
-			text-anchor="end">Today</text
-		>
-	</svg>
-	<ul class="visually-hidden">
+	<figcaption class="visually-hidden">{label}</figcaption>
+	<ol class="collectors-rows">
 		{#each geometry.bars as bar (bar.machine)}
-			<li>{`${bar.machine}: ${bar.state}, last send ${bar.ageLabel}.`}</li>
+			{@const width = Math.max(bar.end - bar.start, 0.01) * 100}
+			<li class="collectors-row">
+				<p class="collectors-line">
+					<span class="collectors-machine">
+						<span class={`collectors-dot collectors-dot-${bar.state}`} aria-hidden="true"
+						></span>
+						<span class="collectors-name" title={bar.machine}>{bar.machine}</span>
+					</span>
+					<span class="collectors-age"
+						>{bar.state === "ok" ? bar.ageLabel : `${bar.state} · ${bar.ageLabel}`}</span
+					>
+				</p>
+				<div class="collectors-track" aria-hidden="true">
+					<div
+						class={`collectors-bar collectors-bar-${bar.state}`}
+						style={`left: ${bar.start * 100}%; width: ${width}%`}
+					></div>
+				</div>
+			</li>
 		{/each}
-	</ul>
+	</ol>
+	<div class="collectors-axis">
+		<p class="collectors-axis-track">
+			<span>{geometry.from}</span>
+			<span>Today</span>
+		</p>
+	</div>
 </figure>

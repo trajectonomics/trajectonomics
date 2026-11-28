@@ -1,15 +1,6 @@
 import type { Collector } from "../core/collectors"
 import { daysBetween, utcDay } from "./window"
 
-/** The drawing's user units: the same 720-wide frame the other charts use. */
-export const COLLECTORS_WIDTH = 720
-export const COLLECTORS_TOP = 16
-export const COLLECTORS_ROW_HEIGHT = 48
-export const COLLECTORS_BAR_Y = 12
-export const COLLECTORS_BAR_HEIGHT = 14
-export const COLLECTORS_BAR_LEFT = 168
-export const COLLECTORS_BAR_RIGHT = 560
-
 const OK_MS = 2 * 3_600_000
 const LATE_MS = 26 * 3_600_000
 
@@ -45,14 +36,14 @@ function clamp(value: number): number {
 export type CollectorBar = Collector & {
 	state: CollectorState
 	ageLabel: string
-	x: number
-	width: number
+	/** The bar's left edge as a fraction of the axis from `from` to today. */
+	start: number
+	/** The bar's right edge as the same fraction; a bar covers whole days. */
+	end: number
 }
 
 /** Everything the collectors picture draws, computed without a browser. */
 export type CollectorsGeometry = {
-	width: number
-	height: number
 	from: string
 	to: string
 	bars: CollectorBar[]
@@ -70,7 +61,6 @@ export function collectorsGeometry(
 	const from = [...rows].map((row) => row.firstDay).sort()[0] ?? utcDay(nowMs)
 	const to = utcDay(nowMs)
 	const days = Math.max(1, daysBetween(from, to) + 1)
-	const plot = COLLECTORS_BAR_RIGHT - COLLECTORS_BAR_LEFT
 	const bars = rows.map((row) => {
 		const start = clamp(daysBetween(from, row.firstDay) / days)
 		const end = clamp((daysBetween(from, row.lastDay) + 1) / days)
@@ -78,17 +68,11 @@ export function collectorsGeometry(
 			...row,
 			state: collectorState(row.lastSendAt, nowMs),
 			ageLabel: relativeAge(row.lastSendAt, nowMs),
-			x: COLLECTORS_BAR_LEFT + start * plot,
-			width: Math.max(2, (end - start) * plot),
+			start,
+			end,
 		}
 	})
-	return {
-		width: COLLECTORS_WIDTH,
-		height: COLLECTORS_TOP + rows.length * COLLECTORS_ROW_HEIGHT + 28,
-		from,
-		to,
-		bars,
-	}
+	return { from, to, bars }
 }
 
 /** The picture's summary: how many collectors, and how many sent in the last two hours. */

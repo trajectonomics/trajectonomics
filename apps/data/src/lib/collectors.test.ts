@@ -1,8 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { Collector } from "../core/collectors"
 import {
-	COLLECTORS_BAR_LEFT,
-	COLLECTORS_BAR_RIGHT,
 	collectorState,
 	collectorsAriaLabel,
 	collectorsGeometry,
@@ -88,13 +86,12 @@ describe("collectorsGeometry", () => {
 		if (geometry === null) throw new Error("no geometry")
 		expect(geometry.from).toBe("2026-11-20")
 		expect(geometry.to).toBe("2026-11-25")
-		const plot = COLLECTORS_BAR_RIGHT - COLLECTORS_BAR_LEFT
 		const a = geometry.bars.find((bar) => bar.machine === "machine-a")
 		const b = geometry.bars.find((bar) => bar.machine === "machine-b")
-		expect(a?.x).toBeCloseTo(COLLECTORS_BAR_LEFT, 6)
-		expect(a?.width).toBeCloseTo((5 / 6) * plot, 6)
-		expect(b?.x).toBeCloseTo(COLLECTORS_BAR_LEFT + (2 / 6) * plot, 6)
-		expect(b?.width).toBeCloseTo((4 / 6) * plot, 6)
+		expect(a?.start).toBeCloseTo(0, 6)
+		expect(a?.end).toBeCloseTo(5 / 6, 6)
+		expect(b?.start).toBeCloseTo(2 / 6, 6)
+		expect(b?.end).toBeCloseTo(1, 6)
 	})
 
 	test("gives a one-day collector a whole day", () => {
@@ -103,12 +100,11 @@ describe("collectorsGeometry", () => {
 			NOW_MS,
 		)
 		if (geometry === null) throw new Error("no geometry")
-		const plot = COLLECTORS_BAR_RIGHT - COLLECTORS_BAR_LEFT
-		expect(geometry.bars[0]?.x).toBeCloseTo(COLLECTORS_BAR_LEFT, 6)
-		expect(geometry.bars[0]?.width).toBeCloseTo(plot, 6)
+		expect(geometry.bars[0]?.start).toBeCloseTo(0, 6)
+		expect(geometry.bars[0]?.end).toBeCloseTo(1, 6)
 	})
 
-	test("keeps a visible bar for a span beyond today's axis end", () => {
+	test("clamps a span beyond today's axis end to the axis's end", () => {
 		const geometry = collectorsGeometry(
 			[
 				collector({ machine: "machine-a", firstDay: "2026-11-20", lastDay: "2026-11-20" }),
@@ -121,7 +117,8 @@ describe("collectorsGeometry", () => {
 			NOW_MS,
 		)
 		if (geometry === null) throw new Error("no geometry")
-		expect(geometry.bars[1]?.width).toBe(2)
+		expect(geometry.bars[1]?.start).toBe(1)
+		expect(geometry.bars[1]?.end).toBe(1)
 	})
 
 	test("carries the state and age onto each bar", () => {

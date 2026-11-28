@@ -1,70 +1,117 @@
-/* The collectors picture: one hand-drawn SVG row per machine on a shared day axis. */
+/* The collectors picture: one HTML row per machine on a shared day axis. */
 
 .collectors-figure {
 	margin: 0;
 	padding: 0 0 8px;
 }
 
-.collectors-svg {
-	display: block;
-	width: 100%;
-	height: auto;
+.collectors-rows {
+	margin: 0;
+	padding: 0;
+	list-style: none;
 }
 
-.collectors-machine,
-.collectors-age,
-.collectors-axis {
+.collectors-row + .collectors-row {
+	margin-top: 12px;
+}
+
+.collectors-line {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 2px 8px;
+	margin: 0 0 4px;
 	font-family: var(--font-meta);
-	font-variant-numeric: tabular-nums;
+	font-size: 11px;
+	line-height: 1.4;
 }
 
 .collectors-machine {
-	fill: var(--ds-color-foreground);
-	font-size: 11px;
+	display: flex;
+	flex: 1 1 8rem;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
 	font-weight: 500;
+	grid-column: 1;
+	grid-row: 1;
+}
+
+.collectors-name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
 }
 
 .collectors-age {
-	fill: var(--ds-color-muted-foreground);
-	font-size: 11px;
+	margin-left: auto;
+	color: var(--ds-color-muted-foreground);
+	text-wrap: nowrap;
+	grid-column: 3;
+	grid-row: 1;
 }
 
-.collectors-axis {
-	fill: var(--ds-color-muted-foreground);
-	font-size: 10px;
-	letter-spacing: 0.02em;
-}
-
-.collectors-axis-line {
-	stroke: var(--ds-color-border);
-	stroke-width: 1;
-	vector-effect: non-scaling-stroke;
-}
-
-/* State is a colour and a word: the title and the hidden list carry the word. */
-.collectors-bar,
 .collectors-dot {
-	fill: var(--ds-color-primary);
+	flex: none;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--ds-color-primary);
 }
 
+.collectors-track {
+	position: relative;
+	height: 10px;
+	overflow: hidden;
+	border-radius: 2px;
+	background: var(--ds-color-muted);
+	grid-column: 2;
+	grid-row: 1;
+}
+
+.collectors-bar {
+	position: absolute;
+	inset-block: 0;
+	background: var(--ds-color-primary);
+}
+
+/* State is a colour and a word: the row text and the status carry the word. */
 .collectors-bar-late,
 .collectors-dot-late {
-	fill: var(--ds-color-accent);
+	background: var(--ds-color-accent);
 }
 
 .collectors-bar-stopped,
 .collectors-dot-stopped {
-	fill: var(--ds-color-destructive);
+	background: var(--ds-color-destructive);
 }
 
-/* The SVG scales to a phone; larger user units keep its labels at their size on screen. */
-@media (max-width: 40rem) {
-	.collectors-machine,
-	.collectors-age {
-		font-size: 20px;
+.collectors-axis-track {
+	display: flex;
+	justify-content: space-between;
+	margin: 12px 0 0;
+	padding-top: 4px;
+	border-top: 1px solid var(--ds-color-border);
+	color: var(--ds-color-muted-foreground);
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+	grid-column: 2;
+}
+
+/* Wide enough for the name, the track and the status side by side. */
+@media (min-width: 40rem) {
+	.collectors-row,
+	.collectors-axis {
+		display: grid;
+		grid-template-columns: minmax(8rem, 12rem) 1fr minmax(7rem, 10rem);
+		align-items: center;
+		column-gap: 12px;
 	}
 
-	.collectors-axis {
-		font-size: 18px;
+	.collectors-line {
+		display: contents;
 	}
 }
