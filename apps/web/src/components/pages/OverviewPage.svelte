@@ -8,6 +8,7 @@ import { overviewView } from "../../lib/view/overview/view"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
 import OverviewFocus from "../overview/OverviewFocus.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
+import TaxLabelNotice from "../plan-items/TaxLabelNotice.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import OverviewWhatIf from "../what-if/OverviewWhatIf.svelte"
 import WhatIfAbove from "../what-if/WhatIfAbove.svelte"
@@ -20,10 +21,11 @@ interface Props {
 let { scenario = "" }: Props = $props()
 </script>
 
-<!-- The Overview: one focus point with the answer written on its chart, then the quiet summary cards. -->
+<!-- The Overview: one focus point with the answer written on its chart, then the step after a guided save, then the quiet cards. -->
 <PageShell title="Overview">
 	{#snippet children(snapshot)}
 		{@const plan = homePlan(snapshot, scenario)}
+		{@const planDoc = plan === null ? undefined : snapshot.reads.documents[plan]}
 		{@const projection = plan === null ? undefined : snapshot.reads.projections[plan]}
 		{@const run = projection?.ok === true ? projection.data : null}
 		{@const focus = focusOf(snapshot, scenario)}
@@ -48,6 +50,14 @@ let { scenario = "" }: Props = $props()
 					warnings={hero?.warnings ?? []}
 					warningsLabel={hero?.warningsLabel ?? null}
 				/>
+				{#if plan !== null}
+					<TaxLabelNotice
+						plan={plan}
+						doc={planDoc?.ok === true ? planDoc.data.scenario.document : null}
+						source="guided"
+						next
+					/>
+				{/if}
 				<OverviewGrid view={overviewView(snapshot, scenario)} />
 			</div>
 		</WhatIfAbove>

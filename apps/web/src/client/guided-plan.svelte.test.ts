@@ -6,8 +6,10 @@ import { EDIT_PATH, REREAD_PATH } from "../lib/edit/guard"
 import type { RowDrafts } from "../lib/view/guided/money-draft"
 import { keepProblem } from "../lib/view/guided/money-draft"
 import type { PersonDraft } from "../lib/view/household/person-draft"
+import { documentRead, planDocument } from "../lib/view/plan-items/fixtures.test-support"
 import { editSession } from "./edit.svelte.js"
 import { guidedSession } from "./guided-plan.svelte.js"
+import { taxLabelNotice } from "./tax-label-notice.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 import { HASH, realFetch } from "./what-if.test-support"
 
@@ -57,6 +59,7 @@ afterEach(() => {
 	setTestUrl("http://127.0.0.1/")
 	guidedSession.cancel()
 	whatIfSession.end()
+	taxLabelNotice.clear()
 	editSession.token = null
 	editSession.busy = false
 	editSession.clear()
@@ -164,5 +167,35 @@ describe("saving", () => {
 		expect(sent.map((one) => one.url)).toEqual([EDIT_PATH, REREAD_PATH])
 		expect(sent[1]?.body).toEqual({ addPlan: "guided" })
 		expect(guidedSession.refusal).toContain("without its household")
+	})
+
+	test("offers the Tax labels link for the saved plan's first income with no label", async () => {
+		answerEveryStep()
+		const next = structuredClone(DEMO)
+		next.params.scenarios = ["guided"]
+		next.reads.documents["guided"] = documentRead()
+		answers({ ok: true, snapshot: next })
+		await guidedSession.save(DEMO)
+		expect(taxLabelNotice.held).toEqual({
+			plan: "guided",
+			flow: "pension",
+			origin: "guided",
+			taxed: true,
+		})
+	})
+
+	test("offers no Tax labels link when every income of the saved plan has its label", async () => {
+		answerEveryStep()
+		const document = planDocument()
+		const labelled = {
+			...document,
+			flows: document.flows.filter((flow) => flow.kind !== "income" || flow.id === "salary"),
+		}
+		const next = structuredClone(DEMO)
+		next.params.scenarios = ["guided"]
+		next.reads.documents["guided"] = documentRead(labelled)
+		answers({ ok: true, snapshot: next })
+		await guidedSession.save(DEMO)
+		expect(taxLabelNotice.held).toBeNull()
 	})
 })

@@ -1,10 +1,14 @@
 import { INSTALL_URL } from "../components/hosted/message"
-import type { FocusButton } from "../lib/view/overview/focus-setup"
+import type { FocusButton, SetupAction } from "../lib/view/overview/focus-setup"
+import { withBase } from "./links"
 
 /**
- * The hosted Demo's setup action: there is no write path to make a plan with, so it points at the
- * install, the same target the demo notice's "Get traj" uses.
+ * The hosted Demo's setup action: with no plan, the guided page is a link under the base path; any other setup case
+ * points at the install, the same target the demo notice's "Get traj" uses, since the Demo has no write path.
  */
-export function setupButton(): FocusButton {
+export function setupButton(action: SetupAction = "plan"): FocusButton {
+	if (action === "first") {
+		return { label: "Set up a first plan", href: withBase("/plans/new/"), external: false }
+	}
 	return { label: "Start a plan", href: INSTALL_URL, external: true }
 }
