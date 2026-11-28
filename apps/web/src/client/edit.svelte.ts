@@ -1,8 +1,6 @@
 import { editAnswer, type PreviewAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { type EditOutcome, editOutcome } from "../lib/edit/outcome"
-import type { AllowancePlan } from "../lib/snapshot/allowance-params"
-import type { ChanceInputs } from "../lib/snapshot/chance-params"
 import { isActionSource } from "../lib/view/action-source"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
 import { fetchEditSession, postEdit, postPreview } from "./edit-post.js"
@@ -65,12 +63,12 @@ class EditSession extends EditState {
 	 * `allowances`, the read uses those inputs for the allowance reads (null clears them); nothing is written.
 	 * Returns true when the new Snapshot is shown.
 	 */
-	reread(allowances?: AllowancePlan | null): Promise<boolean> {
+	reread(allowances?: RereadBody["allowances"]): Promise<boolean> {
 		return this.sendReread(allowances === undefined ? {} : { allowances })
 	}
 
 	/** A reread with new paths and seed for the chance reads (web ADR 0018); nothing is written. */
-	rereadChance(chance: ChanceInputs): Promise<boolean> {
+	rereadChance(chance: Required<RereadBody>["chance"]): Promise<boolean> {
 		return this.sendReread({ chance })
 	}
 
