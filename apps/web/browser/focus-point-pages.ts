@@ -28,9 +28,10 @@ export const ANSWERS: Readonly<Record<string, readonly string[]>> = {
 		"28 Oct 2026.",
 		"3 accounts, 0 not recorded in the last month.",
 	],
+	"/compare/": ["Which plan lets you stop soonest?", "base, in Oct 2040."],
 }
 
-/** The ten pages #707 gives a focus point so far, in the issue's order. */
+/** The eleven pages #707 gives a focus point. */
 export const FOCUS_PAGES = [
 	"/net-worth/",
 	"/chance/",
@@ -42,6 +43,7 @@ export const FOCUS_PAGES = [
 	"/milestones/",
 	"/health/",
 	"/ledger/",
+	"/compare/",
 ] as const
 
 /** The focus pages whose answer is money, which Hide amounts must mask. Chance states a rate, and stays. */
