@@ -49,6 +49,29 @@ test("Next says to keep a row when every row is unticked, and focuses that sente
 	await expect(page.getByRole("heading", { name: "Your money" })).toBeVisible()
 })
 
+test("problems shown keep focus on the checkbox when the last kept row is unticked", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await page.goto(`${BASE_URL}/plans/new/?demo=1`)
+	await fillHolder(page)
+	await page.getByRole("button", { name: "Next" }).click()
+	// An amount problem puts the problems on the step without dropping a row.
+	const row = firstIncomeRow()
+	await page.getByLabel(row.name, { exact: true }).fill("not a number")
+	await page.getByRole("button", { name: "Next" }).click()
+	await expect(page.getByRole("heading", { name: "Your money" })).toBeVisible()
+	const keeps = page.getByRole("checkbox", { name: /^Keep / })
+	const count = await keeps.count()
+	for (let index = 0; index < count; index += 1) {
+		await keeps.nth(index).focus()
+		await page.keyboard.press("Space")
+	}
+	// The keep sentence appears with the last untick, but it took no focus: only Next moves focus to it.
+	await expect(page.getByRole("alert")).toHaveText("Keep at least one row.")
+	await expect(keeps.nth(count - 1)).toBeFocused()
+})
+
 test("a masked amount shows the CLI's figure on focus and the mask again on blur", async ({
 	page,
 }) => {

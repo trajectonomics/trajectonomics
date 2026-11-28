@@ -131,7 +131,7 @@ describe("with no session, a page is its content and nothing more", () => {
 		const assumed = planAssumed(DEMO, plan, currentSearch())
 		const card =
 			assumed === null ? null : assumedCard(assumed.items, assumed.groups, currentSearch())
-		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}<div role="status"></div>${bodyOf(AssumedCard, { view: card })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
+		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}<div></div><p role="status" class="sr-only"></p>${bodyOf(AssumedCard, { view: card })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
 		expect(shown(page)).toBe(framed("Overview", content))
 	})
