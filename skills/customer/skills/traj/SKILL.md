@@ -141,6 +141,6 @@ When the gap remains, or the update fails — offline, or a Node older than the 
 
 Phase 1 is record, project and answer. V1 is THB and Thailand; the United States follows later, and multi-currency does not.
 
-`traj schema` is the honest answer to "what can it do": read it before you promise anything. When a capability is absent from it — a second jurisdiction, or projections and financial independence in an older release — update the traj skills first, once, as "When something is missing, update the skills first" says, because the copy you follow may not be the newest. When the capability is still absent from the schema in front of you, say that this version of `traj` cannot answer it, offer the record-and-report part you can do, and leave the missing number missing rather than approximating it. Never fill a gap with arithmetic of your own, and never present an estimate as the tool's answer.
+`traj schema` is the honest answer to "what can it do": read it before you promise anything. When a capability is absent from it — a second jurisdiction, or projections and financial independence in an older release — say that this version of `traj` cannot answer it, offer the record-and-report part you can do, and leave the missing number missing rather than approximating it. Never fill a gap with arithmetic of your own, and never present an estimate as the tool's answer.
 
 Every result you give the user states the as-of date it was read at, and whether tax is in it. A figure without those two is one they will misread.
