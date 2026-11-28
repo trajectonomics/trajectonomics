@@ -1,10 +1,11 @@
-import { isSafeInteger, overflow } from "../engine/overflow"
+import { overflow } from "../engine/overflow"
 import type { EngineRun } from "../engine/result"
 import type { Scenario } from "../types"
 import type { CashflowBreakdown } from "../types/breakdown"
 import type { ProjectionProblem } from "../types/projection"
 import { categoryTotals } from "./cashflow-flows"
 import { breakdownOf } from "./cashflow-lines"
+import { overflows } from "./cashflow-overflow"
 import { sumPeriod } from "./cashflow-sums"
 import type { Period } from "./periods"
 
@@ -27,21 +28,7 @@ export function buildCashflow(
 		const sums = sumPeriod(run.totals, period)
 		const unmet = run.runsOut?.date === period.to ? run.runsOut.unmet : 0n
 		const categories = categoryTotals(scenario.flows, sums.planned)
-		const values = [
-			...sums.planned.values(),
-			...sums.applied.values(),
-			...sums.unfunded.values(),
-			...sums.employer.values(),
-			...sums.prepaid.values(),
-			...sums.settled.values(),
-			...sums.drawn.values(),
-			...sums.surplus.values(),
-			...sums.transfers.values(),
-			...sums.unmoved.values(),
-			...categories.map((item) => item.amount),
-			unmet,
-		]
-		if (!values.every(isSafeInteger)) return { fields: {}, problem: overflow(period.to) }
+		if (overflows(sums, categories, unmet)) return { fields: {}, problem: overflow(period.to) }
 		cashflow.push(breakdownOf(scenario, period, sums, categories, unmet))
 	}
 	return { fields: { cashflow }, problem: undefined }

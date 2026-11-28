@@ -1,4 +1,5 @@
 import type { AccountId, DateString, MinorUnits } from "./common"
+import type { CashflowLines } from "./reporting"
 
 /** One Levy's amount in a period; `levy` is the Levy id. */
 export interface LevyLine {
@@ -78,33 +79,8 @@ export interface DrawnLine extends AccountLine {
  * One Annual roll-up's cash-flow breakdown, with the same `index`, `from` and `to`. Every total
  * equals its roll-up field, and the identity in `docs/adr/0018` holds exactly in minor units.
  */
-export interface CashflowBreakdown {
+export type CashflowBreakdown = {
 	readonly index: number
 	readonly from: DateString
 	readonly to: DateString
-	readonly income: readonly FlowLine[]
-	readonly prepaid: readonly LevyLine[]
-	readonly settlements: readonly LevyLine[]
-	readonly expenses: readonly ExpenseLine[]
-	readonly categories: readonly CategoryLine[]
-	readonly contributions: readonly ContributionLine[]
-	/**
-	 * Employer money into Accounts, by Flow; present only when the Scenario declares an employer
-	 * Contribution. Kept out of the identity: it never entered cashflow, so money in still equals money out.
-	 */
-	readonly employer?: readonly EmployerLine[]
-	/**
-	 * Payouts by Account, in Scenario order; present only when the Scenario declares a payout. Money in:
-	 * `income` lists the declared income Flows, so the identity adds `Σpayouts` to its money in.
-	 */
-	readonly payouts?: readonly PayoutLine[]
-	readonly withdrawals: readonly WithdrawalLine[]
-	/**
-	 * Transfers by Flow, in Scenario order; present only when the Scenario declares a transfer (ADR 0031). Money
-	 * moved between the plan's own Accounts: outside the identity, which it enters on neither side.
-	 */
-	readonly transfers?: readonly TransferLine[]
-	readonly drawn: readonly DrawnLine[]
-	readonly surplus: readonly AccountLine[]
-	readonly unmet: MinorUnits
-}
+} & CashflowLines

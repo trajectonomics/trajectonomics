@@ -1,6 +1,6 @@
-import { addDays } from "../calendar/arith"
-import { daysInMonth, formatDate, parseDate } from "../calendar/civil"
 import type { DateString } from "../types"
+import { addDays } from "./arith"
+import { daysInMonth, formatDate, parseDate } from "./civil"
 
 /** A calendar month, or the part of one that a statement covers. */
 export interface StatementMonth {

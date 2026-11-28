@@ -6,6 +6,7 @@ import type { EstateStatement } from "./estate"
 import type { LevyReport } from "./levy"
 import type { AccountLifetime } from "./lifetime"
 import type { MilestoneResult } from "./milestone"
+import type { ReportingCashflow } from "./reporting"
 import type { SpendingRuleStatement } from "./rule"
 import type { LiabilityStatement } from "./statement"
 
@@ -104,6 +105,10 @@ export interface Projection {
 	readonly liabilities?: readonly LiabilityStatement[]
 	/** One per Annual roll-up in order; present only with `cashflowBreakdown`. */
 	readonly cashflow?: readonly CashflowBreakdown[]
+	/** One per Reporting year in order; present only with `reporting.years`. */
+	readonly cashflowYears?: readonly ReportingCashflow[]
+	/** The Reporting months `reporting.monthsOf` names, in order; present only with it. */
+	readonly cashflowMonths?: readonly ReportingCashflow[]
 	/** Each routing target in force on the start and the horizon; only when one is `{ amount, growth }` (ADR 0030). */
 	readonly routing?: ProjectionRouting
 	/** One statement per rule Flow in Scenario order; present only with `spendingRules`. */

@@ -1,6 +1,7 @@
 import { check } from "../check"
 import { checkPathSelection } from "../check/chance"
 import { checkReturnModel } from "../check/market"
+import { checkReportingOptions } from "../check/reporting"
 import { marketPath } from "../market/paths"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { PathProjectionResult, PathSelection } from "../types/path"
@@ -20,7 +21,11 @@ export function projectPath(
 	selection: PathSelection,
 	options: ProjectionOptions = {},
 ): PathProjectionResult {
-	const problems = [...check(baseline, scenario, timeline), ...checkPathSelection(selection)]
+	const problems = [
+		...check(baseline, scenario, timeline),
+		...checkPathSelection(selection),
+		...checkReportingOptions(options.reporting, timeline),
+	]
 	if (problems.length > 0) return { ok: false, problems }
 	const accounts = scenario.accounts.map((account) => account.id)
 	const modelProblems = checkReturnModel(selection.model, accounts, timeline)

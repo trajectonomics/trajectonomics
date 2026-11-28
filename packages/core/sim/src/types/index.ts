@@ -87,6 +87,7 @@ export type {
 	RuleOfThumbReference,
 	TwentyFiveTimesReference,
 } from "./reference"
+export type * from "./reporting"
 export type * from "./rule"
 export type { LabelSaving, SavingStop, SavingsOptions, SavingsResult } from "./savings"
 export type { Economy, Scenario } from "./scenario"

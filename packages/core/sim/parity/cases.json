@@ -12220,5 +12220,172 @@
 			"index": 7
 		},
 		"pathSha256": "fc1049fe0b2c35a504cd83b5267d26b898aacea6fcf44b068ab85a6b8bbfd343"
+	},
+	{
+		"name": "reporting-levy-april",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 10000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true,
+					"label": "salary",
+					"prepayments": [
+						{
+							"levy": "plain",
+							"bps": 1000
+						}
+					]
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			},
+			"levies": [
+				{
+					"id": "plain",
+					"period": {
+						"month": 1,
+						"day": 1
+					},
+					"settlement": {
+						"month": 3,
+						"day": 31
+					},
+					"measures": [
+						{
+							"id": "owed",
+							"op": "const",
+							"value": 9000
+						}
+					],
+					"due": "owed",
+					"carryIn": [
+						{
+							"periodStart": "2025-01-01",
+							"tallies": [],
+							"prepaid": 7000
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2027-04-30",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"reporting": {
+				"yearStart": 4,
+				"years": true,
+				"monthsOf": "all"
+			}
+		},
+		"sha256": "fea7d925a926ba54fcb73c3511affb396a40d32c95fd3ac4f09a7faf3b7e817b"
+	},
+	{
+		"name": "reporting-leap-day",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "once",
+					"start": "2028-02-29",
+					"amount": 100,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "rent",
+					"frequency": "monthly",
+					"start": "2028-02-29",
+					"amount": 30,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2028-02-29",
+			"horizon": "2028-04-15",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"reporting": {
+				"yearStart": 3,
+				"years": true,
+				"monthsOf": "all"
+			}
+		},
+		"sha256": "72fa0cb1d0039cc423d0e2c41391edefe53238827e6c79c136cd99205d463c83"
 	}
 ]

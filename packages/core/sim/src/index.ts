@@ -15,6 +15,7 @@ export {
 	DISPLAY_LABEL_RULE,
 	isDisplayLabel,
 } from "./check/label-rule"
+export { reportingYearRange } from "./check/reporting"
 export { project } from "./engine/project"
 export { projectPath } from "./engine/project-path"
 export { routedTargetAt } from "./engine/routed"

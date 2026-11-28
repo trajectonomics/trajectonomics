@@ -17,13 +17,16 @@ export interface PeriodSums {
 	readonly unmoved: ReadonlyMap<string, bigint>
 }
 
+/** The sums under construction: the same groups, each map writable. */
+export type MutableSums = { -readonly [K in keyof PeriodSums]: Map<string, bigint> }
+
 function addAll(into: Map<string, bigint>, from: ReadonlyMap<string, bigint>): void {
 	for (const [key, amount] of from) addTo(into, key, amount)
 }
 
-/** Sums the lines of the days that land within `period`, both ends inclusive. */
-export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodSums {
-	const sums = {
+/** Empty sums, one map per line group. */
+export function emptySums(): MutableSums {
+	return {
 		planned: new Map<string, bigint>(),
 		applied: new Map<string, bigint>(),
 		unfunded: new Map<string, bigint>(),
@@ -35,19 +38,28 @@ export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodS
 		transfers: new Map<string, bigint>(),
 		unmoved: new Map<string, bigint>(),
 	}
+}
+
+/** Adds one day's lines into `sums`. */
+export function addLines(sums: MutableSums, lines: DayLines): void {
+	addAll(sums.planned, lines.planned)
+	addAll(sums.applied, lines.applied)
+	addAll(sums.unfunded, lines.unfunded)
+	addAll(sums.employer, lines.employer)
+	addAll(sums.prepaid, lines.prepaid)
+	addAll(sums.settled, lines.settled)
+	addAll(sums.drawn, lines.drawn)
+	addAll(sums.surplus, lines.surplus)
+	addAll(sums.transfers, lines.transfers)
+	addAll(sums.unmoved, lines.unmoved)
+}
+
+/** Sums the lines of the days that land within `period`, both ends inclusive. */
+export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodSums {
+	const sums = emptySums()
 	for (const total of totals) {
 		if (total.lines === undefined || total.date < period.from || total.date > period.to) continue
-		const lines: DayLines = total.lines
-		addAll(sums.planned, lines.planned)
-		addAll(sums.applied, lines.applied)
-		addAll(sums.unfunded, lines.unfunded)
-		addAll(sums.employer, lines.employer)
-		addAll(sums.prepaid, lines.prepaid)
-		addAll(sums.settled, lines.settled)
-		addAll(sums.drawn, lines.drawn)
-		addAll(sums.surplus, lines.surplus)
-		addAll(sums.transfers, lines.transfers)
-		addAll(sums.unmoved, lines.unmoved)
+		addLines(sums, total.lines)
 	}
 	return sums
 }

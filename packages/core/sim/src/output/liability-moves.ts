@@ -1,7 +1,7 @@
+import type { StatementMonth } from "../calendar/statement-months"
 import type { DayTotals } from "../engine/occurrence"
 import type { AccountId } from "../types"
 import type { LiabilityMonth } from "../types/statement"
-import type { StatementMonth } from "./statement-months"
 
 export interface Moves {
 	readonly drawn: readonly bigint[]

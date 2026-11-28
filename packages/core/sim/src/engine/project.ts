@@ -1,10 +1,12 @@
+import { statementMonths } from "../calendar/statement-months"
 import { check } from "../check"
+import { checkReportingOptions } from "../check/reporting"
 import { buildEstate } from "../estate/build"
 import { buildProjection } from "../output/build"
+import { reportingAsked } from "../output/cashflow-reporting"
 import { buildLiabilities } from "../output/liabilities"
 import { periodEndDates } from "../output/periods"
 import { rowDates } from "../output/row-dates"
-import { statementMonths } from "../output/statement-months"
 import { withPayouts } from "../payout/flows"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionResult } from "../types/projection"
@@ -31,7 +33,10 @@ export function project(
 	timeline: Timeline,
 	options: ProjectionOptions = {},
 ): ProjectionResult {
-	const problems = check(baseline, declared, timeline)
+	const problems = [
+		...check(baseline, declared, timeline),
+		...checkReportingOptions(options.reporting, timeline),
+	]
 	if (problems.length > 0) return { ok: false, problems }
 	return projectChecked(baseline, declared, timeline, options)
 }
@@ -48,9 +53,10 @@ export function projectChecked(
 	const scenario = runScenarioOf(withPayouts(declared), returns)
 	const observed = observationDates(timeline, statements)
 	const breakdown = options.cashflowBreakdown === true
+	const reporting = options.reporting
 	const result = runEngine(baseline, scenario, timeline, observed, returns, {
 		tracked: statements,
-		breakdown,
+		breakdown: breakdown || reportingAsked(reporting) !== undefined,
 	})
 	if (!result.ok) return { ok: false, problems: [result.problem] }
 	const output = buildProjection(
@@ -60,6 +66,7 @@ export function projectChecked(
 		timeline,
 		breakdown,
 		options.routing === true,
+		reporting,
 	)
 	if ("problem" in output) return { ok: false, problems: [output.problem] }
 	const withRule = withRules(

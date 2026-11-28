@@ -1,3 +1,4 @@
+import { type StatementMonth, statementMonths } from "../calendar/statement-months"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { EngineRun } from "../engine/result"
 import type { EngineSnapshot } from "../engine/snapshot"
@@ -7,7 +8,6 @@ import type { ProjectionProblem } from "../types/projection"
 import type { LiabilityMonth, LiabilityStatement } from "../types/statement"
 import type { Moves } from "./liability-moves"
 import { monthRow, movesOf } from "./liability-moves"
-import { type StatementMonth, statementMonths } from "./statement-months"
 
 /** The statements of one run, one per liability in Scenario order, or the problem that stopped them. */
 export interface LiabilityOutcome {

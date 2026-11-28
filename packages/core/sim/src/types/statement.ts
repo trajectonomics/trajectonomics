@@ -1,4 +1,5 @@
 import type { AccountId, DateString, MinorUnits } from "./common"
+import type { ReportingOptions } from "./reporting"
 
 /**
  * One calendar month of one liability, or the part of a month that the Projection covers. The
@@ -46,4 +47,6 @@ export interface ProjectionOptions {
 	readonly estate?: boolean
 	/** Each routing target in force on the start and the horizon; present only when set and a target is `{ amount, growth }` (ADR 0030). */
 	readonly routing?: boolean
+	/** One Cash-flow breakdown per Reporting year and per Reporting month; present only when it asks for one (ADR 0034). */
+	readonly reporting?: ReportingOptions
 }
