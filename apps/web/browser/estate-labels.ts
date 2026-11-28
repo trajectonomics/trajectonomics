@@ -40,7 +40,7 @@ function firstProjection(snapshot: FlowSnapshot, name: string): ProjectionRead {
 	return projection
 }
 
-/** The last date the estate states, which `?at=end` chooses and the page would choose by default too. */
+/** The last date the estate states, which `?estate=end` chooses and the page would choose by default too. */
 function lastDate(tables: readonly CashflowTable[]): string {
 	const estate = tables.find((table) => table.name === "estate")
 	const lines = tables.find((table) => table.name === "estateLines")
@@ -73,7 +73,7 @@ function patchLines(lines: CashflowTable, date: string): void {
 
 /**
  * The Demo snapshot with hard names on the estate lines of the date the page shows by default. The last
- * estate row is the plan's last year, which `?at=end` asks for, so every name drawn is one the review's
+ * estate row is the plan's last year, which `?estate=end` asks for, so every name drawn is one the review's
  * measurements cut on the side beside its amount.
  */
 export async function longEstateLabels(page: Page): Promise<FlowSnapshot> {

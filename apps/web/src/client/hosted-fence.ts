@@ -14,7 +14,7 @@ const READ_CONTROLS = [
 	'select[name="account"]',
 	'select[name="table"]',
 	'select[id$="-select"]',
-	// The estate page's date only sets `?at=`.
+	// The estate page's date only sets `?estate=`, and reads an old `?at=` link in its place.
 	"select#estate-date",
 	// A visitor's own charts live in this browser's localStorage only: editing, copying, deleting, exporting and importing send nothing.
 	'[role="group"][aria-label="This chart"] button',
