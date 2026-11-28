@@ -17,7 +17,7 @@ let {
 
 const chart = $derived(chartGeometry(series))
 const label = $derived(chartAriaLabel(series, from, to, unit))
-const bucket = $derived(unit === "hour" ? "hour" : unit === "week" ? "week" : "day")
+const bucket = $derived(unit)
 const bucketName = $derived(bucket.charAt(0).toUpperCase() + bucket.slice(1))
 const days = $derived(series[0]?.points ?? [])
 let pinned = $state<string | null>(null)

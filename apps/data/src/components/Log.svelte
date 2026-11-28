@@ -90,6 +90,46 @@ function chooseBucket(bucket: BucketKind): void {
 		liveHref={liveHref}
 	/>
 
+	<div class="log-controls">
+		<fieldset class="view-group">
+			<legend class="meta-label">Period</legend>
+			<div class="segmented">
+				{#each PERIODS as entry (entry.key)}
+					<label class="segment">
+						<input
+							class="segment-input"
+							type="radio"
+							name="period"
+							value={entry.key}
+							checked={state.period === entry.key}
+							onchange={() => choosePeriod(entry.key)}
+						/>
+						<span class="segment-label">{entry.label}</span>
+					</label>
+				{/each}
+			</div>
+		</fieldset>
+		<fieldset class="view-group">
+			<legend class="meta-label">By</legend>
+			<div class="segmented">
+				{#each BUCKETS as choice (choice.key)}
+					<label class="segment">
+						<input
+							class="segment-input"
+							type="radio"
+							name="bucket"
+							value={choice.key}
+							checked={state.bucket === choice.key}
+							disabled={!allowedBuckets.includes(choice.key)}
+							onchange={() => chooseBucket(choice.key)}
+						/>
+						<span class="segment-label">{choice.label}</span>
+					</label>
+				{/each}
+			</div>
+		</fieldset>
+	</div>
+
 	{#if state.status === "loading"}
 		<div class="state-panel" role="status">
 			<p>Loading data…</p>
@@ -105,45 +145,6 @@ function chooseBucket(bucket: BucketKind): void {
 			<button class="retry-button" type="button" onclick={() => void state.load()}>Retry</button>
 		</div>
 	{:else if days !== null}
-		<div class="log-controls">
-			<fieldset class="view-group">
-				<legend class="meta-label">Period</legend>
-				<div class="segmented">
-					{#each PERIODS as entry (entry.key)}
-						<label class="segment">
-							<input
-								class="segment-input"
-								type="radio"
-								name="period"
-								value={entry.key}
-								checked={state.period === entry.key}
-								onchange={() => choosePeriod(entry.key)}
-							/>
-							<span class="segment-label">{entry.label}</span>
-						</label>
-					{/each}
-				</div>
-			</fieldset>
-			<fieldset class="view-group">
-				<legend class="meta-label">By</legend>
-				<div class="segmented">
-					{#each BUCKETS as choice (choice.key)}
-						<label class="segment">
-							<input
-								class="segment-input"
-								type="radio"
-								name="bucket"
-								value={choice.key}
-								checked={state.bucket === choice.key}
-								disabled={!allowedBuckets.includes(choice.key)}
-								onchange={() => chooseBucket(choice.key)}
-							/>
-							<span class="segment-label">{choice.label}</span>
-						</label>
-					{/each}
-				</div>
-			</fieldset>
-		</div>
 		<section class="section-block" aria-labelledby="chart-title">
 			<h2 id="chart-title" class="meta-label section-title">Tokens per {state.bucket}</h2>
 			<UsageChart {series} from={chartFrom} to={days.to} unit={state.bucket} />
