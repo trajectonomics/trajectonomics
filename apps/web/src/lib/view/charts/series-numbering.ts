@@ -1,19 +1,10 @@
+import { clashGroups } from "./series-groups"
+
 /** A series by id and the name it reads, before names are told apart. A `twinLabel` names a twin suffix instead of the id's label. */
 export type Series = {
 	readonly id: string
 	readonly name: string
 	readonly twinLabel?: string
-}
-
-/** The indexes of each name more than one series reads. */
-function clashGroups(names: readonly string[]): number[][] {
-	const groups = new Map<string, number[]>()
-	for (const [index, name] of names.entries()) {
-		const same = groups.get(name) ?? []
-		same.push(index)
-		groups.set(name, same)
-	}
-	return [...groups.values()].filter((indexes) => indexes.length > 1)
 }
 
 /** The indexes in sorted-id order. */
@@ -25,7 +16,7 @@ function sortedBy<T extends Series>(items: readonly T[], indexes: readonly numbe
 /** The clash groups by their smallest id, each one's members in sorted-id order. */
 function sortedGroups<T extends Series>(items: readonly T[], names: readonly string[]): number[][] {
 	const idOf = (indexes: readonly number[]) => items[indexes[0] ?? -1]?.id ?? ""
-	const groups = clashGroups(names).map((indexes) => sortedBy(items, indexes))
+	const groups = clashGroups(names).map(([, indexes]) => sortedBy(items, indexes))
 	return groups.sort((a, b) => idOf(a).localeCompare(idOf(b)))
 }
 

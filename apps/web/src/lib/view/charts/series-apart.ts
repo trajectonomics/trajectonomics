@@ -1,7 +1,8 @@
 import type { AccountNames } from "../account-names"
+import { clashGroups } from "./series-groups"
 import { seriesLabelId } from "./series-ids"
 import { numbered, type Series } from "./series-numbering"
-import { clashGroups, TWIN_STEPS, tellGroup, twin } from "./series-twins"
+import { TWIN_STEPS, tellGroup, twin } from "./series-twins"
 
 /** Raises the level each item of one clash group takes. */
 function raiseLevels<T extends Series>(

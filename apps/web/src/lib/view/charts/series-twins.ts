@@ -5,17 +5,18 @@ import type { Series } from "./series-numbering"
 /** The twin steps a clash takes before a number: "(item)", "(item, category)", "(item, category, Account)". */
 export const TWIN_STEPS = 3
 
-const WORDS = /[\p{L}\p{M}\p{N}]+/gu
+/** A word, or a run of symbols (an emoji category still counts); a symbol never swallows the word after it, and invisible characters say nothing. */
+const PIECES = /[\p{L}\p{M}\p{N}]+|\p{S}+/gu
 
-/** The words a name says, in lower case, so a suffix that only repeats them adds no information. */
-function wordsOf(text: string): ReadonlySet<string> {
-	return new Set(text.toLowerCase().match(WORDS) ?? [])
+/** The pieces a name says, in lower case, so a suffix that only repeats them adds no information. */
+function piecesOf(text: string): ReadonlySet<string> {
+	return new Set(text.toLowerCase().match(PIECES) ?? [])
 }
 
-/** Whether a twin suffix says a word the name does not already say. */
+/** Whether a twin suffix says a piece the name does not already say. */
 function informs(name: string, suffix: string): boolean {
-	const said = wordsOf(name)
-	return (suffix.toLowerCase().match(WORDS) ?? []).some((word) => !said.has(word))
+	const said = piecesOf(name)
+	return (suffix.toLowerCase().match(PIECES) ?? []).some((piece) => !said.has(piece))
 }
 
 /**
@@ -35,17 +36,6 @@ export function twin(
 	const account = level >= 3 ? seriesAccount(item.id, accounts) : null
 	if (account !== null) return ` (${label}, ${kind}, ${account})${` (${label})`.repeat(level - 3)}`
 	return ` (${label}, ${kind})${` (${label})`.repeat(level - 2)}`
-}
-
-/** The indexes of each name more than one item reads, with that name. */
-export function clashGroups(names: readonly string[]): [string, number[]][] {
-	const groups = new Map<string, number[]>()
-	for (const [index, name] of names.entries()) {
-		const same = groups.get(name) ?? []
-		same.push(index)
-		groups.set(name, same)
-	}
-	return [...groups].filter(([, indexes]) => indexes.length > 1)
 }
 
 /** The twin suffix each item of a group would take at `step`, in the group's order. */
