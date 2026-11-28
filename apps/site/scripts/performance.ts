@@ -19,15 +19,20 @@ const PAGES = [
 	{ label: "/ (th)", cookie: "traj_lang=th" },
 ] as const
 
-/** A hung browser or Worker must not hold CI, so the whole check is bounded. */
+/**
+ * A hung browser or Worker must not hold CI, so the whole check is bounded. One run takes about 7–8s
+ * in CI, so 10 of them (5 per page) plus the Worker's start fit well inside 420s.
+ */
 const HARD_TIMEOUT_MS = 420_000
 
-/** The performance score one mobile Lighthouse run reports, or `undefined` when it has none. */
-async function scoreOf(
-	url: string,
-	port: number,
-	cookie: string | null,
-): Promise<number | undefined> {
+/** One mobile Lighthouse run: its performance score and the benchmark index of the runner that ran it. */
+interface PerformanceRun {
+	readonly score: number | undefined
+	readonly benchmarkIndex: number | undefined
+}
+
+/** The performance score one mobile Lighthouse run reports, and its runner's benchmark index. */
+async function scoreOf(url: string, port: number, cookie: string | null): Promise<PerformanceRun> {
 	const result = await lighthouse(url, {
 		port,
 		output: "json",
@@ -44,10 +49,23 @@ async function scoreOf(
 		},
 		throttlingMethod: "simulate",
 	})
-	return result?.lhr.categories["performance"]?.score ?? undefined
+	return {
+		score: result?.lhr.categories["performance"]?.score ?? undefined,
+		benchmarkIndex: result?.lhr.environment.benchmarkIndex,
+	}
 }
 
-/** Measure each home three times against the local Worker, returning the process exit code. */
+/** A run's score, or `none` when it has none, so a missing score is visible in the log. */
+function scoreText(score: number | undefined): string {
+	return score?.toFixed(2) ?? "none"
+}
+
+/** A run's benchmark index, or `?` when it has none, so a missing index is visible in the log. */
+function benchmarkText(index: number | undefined): string {
+	return index?.toString() ?? "?"
+}
+
+/** Measure each home `PERFORMANCE_RUNS` times against the local Worker, returning the process exit code. */
 export async function main(): Promise<number> {
 	const port = await freePort()
 	const baseUrl = `http://127.0.0.1:${port}`
@@ -69,10 +87,16 @@ export async function main(): Promise<number> {
 		browser = await chromium.launch({ args: [`--remote-debugging-port=${debugPort}`] })
 		const failures: PerformanceFailure[] = []
 		for (const page of PAGES) {
-			const scores: (number | undefined)[] = []
+			const runs: PerformanceRun[] = []
 			for (let run = 1; run <= PERFORMANCE_RUNS; run++) {
-				scores.push(await scoreOf(`${baseUrl}/`, debugPort, page.cookie))
+				runs.push(await scoreOf(`${baseUrl}/`, debugPort, page.cookie))
 			}
+			// Every run's score and the runner's benchmark index, so a flake's next diagnosis can tell a
+			// slow shared runner from a regression on the page.
+			console.log(
+				`performance: ${page.label} runs ${runs.map((run) => scoreText(run.score)).join(" ")} (benchmarkIndex ${runs.map((run) => benchmarkText(run.benchmarkIndex)).join(" ")})`,
+			)
+			const scores = runs.map((run) => run.score)
 			const median = medianScore(scores)
 			if (median !== undefined)
 				console.log(`performance: ${page.label} median ${median.toFixed(2)}`)

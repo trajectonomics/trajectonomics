@@ -79,24 +79,41 @@ export async function startLiveDemo(page: Page): Promise<void> {
 }
 
 /**
- * Put focus on the embedded iframe's last control and press Tab once. The frame's own tab stops are the
- * Dashboard's to test; this checks that the keyboard leaves the frame onto the document's next control,
- * so the Site's controls on both sides are still reached in order.
+ * Put focus on the embedded iframe's last control and press Tab until the keyboard leaves the frame.
+ * The frame's own tab stops are the Dashboard's to test; this checks that the keyboard leaves the frame
+ * onto the document's next control, so the Site's controls on both sides are still reached in order.
+ *
+ * Focusing the frame's last control is a best guess: the Dashboard may still be hydrating or
+ * re-rendering, so the element is not always the frame's real last stop and one Tab can land on
+ * another control inside it. A keyboard visitor only needs Tab to leave the frame eventually, so this
+ * presses Tab again, at most once per control the frame shows, and fails only when the frame keeps
+ * focus: a real focus trap.
  */
 export async function tabOutOfFrame(page: Page): Promise<boolean> {
 	await page.evaluate((selector) => {
-		const frame = document.querySelector("iframe")
-		if (!(frame instanceof HTMLIFrameElement)) return
-		const controls = [...(frame.contentDocument?.querySelectorAll(selector) ?? [])].filter(
+		const frame = document.querySelector<HTMLIFrameElement>("iframe")
+		const controls = [...(frame?.contentDocument?.querySelectorAll(selector) ?? [])].filter(
 			(element) => element.getClientRects().length > 0,
 		)
-		const last = controls.at(-1)
 		// The frame's elements belong to the frame's realm, so the parent's `instanceof` cannot see them;
 		// focus the last one by its own method.
-		if (last !== undefined) (last as HTMLElement).focus()
+		;(controls.at(-1) as HTMLElement | undefined)?.focus()
 	}, FOCUSABLE)
 	await page.keyboard.press("Tab")
-	return page.evaluate(() => !(document.activeElement instanceof HTMLIFrameElement))
+	if (!(await page.evaluate(() => document.activeElement instanceof HTMLIFrameElement))) return true
+	// Count the frame's controls once the loop starts: each one can need a press of its own before the
+	// keyboard reaches the frame's end, plus the press that leaves it.
+	const frameStops = await page.evaluate((selector) => {
+		const frame = document.querySelector<HTMLIFrameElement>("iframe")
+		const elements = [...(frame?.contentDocument?.querySelectorAll(selector) ?? [])]
+		return elements.filter((element) => element.getClientRects().length > 0).length
+	}, FOCUSABLE)
+	for (let press = 0; press <= frameStops; press++) {
+		await page.keyboard.press("Tab")
+		if (!(await page.evaluate(() => document.activeElement instanceof HTMLIFrameElement)))
+			return true
+	}
+	return false
 }
 
 /** Press Tab until the Copy button has focus, and return whether it gets there at all. */
