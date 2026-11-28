@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { activeTheme } from "$lib/themeStore";
+  import { activeMascot } from "$lib/themeStore";
 
   let { alt = "Empty month" }: { alt?: string } = $props();
 
   // The sitting robot waits with you rather than looking lost at an empty month. Copied
   // from apps/site/public/mascot/sit.webp into static/mascot/robot/ (offline bundle).
-  const robot = $derived($activeTheme === "trajectonomics");
+  // The Mascot setting decides between it and the sleeping pig below.
+  const robot = $derived($activeMascot === "robot");
 </script>
 
 {#if robot}

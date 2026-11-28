@@ -47,6 +47,9 @@ declare global {
       updateWidget?(snapshotJson: string): void;
       /** The widget button that opened the app, once: "add", "scan" or "". */
       takeWidgetAction?(): string;
+      // The mascot setting and the launcher icon it switches, see MascotIcon.kt
+      /** Stores "robot" or "moo" and redraws the widget; the launcher icon follows on leaving. */
+      setMascot?(mascot: string): void;
     };
   }
 }

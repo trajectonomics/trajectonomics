@@ -43,6 +43,7 @@
   import { CHANGELOG, type WhatsNewAction } from "$lib/whatsNew";
   import { t } from "$lib/i18n";
   import type { AppTheme, HandMode } from "$lib/theme";
+  import type { Mascot } from "$lib/mascot";
   import type { Account, AppSettings, Category, Tag } from "$lib/types";
 
   export type SettingsSubPage =
@@ -69,6 +70,7 @@
     isScanning,
     mascotMood = "idle",
     theme = "trajectonomics",
+    mascot = "robot",
     hand = "right",
     shareStats = false,
     appLockAvailable = false,
@@ -84,6 +86,7 @@
     onWhatsNewAction,
     subPage = $bindable<SettingsSubPage>(null),
     onChangeTheme,
+    onChangeMascot,
     onChangeHand,
     onChangeShareStats,
     onSaveSettings,
@@ -108,6 +111,7 @@
     isScanning: boolean;
     mascotMood?: MascotMood;
     theme?: AppTheme;
+    mascot?: Mascot;
     hand?: HandMode;
     /** Anonymous usage stats switch (opt-in, off by default). See $lib/analytics. */
     shareStats?: boolean;
@@ -135,6 +139,7 @@
     onWhatsNewAction?: (action: Exclude<WhatsNewAction, "widget-help">) => void;
     subPage?: SettingsSubPage;
     onChangeTheme: (next: AppTheme) => void;
+    onChangeMascot: (next: Mascot) => void;
     onChangeHand: (next: HandMode) => void;
     onChangeShareStats: (on: boolean) => void;
     onSaveSettings: (next: AppSettings) => Promise<void>;
@@ -926,6 +931,50 @@
               </div>
             </button>
           </div>
+        </section>
+
+        <!-- Mascot picker: its own setting, not the theme's, and it also drives the
+             launcher icon and the widget image (MascotIcon.kt, MooWidget.kt). -->
+        <section class="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-subtle)] p-4 space-y-3 shadow-xs">
+          <h3 class="text-sm font-bold text-[var(--text-primary)]">{t(lang, "mascot")}</h3>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onclick={() => onChangeMascot("robot")}
+              aria-pressed={mascot === "robot"}
+              class="flex items-center gap-2.5 rounded-2xl p-3.5 border text-left transition-all {mascot === 'robot'
+                ? 'border-[var(--brand)] bg-[var(--brand-soft)] ring-1 ring-[var(--brand)]'
+                : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
+            >
+              <img
+                src="/mascot/robot/wave.webp"
+                alt=""
+                class="size-10 shrink-0 object-contain select-none"
+              />
+              <div class="text-xs font-bold text-[var(--text-primary)] truncate">
+                {t(lang, "mascotRobot")}
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onclick={() => onChangeMascot("moo")}
+              aria-pressed={mascot === "moo"}
+              class="flex items-center gap-2.5 rounded-2xl p-3.5 border text-left transition-all {mascot === 'moo'
+                ? 'border-[var(--brand)] bg-[var(--brand-soft)] ring-1 ring-[var(--brand)]'
+                : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
+            >
+              <img
+                src="/mascot/mascot-idle.webp"
+                alt=""
+                class="size-10 shrink-0 object-contain select-none"
+              />
+              <div class="text-xs font-bold text-[var(--text-primary)] truncate">
+                {t(lang, "mascotMoo")}
+              </div>
+            </button>
+          </div>
+          <p class="text-[11px] text-[var(--text-muted)]">{t(lang, "mascotHint")}</p>
         </section>
 
         <section class="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-subtle)] p-4 space-y-3 shadow-xs">

@@ -27,6 +27,7 @@
   import { track } from "$lib/analytics";
   import { t, type I18nKey } from "$lib/i18n";
   import type { AppTheme, HandMode } from "$lib/theme";
+  import { activeMascot } from "$lib/themeStore";
   import type { AppSettings } from "$lib/types";
 
   let {
@@ -324,7 +325,7 @@
               <div class="relative">
                 <div class="absolute inset-4 rounded-full bg-[var(--brand-soft)] blur-xl"></div>
                 <div class="relative motion-safe:animate-[moo-bob_3s_ease-in-out_infinite]">
-                  <MooMascot mood="idle" size="lg" alt={theme === "trajectonomics" ? "OpenJot mascot" : "Moo"} />
+                  <MooMascot mood="idle" size="lg" alt={$activeMascot === "robot" ? "OpenJot mascot" : "Moo"} />
                 </div>
               </div>
               <h2 id="onb-title-{i}" bind:this={headings[i]} tabindex="-1" class="text-3xl font-extrabold tracking-tight outline-none">
@@ -524,7 +525,7 @@
                 <span class="absolute -left-6 top-2 text-2xl motion-safe:animate-[moo-twinkle_1.6s_ease-in-out_infinite]" aria-hidden="true">✨</span>
                 <span class="absolute -right-5 top-10 text-xl motion-safe:animate-[moo-twinkle_1.6s_ease-in-out_0.5s_infinite]" aria-hidden="true">🎉</span>
                 <span class="absolute -left-2 bottom-3 text-lg motion-safe:animate-[moo-twinkle_1.6s_ease-in-out_1s_infinite]" aria-hidden="true">💖</span>
-                <MooMascot mood="happy" size="lg" alt={theme === "trajectonomics" ? "OpenJot mascot" : "Moo"} />
+                <MooMascot mood="happy" size="lg" alt={$activeMascot === "robot" ? "OpenJot mascot" : "Moo"} />
               </div>
               <h2 id="onb-title-{i}" bind:this={headings[i]} tabindex="-1" class="text-3xl font-extrabold tracking-tight outline-none">
                 {tr("onbDoneTitle")}

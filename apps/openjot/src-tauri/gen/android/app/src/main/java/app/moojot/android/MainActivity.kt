@@ -77,6 +77,14 @@ class MainActivity : TauriActivity() {
         handleWidgetIntent(intent)
     }
 
+    override fun onStop() {
+        super.onStop()
+        // The launcher icon follows the Mascot setting. Switching the enabled alias while the
+        // app is in the foreground can close the task on some Android versions, so it happens
+        // once the person has left the app (see MascotIcon.kt).
+        MascotIcon.applyLauncherIcon(this)
+    }
+
     /**
      * A widget button opened the app (#81). The web app asks for the action when it starts
      * (takeWidgetAction) and, when it is already running, hears moojot:widget-action.
@@ -217,6 +225,18 @@ class MainActivity : TauriActivity() {
             val action = pendingWidgetAction ?: ""
             pendingWidgetAction = null
             return action
+        }
+
+        // ---- Mascot setting, see MascotIcon.kt ----
+        /**
+         * Stores the mascot and redraws the widget with its image. The launcher icon is not
+         * switched here: onStop does that, because changing the enabled alias of the running
+         * task can close the app on some Android versions.
+         */
+        @JavascriptInterface
+        fun setMascot(mascot: String) {
+            MascotIcon.save(this@MainActivity, mascot)
+            MooWidget.refresh(this@MainActivity)
         }
 
         // ---- Daily reminder (#80), see DailyReminder.kt ----

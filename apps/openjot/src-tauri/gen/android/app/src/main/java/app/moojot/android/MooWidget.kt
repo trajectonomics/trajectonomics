@@ -94,6 +94,15 @@ object MooWidget {
             else -> R.drawable.widget_bg_pink
         }
         views.setInt(R.id.widget_root, "setBackgroundResource", background)
+        // The widget's mascot follows the Mascot setting, not the theme (MascotIcon.kt).
+        views.setImageViewResource(
+            R.id.widget_mascot,
+            if (MascotIcon.current(context) == MascotIcon.ROBOT) {
+                R.drawable.widget_mascot_robot
+            } else {
+                R.drawable.widget_mascot
+            }
+        )
         views.setOnClickPendingIntent(R.id.widget_root, openApp(context, null, 0))
         views.setOnClickPendingIntent(R.id.widget_add, openApp(context, ACTION_ADD, 1))
         views.setOnClickPendingIntent(R.id.widget_scan, openApp(context, ACTION_SCAN, 2))
