@@ -1,3 +1,4 @@
+@import "./collect-flow.css";
 /* The method page: a narrow reading column of plain, short prose. */
 
 .method {
@@ -14,7 +15,7 @@
 }
 
 .method-title {
-	margin: 0 0 16px;
+	margin: 0 0 32px;
 	font-family: var(--font-display);
 	font-size: clamp(2.25rem, 5vw, 3.25rem);
 	font-weight: 300;

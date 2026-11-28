@@ -1,0 +1,44 @@
+/* The arrows and the link between the two stages. */
+
+.flow-arrow {
+	width: 24px;
+	height: 24px;
+	flex: none;
+	align-self: center;
+	fill: none;
+	stroke: var(--ds-color-muted-foreground);
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.flow-link {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+@media (min-width: 40rem) {
+	.flow-link {
+		flex-direction: column;
+		gap: 4px;
+	}
+}
+
+.flow-link .flow-arrow {
+	transform: rotate(90deg);
+}
+
+@media (min-width: 40rem) {
+	.flow-link .flow-arrow {
+		transform: none;
+	}
+}
+
+.flow-link-label {
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--ds-color-foreground);
+}
