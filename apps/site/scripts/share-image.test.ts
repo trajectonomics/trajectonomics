@@ -5,6 +5,7 @@ import { join } from "node:path"
 import type { RenderedImage } from "@resvg/resvg-js"
 import { pngPixels } from "../src/lib/build/image-pixels"
 import { dictionaryFor, LANGUAGES } from "../src/lib/language/languages"
+import { CURVE_WIDTH } from "../src/lib/social/chart-layout"
 import {
 	MARGIN,
 	META_BASELINE,
@@ -69,19 +70,21 @@ describe("the PNG a share image rasterizes to", () => {
 		expect(png.length).toBeLessThan(SHARE_IMAGE_MAX_BYTES)
 	})
 
-	it("draws the statement and the meta in the Site's own faces, not only in the Thai fallback", async () => {
+	it("draws the question and the meta in the Site's own faces, not only in the Thai fallback", async () => {
 		const image = await composedImage("en")
 		const fonts = await shareImageFonts()
 		const thai = fonts.filter((path) => path.endsWith("NotoSansThai.ttf"))
 		expect(renderShareImage(image, fonts)).not.toEqual(renderShareImage(image, thai))
 	})
 
-	it("keeps every pixel of the statement inside the image's margins", async () => {
+	it("keeps every stroke and glyph inside the image's margins", async () => {
 		const rendered = renderShareImagePixels(await composedImage(), await shareImageFonts())
 		const ink = inkExtent(rendered)
 		expect(ink).toBeDefined()
-		expect(ink?.left).toBeGreaterThanOrEqual(MARGIN)
-		expect(ink?.right).toBeLessThanOrEqual(SHARE_IMAGE_WIDTH - MARGIN)
+		// A round cap is a semicircle around the path's end, so the curve reaches half its width past
+		// the margin the coordinates sit on. No glyph or fill goes further than that.
+		expect(ink?.left).toBeGreaterThanOrEqual(MARGIN - CURVE_WIDTH / 2)
+		expect(ink?.right).toBeLessThanOrEqual(SHARE_IMAGE_WIDTH - MARGIN + CURVE_WIDTH / 2)
 	})
 
 	it("prints the same bytes twice, so a rebuild does not touch the file", async () => {

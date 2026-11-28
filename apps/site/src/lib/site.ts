@@ -33,6 +33,12 @@ export const ONBOARDING_SKILL_URL = `${SKILLS_RAW_PATH}/traj-onboarding/SKILL.md
  */
 export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and follow it.`
 
+/** The demo's as-of date: the date its Baseline is read at, and the start of its time axis. */
+export const FI_DEMO_AS_OF = "2026-03-31"
+
+/** The demo's horizon: the date its projection stops at, and the end of its time axis. */
+export const FI_DEMO_HORIZON = "2066-03-31"
+
 /**
  * The commands the demo window shows the agent running before the demo command: a fresh `traj` has
  * no ledger and no Scenario, so the example first writes the CLI's own template to `base.json`,
@@ -43,7 +49,7 @@ export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and fol
  */
 export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
 	"traj init",
-	"traj scenario apply --template --as-of 2026-03-31 > base.json",
+	`traj scenario apply --template --as-of ${FI_DEMO_AS_OF} > base.json`,
 	"traj scenario apply base --file base.json",
 ])
 
@@ -51,8 +57,7 @@ export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
  * The command the demo window shows the agent running, taken from the CLI's own `traj fi`
  * examples. A product fixture, the same text in every Language, and not copy.
  */
-export const FI_DEMO_COMMAND =
-	"traj fi --scenario base --as-of 2026-03-31 --horizon 2066-03-31 --json"
+export const FI_DEMO_COMMAND = `traj fi --scenario base --as-of ${FI_DEMO_AS_OF} --horizon ${FI_DEMO_HORIZON} --json`
 
 /** The name on the demo window's title bar: the app a visitor's agent runs in, drawn rather than embedded. */
 export const DEMO_APP_NAME = "Claude"
@@ -69,7 +74,7 @@ export const FI_DEMO_DATE = "2041-08-01"
  */
 export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
 	"{",
-	'  "asOf": "2026-03-31",',
+	`  "asOf": "${FI_DEMO_AS_OF}",`,
 	'  "tax": "not_applied",',
 	'  "method": "survival",',
 	`  "fi": { "reachable": true, "fiDate": "${FI_DEMO_DATE}" }`,
