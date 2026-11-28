@@ -6,19 +6,19 @@ import type { AssumedGroup, AssumedLine, AssumedSubject } from "./types"
 /** The group of the pre-filled amounts, each line changed on the page its Flow is edited on. */
 export function amounts(
 	items: readonly Prefilled[],
-	document: ScenarioDocument,
+	doc: ScenarioDocument,
 	search: string,
 ): AssumedGroup[] {
 	const lines: (AssumedLine & { subject: AssumedSubject })[] = items.flatMap((item) => {
 		const [section, id, field] = splitPath(item.path)
 		if (section !== "flows" || id === undefined || field !== "amount") return []
 		if (typeof item.value !== "string") return []
-		const income = document.flows.some((flow) => flow.id === id && flow.kind === "income")
+		const income = doc.flows.some((flow) => flow.id === id && flow.kind === "income")
 		return [
 			{
 				key: item.path,
 				subject: { kind: "flow" as const, id },
-				amount: { value: item.value, currency: document.currency },
+				amount: { value: item.value, currency: doc.currency },
 				link: change(income === true ? "/income/" : "/expenses/", search),
 				keep: keepOf(item),
 			},
