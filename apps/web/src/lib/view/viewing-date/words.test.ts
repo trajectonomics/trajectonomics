@@ -104,6 +104,10 @@ describe("the Net worth page's focus label for a viewing month", () => {
 		expect(netWorthLabel(at, "2031-03", PLAN, false)).toBe(
 			"What will you be worth at the end of Mar 2031? 3.4M THB on 31 Mar 2031, in the plan base.",
 		)
+		const other = { name: "retire-early", currency: "USD" }
+		expect(netWorthLabel(at, "2031-03", other, false)).toBe(
+			"What will you be worth at the end of Mar 2031? 3.4M USD on 31 Mar 2031, in the plan retire-early.",
+		)
 	})
 
 	test("a month after the plan ran out names the plan and the run-out date", () => {

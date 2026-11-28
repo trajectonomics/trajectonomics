@@ -91,8 +91,8 @@ function futureLabel(row: MonthlyRow, month: string, plan: NetWorthPlan, hidden:
 	const when = formatMonth(month)
 	const date = formatDate(row.date)
 	return hidden
-		? `What will you be worth at the end of ${when}? The amount is hidden. On ${date}, in the plan base.`
-		: `What will you be worth at the end of ${when}? ${formatCompact(row.netWorth)} ${plan.currency} on ${date}, in the plan base.`
+		? `What will you be worth at the end of ${when}? The amount is hidden. On ${date}, in the plan ${plan.name}.`
+		: `What will you be worth at the end of ${when}? ${formatCompact(row.netWorth)} ${plan.currency} on ${date}, in the plan ${plan.name}.`
 }
 
 /** A month after the plan ran out: its question and the date the plan ended, with no figure. */
