@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor, languageBuildUrl } from "../language/languages"
-import { FI_DEMO_COMMAND, INSTALL_PROMPT } from "../site"
+import { FI_DEMO_COMMAND, FI_DEMO_SETUP_COMMANDS, INSTALL_PROMPT } from "../site"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "./llms-full"
 import { linkCount } from "./llms-markdown"
 
@@ -51,8 +51,10 @@ describe("the full Answer engine file", () => {
 		}
 	})
 
-	it("prints the demo command and its answer as fenced code, not as a link", () => {
-		expect(LLMS_FULL_TXT).toContain(`\`\`\`bash\n${FI_DEMO_COMMAND}\n\`\`\``)
+	it("prints the demo's setup, its command and its answer as fenced code, not as a link", () => {
+		expect(LLMS_FULL_TXT).toContain(
+			`\`\`\`bash\n${FI_DEMO_SETUP_COMMANDS.join("\n")}\n${FI_DEMO_COMMAND}\n\`\`\``,
+		)
 		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
 	})
 

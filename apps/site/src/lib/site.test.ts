@@ -14,6 +14,7 @@ import {
 	FI_DEMO_COMMAND,
 	FI_DEMO_DATE,
 	FI_DEMO_OUTPUT,
+	FI_DEMO_SETUP_COMMANDS,
 	GITHUB_ORG_URL,
 	GITHUB_REPO_URL,
 	GITHUB_SKILLS_URL,
@@ -96,6 +97,13 @@ describe("the Site's own constants", () => {
 		expect(FI_DEMO_COMMAND).toContain("--as-of")
 		expect(FI_DEMO_COMMAND).toContain("--horizon")
 		expect(FI_DEMO_COMMAND.endsWith("--json")).toBe(true)
+	})
+
+	it("creates the ledger and the `base` Scenario the demo command reads, before it runs", () => {
+		expect(FI_DEMO_SETUP_COMMANDS).toEqual([
+			"traj init",
+			"traj scenario apply --template | traj scenario apply base --file -",
+		])
 	})
 
 	it("prints the demo's output as the CLI's JSON, with one date the panel repeats", () => {

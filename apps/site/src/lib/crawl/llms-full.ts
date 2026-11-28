@@ -1,7 +1,13 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import { openJotDictionaryFor } from "../language/openjot-dictionary"
-import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, INSTALL_PROMPT, SKILLS_LICENCE_URL } from "../site"
+import {
+	FI_DEMO_COMMAND,
+	FI_DEMO_OUTPUT,
+	FI_DEMO_SETUP_COMMANDS,
+	INSTALL_PROMPT,
+	SKILLS_LICENCE_URL,
+} from "../site"
 import { ABSOLUTE_OPENJOT_URL } from "../site/openjot"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
@@ -20,8 +26,17 @@ const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent
 /** The pill's two runs: the licence and the release, both facts the page prints. */
 const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 
-/** The demo the page shows: the command an agent runs, and the abridged JSON it answers with. */
-const DEMO = ["```bash", FI_DEMO_COMMAND, "```", "", "```json", ...FI_DEMO_OUTPUT, "```"]
+/** The demo the page shows: the setup, the command an agent runs, and the abridged JSON it answers with. */
+const DEMO = [
+	"```bash",
+	...FI_DEMO_SETUP_COMMANDS,
+	FI_DEMO_COMMAND,
+	"```",
+	"",
+	"```json",
+	...FI_DEMO_OUTPUT,
+	"```",
+]
 
 /** A line of one transcript: the speaker the page aligns, then what they say. */
 const line = (speaker: string, said: string) => `- ${speaker}: ${said}`

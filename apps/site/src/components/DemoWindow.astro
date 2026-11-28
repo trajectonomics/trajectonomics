@@ -10,7 +10,13 @@ import {
 	type Timeline,
 	typing,
 } from "../lib/motion/timeline"
-import { DEMO_APP_NAME, DEMO_SKILL_COMMAND, FI_DEMO_COMMAND, FI_DEMO_OUTPUT } from "../lib/site"
+import {
+	DEMO_APP_NAME,
+	DEMO_SKILL_COMMAND,
+	FI_DEMO_COMMAND,
+	FI_DEMO_OUTPUT,
+	FI_DEMO_SETUP_COMMANDS,
+} from "../lib/site"
 import ChatMessage from "./ChatMessage.astro"
 import Arrow from "./icons/Arrow.astro"
 import Check from "./icons/Check.astro"
@@ -160,6 +166,9 @@ const keys = (prompt: typeof typed.with, chars: number) =>
 						<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(guided, BEAT.terminal)}>
 							<p class="chat-text chat-note">{dictionary.actionSkillLine}</p>
 							<div class="terminal bg-stage text-stage-foreground">
+								{FI_DEMO_SETUP_COMMANDS.map((command) => (
+									<code class="terminal-command"><span class="terminal-prompt" aria-hidden="true">$ </span>{command}</code>
+								))}
 								<code class="terminal-command"><span class="terminal-prompt" aria-hidden="true">$ </span>{FI_DEMO_COMMAND}</code>
 								<pre class="terminal-output"><code>{FI_DEMO_OUTPUT.map((line, index) => <span class="terminal-line" style={`--step-delay:${at(guided, BEAT.lines + index)}ms`}>{line}</span>)}</code></pre>
 								<p class="terminal-note">{dictionary.actionExampleNote}</p>

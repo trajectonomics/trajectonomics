@@ -23,7 +23,7 @@ export const THAI_SECTIONS = Object.freeze({
 	actionAttachName: "budget-2026.csv",
 	actionNeedMore: "ตารางนี้มีรายจ่าย แต่ไม่มีเงินออมที่มีอยู่ ตอนนี้คุณมีเงินเก็บเท่าไหร่",
 	actionData: "ตอนนี้มีเงินเก็บ 1.2 ล้าน และออมเดือนละ 25,000",
-	actionSkillLine: "เอเจนต์โหลดสกิล traj แล้วรัน CLI:",
+	actionSkillLine: "เอเจนต์โหลดสกิล traj สร้างสถานการณ์ชื่อ base แล้วรัน CLI:",
 	actionProvenance: "traj fi · ณ วันที่ 31 มี.ค. 2026",
 	replay: "เล่นอีกครั้ง",
 	actionExampleNote: "ตัวอย่างผลลัพธ์แบบย่อ",
