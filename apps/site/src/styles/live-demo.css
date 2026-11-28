@@ -1,0 +1,120 @@
+/*
+ * The live Demo on the home (ADR 0034): the hosted Dashboard in the hero window's frame, with
+ * browser-style zoom (at zoom z the iframe lays out at 1/z of the box and is scaled by z). Every
+ * colour is a Semantic Token Role, and the frame matches the hero's app window (ADR 0022).
+ */
+
+.live {
+	margin-top: 40px;
+	overflow: hidden;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 12px;
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+}
+
+@media (min-width: 40rem) {
+	.live {
+		margin-top: 56px;
+	}
+}
+
+/* The bar wraps rather than overflowing: the title truncates, the controls stay whole. */
+.live-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 12px;
+	min-height: 2.5rem;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--ds-color-border);
+	background: var(--ds-color-muted);
+}
+
+.live-title {
+	flex: 1 1 6rem;
+	min-width: 0;
+	overflow: hidden;
+	font-size: 12px;
+	text-align: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--ds-color-muted-foreground);
+}
+
+.live-zoom {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.live-zoom button {
+	display: inline-flex;
+	min-width: 2rem;
+	min-height: 2rem;
+	align-items: center;
+	justify-content: center;
+	padding: 0 6px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 6px;
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+	font-family: var(--font-meta);
+	font-size: 12px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.live-zoom button:hover:enabled:not([aria-disabled="true"]) {
+	border-color: var(--ds-color-foreground);
+}
+
+.live-zoom button:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+.live-zoom button:disabled,
+.live-zoom button[aria-disabled="true"] {
+	cursor: default;
+	opacity: 0.45;
+}
+
+.live-zoom [data-live-reset] {
+	min-width: 4rem;
+}
+
+.live-open {
+	display: inline-flex;
+	min-height: 2rem;
+	align-items: center;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ds-color-foreground);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.live-open:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* The visible box: a fixed frame the scaled iframe cannot grow, so no zoom step moves the page. */
+.live-viewport {
+	position: relative;
+	overflow: hidden;
+	height: min(75svh, 46rem);
+}
+
+.live-viewport iframe {
+	position: absolute;
+	inset: 0 auto auto 0;
+	border: 0;
+	width: calc(100% / var(--zoom, 1));
+	height: calc(100% / var(--zoom, 1));
+	transform: scale(var(--zoom, 1));
+	transform-origin: 0 0;
+}

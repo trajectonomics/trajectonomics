@@ -23,7 +23,14 @@ async function expectAxeReportsNothing(page: Page, path: string): Promise<void> 
 	// ([ADR 0028](../docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md)).
 	await page.addStyleTag({ content: ".consent { position: static; }" })
 	// One options call: a later options() replaces the whole object, tags included.
-	const results = await new AxeBuilder({ page }).options(axeOptions()).analyze()
+	// The live Demo is the real Dashboard in an iframe, a second document with its own labels and
+	// controls (ADR 0034). Its chart text sits over drawn shapes axe cannot judge, and the frame's own
+	// document is the Dashboard's to keep accessible: this scan judges the Site's document, so the
+	// section's heading, zoom controls and way out are still held to every rule.
+	const results = await new AxeBuilder({ page })
+		.options(axeOptions())
+		.exclude("[data-live-frame]")
+		.analyze()
 	const violations = results.violations.map(
 		(violation) => `${violation.id} (${violation.impact}): ${violation.help}`,
 	)

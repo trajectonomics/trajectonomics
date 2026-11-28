@@ -8,13 +8,14 @@ import { BASE_URL } from "./base-url"
  * `/demo/` path. The Site's own home keeps no policy.
  */
 const DEMO_POLICY =
-	"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'"
+	"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'self'; frame-ancestors 'self'"
 
 /**
  * The one violation the Demo reports on purpose. The validation library in the bundle probes
  * `Function("")` to choose its compiled path and falls back to its plain one when that throws, so
  * `script-src` blocks `eval` and the Demo works without it. The policy does not allow `'unsafe-eval'`
- * to silence the probe (ADR 0031).
+ * to silence the probe (ADR 0031). `frame-ancestors 'self'` lets the Site's own home frame the Demo
+ * (ADR 0034).
  */
 const EVAL_PROBE = "script-src blocked eval"
 

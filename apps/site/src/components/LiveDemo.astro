@@ -1,0 +1,99 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see DEMO_PATH.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { DEMO_PATH } from "../lib/site"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+{/*
+ * The hosted Dashboard, live on the home (ADR 0034): the real Demo in a framed window, fully
+ * clickable. Its zoom works like browser zoom: at zoom z the iframe lays out at 1/z of the visible
+ * box and is scaled by z, so a phone can zoom out and read the Dashboard's wide layout. The three
+ * controls ship disabled, so a page with no script offers no control that cannot work (ADR 0022); the
+ * iframe itself needs no script and stays usable at 100%. The script is inline, in the hero's style,
+ * and its notes live here because every byte ships against the page's 10,000 (ADR 0005).
+ */}
+<section id="demo" class="section-surface bg-background" data-live-demo>
+	<div class="section-inner">
+		<div class="section-head">
+			<p class="eyebrow">{dictionary.liveDemoEyebrow}</p>
+			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.liveDemoHeading}
+			</h2>
+		</div>
+		<p class="section-lede mt-4 text-muted-foreground">{dictionary.liveDemoLead}</p>
+
+		<div class="live" data-live>
+			<div class="live-bar">
+				<span class="app-dots" aria-hidden="true"><i /><i /><i /></span>
+				<span class="live-title">{dictionary.liveDemoTitle}</span>
+				<div class="live-zoom" role="group" aria-label={dictionary.liveDemoZoom}>
+					<button type="button" data-live-out aria-label={dictionary.liveDemoZoomOut} disabled>
+						<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
+							<path d="M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+							></path>
+						</svg>
+					</button>
+					<button type="button" data-live-reset disabled>
+						<span data-live-level>100%</span><span class="sr-only"> {dictionary.liveDemoZoomReset}</span>
+					</button>
+					<button type="button" data-live-in aria-label={dictionary.liveDemoZoomIn} disabled>
+						<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
+							<path
+								d="M1 6h10M6 1v10"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"></path>
+						</svg>
+					</button>
+				</div>
+				<span class="sr-only" role="status" data-live-said></span>
+				<a class="live-open" href={DEMO_PATH}>{dictionary.liveDemoOpen}</a>
+			</div>
+			<div class="live-viewport" data-live-viewport style="--zoom:1">
+				<iframe
+					data-live-frame
+					src={DEMO_PATH}
+					title={dictionary.liveDemoFrameTitle}
+					loading="lazy"></iframe>
+			</div>
+		</div>
+	</div>
+</section>
+
+{/*
+ * The zoom: one step per press through the eight browser-zoom steps, from 50% to 125%, starting at
+ * 100%. The percentage button resets. The control enables its own buttons, so the markup's disabled
+ * state is the no-script state, and nothing is stored: the zoom is this visit's, never a cookie. At
+ * either end the button is aria-disabled rather than disabled, so the keyboard focus on it stays put,
+ * and the status line says each new level, because the percentage sits inside a button's name.
+ */}
+<script is:inline>
+	;(() => {
+		const live = document.querySelector("[data-live]")
+		const box = live?.querySelector("[data-live-viewport]")
+		const level = live?.querySelector("[data-live-level]")
+		const said = live?.querySelector("[data-live-said]")
+		if (!box || !level || !said) return
+		const [out, reset, up] = live.querySelectorAll("button")
+		const steps = [50, 67, 75, 80, 90, 100, 110, 125]
+		let at = 5
+		const show = (next) => {
+			at = Math.max(0, Math.min(7, next))
+			box.style.setProperty("--zoom", steps[at] / 100)
+			level.textContent = said.textContent = `${steps[at]}%`
+			out.setAttribute("aria-disabled", at === 0)
+			up.setAttribute("aria-disabled", at === 7)
+		}
+		out.onclick = () => show(at - 1)
+		up.onclick = () => show(at + 1)
+		reset.onclick = () => show(5)
+		for (const button of [out, reset, up]) button.disabled = false
+	})()
+</script>
