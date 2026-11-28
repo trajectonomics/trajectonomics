@@ -21,22 +21,30 @@ export type CollectorRead = { signedIn: boolean; rows: CollectorRow[] }
 
 type BatchRow = { results?: unknown[] }
 
-/** Purges expired sessions and inserts the new one in one batched write (ADR 0015). */
+// A tombstoned `sub` never signs in again (ADR 0015), so the insert writes nothing for one.
+const INSERT_SESSION = `
+INSERT INTO web_session (session_hash, auth_user_id, created_at, expires_at)
+SELECT ?, ?, ?, ?
+WHERE NOT EXISTS (SELECT 1 FROM contributor_tombstone WHERE auth_user_hash = ?)
+RETURNING session_hash`
+
+/**
+ * Purges expired sessions and inserts the new one in one batched write (ADR 0015). Answers false,
+ * with no row written, when the user was deleted.
+ */
 export async function createWebSession(
 	db: D1Database,
-	sessionHash: string,
-	authUserId: string,
+	session: { hash: string; authUserId: string; authUserHash: string },
 	createdAt: string,
 	expiresAt: string,
-): Promise<void> {
-	await db.batch([
+): Promise<boolean> {
+	const results = (await db.batch([
 		db.prepare("DELETE FROM web_session WHERE expires_at <= ?").bind(createdAt),
 		db
-			.prepare(
-				"INSERT INTO web_session (session_hash, auth_user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
-			)
-			.bind(sessionHash, authUserId, createdAt, expiresAt),
-	])
+			.prepare(INSERT_SESSION)
+			.bind(session.hash, session.authUserId, createdAt, expiresAt, session.authUserHash),
+	])) as BatchRow[]
+	return (results[1]?.results ?? []).length > 0
 }
 
 /** Removes one session by its hash; an unknown hash removes nothing. */

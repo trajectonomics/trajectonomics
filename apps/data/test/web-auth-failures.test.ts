@@ -79,6 +79,17 @@ describe("the callback's failures", () => {
 				}),
 		],
 		[
+			"a deleted user, whose tombstone refuses the sign-in",
+			async (context) => {
+				context.database
+					.prepare("INSERT INTO contributor_tombstone (auth_user_hash, deleted_at) VALUES (?, ?)")
+					.run(await sha256Hex("user-deleted"), "2026-11-25T11:00:00.000Z")
+				return callback(context, signer.jwks, {
+					authFetch: tokenFetch(await signer.sign({ sub: "user-deleted", scope: null })),
+				})
+			},
+		],
+		[
 			"an unavailable key set",
 			async (context) =>
 				callback(context, signer.jwks, {

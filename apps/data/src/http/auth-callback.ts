@@ -29,7 +29,12 @@ async function startSession(
 	const nowIso = new Date(context.nowMs).toISOString()
 	const expiresAt = new Date(context.nowMs + SESSION_TTL_SECONDS * 1000).toISOString()
 	try {
-		await createWebSession(env.DB, await sha256Hex(sessionId), authUserId, nowIso, expiresAt)
+		const session = {
+			hash: await sha256Hex(sessionId),
+			authUserId,
+			authUserHash: await sha256Hex(authUserId),
+		}
+		if (!(await createWebSession(env.DB, session, nowIso, expiresAt))) return callbackFailed()
 	} catch (error) {
 		console.error("data: web session write failed", error)
 		return callbackFailed()
