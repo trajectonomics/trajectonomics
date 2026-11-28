@@ -7,14 +7,18 @@ import { PAGES, pageName } from "./pages"
 const WIDTH_PX = 1280
 const HEIGHT_PX = 800
 
-/** The text of every command block on the page: a `pre code` whose text starts with `traj `. */
+/**
+ * The text of every traj command on the page: any `code` whose text starts with `traj `, in a Details
+ * block or in a table cell. `traj dashboard` is the advice to start the Dashboard, not the command a
+ * figure came from, so it stays.
+ */
 function commands(page: Page): Promise<string[]> {
 	return page
-		.locator("pre code")
+		.locator("code")
 		.evaluateAll((codes) =>
 			codes
 				.map((code) => (code.textContent ?? "").trim())
-				.filter((text) => text.startsWith("traj ")),
+				.filter((text) => text.startsWith("traj ") && !text.startsWith("traj dashboard")),
 		)
 }
 
@@ -26,7 +30,7 @@ for (const path of PAGES) {
 	})
 }
 
-for (const path of ["/projection/years/", "/net-worth/"]) {
+for (const path of ["/projection/years/", "/net-worth/", "/health/"]) {
 	test(`${pageName(path)} shows the traj commands with the switch on`, async ({ page }) => {
 		await page.setViewportSize({ width: WIDTH_PX, height: HEIGHT_PX })
 		await page.addInitScript(() => localStorage.setItem("traj.showCommands", "1"))
