@@ -24,8 +24,8 @@ describe("the traj-plan Skill", () => {
 	it("is published from its own manifest row, at the release that carries the tax allowances", () => {
 		expect(row).toBeDefined()
 		// `scenario tax` takes its allowance flags from 0.3.0; 0.2.0 publishes only the tax flag itself.
-		expect(row?.cliRange).toBe(">=0.3.0 <0.8.0")
-		expect(block).toContain('cli: ">=0.3.0 <0.8.0"')
+		expect(row?.cliRange).toBe(">=0.3.0 <0.9.0")
+		expect(block).toContain('cli: ">=0.3.0 <0.9.0"')
 	})
 
 	it("asks for the as-of and the horizon, and never substitutes a default for either", () => {
@@ -84,7 +84,8 @@ describe("the traj-plan Skill", () => {
 		expect(step).toContain("does not file a return or use e-Filing")
 		expect(step).not.toContain("cannot produce a tax figure yet")
 		expect(step).toContain("THB")
-		expect(step).toContain("no Monte Carlo, no return shock")
+		expect(step).toContain("one deterministic projection rather than a probability")
+		expect(step).not.toContain("no Monte Carlo")
 		expect(step).toContain("retire at 55")
 		expect(step).toContain("The as-of every figure was read at, and whether tax is in it")
 	})
@@ -169,7 +170,8 @@ describe("the Thai tax recipe in the traj-plan Skill", () => {
 		expect(codeSpans(tax)).toContain(
 			"traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json",
 		)
-		expect(tax).toContain("cannot add one")
+		expect(tax).toContain("replaces a path that exists")
+		expect(tax).not.toContain("cannot add one")
 		expect(tax).toContain("100 THB is 10000 satang")
 	})
 

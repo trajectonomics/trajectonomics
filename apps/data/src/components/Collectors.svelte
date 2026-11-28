@@ -5,6 +5,7 @@ import { CollectorsState } from "../client/collectors.svelte"
 import { collectorsGeometry, exactMinute } from "../lib/collectors"
 import { SIGN_IN_PATH, SIGN_OUT_PATH } from "../lib/site"
 import CollectorsChart from "./CollectorsChart.svelte"
+import MeterList from "./MeterList.svelte"
 
 const state = new CollectorsState()
 
@@ -45,44 +46,48 @@ const geometry = $derived(
 			type="button"
 			onclick={() => void state.load(window.location.search)}>Retry</button
 		>
-	{:else if state.collectors.length === 0}
+	{:else if state.collectors.length === 0 && state.meters.length === 0}
 		<p class="collectors-empty">
 			No collector has sent from this account yet. Run the collector's <code>login</code> on
 			each machine.
 		</p>
 		{@render signOut()}
-	{:else if geometry !== null}
-		<CollectorsChart {geometry} />
+	{:else}
+		{#if geometry !== null}
+			<CollectorsChart {geometry} />
 
-		<details class="collectors-details">
-			<summary>Details</summary>
-			<div class="table-frame">
-				<div class="table-scroll">
-					<table class="usage-table collectors-table">
-						<thead>
-							<tr>
-								<th scope="col">Machine</th>
-								<th scope="col">First day</th>
-								<th scope="col">Last day</th>
-								<th scope="col" class="number">Rows</th>
-								<th scope="col">Last send</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each state.collectors as collector (collector.machine)}
+			<details class="collectors-details">
+				<summary>Details</summary>
+				<div class="table-frame">
+					<div class="table-scroll">
+						<table class="usage-table collectors-table">
+							<thead>
 								<tr>
-									<th scope="row">{collector.machine}</th>
-									<td>{collector.firstDay}</td>
-									<td>{collector.lastDay}</td>
-									<td class="number">{collector.rows.toLocaleString("en-US")}</td>
-									<td>{exactMinute(collector.lastSendAt)}</td>
+									<th scope="col">Machine</th>
+									<th scope="col">First day</th>
+									<th scope="col">Last day</th>
+									<th scope="col" class="number">Rows</th>
+									<th scope="col">Last send</th>
 								</tr>
-							{/each}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{#each state.collectors as collector (collector.machine)}
+									<tr>
+										<th scope="row">{collector.machine}</th>
+										<td>{collector.firstDay}</td>
+										<td>{collector.lastDay}</td>
+										<td class="number">{collector.rows.toLocaleString("en-US")}</td>
+										<td>{exactMinute(collector.lastSendAt)}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				</div>
-			</div>
-		</details>
+			</details>
+		{/if}
+
+		<MeterList meters={state.meters} nowMs={state.nowMs} />
 
 		{@render signOut()}
 	{/if}

@@ -39,9 +39,10 @@ redirects its pages (ADR 0006).
 
 1. `traj-data` never holds an email or a name. It holds contributor ids, plan and model ids, UTC
    buckets, numbers, and the auth user id on `contributor`.
-2. The public API serves aggregates, never a stored row: `rollup_daily` for the usage read, and
-   `usage_hourly` summed per plan and bucket for the peaks (ADR 0007). No response carries a
-   machine, a contributor or an hourly bucket.
+2. The public API serves aggregates, never a stored row: `rollup_daily` for the usage read,
+   `usage_hourly` summed per plan and bucket for the peaks (ADR 0007), and `usage_hourly` summed per
+   plan and UTC hour for at most 7 days for the Log's hourly read (ADR 0016). No response carries a
+   machine, a contributor, or a model per hour.
 3. `/data/ingest` (and the old host's `/ingest`) accepts only auth's access tokens (ADR 0015):
    EdDSA, the exact `AUTH_ISSUER`, the `https://trajectonomics.com/data` audience and the
    `data:ingest` scope. The contributor comes from the token's `sub` through
@@ -72,3 +73,5 @@ redirects its pages (ADR 0006).
 - The device-login polling counts against auth's `/api/auth/oauth2/token` rate limit (20 requests
   per 60 s per IP). Signing several hosts in behind one IP and then sending at once can get HTTP 429
   on the first token refresh; it clears within a minute.
+- A quota sampler that skips (expired sign-in) exits 0 and only logs; the Usage meters panel on
+  `/data/me` is where a stopped meter shows.

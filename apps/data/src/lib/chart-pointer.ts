@@ -4,13 +4,13 @@ import { compactCount } from "./format"
 const PLOT_LEFT = 64
 const PLOT_RIGHT = 16
 
-/** One line the day readout can name. */
+/** One line the bucket readout can name. */
 export type ReadoutLine = {
 	name: string
-	points: readonly { day: string; tokens: number }[]
+	points: readonly { label: string; tokens: number }[]
 }
 
-/** The day index under an x in the chart's coordinates, clamped to the series. */
+/** The bucket index under an x in the chart's coordinates, clamped to the series. */
 export function dayAt(x: number, dayCount: number): number {
 	if (dayCount <= 1) return 0
 	const span = CHART_WIDTH - PLOT_LEFT - PLOT_RIGHT
@@ -20,7 +20,7 @@ export function dayAt(x: number, dayCount: number): number {
 	return index
 }
 
-/** The day an arrow key moves to, or null when the key does not move the probe. */
+/** The bucket an arrow key moves to, or null when the key does not move the probe. */
 export function keyDay(key: string, current: number | null, dayCount: number): number | null {
 	if (dayCount <= 0) return null
 	const last = dayCount - 1
@@ -31,13 +31,13 @@ export function keyDay(key: string, current: number | null, dayCount: number): n
 	return null
 }
 
-/** The day under the probe, with each plan's compact total. Null when the index is outside. */
+/** The bucket under the probe, with each plan's compact total. Null when the index is outside. */
 export function chartReadout(lines: readonly ReadoutLine[], dayIndex: number): string | null {
-	const day = lines[0]?.points[dayIndex]
-	if (day === undefined) return null
+	const bucket = lines[0]?.points[dayIndex]
+	if (bucket === undefined) return null
 	const parts = lines.map((line) => {
 		const tokens = line.points[dayIndex]?.tokens ?? 0
 		return `${line.name} ${compactCount(tokens)}`
 	})
-	return `${day.day}: ${parts.join(" · ")}`
+	return `${bucket.label}: ${parts.join(" · ")}`
 }

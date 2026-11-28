@@ -4,6 +4,8 @@
 
 Proposed, 2026-11-28. Extends ADR 0004 (the auth service) and ADR 0009 (cache reads kept apart).
 
+Amended by [ADR 0016](0016-the-log-serves-hourly-sums-for-short-windows.md), 2026-11-28: the public API also serves the org's hourly sums per plan for at most 7 days, for the Log's hour view.
+
 ## Context
 
 `trajectonomics.com/data` is a pilot with one contributor, the trajectonomics organisation, on a

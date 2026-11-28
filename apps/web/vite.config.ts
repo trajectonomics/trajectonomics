@@ -4,6 +4,7 @@ import adapter from "@sveltejs/adapter-static"
 import { sveltekit } from "@sveltejs/kit/vite"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig, type Plugin } from "vite"
+import { faviconSet } from "./scripts/favicon-set.js"
 import hostedConfig from "./src/hosted/overrides.json" with { type: "json" }
 
 // Static output: the root layout prerenders one shell per route into dist/, served on loopback.
@@ -50,6 +51,8 @@ function hostedTwins(): Plugin {
 
 export default defineConfig({
 	plugins: [
+		// First: the Favicon Set is in public/ before SvelteKit reads its assets folder, in both builds.
+		faviconSet(),
 		tailwindcss(),
 		...(hosted ? [hostedTwins()] : []),
 		sveltekit({

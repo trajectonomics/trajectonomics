@@ -51,6 +51,13 @@ identity is machine, plan, model, bucket and source, so replaying it is an upser
 One observation of a plan window's meter: the percentage used and the reset time, at a UTC hour.
 Claude, OpenCode Go, Antigravity, Cursor and Meta (Muse) are the plans with a readable meter.
 
+## Usage meter freshness
+
+Whether the sampler read a metered plan's quota lately, as the signed-in page shows it: `fresh`
+under three hours, `stale` at three hours or more, and `missing` when the plan was used in the last
+seven days but its meter was never read. A meter goes stale when the tool's sign-in on the
+collecting machine expires, because the sampler then skips that plan and only logs it.
+
 ## Limit estimate
 
 The tokens a plan window would hold at 100%, estimated from its own usage meter: the tokens we used
@@ -91,7 +98,8 @@ and Antigravity have one; every other plan shows its measured 30-day peak.
 ## Rollup
 
 One UTC day's totals for one plan and model, summed from that day's Usage Rows and stored in
-`rollup_daily`. The public API serves rollups only, never hourly rows.
+`rollup_daily`. The public API serves a rollup or a sum, never a stored row: daily rollups for the
+usage read, summed hours for the peaks and the Log's hour view (ADR 0016).
 
 ## Series
 
@@ -109,6 +117,18 @@ peaks window longer than the collected span shows its days so far instead of a f
 
 A `YYYY-MM-DD` cap on a read: the answer uses data up to and including that day. It is a
 query-time view, not a frozen snapshot (ADR 0003).
+
+## Period
+
+The Log's window ending on the day in view: `1d`, `3d`, `7d`, `wtd` (Monday of that week to the
+day), `mtd` (the 1st of that month to the day), `30d` or `90d`. It travels in the address as
+`period`; `30d` is the default and is left out.
+
+## Bucket
+
+How the Log groups a period's tokens: by UTC hour, day or week, with weeks starting on Monday. It
+travels as `by`; a period offers only the buckets it can fill, and its default depends on the
+period: `hour` for 1D and 3D, `week` for 3M, `day` otherwise (ADR 0016).
 
 ## Plan Table
 

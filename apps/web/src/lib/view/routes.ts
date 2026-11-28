@@ -117,6 +117,7 @@ export function navPath(path: string): string {
 /** The titles of pages that are in no navigation group, by path. */
 const OTHER_TITLES: Readonly<Record<string, string>> = {
 	"/plans/": "Plans",
+	"/plans/new/": "New plan",
 	"/income/": "Income",
 	"/expenses/": "Expenses",
 	"/assets-and-debts/": "Assets and debts",
@@ -124,9 +125,12 @@ const OTHER_TITLES: Readonly<Record<string, string>> = {
 	"/projection/years/": "Year by year",
 	"/household/": "Household",
 	"/routing/": "Where money goes",
+	"/chance/path/": "One future",
 }
 
 /** The heading of the page at a path: its navigation label, or the title of a page the navigation does not list. */
 export function pageTitle(path: string): string {
 	return OTHER_TITLES[path] ?? routeAt(navPath(path))?.label ?? "Dashboard"
 }
+
+export { documentTitle, errorTitle } from "./titles"

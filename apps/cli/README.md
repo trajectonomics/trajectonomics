@@ -283,8 +283,6 @@ the other Return's. A missing class is listed by name, and a bare label is refus
 
 ## Chance of success
 
-> **Ships in 0.8.0.**
-
 `traj projection chance` runs one Scenario over seeded Market paths and reports
 the share that never run out before the Horizon, with the net-worth Bands at each
 year. The paths draw from a Return model you state in a JSON file, with
@@ -320,8 +318,6 @@ Dashboard, as a page of its own: it uses `plan` unless you name a
 
 ## Tax allowances
 
-> **Ships in 0.8.0.**
-
 `traj projection allowances` reads a Scenario that has a tax Levy and says, for each
 whole tax year the Projection holds, how much more of each contribution label (RMF, ThaiESG
 and the others the Levy reads) would still lower the tax, and by how much. You name the
@@ -338,8 +334,6 @@ describes the result.
 
 ## Money as decimals in a Scenario
 
-> **Ships in 0.8.0.**
-
 `traj scenario show base --decimal` prints a Scenario with each amount as a decimal string of the
 Currency's major unit, such as `"1000.00"` for 100000 satang, and
 `traj scenario apply base --file base.json --decimal` reads that form back. The stored plan is the
@@ -347,8 +341,6 @@ same either way: saving what `show --decimal` printed leaves it unchanged. A val
 than the Currency has is refused, never rounded.
 
 ## A what-if, applied to the plan it came from
-
-> **Ships in 0.8.0.**
 
 `traj projection run --set` projects a change without saving it. `traj scenario apply` saves the same
 change to the stored plan, so the plan you keep is the one you projected. It takes the `--set`,
@@ -365,8 +357,6 @@ exits 0. `--if-hash <contentHash>` writes only when the stored plan still has th
 `--without` never take a document, so the what-if cannot replace a plan you did not read.
 
 ### Adding an item to a what-if
-
-> **Ships in 0.8.0.**
 
 `--add <list>=<json>` puts one new item on the end of `accounts`, `flows` or `milestones`, so a new
 loan, an extra payment or a new Flow can be tried before it is saved. The item carries its own `id`,
@@ -392,8 +382,6 @@ item's money is a decimal string of the Currency's major unit. Nothing is writte
 
 ## Naming plans, keeping notes on them, and marking the main one
 
-> **Ships in 0.8.0.**
-
 A person who compares "retire at 55" with "retire at 60 and buy a condo" ends up with several plans.
 `traj scenario rename early retire-at-55` gives a plan a better name and keeps its id, document and
 `contentHash`. `traj scenario notes retire-at-55 --text "Sell the condo in 2031."` keeps plain text
@@ -407,8 +395,6 @@ still need `--scenario`. `scenario rm` of the main plan is refused until another
 (`scenario main --clear` takes the mark off), or removed anyway with `--force`.
 
 ## Milestones: points in the plan that a Flow waits for
-
-> **Ships in 0.8.0.**
 
 A Scenario may name points in the plan a Flow can wait for: a date, a number of months after another
 point, a net-worth or spending figure, or a multiple of spending. They are the `milestones` of the
@@ -432,8 +418,6 @@ each side.
 
 ## Naming a Flow, a Milestone or a person
 
-> **Ships in 0.8.0.**
-
 Every Flow, every Milestone and every person of a household may carry a `displayLabel`: the words a
 page reads in place of the id, such as Thai text. It is free text of 1 to 80 code points, with no
 control, invisible or bidirectional characters and no leading or trailing whitespace. It is no key
@@ -456,8 +440,6 @@ document without it (`--file`), or empty the Name field in the Dashboard: `--set
 cannot remove a key, so `null` and `""` are refused.
 
 ## Where each year's money went
-
-> **Ships in 0.8.0.**
 
 `traj projection run --breakdown` adds each Annual roll-up's cash flow as the engine routed it: each
 Flow's income, the tax taken at source and each Levy's settlement (a refund is negative), each expense
@@ -494,8 +476,6 @@ Contributions the cash could not fund; it is not in saving.
 
 ## Where the money goes, and moving it between Accounts
 
-> **Ships in 0.8.0.**
-
 `cashflow` takes three more forms, every figure in them the caller's own (`traj` ships none): a surplus step's `share`, which takes that
 many basis points of what is still unrouted instead of everything (a percent string such as `"30.00"` under `--decimal`); a `withdraw` entry that is `{ account, downTo }`, which keeps a Reserve floor
 in the Account while the others are drawn; and an `upTo` or `downTo` that is `{ amount, growth }`, which keeps its value in today's money. A
@@ -510,8 +490,6 @@ and with `--breakdown` the `entry` each drawn line came from and a `transfers` t
 and is not stated yet. A plan without these forms prints exactly as before.
 
 ## Loans
-
-> **Ships in 0.8.0.**
 
 A loan is three parts of a Scenario document: a liability Account with a nominal `rate` and a `compounding`
 period, a `withdrawal` Flow from that liability when the money arrives, and a Contribution into the
@@ -535,8 +513,6 @@ The figures are the engine's: `interest` is the residual of the month, so `openi
 equals `closing` exactly. Without `--liabilities` the output is unchanged.
 
 ### What a fee and a payout came to over the plan
-
-> **Ships in 0.8.0.**
 
 An asset Account can pay out a share of its value as income (`payout`) and be charged a yearly `fee`.
 `traj projection run` states each one's total over the whole horizon, so nothing needs adding up: the
@@ -592,8 +568,6 @@ traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 ```
 
 ### Going back after an upgrade
-
-> **Ships in 0.8.0.**
 
 When a newer `traj` has to migrate your database to a newer schema, it first copies it beside the
 original as `traj.db.pre-v<N>.bak`, where `N` is the schema version the copy holds, and says so once

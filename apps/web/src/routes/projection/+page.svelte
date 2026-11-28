@@ -6,10 +6,6 @@ import ProjectionPage from "../../components/pages/ProjectionPage.svelte"
 import { editsShown } from "../../lib/edit/shown"
 </script>
 
-<svelte:head>
-	<title>Plan · Dashboard</title>
-</svelte:head>
-
 <ProjectionPage
 	scenario={queryParam("scenario", "")}
 	editable={editsShown(editSession.token, page.url.search)}

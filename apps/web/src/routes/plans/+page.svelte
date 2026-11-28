@@ -6,10 +6,6 @@ import PlansPage from "../../components/pages/PlansPage.svelte"
 import { editsShown } from "../../lib/edit/shown"
 </script>
 
-<svelte:head>
-	<title>Plans · Dashboard</title>
-</svelte:head>
-
 <PlansPage
 	range={queryParam("range", "all")}
 	onRange={(id) => setQueryParam("range", id)}

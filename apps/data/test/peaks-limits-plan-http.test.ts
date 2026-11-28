@@ -53,6 +53,80 @@ describe("GET /api/peaks limits by plan", () => {
 		expect(body.plans[0]?.limits?.thirtyDays?.derived).toBeUndefined()
 	})
 
+	test("keeps the readings of a plan with no tier catalogue", async () => {
+		const context = harness()
+		await seed(
+			context,
+			[
+				withTotal(600_000, {
+					plan: "meta",
+					model: "muse-ember-1.0",
+					source: "t3-muse",
+					hourUtc: "2026-11-24T08:00:00.000Z",
+				}),
+				withTotal(300_000, {
+					plan: "meta",
+					model: "muse-ember-1.0",
+					source: "t3-muse",
+					hourUtc: "2026-11-24T09:00:00.000Z",
+				}),
+			],
+			[
+				quotaSample({
+					plan: "meta",
+					window: "five_hour",
+					sampledAt: "2026-11-24T08:00:00.000Z",
+					usedPct: 2,
+					resetsAt: "2026-11-24T13:00:00.000Z",
+				}),
+				quotaSample({
+					plan: "meta",
+					window: "five_hour",
+					sampledAt: "2026-11-24T10:00:00.000Z",
+					usedPct: 8,
+					resetsAt: "2026-11-24T13:00:00.000Z",
+				}),
+				quotaSample({
+					plan: "meta",
+					window: "weekly",
+					sampledAt: "2026-11-24T08:00:00.000Z",
+					usedPct: 37,
+					resetsAt: "2026-11-29T00:00:00.000Z",
+				}),
+				quotaSample({
+					plan: "meta",
+					window: "weekly",
+					sampledAt: "2026-11-24T10:00:00.000Z",
+					usedPct: 39,
+					resetsAt: "2026-11-29T00:00:00.000Z",
+				}),
+			],
+		)
+		const body = (await (await read(context, "/api/peaks")).json()) as PeaksBody
+		expect(body.plans[0]?.plan).toBe("meta")
+		expect(body.plans[0]?.tier).toBeNull()
+		expect(body.plans[0]?.limits?.fiveHours).toEqual({
+			tokens: 15_000_000,
+			low: 12_857_143,
+			high: 18_000_000,
+			processed: { value: 15_000_000, low: 12_857_143, high: 18_000_000 },
+			usd: null,
+			points: 6,
+			readings: 2,
+			rough: true,
+		})
+		expect(body.plans[0]?.limits?.sevenDays).toEqual({
+			tokens: 45_000_000,
+			low: 30_000_000,
+			high: 90_000_000,
+			processed: { value: 45_000_000, low: 30_000_000, high: 90_000_000 },
+			usd: null,
+			points: 2,
+			readings: 2,
+			rough: true,
+		})
+	})
+
 	test("ignores a community contributor's meter readings", async () => {
 		const context = harness()
 		await seed(

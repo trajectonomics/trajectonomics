@@ -93,7 +93,10 @@ describe("a skills lock", () => {
 })
 
 describe("the hash of an installed Skill folder", () => {
-	const sandbox = mkdtempSync(join(homedir(), ".cache", "skill-folder-hash-"))
+	// A fresh CI runner has no ~/.cache yet, and mkdtemp makes only the last path segment.
+	const cache = join(homedir(), ".cache")
+	mkdirSync(cache, { recursive: true })
+	const sandbox = mkdtempSync(join(cache, "skill-folder-hash-"))
 
 	afterAll(() => rmSync(sandbox, { recursive: true, force: true }))
 

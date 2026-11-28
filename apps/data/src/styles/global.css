@@ -27,6 +27,7 @@
 @import "./log.css";
 @import "./collectors.css";
 @import "./collectors-chart.css";
+@import "./meters-panel.css";
 @import "./plan-mark.css";
 @import "./summary.css";
 @import "./meter.css";
@@ -56,14 +57,6 @@
 
 [data-theme="dark"] {
 	color-scheme: dark;
-}
-
-/* The display face of headlines and the mono face of every meta label, as the Site draws them. */
-:root {
-	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
-	--font-meta:
-		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
-	--font-mono: var(--font-meta);
 }
 
 .data-body {

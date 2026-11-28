@@ -127,7 +127,7 @@ A published Semantic Token Role a landmark paints behind its content, and the te
 _Avoid_: Background colour, band
 
 **Mascot**:
-The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is eleven poses, each a Gemini render cut out of a green screen into a transparent WebP. It peeks over the hero's live window. It holds a chart beside the Features heading, and each of the four small Features cards has its own pose that acts out the feature, each in a different place ([ADR 0028](docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md), [ADR 0029](docs/adr/0029-each-small-feature-card-puts-its-robot-somewhere-else.md)). It thinks beside the FAQ heading, waves above the closing call to action, sits in the footer, and is lost on the Not-found page. The home places it so a phone always has one on screen ([ADR 0027](docs/adr/0027-a-phone-always-has-the-mascot-on-screen.md)). It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
+The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is eleven poses, each a Gemini render cut out of a green screen into a transparent WebP, and a twelfth, `point`, a transparent PNG that stands on the home share card pointing at its answer ([ADR 0036](docs/adr/0036-the-home-share-card-shows-the-answer.md)). It peeks over the hero's live window. It holds a chart beside the Features heading, and each of the four small Features cards has its own pose that acts out the feature, each in a different place ([ADR 0028](docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md), [ADR 0029](docs/adr/0029-each-small-feature-card-puts-its-robot-somewhere-else.md)). It thinks beside the FAQ heading, waves above the closing call to action, sits in the footer, and is lost on the Not-found page. The home places it so a phone always has one on screen ([ADR 0027](docs/adr/0027-a-phone-always-has-the-mascot-on-screen.md)). It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
 _Avoid_: Bot icon, logo, avatar
 
 **Star snapshot**:
@@ -183,11 +183,14 @@ The Open Graph and X meta a share sheet renders for a page: its title, descripti
 _Avoid_: Preview card, OG tags
 
 **Share image**:
-The 1200 × 630 PNG a page advertises as `og:image`: the page's value statement, the brand lockup and
-the host, painted in the shipped Theme's colours and written to `public/og/<name>.png` by
-`scripts/share-image.ts` before every build (`<language>.png` for a home, `openjot-<language>.png`
-for OpenJot). It is generated and never committed, and it is no page subresource, so no page budget
-counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.md)).
+The 1200 × 630 PNG a page advertises as `og:image`, painted in the shipped Theme's colours and
+written to `public/og/<name>.png` by `scripts/share-image.ts` before every build (`<language>.png`
+for a home, `openjot-<language>.png` for OpenJot). A home's card shows the answer as a picture: the
+Language's question above a net-worth line, grey while working and orange once free to stop, with the
+FI date written on the curve, and the Mascot standing at its right pointing back at it; OpenJot's card keeps the page's one-line summary. It is generated and
+never committed, and it is no page subresource, so no page budget counts it
+([ADR 0018](docs/adr/0018-the-share-image-is-generated-at-build-time.md),
+[ADR 0036](docs/adr/0036-the-home-share-card-shows-the-answer.md)).
 _Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:

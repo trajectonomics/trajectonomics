@@ -1,7 +1,8 @@
 import type { Dictionary } from "../language/dictionary"
 import type { Language } from "../language/language"
 import { openJotDictionaryFor } from "../language/openjot-dictionary"
-import { SITE_BRAND_NAME, SITE_ORIGIN } from "../site"
+import { FI_DEMO_DATE, SITE_BRAND_NAME, SITE_ORIGIN } from "../site"
+import { shortMonthYear } from "./share-date"
 
 /** The media type every share sheet reads a large card's image as. */
 export const SHARE_IMAGE_TYPE = "image/png"
@@ -26,9 +27,17 @@ export function absoluteOpenJotShareImageUrl(language: Language): string {
 	return `${SITE_ORIGIN}/${openJotShareImagePath(language)}`
 }
 
-/** What the image shows, for a reader who cannot see it: the wordmark, and the value statement. */
+/**
+ * What the home card shows, for a reader who cannot see it: the question, and the picture's answer.
+ * The `free` label is capitalised on the picture and sits mid-sentence here, so it is lowercased;
+ * Thai has no case, so its own label passes through unchanged.
+ */
 export function shareImageAlt(dictionary: Dictionary): string {
-	return `${SITE_BRAND_NAME} — ${dictionary.description}`
+	const date = shortMonthYear(FI_DEMO_DATE, dictionary.shareMonths)
+	const picture = dictionary.shareChartAlt
+		.replaceAll("{date}", date)
+		.replaceAll("{free}", dictionary.shareFreeLabel.toLowerCase())
+	return `${SITE_BRAND_NAME} — ${dictionary.actionQuestion} ${picture}`
 }
 
 /** What the OpenJot card shows: the app's name, and its one-line summary. */

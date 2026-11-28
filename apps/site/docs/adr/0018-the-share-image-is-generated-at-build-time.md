@@ -4,6 +4,11 @@ status: accepted
 
 # The share image is generated at build time
 
+> **Superseded in part on 2026-11-28.** The home card now draws the answer as a picture instead of
+> the value statement ([ADR 0036](./0036-the-home-share-card-shows-the-answer.md)). The OpenJot card,
+> and everything below about generation, colours, type and the head, stay in force, except the home
+> card's alt text.
+
 ## Context
 
 A link to the Site unfurled as a bare title and a sentence in Slack, X, LinkedIn and iMessage, and in

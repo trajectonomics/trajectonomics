@@ -1,11 +1,19 @@
 import { describe, expect, it } from "bun:test"
+import type { Dictionary } from "../language/dictionary"
 import { dictionaryFor } from "../language/languages"
-import { SITE_BRAND_NAME } from "../site"
-import { LOCKUP_HEIGHT, SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "./layout"
+import { QUESTION_BASELINE, QUESTION_SIZE } from "./chart-layout"
+import {
+	LOCKUP_HEIGHT,
+	MARGIN,
+	META_BASELINE,
+	META_SIZE,
+	SHARE_IMAGE_HEIGHT,
+	SHARE_IMAGE_WIDTH,
+} from "./layout"
 import type { ShareLockup } from "./lockup"
-import { absoluteShareImageUrl, shareImageAlt, shareImagePath } from "./share-advert"
 import type { ShareColours } from "./share-colours"
 import { type ShareImage, type ShareImageInput, shareImage } from "./share-image"
+import { drawableThai, escapeXml } from "./statement"
 
 const COLOURS: ShareColours = Object.freeze({
 	background: "#0a0a0a",
@@ -20,6 +28,13 @@ const LOCKUP: ShareLockup = Object.freeze({
 	markup: '<path fill="currentColor" d="M0 0Z"/>',
 })
 
+/** A one-pixel PNG: the home card's composition only places the mascot, it never decodes it. */
+const MASCOT = Object.freeze({
+	width: 1,
+	height: 1,
+	href: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+})
+
 /** One Language's image, composed from the Theme's colours and the shipped lockup. */
 function imageOf(language: string): ShareImage {
 	const input: ShareImageInput = {
@@ -27,20 +42,12 @@ function imageOf(language: string): ShareImage {
 		dictionary: dictionaryFor(language),
 		colours: COLOURS,
 		lockup: LOCKUP,
+		mascot: MASCOT,
 	}
 	return shareImage(input)
 }
 
-describe("one Language's share image", () => {
-	it("is written to that Language's own file", () => {
-		expect(shareImagePath("en")).toBe("og/en.png")
-		expect(shareImagePath("th")).toBe("og/th.png")
-	})
-
-	it("is advertised on the Site's own origin, in the form a crawler fetches", () => {
-		expect(absoluteShareImageUrl("th")).toBe("https://trajectonomics.com/og/th.png")
-	})
-
+describe("one Language's home share image", () => {
 	it("is cut at the size every share sheet reads a large card at", () => {
 		const image = imageOf("en")
 		expect(image.width).toBe(SHARE_IMAGE_WIDTH)
@@ -49,17 +56,19 @@ describe("one Language's share image", () => {
 	})
 
 	it("paints the Theme's own background, ink, muted meta and accent, and no other colour", () => {
-		const { svg } = imageOf("en")
-		const painted = svg.match(/#[0-9a-f]{6}/gi)
+		const painted = imageOf("en").svg.match(/#[0-9a-f]{6}/gi)
 		expect(new Set(painted)).toEqual(new Set(Object.values(COLOURS)))
 	})
 
-	it("carries the Language's own value statement, each line in the face its script asks for", () => {
-		const english = imageOf("en").svg
-		expect(english).toContain('font-family="Aleo"')
-		const thai = imageOf("th").svg
-		expect(thai).toContain("ไม่มีแดชบอร์ด")
-		expect(thai).toContain('font-family="Noto Sans Thai"')
+	it("asks the Language's own question, at the headline's size and in its script's face", () => {
+		const english = dictionaryFor("en")
+		expect(imageOf("en").svg).toContain(
+			`<text x="${MARGIN}" y="${QUESTION_BASELINE}" font-family="Aleo" font-size="${QUESTION_SIZE}" fill="${COLOURS.foreground}">${escapeXml(english.actionQuestion)}</text>`,
+		)
+		const thai = dictionaryFor("th")
+		expect(imageOf("th").svg).toContain(
+			`<text x="${MARGIN}" y="${QUESTION_BASELINE}" font-family="Noto Sans Thai" font-size="${QUESTION_SIZE}" fill="${COLOURS.foreground}">${escapeXml(drawableThai(thai.actionQuestion))}</text>`,
+		)
 	})
 
 	it("draws the brand lockup, scaled to the height the image allows", () => {
@@ -69,30 +78,51 @@ describe("one Language's share image", () => {
 		expect(svg).toContain('color="#fafafa"')
 	})
 
-	it("names the host under the statement and the Language in the corner", () => {
-		const english = imageOf("en").svg
-		expect(english).toContain(">trajectonomics.com<")
-		expect(english).toContain(`>${dictionaryFor("en").languageName}<`)
-		expect(imageOf("th").svg).toContain(`>${dictionaryFor("th").languageName}<`)
+	it("names the host in the corner, and no longer the Language", () => {
+		expect(imageOf("en").svg).toContain(
+			`<text x="${SHARE_IMAGE_WIDTH - MARGIN}" y="${META_BASELINE}" text-anchor="end" font-family="Azeret Mono" font-size="${META_SIZE}" fill="${COLOURS.mutedForeground}">trajectonomics.com</text>`,
+		)
+		for (const language of ["en", "th"]) {
+			expect(imageOf(language).svg).not.toContain(`>${dictionaryFor(language).languageName}<`)
+		}
 	})
 
-	it("reads the same lockup and the same size in both Languages, and different words", () => {
-		const english = imageOf("en").svg
-		const thai = imageOf("th").svg
-		expect(english).not.toBe(thai)
-		expect(english).toContain(LOCKUP.markup)
-		expect(thai).toContain(LOCKUP.markup)
+	it("keeps every coordinate inside the 72-pixel margin box", () => {
+		const { svg } = imageOf("en")
+		for (const [, value] of svg.matchAll(/\b(?:x|cx|x1|x2)="(-?[\d.]+)"/g)) {
+			expect(Number(value)).toBeGreaterThanOrEqual(MARGIN)
+			expect(Number(value)).toBeLessThanOrEqual(SHARE_IMAGE_WIDTH - MARGIN)
+		}
+		for (const [, value] of svg.matchAll(/\b(?:y|cy|y1|y2)="(-?[\d.]+)"/g)) {
+			expect(Number(value)).toBeGreaterThanOrEqual(MARGIN)
+			expect(Number(value)).toBeLessThanOrEqual(SHARE_IMAGE_HEIGHT - MARGIN)
+		}
+		for (const [, data] of svg.matchAll(/<path d="([^"]*)"[^>]*(?:fill="none"|fill-opacity=)/g)) {
+			const points = (data ?? "").replace(/[MLZ]/g, " ").trim().split(/\s+/).map(Number)
+			for (let index = 0; index + 1 < points.length; index += 2) {
+				expect(points[index]).toBeGreaterThanOrEqual(MARGIN)
+				expect(points[index]).toBeLessThanOrEqual(SHARE_IMAGE_WIDTH - MARGIN)
+				expect(points[index + 1]).toBeGreaterThanOrEqual(MARGIN)
+				expect(points[index + 1]).toBeLessThanOrEqual(SHARE_IMAGE_HEIGHT - MARGIN)
+			}
+		}
 	})
-})
 
-describe("what the share image shows, for a reader who cannot see it", () => {
-	it("names the wordmark and the Language's value statement", () => {
-		const dictionary = dictionaryFor("en")
-		expect(shareImageAlt(dictionary)).toBe(`${SITE_BRAND_NAME} — ${dictionary.description}`)
-	})
-
-	it("speaks each Language's own words", () => {
-		expect(shareImageAlt(dictionaryFor("th"))).toContain(dictionaryFor("th").description)
-		expect(shareImageAlt(dictionaryFor("th"))).not.toBe(shareImageAlt(dictionaryFor("en")))
+	it("escapes every character XML reserves in the question and the label", () => {
+		const unsafe: Dictionary = {
+			...dictionaryFor("en"),
+			actionQuestion: "a & b < c > d \" e ' f",
+			shareFreeLabel: "<free>",
+		}
+		const svg = shareImage({
+			language: "en",
+			dictionary: unsafe,
+			colours: COLOURS,
+			lockup: LOCKUP,
+			mascot: MASCOT,
+		}).svg
+		expect(svg).toContain("a &amp; b &lt; c &gt; d &quot; e &apos; f")
+		expect(svg).toContain("&lt;free&gt;")
+		expect(svg).not.toContain("<free>")
 	})
 })

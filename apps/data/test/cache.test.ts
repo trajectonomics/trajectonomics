@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import {
 	healthCacheKey,
+	hourlyCacheKey,
+	hourlyStaleCacheKey,
 	peaksCacheKey,
 	peaksStaleCacheKey,
 	usageCacheKey,
@@ -35,6 +37,31 @@ describe("usageCacheKey", () => {
 	test("names one resource from either host", () => {
 		const apex = usageCacheKey(get("/api/usage?from=2026-11-24&plan=claude"))
 		const old = usageCacheKey(legacy("/api/usage?plan=claude&from=2026-11-24"))
+		expect(old.url).toBe(apex.url)
+	})
+})
+
+describe("hourlyCacheKey", () => {
+	test("keeps asOf, from and to in a fixed order and drops the rest", () => {
+		const key = hourlyCacheKey(
+			get("/api/usage/hourly?to=2026-11-24&from=2026-11-20&foo=bar&asOf=2026-11-21&by=hour"),
+		)
+		expect(key.url).toBe(
+			"https://trajectonomics.com/data/api/usage/hourly?asOf=2026-11-21&from=2026-11-20&to=2026-11-24",
+		)
+	})
+
+	test("gives the stale copy its own key", () => {
+		const request = get("/api/usage/hourly?from=2026-11-24")
+		expect(hourlyStaleCacheKey(request).url).toBe(
+			"https://trajectonomics.com/data/api/usage/hourly?from=2026-11-24&__stale=1",
+		)
+		expect(hourlyStaleCacheKey(request).url).not.toBe(hourlyCacheKey(request).url)
+	})
+
+	test("names one resource from either host", () => {
+		const apex = hourlyCacheKey(get("/api/usage/hourly?from=2026-11-24&to=2026-11-25"))
+		const old = hourlyCacheKey(legacy("/api/usage/hourly?to=2026-11-25&from=2026-11-24"))
 		expect(old.url).toBe(apex.url)
 	})
 })

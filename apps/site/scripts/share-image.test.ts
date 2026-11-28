@@ -5,6 +5,7 @@ import { join } from "node:path"
 import type { RenderedImage } from "@resvg/resvg-js"
 import { pngPixels } from "../src/lib/build/image-pixels"
 import { dictionaryFor, LANGUAGES } from "../src/lib/language/languages"
+import { CURVE_WIDTH } from "../src/lib/social/chart-layout"
 import {
 	MARGIN,
 	META_BASELINE,
@@ -16,6 +17,7 @@ import { SHARE_IMAGE_MAX_BYTES, shareImage } from "../src/lib/social/share-image
 import { readDesignTokens } from "./adapters/design-tokens"
 import { shareImageFonts } from "./adapters/share-fonts"
 import { readShareLockup } from "./adapters/share-lockup"
+import { readShareMascot } from "./adapters/share-mascot"
 import { renderShareImage, renderShareImagePixels, writeShareImages } from "./share-image"
 
 /** The card every share image must be cut at, which the checks hold it to. */
@@ -31,6 +33,7 @@ async function composedImage(language: string = LANGUAGE) {
 		dictionary: dictionaryFor(language),
 		colours: shareColours(await readDesignTokens()),
 		lockup: await readShareLockup(),
+		mascot: await readShareMascot(),
 	})
 }
 
@@ -69,19 +72,21 @@ describe("the PNG a share image rasterizes to", () => {
 		expect(png.length).toBeLessThan(SHARE_IMAGE_MAX_BYTES)
 	})
 
-	it("draws the statement and the meta in the Site's own faces, not only in the Thai fallback", async () => {
+	it("draws the question and the meta in the Site's own faces, not only in the Thai fallback", async () => {
 		const image = await composedImage("en")
 		const fonts = await shareImageFonts()
 		const thai = fonts.filter((path) => path.endsWith("NotoSansThai.ttf"))
 		expect(renderShareImage(image, fonts)).not.toEqual(renderShareImage(image, thai))
 	})
 
-	it("keeps every pixel of the statement inside the image's margins", async () => {
+	it("keeps every stroke and glyph inside the image's margins", async () => {
 		const rendered = renderShareImagePixels(await composedImage(), await shareImageFonts())
 		const ink = inkExtent(rendered)
 		expect(ink).toBeDefined()
-		expect(ink?.left).toBeGreaterThanOrEqual(MARGIN)
-		expect(ink?.right).toBeLessThanOrEqual(SHARE_IMAGE_WIDTH - MARGIN)
+		// A round cap is a semicircle around the path's end, so the curve reaches half its width past
+		// the margin the coordinates sit on. No glyph or fill goes further than that.
+		expect(ink?.left).toBeGreaterThanOrEqual(MARGIN - CURVE_WIDTH / 2)
+		expect(ink?.right).toBeLessThanOrEqual(SHARE_IMAGE_WIDTH - MARGIN + CURVE_WIDTH / 2)
 	})
 
 	it("prints the same bytes twice, so a rebuild does not touch the file", async () => {
@@ -100,6 +105,17 @@ describe("the PNG a share image rasterizes to", () => {
 	})
 })
 
+describe("the mascot the home card draws", () => {
+	it("is a committed PNG under its own ceiling, whose data URI states its own pixel size", async () => {
+		const mascot = await readShareMascot()
+		const prefix = "data:image/png;base64,"
+		expect(mascot.href.startsWith(prefix)).toBe(true)
+		const bytes = Buffer.from(mascot.href.slice(prefix.length), "base64")
+		expect(bytes.length).toBeLessThan(45 * 1024)
+		expect(pngPixels(bytes)).toEqual({ width: mascot.width, height: mascot.height })
+	})
+})
+
 describe("the share images the prebuild step writes", () => {
 	it("writes one PNG per page and Language, at the card's size, into the static directory", async () => {
 		const destination = await mkdtemp(join(tmpdir(), "share-image-"))
@@ -111,6 +127,7 @@ describe("the share images the prebuild step writes", () => {
 			for (const name of files) {
 				const png = await Bun.file(join(destination, name)).bytes()
 				expect(pngPixels(png)).toEqual(CARD)
+				expect(png.length).toBeLessThan(SHARE_IMAGE_MAX_BYTES)
 			}
 		} finally {
 			await rm(destination, { recursive: true, force: true })

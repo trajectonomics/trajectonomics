@@ -4,6 +4,14 @@
  * Worker serves them under /fonts/. Thai falls through to the system Thai face.
  */
 
+/* The display face of headlines and the mono face of every meta label, as the Site draws them. */
+:root {
+	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
+	--font-meta:
+		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
+	--font-mono: var(--font-meta);
+}
+
 @font-face {
 	font-family: "Aleo";
 	font-style: normal;

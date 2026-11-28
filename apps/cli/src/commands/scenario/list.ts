@@ -8,7 +8,6 @@ import { withStore } from "../../with-store"
 export const list: Leaf = defineCommand({
 	name: "list",
 	summary: "List the live Scenarios by name",
-	note: "The taxed flag ships in 0.8.0, and so do hasNotes and main.",
 	positionals: [],
 	input: z.strictObject({}),
 	output: z.strictObject({

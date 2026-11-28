@@ -1,0 +1,93 @@
+/* The Usage meters panel: one row per metered plan, and a phrase carries each row's state. */
+
+.meters-panel {
+	margin-top: 40px;
+}
+
+.meters-title {
+	margin: 0;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--ds-color-border);
+	font-family: var(--font-display);
+	font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+	font-weight: 300;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+
+.meters-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.meters-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 12px;
+	padding: 10px 0;
+	border-bottom: 1px solid var(--ds-color-border);
+	font-size: 14px;
+	line-height: 1.4;
+}
+
+.meters-plan {
+	display: flex;
+	min-width: 0;
+	flex: 1 1 10rem;
+	align-items: center;
+	gap: 8px;
+}
+
+.meters-name {
+	min-width: 0;
+	overflow: hidden;
+	font-weight: 500;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
+}
+
+.meters-status {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-left: auto;
+	font-family: var(--font-meta);
+	font-size: 12px;
+	color: var(--ds-color-muted-foreground);
+	text-wrap: nowrap;
+}
+
+.meters-dot {
+	width: 8px;
+	height: 8px;
+	flex: none;
+	border-radius: 50%;
+	background: var(--ds-color-primary);
+}
+
+/* Fresh keeps the primary dot; the two stopped states repeat the words beside them. */
+.meters-dot-stale {
+	background: var(--ds-color-accent);
+}
+
+.meters-dot-missing {
+	background: var(--ds-color-destructive);
+}
+
+.meters-phrase-stale {
+	color: var(--ds-color-accent);
+}
+
+.meters-phrase-missing {
+	color: var(--ds-color-destructive);
+}
+
+.meters-hint {
+	max-width: 44rem;
+	margin: 12px 0 0;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--ds-color-muted-foreground);
+}

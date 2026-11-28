@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import {
+	isMuseNoUsage,
 	parseAntigravityQuota,
 	parseCursorQuota,
 	parseMuseQuota,
@@ -195,5 +196,14 @@ describe("parseMuseQuota", () => {
 		expect(
 			parseMuseQuota({ allowance: { window: { usedPercent: -1 }, weekly: null } }, SAMPLED_AT),
 		).toBeNull()
+	})
+})
+
+describe("isMuseNoUsage", () => {
+	test("matches only Muse's empty-window reason with a null allowance", () => {
+		expect(isMuseNoUsage({ allowance: null, reason: "server_sent_no_usage" })).toBe(true)
+		expect(isMuseNoUsage({ allowance: null, reason: "something_else" })).toBe(false)
+		expect(isMuseNoUsage({ allowance: {}, reason: "server_sent_no_usage" })).toBe(false)
+		expect(isMuseNoUsage(null)).toBe(false)
 	})
 })
