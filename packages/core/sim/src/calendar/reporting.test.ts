@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { reportingYearOf, reportingYears } from "./reporting"
 
-describe("reportingYearOf", () => {
+describe("a date belongs to the Reporting year whose chosen month began it", () => {
 	it("names the year by the calendar year whose year-start month began it", () => {
 		expect(reportingYearOf("2026-11-15", 1)).toBe(2026)
 		expect(reportingYearOf("2026-02-10", 4)).toBe(2025)
@@ -12,7 +12,7 @@ describe("reportingYearOf", () => {
 	})
 })
 
-describe("reportingYears", () => {
+describe("a Reporting year starts on the 1st of its chosen month and ends the day before the next", () => {
 	it("runs a full year from the year-start day to the day before the next one", () => {
 		expect(reportingYears("2026-11-01", "2028-03-15", undefined, 11)).toEqual([
 			{ year: 2026, from: "2026-11-01", to: "2027-10-31", partial: false },
@@ -24,6 +24,13 @@ describe("reportingYears", () => {
 		expect(reportingYears("2026-11-28", "2027-12-31", undefined, 1)).toEqual([
 			{ year: 2026, from: "2026-11-28", to: "2026-12-31", partial: true },
 			{ year: 2027, from: "2027-01-01", to: "2027-12-31", partial: false },
+		])
+	})
+
+	it("starts on the As-of in the year-start month and stays partial", () => {
+		expect(reportingYears("2026-11-28", "2027-12-31", undefined, 11)).toEqual([
+			{ year: 2026, from: "2026-11-28", to: "2027-10-31", partial: true },
+			{ year: 2027, from: "2027-11-01", to: "2027-12-31", partial: true },
 		])
 	})
 

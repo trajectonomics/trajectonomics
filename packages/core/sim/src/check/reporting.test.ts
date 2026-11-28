@@ -36,7 +36,17 @@ function invalid(key?: string): readonly ProjectionProblem[] {
 	return [{ code: "INVALID_OPTION", path }]
 }
 
-describe("checkReportingOptions", () => {
+/** An options object whose `reporting` throws on every read, as a hostile caller can supply. */
+function throwingReporting(): unknown {
+	const boom = (): never => {
+		throw new Error("boom")
+	}
+	const reporting = {}
+	Object.defineProperty(reporting, "yearStart", { enumerable: true, get: boom })
+	return reporting
+}
+
+describe("the reporting option is refused field by field", () => {
 	it.each([
 		["a non-object", 5, invalid()],
 		["a year start of 0", { yearStart: 0 }, invalid("yearStart")],
@@ -54,24 +64,10 @@ describe("checkReportingOptions", () => {
 		expect(pathProblemsOf(withReporting(reporting))).toEqual(expected)
 	})
 
-	it.each([
-		["years", { yearStart: 1, years: true }],
-		["an absent monthsOf", { yearStart: 1, years: true, monthsOf: undefined }],
-		["a year start alone", { yearStart: 4 }],
-	])("accepts %s", (_name, reporting) => {
-		expect(problemsOf(withReporting(reporting))).toEqual([])
-	})
-
-	it("states a Projection with only a year start exactly as the run without reporting", () => {
-		const plain = project(partialEnds.baseline, partialEnds.scenario, partialEnds.timeline, {})
-		const asked = project(
-			partialEnds.baseline,
-			partialEnds.scenario,
-			partialEnds.timeline,
-			withReporting({ yearStart: 4 }),
-		)
-		if (!plain.ok || !asked.ok) throw new Error("the fixture must project")
-		expect(JSON.stringify(asked.projection)).toBe(JSON.stringify(plain.projection))
+	it("reports a throwing getter as NOT_AN_OBJECT at the options root, never as a throw", () => {
+		const expected: readonly ProjectionProblem[] = [{ code: "NOT_AN_OBJECT", path: ["options"] }]
+		expect(problemsOf(withReporting(throwingReporting()))).toEqual(expected)
+		expect(pathProblemsOf(withReporting(throwingReporting()))).toEqual(expected)
 	})
 
 	it("orders a Timeline problem first and reads no month range from it", () => {
@@ -102,7 +98,29 @@ describe("checkReportingOptions", () => {
 	})
 })
 
-describe("reportingYearRange", () => {
+describe("a valid reporting option asks the Projection for its spans", () => {
+	it.each([
+		["years", { yearStart: 1, years: true }],
+		["an absent monthsOf", { yearStart: 1, years: true, monthsOf: undefined }],
+		["a year start alone", { yearStart: 4 }],
+	])("accepts %s", (_name, reporting) => {
+		expect(problemsOf(withReporting(reporting))).toEqual([])
+	})
+
+	it("states a Projection with only a year start exactly as the run without reporting", () => {
+		const plain = project(partialEnds.baseline, partialEnds.scenario, partialEnds.timeline, {})
+		const asked = project(
+			partialEnds.baseline,
+			partialEnds.scenario,
+			partialEnds.timeline,
+			withReporting({ yearStart: 4 }),
+		)
+		if (!plain.ok || !asked.ok) throw new Error("the fixture must project")
+		expect(JSON.stringify(asked.projection)).toBe(JSON.stringify(plain.projection))
+	})
+})
+
+describe("the Reporting years of a Timeline are known before the run", () => {
 	it("reads the first and last Reporting year of a valid Timeline", () => {
 		expect(reportingYearRange(partialEnds.timeline, 1)).toEqual({ first: 2026, last: 2027 })
 	})

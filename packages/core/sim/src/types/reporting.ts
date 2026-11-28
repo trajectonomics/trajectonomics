@@ -51,12 +51,21 @@ export interface CashflowLines {
 	readonly expenses: readonly ExpenseLine[]
 	readonly categories: readonly CategoryLine[]
 	readonly contributions: readonly ContributionLine[]
-	/** Employer money into Accounts, by Flow; present only when the Scenario declares an employer Contribution. */
+	/**
+	 * Employer money into Accounts, by Flow; present only when the Scenario declares an employer
+	 * Contribution. Kept out of the identity: it never entered cashflow, so money in still equals money out.
+	 */
 	readonly employer?: readonly EmployerLine[]
-	/** Payouts by Account, in Scenario order; present only when the Scenario declares a payout. */
+	/**
+	 * Payouts by Account, in Scenario order; present only when the Scenario declares a payout. Money in:
+	 * `income` lists the declared income Flows, so the identity adds `Σpayouts` to its money in.
+	 */
 	readonly payouts?: readonly PayoutLine[]
 	readonly withdrawals: readonly WithdrawalLine[]
-	/** Transfers by Flow, in Scenario order; present only when the Scenario declares a transfer (ADR 0031). */
+	/**
+	 * Transfers by Flow, in Scenario order; present only when the Scenario declares a transfer (ADR 0031). Money
+	 * moved between the plan's own Accounts: outside the identity, which it enters on neither side.
+	 */
 	readonly transfers?: readonly TransferLine[]
 	readonly drawn: readonly DrawnLine[]
 	readonly surplus: readonly AccountLine[]

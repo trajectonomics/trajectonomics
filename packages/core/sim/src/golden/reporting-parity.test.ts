@@ -11,11 +11,20 @@ import { totalOf, totalSums, yearBounds } from "./reporting-check"
 
 const BASE: ProjectionOptions = { cashflowBreakdown: true }
 const YEAR_STARTS = [1, 7] as const
+/** Every key `reporting` states (ADR 0034 and its amendments), left out of a report-only comparison. */
+const REPORTING_KEYS = new Set([
+	"cashflowYears",
+	"cashflowYearTotals",
+	"cashflowYearTransfers",
+	"cashflowMonths",
+	"cashflowMonthTotals",
+	"cashflowMonthTransfers",
+])
 
-/** The case's options without `cashflowBreakdown` and `reporting`, plus the breakdown the checks need. */
-function baseOf(projectOptions: ProjectionOptions | undefined): ProjectionOptions {
+/** The case's options without `cashflowBreakdown` and `reporting`. */
+function restOf(projectOptions: ProjectionOptions | undefined): ProjectionOptions {
 	const { cashflowBreakdown: _breakdown, reporting: _reporting, ...rest } = projectOptions ?? {}
-	return { ...rest, ...BASE }
+	return rest
 }
 
 function statedOptions(base: ProjectionOptions, yearStart: number): ProjectionOptions {
@@ -66,16 +75,32 @@ function checkRun(
 	checkSpans(stated, timeline.start, plain.runsOut?.date ?? timeline.horizon, yearStart)
 }
 
+/** A Projection as JSON, without any key only `reporting` states. */
+function withoutReporting(projection: Projection): string {
+	const kept = Object.entries(projection).filter(([key]) => !REPORTING_KEYS.has(key))
+	return JSON.stringify(Object.fromEntries(kept))
+}
+
+/** `reporting` alone adds its own keys and no `cashflow`, and leaves every other key byte-identical. */
+function checkReportingAlone(breakdown: Projection, bare: Projection, alone: Projection): void {
+	expect(Object.keys(breakdown).filter((key) => !(key in alone))).toEqual(["cashflow"])
+	expect(withoutReporting(alone)).toBe(withoutReporting(bare))
+}
+
 /** Every `project` run of one fixture, at both Reporting year starts. */
 function checkProject(testCase: ParityCase): void {
 	const { baseline, scenario, timeline } = testCase.fixture
-	const base = baseOf(testCase.projectOptions)
+	const rest = restOf(testCase.projectOptions)
+	const base = { ...rest, ...BASE }
 	const plain = project(baseline, scenario, timeline, base)
-	if (!plain.ok) throw new Error("the parity fixture must project")
+	const bare = project(baseline, scenario, timeline, rest)
+	if (!plain.ok || !bare.ok) throw new Error("the parity fixture must project")
 	for (const yearStart of YEAR_STARTS) {
 		const stated = project(baseline, scenario, timeline, statedOptions(base, yearStart))
-		if (!stated.ok) throw new Error("the parity fixture must project")
+		const alone = project(baseline, scenario, timeline, statedOptions(rest, yearStart))
+		if (!stated.ok || !alone.ok) throw new Error("the parity fixture must project")
 		checkRun(plain.projection, stated.projection, timeline, yearStart)
+		checkReportingAlone(plain.projection, bare.projection, alone.projection)
 	}
 }
 
@@ -87,9 +112,11 @@ function checkPath(testCase: ParityCase): void {
 	const built = planReturnModel(scenario, path)
 	if (!built.ok) throw new Error("the plan model was refused")
 	const selection = { model: built.model, seed: path.seed, paths: path.paths, index: path.index }
-	const base = baseOf(testCase.projectOptions)
+	const rest = restOf(testCase.projectOptions)
+	const base = { ...rest, ...BASE }
 	const plain = projectPath(baseline, scenario, timeline, selection, base)
-	if (!plain.ok) throw new Error("the parity fixture must project")
+	const bare = projectPath(baseline, scenario, timeline, selection, rest)
+	if (!plain.ok || !bare.ok) throw new Error("the parity fixture must project")
 	for (const yearStart of YEAR_STARTS) {
 		const stated = projectPath(
 			baseline,
@@ -98,8 +125,16 @@ function checkPath(testCase: ParityCase): void {
 			selection,
 			statedOptions(base, yearStart),
 		)
-		if (!stated.ok) throw new Error("the parity fixture must project")
+		const alone = projectPath(
+			baseline,
+			scenario,
+			timeline,
+			selection,
+			statedOptions(rest, yearStart),
+		)
+		if (!stated.ok || !alone.ok) throw new Error("the parity fixture must project")
 		checkRun(plain.projection, stated.projection, timeline, yearStart)
+		checkReportingAlone(plain.projection, bare.projection, alone.projection)
 	}
 }
 
