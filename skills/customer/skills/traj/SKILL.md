@@ -121,7 +121,7 @@ A **gap** is any of these:
 
 - the session's pinned command-line version is past the upper bound of an installed skill's CLI Range, read from that skill's frontmatter `cli`;
 - `traj schema` lacks a command, a flag or an error code this Skill or its Recipe tells you to use, or the person asks for a job this Skill does not cover and `traj schema` lists a command for it;
-- the job's Recipe row is missing from `skills.manifest.json` at the pin, or the resolved scope has no pin: no `commit`, or a `source` of `trajectonomics/skills`.
+- the job's Recipe row is missing from `skills.manifest.json` at the pin, or the resolved scope has no pin: no `commit`, or the entry's `source` is `trajectonomics/skills`.
 
 When you find one, update the installed traj skills once, at most, in the session, naming all five so the person's other skills stay untouched, and say in one sentence that you updated the traj skills because of the gap you named:
 
