@@ -35,8 +35,8 @@ export class Statement {
 		return {}
 	}
 
-	execute(): void {
-		this.database.prepare(this.sql).run(...(this.values as SQLQueryBindings[]))
+	execute(): unknown[] {
+		return this.database.prepare(this.sql).all(...(this.values as SQLQueryBindings[])) as unknown[]
 	}
 }
 
@@ -65,11 +65,10 @@ class TestD1 {
 		const hook = this.beforeBatchHook
 		this.beforeBatchHook = null
 		if (hook !== null) await hook()
-		const run = this.database.transaction(() => {
-			for (const statement of statements) statement.execute()
-		})
-		run()
-		return []
+		const run = this.database.transaction(() =>
+			statements.map((statement) => ({ results: statement.execute() })),
+		)
+		return run()
 	}
 }
 

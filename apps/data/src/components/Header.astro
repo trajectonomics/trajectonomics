@@ -7,7 +7,7 @@ import { DATA_PATH, LOG_PATH, METHOD_PATH, SITE_HOME_URL, SITE_NAME } from "../l
 
 interface Props {
 	/** Which header link is the current page. */
-	readonly current: "overview" | "method" | "log"
+	readonly current: "overview" | "method" | "log" | null
 }
 
 const { current } = Astro.props

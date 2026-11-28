@@ -1,0 +1,70 @@
+/* The collectors picture: one hand-drawn SVG row per machine on a shared day axis. */
+
+.collectors-figure {
+	margin: 0;
+	padding: 0 0 8px;
+}
+
+.collectors-svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.collectors-machine,
+.collectors-age,
+.collectors-axis {
+	font-family: var(--font-meta);
+	font-variant-numeric: tabular-nums;
+}
+
+.collectors-machine {
+	fill: var(--ds-color-foreground);
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.collectors-age {
+	fill: var(--ds-color-muted-foreground);
+	font-size: 11px;
+}
+
+.collectors-axis {
+	fill: var(--ds-color-muted-foreground);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+}
+
+.collectors-axis-line {
+	stroke: var(--ds-color-border);
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+}
+
+/* State is a colour and a word: the title and the hidden list carry the word. */
+.collectors-bar,
+.collectors-dot {
+	fill: var(--ds-color-primary);
+}
+
+.collectors-bar-late,
+.collectors-dot-late {
+	fill: var(--ds-color-accent);
+}
+
+.collectors-bar-stopped,
+.collectors-dot-stopped {
+	fill: var(--ds-color-destructive);
+}
+
+/* The SVG scales to a phone; larger user units keep its labels at their size on screen. */
+@media (max-width: 40rem) {
+	.collectors-machine,
+	.collectors-age {
+		font-size: 20px;
+	}
+
+	.collectors-axis {
+		font-size: 18px;
+	}
+}
