@@ -1,8 +1,12 @@
 /** The lowest mobile Lighthouse performance score a page may have. */
 export const PERFORMANCE_MIN_SCORE = 0.95
 
-/** The runs one page is measured by; the median decides, and a missing score fails. */
-export const PERFORMANCE_RUNS = 3
+/**
+ * The runs one page is measured by; the median decides, and a missing score fails. Lighthouse's
+ * variability guidance (`variability.md`) says "the median Lighthouse score of 5 runs is twice as
+ * stable as 1 run", so a shared runner's slow minute less often fails a page that has not changed.
+ */
+export const PERFORMANCE_RUNS = 5
 
 /** Stable codes for every way a page can fail the mobile performance check. */
 export type PerformanceFailureCode = "LIGHTHOUSE_SCORE_MISSING" | "LIGHTHOUSE_SCORE_TOO_LOW"
