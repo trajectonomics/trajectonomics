@@ -30,8 +30,7 @@ export function endLabels(
 	plot: Plot,
 ): EndLabel[] | null {
 	const [first, second] = series
-	if (second === undefined || first === undefined) return null
-	if (first.short === undefined || second.short === undefined) return null
+	if (series.length !== 2 || first?.short === undefined || second?.short === undefined) return null
 	const firstMark = lastMark(layout, 0)
 	const secondMark = lastMark(layout, 1)
 	if (firstMark === undefined || secondMark === undefined) return null

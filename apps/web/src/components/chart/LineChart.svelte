@@ -75,7 +75,7 @@ const layout = $derived(
 			? withStepLine(columns, step, columnXs(series), plot)
 			: columns,
 )
-const ends = $derived(endLabels && layout ? lineEndLabels(layout, series, plot) : null)
+const ends = $derived(endLabels && !step && layout ? lineEndLabels(layout, series, plot) : null)
 </script>
 
 <!-- A line chart with hover, keyboard and abbreviated axis labels, and a tooltip of each series' own string. -->

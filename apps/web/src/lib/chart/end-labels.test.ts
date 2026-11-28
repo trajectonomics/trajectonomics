@@ -54,6 +54,11 @@ describe("endLabels", () => {
 		expect(endLabels(layoutOf(lines), lines, PLOT)).toBeNull()
 	})
 
+	test("keeps the legend for a chart of more than two series", () => {
+		const lines = [series("Future money", 620), series("Today's money", 200), series("Third", 400)]
+		expect(endLabels(layoutOf(lines), lines, PLOT)).toBeNull()
+	})
+
 	test("keeps the legend when a label would stand closer than 14 pixels to the plot's top", () => {
 		const lines = [series("Future money", 1000), series("Today's money", 900)]
 		expect(endLabels(layoutOf(lines), lines, PLOT)).toBeNull()
