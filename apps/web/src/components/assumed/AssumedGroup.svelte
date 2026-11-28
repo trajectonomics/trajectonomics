@@ -1,13 +1,14 @@
 <script lang="ts">
-import type { AssumedGroup } from "../../lib/view/assumed/types"
+import type { AssumedGroup, AssumedKeeper } from "../../lib/view/assumed/types"
 import AssumedLine from "./AssumedLine.svelte"
 import AssumedWords from "./AssumedWords.svelte"
 
 interface Props {
 	group: AssumedGroup
+	keeper: AssumedKeeper | null
 }
 
-let { group }: Props = $props()
+let { group, keeper }: Props = $props()
 const id = $derived(`assumed-${group.key}`)
 </script>
 
@@ -27,7 +28,7 @@ const id = $derived(`assumed-${group.key}`)
 	</div>
 	<ul class="space-y-1 text-sm text-muted-foreground">
 		{#each group.lines as line (line.key)}
-			<AssumedLine {line} />
+			<AssumedLine {line} {keeper} />
 		{/each}
 	</ul>
 </section>

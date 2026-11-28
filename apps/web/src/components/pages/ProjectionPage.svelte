@@ -54,6 +54,6 @@ let { scenario, editable, terms, onTerms, chart, onChart, items, onItems }: Prop
 			{items}
 			{onItems}
 		/>
-		<AssumedSection {snapshot} {plan} />
+		<AssumedSection {snapshot} {plan} {editable} />
 	{/snippet}
 </PageShell>

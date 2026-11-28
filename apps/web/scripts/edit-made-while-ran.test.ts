@@ -1,8 +1,8 @@
-// A plan of the name a new plan's Edit writes is made while it runs (issue #750, item 2): the write is done, so it
-// ran, and the answer says it replaced that plan ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
+// A plan of the name a new plan's Edit writes is made while it runs (issue #750, item 2): the write creates a plan or
+// refuses, so that plan stays as it was ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { join } from "node:path"
-import { scenarioList } from "../src/lib/contract"
+import { scenarioShow } from "../src/lib/contract"
 import { demoCarryIn } from "./demo/carry-in"
 import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
@@ -12,8 +12,7 @@ import { createEditor, type Editor } from "./serve-edit"
 
 /**
  * A `traj` around the workspace binary that forks `raced` just before the real `scenario apply raced` writes: the
- * name is taken by the time the write runs, so the write replaces that plan. The dry run and every other call go
- * straight through.
+ * name is taken by the time the write runs. The dry run and every other call go straight through.
  */
 const MADE_WHILE_RAN = `
 if [ "$1" = "scenario" ] && [ "$2" = "apply" ] && [ "$3" = "raced" ]; then
@@ -36,12 +35,12 @@ let scratch = ""
 let home = ""
 let editor: Editor | null = null
 
-/** The plans the ledger stores, read through the workspace binary itself. */
-function ledgerNames(): string[] {
-	const run = Bun.spawnSync([BINARY, "scenario", "list", "--json"], {
+/** One stored plan's content hash, read through the workspace binary itself. */
+function storedHash(name: string): string {
+	const run = Bun.spawnSync([BINARY, "scenario", "show", name, "--decimal", "--json"], {
 		env: { ...process.env, TRAJ_HOME: home, DO_NOT_TRACK: "1" },
 	})
-	return scenarioList.parse(JSON.parse(run.stdout.toString())).scenarios.map((plan) => plan.name)
+	return scenarioShow.parse(JSON.parse(run.stdout.toString())).scenario.contentHash
 }
 
 beforeAll(async () => {
@@ -68,25 +67,21 @@ afterAll(async () => {
 	if (scratch !== "") await removeScratch(scratch)
 })
 
-describe("a new plan that replaced one made while the Edit ran", () => {
+describe("a new plan whose name is taken while the Edit runs", () => {
 	test(
-		"answers ok with replaced, and the plan it replaced is the one the page is served and the ledger holds",
+		"is refused as the CLI refuses it, and the plan made meanwhile stays as it was",
 		async () => {
 			const editing = editor
 			if (editing === null) throw new Error("no editor")
 			const answer = await editing.edit(editRequest({}, NEW_PLAN), 4321)
-			expect(answer.status).toBe(200)
 			const body = (await answer.json()) as {
 				ok: boolean
-				replaced?: boolean
-				snapshot: { params: { scenarios: string[] } }
+				error?: { code: string; path?: string }
 			}
-			expect(body.ok).toBe(true)
-			expect(body.replaced).toBe(true)
-			// `params` followed the write, so Reload reads the plan the write made.
-			expect(body.snapshot.params.scenarios).toContain("raced")
-			expect(editing.body).toContain("raced")
-			expect(ledgerNames()).toContain("raced")
+			expect(body.ok).toBe(false)
+			expect(body.error).toMatchObject({ code: "scenario_name_taken", path: "name" })
+			// `raced` is the fork of `base` the wrapper made: the template did not replace it.
+			expect(storedHash("raced")).toBe(storedHash("base"))
 		},
 		SLOW_MS,
 	)

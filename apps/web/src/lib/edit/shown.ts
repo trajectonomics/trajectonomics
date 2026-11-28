@@ -17,3 +17,8 @@ export function editsShown(token: string | null, search: string): boolean {
 export function drawerEditsShown(): boolean {
 	return true
 }
+
+/** Whether the Plan page offers Keep on a value `traj` wrote ([ADR 0032](../../../docs/adr/0032-home-and-the-plan-page-show-what-a-plan-assumes.md)). */
+export function keepShown(): boolean {
+	return true
+}

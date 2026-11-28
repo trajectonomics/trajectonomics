@@ -162,3 +162,12 @@ This replaces "The boundary" and "The page" bullets of the amendment above, and 
 - **Reload.** A plain reread keeps an inline action's source, so a Reload that fails says why beside that control and its notice stays. A reread that carries inputs belongs to its form, as before.
 - **Tests.** `routing-refusal.svelte.test.ts`, `plan-main-refusal.svelte.test.ts` and `year-refusal.svelte.test.ts` pin each control, `action-reload.svelte.test.ts` the Reload, and `browser/inline-refusal.e2e.ts` presses the controls at 360px with every `/edit` answered by the test, so nothing is written.
 
+## Amendment (2026-11-28): a new plan is the template write
+
+This replaces the template read of the amendment "the plan-managing Edits", and takes a new plan from the ledger's accounts out of the amendment "a new plan that replaced one made while it ran" ([ADR 0032](0032-home-and-the-plan-page-show-what-a-plan-assumes.md)).
+
+- **The write.** `apply-plan` with `template: { asOf }` is `traj scenario apply <name> --template --as-of <asOf>`, run dry and then real like every other write. The server reads no template first and sends no document. `traj` saves the plan with the list of the values it wrote itself ([cli ADR 0084](../../../cli/docs/adr/0084-a-plan-remembers-which-values-traj-wrote-and-a-set-states-one.md)).
+- **A taken name.** The write creates the plan or refuses it as `scenario_name_taken`, in one transaction, so it replaces nothing: a plan of the name made between the dry run and the real write stays as it is, and the Edit answers that refusal. The server's own `created` check is gone from `serve-apply.ts`.
+- **What still says `replaced`.** Only the guided plan, whose apply of a document can still replace a plan made while it ran ([ADR 0031](0031-a-guided-first-plan-is-one-edit-that-saves-a-plan-and-its-household.md)).
+- **Tests.** `plan-edit.test.ts` and `edits.test.ts` pin the argv, with no standard input. `edit-made-while-ran.test.ts` forks `raced` in a wrapper just before the real write: the answer is the CLI's `scenario_name_taken` and the forked plan stays.
+

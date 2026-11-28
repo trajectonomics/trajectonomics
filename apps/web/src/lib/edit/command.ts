@@ -16,14 +16,9 @@ export type WriteCommand = { argv: string[]; stdin?: string }
 /**
  * The `traj` write a single-write Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
  * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). The
- * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055). A plan started
- * from the ledger's accounts also takes the template the server read (`templateRead`), which it applies.
+ * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055).
  */
-export function writeCommand(
-	edit: SingleWriteEdit,
-	dryRun: boolean,
-	template?: string,
-): WriteCommand {
+export function writeCommand(edit: SingleWriteEdit, dryRun: boolean): WriteCommand {
 	const flags = dryRun ? ["--dry-run", "--json"] : ["--json"]
 	switch (edit.kind) {
 		case "copy-plan": {
@@ -49,10 +44,7 @@ export function writeCommand(
 				],
 			}
 		case "apply-plan":
-			if ("template" in edit) {
-				if (template === undefined) throw new Error("a new plan needs the template it starts from")
-				return startCommand(edit, template, flags)
-			}
+			if ("template" in edit) return startCommand(edit, flags)
 			// The page holds decimal-form documents only, so the write reads that form (ADR-0047).
 			return {
 				argv: [

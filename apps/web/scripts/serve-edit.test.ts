@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test"
+import { join } from "node:path"
 import { EDIT_TOKEN_HEADER } from "../src/lib/edit/guard"
 import { editRequest, getRequest, PARAMS, PORT, TOKEN } from "./edit-request.test-support"
+import { makeScratch, removeScratch } from "./scratch"
+import { runEdit } from "./serve-apply"
 import { createEditor } from "./serve-edit"
 
 const COPY = JSON.stringify({ kind: "copy-plan", from: "base", name: "early" })
@@ -93,5 +96,27 @@ describe("POST /reread refusals", () => {
 	test("refuses a reread before the first Snapshot is read", async () => {
 		const response = editor().reread(editRequest({}, "{}"), PORT)
 		expect(await refusedWith(await response)).toEqual({ status: 503, code: "not_ready" })
+	})
+})
+
+describe("a new plan from the ledger's accounts", () => {
+	test("is the template write, dry then real, with no read before them", async () => {
+		const scratch = await makeScratch("traj-web-new-plan-")
+		try {
+			const calls = join(scratch, "calls")
+			// A stand-in for traj that records each call and answers as a write that created the plan.
+			const script = `echo "$*" >>"$CALLS"; echo '{"status":"created"}'`
+			const context = { binary: "/bin/sh", prefix: ["-c", script, "traj"], env: { CALLS: calls } }
+			const template = { asOf: "2026-10-31" }
+			const run = await runEdit(context, { kind: "apply-plan", name: "fresh", template })
+			expect(run).toEqual({ ok: true, replaced: false, droppedAnchors: [], droppedOwners: [] })
+			const write = "scenario apply fresh --template --as-of 2026-10-31"
+			expect((await Bun.file(calls).text()).trim().split("\n")).toEqual([
+				`${write} --dry-run --json`,
+				`${write} --json`,
+			])
+		} finally {
+			await removeScratch(scratch)
+		}
 	})
 })

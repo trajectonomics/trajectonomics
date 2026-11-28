@@ -49,6 +49,12 @@ export interface AssumedLine {
 	readonly keep?: AssumedKeep
 }
 
+/** The saved plan a Keep writes to, and the hash the page read it at. */
+export interface AssumedKeeper {
+	readonly plan: string
+	readonly contentHash: string
+}
+
 export interface AssumedGroup {
 	readonly key: AssumedGroupKey
 	readonly sentence: AssumedSentence

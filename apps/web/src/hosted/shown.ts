@@ -10,3 +10,8 @@ export function editsShown(_token: string | null, _search: string): boolean {
 export function drawerEditsShown(): boolean {
 	return false
 }
+
+/** No Keep here: a button on every line that writes nothing would only bury the list a visitor came to read. */
+export function keepShown(): boolean {
+	return false
+}
