@@ -30,20 +30,31 @@ export async function exchangeCode(
 			method: "POST",
 			headers: { "content-type": "application/x-www-form-urlencoded" },
 			body: tokenForm(code, verifier),
-			redirect: "error",
+			// workerd refuses "error"; "manual" never follows, and the ok check below rejects a 3xx.
+			redirect: "manual",
 			signal: AbortSignal.timeout(TOKEN_TIMEOUT_MS),
 		})
-	} catch {
+	} catch (error) {
+		// The name only: the code and verifier stay out of the log.
+		console.error("data: token exchange failed", error instanceof Error ? error.name : "unknown")
 		return null
 	}
-	if (!response.ok) return null
+	if (!response.ok) {
+		console.error("data: token exchange answered", response.status)
+		return null
+	}
 	let body: unknown
 	try {
 		body = await response.json()
 	} catch {
+		console.error("data: token exchange answered no JSON")
 		return null
 	}
-	if (typeof body !== "object" || body === null) return null
-	const token = (body as { access_token?: unknown }).access_token
-	return typeof token === "string" ? token : null
+	const token =
+		typeof body === "object" && body !== null
+			? (body as { access_token?: unknown }).access_token
+			: undefined
+	if (typeof token === "string") return token
+	console.error("data: token exchange answered no access token")
+	return null
 }

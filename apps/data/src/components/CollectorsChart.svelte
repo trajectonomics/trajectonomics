@@ -45,7 +45,10 @@ const label = $derived(collectorsAriaLabel(geometry.bars))
 					height={COLLECTORS_BAR_HEIGHT}
 					rx="2"
 				/>
-				<text class="collectors-age" x={end + 8} y={top + 22}>{bar.ageLabel}</text>
+				<!-- The state is a word as well as a colour, for anyone who cannot tell the dots apart. -->
+				<text class="collectors-age" x={end + 8} y={top + 22}
+					>{bar.state === "ok" ? bar.ageLabel : `${bar.state} · ${bar.ageLabel}`}</text
+				>
 			</g>
 		{/each}
 		<line

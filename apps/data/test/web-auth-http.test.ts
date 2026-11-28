@@ -86,7 +86,7 @@ describe("GET /data/auth/callback", () => {
 		expect(row.expires_at).toBe(new Date(NOW_MS + 28_800_000).toISOString())
 		expect(capture.url).toBe(`${TEST_ISSUER}/api/auth/oauth2/token`)
 		expect(capture.init?.method).toBe("POST")
-		expect(capture.init?.redirect).toBe("error")
+		expect(capture.init?.redirect).toBe("manual")
 		expect(capture.init?.signal).toBeInstanceOf(AbortSignal)
 		const headers = new Headers(capture.init?.headers)
 		expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded")

@@ -1,10 +1,10 @@
-import { beforeAll, describe, expect, test } from "bun:test"
+import { beforeAll, describe, expect, spyOn, test } from "bun:test"
 import { sha256Hex } from "../src/core/hash"
 import { ME_PATH } from "../src/core/urls"
 import { SESSION_COOKIE } from "../src/core/web-auth"
 import { harness } from "./support/http"
 import { failingJwks } from "./support/jwks"
-import { type TestSigner, testSigner } from "./support/token"
+import { type TestSigner, TOKEN_NOW_SECONDS, testSigner } from "./support/token"
 import { cookieFrom, count, oauthCookie, seedSession, setCookies } from "./support/web-auth"
 import { CLEARED_OAUTH, callback, startSignIn, tokenFetch } from "./support/web-auth-callback"
 
@@ -90,6 +90,31 @@ describe("the callback's failures", () => {
 			},
 		],
 		[
+			"a token endpoint that redirects",
+			(context) =>
+				callback(context, signer.jwks, {
+					authFetch: (async () =>
+						new Response(null, {
+							status: 302,
+							headers: { location: "https://example.test/" },
+						})) as unknown as typeof fetch,
+				}),
+		],
+		[
+			"a token from another issuer",
+			async (context) =>
+				callback(context, signer.jwks, {
+					authFetch: tokenFetch(await signer.sign({ issuer: "https://example.test", scope: null })),
+				}),
+		],
+		[
+			"an expired token",
+			async (context) =>
+				callback(context, signer.jwks, {
+					authFetch: tokenFetch(await signer.sign({ iat: TOKEN_NOW_SECONDS - 2000, scope: null })),
+				}),
+		],
+		[
 			"an unavailable key set",
 			async (context) =>
 				callback(context, signer.jwks, {
@@ -100,8 +125,9 @@ describe("the callback's failures", () => {
 	]
 
 	test.each(failures)("fails for %s and clears the OAuth cookie", async (_name, run) => {
+		const logged = spyOn(console, "error").mockImplementation(() => {})
 		const context = harness()
-		const response = await run(context)
+		const response = await run(context).finally(() => logged.mockRestore())
 		expect(response.status).toBe(303)
 		expect(response.headers.get("location")).toBe(FAILED_LOCATION)
 		expect(setCookies(response)).toEqual([CLEARED_OAUTH])
