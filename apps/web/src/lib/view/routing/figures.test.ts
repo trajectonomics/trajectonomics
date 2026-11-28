@@ -126,6 +126,24 @@ describe("where a refusal lands", () => {
 		})
 	})
 
+	test("a transfer id that holds a dot or a backslash is one segment, so its refusal lands on its row", () => {
+		expect(placeOf(error("document.flows.transfer\\.2026.target"), [])).toEqual({
+			kind: "flow",
+			id: "transfer.2026",
+			field: "target",
+		})
+		expect(placeOf(error("document.flows.pay\\\\401.target"), [])).toEqual({
+			kind: "flow",
+			id: "pay\\401",
+			field: "target",
+		})
+		expect(placeOf(error("--set", { documentPath: "document.flows.a\\=b.target" }), [])).toEqual({
+			kind: "flow",
+			id: "a=b",
+			field: "target",
+		})
+	})
+
 	test("a what-if's refusal names the document path in its details", () => {
 		const place = placeOf(error("--set", { documentPath: "document.cashflow.surplus.1.share" }), [])
 		expect(place).toEqual({ kind: "row", list: "surplus", index: 1, field: "share" })
