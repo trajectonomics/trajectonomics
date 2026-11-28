@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0035
 ---
 
 # The browser checks judge a phone, and the demo output wraps

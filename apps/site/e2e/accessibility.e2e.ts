@@ -1,7 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect, type Page, test } from "@playwright/test"
-import { FI_DEMO_OUTPUT } from "../src/lib/site"
-import { DEVICE_SCHEMES, expectShippedTheme, homeOf, openPage, PAGES_UNDER_TEST } from "./pages"
+import { DEVICE_SCHEMES, expectShippedTheme, openPage, PAGES_UNDER_TEST } from "./pages"
 import { VIEWPORTS } from "./viewports"
 
 /** Every WCAG 2.2 AA tag the Site promises. */
@@ -23,10 +22,10 @@ async function expectAxeReportsNothing(page: Page, path: string): Promise<void> 
 	// ([ADR 0028](../docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md)).
 	await page.addStyleTag({ content: ".consent { position: static; }" })
 	// One options call: a later options() replaces the whole object, tags included.
-	// The live Demo is the real Dashboard in an iframe, a second document with its own labels and
-	// controls (ADR 0034). Its chart text sits over drawn shapes axe cannot judge, and the frame's own
+	// The hero's window is the real Dashboard in an iframe, a second document with its own labels and
+	// controls (ADR 0035). Its chart text sits over drawn shapes axe cannot judge, and the frame's own
 	// document is the Dashboard's to keep accessible: this scan judges the Site's document, so the
-	// section's heading, zoom controls and way out are still held to every rule.
+	// window's bar, zoom controls and way out are still held to every rule.
 	const results = await new AxeBuilder({ page })
 		.options(axeOptions())
 		.exclude("[data-live-frame]")
@@ -50,10 +49,8 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
 			test.use({
 				colorScheme: scheme,
 				// Reduced motion settles the load-in animation at once, so axe judges the shipped pixels
-				// instead of a mid-animation frame whose opacity lowers the computed contrast. It also
-				// lays both demo chats out whole, where motion allowed shows one at a time: the chat with
-				// the skill, which carries the demo output, is in the judged tree only here
-				// ([ADR 0022](../docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)).
+				// instead of a mid-animation frame whose opacity lowers the computed contrast
+				// ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
 				reducedMotion: "reduce",
 				viewport,
 			})
@@ -70,59 +67,6 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
 		})
 	}
 }
-
-for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
-	test.describe(`axe on the demo window in its interactive state at the ${viewportName} viewport`, () => {
-		// Motion allowed, so the script runs: the sidebar is in the reading order, its controls are
-		// enabled and each transcript is a scroll region that must be a Tab stop. A click on a chat in the
-		// sidebar settles it, so axe judges the shipped pixels and not a frame of the sequence.
-		test.use({ colorScheme: "light", reducedMotion: "no-preference", viewport })
-
-		test("has no axe violation, and nothing axe cannot judge", async ({ page }) => {
-			await openPage(page, homeOf("en"))
-			await page.locator('[data-app-chat="with"]').click()
-			await page.locator('[data-app-chat="without"]').click()
-			await expect(page.locator('.app-chat[data-chat="without"]')).not.toHaveAttribute(
-				"data-motion",
-				/.+/,
-			)
-			await expect(page.locator("[data-app-side]")).not.toHaveAttribute("aria-hidden", /.+/)
-			// The load-in animation has settled, so no frame of it lowers a computed contrast.
-			await page.waitForTimeout(1_500)
-			await expectAxeReportsNothing(page, "the English home with the demo window interactive")
-		})
-	})
-}
-
-test.describe("the demo output at the phone viewport", () => {
-	// The same setting the axe loop uses above, and for the same reason.
-	test.use({ reducedMotion: "reduce" })
-
-	test("shows its whole answer without scrolling", async ({ page }) => {
-		// The viewport is set here rather than looped over, so the check holds on its own. It is stricter
-		// than axe's `scrollable-region-focusable`, which passes a scrollable region that is keyboard
-		// focusable: this asks that there be nothing to scroll, and names the element and both widths.
-		await page.setViewportSize(VIEWPORTS.phone)
-		await openPage(page, homeOf("en"))
-		const output = page.locator("pre.terminal-output")
-		const measured = await output.evaluate((element) => ({
-			clientWidth: element.clientWidth,
-			lines: [...element.querySelectorAll(".terminal-line")].map((line) => line.textContent ?? ""),
-			scrollWidth: element.scrollWidth,
-		}))
-		expect(
-			measured.clientWidth,
-			"pre.terminal-output sits on a panel the phone lays out",
-		).toBeGreaterThan(0)
-		expect(measured.lines, "pre.terminal-output prints the whole fixture").toEqual([
-			...FI_DEMO_OUTPUT,
-		])
-		expect(
-			measured.scrollWidth,
-			`pre.terminal-output scrolls to ${measured.scrollWidth} px inside ${measured.clientWidth} px`,
-		).toBe(measured.clientWidth)
-	})
-})
 
 test("a fixture outside the build with an unnamed button fails axe", async ({ page }) => {
 	const fixture =

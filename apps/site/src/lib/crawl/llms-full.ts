@@ -27,8 +27,9 @@ const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent
 const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 
 /**
- * The comment above each setup command, in order: what happens before it, named because the window
- * shortens the setup. The template's `--as-of` reads the ledger, so the balance is recorded first.
+ * The comment above each setup command, in order: what happens before it. This file is the only place
+ * the setup is written out, because the page's install window shows the prompt alone. The template's
+ * `--as-of` reads the ledger, so the balance is recorded first.
  */
 const SETUP_NOTES: readonly string[] = [
 	"# First-time setup:",
@@ -46,9 +47,10 @@ const SETUP_LINES = FI_DEMO_SETUP_COMMANDS.flatMap((command, at) => {
 const ASK_NOTE = "# Ask when you reach financial independence:"
 
 /**
- * The demo the page shows: the first-time setup, the command an agent runs, and the abridged JSON it
- * answers with. The setup label is there because `scenario apply base --file` replaces an existing
- * `base` plan, so the three commands are a one-time setup and not a repeatable script.
+ * The demo this file carries, and the page no longer plays: the first-time setup, the command an agent
+ * runs, and the abridged JSON it answers with. The setup label is there because `scenario apply base
+ * --file` replaces an existing `base` plan, so the three commands are a one-time setup and not a
+ * repeatable script.
  */
 const DEMO = [
 	"```bash",
@@ -63,10 +65,10 @@ const DEMO = [
 	"```",
 ]
 
-/** A line of one transcript: the speaker the page aligns, then what they say. */
+/** A line of one transcript: the speaker, then what they say. */
 const line = (speaker: string, said: string) => `- ${speaker}: ${said}`
 
-/** The agent alone's exchange, in the order the page plays it. */
+/** The agent alone's exchange, in the order this file tells it. */
 const ALONE = [
 	`**${dictionary.actionWithoutLabel}**`,
 	"",
@@ -117,9 +119,10 @@ const OPENJOT_LINES = [
 ]
 
 /**
- * The full Answer engine file at `/llms-full.txt`: the landing page's copy in the fallback Language,
- * rendered as Markdown, at the Site's one address. It is the page's own words, so it cannot say
- * anything the page does not.
+ * The full Answer engine file at `/llms-full.txt`: the Site's words in the fallback Language, rendered
+ * as Markdown, at the Site's one address. It carries the two demo transcripts, which the page no
+ * longer shows, so it says more than the page: the exchanges, the setup and the JSON answer are only
+ * here. Every line of that copy is still the owner's own Dictionary text.
  */
 export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.description, [
 	section("Address", ADDRESS_LINES),
