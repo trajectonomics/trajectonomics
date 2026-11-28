@@ -21,7 +21,11 @@ class EditSession extends EditState {
 
 	/** Asks the server for the session once. A server that does not answer (`vite preview`) leaves the token null. */
 	open(): Promise<void> {
-		this.opened ??= this.fetchSession()
+		// A page loaded while the server's Snapshot lacks a landed write says so, as the page that wrote did.
+		this.opened ??= fetchEditSession().then((session) => {
+			if (session?.unread === true) this.savedUnread = true
+			this.token = session?.token ?? null
+		})
 		return this.opened
 	}
 
@@ -123,13 +127,6 @@ class EditSession extends EditState {
 		this.savedUnread = outcome.snapshot === null
 		if (this.savedUnread) this.landings += 1
 		return true
-	}
-
-	private async fetchSession(): Promise<void> {
-		const session = await fetchEditSession()
-		// A page loaded while the server's Snapshot lacks a landed write says so, as the page that wrote did.
-		if (session?.unread === true) this.savedUnread = true
-		this.token = session?.token ?? null
 	}
 }
 
