@@ -65,6 +65,11 @@ describe("the hosted twins", () => {
 			href: INSTALL_URL,
 			external: true,
 		})
+		expect(setupButton("first")).toEqual({
+			label: "Set up a first plan",
+			href: "/demo/plans/new/",
+			external: false,
+		})
 	})
 
 	test("say on a switched-off control what it would do and where to do it", () => {

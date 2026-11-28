@@ -4,6 +4,7 @@ import { demoSnapshotJson } from "../../../scripts/demo-snapshot"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { editSession } from "../../client/edit.svelte.js"
 import { guidedSession } from "../../client/guided-plan.svelte.js"
+import { taxLabelNotice } from "../../client/tax-label-notice.svelte.js"
 import { type Snapshot, snapshot } from "../../lib/contract"
 import { blankPerson } from "../../lib/view/guided/people"
 import NewPlanForm from "../plans/NewPlanForm.svelte"
@@ -35,6 +36,7 @@ beforeEach(() => {
 afterEach(() => {
 	guidedSession.cancel()
 	editSession.token = null
+	taxLabelNotice.clear()
 	// The entry-point tests set `?demo=1`: put the default address back, so no later file reads it.
 	setTestUrl("http://127.0.0.1/")
 })
@@ -116,6 +118,12 @@ describe("the guided plan page", () => {
 		expect(body).toContain('tabindex="-1"')
 		expect(body).not.toContain("Save plan")
 		expect(body).not.toContain("Stop-work age")
+	})
+
+	test("keeps the tax step off the What-if, whose link would skip the plan switch guard", () => {
+		guidedSession.saved = "guided"
+		taxLabelNotice.offer({ plan: "guided", flow: "pension", origin: "guided", taxed: true })
+		expect(page()).not.toContain("/settings/tax/")
 	})
 
 	test("shows the age problem when the stop step comes back with the age already filled", () => {

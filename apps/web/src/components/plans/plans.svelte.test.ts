@@ -5,7 +5,6 @@ import { snapshotLoader } from "../../client/browser"
 import { editSession } from "../../client/edit.svelte.js"
 import { planEditor } from "../../client/plan-editor.svelte.js"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
-import { withSearch as hostedWithSearch } from "../../hosted/links"
 import { ledgerWith } from "../../lib/view/plans/fixtures.test-support"
 import { type PlanRow, planRows } from "../../lib/view/plans/rows"
 import { LOADING } from "../../lib/view/state"
@@ -126,7 +125,6 @@ describe("the plans page", () => {
 		const body = page()
 		expect(body).toContain("Set up a first plan")
 		expect(body).toContain('href="/plans/new/?demo=1"')
-		expect(hostedWithSearch("/plans/new/", "?demo=1")).toBe("/demo/plans/new/?demo=1")
 		expect(body).not.toContain("plan-range")
 	})
 

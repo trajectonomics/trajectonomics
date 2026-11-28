@@ -176,7 +176,12 @@ describe("saving", () => {
 		next.reads.documents["guided"] = documentRead()
 		answers({ ok: true, snapshot: next })
 		await guidedSession.save(DEMO)
-		expect(taxLabelNotice.held).toEqual({ plan: "guided", flow: "pension" })
+		expect(taxLabelNotice.held).toEqual({
+			plan: "guided",
+			flow: "pension",
+			origin: "guided",
+			taxed: true,
+		})
 	})
 
 	test("offers no Tax labels link when every income of the saved plan has its label", async () => {

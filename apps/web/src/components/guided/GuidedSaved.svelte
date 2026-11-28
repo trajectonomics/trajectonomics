@@ -1,5 +1,4 @@
 <script lang="ts">
-import TaxLabelNotice from "../plan-items/TaxLabelNotice.svelte"
 import { PRIMARY } from "./styles"
 
 interface Props {
@@ -21,6 +20,5 @@ $effect(() => {
 	<p bind:this={sentence} tabindex="-1" class="text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 		Saved {name}. Settle the What-if above, then open it.
 	</p>
-	<TaxLabelNotice plan={name} doc={null} next />
 	<button type="button" class={PRIMARY} onclick={onOpen}>Open {name}</button>
 </div>
