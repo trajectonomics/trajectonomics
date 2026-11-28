@@ -49,7 +49,7 @@ export const FI_DEMO_HORIZON = "2066-03-31"
  */
 export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
 	"traj init",
-	`traj scenario apply --template --as-of ${FI_DEMO_AS_OF} > base.json`,
+	"traj scenario apply --template --as-of 2026-03-31 > base.json",
 	"traj scenario apply base --file base.json",
 ])
 
@@ -57,7 +57,8 @@ export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
  * The command the demo window shows the agent running, taken from the CLI's own `traj fi`
  * examples. A product fixture, the same text in every Language, and not copy.
  */
-export const FI_DEMO_COMMAND = `traj fi --scenario base --as-of ${FI_DEMO_AS_OF} --horizon ${FI_DEMO_HORIZON} --json`
+export const FI_DEMO_COMMAND =
+	"traj fi --scenario base --as-of 2026-03-31 --horizon 2066-03-31 --json"
 
 /** The name on the demo window's title bar: the app a visitor's agent runs in, drawn rather than embedded. */
 export const DEMO_APP_NAME = "Claude"
@@ -74,7 +75,7 @@ export const FI_DEMO_DATE = "2041-08-01"
  */
 export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
 	"{",
-	`  "asOf": "${FI_DEMO_AS_OF}",`,
+	'  "asOf": "2026-03-31",',
 	'  "tax": "not_applied",',
 	'  "method": "survival",',
 	`  "fi": { "reachable": true, "fiDate": "${FI_DEMO_DATE}" }`,
