@@ -16,6 +16,13 @@ const SECTION_FIELDS: Readonly<Record<string, Readonly<Record<string, string>>>>
 	},
 	fee: { fee: "feeRate", bps: "feeRate", rounding: "feeRounding" },
 }
+/** The dates the employer's Flow copies from the salary, by their key: the person types them at the salary's own fields. */
+const COPIED_DATES: Readonly<Record<string, string>> = {
+	start: "start",
+	startAt: "start",
+	end: "end",
+	endAt: "end",
+}
 const EMPLOYER_FIELDS: Readonly<Record<string, string>> = {
 	num: "employerShare",
 	den: "employerShare",
@@ -56,6 +63,8 @@ function employerFieldOf(
 	fields: readonly string[],
 ): string | null | undefined {
 	if (!owns(path, employer)) return undefined
+	const date = COPIED_DATES[path[employer.length] ?? ""]
+	if (date !== undefined && fields.includes(date)) return date
 	if (!fields.includes("employerAccount")) return null
 	return EMPLOYER_FIELDS[path[path.length - 1] ?? ""] ?? "employerAccount"
 }

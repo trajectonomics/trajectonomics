@@ -17,7 +17,7 @@ let { name, label, bound = $bindable(), shown }: Props = $props()
 
 <!-- A lowest or highest yearly amount, optional: an empty amount means the rule has none. -->
 <div class="space-y-3">
-	<Field id="spend-{name}" {label} inputmode="decimal" hint="The amount of a whole year. Optional, such as 300000.00" bind:value={bound.amount} problem={shown.at(name)} />
+	<Field id="spend-{name}" {label} inputmode="decimal" money hint="The amount of a whole year. Optional, such as 300000.00" bind:value={bound.amount} problem={shown.at(name)} />
 	{#if bound.amount.trim() !== ""}
 		<Field id="spend-{name}-growth" label="How it grows each year" options={BOUND_GROWTH_CHOICES} bind:value={bound.growth} />
 		{#if bound.growth === "fixed"}

@@ -8,9 +8,10 @@ import {
 	anchorDraftOf,
 	anchorFromDraft,
 } from "../../lib/view/household/anchor-draft"
+import { anchorShown, type SentAnchor } from "../../lib/view/household/anchor-shown"
 import { householdWithAnchor } from "../../lib/view/household/document"
 import { EDGE_CHOICES, WHEN_CHOICES } from "../../lib/view/plan-items/options"
-import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import type { Problems } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
 import FormAlert from "../ui/FormAlert.svelte"
 
@@ -33,11 +34,15 @@ const edgeChoices = [BLANK, ...EDGE_CHOICES]
 const people = $derived(household.people.map((person) => person.id))
 let draft: AnchorDraft = $state(anchorDraftOf())
 let problems: Problems = $state({})
-const FIELDS = ["flow", "edge", "person", "when", "age"]
-/** The whole path of the anchor the form writes, so a refusal at another anchor is the form's own problem. */
-let item = $state<readonly string[]>(["anchors"])
+/** What the last save sent, which a refusal's path counts into. */
+let sent = $state.raw<SentAnchor>({ anchors: [], path: "" })
 const shown = $derived(
-	shownProblems(problems, editSession.failure, editSession.error, FIELDS, item),
+	anchorShown(
+		problems,
+		{ failure: editSession.failure, message: editSession.error },
+		sent,
+		draft.when,
+	),
 )
 const flowChoices = $derived([
 	BLANK,
@@ -59,7 +64,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
-	item = ["anchors", String(next.anchors.findIndex((anchor) => anchor.path === result.anchor.path))]
+	sent = { anchors: next.anchors, path: result.anchor.path }
 	if (await saveHousehold(name, householdHash, next)) onDone()
 }
 </script>

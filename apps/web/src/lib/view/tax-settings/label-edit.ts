@@ -3,13 +3,19 @@
  * `apply-plan` Edit that names the hash the page read ([web ADR 0008](../../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)),
  * which is what `scenario tax --label` writes onto the Flow. `traj` checks the label against the Flow's kind. Pure.
  */
-import type { ErrorBody, ScenarioDocument } from "../../contract"
+import type { ErrorBody, HouseholdDocument, ScenarioDocument } from "../../contract"
 import type { EditInput } from "../../edit/edit"
 import { INCOME_LABEL_IDS, type TaxLabels } from "../../edit/tax-labels"
+import { flowOwner } from "../household/owner"
 import type { Problems, Shown } from "../plan-items/problems"
 import { shownProblems } from "../plan-items/problems"
 import { namedRefusal } from "../plan-items/refusal"
+import { readsFilerLabels } from "./filer-label"
 import { INCOME_LABELS } from "./label-choices"
+
+/** What the form says where the plan's tax needs to know whose an income is, and the household does not say. */
+export const OWNER_FIRST =
+	"This plan's tax needs to know whose income this is. Set its Owner on the Income page, then label it."
 
 /** What the label form holds: the Flow and the label chosen. */
 export interface LabelDraft {
@@ -32,9 +38,20 @@ export function withFlowLabel(
 	return { ...plan, flows: plan.flows.map((it) => (it.id === flow ? { ...it, label } : it)) }
 }
 
-/** The Edit a draft makes, or the problems at its fields. A label outside the list is refused here and by `traj`. */
+/** The plan a label is saved into, with the household that says whose each Flow is. */
+export interface LabelTarget {
+	name: string
+	contentHash: string
+	plan: ScenarioDocument
+	household: HouseholdDocument | null
+}
+
+/**
+ * The Edit a draft makes, or the problems at its fields. A label outside the list is refused here and by `traj`. Where the
+ * plan's tax reads each person's income, the label names the Flow's Owner (`income.section40_1@me`).
+ */
 export function labelEdit(
-	target: { name: string; contentHash: string; plan: ScenarioDocument },
+	target: LabelTarget,
 	draft: LabelDraft,
 ): { ok: true; edit: EditInput } | { ok: false; problems: Problems } {
 	const problems: Record<string, string> = {}
@@ -44,13 +61,17 @@ export function labelEdit(
 	if (!INCOME_LABELS.some((choice) => choice.value === draft.label)) {
 		problems["label"] = "Choose a tax label."
 	}
+	const { name, contentHash, plan, household } = target
+	const filed = readsFilerLabels(plan)
+	const owner = filed ? flowOwner(household, draft.flow) : ""
+	if (filed && problems["flow"] === undefined && owner === "") problems["flow"] = OWNER_FIRST
 	if (Object.keys(problems).length > 0) return { ok: false, problems }
-	const { name, contentHash, plan } = target
+	const label = filed ? `${draft.label}@${owner}` : draft.label
 	const edit = {
 		kind: "apply-plan",
 		name,
 		contentHash,
-		document: withFlowLabel(plan, draft.flow, draft.label),
+		document: withFlowLabel(plan, draft.flow, label),
 	} satisfies EditInput
 	return { ok: true, edit }
 }

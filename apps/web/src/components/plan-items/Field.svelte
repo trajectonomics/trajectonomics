@@ -39,13 +39,12 @@ let {
 
 const choices = $derived(fieldChoices(options, value))
 let focused = $state(false)
-/** The draft the last Undo took away, which only its Redo puts back at a hidden amount. */
-let undone = $state<string | null>(null)
+let undone = $state<string | null>(null) // The draft the last Undo took away; only its Redo puts it back.
 /** True while the digits show as the mask: a focused field shows the real value, so the person can edit it. */
 const masked = $derived(money && preferences.hidden && !focused && value.trim() !== "")
 const shown = $derived(masked ? maskMoney(value) : value)
 
-/** The draft a typed value makes. A hidden amount's Undo and Redo are read for what they mean, not the text they compose. */
+/** The draft a typed value makes: a hidden amount's Undo and Redo are read for what they mean, and a script's input is masked again. */
 function onInput(event: Event & { currentTarget: HTMLInputElement }): void {
 	const field = event.currentTarget
 	const typed = field.value
@@ -57,7 +56,8 @@ function onInput(event: Event & { currentTarget: HTMLInputElement }): void {
 	undone = next.undone
 	const caret = (field.selectionStart ?? typed.length) - (typed.length - next.draft.length)
 	value = next.draft
-	if (next.draft !== typed) {
+	if (masked) field.value = shown
+	else if (next.draft !== typed) {
 		field.value = shown
 		field.setSelectionRange(caret, caret)
 	}
@@ -74,6 +74,7 @@ const described = $derived(describedBy(id, { hint, problem, masked }))
 			{id}
 			{disabled}
 			bind:value
+			aria-invalid={problem ? "true" : undefined}
 			aria-describedby={described}
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 		>

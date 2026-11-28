@@ -22,7 +22,7 @@ const rule = $derived(draft.how !== "" && draft.how !== "level")
 		<Field id="spend-frequency" label="How it is paid" hint={draft.startMode === "milestone" ? "A monthly rule pays from the month the Milestone fires. A yearly one pays on the same day each year, counted from the plan's As-of." : undefined} options={PAY_CHOICES} bind:value={draft.frequency} problem={shown.at("frequency")} />
 	{/if}
 	{#if draft.how === "level"}
-		<Field id="spend-amount" label={draft.frequency === "annual" ? "Amount each year" : "Amount each month"} inputmode="decimal" hint="Keeps pace with inflation. A decimal number, such as 40000.00" bind:value={draft.amount} problem={shown.at("amount")} />
+		<Field id="spend-amount" label={draft.frequency === "annual" ? "Amount each year" : "Amount each month"} inputmode="decimal" money hint="Keeps pace with inflation. A decimal number, such as 40000.00" bind:value={draft.amount} problem={shown.at("amount")} />
 	{/if}
 	{#if rule}
 		<Field id="spend-rate" label={draft.how === "currentRate" ? "Share of your savings each year" : "Share of your savings at the start"} inputmode="decimal" hint="Your own estimate. A percent with at most two places, such as 4 or 4.25" bind:value={draft.rate} problem={shown.at("rate")} />

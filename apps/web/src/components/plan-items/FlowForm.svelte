@@ -5,12 +5,12 @@ import { currentItemText } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
-import { employerIdOf, employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
-import { FLOW_FIELDS } from "../../lib/view/plan-items/fields"
+import { flowOwner, ownerChoices } from "../../lib/view/household/owner"
+import { employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
+import { flowShown } from "../../lib/view/plan-items/flow-shown"
 import { flowFormStart } from "../../lib/view/plan-items/flow-try-draft"
 import { categoriesOf, type FlowKind } from "../../lib/view/plan-items/flows"
-import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
-import { namedRefusal } from "../../lib/view/plan-items/refusal"
+import type { Problems } from "../../lib/view/plan-items/problems"
 import { newIncomeNeedsTaxLabel } from "../../lib/view/plan-items/tax-label"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
@@ -27,8 +27,7 @@ interface Props {
 	household: HouseholdDocument | null
 	/** The Flow to edit; absent for a new one. */
 	existing?: ScenarioFlow | undefined
-	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. A saved new income in a
-	 * taxed plan also hands over the Flow whose Tax labels page takes its label. */
+	/** Runs once the save has run. A new income in a taxed plan hands over the Flow that needs a tax label. */
 	onDone: (taxLabelFlow?: string) => void
 	/** True when the drawer tries values in the What-if session, instead of saving them. */
 	tryValue?: boolean
@@ -44,61 +43,63 @@ let {
 	contentHash,
 	tryValue = false,
 }: Props = $props()
-const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
+/** The Flow the last save added: the form edits it from then on, so a second Save adds no other one. */
+let addedId: string | undefined = $state()
+const held = $derived(existing ?? doc.flows.find((flow) => flow.id === addedId))
+const anchors = $derived(flowAnchorLabels(household, held?.id ?? ""))
+/** The Owner the household holds for the Flow, and the choices of the Owner field, which only a save writes. */
+const storedOwner = $derived(flowOwner(household, held?.id ?? ""))
+// svelte-ignore state_referenced_locally
+let owner = $state(flowOwner(household, existing?.id ?? ""))
+const owners = $derived(
+	kind === "income" && !tryValue ? ownerChoices(household, storedOwner) : undefined,
+)
 const start = () => flowFormStart(doc, name, existing, tryValue, whatIfSession.whatIf)
 let draft = $state(start().draft)
 let employer = $state(start().employer)
 let problems: Problems = $state({})
 /** The fields a tried value cleared, which a what-if cannot hold. */
 let cleared: string[] = $state([])
-/** Whether a cleared field left the Flow switched off, so the what-if holds no other change to point at. */
 const keptOff = $derived(
 	cleared.length > 0 && whatIfSession.isOffIn(name, `flows.${existing?.id ?? ""}`),
 )
 /** The ids of the Flows of the document the last save sent, in order, which a refusal's position in its path names. */
 let sent: string[] = $state([])
-/** The Flow the form edits: its stored id, or the one the last save added. */
-const savedId = $derived(
-	existing?.id ?? sent.find((id) => !doc.flows.some((flow) => flow.id === id)),
-)
-const item = $derived(["flows", savedId ?? ""])
-const employerPath = $derived(["flows", employerIdOf(savedId ?? "")])
-const refusal = $derived(namedRefusal(editSession.failure, sent))
 const shown = $derived(
-	shownProblems(problems, refusal, editSession.error, FLOW_FIELDS, item, employerPath),
+	flowShown(
+		{ problems, failure: editSession.failure, message: editSession.error, sent },
+		{ held: held?.id, flows: doc.flows },
+	),
 )
-/** True while the form shows the note for a new income in a taxed plan, so the fields say what the save leaves undone. */
 const needsTaxLabel = $derived(newIncomeNeedsTaxLabel(doc, kind, existing))
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	/** The ids the drawer opened on: the save's document adds the Flow a tax label is needed for. */
-	const before = new Set(doc.flows.map((flow) => flow.id))
 	const saved = await saveFlow({
 		name,
 		contentHash,
 		doc,
 		kind,
-		existing,
+		existing: held,
 		draft,
 		employer,
 		tryValue,
+		owner: owners === undefined || owner === storedOwner ? undefined : owner,
 	})
 	problems = saved.problems
 	cleared = saved.cleared
 	sent = saved.sent
-	const added = saved.sent.find((id) => !before.has(id))
-	const taxLabelFlow = needsTaxLabel ? added : undefined
-	if (saved.done) onDone(tryValue ? undefined : taxLabelFlow)
+	addedId = saved.added ?? addedId
+	if (saved.done) onDone(tryValue || !needsTaxLabel ? undefined : addedId)
 }
 
 async function remove(): Promise<void> {
-	if (await deleteFlow({ name, contentHash, doc }, existing?.id ?? "")) onDone()
+	if (await deleteFlow({ name, contentHash, doc }, held?.id ?? "")) onDone()
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : `Add ${kind}`}>
-	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} {needsTaxLabel} />
+<form onsubmit={save} class="space-y-6" aria-label={held ? `Edit ${currentItemText("flow", held.id)}` : `Add ${kind}`}>
+	<FlowFields bind:draft bind:employer bind:owner {owners} {kind} existing={held} {shown} {name} {anchors} trying={tryValue} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} {needsTaxLabel} />
 	<TryNotice fields={cleared} others={!keptOff} />
-	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
+	<ItemActions id={held?.id} kind="flow" onDelete={remove} trying={tryValue} note={held === undefined ? undefined : salaryDeleteNote(doc.flows, held.id)} />
 </form>

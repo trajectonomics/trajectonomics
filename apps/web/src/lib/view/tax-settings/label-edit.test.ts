@@ -15,7 +15,7 @@ const document = {
 	accounts: [],
 	flows: [flow("salary", "income"), flow("rent", "expense")],
 } as unknown as ScenarioDocument
-const target = { name: "base", contentHash: HASH, plan: document }
+const target = { name: "base", contentHash: HASH, plan: document, household: null }
 
 describe("the tax label form", () => {
 	test("offers only the labels the CLI accepts for an income Flow, none chosen first", () => {

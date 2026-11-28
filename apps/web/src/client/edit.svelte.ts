@@ -7,6 +7,7 @@ import { isActionSource } from "../lib/view/action-source"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
 import { fetchEditSession, postEdit, postPreview } from "./edit-post.js"
 import { EditState } from "./edit-state.svelte.js"
+import { focused, focusRefusal } from "./refused-focus.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
@@ -29,6 +30,7 @@ class EditSession extends EditState {
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
 	async run(edit: EditInput, source = "form"): Promise<boolean> {
 		if (this.token === null || this.busy) return false
+		const pressed = focused()
 		this.busy = true
 		this.source = source
 		this.clear()
@@ -42,6 +44,7 @@ class EditSession extends EditState {
 			return false
 		} finally {
 			this.busy = false
+			if (this.error !== null || this.stale) void focusRefusal(pressed)
 		}
 	}
 
