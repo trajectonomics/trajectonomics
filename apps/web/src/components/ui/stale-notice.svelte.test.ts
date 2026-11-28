@@ -9,6 +9,7 @@ afterEach(() => {
 	editSession.savedUnread = false
 	editSession.failure = null
 	editSession.source = "form"
+	editSession.reloadError = null
 })
 
 describe("StaleNotice", () => {
@@ -43,6 +44,19 @@ describe("StaleNotice", () => {
 		const landed = render(StaleNotice, { props: { shows: "landed" } }).body
 		expect(landed).not.toContain(STALE_PLAN)
 		expect(landed).not.toContain(">Reload</button>")
+	})
+
+	test("says why its Reload failed inside the alert, and leaves the button focusable", () => {
+		editSession.savedUnread = true
+		editSession.reloadError = "The ledger is busy."
+		editSession.busy = true
+		const { body } = render(StaleNotice, { props: { shows: "landed" } })
+		editSession.busy = false
+		const alert = body.slice(body.indexOf('role="alert"'), body.indexOf(">Reload</button>"))
+		expect(alert).toContain("The ledger is busy.")
+		expect(body).toContain('aria-disabled="true"')
+		// A `disabled` button drops keyboard focus to the page body while its own request runs.
+		expect(body).not.toMatch(/<button[^>]*\sdisabled/)
 	})
 
 	test("draws a focus ring on its button and never turns the ring off", () => {

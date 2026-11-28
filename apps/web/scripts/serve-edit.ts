@@ -2,7 +2,7 @@
 // traj, re-reads the Snapshot and answers it ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 import type { Snapshot } from "../src/lib/contract"
 import { followEdit } from "../src/lib/edit/follow"
-import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
+import { EDIT_TOKEN_HEADER, refuseEdit } from "../src/lib/edit/guard"
 import { createEditGate } from "./edit-gate"
 import { changedBy, paramsAfter, rereadInputs } from "./run-reread"
 import { runEdit } from "./serve-apply"
@@ -10,7 +10,7 @@ import { failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
 import { answerPath } from "./serve-path"
 import { recordValues } from "./serve-record-values"
-import { json } from "./serve-respond"
+import { answerSession } from "./serve-session"
 import { answerOf, answerWritten } from "./serve-snapshot-answer"
 import { answerWhatIf } from "./serve-what-if"
 import { runSnapshot, type SnapshotRun } from "./snapshot-run"
@@ -24,6 +24,8 @@ export function createEditor(options: EditorOptions): Editor {
 	let held: Snapshot | null = null
 	// True after a whole read failed, as after a write that landed: until a whole read succeeds, no reread keeps reads from before it.
 	let behind = false
+	// True from a write that landed while its read failed, until a whole read succeeds: the served body lacks that write.
+	let unread = false
 	const gate = createEditGate()
 
 	/** Keeps a Snapshot that ran as the served body and as the one a later reread may keep reads of. */
@@ -31,6 +33,7 @@ export function createEditor(options: EditorOptions): Editor {
 		if (run.ok) {
 			body = JSON.stringify(run.snapshot)
 			held = run.snapshot
+			unread = false
 		}
 		return run
 	}
@@ -41,20 +44,27 @@ export function createEditor(options: EditorOptions): Editor {
 		return run
 	}
 
+	/** The read after a write that landed. */
+	async function readWritten(): Promise<SnapshotRun> {
+		const run = await refresh()
+		if (!run.ok) unread = true
+		return run
+	}
+
 	/** The Edit's own run: dry first, then the real write, then the Snapshot read again. */
 	async function apply(request: Request): Promise<Response> {
 		const read = await readEdit(request)
 		if (!read.ok) return failure(400, read.error)
 		const { edit } = read
 		if (edit.kind === "record-values") {
-			return recordValues({ traj: options.traj, held, refresh }, edit)
+			return recordValues({ traj: options.traj, held, refresh: readWritten }, edit)
 		}
 		const run = await runEdit(options.traj, edit)
 		if (!run.ok) return failure(200, run.error)
 		// The write is in, so `params` follows it before the read: a failed read still leaves Reload reading what it made.
 		params = followEdit(params, edit)
 		// An EditRun that ran is a Stated (its `ok` is not read).
-		return answerWritten(await refresh(), run)
+		return answerWritten(await readWritten(), run)
 	}
 
 	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data; or reads one path. */
@@ -103,15 +113,7 @@ export function createEditor(options: EditorOptions): Editor {
 			return body
 		},
 		refresh,
-		session(request, port) {
-			const refusal = refuseSession({
-				method: request.method,
-				host: request.headers.get("host"),
-				port,
-			})
-			if (refusal) return refused(refusal.status, refusal.code, refusal.message)
-			return json(200, JSON.stringify({ token: options.token }))
-		},
+		session: (request, port) => answerSession(request, port, { token: options.token, unread }),
 		edit: (request, port) => admit(request, port, () => apply(request)),
 		reread: (request, port) => admit(request, port, () => rereadAnswer(request)),
 		whatIf: (request, port) =>

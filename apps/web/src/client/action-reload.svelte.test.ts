@@ -35,6 +35,16 @@ describe("Reload beside an inline action", () => {
 		expect(editSession.error).toBe("busy")
 	})
 
+	test("from the notice says why in the notice, and leaves the source and the error alone", async () => {
+		await staleAction()
+		answers(BUSY)
+		expect(await editSession.reload()).toBe(false)
+		expect(editSession.source).toBe(SOURCE)
+		expect(editSession.stale).toBe(true)
+		expect(editSession.error).toBeNull()
+		expect(editSession.reloadError).toBe("busy")
+	})
+
 	test("that succeeds forgets the refusal", async () => {
 		await staleAction()
 		answers(RAN)

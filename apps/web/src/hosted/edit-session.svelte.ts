@@ -23,6 +23,8 @@ class HostedEditSession implements Session {
 	failure = $state<ErrorBody | null>(null)
 	stale = $state(false)
 	savedUnread = $state(false)
+	landings = $state(0)
+	reloadError = $state<string | null>(null)
 	result = $state<AccountValues | null>(null)
 
 	open(): Promise<void> {
@@ -50,6 +52,10 @@ class HostedEditSession implements Session {
 	}
 
 	addPlan(_name: string): Promise<boolean> {
+		return Promise.resolve(false)
+	}
+
+	reload(): Promise<boolean> {
 		return Promise.resolve(false)
 	}
 }
