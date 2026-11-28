@@ -12,6 +12,8 @@ export const MAX_TOKENS = 100_000_000_000
 export const MAX_INGEST_ROWS = 5_000
 /** The largest ingest body, in bytes. */
 export const MAX_INGEST_BYTES = 1_048_576
+/** The largest account-deletion body, in bytes. */
+export const MAX_DELETE_BYTES = 1_024
 /** How many validation errors a 400 response lists. */
 export const MAX_INGEST_ERRORS = 10
 /** The earliest UTC day the public query may name. */

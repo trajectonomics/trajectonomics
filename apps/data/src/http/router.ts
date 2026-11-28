@@ -2,6 +2,7 @@ import { routeRequest } from "../core/route"
 import type { Env, RequestContext } from "../env"
 import { handleHealth } from "./health"
 import { handleIngest } from "./ingest"
+import { handleDeleteContributor } from "./internal"
 import { handlePeaks } from "./peaks"
 import { json, methodNotAllowed, permanentRedirect } from "./responses"
 import { handleUsage } from "./usage"
@@ -31,6 +32,8 @@ export function handleRequest(
 			return handleHealth(request, env, context)
 		case "ingest":
 			return handleIngest(request, env, context)
+		case "delete_contributor":
+			return handleDeleteContributor(request, env, context)
 		case "redirect":
 			return Promise.resolve(permanentRedirect(route.location))
 		case "method_not_allowed":
