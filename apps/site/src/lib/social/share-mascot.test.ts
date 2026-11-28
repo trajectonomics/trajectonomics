@@ -40,8 +40,9 @@ describe("the mascot the home card draws", () => {
 		expect(placement.x + placement.width).toBeCloseTo(SHARE_IMAGE_WIDTH - MARGIN, 1)
 	})
 
-	it("keeps clear of the chart and of the question's baseline above it", () => {
+	it("keeps 24 px clear of the chart and of the host line above it", () => {
 		const placement = mascotPlacement(MASCOT)
+		expect(MASCOT_GAP).toBe(24)
 		expect(placement.x).toBeGreaterThanOrEqual(CHART_RIGHT + MASCOT_GAP)
 		expect(placement.y).toBeGreaterThanOrEqual(META_BASELINE + MASCOT_GAP)
 	})

@@ -79,7 +79,7 @@ the baseline the chart starts from, in the space the curve leaves free, and poin
 ### The brief
 
 > Use your image generation tool to create one image. The character is the small cute robot mascot
-> in `cover.webp` and `with-traj.webp`: soft matte cream 3D body like smooth vinyl or clay, a
+> in `public/mascot/chart.webp`, `wave.webp` and `sit.webp`: soft matte cream 3D body like smooth vinyl or clay, a
 > rounded rectangular head, a glossy black visor with two glowing round orange eyes, a thin black
 > antenna with a small orange ball, short stubby arms and legs. Soft studio lighting, gentle
 > shadows, very cute and friendly. Background: perfectly flat, uniform, pure chroma-key green
