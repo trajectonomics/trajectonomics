@@ -21,6 +21,7 @@ const PLANS = [
 	"labels-360",
 	"landed-notes-360",
 	"landed-order-360",
+	"row-order-360",
 ] as const
 const LOCKED_HOME_LOAN = 14444
 const PARAMS: PlanParams = {
