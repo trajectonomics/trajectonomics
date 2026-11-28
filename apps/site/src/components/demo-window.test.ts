@@ -124,7 +124,7 @@ describe("the demo window in every Language", () => {
 				`${dictionary.actionAgent} ${dictionary.actionNeedMore}`,
 				`${dictionary.actionYou} ${dictionary.actionData}`,
 			])
-			expect(spoken[4]).toContain(dictionary.actionSkillLine)
+			expect(unescapeText(spoken[4] ?? "")).toContain(dictionary.actionSkillLine)
 			expect(spoken[4]).toContain(FI_DEMO_COMMAND)
 			expect(spoken[4]).toContain(dictionary.actionExampleNote)
 			expect(spoken[5]).toBe(

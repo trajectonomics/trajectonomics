@@ -26,6 +26,13 @@ const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent
 /** The pill's two runs: the licence and the release, both facts the page prints. */
 const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 
+/** The first line of the demo's bash fence: what the setup does, named because the window shortens it. */
+const SETUP_NOTE =
+	"# First-time setup: record your balance, then fill base.json with your numbers before applying it."
+
+/** The line above the demo command: the question that command answers. */
+const ASK_NOTE = "# Ask when you reach financial independence:"
+
 /**
  * The demo the page shows: the first-time setup, the command an agent runs, and the abridged JSON it
  * answers with. The setup label is there because `scenario apply base --file` replaces an existing
@@ -33,8 +40,10 @@ const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
  */
 const DEMO = [
 	"```bash",
-	"# First-time setup:",
+	SETUP_NOTE,
 	...FI_DEMO_SETUP_COMMANDS,
+	"",
+	ASK_NOTE,
 	FI_DEMO_COMMAND,
 	"```",
 	"",

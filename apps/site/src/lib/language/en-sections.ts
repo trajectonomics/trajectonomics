@@ -30,7 +30,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 		"This covers your spending, but not what you have saved. What is your balance today?",
 	actionData: "I have 1.2M saved today and I put away 25,000 a month.",
 	actionSkillLine:
-		"The agent loads the traj skill, records your balance, puts your numbers in base.json and runs the CLI (setup shortened):",
+		"The agent's traj skill records your balance, fills base.json with your numbers and runs the CLI:",
 	actionProvenance: "traj fi · as of 31 Mar 2026",
 	replay: "Replay",
 	actionExampleNote: "Example output, abridged.",

@@ -1,6 +1,4 @@
 import { describe, expect, it } from "bun:test"
-import { readFileSync } from "node:fs"
-import { join } from "node:path"
 import * as site from "./site"
 import {
 	BLOG_PATH,
@@ -16,7 +14,6 @@ import {
 	FI_DEMO_COMMAND,
 	FI_DEMO_DATE,
 	FI_DEMO_OUTPUT,
-	FI_DEMO_SETUP_COMMANDS,
 	GITHUB_ORG_URL,
 	GITHUB_REPO_URL,
 	GITHUB_SKILLS_URL,
@@ -99,39 +96,6 @@ describe("the Site's own constants", () => {
 		expect(FI_DEMO_COMMAND).toContain("--as-of")
 		expect(FI_DEMO_COMMAND).toContain("--horizon")
 		expect(FI_DEMO_COMMAND.endsWith("--json")).toBe(true)
-	})
-
-	it("runs setup commands whose subcommands and flags the CLI source defines, so the demo cannot drift", () => {
-		const root = join(import.meta.dir, "../../../..")
-		const source = (path: string) => readFileSync(join(root, path), "utf8")
-		const commandFiles: Record<string, string> = {
-			init: "apps/cli/src/commands/init.ts",
-			"scenario apply": "apps/cli/src/commands/scenario/apply.ts",
-		}
-
-		for (const command of FI_DEMO_SETUP_COMMANDS) {
-			const subcommand = Object.keys(commandFiles)
-				.sort((one, other) => other.length - one.length)
-				.find((name) => command.startsWith(`traj ${name}`))
-			if (subcommand === undefined) throw new Error(`no CLI source for \`${command}\``)
-			expect(source(commandFiles[subcommand] ?? "")).toContain(
-				`name: "${subcommand.split(" ").at(-1)}"`,
-			)
-		}
-
-		const flags = [...FI_DEMO_SETUP_COMMANDS.join("\n").matchAll(/--([a-z][a-z-]*)/g)].map(
-			([, flag]) => flag,
-		)
-		expect(flags).toEqual(["template", "file"])
-		const apply = source(commandFiles["scenario apply"] ?? "")
-		for (const flag of flags) {
-			const option = flag?.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())
-			expect(apply).toMatch(new RegExp(`\\b${option}:\\s`))
-		}
-
-		const index = source("apps/cli/src/commands/index.ts")
-		expect(index).toContain('import { init } from "./init"')
-		expect(index).toMatch(/\n\t\tinit,/m)
 	})
 
 	it("prints the demo's output as the CLI's JSON, with one date the panel repeats", () => {

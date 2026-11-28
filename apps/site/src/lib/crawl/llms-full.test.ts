@@ -51,9 +51,17 @@ describe("the full Answer engine file", () => {
 		}
 	})
 
-	it("labels the demo's setup as a first-time setup, which its command and answer follow in code", () => {
+	it("walks the demo from the first-time setup to the command and the answer it prints", () => {
 		expect(LLMS_FULL_TXT).toContain(
-			`\`\`\`bash\n# First-time setup:\n${FI_DEMO_SETUP_COMMANDS.join("\n")}\n${FI_DEMO_COMMAND}\n\`\`\``,
+			[
+				"```bash",
+				"# First-time setup: record your balance, then fill base.json with your numbers before applying it.",
+				...FI_DEMO_SETUP_COMMANDS,
+				"",
+				"# Ask when you reach financial independence:",
+				FI_DEMO_COMMAND,
+				"```",
+			].join("\n"),
 		)
 		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
 	})
