@@ -1,17 +1,14 @@
 import { z } from "zod"
-import { UUID_SHAPED } from "../../account/name"
 import { defineCommand, type Leaf } from "../../command"
-import { missingFieldError } from "../../document"
+import { runApply } from "../../scenario/apply-command"
 import { APPLY_EXAMPLES } from "../../scenario/apply-examples"
-import { DOCUMENT, exclusive, REQUIRED_NAME } from "../../scenario/apply-forms"
-import { applyWhatIfFlags, whatIfResult } from "../../scenario/apply-what-if"
-import { applyResult, writeApplied } from "../../scenario/apply-write"
+import { DOCUMENT } from "../../scenario/apply-forms"
+import { whatIfResult } from "../../scenario/apply-what-if"
+import { applyResult } from "../../scenario/apply-write"
 import { decimalFlag } from "../../scenario/decimal-schema"
-import { invalidScenarioName } from "../../scenario/errors"
 import { fromHistoryFlag, monthsFlag } from "../../scenario/history-flags"
 import { IF_HASH } from "../../scenario/if-hash"
-import { addFlag, decimalProblem, setFlag, withoutFlag } from "../../scenario/override-flags"
-import { printTemplate } from "../../scenario/template"
+import { addFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
 import { LEDGER_READ_CODES } from "../../store"
 
 export const apply: Leaf = defineCommand({
@@ -74,29 +71,9 @@ export const apply: Leaf = defineCommand({
 		"AMOUNT_OVERFLOW",
 		"unsupported_currency",
 		"scenario_changed",
+		"scenario_name_taken",
 		"not_found",
 		...LEDGER_READ_CODES,
 	],
-	run: (input, document, ctx) => {
-		const wrong = exclusive(input)
-		if (wrong !== undefined) return wrong
-		if (input.template === true) {
-			return printTemplate(ctx, input.asOf, {
-				history: input.fromHistory === true ? { months: input.months ?? 12 } : undefined,
-				decimal: input.decimal === true,
-			})
-		}
-		if (input.file === undefined) return decimalProblem(input) ?? applyWhatIfFlags(ctx, input)
-		// The document form checks this before it reads the document; the guard keeps `name` a string.
-		const name = input.name
-		if (name === undefined) return missingFieldError(REQUIRED_NAME)
-		if (UUID_SHAPED.test(name)) return invalidScenarioName()
-		return writeApplied(ctx, {
-			name,
-			document,
-			decimal: input.decimal === true,
-			dryRun: input.dryRun === true,
-			ifHash: input.ifHash,
-		})
-	},
+	run: (input, document, ctx) => runApply(input, document, ctx),
 })

@@ -1,19 +1,12 @@
 import { type AppError, fail, isAppError } from "../errors"
-import { scenarioChanged } from "../scenario/errors"
+import { scenarioChanged, scenarioNameTaken } from "../scenario/errors"
 import { applyConflictHint } from "../scenario/household/conflict-hint"
-import { contentHash } from "./canonical"
 import { liveOnly, SCENARIO_COLUMNS, SCENARIO_ORDER } from "./columns"
 import type { Ctx } from "./context"
 import { read, write } from "./guard"
 import { type RawScenarioRow, toScenarioRow } from "./scenario-read"
-import {
-	anchorsFor,
-	canonicalDocument,
-	insertScenario,
-	liveScenario,
-	replaceScenario,
-	taxKept,
-} from "./scenario-rows"
+import { anchorsFor, canonicalDocument, liveScenario } from "./scenario-rows"
+import { createdScenario, savedScenario } from "./scenario-save"
 import type { NewScenario, ScenarioSaved } from "./scenario-types"
 import type { ListOptions, ScenarioRow, ScenarioSort, WriteOptions } from "./types"
 
@@ -40,40 +33,14 @@ export function saveScenario(
 		ctx.db,
 		() => {
 			const current = liveScenario(ctx, "name", input.name)
+			if (input.createOnly === true && current !== null) return scenarioNameTaken(current.id)
 			const stale = staleRefusal(current, input.name, input.expectedHash)
 			if (stale !== undefined) return stale
 			const resolved = anchorsFor(current, input.document, applyConflictHint(input.name))
 			if (isAppError(resolved)) return resolved
 			const document = canonicalDocument(resolved.document)
-			if (!current) {
-				const scenario = insertScenario(ctx, {
-					name: input.name,
-					document,
-					forkedFrom: null,
-					household: null,
-					tax: null,
-					notes: null,
-				})
-				return { status: "created", scenario, droppedAnchors: [], droppedOwners: [] }
-			}
-			const tax = taxKept(current, resolved.document)
-			if (
-				current.contentHash === contentHash(document) &&
-				current.household === resolved.household &&
-				current.tax === tax
-			) {
-				return { status: "unchanged", scenario: current, droppedAnchors: [], droppedOwners: [] }
-			}
-			const scenario = replaceScenario(ctx, current, document, {
-				household: resolved.household,
-				tax,
-			})
-			return {
-				status: "updated",
-				scenario,
-				droppedAnchors: resolved.dropped,
-				droppedOwners: resolved.droppedOwners,
-			}
+			if (!current) return createdScenario(ctx, input, resolved, document)
+			return savedScenario(ctx, current, input, resolved, document)
 		},
 		options,
 	)

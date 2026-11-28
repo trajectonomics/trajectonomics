@@ -1,17 +1,11 @@
 import { type AppError, isAppError } from "../errors"
-import { isPlainObject } from "../json"
 import { householdDocument } from "../scenario/household/document"
 import { canonicalHousehold } from "../scenario/household/model"
-import { notesProblem } from "../scenario/notes"
 import { canonicalTax, requestOfStored, storedTaxOf } from "../scenario/tax/stored"
 import { storedTax } from "../scenario/tax/stored-schema"
-import {
-	canonicalScenarioDocument,
-	formatMinorUnits,
-	isTxCorrection,
-	parseMinorUnits,
-	TX_CORRECTIONS,
-} from "../store"
+import { parseUnstated, serializeUnstated } from "../scenario/unstated/entry"
+import { canonicalScenarioDocument, formatMinorUnits, parseMinorUnits } from "../store"
+import { correction, dimensions, flag, notes } from "./fields-simple"
 import type { FieldKind } from "./format"
 import { invalid } from "./invalid"
 
@@ -53,14 +47,6 @@ function amount(value: unknown, path: string, record: Record<string, unknown>): 
 	})
 }
 
-function dimensions(value: unknown, path: string): unknown | AppError {
-	if (!isPlainObject(value)) return invalid(path, "must be an object of strings or null")
-	const entries = Object.values(value)
-	if (entries.length === 0) return invalid(path, "must be null when empty, never {}")
-	if (!entries.every((v) => typeof v === "string")) return invalid(path, "values must be strings")
-	return value
-}
-
 function document(value: unknown, path: string): unknown | AppError {
 	return canonicalScenarioDocument(value, path)
 }
@@ -85,20 +71,12 @@ function tax(value: unknown, path: string): unknown | AppError {
 	return canonicalTax(storedTaxOf(requestOfStored(parsed.data)))
 }
 
-/** A plan's notes, checked by the rules `traj scenario notes` stores them under. */
-function notes(value: unknown, path: string): unknown | AppError {
-	if (typeof value !== "string") return invalid(path, "must be a string or null")
-	const problem = notesProblem(value)
-	return problem === null ? value : invalid(path, problem)
-}
-
-function flag(value: unknown, path: string): unknown | AppError {
-	return typeof value === "boolean" ? value : invalid(path, "must be true or false")
-}
-
-function correction(value: unknown, path: string): unknown | AppError {
-	if (value === null || isTxCorrection(value)) return value
-	return invalid(path, `must be null or one of ${TX_CORRECTIONS.join(", ")}`)
+/** The paths a plan's writes left unstated, as the column stores them: canonical text or null. */
+function unstated(value: unknown, path: string): unknown | AppError {
+	if (value === null) return null
+	if (!Array.isArray(value)) return invalid(path, "must be an array of entries or null")
+	const parsed = parseUnstated(value, path)
+	return isAppError(parsed) ? parsed : serializeUnstated(parsed)
 }
 
 /** How each field kind is checked and turned back into the store's row value. */
@@ -114,6 +92,7 @@ export const DECODERS: Record<FieldKind, Decode> = {
 	"household?": nullable(household),
 	"tax?": nullable(tax),
 	"notes?": nullable(notes),
+	"unstated?": unstated,
 	flag,
 	correction,
 }

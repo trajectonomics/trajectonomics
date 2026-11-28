@@ -76,7 +76,11 @@ export const fork: Leaf = defineCommand({
 			if (isAppError(source)) return source
 			if (source === null) return scenarioNotFound(input.from, "from")
 			let applied: Applied = { overrides: [], removals: [], additions: [] }
-			const options: ForkOptions = { dryRun, notes: input.noNotes !== true }
+			const options: ForkOptions = {
+				dryRun,
+				notes: input.noNotes !== true,
+				stated: () => applied.overrides.map((override) => override.path),
+			}
 			if (sets.length > 0 || without.length > 0 || add.length > 0) {
 				options.transform = transformFor({ sets, without, add, decimal: input.decimal }, (done) => {
 					applied = done

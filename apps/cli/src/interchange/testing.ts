@@ -19,8 +19,8 @@ export const GOLDEN_NOTES = "แผนหลัก: เกษียณอาย�
 export async function goldenWithoutNotes(): Promise<string> {
 	return edit(
 		await goldenJsonl(),
-		`,"notes":${JSON.stringify(GOLDEN_NOTES)},"main":true}`,
-		',"notes":null,"main":false}',
+		`,"notes":${JSON.stringify(GOLDEN_NOTES)},"main":true,`,
+		',"notes":null,"main":false,',
 	)
 }
 

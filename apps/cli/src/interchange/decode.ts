@@ -50,6 +50,7 @@ function scenarioSiblings(row: Record<string, unknown>, path: string): AppError 
 	if (!("tax" in row)) row["tax"] = null
 	if (!("notes" in row)) row["notes"] = null
 	if (!("main" in row)) row["main"] = false
+	if (!("unstated" in row)) row["unstated"] = null
 	if (row["main"] === true && row["deletedAt"] !== null) {
 		return invalid(`${path}.main`, "must be false: a deleted scenario is not the main plan")
 	}

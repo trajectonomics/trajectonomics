@@ -81,7 +81,12 @@ export function writeWhatIf(ctx: Context, write: WhatIfWrite): Result<WhatIfResu
 		})
 		if (isAppError(applied)) return applied
 		const outcome = store.saveScenario(
-			{ name: write.name, document: applied.document, expectedHash: plan.contentHash },
+			{
+				name: write.name,
+				document: applied.document,
+				expectedHash: plan.contentHash,
+				stated: applied.overrides.map((override) => override.path),
+			},
 			{ dryRun: write.dryRun },
 		)
 		if (isAppError(outcome)) return nameTheSet(outcome, applied.overrides)

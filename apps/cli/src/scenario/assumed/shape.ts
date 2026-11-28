@@ -1,10 +1,23 @@
 import { z } from "zod"
 
 /**
- * The kinds of Assumed value this build publishes, in the order `assumedOf` lists them (cli ADR-0083).
- * `template-default` joins them with the stored column in #689 part 2, and `run-rate` waits for #687.
+ * The kinds of Assumed value this build publishes, in the order `assumedOf` lists them (cli ADR-0083,
+ * ADR-0084). `run-rate` waits for #687, which adds a `history` source to the same column.
  */
-export const ASSUMED_KINDS = ["unlabelled-income", "unstated-allowance", "tax-figure"] as const
+export const ASSUMED_KINDS = [
+	"template-default",
+	"unlabelled-income",
+	"unstated-allowance",
+	"tax-figure",
+] as const
+
+/** A value `traj` wrote into the document that no edit has touched since (cli ADR-0084). */
+export type TemplateDefault = {
+	kind: "template-default"
+	path: string
+	value: number | string
+	hint: string
+}
 
 /** An income Flow with no string `label`, in a plan that holds a Levy. */
 export type UnlabelledIncome = {
@@ -33,7 +46,26 @@ export type TaxFigure = {
 }
 
 /** One value a plan assumes that nobody stated, told apart by its `kind`. */
-export type AssumedItem = UnlabelledIncome | UnstatedAllowance | TaxFigure
+export type AssumedItem = TemplateDefault | UnlabelledIncome | UnstatedAllowance | TaxFigure
+
+const templateDefault = z.strictObject({
+	kind: z
+		.literal("template-default")
+		.describe(
+			"A value `traj` wrote into the document that no edit has touched since (cli ADR-0084).",
+		),
+	path: z
+		.string()
+		.describe(
+			"`economy.inflation`, `accounts.<id>.rate` or `flows.<id>.amount`, in the Override grammar.",
+		),
+	value: z
+		.union([z.number(), z.string()])
+		.describe(
+			"The value as `scenario show` prints it: an amount is a decimal string under `--decimal`, while inflation and rates stay integer basis points.",
+		),
+	hint: z.string().describe("The command that states the value, at this one or another."),
+})
 
 const unlabelledIncome = z.strictObject({
 	kind: z
@@ -76,6 +108,7 @@ const taxFigure = z.strictObject({
 
 /** One Assumed value, a discriminated union on `kind` (cli ADR-0083). */
 export const assumedItem: z.ZodType<AssumedItem> = z.discriminatedUnion("kind", [
+	templateDefault,
 	unlabelledIncome,
 	unstatedAllowance,
 	taxFigure,
@@ -85,5 +118,5 @@ export const assumedItem: z.ZodType<AssumedItem> = z.discriminatedUnion("kind", 
 export const assumedField: z.ZodType<AssumedItem[]> = z
 	.array(assumedItem)
 	.describe(
-		"The values this plan assumes that nobody stated, in the fixed kind order; empty when there are none (cli ADR-0083). `template-default` joins them with the stored column in #689 part 2, and `run-rate` waits for #687.",
+		"The values this plan assumes that nobody stated, in the fixed kind order; empty when there are none (cli ADR-0083, ADR-0084). `run-rate` waits for #687.",
 	)

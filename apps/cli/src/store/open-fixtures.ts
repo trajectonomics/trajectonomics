@@ -6,6 +6,7 @@ import { schemaV1 } from "./schema-v1"
 import { schemaV2 } from "./schema-v2"
 import { schemaV3 } from "./schema-v3"
 import { schemaV4 } from "./schema-v4"
+import { schemaV5 } from "./schema-v5"
 
 /**
  * One builder per schema version below head, each producing what that version left on disk.
@@ -50,6 +51,18 @@ export const fixtures: Record<number, (home: string) => Promise<void>> = {
 		schemaV3(db)
 		schemaV4(db)
 		db.run("PRAGMA user_version = 4")
+		db.close()
+	},
+	// Version 5 adds notes and the main-plan flag; it has no unstated column yet (cli ADR-0084).
+	5: async (home) => {
+		expect((await capture(["init"], { TRAJ_HOME: home })).code).toBe(0)
+		const db = new Database(join(home, "traj.db"))
+		schemaV1(db)
+		schemaV2(db)
+		schemaV3(db)
+		schemaV4(db)
+		schemaV5(db)
+		db.run("PRAGMA user_version = 5")
 		db.close()
 	},
 }

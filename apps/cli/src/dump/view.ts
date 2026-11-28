@@ -65,6 +65,8 @@ export type DumpScenarioRow = {
 	notes: string | null
 	/** True for the main plan (cli ADR-0071). */
 	main: boolean
+	/** The paths `traj` wrote, as canonical JSON text, or null (cli ADR-0084). */
+	unstated: string | null
 	version: number
 	createdAt: string
 	updatedAt: string
