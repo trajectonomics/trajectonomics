@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { expect, test } from "@playwright/test"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { SCREENSHOTS } from "./demo"
-import { expectNoSideScroll, fillHolder, walkSteps } from "./guided-plan"
+import { deleteScratchPlan, expectNoSideScroll, fillHolder, walkSteps } from "./guided-plan"
 
 // The guided plan's write on the scratch ledger: one Save makes the plan and opens Home, and a Reload takes a moved
 // ledger back to the money step (web ADR 0031).
@@ -29,6 +29,7 @@ test("the guided plan saves end to end on the scratch ledger", async ({ page }) 
 	await expect(page.getByText("guided-e2e").first()).toBeVisible()
 	await expectNoSideScroll(page)
 	await page.screenshot({ path: `${SHOTS}/scratch/1280/4-saved.png`, fullPage: true })
+	await deleteScratchPlan(page, "guided-e2e")
 })
 
 test("Reload takes focus back to the money step when the ledger moved", async ({ page }) => {
