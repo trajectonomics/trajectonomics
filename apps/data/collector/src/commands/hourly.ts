@@ -8,7 +8,7 @@ import { runHourly } from "../hourly/run"
 import { spawnInheritStderr } from "../hourly/spawn"
 import { readCursor, writeCursor } from "../hourly/state"
 import { errorMessage } from "../message"
-import { DEFAULT_INGEST_URL, defaultKeyFile, type FetchLike, sendRows } from "../send"
+import { DEFAULT_INGEST_URL, type FetchLike, sendRows } from "../send"
 import { lazyBearer, realBearerDeps, resolveBearer } from "../send/bearer"
 import { tokenAllowedFor } from "../send/token-url"
 import { type HourlyCommandDeps, runSend } from "./hourly-send"
@@ -34,10 +34,8 @@ export async function runHourlyCommand(
 		resolveBearer(
 			{
 				credentialsPath: credentialsPath(deps.home),
-				keyFile: defaultKeyFile(deps.home),
 				url,
 				tokenUrlAllowed: tokenAllowedFor(url, deps.env),
-				forceKey: false,
 			},
 			deps.bearer,
 		),
@@ -68,7 +66,7 @@ function realHourlyCommandDeps(): HourlyCommandDeps {
 		spawn: spawnInheritStderr,
 		readCursor: (name) => readCursor(stateDir, name),
 		writeCursor: (name, iso) => writeCursor(stateDir, name, iso),
-		bearer: realBearerDeps(authFetch, log),
+		bearer: realBearerDeps(authFetch),
 		fetch: postFetch,
 		send: sendRows,
 		log,

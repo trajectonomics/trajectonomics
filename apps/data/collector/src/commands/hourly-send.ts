@@ -2,7 +2,7 @@ import type { Spawner } from "../hourly/spawn"
 import { errorMessage } from "../message"
 import type { IngestRow } from "../rows"
 import type { FetchLike, SendConfig, SendReport } from "../send"
-import type { Bearer, BearerDeps } from "../send/bearer"
+import type { BearerDeps } from "../send/bearer"
 
 /** The I/O one hourly run touches, injected so tests never spawn or write a cursor. */
 export type HourlyCommandDeps = {
@@ -21,12 +21,12 @@ export type HourlyCommandDeps = {
 }
 
 /** Resolves the token at the first send, reports a bearer failure once, and never repeats it. */
-export function runSend(deps: HourlyCommandDeps, url: string, bearer: () => Promise<Bearer>) {
+export function runSend(deps: HourlyCommandDeps, url: string, bearer: () => Promise<string>) {
 	let reported: string | null = null
 	return async (rows: readonly IngestRow[]): Promise<SendReport> => {
 		let token: string
 		try {
-			token = (await bearer()).bearer
+			token = await bearer()
 		} catch (error) {
 			if (reported === null) {
 				reported = errorMessage(error)

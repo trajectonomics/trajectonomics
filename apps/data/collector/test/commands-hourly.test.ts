@@ -43,14 +43,9 @@ function makeDeps(options: {
 		saveCredentials: () => {
 			events.push("save")
 		},
-		readKey: () => {
-			events.push("key")
-			return "synthetic-ingest-key"
-		},
 		fetch: options.fetch,
 		nowIso: () => "2026-11-28T12:00:00.000Z",
 		sleep: async () => {},
-		log: (line) => logs.push(line),
 	}
 	const deps: HourlyCommandDeps = {
 		env: {},
@@ -140,7 +135,21 @@ describe("runHourlyCommand wiring", () => {
 		await runHourlyCommand([], run.deps)
 
 		expect(run.logs.some((line) => line.includes("must be a regular file"))).toBe(true)
-		expect(run.events).not.toContain("key")
+		expect(run.events.some((event) => event.startsWith("send:"))).toBe(false)
+		expect(run.events.some((event) => event.startsWith("cursor:"))).toBe(false)
+		expect(run.exits).toEqual([1])
+	})
+
+	test("a machine that never signed in fails before any host is sent, with no network call", async () => {
+		const fetched = queueFetch([])
+		const run = makeDeps({ fetch: fetched.fetch, spawn: spawnRow(), readCredentials: () => null })
+
+		await runHourlyCommand([], run.deps)
+
+		expect(run.logs.filter((line) => line.includes("not signed in"))).toHaveLength(1)
+		expect(fetched.calls).toHaveLength(0)
+		expect(run.events.some((event) => event.startsWith("send:"))).toBe(false)
+		expect(run.events.some((event) => event.startsWith("cursor:"))).toBe(false)
 		expect(run.exits).toEqual([1])
 	})
 })

@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto"
 import { dirname, join } from "node:path"
 import { errorCode, errorMessage } from "../message"
-import { keyModeError } from "../send/key"
 import { type Credentials, parseCredentials } from "./credential-shape"
 
 export type { Credentials } from "./credential-shape"
@@ -25,6 +24,12 @@ export function credentialsPath(home: string): string {
 	return join(home, ".config/traj-data/credentials.json")
 }
 
+/** A file-mode problem, or null when only its owner can access the file. */
+function modeProblem(mode: number): string | null {
+	if ((mode & 0o077) === 0) return null
+	return "is accessible by group or others"
+}
+
 /** Reads the credentials file: null when absent, an error when unsafe or malformed. */
 export function readCredentials(path: string, deps: CredentialDeps): Credentials | null {
 	let stat: CredentialStat
@@ -37,7 +42,7 @@ export function readCredentials(path: string, deps: CredentialDeps): Credentials
 	if (stat.isSymbolicLink || !stat.isFile) {
 		throw new Error(`credentials file ${path} must be a regular file`)
 	}
-	const problem = keyModeError(stat.mode)
+	const problem = modeProblem(stat.mode)
 	if (problem !== null) {
 		throw new Error(`credentials file ${path} ${problem}; run: chmod 600 ${path}`)
 	}

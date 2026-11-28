@@ -2,7 +2,8 @@ import { BASE_PATH, INGEST_PATH, LEGACY_HOST, SITE_ORIGIN } from "../../src/core
 import type { Env } from "../../src/env"
 import type { CacheLike } from "../../src/http/cache"
 import { type Statement, type TestDb, testDb } from "./d1"
-import { NOW_MS, TEST_ISSUER, TEST_KEY } from "./fixtures"
+import { NOW_MS, TEST_ISSUER, TEST_SUB } from "./fixtures"
+import { TEST_TOKEN } from "./token"
 
 type CacheEntry = {
 	response: Response
@@ -24,11 +25,11 @@ export type Harness = {
 	beforeNextBatch: TestDb["beforeNextBatch"]
 }
 
-/** An in-memory D1, the test key, and a cache that honours each response's max-age. */
+/** An in-memory D1, the org binding the test token sends as, and a cache that honours each max-age. */
 export function harness(options: { maxCalls?: number } = {}): Harness {
 	const { db, database, calls, batches, beforeNextBatch } = testDb(options)
 	return {
-		env: { DB: db, AUTH_ISSUER: TEST_ISSUER, INGEST_BOOTSTRAP_KEY: TEST_KEY },
+		env: { DB: db, AUTH_ISSUER: TEST_ISSUER, ORG_AUTH_USER_ID: TEST_SUB },
 		cache: memoryCache(),
 		database,
 		calls,
@@ -62,10 +63,10 @@ export function memoryCache(): MemoryCache {
 	}
 }
 
-export function ingestRequest(body: unknown, key = TEST_KEY): Request {
+export function ingestRequest(body: unknown, token = TEST_TOKEN): Request {
 	return new Request(`${SITE_ORIGIN}${INGEST_PATH}`, {
 		method: "POST",
-		headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+		headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
 		body: JSON.stringify(body),
 	})
 }
