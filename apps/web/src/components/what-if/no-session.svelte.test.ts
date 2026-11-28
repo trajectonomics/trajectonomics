@@ -19,6 +19,7 @@ import ComparePanel from "../compare/ComparePanel.svelte"
 import MilestonesBody from "../milestones/MilestonesBody.svelte"
 import MilestonesView from "../milestones/MilestonesView.svelte"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
+import NetWorthFocus from "../net-worth/NetWorthFocus.svelte"
 import PnlCard from "../net-worth/PnlCard.svelte"
 import OverviewFocus from "../overview/OverviewFocus.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
@@ -87,7 +88,9 @@ describe("with no session, a page is its content and nothing more", () => {
 
 	test("Net worth", () => {
 		const view = netWorthPageView(DEMO)
-		const content = `<div class="space-y-8">${bodyOf(PnlCard, { pnl: view.pnl })}${bodyOf(RecordValues, { snapshot: DEMO })}${bodyOf(NetWorthContent, { view })}</div>`
+		const focus = bodyOf(NetWorthFocus, { read: view.netWorth, history: view.history })
+		const cards = `<div class="space-y-8">${bodyOf(PnlCard, { pnl: view.pnl })}${bodyOf(RecordValues, { snapshot: DEMO })}${bodyOf(NetWorthContent, { view })}</div>`
+		const content = `<div class="space-y-8">${focus}${cards}</div>`
 		const page = bodyOf(NetWorthPage, { scenario: "base" })
 		expect(shown(page)).toBe(framed("Net worth", content))
 	})

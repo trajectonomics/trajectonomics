@@ -89,6 +89,13 @@ describe("the Withdrawals page", () => {
 		expect(bare).toContain("each is your own estimate")
 	})
 
+	test("offers the Set control on a plan with no rule when the server answers a session", () => {
+		const bare = render(WithdrawalsBody, {
+			props: { snapshot: DEMO, scenario: "retire-early", terms: "both", onTerms: () => {} },
+		}).body
+		expect(bare).toContain(">Set how you spend in retirement</button>")
+	})
+
 	test("a Saved plan block of a plan with no spending Flow says there is no rule yet, not that it is a level amount", () => {
 		const chance = DEMO.reads.chance["base"]
 		const view = withdrawalsView(
@@ -106,7 +113,13 @@ describe("the Withdrawals page", () => {
 		editSession.token = null
 		expect(page()).not.toContain("Change retirement-spending")
 		editSession.token = "t"
-		expect(page()).toContain("Change retirement-spending")
+		const body = page()
+		expect(body).toContain("Change retirement-spending")
+		// The focus point stays the first thing under the h1; the edit control follows it (#707).
+		expect(body.indexOf("data-focus-answer")).toBeGreaterThan(-1)
+		expect(body.indexOf("data-focus-answer")).toBeLessThan(
+			body.indexOf("Change retirement-spending"),
+		)
 	})
 })
 

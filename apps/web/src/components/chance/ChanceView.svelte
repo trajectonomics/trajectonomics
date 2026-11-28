@@ -5,10 +5,10 @@ import { futuresViewOf } from "../../lib/view/chance/futures"
 import { chanceViewOf } from "../../lib/view/chance/page"
 import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
-import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import ChanceWhatIf from "../what-if/ChanceWhatIf.svelte"
+import ChanceFocus from "./ChanceFocus.svelte"
 import ChanceResult from "./ChanceResult.svelte"
 
 interface Props {
@@ -21,7 +21,7 @@ interface Props {
 	onScenario: (value: string) => unknown
 }
 
-/** The Scenario picker and the chance of the chosen Scenario. The choice lives in the address bar. */
+/** The chance of the chosen Scenario: its focus point first, then the plan picker and the detail below. */
 let { names, chance, scenario, onScenario }: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : chance[name])
@@ -39,18 +39,16 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 	</EmptyState>
 {:else}
 	<div class="space-y-6">
-		<SegmentedControl
-			name="scenario"
-			label="Plan"
-			{options}
-			value={name}
-			onChange={onScenario}
-		/>
+		<ChanceFocus {read} plan={name} />
+		<SegmentedControl name="scenario" label="Plan" {options} value={name} onChange={onScenario} />
 		{#if lens}<ChanceWhatIf {lens} baseline={read.ok ? read.data : null} />{/if}
-		<ReadView {read} label={`Chance of success for ${name}`}>
-			{#snippet children(data)}
-				<ChanceResult view={chanceViewOf(data)} argv={read.argv} plan={name} futures={futuresViewOf(data)} />
-			{/snippet}
-		</ReadView>
+		{#if read.ok}
+			<ChanceResult
+				view={chanceViewOf(read.data)}
+				argv={read.argv}
+				plan={name}
+				futures={futuresViewOf(read.data)}
+			/>
+		{/if}
 	</div>
 {/if}
