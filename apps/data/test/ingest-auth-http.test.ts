@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, spyOn, test } from "bun:test"
 import { sha256Hex } from "../src/core/hash"
-import { INGEST_PATH, SITE_ORIGIN } from "../src/core/urls"
+import { INGEST_PATH, LEGACY_HOST, SITE_ORIGIN } from "../src/core/urls"
 import type { Env } from "../src/env"
 import type { JwksSource } from "../src/http/jwks"
 import { handleRequest } from "../src/http/router"
@@ -129,11 +129,34 @@ describe("POST /ingest with an auth token", () => {
 		expect(keys.refreshes()).toBe(1)
 	})
 
-	test("the bootstrap key is still accepted", async () => {
+	test("a bearer that is not a JWT is 401 on both hosts, even with the retired key variable set", async () => {
 		const context = harness()
-		const response = await post(context, "test-key")
-		expect(response.status).toBe(200)
-		expect(count(context, "usage_hourly")).toBe(1)
+		const bearer = "synthetic-not-a-jwt"
+		// The retired secret's name must not bring its value back into the auth path.
+		const env = { ...context.env, INGEST_BOOTSTRAP_KEY: bearer } as unknown as Env
+		const logged = spyOn(console, "error").mockImplementation(() => {})
+		try {
+			const apex = await handleRequest(request(bearer, { usage: [usageRow()] }), env, {
+				nowMs: NOW_MS,
+			})
+			expect(apex.status).toBe(401)
+			expect(await apex.json()).toEqual({ error: "unauthorized" })
+			const old = await handleRequest(
+				new Request(`https://${LEGACY_HOST}/ingest`, {
+					method: "POST",
+					headers: { authorization: `Bearer ${bearer}`, "content-type": "application/json" },
+					body: JSON.stringify({ usage: [usageRow()] }),
+				}),
+				env,
+				{ nowMs: NOW_MS },
+			)
+			expect(old.status).toBe(401)
+			expect(await old.json()).toEqual({ error: "unauthorized" })
+			expect(count(context, "usage_hourly")).toBe(0)
+			expect(logged).not.toHaveBeenCalled()
+		} finally {
+			logged.mockRestore()
+		}
 	})
 
 	test("a JWT ingest makes at most two D1 calls", async () => {

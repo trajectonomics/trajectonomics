@@ -82,27 +82,29 @@ migrations. The workflow applies `apps/data/migrations` with
 `bunx wrangler d1 migrations apply traj-data --remote` before it deploys the Worker, which declares
 its zone route. Its old host `data.trajectonomics.com` stays attached: it redirects its pages to
 `/data`, and it still answers `/api/*` and `/ingest`. The first deploy needs no secret:
-`/data/ingest` answers 401 until one exists. After it, set the temporary bootstrap key and send one batch:
+`/data/ingest` answers 401 to any request without a valid auth token, and
+`403 not_a_contributor` to a signed-in collector until `ORG_AUTH_USER_ID` binds the org (below).
 
 ```sh
 cd apps/data
-bunx wrangler secret put INGEST_BOOTSTRAP_KEY
 bunx wrangler d1 migrations apply traj-data --local   # local development only
 ```
 
 `GET https://trajectonomics.com/data/api/health` shows the last ingest. The old
 `https://data.trajectonomics.com/api/health` still answers too, and the old
 `https://data.trajectonomics.com/ingest` still accepts a batch beside
-`https://trajectonomics.com/data/ingest`. The key is temporary and the auth service replaces it
-(ADR 0004); never commit it and never put it in `wrangler.jsonc`. The read API caches for an hour, so
-a fresh batch appears within that window without a deploy.
+`https://trajectonomics.com/data/ingest`. The read API caches for an hour, so a fresh batch appears
+within that window without a deploy.
 
-`INGEST_BOOTSTRAP_KEY` is transitional (ADR 0015): `/data/ingest` and the old host's `/ingest`
-accept it only until our own collector sends with an auth token, and the pull request after that
-removes the key branch and deletes the secret.
+The temporary `INGEST_BOOTSTRAP_KEY` is retired (#601): the deploy that drops the key path removes
+its last reader, and the secret is then deleted once, from `apps/data`:
 
-Once the collector can sign in (its `login` command arrives with the collector half of #601) and
-has signed in once, set the org owner's auth user id as a Worker secret, from `apps/data`:
+```sh
+bunx wrangler secret delete INGEST_BOOTSTRAP_KEY --name data
+```
+
+Once the collector has signed in, set the org owner's auth user id as a Worker secret, from
+`apps/data`:
 
 ```sh
 cd apps/data

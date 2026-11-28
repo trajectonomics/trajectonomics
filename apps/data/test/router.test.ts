@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { routeRequest } from "../src/core/route"
 import { handleRequest } from "../src/http/router"
-import { NOW_MS, TEST_KEY, usageRow } from "./support/fixtures"
+import { NOW_MS, usageRow } from "./support/fixtures"
 import { get, harness, ingestRequest, legacy } from "./support/http"
 import { silenceConsoleError } from "./support/log"
+import { TEST_JWKS, TEST_TOKEN } from "./support/token"
 import { failingEnv } from "./support/usage"
 
 const APEX = "trajectonomics.com"
@@ -119,7 +120,7 @@ describe("routeRequest on localhost", () => {
 describe("the router over HTTP", () => {
 	test("answers the apex API and ingest addresses", async () => {
 		const context = harness()
-		const contextOptions = { nowMs: NOW_MS, cache: context.cache }
+		const contextOptions = { nowMs: NOW_MS, cache: context.cache, jwks: TEST_JWKS }
 		const seeded = await handleRequest(
 			ingestRequest({ usage: [usageRow()] }),
 			context.env,
@@ -140,11 +141,11 @@ describe("the router over HTTP", () => {
 
 	test("answers the old host's API and POST ingest without redirecting", async () => {
 		const context = harness()
-		const contextOptions = { nowMs: NOW_MS, cache: context.cache }
+		const contextOptions = { nowMs: NOW_MS, cache: context.cache, jwks: TEST_JWKS }
 		const seeded = await handleRequest(
 			legacy("/ingest", {
 				method: "POST",
-				headers: { authorization: `Bearer ${TEST_KEY}`, "content-type": "application/json" },
+				headers: { authorization: `Bearer ${TEST_TOKEN}`, "content-type": "application/json" },
 				body: JSON.stringify({ usage: [usageRow()] }),
 			}),
 			context.env,
@@ -190,6 +191,7 @@ describe("the router over HTTP", () => {
 		await handleRequest(ingestRequest({ usage: [usageRow()] }), context.env, {
 			nowMs: NOW_MS,
 			cache: context.cache,
+			jwks: TEST_JWKS,
 		})
 		const first = await handleRequest(legacy("/api/usage?from=2026-11-24"), context.env, {
 			nowMs: NOW_MS,

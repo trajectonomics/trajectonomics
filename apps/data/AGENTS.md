@@ -42,12 +42,13 @@ redirects its pages (ADR 0006).
 2. The public API serves aggregates, never a stored row: `rollup_daily` for the usage read, and
    `usage_hourly` summed per plan and bucket for the peaks (ADR 0007). No response carries a
    machine, a contributor or an hourly bucket.
-3. `/data/ingest` (and the old host's `/ingest`) authenticates with auth's access tokens
-   (ADR 0015): EdDSA, the exact `AUTH_ISSUER`, the `https://trajectonomics.com/data` audience and
-   the `data:ingest` scope. The contributor comes from the token's `sub` through
+3. `/data/ingest` (and the old host's `/ingest`) accepts only auth's access tokens (ADR 0015):
+   EdDSA, the exact `AUTH_ISSUER`, the `https://trajectonomics.com/data` audience and the
+   `data:ingest` scope. The contributor comes from the token's `sub` through
    `contributor.auth_user_id`, never from the body; a row that names another contributor is
-   rejected. The temporary `INGEST_BOOTSTRAP_KEY` still sends as the org until #601's last pull
-   request retires it.
+   rejected. A bearer that is not a three-part JWT is `401 unauthorized`; the shared
+   `INGEST_BOOTSTRAP_KEY` was retired in #601, and its secret is deleted once the deploy that drops
+   it is live.
 4. `src/core/` is pure: validation, rollups, query parsing, health and host/path routing take their
    inputs as arguments. D1 stays in `src/db/`, HTTP in `src/http/`.
 5. Data never triggers a rebuild (ADR 0001). Ingest recomputes rollups in D1; the pages and the API
@@ -63,3 +64,11 @@ redirects its pages (ADR 0006).
 9. `/internal/*` answers only on the host `data.internal`, which has no DNS and is reachable only
    through auth's `DATA` service binding. Every other host answers `not_found`, never a redirect,
    because a redirect would turn auth's POST into a GET. Auth posts account deletions there.
+
+## Lessons
+
+- workerd refuses `fetch`/`Request` with `redirect: "error"` (a `TypeError` at runtime, while the Bun
+  tests pass). Use `redirect: "manual"` and check `response.ok`.
+- The device-login polling counts against auth's `/api/auth/oauth2/token` rate limit (20 requests
+  per 60 s per IP). Signing several hosts in behind one IP and then sending at once can get HTTP 429
+  on the first token refresh; it clears within a minute.

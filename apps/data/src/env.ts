@@ -8,8 +8,6 @@ export type Env = {
 	AUTH_ISSUER: string
 	/** The owner's auth user id, which binds the org row once (ADR 0015). */
 	ORG_AUTH_USER_ID?: string
-	/** Transitional until the shared key is retired (ADR 0015). */
-	INGEST_BOOTSTRAP_KEY?: string
 }
 
 /** Per-request dependencies the Worker injects and tests replace. */

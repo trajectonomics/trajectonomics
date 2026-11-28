@@ -86,7 +86,7 @@ describe("credentialsPath", () => {
 
 describe("readCredentials", () => {
 	test("refuses a file group or others can read, before reading it", () => {
-		for (const mode of [0o644, 0o640]) {
+		for (const mode of [0o644, 0o640, 0o604, 0o660, 0o602]) {
 			const { calls, deps } = fakeDeps({ stat: { ...OWNER_ONLY, mode } })
 			expect(() => readCredentials(PATH, deps)).toThrow("chmod 600")
 			expect(calls.reads).toBe(0)

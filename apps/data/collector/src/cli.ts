@@ -13,7 +13,7 @@ const USAGE = `Usage:
   bun src/cli.ts login [--issuer <url>]
   bun src/cli.ts logout
   bun src/cli.ts whoami
-  bun src/cli.ts send [--url <url>] [--key-file <path>] [files...]
+  bun src/cli.ts send [--url <url>] [files...]
   bun src/cli.ts hourly [--config <path>]`
 
 async function main(argv: readonly string[]): Promise<void> {
