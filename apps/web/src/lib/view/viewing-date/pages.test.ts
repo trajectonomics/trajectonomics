@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { routeAt } from "../routes"
 import { usesViewingDate, VIEWING_PAGES } from "./pages"
 
 describe("the pages that use the viewing date", () => {
@@ -6,11 +7,9 @@ describe("the pages that use the viewing date", () => {
 		expect(VIEWING_PAGES).toEqual([])
 	})
 
-	test("names route paths with their trailing slash, each one a page the date applies to", () => {
+	test("names route paths with their trailing slash, each one a route the Dashboard has", () => {
 		for (const path of VIEWING_PAGES) {
-			expect(path.startsWith("/")).toBe(true)
-			expect(path.endsWith("/")).toBe(true)
-			expect(usesViewingDate(path)).toBe(true)
+			expect(routeAt(path)).toBeDefined()
 		}
 	})
 

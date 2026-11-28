@@ -15,8 +15,7 @@ export interface ViewingRange {
 /** The range of a Snapshot: its first history month (or the As-of month with no history) to its horizon month (or the As-of month with no plans). */
 export function viewingRange(params: SnapshotParams): ViewingRange {
 	const asOf = monthOf(params.asOf)
-	const first =
-		params.historyDates.length === 0 ? asOf : monthOf(params.historyDates[0] ?? params.asOf)
+	const first = monthOf(params.historyDates[0] ?? params.asOf)
 	const last = params.scenarios.length === 0 ? asOf : monthOf(params.horizon)
 	return { first, asOf, last }
 }

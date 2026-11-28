@@ -31,11 +31,10 @@ export function sideSentence(
 	side: Side,
 	month: string,
 	period: SidePeriod,
-	end: string | null,
+	end: string,
 ): string | null {
 	if (side === "in") return null
 	if (side === "before") return beforeSentence(page, month, period)
-	if (end === null) return null
 	const date = formatDate(end)
 	return side === "ranOut"
 		? `The plan runs out on ${date}, so this is its last year.`
@@ -52,10 +51,10 @@ function beforeSentence(
 		return `${formatMonth(month)} is before the plan starts, so this is its first year.`
 	}
 	if (page === "tax") {
-		const year = yearOf("from" in period ? period.from : "")
+		const year = yearOf("from" in period ? period.from : period.date)
 		return `Tax is projected from ${year}, so this is ${year}.`
 	}
-	return `The rule starts in ${formatMonth("date" in period ? period.date : "")}, so this is its first year.`
+	return `The rule starts in ${formatMonth("date" in period ? period.date : period.from)}, so this is its first year.`
 }
 
 /** The Cash flow sentence for a month inside a roll-up: "Mar 2031 is in the year from 31 Oct 2030 to 30 Oct 2031." */

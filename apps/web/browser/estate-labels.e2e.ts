@@ -37,3 +37,12 @@ test("?estate= wins over a viewing month in ?at=", async ({ page }) => {
 	await openDemo(page, "/estate/?estate=milestone:car-paid-off&at=2031-03", { theme: "light" })
 	await expect(page.locator("#estate-date")).toHaveValue("milestone:car-paid-off")
 })
+
+// Choosing a date writes `?estate=` only: `?at=` is the viewing date and stays as it was.
+test("choosing a date writes ?estate= and leaves ?at= alone", async ({ page }) => {
+	await openDemo(page, "/estate/?at=2031-03", { theme: "light" })
+	await page.locator("#estate-date").selectOption("end")
+	await expect(page).toHaveURL(/[?&]estate=end/)
+	await expect(page).toHaveURL(/[?&]at=2031-03/)
+	await expect(page.locator("#estate-date")).toHaveValue("end")
+})
