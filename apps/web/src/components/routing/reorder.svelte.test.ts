@@ -44,12 +44,19 @@ describe("reordering by keyboard", () => {
 		expect(reorder.drop(event, 1)).toBeNull()
 	})
 
+	test("focus goes back to the pressed button on the row that moved, so a keyboard presses it again", () => {
+		const focused: string[] = []
+		const button = (disabled: boolean, name: string) =>
+			({ disabled, focus: () => focused.push(name) }) as unknown as HTMLButtonElement
+		keepFocus(button(false, "down"), button(false, "up"))
+		expect(focused).toEqual(["down"])
+	})
+
 	test("focus goes to the row's other button when the pressed one turned off at the edge", () => {
 		const focused: string[] = []
 		const button = (disabled: boolean, name: string) =>
 			({ disabled, focus: () => focused.push(name) }) as unknown as HTMLButtonElement
 		keepFocus(button(true, "up"), button(false, "down"))
-		keepFocus(button(false, "up"), button(false, "down"))
 		expect(focused).toEqual(["down"])
 	})
 })
