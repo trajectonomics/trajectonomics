@@ -6,7 +6,7 @@ export interface FocusPlace {
 	readonly y: number
 }
 
-/** One line of the Compare page's focus picture: its polyline, where its name sits, and its FI dot. */
+/** One line of the Compare page's focus picture: its polyline and its FI dot. */
 export interface FocusLine {
 	readonly key: "a" | "b"
 	readonly name: string
@@ -16,8 +16,6 @@ export interface FocusLine {
 	readonly accent: boolean
 	/** The plan's FI date on the annual row that holds it, when the plan reaches one; else null. */
 	readonly dot: FocusPlace | null
-	/** The last point, where the line's name is written; a line with no point ends at the middle right. */
-	readonly end: FocusPlace
 }
 
 /** What one line needs: its chart points, whether it is the winner's, and the FI date to dot. */
@@ -40,7 +38,10 @@ function placeY(value: number, min: number, max: number): number {
 	return round(100 - ((value - min) / (max - min)) * 100)
 }
 
-/** The x of a point in its line: the first is 0, the last 100, and one point alone sits in the middle. */
+/**
+ * The x of a point on the shared time axis of both lines: the first is 0, the longer line's last is 100, and one
+ * point alone sits in the middle. A line that runs out keeps its real years, so it ends short of the edge.
+ */
 function placeX(index: number, count: number): number {
 	if (count < 2) return 50
 	return round((index / (count - 1)) * 100)
@@ -58,15 +59,18 @@ function rowOf(points: readonly CompareChartPoint[], date: string): number {
 	return points.findIndex((point) => point.from <= date && date <= point.to)
 }
 
-/** The two lines of the focus picture, placed in the 0–100 box, the winner accented and each FI date dotted. */
+/** The two lines of the focus picture, placed on one time axis, the winner accented and each FI date dotted. */
 export function focusLines(
 	specs: readonly [FocusLineSpec, FocusLineSpec],
 ): readonly [FocusLine, FocusLine] {
 	const range = togetherRange(specs)
 	const y = (value: number) => (range === null ? 50 : placeY(value, range.min, range.max))
+	const maxCount = Math.max(specs[0].points.length, specs[1].points.length)
 	const line = (spec: FocusLineSpec): FocusLine => {
-		const count = spec.points.length
-		const placed = spec.points.map((point, index) => ({ x: placeX(index, count), y: y(point.y) }))
+		const placed = spec.points.map((point, index) => ({
+			x: placeX(index, maxCount),
+			y: y(point.y),
+		}))
 		const at = spec.dotDate === null ? -1 : rowOf(spec.points, spec.dotDate)
 		return {
 			key: spec.key,
@@ -74,7 +78,6 @@ export function focusLines(
 			points: placed.map((point) => `${point.x},${point.y}`).join(" "),
 			accent: spec.accent,
 			dot: placed[at] ?? null,
-			end: placed.at(-1) ?? { x: 100, y: 50 },
 		}
 	}
 	return [line(specs[0]), line(specs[1])]

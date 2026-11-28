@@ -45,10 +45,10 @@ function winnerOf(data: ProjectionCompare): Won | null {
 	return null
 }
 
-/** The CLI's stated gap, absolute, only when both plans reach: the page never works a gap out itself. */
+/** The CLI's stated gap, absolute, only when both plans reach and the gap is real: the page never works one out. */
 function gapOf(data: ProjectionCompare, won: Won | null): number | null {
 	const stated = data.deltas.fiMonths
-	if (won === null || stated === null) return null
+	if (won === null || stated === null || Math.abs(stated) === 0) return null
 	if (!data.sides.a.fi.reachable || !data.sides.b.fi.reachable) return null
 	return Math.abs(stated)
 }

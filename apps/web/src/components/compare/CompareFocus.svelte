@@ -13,17 +13,10 @@ interface Props {
 /** The page's focus point: both plans' lines, each FI date dotted, and the plan that stops soonest. */
 let { data, chart }: Props = $props()
 const focus = $derived(compareFocusView(data, chart))
-const LABEL_Y = {
-	top: "",
-	middle: "-translate-y-1/2",
-	bottom: "-translate-y-full",
-} as const
-
-/** A name at the very top or bottom of the box is anchored to that edge, so it never leaves the picture. */
-function labelY(y: number): keyof typeof LABEL_Y {
-	if (y <= 15) return "top"
-	return y >= 85 ? "bottom" : "middle"
-}
+/** The winner drawn last, so it stays on top where the two lines and dots meet. */
+const drawn = $derived(
+	focus ? [...focus.lines].sort((x, y) => (x.accent ? 1 : 0) - (y.accent ? 1 : 0)) : [],
+)
 </script>
 
 {#if focus}
@@ -47,7 +40,7 @@ function labelY(y: number): keyof typeof LABEL_Y {
 				</div>
 				<div class="relative h-40 w-full">
 					<svg viewBox="0 0 100 100" preserveAspectRatio="none" class="block h-full w-full">
-						{#each focus.lines as line (line.key)}
+						{#each drawn as line (line.key)}
 							<polyline
 								points={line.points}
 								fill="none"
@@ -61,9 +54,10 @@ function labelY(y: number): keyof typeof LABEL_Y {
 							/>
 						{/each}
 					</svg>
-					{#each focus.lines as line (line.key)}
+					{#each drawn as line (line.key)}
 						{#if line.dot}
 							<span
+								data-compare-dot
 								class={cx(
 									"absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full",
 									line.accent
@@ -75,17 +69,24 @@ function labelY(y: number): keyof typeof LABEL_Y {
 							></span>
 						{/if}
 					{/each}
+				</div>
+				<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" data-compare-legend>
 					{#each focus.lines as line (line.key)}
-						<span
-							class={cx(
-								"absolute max-w-[45%] truncate text-xs text-muted-foreground",
-								line.end.x > 50 ? "-translate-x-full pr-1" : "pl-1",
-								LABEL_Y[labelY(line.end.y)],
-							)}
-							style:left="{line.end.x}%"
-							style:top="{line.end.y}%"
-						>
-							{line.name}
+						<span data-compare-legend-item class="flex min-w-0 items-center gap-1.5">
+							<svg width="20" height="6" viewBox="0 0 20 6" class="shrink-0" aria-hidden="true">
+								<line
+									x1="0"
+									y1="3"
+									x2="20"
+									y2="3"
+									stroke-width="2"
+									stroke-dasharray={line.key === "b" ? "5 3" : undefined}
+									class={line.accent
+										? "stroke-accent print:stroke-foreground"
+										: "stroke-muted-foreground"}
+								/>
+							</svg>
+							<span class="max-w-[12rem] truncate">{line.name}</span>
 						</span>
 					{/each}
 				</div>

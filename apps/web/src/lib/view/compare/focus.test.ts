@@ -43,11 +43,11 @@ const bRows = [
 	row(1, "2040-10-31", "2041-10-30", "400.00"),
 ]
 
-/** Both plans reach, A in Oct 2040 and B two years later, with the gap the test states. */
-function bothReach(months: number | null): ProjectionCompare {
+/** Both plans reach, with the gap the test states; B's FI date is the test's, two years after A by default. */
+function bothReach(months: number | null, bDate = "2042-10-01"): ProjectionCompare {
 	return compareOf(
 		{ ...SIDE_A, fi: reachable("2040-10-01") },
-		{ ...SIDE_B, fi: reachable("2042-10-01") },
+		{ ...SIDE_B, fi: reachable(bDate) },
 		{ ...DEFAULT_DELTAS, fiMonths: months },
 	)
 }
@@ -63,10 +63,7 @@ describe("compareFocusView", () => {
 			["a", true],
 			["b", false],
 		])
-		expect(focus?.action).toEqual({
-			label: "Open this plan",
-			href: "/projection/?scenario=base",
-		})
+		expect(focus?.action).toEqual({ label: "Open this plan", href: "/projection/?scenario=base" })
 		expect(focus?.label).toBe(
 			"Which plan lets you stop soonest? base, in Oct 2040. 24 months sooner than retire-early.",
 		)
@@ -148,6 +145,10 @@ describe("compareFocusView", () => {
 		expect(compareFocusView(one, chartOf(one, ok(runOf(aRows)), ok(runOf(bRows))))?.label).toBe(
 			"Which plan lets you stop soonest? base, in Oct 2040. 1 month sooner than retire-early.",
 		)
+		const equal = bothReach(0, "2040-10-01")
+		const zero = compareFocusView(equal, chartOf(equal, ok(runOf(aRows)), ok(runOf(bRows))))
+		expect(zero?.gap).toBeNull()
+		expect(zero?.label).toBe("Which plan lets you stop soonest? base, in Oct 2040.")
 	})
 
 	test("dots the annual row that holds the FI date, and no row when none holds it", () => {
@@ -179,11 +180,25 @@ describe("compareFocusView", () => {
 		).toBeNull()
 	})
 
+	test("places both lines on the longer plan's time axis, so a short plan ends short of the right edge", () => {
+		const six = Array.from({ length: 6 }, (_, index) =>
+			row(index, `204${index}-01-01`, `204${index}-12-31`, `${(index + 1) * 100}.00`),
+		)
+		const data = compareOf(
+			{ ...SIDE_A, fi: reachable("2040-06-01") },
+			{ ...SIDE_B, fi: reachable("2041-06-01") },
+			DEFAULT_DELTAS,
+		)
+		const focus = compareFocusView(data, chartOf(data, ok(runOf(six)), ok(runOf(six.slice(0, 3)))))
+		expect(focus?.lines[0]?.points).toBe("0,100 20,80 40,60 60,40 80,20 100,0")
+		expect(focus?.lines[1]?.points).toBe("0,100 20,80 40,60")
+		expect(focus?.lines[1]?.dot).toEqual({ x: 20, y: 80 })
+	})
+
 	test("draws a flat pair across the middle", () => {
-		const flat = [
-			row(0, "2039-10-31", "2040-10-30", "100.00"),
-			row(1, "2040-10-31", "2041-10-30", "100.00"),
-		]
+		const flat = Array.from({ length: 2 }, (_, index) =>
+			row(index, `204${index}-01-01`, `204${index}-12-31`, "100.00"),
+		)
 		const data = compareOf(
 			{ ...SIDE_A, fi: reachable("2040-10-01") },
 			{ ...SIDE_B, fi: UNREACHABLE },
