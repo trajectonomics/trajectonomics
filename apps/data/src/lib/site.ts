@@ -1,7 +1,15 @@
-import { API_PATH, BASE_PATH, SITE_ORIGIN } from "../core/urls"
+import {
+	API_PATH,
+	BASE_PATH,
+	COLLECTORS_PATH,
+	ME_PATH,
+	SIGN_IN_PATH,
+	SIGN_OUT_PATH,
+	SITE_ORIGIN,
+} from "../core/urls"
 
 /** The one host every static site is served under: the apex. */
-export { API_PATH, BASE_PATH, SITE_ORIGIN }
+export { API_PATH, BASE_PATH, COLLECTORS_PATH, ME_PATH, SIGN_IN_PATH, SIGN_OUT_PATH, SITE_ORIGIN }
 
 /** The overview page, the root of the data site. */
 export const DATA_PATH = `${BASE_PATH}/`

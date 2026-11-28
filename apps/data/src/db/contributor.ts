@@ -52,6 +52,7 @@ export async function deleteContributor(
 				"INSERT OR IGNORE INTO contributor_tombstone (auth_user_hash, deleted_at) VALUES (?, ?)",
 			)
 			.bind(hash, nowIso),
+		db.prepare("DELETE FROM web_session WHERE auth_user_id = ?").bind(authUserId),
 		db.prepare(`DELETE FROM usage_hourly WHERE contributor_id IN (${community})`).bind(authUserId),
 		db.prepare(`DELETE FROM quota_sample WHERE contributor_id IN (${community})`).bind(authUserId),
 		db.prepare(`DELETE FROM ingest_log WHERE contributor_id IN (${community})`).bind(authUserId),

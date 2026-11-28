@@ -33,6 +33,13 @@ ingest whose `sub` equals `ORG_AUTH_USER_ID` while the row is unbound sets it, i
 own batch. After that the binding alone decides; the secret stops mattering, and deleting that
 account unbinds the row instead of deleting the org's series (ADR 0015).
 
+## Web Session
+
+A signed-in browser on the data site. `web_session` stores the SHA-256 hex of a random session id,
+never the id itself, with the auth user id and an 8-hour expiry. The id lives only in an HttpOnly,
+Secure, SameSite=Lax cookie on `/data`; signing out deletes the row, and deleting the account
+removes that user's sessions in the same batch as the tombstone (ADR 0015).
+
 ## Usage Row
 
 One machine's usage for one plan, model and UTC hour (or UTC day for the Mistral console export):

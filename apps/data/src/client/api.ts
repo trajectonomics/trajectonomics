@@ -1,5 +1,5 @@
-import { API_PATH } from "../lib/site"
-import type { Health, PeaksPayload, UsagePayload } from "../lib/types"
+import { API_PATH, COLLECTORS_PATH } from "../lib/site"
+import type { CollectorsPayload, Health, PeaksPayload, UsagePayload } from "../lib/types"
 import type { DayWindow } from "../lib/window"
 
 /** The three reads the overview needs; peaks may be absent when that read fails. */
@@ -65,4 +65,19 @@ export async function loadOverview(
 /** Fetches the log's rollups and the freshness report. */
 export async function loadLog(window: DayWindow, asOf: string | null): Promise<LogPayload> {
 	return loadUsageAndHealth(window, asOf)
+}
+
+/**
+ * Reads the signed-in person's collectors. A 401 is a signed-out browser, not an error; the page
+ * then offers the one sign-in action instead of a failure panel.
+ */
+export async function loadCollectors(): Promise<CollectorsPayload["collectors"] | null> {
+	const response = await fetch(COLLECTORS_PATH, {
+		headers: { accept: "application/json" },
+		credentials: "same-origin",
+	})
+	if (response.status === 401) return null
+	if (!response.ok) throw new Error(`${COLLECTORS_PATH} answered ${response.status}`)
+	const body = (await response.json()) as CollectorsPayload
+	return body.collectors
 }
