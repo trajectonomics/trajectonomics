@@ -85,21 +85,3 @@ export function hourSeries(
 		}))
 		.sort(comparePlans)
 }
-
-/** The plans in the rows that report whole days, in the plan table's order. */
-export function dayOnlyPlans(rows: readonly UsageRow[]): string[] {
-	const plans = new Set(rows.filter((row) => row.granularity === "day").map((row) => row.plan))
-	return [...plans].sort((a, b) => comparePlans({ plan: a }, { plan: b })).map(planName)
-}
-
-/** The hour view's one-line note about day-only plans, or null when there are none. */
-export function dayOnlyNote(names: readonly string[]): string | null {
-	if (names.length === 0) return null
-	const who =
-		names.length === 1
-			? names[0]
-			: `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`
-	return names.length === 1
-		? `${who} reports whole days, so it has no hourly line.`
-		: `${who} report whole days, so they have no hourly line.`
-}

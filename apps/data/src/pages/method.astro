@@ -116,7 +116,7 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 				Hourly rows are not public as stored rows: the API serves daily rollups, one aggregate
 				per plan computed from the hourly rows, and an hourly sum per plan for the Log's short
 				windows (ADR 0016). A peaks response carries the UTC day a peak's window starts; the
-				hourly read carries a UTC hour, a plan and a sum.
+				hourly read carries a UTC hour, a plan, a token sum and a request count.
 			</li>
 			<li>
 				Prompts, session titles, project names, paths and account ids are excluded from every

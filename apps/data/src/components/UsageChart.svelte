@@ -17,8 +17,7 @@ let {
 
 const chart = $derived(chartGeometry(series))
 const label = $derived(chartAriaLabel(series, from, to, unit))
-const bucket = $derived(unit)
-const bucketName = $derived(bucket.charAt(0).toUpperCase() + bucket.slice(1))
+const bucketName = $derived(unit.charAt(0).toUpperCase() + unit.slice(1))
 const days = $derived(series[0]?.points ?? [])
 let pinned = $state<string | null>(null)
 let hot = $state<string | null>(null)
@@ -212,9 +211,9 @@ function pin(plan: string) {
 			</table>
 		</div>
 		<figcaption class="chart-caption">
-			Total tokens per UTC {bucket}, {from} to {to} ({days.length} {days.length === 1
-				? bucket
-				: `${bucket}s`}).
+			Total tokens per UTC {unit}, {from} to {to} ({days.length} {days.length === 1
+				? unit
+				: `${unit}s`}).
 		</figcaption>
 	</figure>
 {/if}

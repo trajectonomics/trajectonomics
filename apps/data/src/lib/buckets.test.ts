@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { dayOnlyNote, dayOnlyPlans, daySeries, hourSeries, weekSeries } from "./buckets"
+import { daySeries, hourSeries, weekSeries } from "./buckets"
+import { dayOnlyNote, dayOnlyPlans, lastKnownHour } from "./hour-view"
 import type { HourlyRow } from "./hourly-types"
 import type { UsageRow } from "./types"
 
@@ -120,6 +121,25 @@ describe("the hour series", () => {
 	})
 })
 
+describe("the last known hour", () => {
+	test("is the current hour when the last ingest is this hour or none is known", () => {
+		expect(lastKnownHour("2026-11-28T14:37:12.000Z", null)).toBe("2026-11-28T14:00:00.000Z")
+		expect(lastKnownHour("2026-11-28T14:37:12.000Z", "2026-11-28T14:05:00.000Z")).toBe(
+			"2026-11-28T14:00:00.000Z",
+		)
+	})
+
+	test("stops at the last ingest's hour when that is earlier", () => {
+		expect(lastKnownHour("2026-11-28T14:37:12.000Z", "2026-11-28T12:59:00.000Z")).toBe(
+			"2026-11-28T12:00:00.000Z",
+		)
+	})
+
+	test("ignores an unreadable ingest time", () => {
+		expect(lastKnownHour("2026-11-28T14:37:12.000Z", "soon")).toBe("2026-11-28T14:00:00.000Z")
+	})
+})
+
 describe("the day-only note", () => {
 	test("names the plans that report whole days", () => {
 		const rows = [
@@ -127,7 +147,16 @@ describe("the day-only note", () => {
 			row({ plan: "cursor", model: "composer-1" }),
 			row({ plan: "cursor", model: "composer-1", granularity: "day" }),
 		]
-		expect(dayOnlyPlans(rows)).toEqual(["Cursor", "Mistral"])
+		expect(dayOnlyPlans(rows, [])).toEqual(["Cursor", "Mistral"])
+	})
+
+	test("leaves out a plan that also has hourly rows", () => {
+		const rows = [
+			row({ plan: "mistral", granularity: "day" }),
+			row({ plan: "mistral", model: "codestral-2" }),
+		]
+		expect(dayOnlyPlans(rows, [hour("2026-11-24T10:00:00.000Z", 5, "mistral")])).toEqual([])
+		expect(dayOnlyPlans(rows, [])).toEqual(["Mistral"])
 	})
 
 	test("writes one line or several", () => {

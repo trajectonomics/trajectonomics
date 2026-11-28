@@ -30,7 +30,6 @@ export class LogState {
 		this.requestedAsOf = asOf
 		this.status = "loading"
 		this.usage = null
-		this.health = null
 		this.hourly = null
 		const window = periodWindow(this.period, asOf ?? utcDay(Date.now()))
 		this.days = window
@@ -40,7 +39,6 @@ export class LogState {
 			this.usage = result.usage
 			this.health = result.health
 			this.hourly = result.hourly
-			this.days = periodWindow(this.period, result.usage.asOf)
 			this.status = "ready"
 		} catch {
 			if (run !== this.#run) return

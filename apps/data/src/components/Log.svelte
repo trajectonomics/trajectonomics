@@ -3,8 +3,9 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
 import { onMount } from "svelte"
 import { LogState } from "../client/log.svelte"
-import { dayOnlyNote, dayOnlyPlans, daySeries, hourSeries, weekSeries } from "../lib/buckets"
+import { daySeries, hourSeries, weekSeries } from "../lib/buckets"
 import { daysFromCollection } from "../lib/collecting"
+import { dayOnlyNote, dayOnlyPlans, lastKnownHour } from "../lib/hour-view"
 import {
 	BUCKETS,
 	type BucketKind,
@@ -39,8 +40,8 @@ const usageRows = $derived(state.usage?.rows ?? [])
 const hourlyRows = $derived(state.hourly?.rows ?? [])
 const allowedBuckets = $derived(periodEntry(state.period).buckets)
 const lastHour = $derived(
-	state.requestedAsOf === null && days !== null && days.to === utcDay(Date.now())
-		? `${new Date(Date.now()).toISOString().slice(0, 13)}:00:00.000Z`
+	days !== null && days.to === utcDay(Date.now())
+		? lastKnownHour(new Date(Date.now()).toISOString(), state.health?.lastIngestAt)
 		: null,
 )
 const series = $derived(
@@ -50,7 +51,9 @@ const series = $derived(
 			? weekSeries(usageRows, chartDays)
 			: daySeries(usageRows, chartDays),
 )
-const note = $derived(state.bucket === "hour" ? dayOnlyNote(dayOnlyPlans(usageRows)) : null)
+const note = $derived(
+	state.bucket === "hour" ? dayOnlyNote(dayOnlyPlans(usageRows, hourlyRows)) : null,
+)
 const rows = $derived(state.usage === null ? [] : usageTable(state.usage.rows))
 const liveHref = $derived(
 	`${LOG_PATH}${logViewSearch({ period: state.period, bucket: state.bucket }, null)}`,
@@ -68,7 +71,7 @@ function apply(period: PeriodKey, bucket: BucketKind): void {
 }
 
 function choosePeriod(period: PeriodKey): void {
-	apply(period, resolveBucket(period, state.bucket))
+	apply(period, resolveBucket(period, null))
 }
 
 function chooseBucket(bucket: BucketKind): void {
@@ -141,7 +144,7 @@ function chooseBucket(bucket: BucketKind): void {
 		</div>
 	{:else if state.usage !== null && state.usage.rows.length === 0}
 		<div class="state-panel">
-			<p>No data yet</p>
+			<p>No usage in this period yet</p>
 			<button class="retry-button" type="button" onclick={() => void state.load()}>Retry</button>
 		</div>
 	{:else if days !== null}
