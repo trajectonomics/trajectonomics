@@ -28,7 +28,7 @@ export interface ReturnModel {
 	readonly accounts: readonly AccountId[]
 	readonly buckets: readonly MarketBucket[]
 	/** One year's rate per Market path; absent when inflation stays at the Scenario's `inflation`. */
-	readonly inflation?: InflationFactor
+	readonly inflation?: InflationFactor | undefined
 }
 
 /** What `planReturnModel` takes beside the Scenario. */

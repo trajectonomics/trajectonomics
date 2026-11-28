@@ -292,11 +292,14 @@ market history a plan is tested against is your decision, and every figure is
 only as good as that choice. `traj schema projection chance` describes the file.
 Or pass `--return-model plan` to build the model from the plan itself: each asset
 Account's `rate` and its `volatility` (the standard deviation of its yearly
-return, in basis points, which you write into the Scenario). `--buckets` sets its
-size (a power of two from 16 to 1024, 256 by default), the result echoes what it
-was built from as `returnModel`, and `traj projection model --scenario NAME`
-prints the model as JSON, a file `--return-model` reads back. A plan with no
-`volatility` is refused, because every path would be the same path.
+return, in basis points, which you write into the Scenario), and the Scenario's
+`economy.inflationVolatility` (the standard deviation of one year's inflation)
+as an inflation factor, when you state one. `--buckets` sets its size (a power
+of two from 16 to 1024, 256 by default), the result echoes what it was built
+from as `returnModel`, and `traj projection model --scenario NAME` prints the
+model as JSON, a file `--return-model` reads back. A plan with neither an
+Account `volatility` nor an `inflationVolatility` is refused, because every path
+would be the same path.
 Add `--outcomes` to see what each path came to: its closing and lowest net
 worth, the year it was lowest and when it ran out, with the paths at the 10th,
 50th and 90th percentile, the earliest to run out and the lowest named as

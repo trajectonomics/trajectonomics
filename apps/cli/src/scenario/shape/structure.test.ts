@@ -16,6 +16,7 @@ import { TRADE_FLOWS } from "./trade-flows"
 
 const FULL: Record<string, unknown> = {
 	...scenarioExample(VERSION ?? 0),
+	economy: { inflation: 300, inflationVolatility: 150 },
 	accounts: [
 		{ id: "cash", kind: "asset", rate: 150 },
 		{ id: "index", kind: "asset", rate: 600, compounding: "annual", gainLabel: "gains.index" },
@@ -181,12 +182,7 @@ describe("the published Scenario document shape", () => {
 		const objects = documented().filter((entry) => entry.node["properties"] !== undefined)
 		expect(objects).toHaveLength(OBJECT_PATHS.length - 1 + OPEN_OBJECTS.length)
 		for (const entry of objects) {
-			const open = OPEN_OBJECTS.includes(
-				entry.path
-					.map((s) => String(s))
-					.join(".")
-					.replaceAll(/\d+/g, "*"),
-			)
+			const open = OPEN_OBJECTS.includes(entry.path.map(String).join(".").replaceAll(/\d+/g, "*"))
 			expect(entry.node["additionalProperties"]).toBe(open ? undefined : false)
 		}
 		for (const path of OBJECT_PATHS) {

@@ -55,6 +55,13 @@ export const chanceHint: RenderHint = {
 			column("to"),
 			column("p10", "right"),
 			column("p50", "right"),
+			// Shown only for a model with an inflation factor, so a run without one prints as before.
+			{
+				key: "p50Real",
+				label: "Median (today's money)",
+				align: "right",
+				optional: true,
+			},
 			column("p90", "right"),
 		],
 		...SPENDING_COLUMNS,

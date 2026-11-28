@@ -5,6 +5,8 @@ export type PlanModelView = {
 	source: "plan"
 	buckets: number
 	accounts: { id: string; rate: number; volatility: number }[]
+	/** The Scenario's inflation spread, present only when `economy.inflationVolatility` is above 0. */
+	inflation?: { rate: number; volatility: number } | undefined
 }
 
 /** `returnModel` in the result: present only with `--return-model plan` (cli ADR-0068). */
@@ -28,6 +30,21 @@ export const planModelField: z.ZodOptional<z.ZodType<PlanModelView>> = z
 			)
 			.describe(
 				"The Accounts that swing, in the Scenario's order; every other Account keeps its rate.",
+			),
+		inflation: z
+			.strictObject({
+				rate: z
+					.number()
+					.int()
+					.describe("The Scenario's yearly inflation in basis points: the factor's mean."),
+				volatility: z
+					.number()
+					.int()
+					.describe("The standard deviation of one year's inflation in basis points."),
+			})
+			.optional()
+			.describe(
+				"Present only when the Scenario states an `inflationVolatility` above 0: the inflation factor the paths draw.",
 			),
 	})
 	.optional()

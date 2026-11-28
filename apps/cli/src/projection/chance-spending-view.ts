@@ -20,7 +20,15 @@ export type ChanceSpendingBandView = { index: number; to: string; spending: Chan
 export type ChanceLowestYearView = { paths: number; spending: ChancePercentileView[] }
 
 /** The Bands at the roll-ups a person reads, at the 10th, 50th and 90th Percentiles. */
-export type ChanceTableRow = { index: number; to: string; p10: string; p50: string; p90: string }
+export type ChanceTableRow = {
+	index: number
+	to: string
+	p10: string
+	p50: string
+	/** Present only for the nominal Bands of a model with an inflation factor. */
+	p50Real?: string | undefined
+	p90: string
+}
 
 /** The lowest-year Percentiles as one row, with the number of paths they are over. */
 export type ChanceLowestYearRow = {
