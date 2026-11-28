@@ -1,6 +1,7 @@
 import { exportJWK, generateKeyPair, type JSONWebKeySet, SignJWT } from "jose"
 import { DATA_AUDIENCE, INGEST_SCOPE } from "../../src/core/token"
-import { NOW_MS, TEST_ISSUER } from "./fixtures"
+import type { JwksSource } from "../../src/http/jwks"
+import { NOW_MS, TEST_ISSUER, TEST_SUB } from "./fixtures"
 
 /** The fixed clock, in whole seconds, at which the verifier and the signer meet. */
 export const TOKEN_NOW_SECONDS = Math.floor(NOW_MS / 1000)
@@ -64,9 +65,25 @@ export async function testSigner(options: { kid?: string } = {}): Promise<TestSi
 			iat,
 			exp,
 		)
-		if (overrides.sub !== null) jwt.setSubject(overrides.sub ?? "auth-user-a")
+		if (overrides.sub !== null) jwt.setSubject(overrides.sub ?? TEST_SUB)
 		if (overrides.nbf !== undefined) jwt.setNotBefore(overrides.nbf)
 		return jwt.sign(privateKey)
 	}
 	return { privateKey, jwks, kid, sign }
+}
+
+/**
+ * One signer for the tests that only need an accepted token, made once at import. Its key exists
+ * only for the test run.
+ */
+const sharedSigner = await testSigner()
+
+/** A token the ingest accepts; the harness binds its `sub` as the org. */
+export const TEST_TOKEN = await sharedSigner.sign()
+
+/** The key set that verifies `TEST_TOKEN`; pass it in the context of every ingest call. */
+export const TEST_JWKS: JwksSource = {
+	async get() {
+		return { set: sharedSigner.jwks, fetched: false }
+	},
 }

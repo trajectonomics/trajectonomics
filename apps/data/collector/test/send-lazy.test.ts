@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
-import { type Bearer, lazyBearer } from "../src/send/bearer"
+import { lazyBearer } from "../src/send/bearer"
 
-const TOKEN: Bearer = { bearer: "synthetic-token", kind: "token" }
+const TOKEN = "synthetic-token"
 
 describe("lazyBearer", () => {
 	test("resolves once, at the first call, and reuses the promise", async () => {
