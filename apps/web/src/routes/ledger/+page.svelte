@@ -6,8 +6,4 @@ import LedgerPage from "../../components/pages/LedgerPage.svelte"
 const account = $derived(queryParam("account", ""))
 </script>
 
-<svelte:head>
-	<title>Ledger · Dashboard</title>
-</svelte:head>
-
 <LedgerPage {account} onAccount={(value) => void setQueryParam("account", value)} />

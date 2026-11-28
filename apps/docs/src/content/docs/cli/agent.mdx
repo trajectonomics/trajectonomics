@@ -82,6 +82,17 @@ question, with the 25× rule of thumb as a labelled reference.
 This release also serves the Dashboard. [`traj dashboard`](/cli/commands/dashboard/) reads the ledger once
 and serves it on 127.0.0.1 until you stop it, so only this machine can open it.
 
+This release also reads the chance of success. [`traj projection chance`](/cli/commands/projection/)
+runs a Scenario over seeded Market paths from a Return model you state, or from the plan's own rates
+and volatilities with `--return-model plan`, and reports the share of paths that last to the Horizon.
+`traj projection path` replays one of them year by year, and `traj projection model` prints the model
+`plan` builds.
+
+A plan can carry its household, so a person's age pins the plan's dates and each Flow and Account
+can name an Owner. A what-if you read with `--set`, `--without` or `--add` can be saved to the plan with
+[`traj scenario apply`](/cli/commands/scenario/), and [`traj account value`](/cli/commands/account/)
+records what an asset or a debt is worth on a date.
+
 Tax is the Scenario's. [`traj scenario tax`](/cli/commands/scenario/) writes Thailand's 2026
 personal income tax into a Scenario and classifies the income Flows it applies to. A Scenario
 without that Levy is projected before tax, and every result says which it is.

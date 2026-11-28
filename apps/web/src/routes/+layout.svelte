@@ -24,11 +24,15 @@ import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones
 import { chooseScenario, projectedRows, scenarioNames } from "../lib/view/plan"
 import { documentRead } from "../lib/view/plan-items/document"
 import { printHeading } from "../lib/view/print-header"
-import { navPath } from "../lib/view/routes"
+import { documentTitle, errorTitle, navPath, pageTitle } from "../lib/view/routes"
 import { isDemo } from "../lib/view/snapshot-url"
 
 let { children }: { children: Snippet } = $props()
 const artwork = brandArtwork(mark)
+// The tab's title: the page's heading, or the error's own, then the product's name.
+const title = $derived(
+	documentTitle(page.error ? errorTitle(page.status) : pageTitle(page.url.pathname)),
+)
 const names = $derived(scenarioNames(currentSnapshot()))
 // What the Snapshot says of each plan the pages can show: the Main tag, the notes icon and the menus.
 const rows = $derived(projectedRows(currentSnapshot()))
@@ -66,6 +70,8 @@ $effect(() => {
 	if (!isDemo(page.url.search)) void editSession.open()
 })
 </script>
+
+<svelte:head><title>{title}</title></svelte:head>
 
 <SideNavigation
 	brand={artwork}

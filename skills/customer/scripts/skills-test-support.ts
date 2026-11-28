@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import { type InstallCheckFixture, prepareSandbox } from "./install-check-sandbox"
@@ -12,7 +12,10 @@ export * from "./skills-files"
 
 /** A stubbed install-check run: what the check said and the CLI calls each stub made. */
 export function runInstallCheck(fixture: InstallCheckFixture = {}) {
-	const sandbox = mkdtempSync(join(homedir(), ".cache", "skills-install-check-"))
+	// A fresh CI runner has no ~/.cache yet, and mkdtemp makes only the last path segment.
+	const cache = join(homedir(), ".cache")
+	mkdirSync(cache, { recursive: true })
+	const sandbox = mkdtempSync(join(cache, "skills-install-check-"))
 	const prepared = prepareSandbox(sandbox, fixture)
 	try {
 		const result = Bun.spawnSync(["bash", INSTALL_CHECK, ...prepared.args], {

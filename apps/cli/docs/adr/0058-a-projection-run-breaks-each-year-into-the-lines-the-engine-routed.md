@@ -109,3 +109,11 @@ A `drawn` line gains `entry`, the position of the `cashflow.withdraw` entry that
 floor (sim ADR 0030), so an Account listed twice reports once per entry. A surplus line has no entry, because the engine lists each Account
 once (`DUPLICATE_ID`): its step is the one whose Account it names, which the `routing` echo states by position. The CLI computes nothing new here: the
 echo's resolved figure for a target that keeps its value is not stated, because the engine does not state it (ADR-0070).
+
+## Addendum: Reporting years and months (ADR-0086)
+
+`--breakdown` is unchanged. Three more flags state the same lines over other spans (sim ADR 0034):
+`--breakdown-years` per Reporting year (`cashflowYears`, `cashflowYearTotals`), `--breakdown-months <first|all|YYYY>`
+per Reporting month of the years named (`cashflowMonths`, `cashflowMonthTotals`), and `--year-start <1-12>` for the
+month a Reporting year begins in (default 1). A Reporting span has no roll-up row, so its nine totals are sums of
+its lines only, and the identity above holds for every span. See ADR-0086 for the flags, the rows and the errors.

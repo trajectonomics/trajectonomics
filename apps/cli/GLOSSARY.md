@@ -33,6 +33,14 @@ _Avoid_: Run, output
 The lines one Annual roll-up of a Projection is made of, by source, tax, category and Account, as the engine routed them (`projection run --breakdown`, ADR-0058). Each total is the engine's figure or an exact sum of its lines, and money in plus unmet equals money out.
 _Avoid_: Cash-flow statement, budget, flow report
 
+**Reporting year**:
+Twelve months of a Projection from the 1st of the month `--year-start` names (default 1, January), named by the calendar year it begins in, over which `--breakdown-years` states a Cash-flow breakdown (ADR-0086, sim ADR 0034). The first starts on the As-of and the last ends on the horizon or the date the money runs out; a cut one is partial. It never moves an Annual roll-up.
+_Avoid_: Fiscal year, tax year, period
+
+**Reporting month**:
+A calendar month inside a Reporting year, over which `--breakdown-months` states a Cash-flow breakdown; one cut by the As-of, the horizon or a run-out is partial (ADR-0086).
+_Avoid_: Period, month bucket
+
 **Routing**:
 Where a Scenario's money goes: `cashflow.surplus` fills Accounts in order, a step taking a `share` of what is still unrouted and filling up to an `upTo`; `cashflow.withdraw` draws them in order, an entry optionally keeping a Reserve floor with `downTo`. An `upTo` or `downTo` is a whole number (nominal) or `{ amount, growth }`, grown by whole years from the start of the Timeline so it keeps its value in today's money (sim ADR-0030). A `--set` names a step or an entry by its position, such as `cashflow.withdraw.0.downTo` (ADR-0070). `projection run` states it as the `routing` echo.
 _Avoid_: Allocation, waterfall, budget

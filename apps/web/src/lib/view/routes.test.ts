@@ -20,14 +20,13 @@ function groupAt(heading: string) {
 }
 
 describe("the navigation's routes", () => {
-	test("every route in the navigation has a Svelte route file that sets its title", () => {
+	test("every route in the navigation has a Svelte route file of its own", () => {
 		for (const route of ROUTES) {
 			const file = join(ROUTES_DIR, route.path === "/" ? "" : route.path, "+page.svelte")
 			expect(existsSync(file), `${route.path} has a route file`).toBe(true)
+			// The layout writes the one title, from the page's heading: a page that set its own would disagree.
 			const source = readFileSync(file, "utf8")
-			expect(source, `${route.path} sets the title ${route.label} · Dashboard`).toContain(
-				`${route.label} · Dashboard`,
-			)
+			expect(source, `${route.path} sets no title of its own`).not.toContain("<title")
 		}
 	})
 
@@ -176,12 +175,13 @@ describe("the Estate page", () => {
 })
 
 describe("a page opened from a page in the navigation", () => {
-	test("stands under its parent, and has a route file of its own that sets its title", () => {
+	test("stands under its parent, and is titled by its own heading", () => {
 		expect(navPath("/chance/path/")).toBe("/chance/")
 		expect(navPath("/chance/")).toBe("/chance/")
 		expect(routeAt("/chance/path/")).toBeUndefined()
+		expect(pageTitle("/chance/path/")).toBe("One future")
 		const source = readFileSync(join(ROUTES_DIR, "chance/path/+page.svelte"), "utf8")
-		expect(source).toContain("Future · Dashboard")
+		expect(source).not.toContain("<title")
 	})
 
 	test("marks the entry its parent page has, though it is not in the navigation", () => {
@@ -208,6 +208,7 @@ describe("a page opened from a page in the navigation", () => {
 		expect(pageTitle("/household/")).toBe("Household")
 		expect(pageTitle("/routing/")).toBe("Where money goes")
 		expect(pageTitle("/plans/")).toBe("Plans")
+		expect(pageTitle("/plans/new/")).toBe("New plan")
 		expect(pageTitle("/projection/")).toBe("Plan")
 	})
 })

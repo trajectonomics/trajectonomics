@@ -25,7 +25,6 @@ import { addFlag, decimalFlag, withoutFlag } from "../../scenario/override-flags
 export const run: Leaf = defineCommand({
 	name: "run",
 	summary: "Project the Baseline through a Scenario, year by year",
-	note: "Each person's age on the rows, the --breakdown cash flow, --liabilities statements, --accounts values, --spending rule years and --estate statement, and the payouts, fees and employer share a plan declares, ships in 0.8.0.",
 	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({

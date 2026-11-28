@@ -7,16 +7,51 @@ description: Report on the ledger over a period or at a date.
 
 ## `traj report networth`
 
-Show the assets and liabilities behind net worth at a date.
+Show the assets and liabilities behind net worth at a date, or at every month-end.
 
-- `--as-of <string>` — the date the result is stated at, as `YYYY-MM-DD`; required
+- `--as-of <string>` — the date the result is stated at, as `YYYY-MM-DD`; required without
+  `--monthly`
+- `--monthly` — state net worth at every month-end from `--since` to `--until` instead of one date
+- `--since <string>` — with `--monthly`, the range's inclusive start date; omit to start at the
+  month of the first transaction
+- `--until <string>` — the range's inclusive end date, as `YYYY-MM-DD`; required with `--monthly`
 
 ```bash
 traj report networth --as-of 2026-03-31 --json  # The asset and liability balances that make up net worth.
+traj report networth --monthly --since 2026-01-01 --until 2026-03-31 --json  # Net worth at each month-end of a period, in one read.
 ```
 
 The total is `totals`, one entry per currency — the same figure
 [`balance`](/cli/commands/balance/) prints as `netWorth`.
+
+```bash exec
+traj report networth --monthly --since 2026-01-01 --until 2026-03-31 --json | jq '{since, until, months: [.months[] | {asOf, total: .totals[0].amount}]}'
+```
+
+```json output
+{
+  "since": "2026-01-01",
+  "until": "2026-03-31",
+  "months": [
+    {
+      "asOf": "2026-01-31",
+      "total": "1000.00"
+    },
+    {
+      "asOf": "2026-02-28",
+      "total": "1000.00"
+    },
+    {
+      "asOf": "2026-03-31",
+      "total": "879.50"
+    }
+  ]
+}
+```
+
+The monthly form states every month-end in one read, and each month is exactly what `--as-of` gives
+for that date. A month the Ledger refuses is stated as that refusal in place, and the read itself
+still exits `0`.
 
 A sample `--json` output, pretty-printed here because `--json` prints one line, from a ledger with
 Cash (asset), Loan (liability) and Opening Equity (equity) and one 1,000 THB opening transaction on
@@ -25,6 +60,8 @@ Cash (asset), Loan (liability) and Opening Equity (equity) and one 1,000 THB ope
 ```json
 {
   "asOf": "2026-03-31",
+  "firstTransactionDate": "2026-01-01",
+  "noTransactionsBefore": false,
   "rows": [
     {
       "account": {

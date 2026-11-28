@@ -22,7 +22,6 @@ import { addFlag, decimalFlag, withoutFlag } from "../scenario/override-flags"
 export const fi: Leaf = defineCommand({
 	name: "fi",
 	summary: "Report the financial independence date under a Scenario",
-	note: "Each person's age at the FI date ships in 0.8.0.",
 	description: `${FI_METHOD} ${FI_HORIZON}`,
 	positionals: [],
 	input: z.strictObject({

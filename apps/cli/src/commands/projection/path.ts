@@ -31,7 +31,6 @@ export const path: Leaf = defineCommand({
 	name: "path",
 	summary: "Replay one seeded Market path of a chance of success, year by year",
 	description: PATH_METHOD,
-	note: "Replaying a Market path ships in 0.8.0.",
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,

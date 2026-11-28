@@ -21,7 +21,6 @@ import { withStore } from "../../with-store"
 export const fork: Leaf = defineCommand({
 	name: "fork",
 	summary: "Copy a Scenario under a new name",
-	note: "Copying the notes ships in 0.8.0, and so do --no-notes and the droppedAnchors it reports.",
 	positionals: ["from", "name"],
 	input: z.strictObject({
 		from: z.string().min(1).describe("The source Scenario's exact name or its id."),

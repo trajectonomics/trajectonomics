@@ -41,7 +41,6 @@ async function textOf(
 export const notes: Leaf = defineCommand({
 	name: "notes",
 	summary: "Keep plain-text notes on a Scenario, or clear them",
-	note: "Keeping notes on a plan ships in 0.8.0.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().min(1).describe("The Scenario's exact name or its id."),
