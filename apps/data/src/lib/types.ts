@@ -115,9 +115,9 @@ export type PeaksPayload = {
 	plans: PlanPeak[]
 }
 
-/** A day's token total for one plan, as the chart plots it. */
+/** A bucket's token total for one plan, as the chart plots it; `label` is what it prints. */
 export type ChartPoint = {
-	day: string
+	label: string
 	tokens: number
 }
 

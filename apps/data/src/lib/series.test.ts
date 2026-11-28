@@ -40,9 +40,9 @@ describe("the chart series", () => {
 	test("plots zero on a day with no row", () => {
 		const series = chartSeries([row({ day: "2026-11-25" })], DAYS)
 		expect(series[0]?.points).toEqual([
-			{ day: "2026-11-24", tokens: 0 },
-			{ day: "2026-11-25", tokens: 100 },
-			{ day: "2026-11-26", tokens: 0 },
+			{ label: "2026-11-24", tokens: 0 },
+			{ label: "2026-11-25", tokens: 100 },
+			{ label: "2026-11-26", tokens: 0 },
 		])
 	})
 

@@ -3,7 +3,7 @@ import { CHART_WIDTH, chartGeometry } from "./chart"
 import { chartReadout, dayAt, keyDay } from "./chart-pointer"
 import type { ChartSeries } from "./types"
 
-function line(points: { day: string; tokens: number }[]): ChartSeries {
+function line(points: { label: string; tokens: number }[]): ChartSeries {
 	return { plan: "claude", name: "Claude", total: 0, points }
 }
 
@@ -11,9 +11,9 @@ describe("the day under the pointer", () => {
 	test("lands on the day the chart drew", () => {
 		const chart = chartGeometry([
 			line([
-				{ day: "2026-11-24", tokens: 100 },
-				{ day: "2026-11-25", tokens: 50 },
-				{ day: "2026-11-26", tokens: 0 },
+				{ label: "2026-11-24", tokens: 100 },
+				{ label: "2026-11-25", tokens: 50 },
+				{ label: "2026-11-26", tokens: 0 },
 			]),
 		])
 		const points = chart?.lines[0]?.points ?? []
@@ -47,8 +47,8 @@ describe("the day readout", () => {
 		expect(
 			chartReadout(
 				[
-					line([{ day: "2026-11-27", tokens: 1500 }]),
-					{ name: "OpenCode Go", points: [{ day: "2026-11-27", tokens: 2_000_000 }] },
+					line([{ label: "2026-11-27", tokens: 1500 }]),
+					{ name: "OpenCode Go", points: [{ label: "2026-11-27", tokens: 2_000_000 }] },
 				],
 				0,
 			),
@@ -56,6 +56,6 @@ describe("the day readout", () => {
 	})
 
 	test("says nothing for a day the series does not have", () => {
-		expect(chartReadout([line([{ day: "2026-11-27", tokens: 1 }])], 3)).toBeNull()
+		expect(chartReadout([line([{ label: "2026-11-27", tokens: 1 }])], 3)).toBeNull()
 	})
 })

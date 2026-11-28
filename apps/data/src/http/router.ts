@@ -8,6 +8,7 @@ import { handleMeCollectors } from "./me"
 import { handlePeaks } from "./peaks"
 import { json, methodNotAllowed, permanentRedirect } from "./responses"
 import { handleUsage } from "./usage"
+import { handleUsageHourly } from "./usage-hourly"
 import { handleSignIn, handleSignOut } from "./web-auth"
 
 /**
@@ -29,6 +30,8 @@ export function handleRequest(
 	switch (route.kind) {
 		case "usage":
 			return handleUsage(request, env, context)
+		case "usage_hourly":
+			return handleUsageHourly(request, env, context)
 		case "peaks":
 			return handlePeaks(request, env, context)
 		case "health":

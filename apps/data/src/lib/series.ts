@@ -19,7 +19,7 @@ export function chartSeries(rows: readonly UsageRow[], days: readonly string[]):
 			plan,
 			name: planName(plan),
 			total: days.reduce((sum, day) => sum + (byDay.get(day) ?? 0), 0),
-			points: days.map((day) => ({ day, tokens: byDay.get(day) ?? 0 })),
+			points: days.map((day) => ({ label: day, tokens: byDay.get(day) ?? 0 })),
 		}))
 		.sort(comparePlans)
 }

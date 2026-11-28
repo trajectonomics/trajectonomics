@@ -12,6 +12,7 @@ import {
 /** What the Worker answers for one request; `src/http/router.ts` turns it into a Response. */
 export type Route =
 	| { kind: "usage" }
+	| { kind: "usage_hourly" }
 	| { kind: "peaks" }
 	| { kind: "health" }
 	| { kind: "ingest" }
@@ -54,6 +55,7 @@ function isMeApi(pathname: string): boolean {
 /** The API paths both hosts answer, relative to the base path. */
 function apiRoute(pathname: string): Route | null {
 	if (pathname === "/api/usage") return { kind: "usage" }
+	if (pathname === "/api/usage/hourly") return { kind: "usage_hourly" }
 	if (pathname === "/api/peaks") return { kind: "peaks" }
 	if (pathname === "/api/health") return { kind: "health" }
 	return null
