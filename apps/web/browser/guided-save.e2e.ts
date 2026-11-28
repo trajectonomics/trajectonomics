@@ -10,6 +10,8 @@ const SHOTS = process.env["TRAJ_WEB_GUIDED_SHOTS"] ?? `${SCREENSHOTS}/guided`
 const DEMO = readFileSync(new URL("../public/demo/snapshot.json", import.meta.url), "utf8")
 
 test("the guided plan saves end to end on the scratch ledger", async ({ page }) => {
+	// A save, the Plans page's read and the delete each run through the real command line on a server shared by the shard.
+	test.setTimeout(300_000)
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await page.goto(`${SCRATCH_ORIGIN}/plans/new/`)
 	await expect(page.getByRole("heading", { name: "New plan" })).toBeVisible()
