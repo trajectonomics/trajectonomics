@@ -1,7 +1,7 @@
 <script lang="ts">
 import { currentItemNames } from "../../../client/item-names.svelte.js"
 import type { ProjectionChance, ProjectionPath } from "../../../lib/contract"
-import { pathRowsOf, returnAccounts } from "../../../lib/view/chance/path-rows"
+import { pathInflationShown, pathRowsOf, returnAccounts } from "../../../lib/view/chance/path-rows"
 import { pathHeaderOf } from "../../../lib/view/chance/path-view"
 import { parseTerms } from "../../../lib/view/projection/terms"
 import Provenance from "../../ui/Provenance.svelte"
@@ -25,6 +25,7 @@ interface Props {
 let { path, chance, plan, names, terms, onTerms, argv }: Props = $props()
 const header = $derived(pathHeaderOf(path, chance))
 const rows = $derived(pathRowsOf(path, header.lowest?.day ?? null, currentItemNames()))
+const inflation = $derived(pathInflationShown(path))
 const accounts = $derived(returnAccounts(path).map((id) => names.get(id) ?? id))
 </script>
 
@@ -37,7 +38,7 @@ const accounts = $derived(returnAccounts(path).map((id) => names.get(id) ?? id))
 			Each return is the market's growth of that Account from the first day of the year through its last, so it covers one day
 			more than the closing net worth, and it is free of what was paid in or taken out.
 		</p>
-		<PathTable {rows} {accounts} terms={parseTerms(terms)} currency={path.currency} />
+		<PathTable {rows} {accounts} {inflation} terms={parseTerms(terms)} currency={path.currency} />
 	</section>
 	<Provenance name="Chance of this path" commands={[argv]} />
 </div>

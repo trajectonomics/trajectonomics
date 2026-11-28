@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { chanceWithOutcomes, pathFixture } from "./futures.test-support"
-import { pathRowsOf, returnAccounts } from "./path-rows"
+import { pathInflationShown, pathRowsOf, returnAccounts } from "./path-rows"
 import { pathHeaderOf, pathMarkers } from "./path-view"
 import { lowestWhen, returnText } from "./path-words"
 
@@ -75,6 +75,26 @@ describe("pathRowsOf", () => {
 	test("leaves a return blank where traj states none for that year", () => {
 		const rows = pathRowsOf({ ...path, returns: path.returns.slice(0, 1) }, null)
 		expect(rows[1]?.returns).toEqual([null, null])
+	})
+
+	test("states each roll-up's inflation in percent when the CLI drew one", () => {
+		const returns = path.returns.map((rollup, index) => ({ ...rollup, inflationBps: 250 + index }))
+		const rows = pathRowsOf({ ...path, returns }, null)
+		expect(rows.map((row) => row.inflation)).toEqual(["2.50%", "2.51%", "2.52%"])
+	})
+
+	test("states no inflation, and no column, when the CLI drew none", () => {
+		const rows = pathRowsOf(path, null)
+		expect(rows.map((row) => row.inflation)).toEqual([null, null, null])
+		expect(pathInflationShown(path)).toBe(false)
+	})
+})
+
+describe("pathInflationShown", () => {
+	test("is true only when a roll-up states its inflation", () => {
+		const path = pathFixture(0)
+		const returns = path.returns.map((rollup) => ({ ...rollup, inflationBps: 300 }))
+		expect(pathInflationShown({ ...path, returns })).toBe(true)
 	})
 })
 

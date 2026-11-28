@@ -3,6 +3,7 @@ import { editSession } from "../../client/edit.svelte.js"
 import type { ScenarioShow } from "../../lib/contract"
 import { documentFromDraft } from "../../lib/view/assumptions/build"
 import { draftOf } from "../../lib/view/assumptions/draft"
+import { inflationSwingOf } from "../../lib/view/assumptions/inflation"
 import { assumptionsShown } from "../../lib/view/assumptions/refusal"
 import { accountIds } from "../../lib/view/plan-items/document"
 import Field from "../plan-items/Field.svelte"
@@ -28,6 +29,7 @@ let problems: Readonly<Record<string, string>> = $state({})
 // An error shows here only while this form sent the request (the Chance form sends as "form").
 const mine = $derived(editSession.source === SOURCE)
 const ids = $derived(accountIds(show.document))
+const swing = $derived(inflationSwingOf(show))
 const shown = $derived(
 	assumptionsShown(
 		problems,
@@ -74,6 +76,7 @@ function tryThem(): void {
 				problem={shown.at("inflation")}
 				disabled={!editable}
 			/>
+			{#if swing}<p class="text-sm text-muted-foreground">{swing}</p>{/if}
 		</div>
 	</section>
 	<section class="space-y-3" aria-labelledby="accounts">

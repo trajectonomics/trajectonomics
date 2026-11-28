@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
+import { fanSeriesOf } from "./bands"
 import { chanceFixture } from "./fixtures.test-support"
-import { chanceSummaryOf, chanceViewOf, fanSeriesOf, runsOutBarsOf } from "./page"
+import { chanceSummaryOf, chanceViewOf, runsOutBarsOf } from "./page"
 
 describe("chanceSummaryOf", () => {
 	test("states the share from the CLI's basis points, with the markets and the currency", () => {
@@ -93,25 +94,22 @@ describe("chanceViewOf", () => {
 	})
 })
 
-describe("bandRowsOf", () => {
-	test("takes the CLI's Bands table rows as dates and money, and reads nothing else", () => {
-		const view = chanceViewOf(
-			chanceFixture({
-				tables: [
-					{
-						name: "bands",
-						count: 1,
-						rows: [{ index: 2, to: "2028-12-31", p10: "1000.00", p50: "2000.50", p90: "3000.00" }],
-					},
-				],
-			}),
-		)
-		expect(view.bandRows).toEqual([
-			{ ends: "31 Dec 2028", p10: "1,000.00", p50: "2,000.50", p90: "3,000.00" },
-		])
+describe("chanceViewOf's Bands", () => {
+	test("states the nominal Bands as the future, and none as today's without realBands", () => {
+		const view = chanceViewOf(chanceFixture())
+		expect(view.future.series.map((line) => line.name)).toEqual(["P10", "P25", "P50", "P75", "P90"])
+		expect(view.today).toBeNull()
 	})
 
-	test("has no rows when the CLI printed no Bands table", () => {
-		expect(chanceViewOf(chanceFixture()).bandRows).toEqual([])
+	test("states the CLI's realBands as today's money beside the nominal future", () => {
+		const realBands = chanceFixture().bands.map((band) => ({
+			...band,
+			netWorth: band.netWorth.map((percentile) => ({ ...percentile, value: "90000.00" })),
+		}))
+		const view = chanceViewOf(chanceFixture({ realBands }))
+		expect(
+			view.today?.series.every((line) => line.points.every((point) => point.y === 90000)),
+		).toBe(true)
+		expect(view.future.series.find((line) => line.name === "P50")?.points[0]?.y).toBe(50000)
 	})
 })

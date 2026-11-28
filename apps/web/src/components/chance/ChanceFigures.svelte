@@ -1,5 +1,6 @@
 <script lang="ts">
-import type { BandRow, RunsOutBar } from "../../lib/view/chance/page"
+import type { BandRow } from "../../lib/view/chance/bands"
+import type { RunsOutBar } from "../../lib/view/chance/page"
 import Money from "../ui/Money.svelte"
 
 interface Props {

@@ -59,6 +59,52 @@ describe("ChanceView", () => {
 	})
 })
 
+describe("ChanceView's Bands", () => {
+	const TABLES = [
+		{
+			name: "bands" as const,
+			count: 1,
+			rows: [{ index: 0, to: "2026-12-31", p10: "1000.00", p50: "2000.00", p90: "3000.00" }],
+		},
+	]
+	const REAL = chanceFixture().bands.map((band) => ({
+		...band,
+		netWorth: band.netWorth.map((percentile) => ({ ...percentile, value: "90000.00" })),
+	}))
+
+	test("offers Today's and Future money only when the CLI states the real Bands", () => {
+		const withReal = renderView({
+			base: { argv: ARGV, ok: true, data: chanceFixture({ tables: TABLES, realBands: REAL }) },
+		})
+		expect(withReal).toContain('name="money"')
+		expect(withReal).toContain('value="today"')
+		expect(withReal).toContain('value="future"')
+		expect(withReal).toContain("Future money")
+		const without = renderView({
+			base: { argv: ARGV, ok: true, data: chanceFixture({ tables: TABLES }) },
+		})
+		expect(without).not.toContain('name="money"')
+		expect(without).not.toContain("Future money")
+	})
+
+	test("opens on today's money, so the hidden Bands table carries the real figures", () => {
+		const body = renderView({
+			base: { argv: ARGV, ok: true, data: chanceFixture({ tables: TABLES, realBands: REAL }) },
+		})
+		const table = body.slice(body.indexOf('<div class="sr-only">'))
+		expect(table).toContain("90,000.00")
+		expect(table).not.toContain("2,000.00")
+	})
+
+	test("states the nominal Bands when the CLI states no real Bands", () => {
+		const body = renderView({
+			base: { argv: ARGV, ok: true, data: chanceFixture({ tables: TABLES }) },
+		})
+		const table = body.slice(body.indexOf('<div class="sr-only">'))
+		expect(table).toContain("2,000.00")
+	})
+})
+
 describe("ChanceView's text alternatives", () => {
 	test("carries the Bands table and the runs-out counts in visually hidden tables", () => {
 		const data = chanceFixture({
