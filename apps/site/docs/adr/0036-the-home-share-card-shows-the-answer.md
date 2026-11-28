@@ -5,7 +5,7 @@ status: accepted
 # The home share card shows the answer as a picture
 
 The home card used to print the Language's value statement under the wordmark: a paragraph on a
-1200 × 630 canvas. [DESIGN_PRINCIPLES.md](../../../DESIGN_PRINCIPLES.md) puts the picture on the first
+1200 × 630 canvas. [DESIGN_PRINCIPLES.md](../../../../DESIGN_PRINCIPLES.md) puts the picture on the first
 rung and every word below it, and the card has one job a shared link gets a glance at: answer "when
 can I stop working?". [ADR 0018](./0018-the-share-image-is-generated-at-build-time.md) still owns how
 the card is generated and advertised; this record changes what its home half shows. The OpenJot card
@@ -18,7 +18,7 @@ keeps ADR 0018's composition, and `composeShareImage` is untouched.
   margin and moves the host to the top-right corner; the Language name no longer appears. The
   Language's own `actionQuestion` sits at 44 px, and under it the net-worth line answers it. Every
   word pays rent.
-- **A line, not figures.** The curve is illustrative, drawn from `netWorthShape(u)`: a rising
+- **A line, not figures.** The curve is drawn from `netWorthShape(u)`: a rising
   exponential through the working years, then a levelling exponential once the person is free to
   stop, joined with no step at the FI date. No y-axis or amount is shown. The line is illustrative;
   the only figure the picture takes from the demo is its FI date, on the demo's time axis. The

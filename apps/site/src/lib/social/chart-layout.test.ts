@@ -1,6 +1,13 @@
 import { describe, expect, it } from "bun:test"
 import { dictionaryFor } from "../language/languages"
-import { FI_DEMO_AS_OF, FI_DEMO_COMMAND, FI_DEMO_DATE, FI_DEMO_HORIZON } from "../site"
+import {
+	FI_DEMO_AS_OF,
+	FI_DEMO_COMMAND,
+	FI_DEMO_DATE,
+	FI_DEMO_HORIZON,
+	FI_DEMO_OUTPUT,
+	FI_DEMO_SETUP_COMMANDS,
+} from "../site"
 import { CHART_END_DATE, CHART_START_DATE, KNEE_FRACTION, netWorthShape } from "./chart-layout"
 import { dateFraction, shortMonthYear } from "./share-date"
 
@@ -97,5 +104,7 @@ describe("the card's time axis against the demo command", () => {
 	it("spans the as-of and the horizon the demo's command runs with", () => {
 		expect(FI_DEMO_COMMAND).toContain(`--as-of ${FI_DEMO_AS_OF} `)
 		expect(FI_DEMO_COMMAND).toContain(`--horizon ${FI_DEMO_HORIZON} `)
+		expect(FI_DEMO_SETUP_COMMANDS.join("\n")).toContain(`--as-of ${FI_DEMO_AS_OF} `)
+		expect(FI_DEMO_OUTPUT).toContain(`  "asOf": "${FI_DEMO_AS_OF}",`)
 	})
 })
