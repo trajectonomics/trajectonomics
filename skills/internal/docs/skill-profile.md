@@ -17,8 +17,9 @@ should receive the profile:
 node <path-to-trajectonomics-checkout>/skills/internal/scripts/install-profile.mjs
 ```
 
-The installer acts on the current working directory, so run it from the
-repository that should receive the profile.
+The installer acts on the current working directory and reads the profile from
+your checkout, so update the checkout to the latest `main` first
+(`git switch main && git pull`).
 
 The old `npx -y --package=github:trajectonomics/internal-skills#main
 install-skills-profile` command no longer works: `trajectonomics/internal-skills`
@@ -27,7 +28,7 @@ is archived and will never receive this fix.
 `main` is intentional. Factory repositories use the profile itself from `main`:
 the upstream skill pins are fixed, but the profile contents are not. Editing
 `profiles/factory.json` on `main` changes every repository that re-runs the
-installer.
+installer from an up-to-date checkout.
 
 The installer requires `npx` and network access at install time: `npx` fetches
 `skills@1.7.6`, and `experimental_sync` fetches the pinned upstream commit.

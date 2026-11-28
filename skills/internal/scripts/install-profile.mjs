@@ -94,10 +94,13 @@ async function main(argv) {
   );
 
   // `npx --package=X` exports npm_config_package=X, which would make the nested
-  // npx resolve `skills@<pin>` as an alias for X instead of the skills CLI.
+  // npx resolve `skills@<pin>` as an alias for X instead of the skills CLI, and
+  // `npx -c` exports npm_config_call, which makes the nested npx fail (EUSAGE).
   const childEnv = { ...process.env };
-  delete childEnv.npm_config_package;
-  delete childEnv.NPM_CONFIG_PACKAGE;
+  for (const key of ['npm_config_package', 'npm_config_call']) {
+    delete childEnv[key];
+    delete childEnv[key.toUpperCase()];
+  }
 
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const result = spawnSync(

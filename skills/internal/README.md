@@ -20,9 +20,9 @@ Factory repositories install a pinned set of upstream engineering skills (grilli
 node <path-to-trajectonomics-checkout>/skills/internal/scripts/install-profile.mjs
 ```
 
-The installer writes into the current working directory, so run it from the repository that should receive the profile. The old `npx -y --package=github:trajectonomics/internal-skills#main install-skills-profile` command no longer works: `trajectonomics/internal-skills` is archived and will never receive this fix.
+The installer reads the profile from your checkout, so update it to the latest `main` first (`git switch main && git pull`). The old `npx -y --package=github:trajectonomics/internal-skills#main install-skills-profile` command no longer works: `trajectonomics/internal-skills` is archived and will never receive this fix.
 
-Factory repositories intentionally track this profile on `main`: the upstream skill pins are fixed, but the profile contents are not. Editing `profiles/factory.json` on `main` changes every repository that re-runs the installer.
+Factory repositories intentionally track this profile on `main`: the upstream skill pins are fixed, but the profile contents are not. Editing `profiles/factory.json` on `main` changes every repository that re-runs the installer from an up-to-date checkout.
 
 The installer requires `npx` and network access at install time.
 

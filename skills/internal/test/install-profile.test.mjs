@@ -22,6 +22,8 @@ const { join } = require('node:path');
       JSON.stringify({
         npm_config_package: process.env.npm_config_package ?? '<unset>',
         NPM_CONFIG_PACKAGE: process.env.NPM_CONFIG_PACKAGE ?? '<unset>',
+        npm_config_call: process.env.npm_config_call ?? '<unset>',
+        NPM_CONFIG_CALL: process.env.NPM_CONFIG_CALL ?? '<unset>',
       })
     );
   }
@@ -142,18 +144,22 @@ test('installer merges the profile and writes pinned lock refs through sync', as
   assert.equal(lock.skills.wrangler.ref, cloudflare.ref);
 });
 
-test('installer does not leak npm_config_package into the nested npx', async () => {
+test('installer does not leak npx package or call settings into the nested npx', async () => {
   const { result, nestedEnv } = await runInstaller(
     '{\n\t"name": "leak",\n\t"private": true\n}',
     {
       npm_config_package: 'github:example/whatever',
       NPM_CONFIG_PACKAGE: 'github:example/whatever',
+      npm_config_call: 'install-skills-profile',
+      NPM_CONFIG_CALL: 'install-skills-profile',
     }
   );
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
   assert.deepEqual(nestedEnv, {
     npm_config_package: '<unset>',
     NPM_CONFIG_PACKAGE: '<unset>',
+    npm_config_call: '<unset>',
+    NPM_CONFIG_CALL: '<unset>',
   });
 });
 
