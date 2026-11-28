@@ -8,7 +8,7 @@
  */
 import { getSessionFromCtx } from "better-auth/api"
 import { grantLifetimeRejection } from "../core/resource-request"
-import { deleteConsentRow, deleteTokenFamily } from "./family"
+import { deleteConsentRow, deleteTokenFamily, snapshotTokenFamily } from "./family"
 import { hookNow, type OAuthHookOptions } from "./request"
 import { findConsents, type StoredConsent } from "./store"
 import { asDate } from "./values"
@@ -48,7 +48,7 @@ export async function expireConsentForSession(
 /**
  * The `/oauth2/consent` preparation: the same expiry as above, plus the leftover token family
  * when no consent exists at all. The library is about to create a fresh approval; a token from
- * the previous one must not attach to it.
+ * the previous one is deleted first (ADR 0002 names the in-flight exchange that can slip past).
  */
 export async function prepareConsentForApproval(
 	ctx: { context: unknown; headers?: Headers | undefined },
@@ -58,8 +58,10 @@ export async function prepareConsentForApproval(
 	await expireSignedInConsent(ctx, clientId, options, true)
 }
 
+type Ctx = { context: unknown; headers?: Headers | undefined }
+
 async function expireSignedInConsent(
-	ctx: { context: unknown; headers?: Headers | undefined },
+	ctx: Ctx,
 	clientId: string,
 	options: OAuthHookOptions,
 	cleanupWhenAbsent: boolean,
@@ -70,13 +72,27 @@ async function expireSignedInConsent(
 	const owner = { clientId, userId }
 	const rows = await findConsents(ctx, clientId, userId)
 	const live = rows.filter((consent) => !consentExpired(ctx, consent, options))
-	for (const consent of rows) {
-		if (live.includes(consent)) continue
-		// A live approval is the grant; dead duplicate rows go without touching its token family.
-		await deleteConsentRow(ctx, consent.id)
-	}
-	if (live.length > 0) return
+	// A live approval is the grant: dead duplicates go, and its token family is never read.
+	if (live.length > 0) return deleteRowsExcept(ctx, rows, live)
 	if (rows.length === 0 && !cleanupWhenAbsent) return
-	await deleteTokenFamily(ctx, owner)
+	// The family as it stood before the read that decides the delete, so a token another approval
+	// mints afterwards survives. The ids, not a timestamp: the library stores `createdAt` in whole
+	// seconds, so a token minted later in the same second would look older than the read.
+	const family = await snapshotTokenFamily(options.database, owner)
+	const after = await findConsents(ctx, clientId, userId)
+	// An approval landed since the read above: it owns the family, so nothing is deleted.
+	if (after.some((consent) => !consentExpired(ctx, consent, options))) return
+	for (const consent of after) await deleteConsentRow(ctx, consent.id)
+	await deleteTokenFamily(options.database, family)
 	await deletePendingAuthorizationCodes(options.database, owner)
+}
+
+async function deleteRowsExcept(
+	ctx: Ctx,
+	rows: readonly StoredConsent[],
+	live: readonly StoredConsent[],
+): Promise<void> {
+	for (const consent of rows) {
+		if (!live.includes(consent)) await deleteConsentRow(ctx, consent.id)
+	}
 }

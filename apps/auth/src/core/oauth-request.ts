@@ -51,6 +51,30 @@ export function deviceApproveBodyRejection(body: unknown): DeviceApproveBodyReje
 	return Object.keys(body).every((key) => key === "userCode") ? null : "unexpected-field"
 }
 
+export type ClaimsParameterRejection = "claims-parameter"
+
+/**
+ * OIDC's `claims` request parameter is refused, and this check must not be relaxed. The library
+ * does resolve a request's claims object for an opaque access token: its userinfo answer releases
+ * a claim when the granted scopes include the claim's scope or when the request named it, so a
+ * client granted only `openid`, asking without a `resource`, that sends
+ * `claims={"userinfo":{"email":null}}` would receive the email from `/userinfo`, which the consent
+ * screen never showed. A JWT access token, which a `resource` selects, resolves userinfo claims by
+ * scope alone. Refusing the parameter is what keeps a token to the claims the consent screen
+ * shows, whichever format the library issues. Any value counts, including an empty one, and every
+ * source that can hold the field is read.
+ */
+export function claimsParameterRejection(
+	...sources: readonly unknown[]
+): ClaimsParameterRejection | null {
+	return sources.some(carriesClaims) ? "claims-parameter" : null
+}
+
+function carriesClaims(source: unknown): boolean {
+	if (source instanceof URLSearchParams) return source.has("claims")
+	return typeof source === "object" && source !== null && Object.hasOwn(source, "claims")
+}
+
 export type AuthorizeMethodRejection = "post-authorize"
 
 /**

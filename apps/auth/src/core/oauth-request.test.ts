@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import {
 	authorizeMethodRejection,
+	claimsParameterRejection,
 	deviceApproveBodyRejection,
 	deviceScopeRejection,
 	formMediaTypeRejection,
@@ -44,6 +45,31 @@ describe("deviceScopeRejection", () => {
 		expect(deviceScopeRejection("")).toBe("scope-required")
 		expect(deviceScopeRejection("   ")).toBe("scope-required")
 		expect(deviceScopeRejection(["openid"])).toBe("scope-required")
+	})
+})
+
+describe("claimsParameterRejection", () => {
+	it("refuses a query that carries claims, whatever the value", () => {
+		expect(claimsParameterRejection({ claims: '{"userinfo":{"email":null}}' })).toBe(
+			"claims-parameter",
+		)
+		expect(claimsParameterRejection({ claims: "" })).toBe("claims-parameter")
+		expect(claimsParameterRejection(new URLSearchParams("claims="))).toBe("claims-parameter")
+	})
+
+	it("refuses claims in either the query or the parsed body", () => {
+		expect(claimsParameterRejection({ scope: "openid" }, { claims: "{}" })).toBe("claims-parameter")
+	})
+
+	it("allows a request without the field", () => {
+		expect(claimsParameterRejection({ scope: "openid" })).toBeNull()
+		expect(
+			claimsParameterRejection(undefined, null, new URLSearchParams("scope=openid")),
+		).toBeNull()
+	})
+
+	it("names a field that merely contains claims as something else", () => {
+		expect(claimsParameterRejection({ claims_hint: "x" })).toBeNull()
 	})
 })
 

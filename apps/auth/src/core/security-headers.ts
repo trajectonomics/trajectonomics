@@ -116,9 +116,9 @@ function hasFrameAncestors(policy: string): boolean {
  * Better Auth answers some paths with a page of its own; the end-session confirmation posts a form
  * and sets the policy it needs. Overwriting that policy with the strict one would break the form,
  * so an answer that already carries a policy keeps it; only the frame rule is added when the
- * handler's policy has none. Every other answer gets the strict default. That includes JSON,
- * redirects and `/api/auth/error`, which sets no policy of its own; people no longer land there,
- * because a failed sign-in returns to the sign-in page (directly, or through `/?error=`).
+ * handler's policy has none. Every other answer gets the strict default, including JSON and
+ * redirects. `/api/auth/error` is one of those redirects: `onAPIError.errorURL` sends the browser
+ * to the sign-in page, so the library's own error HTML never reaches a person.
  */
 export function withSecurityHeaders(response: Response): Response {
 	const headers = new Headers(response.headers)

@@ -32,12 +32,14 @@ test("a failed deletion leaves a notice the retry skips while the user exists", 
 		await page.goto("/account/")
 		await page.getByLabel("Type your email to confirm").fill(user.email)
 		await page.getByRole("button", { name: "Delete my account" }).click()
+		// A 5xx may mean the deletion happened before the answer failed, so the page claims nothing.
 		await expect(page.getByRole("alert")).toHaveText(
-			"The account was not deleted. You were signed out; sign in again to try again.",
+			"We couldn't confirm whether the account was deleted. Reload this page to check.",
 		)
 		// The page no longer acts as if the person is signed in.
 		await expect(page.getByRole("switch", { name: "Email updates" })).toHaveCount(0)
-		await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible()
+		await expect(page.getByRole("button", { name: "Reload" })).toBeVisible()
+		await expect(page.getByRole("link", { name: "Sign in" })).toHaveCount(0)
 		expect(
 			queryLocal<{ id: string }>(scratch, `select "id" from "user" where "id" = '${user.id}'`),
 		).toHaveLength(1)
@@ -70,7 +72,7 @@ test("a failed queue insert aborts the deletion, and the page stops acting signe
 		await page.goto("/account/")
 		await page.getByLabel("Type your email to confirm").fill(user.email)
 		await page.getByRole("button", { name: "Delete my account" }).click()
-		await expect(page.getByRole("alert")).toContainText("The account was not deleted")
+		await expect(page.getByRole("alert")).toContainText("We couldn't confirm")
 		expect(
 			queryLocal<{ id: string }>(scratch, `select "id" from "user" where "id" = '${user.id}'`),
 		).toHaveLength(1)

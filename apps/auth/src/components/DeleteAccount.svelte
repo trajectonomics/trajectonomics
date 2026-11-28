@@ -4,6 +4,7 @@
 import { tick } from "svelte"
 import { deleteAccount, readSession, signOut } from "../client/auth"
 import { AuthRequestError } from "../client/errors"
+import { deletionFailureOutcome } from "../lib/deletion-outcome"
 import { dictionaryFor, type Language, pagePath } from "../lib/language"
 
 let {
@@ -34,9 +35,9 @@ async function remove(event: SubmitEvent): Promise<void> {
 		await deleteAccount()
 		window.location.assign(`${pagePath(language, "sign-in")}?deleted=1`)
 	} catch (error) {
-		// Only an answer from the server says the account is still there. Without one (a network
-		// error or a lost response) the page claims neither a deletion nor a sign-out.
-		if (!(error instanceof AuthRequestError)) {
+		// Only a 4xx answer says the account is still there. Without one (a network error, a lost
+		// response or a 5xx) the page claims neither a deletion nor a sign-out.
+		if (!(error instanceof AuthRequestError) || deletionFailureOutcome(error) === "unconfirmed") {
 			onfailed("unconfirmed")
 			return
 		}
