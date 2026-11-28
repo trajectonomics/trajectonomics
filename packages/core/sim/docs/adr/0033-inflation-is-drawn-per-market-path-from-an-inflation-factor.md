@@ -77,9 +77,16 @@ each, under Bun: inflation off took 6,546 ms and volatility 150 took 9,505 ms, a
 was 1.5x, and the run stays inside it; the review re-measured 7,132 ms against 10,101 ms, 1.42. A profile of
 300 paths puts about half the extra time in rebuilding each path's events, because the per-path Scenario
 (`{ ...scenario, prices }`) misses `buildEvents`' per-Scenario cache, and about 15% in `growthYears` inside
-`inflateBy`; the real figures are about 4%, and the draws themselves cost one word per growth year. Both larger
-costs can be removed without changing a figure (issue #815). A larger Timeline costs
+`inflateBy`; the real figures are about 4%, and the draws themselves cost one word per growth year. Issue #815
+set out to remove both larger costs without changing a figure; only the first could be (below). A larger Timeline costs
 the same words, and a plan with no volatility draws none of them.
+
+Since #815, a chance run with inflation keys its event dates on the declared Scenario and rebuilds only the fixed
+Flows' amounts for each path's inflation, so the dates are worked out once per run. On the same benchmark the ratio
+fell to about 1.27 (4,772 ms against 6,021 ms, then 4,630 ms against 5,956 ms), with every parity case unchanged.
+`inflateBy` keeps `growthYears`: replacing it with whole 365-day counts differs for a Timeline that starts on
+29 February, at 28 February of each later leap year (2024-02-29 to 2028-02-28 counts 3 years against 4), so it
+would change figures.
 
 ## Tests
 

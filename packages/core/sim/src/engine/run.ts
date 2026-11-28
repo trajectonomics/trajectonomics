@@ -12,7 +12,7 @@ import type { Returns } from "./returns"
 import { openRules } from "./rule-book"
 import { attachRules, attachTracker } from "./run-attach"
 import type { RunOptions } from "./run-options"
-import { runScenarioOf } from "./run-scenario"
+import { inflationOf, runScenarioOf } from "./run-scenario"
 import { type RunAccumulator, stepDate } from "./run-step"
 import { createStates, type StateMap } from "./state"
 
@@ -63,7 +63,7 @@ export function runEngine(
 		resolveReturns(returns, timeline),
 	)
 	const calendar = resolvedCalendar(runScenario)
-	const events = buildEvents(runScenario, timeline, calendar)
+	const events = buildEvents(scenario, timeline, calendar, inflationOf(runScenario))
 	const levies = planLevies(runScenario, timeline, calendar)
 	const gate = MilestoneGate.create(runScenario, timeline, calendar, events)
 	const tracker = tracked ? openOwedTracker(states, timeline.start) : undefined
