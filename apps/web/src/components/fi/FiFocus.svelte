@@ -20,6 +20,6 @@ let { focus, run, people }: Props = $props()
 	aria-labelledby="focus-point-answer"
 	class="border-b border-border pb-6"
 >
-	<h2 data-focus-heading id="focus-point-answer" class="sr-only">{focus.sentence}</h2>
+	<h3 data-focus-heading id="focus-point-answer" class="sr-only">{focus.sentence}</h3>
 	<FocusChart focus={{ ...focus, plan: null }} {run} {people} />
 </section>

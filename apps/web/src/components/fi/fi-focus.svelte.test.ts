@@ -47,7 +47,7 @@ describe("the FI page's lead picture", () => {
 	test("states the rule of thumb as one quiet line, with the reference behind Details", () => {
 		const page = body()
 		const outside = outsideDetails(page)
-		expect(outside).toContain("Rule of thumb:")
+		expect(outside).toContain("Rule of thumb ·")
 		expect(outside).toContain("(reference: 25×)")
 		expect(outside).not.toContain("Not met")
 	})

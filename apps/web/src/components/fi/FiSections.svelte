@@ -32,11 +32,13 @@ function projectionOf(name: string): ProjectionRun | null {
 	<div class="space-y-12">
 		{#each entries as [name, read], index (name)}
 			{@const lens = whatIfSession.lensFor(name)}
+			{@const focus = index === 0 && read.ok ? focusOf(snapshot, name) : null}
+			{@const lead = focus !== null && focus.plan === name}
 			<section aria-labelledby="{uid}-scenario-{index}" class="space-y-6">
 				<h2 id="{uid}-scenario-{index}" class="text-xl font-semibold tracking-tight">{name}</h2>
-				{#if index === 0 && read.ok}
+				{#if lead && focus !== null}
 					<FiFocus
-						focus={focusOf(snapshot, name)}
+						{focus}
 						run={projectionOf(name)}
 						people={personNames(householdOf(snapshot, name))}
 					/>
@@ -44,7 +46,7 @@ function projectionOf(name: string): ProjectionRun | null {
 				{#if lens}<FiWhatIf {lens} />{/if}
 				<ReadView {read} label={`FI date of ${name}`}>
 					{#snippet children(answer)}
-						<FiResult fi={answer} argv={read.argv} lead={index === 0} />
+						<FiResult fi={answer} argv={read.argv} {lead} />
 					{/snippet}
 				</ReadView>
 			</section>

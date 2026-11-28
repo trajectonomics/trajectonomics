@@ -13,7 +13,7 @@ let { reference, currency }: Props = $props()
 </script>
 
 <div class="space-y-2">
-	<p class="text-sm text-muted-foreground">Rule of thumb: {reference.multipleInWords}</p>
+	<p class="text-sm text-muted-foreground">Rule of thumb · {reference.multipleInWords}</p>
 	<details class="text-sm">
 		<summary class="cursor-pointer">Rule-of-thumb reference, not the answer</summary>
 		<p class="mt-2 text-muted-foreground">
