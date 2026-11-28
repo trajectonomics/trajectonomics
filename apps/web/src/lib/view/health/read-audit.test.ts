@@ -47,14 +47,28 @@ function withFailedBaseline(source: Snapshot, code = "NEGATIVE_AMOUNT"): Snapsho
 describe("readAudit", () => {
 	test("lists every Read the Snapshot holds, once each", () => {
 		const { reads } = demo
-		// Eight single Reads: doctor, accounts, balance, net worth, P&L, transactions, baseline, scenarios.
+		// Nine single Reads: doctor, accounts, balance, net worth, P&L, transactions, baseline, run-rates, scenarios.
 		const expected =
-			8 +
+			9 +
 			reads.netWorthHistory.length +
 			Object.keys(reads.projections).length +
 			Object.keys(reads.fi).length +
 			(reads.compare === null ? 0 : 1)
 		expect(readAudit(demo)).toHaveLength(expected)
+	})
+
+	test("lists the run-rates after the Baseline, when the Snapshot holds them", () => {
+		const questions = readAudit(demo).map((row) => row.question)
+		expect(questions.indexOf("Run-rates at the As-of")).toBe(
+			questions.indexOf("Baseline at the As-of") + 1,
+		)
+	})
+
+	test("leaves the run-rates out of a Snapshot saved before they were read", () => {
+		const before = { ...demo.reads }
+		delete before.rates
+		const rows = readAudit({ ...demo, reads: before })
+		expect(rows.some((row) => row.question === "Run-rates at the As-of")).toBe(false)
 	})
 
 	test("gives each Read its command, as a person could paste it", () => {
