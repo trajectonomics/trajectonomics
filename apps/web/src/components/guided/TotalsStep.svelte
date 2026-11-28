@@ -1,7 +1,7 @@
 <script lang="ts">
 import { maskedFocus } from "../../client/masked-focus.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { maskMoney } from "../../lib/format"
+import { draftAfterInput, maskMoney } from "../../lib/format"
 import { type TotalsDraft, totalProblem } from "../../lib/view/guided/money-draft"
 import { HINT, INPUT, LABEL, PROBLEM } from "./styles"
 
@@ -33,6 +33,23 @@ const shownTotal = (field: "income" | "spending"): string =>
 	preferences.hidden && focused !== field && totals[field].trim() !== ""
 		? maskMoney(totals[field])
 		: totals[field]
+
+/** The draft a typed total makes. Undo can put the mask back, which is no amount, so it keeps the draft and the field. */
+function onInput(
+	field: "income" | "spending",
+	event: Event & { currentTarget: HTMLInputElement },
+): void {
+	const control = event.currentTarget
+	const typed = control.value
+	const next = draftAfterInput(totals[field], typed)
+	const caret = (control.selectionStart ?? typed.length) - (typed.length - next.length)
+	touched[field] = true
+	onTotal(field, next)
+	if (next !== typed) {
+		control.value = shownTotal(field)
+		control.setSelectionRange(caret, caret)
+	}
+}
 </script>
 
 <section class="space-y-4">
@@ -52,10 +69,7 @@ const shownTotal = (field: "income" | "spending"): string =>
 				}}
 				aria-invalid={problem ? "true" : undefined}
 				aria-describedby={problem ? `${field.id}-problem` : masked ? `${field.id}-masked` : undefined}
-				oninput={(event) => {
-					touched[field.field] = true
-					onTotal(field.field, event.currentTarget.value)
-				}} />
+				oninput={(event) => onInput(field.field, event)} />
 			{#if masked}<span id="{field.id}-masked" class="sr-only">Amount hidden. Select the field to see and edit it.</span>{/if}
 			{#if problem}<p id="{field.id}-problem" role="alert" class={PROBLEM}>{problem}</p>{/if}
 		</div>
