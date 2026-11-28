@@ -16,7 +16,7 @@ let { focus, rowHeight }: Props = $props()
 
 <div class="flex min-h-[200px] w-full flex-col justify-center gap-2">
 	<div class="flex min-w-0 items-baseline justify-between gap-2">
-		<span class="text-xs text-muted-foreground">{focus.accounts} accounts</span>
+		<span class="shrink-0 text-xs whitespace-nowrap text-muted-foreground">{focus.accounts} accounts</span>
 		<FocusAnswer>
 			{focus.newest === null ? `Not since ${formatDate(focus.start)}` : formatDate(focus.newest)}
 		</FocusAnswer>

@@ -83,7 +83,7 @@ function usesOf(rollup: Rollup): { readonly name: string; readonly amount: strin
 }
 
 /**
- * The focus point of one Annual roll-up. Null when the year states no money in, unmet or use total, which is
+ * The focus point of one Annual roll-up. Null when the year states no money in or use total, which is
  * the page's own empty state rather than an answer. Every figure is the CLI's string; the bar's widths are
  * those strings placed for drawing only (web ADR 0002).
  */

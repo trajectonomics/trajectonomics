@@ -40,11 +40,11 @@ const ANCHOR = {
 								/></span></FocusAnswer>
 					{/if}
 				</div>
-				<div class="relative h-24 w-full overflow-hidden">
-					<div class="absolute inset-x-0 top-14 h-px bg-border"></div>
+				<div class="relative h-28 w-full overflow-hidden">
+					<div class="absolute inset-x-0 top-[4.5rem] h-px bg-border"></div>
 					{#each focus.pins as pin (pin.key)}
 						<span
-							class="absolute top-14 -translate-x-1/2 -translate-y-1/2"
+							class="absolute top-[4.5rem] -translate-x-1/2 -translate-y-1/2"
 							style:left="{4 + pin.x * 92}%"
 						>
 							{#if pin.next}
@@ -74,7 +74,7 @@ const ANCHOR = {
 						</span>
 					{/each}
 					<div
-						class="absolute top-16 right-[4%] left-[4%] flex justify-between text-xs text-muted-foreground"
+						class="absolute top-20 right-[4%] left-[4%] flex justify-between text-xs text-muted-foreground"
 					>
 						<span>{focus.startYear}</span>
 						<span>{focus.endYear}</span>

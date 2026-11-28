@@ -11,7 +11,7 @@ export interface LedgerFocusRow {
 	readonly last: string | null
 	/** Its place on the time axis, from 0 to 1, placed for drawing only. */
 	readonly x: number
-	/** True when it holds no record in the window, or its last is before the As-of's month. */
+	/** True when it holds no record in the window, or its last is before the same day one month before the As-of. */
 	readonly stale: boolean
 }
 
