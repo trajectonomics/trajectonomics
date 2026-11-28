@@ -49,8 +49,8 @@ const without = (index: number) => list(entries.filter((_, at) => at !== index))
 				<span class="block text-xs text-muted-foreground">No later entry takes the rest of this account, so the money under its floor is never used.</span>
 			{/if}
 		{/snippet}
-		{#snippet buttons(_entry, saved)}
-			<RowButtons label={`entry ${saved + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: saved, trying: false })}
+		{#snippet buttons(_entry, saved, shown)}
+			<RowButtons label={`entry ${shown + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: saved, trying: false })}
 				onTry={() => (drawer = { index: saved, trying: true })} onRemove={() => routing.save(ctx, without(saved))} onTryRemove={() => routing.tryIt(ctx, without(saved))} />
 		{/snippet}
 	</ReorderList>

@@ -22,10 +22,10 @@ interface Props {
 	onTry: (order: readonly T[]) => void
 	row: Snippet<[T, number, readonly T[]]>
 	/**
-	 * The buttons after Up and Down: edit, try, remove. Their number is the row's index in `items`, the list the page
-	 * saves, so a button acts on the item the row shows even after an order that is not saved yet.
+	 * The buttons after Up and Down: edit, try, remove. The first number is the row's saved index in `items`, which a
+	 * button acts on after an order that is not saved yet; the second is the place the row shows, which names it.
 	 */
-	buttons?: Snippet<[T, number]>
+	buttons?: Snippet<[T, number, number]>
 }
 
 let {
@@ -69,7 +69,7 @@ async function dropped(event: DragEvent, index: number): Promise<void> {
 		<OrderRow rowKey={entry.key} {index} count={reorder.rows.length} label={labelOf(entry.item, reorder.items, index)} {reorder} {editable}
 			problem={broken?.index === index ? broken.message : refused(index)} onDrop={dropped}>
 			{@render row(entry.item, index, reorder.items)}
-			{#snippet actions()}{@render buttons?.(entry.item, saved[index] ?? index)}{/snippet}
+			{#snippet actions()}{@render buttons?.(entry.item, saved[index] ?? index, index)}{/snippet}
 		</OrderRow>
 	{/each}
 </ol>
