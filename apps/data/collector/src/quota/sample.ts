@@ -4,7 +4,8 @@ import { claudeCredential, openCodeCredential, skipReason } from "./credentials"
 import { type FetchLike, fetchQuotaRows } from "./fetch"
 import { parseClaudeQuota, parseOpenCodeQuota } from "./parse"
 import { QUOTA_PLANS } from "./plans"
-import { sampleAntigravity, sampleCursor, sampleMuse } from "./sample-extra"
+import { sampleAntigravity } from "./sample-antigravity"
+import { sampleCursor, sampleMuse } from "./sample-extra"
 
 /** Result of running a local CLI quota command; null means the binary could not be spawned. */
 export type CommandResult = { exitCode: number; stdout: string } | null
@@ -21,6 +22,8 @@ export type SampleDeps = {
 	log: (line: string) => void
 	/** Finds the local Antigravity OAuth token file; omitted or null skips Antigravity. */
 	antigravityTokenPath?: (home: string) => string | null
+	/** Finds Antigravity ACP refresh-token files, newest first; omitted skips that exchange. */
+	acpTokenPaths?: (home: string) => string[]
 	/** Resolves the `muse` CLI path; defaults to `"muse"`. */
 	museBinary?: (home: string) => string
 	/** Resolves the `agy` CLI path; defaults to `"agy"`. */

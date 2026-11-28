@@ -122,3 +122,11 @@ typo.
   byte for byte as before (the parity hashes are unchanged).
 - **The refusal names the rule.** `INVALID_CATEGORY` is one code for every way to break the rule, so the
   CLI quotes `EXPENSE_CATEGORY_RULE`, which `sim` exports, beside the code.
+
+## Amended by ADR 0034
+
+The same lines are also stated per Reporting year (a year that begins on the 1st of a month the caller
+chooses) and per Reporting month (a calendar month), under `ProjectionOptions.reporting`, as
+`Projection.cashflowYears` and `Projection.cashflowMonths`. Each is the sum of the days it covers, cut by the
+As-of, the horizon or a run-out date and then marked `partial`, and the identity above holds for every one.
+There is no roll-up field for those spans, and no balance is stated. `cashflow` and its bytes are unchanged.

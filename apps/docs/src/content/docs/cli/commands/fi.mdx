@@ -11,13 +11,24 @@ hashes, the Overrides it applied and its tax status.
 - `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
 - `--scenario <string>` — the Scenario's exact name or its id; required
 - `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>`, after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the
+  Currency's major unit, such as `"90000.50"`, instead of satang
 - `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
   path, or `-` for stdin
 
 ```bash
-traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --json                           # The survival FI date, with the 25x figure as a labelled reference.
-traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000  # The same date under one changed assumption.
+traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --json                                     # The survival FI date, with the 25x figure as a labelled reference.
+traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000           # The same date under one changed assumption.
+traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000 --decimal   # The same change as a decimal amount of THB.
+traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.gym                         # The same date with one Flow taken out.
 ```
+
+On a reachable FI date, `fi.ages` names each household person's age there, one `{ person, age }` per
+person; a plan with no household states an empty list, and an unreachable answer states no `ages`.
+A person who has not joined the plan by that date is absent from it.
 
 From the FI month on, every earned income Flow stops, and tax keeps running on what remains. A
 Scenario that pays a debt from a share of earned income cannot keep paying it after the FI month, so

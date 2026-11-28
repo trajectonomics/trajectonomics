@@ -2,7 +2,7 @@
 name: traj-plan
 description: "Work out when someone can stop working, or reach financial independence, from their own money with `traj`, the personal money command line: project their net worth to a date they name, show what a purchase or a raise would change, and estimate what their Thai income tax comes to for a tax year and what one deduction (RMF, ThaiESG, an allowance) would change. Use when someone asks when they can stop working or retire, how much Thai income tax they will owe, what an RMF contribution would save them in tax, what their net worth will be next year, for a projection or a what-if on their money, or whether their money lasts. It estimates; it never prepares, files or checks a tax return."
 metadata:
-  cli: ">=0.3.0 <0.8.0"
+  cli: ">=0.3.0 <0.9.0"
 ---
 
 # traj-plan
@@ -166,8 +166,8 @@ There are two ways to show a deduction, one for each kind:
   flag states them. Keep one contribution Flow of that class in the Tax Baseline at amount zero, then
   compare with `--set`, which replaces that Flow's amount:
   `traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json`.
-  `--set` replaces a path that exists and cannot add one, so when the Scenario has no such Flow, add
-  it to the document first. Step T2's `--label` never covered that Flow, so write the Tax Baseline's
+  `--set` replaces a path that exists, so when the Scenario has no such Flow, add it to the document
+  first. Step T2's `--label` never covered that Flow, so write the Tax Baseline's
   Levy again before comparing: `traj scenario tax <name> --tax th-2026` with the same flags and labels
   as Step T2 plus `--label <flow>=<label>`, the class the person chose in Step T1. Compare only after
   that. Amounts are integer satang: 100 THB is 10000 satang.
@@ -195,9 +195,9 @@ Every plan answer carries these, in plain words:
 - **What is not modelled**, named for the question asked — the facts the Scenario does not carry, and
   for a tax figure the classes its Levy leaves out.
 - **What `traj` cannot do in this release**: it does not file a return or use e-Filing, it cannot hold
-  a currency other than THB (so no USD), and it has no Monte Carlo, no return shock, and no
-  "retire at 55" — a sentence like that is refused, not approximated. Leave the missing number
-  missing.
+  a currency other than THB (so no USD), it reports the `fi` date from one deterministic projection
+  rather than a probability, and it has no "retire at 55" — a sentence like that is refused, not
+  approximated. Leave the missing number missing.
 - **The as-of every figure was read at, and whether tax is in it.** A figure carries tax only when its
   Scenario carries a Levy; the result's `tax` field says whether it is applied.
 

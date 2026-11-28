@@ -10,6 +10,7 @@ import { type ShareImage, shareImage } from "../src/lib/social/share-image"
 import { readDesignTokens } from "./adapters/design-tokens"
 import { shareImageFonts } from "./adapters/share-fonts"
 import { readShareLockup } from "./adapters/share-lockup"
+import { readShareMascot } from "./adapters/share-mascot"
 
 /** The PNG one composed share image rasterizes to, with its own fonts and no system font consulted. */
 export function renderShareImage(image: ShareImage, fonts: readonly string[]): Uint8Array {
@@ -39,6 +40,7 @@ function imagesOf(
 	openJot: (typeof OPENJOT_LANGUAGES)[number],
 	colours: ReturnType<typeof shareColours>,
 	lockup: Awaited<ReturnType<typeof readShareLockup>>,
+	mascot: Awaited<ReturnType<typeof readShareMascot>>,
 ): readonly ShareImageFile[] {
 	return [
 		{
@@ -48,6 +50,7 @@ function imagesOf(
 				dictionary: language.dictionary,
 				colours,
 				lockup,
+				mascot,
 			}),
 		},
 		{
@@ -70,12 +73,13 @@ function imagesOf(
 export async function writeShareImages(destination: string): Promise<readonly string[]> {
 	const colours = shareColours(await readDesignTokens())
 	const lockup = await readShareLockup()
+	const mascot = await readShareMascot()
 	const fonts = await shareImageFonts()
 	await mkdir(destination, { recursive: true })
 	const files = LANGUAGES.flatMap((entry) => {
 		const openJot = OPENJOT_LANGUAGES.find((candidate) => candidate.language === entry.language)
 		if (openJot === undefined) throw new Error(`no OpenJot card for ${entry.language}`)
-		return imagesOf(entry, openJot, colours, lockup)
+		return imagesOf(entry, openJot, colours, lockup, mascot)
 	})
 	for (const { path: name, image } of files) {
 		const png = renderShareImage(image, fonts)

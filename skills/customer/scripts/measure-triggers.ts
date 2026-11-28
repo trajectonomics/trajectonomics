@@ -55,6 +55,7 @@ function report(query: TriggerQuery, picks: string[]): number {
 }
 
 mkdirSync(join(homedir(), ".cache"), { recursive: true })
+mkdirSync(join(homedir(), ".cache"), { recursive: true })
 const scratch = mkdtempSync(join(homedir(), ".cache", "measure-triggers-"))
 try {
 	const skills = readListedSkills()

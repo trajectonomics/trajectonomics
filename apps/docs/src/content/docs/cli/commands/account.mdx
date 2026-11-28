@@ -49,4 +49,44 @@ traj account show Cash                                  # Show an account by nam
 traj account show 0194a000-0002-7000-8000-000000000002  # By id.
 ```
 
+## `traj account value <account>`
+
+Record what an asset or liability is worth on a date, and write the difference as a transaction. The
+account must be an unarchived asset or liability Leaf Account, and the value is stated on the
+account's own side: an asset's value, which may be negative, or what a liability still owes as a
+positive amount. The difference posts against an income or equity Leaf Account in the same currency,
+which `--against` names; a value that equals the Balance writes nothing and reports `unchanged`.
+
+- `--value <string>` — what the account is worth on `--date`, as a decimal in its currency
+- `--date <string>` — the `YYYY-MM-DD` date the value is stated for; the Balance is read at the end of
+  that day
+- `--against <string>` — the income or equity Leaf Account, in the same currency, that takes the
+  difference
+- `--file <string>` — a JSON document of values, or `-` for stdin; its schema is
+  `traj schema account value`, and `--template` prints one
+- `--template` — print a document to start from; opens no data directory
+- `--dry-run` — report the valuation and roll the write back
+
+The three forms are one value, a document of many values, and the template. A document applies its
+entries in date order, then account id order, in one write that is all or nothing.
+
+```bash exec
+traj account value Cash --value 900.00 --date 2026-03-31 --against Opening --dry-run --json | jq '{status, before, value, difference}'
+```
+
+```json output
+{
+  "status": "added",
+  "before": "879.50",
+  "value": "900.00",
+  "difference": "20.50"
+}
+```
+
+The Quickstart's Cash holds `879.50` THB on 2026-03-31, so stating `900.00` writes a `20.50` THB
+transaction against `Opening`. A valuation is an ordinary transaction with the memo `Valued at
+900.00`, so `traj tx void` and `traj tx amend` already read it. A valuation dated after this one is
+left as it is: the result's `notes` names the earliest one, how this write moves it, and says to
+restate it.
+
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

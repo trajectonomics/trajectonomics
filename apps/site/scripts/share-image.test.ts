@@ -17,6 +17,7 @@ import { SHARE_IMAGE_MAX_BYTES, shareImage } from "../src/lib/social/share-image
 import { readDesignTokens } from "./adapters/design-tokens"
 import { shareImageFonts } from "./adapters/share-fonts"
 import { readShareLockup } from "./adapters/share-lockup"
+import { readShareMascot } from "./adapters/share-mascot"
 import { renderShareImage, renderShareImagePixels, writeShareImages } from "./share-image"
 
 /** The card every share image must be cut at, which the checks hold it to. */
@@ -32,6 +33,7 @@ async function composedImage(language: string = LANGUAGE) {
 		dictionary: dictionaryFor(language),
 		colours: shareColours(await readDesignTokens()),
 		lockup: await readShareLockup(),
+		mascot: await readShareMascot(),
 	})
 }
 
@@ -103,6 +105,17 @@ describe("the PNG a share image rasterizes to", () => {
 	})
 })
 
+describe("the mascot the home card draws", () => {
+	it("is a committed PNG under its own ceiling, whose data URI states its own pixel size", async () => {
+		const mascot = await readShareMascot()
+		const prefix = "data:image/png;base64,"
+		expect(mascot.href.startsWith(prefix)).toBe(true)
+		const bytes = Buffer.from(mascot.href.slice(prefix.length), "base64")
+		expect(bytes.length).toBeLessThan(45 * 1024)
+		expect(pngPixels(bytes)).toEqual({ width: mascot.width, height: mascot.height })
+	})
+})
+
 describe("the share images the prebuild step writes", () => {
 	it("writes one PNG per page and Language, at the card's size, into the static directory", async () => {
 		const destination = await mkdtemp(join(tmpdir(), "share-image-"))
@@ -114,6 +127,7 @@ describe("the share images the prebuild step writes", () => {
 			for (const name of files) {
 				const png = await Bun.file(join(destination, name)).bytes()
 				expect(pngPixels(png)).toEqual(CARD)
+				expect(png.length).toBeLessThan(SHARE_IMAGE_MAX_BYTES)
 			}
 		} finally {
 			await rm(destination, { recursive: true, force: true })

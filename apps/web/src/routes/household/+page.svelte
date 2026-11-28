@@ -6,10 +6,6 @@ import HouseholdPage from "../../components/pages/HouseholdPage.svelte"
 import { editsShown } from "../../lib/edit/shown"
 </script>
 
-<svelte:head>
-	<title>Household · Dashboard</title>
-</svelte:head>
-
 <HouseholdPage
 	scenario={queryParam("scenario", "")}
 	editable={editsShown(editSession.token, page.url.search)}

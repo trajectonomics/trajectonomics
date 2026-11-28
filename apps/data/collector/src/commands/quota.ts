@@ -1,4 +1,5 @@
 import { homedir } from "node:os"
+import { listAcpTokenPaths } from "../quota/antigravity-acp"
 import { readTextFile } from "../quota/credentials"
 import {
 	findAntigravityTokenPath,
@@ -67,6 +68,7 @@ export async function runQuotaCommand(argv: readonly string[]): Promise<void> {
 		readText: readTextFile,
 		log: (line) => console.error(line),
 		antigravityTokenPath: findAntigravityTokenPath,
+		acpTokenPaths: listAcpTokenPaths,
 		museBinary: resolveMuseBinary,
 		agyBinary: resolveAgyBinary,
 		runCommand: defaultRunner,

@@ -1,12 +1,12 @@
 import { FI_DEMO_AS_OF, FI_DEMO_DATE, FI_DEMO_HORIZON } from "../site"
-import { MARGIN, SHARE_IMAGE_WIDTH } from "./layout"
+import { MARGIN } from "./layout"
 import { dateFraction } from "./share-date"
 
 /** The x the chart's time axis starts at: the margin every block keeps. */
 export const CHART_LEFT = MARGIN
 
-/** The x the axis ends at: the margin mirrored on the right. */
-export const CHART_RIGHT = SHARE_IMAGE_WIDTH - MARGIN
+/** The x the axis ends at: short of the margin, so the mascot stands in the space it frees. */
+export const CHART_RIGHT = 900
 
 /** The y the tallest part of the curve may reach, in pixels. */
 export const CHART_TOP = 270

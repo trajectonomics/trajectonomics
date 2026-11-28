@@ -2,7 +2,7 @@
 name: traj
 description: "Operate `traj`, the Trajectonomics command-line ledger, on someone's own money: record what they earned and spent, keep their accounts, check that the ledger balances, and read balances and reports. Use when someone wants to track their spending from a terminal, set up their accounts (for example to work out their Thai income tax estimate), record an expense or income, check their ledger, or asks about net worth or financial-independence questions; also whenever they name `traj`. It computes from a ledger and nothing else: it is no spreadsheet, gives no investment advice, and does not prepare, file or check a tax return."
 metadata:
-  cli: ">=0.2.0 <0.8.0"
+  cli: ">=0.2.0 <0.9.0"
 ---
 
 # traj
@@ -49,7 +49,7 @@ Take every flag, required field, document shape and enum value from that output,
 - Commands never prompt. Nothing will come back asking a question.
 - A JSON error is an envelope on stderr: `{"error":{"code","exitCode","message","path?","hint?","details?"}}`. Read `exitCode` for the class, `code` for which failure, `hint` for what to try next.
 - Exit classes: `0` ok, `1` unexpected, `2` invalid input you must fix, `3` the domain refused it, `4` not found, `5` conflict such as a name already taken. A launcher failure, before the binary starts, is plain text rather than an envelope: read it, tell the user what it said, and stop retrying.
-- Money is a decimal string at the currency's scale, with its currency (`"120.50"`), everywhere except inside a Scenario document: an amount you pass in a flag, a CSV `amount` cell, a transaction document, and every amount a ledger, report or projection result prints. Inside a Scenario document — one you apply or read back, and the `--set` overrides that change it — money is an integer of minor units, so `100000` is 1,000.00 THB, which is that document's form of the same amount and not a restatement. Add `--decimal` beside a `--set` or `--add` to give its amounts as decimal strings (`--set 'flows.salary.amount="90000.50"' --decimal`); it is refused when there is no `--set` or `--add` for it to read. `traj schema` is the authority wherever it states a unit. Keep the unit the user's: restating one amount in a different unit is a second number you invented.
+- Money is a decimal string at the currency's scale, with its currency (`"120.50"`), everywhere except inside a Scenario document: an amount you pass in a flag, a CSV `amount` cell, a transaction document, and every amount a ledger, report or projection result prints. Inside a Scenario document money is an integer of minor units, so `100000` is 1,000.00 THB, which is that document's form of the same amount and not a restatement. Where a command publishes `--decimal`, it reads or writes the same amounts as decimal strings: beside a `--set` or an `--add` it reads those amounts (`--set 'flows.salary.amount="90000.50"' --decimal`), and a whole-document form reads or writes every amount in the document. `traj schema` is the authority wherever it states a unit. Keep the unit the user's: restating one amount in a different unit is a second number you invented.
 - Dates are `YYYY-MM-DD` Gregorian, in English. A Buddhist Era year is the same day under a different year number: convert it, and ask the user when the source does not say which calendar it is.
 - Use `traj`; never import a core package and compute the figure yourself. The point of the tool is that its arithmetic is the one answer.
 
@@ -119,6 +119,6 @@ Install nothing in these four cases:
 
 Phase 1 is record, project and answer. V1 is THB and Thailand; the United States follows later, and multi-currency does not.
 
-`traj schema` is the honest answer to "what can it do": read it before you promise anything. When a capability is absent from it — a second jurisdiction, an allowance optimiser, or projections and financial independence in an older release — say that this version of `traj` cannot answer it, offer the record-and-report part you can do, and leave the missing number missing rather than approximating it. Never fill a gap with arithmetic of your own, and never present an estimate as the tool's answer.
+`traj schema` is the honest answer to "what can it do": read it before you promise anything. When a capability is absent from it — a second jurisdiction, or projections and financial independence in an older release — say that this version of `traj` cannot answer it, offer the record-and-report part you can do, and leave the missing number missing rather than approximating it. Never fill a gap with arithmetic of your own, and never present an estimate as the tool's answer.
 
 Every result you give the user states the as-of date it was read at, and whether tax is in it. A figure without those two is one they will misread.

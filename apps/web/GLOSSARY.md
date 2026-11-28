@@ -153,7 +153,7 @@ What the plan would leave on one date, as `projection run --estate` states it: t
 _Avoid_: inheritance, will, legacy, probate
 
 **Estate date**:
-The date the Estate page reads: the later life expectancy of the household's holder and partner by default, a Milestone, a household anchor or the plan's last year. The page reads the `estate` row on that date or the first roll-up end after it, and computes no date.
+The date the Estate page reads: the later life expectancy of the household's holder and partner by default, a Milestone, a household anchor or the plan's last year. The page reads the `estate` row on that date or the first roll-up end after it, and computes no date. It lives in `?estate=` and is not the Viewing date ([ADR 0033](docs/adr/0033-the-viewing-date-is-one-month-in-the-address.md)).
 _Avoid_: death date, payout date
 
 **Tax profile**:
@@ -284,3 +284,11 @@ _Avoid_: compare page, plan list, portfolio
 **Range**:
 The control of the Plans page that narrows every chart to the first 10, 20 or 30 yearly rows of its plan, or shows the whole plan. It chooses which of `traj`'s rows are drawn and computes no date or figure.
 _Avoid_: zoom, period, window
+
+**As-of**:
+The date the Snapshot was read at (`params.asOf`, the caller's `--as-of`): the last day the ledger states, and the day every projection starts from. It never moves while the Snapshot is open.
+_Avoid_: today, now, viewing date
+
+**Viewing date**:
+The month the person looks at, `?at=YYYY-MM`, kept on every internal link and left out of the address when it is the As-of month. Before the As-of month a page shows that month-end's history Read; after it, the selected plan's row for that month, or that the plan has run out. It moves inside the range from the first history month to the horizon month of the Snapshot's parameters, and is not the As-of ([ADR 0033](docs/adr/0033-the-viewing-date-is-one-month-in-the-address.md)).
+_Avoid_: as-of, current date, today's date, period

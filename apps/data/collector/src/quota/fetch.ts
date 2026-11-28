@@ -18,7 +18,7 @@ export type FetchInit = {
 /** The fetch signature the sampler needs; tests inject a fake. */
 export type FetchLike = (url: string, init: FetchInit) => Promise<FetchResponse>
 
-const FETCH_TIMEOUT_MS = 15_000
+export const FETCH_TIMEOUT_MS = 15_000
 
 /** Fetches one plan's usage body and parses it; a failure logs one line and yields no rows. */
 export async function fetchQuotaRows(
