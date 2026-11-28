@@ -11,16 +11,16 @@
 
 .blog-footer-inner {
 	display: flex;
-	max-width: 72rem;
+	max-width: 94.5rem;
 	flex-direction: column;
 	gap: 40px;
 	margin: 0 auto;
-	padding: 56px 1.25rem 32px;
+	padding: 56px 1rem 32px;
 }
 
 @media (min-width: 40rem) {
 	.blog-footer-inner {
-		padding: 80px 1.5rem 40px;
+		padding: 80px 2.5rem 40px;
 	}
 }
 
