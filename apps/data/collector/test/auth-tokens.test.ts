@@ -22,13 +22,10 @@ describe("parseTokenResponse", () => {
 	})
 
 	test("never puts a token value in the error", () => {
-		try {
-			parseTokenResponse(tokenBody({ refresh_token: "" }))
-		} catch (error) {
-			const message = error instanceof Error ? error.message : ""
-			expect(message).not.toContain(ACCESS_TOKEN)
-			expect(message).not.toContain(REFRESH_TOKEN)
-		}
+		const parse = () => parseTokenResponse(tokenBody({ refresh_token: "" }))
+		expect(parse).toThrow("refresh_token")
+		expect(parse).not.toThrow(ACCESS_TOKEN)
+		expect(parse).not.toThrow(REFRESH_TOKEN)
 	})
 })
 

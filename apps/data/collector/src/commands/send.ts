@@ -1,58 +1,23 @@
 import { readFileSync } from "node:fs"
 import { homedir } from "node:os"
+import { credentialsPath } from "../auth/credentials"
+import type { AuthFetch } from "../auth/http"
 import { errorMessage } from "../message"
-import { DEFAULT_INGEST_URL, defaultKeyFile, type FetchLike, sendText } from "../send"
-import { realBearerOptions, resolveBearer } from "../send/bearer"
-import { fail } from "./errors"
+import { type FetchLike, type SendConfig, type SendReport, sendText } from "../send"
+import { type BearerDeps, realBearerDeps, resolveBearer } from "../send/bearer"
+import { tokenAllowedFor } from "../send/token-url"
+import { parseSendArgs } from "./send-args"
 
-const USAGE = "Usage: bun src/cli.ts send [--url <url>] [--key-file <path>] [files...]"
-
-/** Parsed `send` arguments. */
-export type SendArgs = { url: string; keyFile: string; files: string[] }
-
-type Flag = "url" | "keyFile"
-
-const FLAGS: Record<string, Flag> = { "--url": "url", "--key-file": "keyFile" }
-
-function valueAfter(argv: readonly string[], index: number, flag: string): string {
-	const value = argv[index + 1]
-	if (value === undefined) fail(`${flag} needs a value`, USAGE)
-	return value
-}
-
-function applyFlag(args: SendArgs, argv: readonly string[], index: number): number {
-	const arg = argv[index] ?? ""
-	const key = FLAGS[arg]
-	if (key === undefined) return index
-	args[key] = valueAfter(argv, index, arg)
-	return index + 1
-}
-
-/** Parses send arguments; `TRAJ_DATA_URL` supplies the URL when `--url` is absent. */
-export function parseSendArgs(
-	argv: readonly string[],
-	env: Record<string, string | undefined>,
-): SendArgs {
-	const args: SendArgs = {
-		url: env["TRAJ_DATA_URL"] ?? DEFAULT_INGEST_URL,
-		keyFile: defaultKeyFile(homedir()),
-		files: [],
-	}
-	for (let i = 0; i < argv.length; i += 1) {
-		const arg = argv[i] ?? ""
-		if (arg === "--help" || arg === "-h") {
-			console.log(USAGE)
-			process.exit(0)
-		}
-		const next = applyFlag(args, argv, i)
-		if (next !== i) {
-			i = next
-			continue
-		}
-		if (arg.startsWith("-")) fail(`Unknown argument: ${arg}`, USAGE)
-		args.files.push(arg)
-	}
-	return args
+/** The I/O one send run touches, injected so tests never read stdin or the owner's files. */
+export type SendCommandDeps = {
+	env: Record<string, string | undefined>
+	home: string
+	readInput: (files: readonly string[]) => Promise<string>
+	bearer: BearerDeps
+	fetch: FetchLike
+	send: (text: string, config: SendConfig) => Promise<SendReport>
+	log: (line: string) => void
+	exit: (code: 0 | 1) => void
 }
 
 async function readInput(files: readonly string[]): Promise<string> {
@@ -61,30 +26,58 @@ async function readInput(files: readonly string[]): Promise<string> {
 }
 
 const postFetch: FetchLike = (url, init) => fetch(url, init)
+const authFetch: AuthFetch = (url, init) => fetch(url, init)
 
-/** Reads credentials and rows, posts them, and exits non-zero on any failure. */
-export async function runSendCommand(argv: readonly string[]): Promise<void> {
-	const args = parseSendArgs(argv, process.env)
-	const log = (line: string): void => console.error(line)
-	let bearer: string
+/** Reads the rows, then the credentials, posts them, and exits non-zero on any failure. */
+export async function runSendCommand(
+	argv: readonly string[],
+	deps: SendCommandDeps = realSendCommandDeps(),
+): Promise<void> {
+	const args = parseSendArgs(argv, deps.env)
+	let text: string
 	try {
-		const resolved = await resolveBearer(realBearerOptions(args.keyFile, postFetch, log))
-		bearer = resolved.bearer
+		text = await deps.readInput(args.files)
 	} catch (error) {
-		log(errorMessage(error))
-		process.exitCode = 1
+		deps.log(`send: ${errorMessage(error)}`)
+		deps.exit(1)
 		return
 	}
 	try {
-		const report = await sendText(await readInput(args.files), {
+		const resolved = await resolveBearer(
+			{
+				credentialsPath: credentialsPath(deps.home),
+				keyFile: args.keyFile,
+				url: args.url,
+				tokenUrlAllowed: tokenAllowedFor(args.url, deps.env),
+				forceKey: args.keyFileExplicit,
+			},
+			deps.bearer,
+		)
+		const report = await deps.send(text, {
 			url: args.url,
-			bearer,
-			fetch: postFetch,
-			log,
+			bearer: resolved.bearer,
+			fetch: deps.fetch,
+			log: deps.log,
 		})
-		process.exitCode = report.ok ? 0 : 1
+		deps.exit(report.ok ? 0 : 1)
 	} catch (error) {
-		console.error(`send: ${errorMessage(error)}`)
-		process.exitCode = 1
+		deps.log(`send: ${errorMessage(error)}`)
+		deps.exit(1)
+	}
+}
+
+function realSendCommandDeps(): SendCommandDeps {
+	const log = (line: string): void => console.error(line)
+	return {
+		env: process.env,
+		home: homedir(),
+		readInput,
+		bearer: realBearerDeps(authFetch, log),
+		fetch: postFetch,
+		send: sendText,
+		log,
+		exit: (code) => {
+			process.exitCode = code
+		},
 	}
 }

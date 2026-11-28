@@ -34,6 +34,7 @@ function makeLogin(fetch: AuthFetch) {
 		save: (credentials) => {
 			saved.push(credentials)
 		},
+		read: () => null,
 		log: (line) => logs.push(line),
 		out: (line) => outs.push(line),
 	}

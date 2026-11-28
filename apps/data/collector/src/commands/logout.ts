@@ -1,71 +1,25 @@
 import { homedir } from "node:os"
-import {
-	type Credentials,
-	credentialsPath,
-	deleteCredentials,
-	FILE_DEPS,
-	readCredentials,
-} from "../auth/credentials"
-import { type AuthFetch, postForm } from "../auth/http"
-import { errorMessage } from "../message"
+import { authIssuer, DEFAULT_AUTH_ISSUER } from "../auth/config"
+import { FILE_DEPS } from "../auth/credential-fs"
+import { credentialsPath, deleteCredentials, readCredentials } from "../auth/credentials"
+import { logout } from "../auth/logout"
 
 const USAGE = "Usage: bun src/cli.ts logout"
 
-/** File, network and output hooks, so tests can fail the revoke on purpose. */
-export type LogoutDeps = {
-	fetch: AuthFetch
-	read: () => Credentials | null
-	remove: () => void
-	log: (line: string) => void
-	out: (line: string) => void
-}
-
-/** One logout's exit code. */
-export type LogoutOutcome = { exitCode: 0 | 1 }
-
-async function revoke(credentials: Credentials, deps: LogoutDeps): Promise<boolean> {
+/** The issuer for the revoke hint when the credentials file could not be read. */
+function hintIssuer(env: Record<string, string | undefined>): string {
 	try {
-		const response = await postForm(deps.fetch, `${credentials.issuer}/api/auth/oauth2/revoke`, {
-			token: credentials.refreshToken,
-			token_type_hint: "refresh_token",
-			client_id: credentials.clientId,
-		})
-		return response.ok
+		return authIssuer(env)
 	} catch {
-		return false
+		return DEFAULT_AUTH_ISSUER
 	}
-}
-
-/** Revokes best-effort, deletes the file either way, and says what is left to do. */
-export async function logout(deps: LogoutDeps): Promise<LogoutOutcome> {
-	let credentials: Credentials | null
-	try {
-		credentials = deps.read()
-	} catch (error) {
-		deps.log(`logout: ${errorMessage(error)}`)
-		return { exitCode: 1 }
-	}
-	if (credentials === null) {
-		deps.out("Not signed in.")
-		return { exitCode: 0 }
-	}
-	const revoked = await revoke(credentials, deps)
-	try {
-		deps.remove()
-	} catch (error) {
-		deps.log(`logout: ${errorMessage(error)}`)
-		return { exitCode: 1 }
-	}
-	deps.out("Signed out.")
-	if (revoked) return { exitCode: 0 }
-	deps.out(
-		"The grant could not be revoked here; revoke it on https://auth.trajectonomics.com/account/.",
-	)
-	return { exitCode: 0 }
 }
 
 /** Runs `logout` against the real credentials file. */
-export async function runLogoutCommand(argv: readonly string[]): Promise<void> {
+export async function runLogoutCommand(
+	argv: readonly string[],
+	env: Record<string, string | undefined> = process.env,
+): Promise<void> {
 	if (argv.some((arg) => arg === "--help" || arg === "-h")) {
 		console.log(USAGE)
 		return
@@ -80,6 +34,7 @@ export async function runLogoutCommand(argv: readonly string[]): Promise<void> {
 		fetch: (url, init) => fetch(url, init),
 		read: () => readCredentials(path, FILE_DEPS),
 		remove: () => deleteCredentials(path, FILE_DEPS),
+		defaultIssuer: hintIssuer(env),
 		log: (line) => console.error(line),
 		out: (line) => console.log(line),
 	})

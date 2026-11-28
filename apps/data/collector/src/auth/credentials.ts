@@ -1,19 +1,22 @@
 import { randomBytes } from "node:crypto"
-import * as fs from "node:fs"
 import { dirname, join } from "node:path"
+import { errorCode, errorMessage } from "../message"
 import { keyModeError } from "../send/key"
 import { type Credentials, parseCredentials } from "./credential-shape"
 
 export type { Credentials } from "./credential-shape"
 
+/** The file facts reading needs; `lstat` never follows a symlink. */
+export type CredentialStat = { isFile: boolean; isSymbolicLink: boolean; mode: number }
+
 /** Injected file operations, so tests never touch a real credentials file. */
 export type CredentialDeps = {
-	modeOf: (path: string) => number
+	lstat: (path: string) => CredentialStat
 	readText: (path: string) => string
-	exists: (path: string) => boolean
 	mkdirPrivate: (path: string) => void
 	writeExclusive: (path: string, text: string, mode: number) => void
 	rename: (from: string, to: string) => void
+	syncDir: (path: string) => void
 	remove: (path: string) => void
 }
 
@@ -22,33 +25,31 @@ export function credentialsPath(home: string): string {
 	return join(home, ".config/traj-data/credentials.json")
 }
 
-/** The real filesystem; every write is owner-only and atomic. */
-export const FILE_DEPS: CredentialDeps = {
-	modeOf: (path) => fs.statSync(path).mode,
-	readText: (path) => fs.readFileSync(path, "utf8"),
-	exists: (path) => fs.existsSync(path),
-	mkdirPrivate: (path) => fs.mkdirSync(path, { recursive: true, mode: 0o700 }),
-	writeExclusive: (path, text, mode) => fs.writeFileSync(path, text, { mode, flag: "wx" }),
-	rename: (from, to) => fs.renameSync(from, to),
-	remove: (path) => fs.rmSync(path, { force: true }),
-}
-
 /** Reads the credentials file: null when absent, an error when unsafe or malformed. */
 export function readCredentials(path: string, deps: CredentialDeps): Credentials | null {
-	if (!deps.exists(path)) return null
-	let mode: number
+	let stat: CredentialStat
 	try {
-		mode = deps.modeOf(path)
-	} catch {
-		throw new Error(`credentials file ${path} cannot be read`)
+		stat = deps.lstat(path)
+	} catch (error) {
+		if (errorCode(error) === "ENOENT") return null
+		throw new Error(`credentials file ${path} cannot be read: ${errorMessage(error)}`)
 	}
-	const problem = keyModeError(mode)
+	if (stat.isSymbolicLink || !stat.isFile) {
+		throw new Error(`credentials file ${path} must be a regular file`)
+	}
+	const problem = keyModeError(stat.mode)
 	if (problem !== null) {
 		throw new Error(`credentials file ${path} ${problem}; run: chmod 600 ${path}`)
 	}
+	let text: string
+	try {
+		text = deps.readText(path)
+	} catch (error) {
+		throw new Error(`credentials file ${path} cannot be read: ${errorMessage(error)}`)
+	}
 	let body: unknown
 	try {
-		body = JSON.parse(deps.readText(path))
+		body = JSON.parse(text)
 	} catch {
 		throw new Error(`credentials file ${path} is not valid JSON`)
 	}
@@ -57,7 +58,7 @@ export function readCredentials(path: string, deps: CredentialDeps): Credentials
 	return credentials
 }
 
-/** Writes the credentials through a mode-600 temporary file and one rename. */
+/** Writes the credentials through a mode-600 temporary file, one rename and a directory sync. */
 export function writeCredentials(
 	path: string,
 	credentials: Credentials,
@@ -65,19 +66,21 @@ export function writeCredentials(
 ): void {
 	deps.mkdirPrivate(dirname(path))
 	const temporary = `${path}.tmp-${process.pid}-${randomBytes(6).toString("hex")}`
-	deps.writeExclusive(temporary, `${JSON.stringify(credentials, null, 2)}\n`, 0o600)
 	try {
+		deps.writeExclusive(temporary, `${JSON.stringify(credentials, null, 2)}\n`, 0o600)
 		deps.rename(temporary, path)
+		deps.syncDir(dirname(path))
 	} catch (error) {
 		try {
 			deps.remove(temporary)
 		} catch {
-			// Best effort; report the rename error.
+			// Best effort; report the write error.
 		}
 		throw error
 	}
 }
 
+/** Deletes the stored credentials file; a missing file is not an error. */
 export function deleteCredentials(path: string, deps: CredentialDeps): void {
 	deps.remove(path)
 }

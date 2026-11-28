@@ -1,5 +1,5 @@
 import type { Credentials } from "../../src/auth/credentials"
-import type { AuthFetch } from "../../src/auth/http"
+import type { AuthFetch, AuthInit } from "../../src/auth/http"
 
 /** A synthetic unsigned JWT; its signature is never verified here. */
 export function fakeJwt(payload: Record<string, unknown>): string {
@@ -57,10 +57,7 @@ export type Reply = { status: number; body: unknown } | Error
 
 /** A fetch that answers a queue of replies and records every request. */
 export function queueFetch(replies: readonly Reply[]) {
-	const calls: {
-		url: string
-		init: { method: "POST"; headers: Record<string, string>; body: string }
-	}[] = []
+	const calls: { url: string; init: AuthInit }[] = []
 	const remaining = [...replies]
 	const fetch: AuthFetch = async (url, init) => {
 		calls.push({ url, init })

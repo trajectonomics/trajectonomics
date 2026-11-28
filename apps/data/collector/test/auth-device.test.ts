@@ -71,19 +71,35 @@ describe("pollDecision", () => {
 		})
 	})
 
-	test("names the status and code of any other error", () => {
-		expect(pollDecision(503, { error: "temporarily_unavailable" }, 5)).toEqual({
+	test("names the status and code of a final 4xx error", () => {
+		expect(pollDecision(400, { error: "invalid_request" }, 5)).toEqual({
 			kind: "fail",
-			message: "sign-in failed: HTTP 503 temporarily_unavailable",
+			message: "sign-in failed: HTTP 400 invalid_request",
 		})
-		expect(pollDecision(502, null, 5)).toEqual({
+		expect(pollDecision(403, null, 5)).toEqual({
 			kind: "fail",
-			message: "sign-in failed: HTTP 502",
+			message: "sign-in failed: HTTP 403",
 		})
 	})
 
+	test("waits longer on a 429, with or without an error field", () => {
+		expect(pollDecision(429, { error: "slow_down" }, 5)).toEqual({
+			kind: "wait",
+			intervalSeconds: 10,
+		})
+		expect(pollDecision(429, null, 5)).toEqual({ kind: "wait", intervalSeconds: 10 })
+	})
+
+	test("waits longer on any 5xx and keeps polling", () => {
+		expect(pollDecision(503, { error: "temporarily_unavailable" }, 5)).toEqual({
+			kind: "wait",
+			intervalSeconds: 10,
+		})
+		expect(pollDecision(502, null, 5)).toEqual({ kind: "wait", intervalSeconds: 10 })
+	})
+
 	test("never echoes a body that carries tokens", () => {
-		const decision = pollDecision(500, { error: "server_error", ...tokenBody() }, 5)
+		const decision = pollDecision(400, { error: "server_error", ...tokenBody() }, 5)
 		expect(decision.kind).toBe("fail")
 		expect(JSON.stringify(decision)).not.toContain(ACCESS_TOKEN)
 		expect(JSON.stringify(decision)).not.toContain(REFRESH_TOKEN)

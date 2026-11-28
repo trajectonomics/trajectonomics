@@ -131,7 +131,9 @@ point is 1% of the limit, so a limit estimate needs a large change in percent be
 ## Sign in
 
 `login` runs the device flow against auth.trajectonomics.com and stores a refresh token; the send
-commands then use a 15-minute access token instead of the temporary ingest key:
+commands then use a 15-minute access token instead of the temporary ingest key. Run `login` only
+after the data Worker that accepts auth tokens is deployed (the Worker part of #601): a token sent
+to a Worker that still checks only the key is rejected.
 
 ```sh
 bun apps/data/collector/src/cli.ts login
@@ -140,12 +142,21 @@ bun apps/data/collector/src/cli.ts logout
 ```
 
 `login` prints a URL and a code, waits for approval, and writes
-`~/.config/traj-data/credentials.json` (mode 600 in a mode-700 directory, written atomically).
-`whoami` prints the account id, the issuer and the days until the 90-day grant limit, without any
-network call. `logout` revokes the grant when auth is reachable and deletes the file either way.
-`TRAJ_AUTH_URL` overrides the issuer for a non-production auth Worker; `login --issuer <url>` does
-the same for one run. Auth allows at most 30 days without use and 90 days from the original
-approval, so run `login` again when `whoami` says the limit is near.
+`~/.config/traj-data/credentials.json` (mode 600 in a mode-700 directory, written atomically). A
+transient auth or network failure during polling only waits longer; a declined or expired code
+fails. `whoami` prints the account id, the issuer and `Sign in again within at most N day(s)`,
+without any network call. `logout` revokes the grant when auth is reachable and deletes the file
+either way, even a malformed one.
+
+Auth allows at most 30 days without use and 90 days from the consent's original approval. Running
+`login` again on a live grant keeps that original date, so it does not renew the 90 days. To renew
+early, revoke the grant on the account page at `<issuer>/account/` (by default
+https://auth.trajectonomics.com/account/), then run `login`; the new consent starts a new 90-day
+clock.
+
+`TRAJ_AUTH_URL` and `login --issuer <url>` must use https. A loopback host (`localhost`,
+`127.0.0.1`, `[::1]`) may use http for local development; every other value is refused before any
+request.
 
 The file holds a refresh token. Never commit it, and never print it.
 
@@ -157,16 +168,25 @@ of at most 5,000 rows and 1 MB of JSON body to the Worker:
 ```sh
 bun apps/data/collector/src/cli.ts send rows.jsonl
 some-command | bun apps/data/collector/src/cli.ts send
-bun apps/data/collector/src/cli.ts send --url http://127.0.0.1:8787/data/ingest rows.jsonl
+bun apps/data/collector/src/cli.ts send --url http://127.0.0.1:8787/data/ingest \
+  --key-file ~/.config/traj-data/ingest.key rows.jsonl
 ```
 
 The URL defaults to `https://trajectonomics.com/data/ingest`; `TRAJ_DATA_URL` overrides it when
 `--url` is absent. The sender uses the access token from
 `~/.config/traj-data/credentials.json` when the machine is signed in. With no credentials file it
-falls back to the temporary ingest key at `~/.config/traj-data/ingest.key`, or `--key-file`, and
-logs one line; a failed token refresh never falls back. The key file must be mode 600 or stricter;
-the sender refuses to run when group or others can read or write it, and it never prints either
-credential.
+uses the temporary ingest key at `~/.config/traj-data/ingest.key`; a failed token refresh never
+falls back to the key. `--key-file <path>` selects a key explicitly and skips the credentials file
+entirely.
+
+A sign-in token goes only to `https://trajectonomics.com` or `https://data.trajectonomics.com`.
+For any other URL the sender fails before refreshing: pass `--key-file`, or set
+`TRAJ_DATA_ALLOW_TOKEN_URL=1` when the target really is an auth-backed Worker, for example a local
+`wrangler dev`. To roll back to the key, delete `~/.config/traj-data/credentials.json`; sends then
+use the key file again.
+
+The key file must be mode 600 or stricter; the sender refuses to run when group or others can read
+or write it, and it never prints either credential.
 
 There are no retries. The Worker upserts rows, so the next hourly run resends the same hours and
 converges. A non-2xx response prints its HTTP status and the error codes in its body (never the
@@ -215,8 +235,10 @@ skew arrive, and the upsert makes the resend harmless.
 Each host's cursor is `~/.local/state/traj-data/cursor-<name>`, holding the latest `hourUtc` that
 was accepted. A host that is offline, exits non-zero or prints a malformed line is logged and
 skipped; its cursor does not move and the other hosts still run. After every host has been tried,
-all rows are sent once. A host's cursor advances only when every row it contributed was accepted.
-The command exits non-zero if any host failed or any send failed, after trying everything.
+all rows are sent once. The bearer is resolved at the first send, once per run, so a long
+collection does not spend its 15-minute access token before sending. A host's cursor advances only
+when every row it contributed was accepted. The command exits non-zero if any host failed or any
+send failed, after trying everything.
 
 ## Install on the runner host
 
@@ -233,17 +255,18 @@ The command exits non-zero if any host failed or any send failed, after trying e
 
    The collector has no runtime dependencies outside bun and the files under `src/`.
 
-2. Sign the runner in once (the grant lasts at most 90 days), and keep the temporary ingest key as
-   a fallback until the first signed-in run:
+2. Deploy the Worker part of #601 first: run `login` only against a Worker that accepts auth
+   tokens. Then sign the runner in once (the grant lasts at most 90 days):
 
    ```sh
    ~/.cache/traj-collector/bun ~/.cache/traj-collector/src/cli.ts login
    ```
 
-   It writes `~/.config/traj-data/credentials.json` (mode 600). The key is removed once the
-   collector sends with a token; write it on the runner host only, readable by its owner alone:
+   It writes `~/.config/traj-data/credentials.json` (mode 600). To roll back to the temporary key,
+   delete that file and write the key on the runner host only, readable by its owner alone:
 
    ```sh
+   rm ~/.config/traj-data/credentials.json
    install -d -m 700 ~/.config/traj-data
    printf '%s\n' '<the ingest key>' > ~/.config/traj-data/ingest.key
    chmod 600 ~/.config/traj-data/ingest.key
@@ -285,10 +308,10 @@ there asks for a browser check.
 | the dev machine (prameubuntu) | itself | yes: Claude Code runs there, so its OAuth token stays fresh |
 
 Each host keeps the collector in `~/.cache/traj-collector` (`bun` is a link to `~/.local/bin/bun`,
-or homeserver2's own binary), its `hosts.json`, `credentials.json` and temporary `ingest.key` in
-`~/.config/traj-data/`, and its cursors in `~/.local/state/traj-data/`. To update, copy `src/`,
-`deploy/` and `package.json` from `main` over the old copy on every host. A run peaks at about
-1.4 GB of memory.
+or homeserver2's own binary), its `hosts.json` and, when signed in, `credentials.json` in
+`~/.config/traj-data/` (`ingest.key` there only for a rollback), and its cursors in
+`~/.local/state/traj-data/`. To update, copy `src/`, `deploy/` and `package.json` from `main` over
+the old copy on every host. A run peaks at about 1.4 GB of memory.
 
 ## Rules
 

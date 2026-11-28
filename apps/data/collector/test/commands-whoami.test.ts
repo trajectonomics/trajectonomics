@@ -38,7 +38,7 @@ describe("whoAmI", () => {
 		expect(sink.lines).toEqual([
 			`Account id: ${ACCOUNT_ID}`,
 			"Issuer: https://auth.synthetic.test",
-			"Sign in again within 63 day(s)",
+			"Sign in again within at most 63 day(s)",
 		])
 	})
 

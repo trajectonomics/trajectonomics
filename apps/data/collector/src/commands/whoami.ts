@@ -1,6 +1,7 @@
 import { homedir } from "node:os"
 import { GRANT_LIMIT_DAYS } from "../auth/config"
-import { type Credentials, credentialsPath, FILE_DEPS, readCredentials } from "../auth/credentials"
+import { FILE_DEPS } from "../auth/credential-fs"
+import { type Credentials, credentialsPath, readCredentials } from "../auth/credentials"
 import { errorMessage } from "../message"
 
 const DAY_MS = 86_400_000
@@ -34,7 +35,7 @@ export function whoAmI(nowMs: number, deps: WhoAmIDeps): 0 | 1 {
 	}
 	deps.out(`Account id: ${credentials.accountId ?? "unknown"}`)
 	deps.out(`Issuer: ${credentials.issuer}`)
-	deps.out(`Sign in again within ${daysLeft(credentials.grantStartedAt, nowMs)} day(s)`)
+	deps.out(`Sign in again within at most ${daysLeft(credentials.grantStartedAt, nowMs)} day(s)`)
 	return 0
 }
 

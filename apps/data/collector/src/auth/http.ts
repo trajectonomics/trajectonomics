@@ -5,14 +5,23 @@ export type AuthResponse = {
 	json: () => Promise<unknown>
 }
 
+/** What the auth client passes to fetch: POST only, no redirects, bounded in time. */
+export type AuthInit = {
+	method: "POST"
+	headers: Record<string, string>
+	body: string
+	signal: AbortSignal
+	redirect: "error"
+}
+
 /** The POST-only fetch signature the auth client needs; tests inject a fake. */
-export type AuthFetch = (
-	url: string,
-	init: { method: "POST"; headers: Record<string, string>; body: string },
-) => Promise<AuthResponse>
+export type AuthFetch = (url: string, init: AuthInit) => Promise<AuthResponse>
 
 /** Auth accepts this media type exactly, with no charset parameter. */
 export const FORM_MEDIA_TYPE = "application/x-www-form-urlencoded"
+
+/** No auth call may hang a run on a stalled socket. */
+export const AUTH_TIMEOUT_MS = 10_000
 
 /** POSTs a form body to an auth endpoint. */
 export function postForm(
@@ -24,6 +33,8 @@ export function postForm(
 		method: "POST",
 		headers: { "Content-Type": FORM_MEDIA_TYPE },
 		body: new URLSearchParams(fields).toString(),
+		signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
+		redirect: "error",
 	})
 }
 

@@ -1,23 +1,41 @@
 import { describe, expect, test } from "bun:test"
 import type { Credentials } from "../src/auth/credentials"
 import type { AuthFetch } from "../src/auth/http"
-import { type LogoutDeps, logout } from "../src/commands/logout"
+import { type LogoutDeps, logout } from "../src/auth/logout"
 import { credentials, formFields, queueFetch } from "./support/auth"
 
-const ACCOUNT_URL =
-	"The grant could not be revoked here; revoke it on https://auth.trajectonomics.com/account/."
+const DEFAULT_ISSUER = "https://auth.synthetic.test"
 
-function makeDeps(fetch: AuthFetch, options: { credentials?: Credentials | null } = {}) {
+function makeDeps(
+	fetch: AuthFetch,
+	options: {
+		credentials?: Credentials | null
+		readError?: Error
+		removeError?: Error
+		defaultIssuer?: string
+	} = {},
+) {
 	const printed: string[] = []
 	const removed: string[] = []
 	const deps: LogoutDeps = {
 		fetch,
-		read: () => (options.credentials === undefined ? credentials() : options.credentials),
-		remove: () => removed.push("removed"),
+		read: () => {
+			if (options.readError !== undefined) throw options.readError
+			return options.credentials === undefined ? credentials() : options.credentials
+		},
+		remove: () => {
+			if (options.removeError !== undefined) throw options.removeError
+			removed.push("removed")
+		},
+		defaultIssuer: options.defaultIssuer ?? DEFAULT_ISSUER,
 		log: (line) => printed.push(line),
 		out: (line) => printed.push(line),
 	}
 	return { deps, printed, removed }
+}
+
+function hint(issuer: string): string {
+	return `The grant could not be revoked here; revoke it on ${issuer}/account/.`
 }
 
 describe("logout", () => {
@@ -29,7 +47,7 @@ describe("logout", () => {
 
 		expect(outcome).toEqual({ exitCode: 0 })
 		expect(run.removed).toEqual(["removed"])
-		expect(run.printed).toEqual(["Signed out.", ACCOUNT_URL])
+		expect(run.printed).toEqual(["Signed out.", hint(DEFAULT_ISSUER)])
 	})
 
 	test("deletes the file even when the revoke cannot be reached", async () => {
@@ -38,7 +56,7 @@ describe("logout", () => {
 
 		expect(await logout(run.deps)).toEqual({ exitCode: 0 })
 		expect(run.removed).toEqual(["removed"])
-		expect(run.printed).toEqual(["Signed out.", ACCOUNT_URL])
+		expect(run.printed).toEqual(["Signed out.", hint(DEFAULT_ISSUER)])
 	})
 
 	test("revokes the stored refresh token", async () => {
@@ -62,5 +80,28 @@ describe("logout", () => {
 		expect(run.printed).toEqual(["Not signed in."])
 		expect(run.removed).toEqual([])
 		expect(fetched.calls).toHaveLength(0)
+	})
+
+	test("deletes a file it cannot read and points at the configured issuer", async () => {
+		const fetched = queueFetch([])
+		const run = makeDeps(fetched.fetch, {
+			readError: new Error("credentials file is malformed"),
+			defaultIssuer: "https://auth.default.test",
+		})
+
+		expect(await logout(run.deps)).toEqual({ exitCode: 0 })
+		expect(run.removed).toEqual(["removed"])
+		expect(run.printed).toEqual(["Signed out.", hint("https://auth.default.test")])
+		expect(fetched.calls).toHaveLength(0)
+	})
+
+	test("exits 1 when the file itself cannot be removed", async () => {
+		const fetched = queueFetch([{ status: 200, body: { revoked: true } }])
+		const run = makeDeps(fetched.fetch, {
+			removeError: new Error("synthetic permission denied"),
+		})
+
+		expect(await logout(run.deps)).toEqual({ exitCode: 1 })
+		expect(run.printed).toEqual(["logout: synthetic permission denied"])
 	})
 })

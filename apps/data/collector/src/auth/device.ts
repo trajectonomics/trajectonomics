@@ -65,26 +65,37 @@ function failure(status: number, body: unknown): PollDecision {
 	return { kind: "fail", message: `sign-in failed: ${detail}` }
 }
 
-/** Reads one token poll: a grant, another wait (slow_down adds 5 s), or a failure. */
+/** RFC 8628 §3.5: a transient failure waits longer and polling continues. */
+const TRANSIENT_EXTRA_SECONDS = 5
+
+function waitLonger(intervalSeconds: number): PollDecision {
+	return { kind: "wait", intervalSeconds: intervalSeconds + TRANSIENT_EXTRA_SECONDS }
+}
+
+function tokens(body: unknown): PollDecision {
+	try {
+		return { kind: "tokens", tokens: parseTokenResponse(body) }
+	} catch (error) {
+		const message = error instanceof Error ? error.message : "token response is malformed"
+		return { kind: "fail", message: `sign-in failed: ${message}` }
+	}
+}
+
+function terminal(code: string | null): PollDecision | null {
+	if (code === "access_denied") return { kind: "fail", message: "the sign-in was declined" }
+	if (code === "expired_token")
+		return { kind: "fail", message: "the code expired; run login again" }
+	return null
+}
+
+/** Reads one token poll: a grant, another wait (slow_down and transients add 5 s), or a failure. */
 export function pollDecision(status: number, body: unknown, intervalSeconds: number): PollDecision {
-	if (status >= 200 && status < 300) {
-		try {
-			return { kind: "tokens", tokens: parseTokenResponse(body) }
-		} catch (error) {
-			const message = error instanceof Error ? error.message : "token response is malformed"
-			return { kind: "fail", message: `sign-in failed: ${message}` }
-		}
-	}
-	switch (oauthErrorCode(body)) {
-		case "authorization_pending":
-			return { kind: "wait", intervalSeconds }
-		case "slow_down":
-			return { kind: "wait", intervalSeconds: intervalSeconds + 5 }
-		case "access_denied":
-			return { kind: "fail", message: "the sign-in was declined" }
-		case "expired_token":
-			return { kind: "fail", message: "the code expired; run login again" }
-		default:
-			return failure(status, body)
-	}
+	if (status >= 200 && status < 300) return tokens(body)
+	const code = oauthErrorCode(body)
+	const done = terminal(code)
+	if (done !== null) return done
+	if (status === 429 || status >= 500) return waitLonger(intervalSeconds)
+	if (code === "authorization_pending") return { kind: "wait", intervalSeconds }
+	if (code === "slow_down") return waitLonger(intervalSeconds)
+	return failure(status, body)
 }
