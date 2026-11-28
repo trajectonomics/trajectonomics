@@ -22,7 +22,9 @@ export type SampleDeps = {
 	antigravityTokenPath?: (home: string) => string | null
 	/** Resolves the `muse` CLI path; defaults to `"muse"`. */
 	museBinary?: (home: string) => string
-	/** Runs `muse usage --json`; omitted skips Muse. */
+	/** Resolves the `agy` CLI path; defaults to `"agy"`. */
+	agyBinary?: (home: string) => string
+	/** Runs `agy models` for Antigravity's token and `muse usage --json`; omitted skips Muse. */
 	runCommand?: CommandRunner
 }
 

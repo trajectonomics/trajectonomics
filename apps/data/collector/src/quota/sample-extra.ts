@@ -3,7 +3,12 @@ import type { QuotaRow } from "../types"
 import { skipReason } from "./credentials"
 import { antigravityCredential, cursorCredential } from "./credentials-extra"
 import { fetchQuotaRows } from "./fetch"
-import { parseAntigravityQuota, parseCursorQuota, parseMuseQuota } from "./parse-providers"
+import {
+	isMuseNoUsage,
+	parseAntigravityQuota,
+	parseCursorQuota,
+	parseMuseQuota,
+} from "./parse-providers"
 import type { SampleDeps } from "./sample"
 
 const ANTIGRAVITY_URL =
@@ -15,11 +20,17 @@ const ANTIGRAVITY_UA = `antigravity/hub/2.24.0 (aidev_client; os_type=${process.
 
 /** Samples Antigravity's Gemini quota summary using the local OAuth token. */
 export async function sampleAntigravity(deps: SampleDeps, sampledAt: string): Promise<QuotaRow[]> {
-	const tokenPath = deps.antigravityTokenPath?.(deps.home) ?? null
-	const credential = antigravityCredential(
-		tokenPath === null ? null : deps.readText(tokenPath),
-		deps.nowMs,
-	)
+	const readCredential = () => {
+		const tokenPath = deps.antigravityTokenPath?.(deps.home) ?? null
+		return antigravityCredential(tokenPath === null ? null : deps.readText(tokenPath), deps.nowMs)
+	}
+	let credential = readCredential()
+	if (!credential.ok && deps.antigravityTokenPath !== undefined && deps.runCommand) {
+		// Antigravity's own CLI refreshes the token it keeps; the collector never writes it.
+		const agy = deps.agyBinary?.(deps.home) ?? "agy"
+		await deps.runCommand([agy, "models"])
+		credential = readCredential()
+	}
 	if (!credential.ok) {
 		deps.log(`quota: antigravity skipped (${skipReason(credential.reason)})`)
 		return []
@@ -84,8 +95,13 @@ export async function sampleMuse(deps: SampleDeps, sampledAt: string): Promise<Q
 	}
 	const rows = parseMuseQuota(body, sampledAt)
 	if (rows === null) {
-		deps.log("quota: meta unexpected output")
+		deps.log(
+			isMuseNoUsage(body)
+				? "quota: meta no reading (no usage yet in this window)"
+				: "quota: meta unexpected output",
+		)
 		return []
 	}
+	deps.log(`quota: meta sampled ${rows.length} rows`)
 	return rows
 }

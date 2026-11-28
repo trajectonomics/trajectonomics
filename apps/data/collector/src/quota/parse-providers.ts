@@ -44,6 +44,12 @@ const MUSE_WINDOWS = [
 	["weekly", "weekly"],
 ] as const
 
+/** Whether Muse reports that nothing has been used in its current window yet. */
+export function isMuseNoUsage(body: unknown): boolean {
+	const record = asObject(body)
+	return record?.["allowance"] === null && record["reason"] === "server_sent_no_usage"
+}
+
 /** Parses `muse usage --json` output into five-hour and weekly quota rows for `meta`. */
 export function parseMuseQuota(body: unknown, sampledAt: string): QuotaRow[] | null {
 	const allowance = asObject(asObject(body)?.["allowance"])
