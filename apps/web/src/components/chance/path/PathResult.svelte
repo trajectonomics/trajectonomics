@@ -30,7 +30,7 @@ const accounts = $derived(returnAccounts(path).map((id) => names.get(id) ?? id))
 </script>
 
 <div class="space-y-6">
-	<PathHeader {header} {plan} />
+	<PathHeader {header} {plan} futureMoney={chance.realBands !== undefined} />
 	<PathChart {path} {terms} {onTerms} />
 	<section aria-labelledby="path-table" class="space-y-2">
 		<h3 id="path-table" class="text-base font-semibold">Year by year</h3>

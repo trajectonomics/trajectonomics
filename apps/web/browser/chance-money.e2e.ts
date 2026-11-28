@@ -33,6 +33,8 @@ for (const width of WIDTHS) {
 		await expect(median).toHaveText(TODAY_SHOWN)
 		const fan = page.getByRole("img", { name: /Net worth Bands by year/ })
 		const todayFan = await fan.textContent()
+		await expect(fan).toHaveAccessibleName(/, Today's money$/)
+		await expect(table).toHaveAccessibleName(/, Today's money$/)
 
 		// The arrow keys move the choice, as they do in any radio group, and the visible option draws a ring.
 		await tabTo(page, today)
@@ -43,12 +45,21 @@ for (const width of WIDTHS) {
 		await expect(future).toBeChecked()
 		await expect(median).not.toHaveText(TODAY_SHOWN)
 		expect(await fan.textContent(), "the fan draws the other money").not.toBe(todayFan)
+		await expect(fan).toHaveAccessibleName(/, Future money$/)
+		await expect(table).toHaveAccessibleName(/, Future money$/)
 		expect(await overflowProblems(page)).toEqual([])
 
 		await page.keyboard.press("ArrowLeft")
 		await expect(today).toBeChecked()
 		await expect(median).toHaveText(TODAY_SHOWN)
 		expect(await overflowProblems(page)).toEqual([])
+
+		// Paper hides the switch, so a printed line names the money instead. Last: hiding the switch drops its focus.
+		const printed = page.getByText("Bands in today's money", { exact: true })
+		await expect(printed).toBeHidden()
+		await page.emulateMedia({ media: "print" })
+		await expect(printed).toBeVisible()
+		await expect(group).toBeHidden()
 	})
 
 	test(`one future states each year's Inflation column at ${width}px`, async ({ page }) => {

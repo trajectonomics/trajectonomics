@@ -10,18 +10,20 @@ interface Props {
 	runsOut: readonly RunsOutBar[]
 	/** The currency the Bands are in, named in the caption. */
 	currency: string
+	/** The money the Bands are shown in, named in the caption, or null when the read states only one. */
+	money: string | null
 }
 
 /**
  * The two charts' figures as visually hidden tables, the text alternative a screen reader and a touch
  * reader use (web ADR 0026). Money is read through `Money`, so Hide amounts reads "amount hidden".
  */
-let { bandRows, runsOut, currency }: Props = $props()
+let { bandRows, runsOut, currency, money }: Props = $props()
 </script>
 
 <div class="sr-only">
 	<table>
-		<caption>Net worth Bands by roll-up end ({currency})</caption>
+		<caption>Net worth Bands by roll-up end ({currency}){money === null ? "" : `, ${money}`}</caption>
 		<thead>
 			<tr>
 				<th scope="col">Roll-up ends</th>

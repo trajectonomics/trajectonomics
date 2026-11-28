@@ -1,7 +1,7 @@
 <script lang="ts">
 import { type BandsView, bandsIn } from "../../lib/view/chance/bands"
 import type { FuturesView } from "../../lib/view/chance/futures"
-import { MONEY_OPTIONS, type MoneyBasis } from "../../lib/view/chance/money"
+import { MONEY_LABELS, MONEY_OPTIONS, type MoneyBasis } from "../../lib/view/chance/money"
 import type { ChanceView } from "../../lib/view/chance/page"
 import ChanceSource from "../assumptions/ChanceSource.svelte"
 import Fact from "../projection/Fact.svelte"
@@ -28,6 +28,9 @@ let { view, argv, plan, futures }: Props = $props()
 let chosen = $state<MoneyBasis | null>(null)
 const money = $derived(chosen ?? (view.today === null ? "future" : "today"))
 const bands: BandsView = $derived(bandsIn(view, money))
+// With a switch on the page, the fan and its table name the money they show; the outcomes below stay in future money.
+const shownIn = $derived(view.today === null ? null : MONEY_LABELS[money])
+const fanLabel = "Net worth Bands by year, from the 10th to the 90th Percentile"
 </script>
 
 <div class="space-y-8">
@@ -54,14 +57,17 @@ const bands: BandsView = $derived(bandsIn(view, money))
 				}}
 			/>
 		{/if}
-		<ChanceFan label="Net worth Bands by year, from the 10th to the 90th Percentile" series={bands.series} />
+		{#if shownIn !== null}
+			<p class="hidden text-sm print:block">Bands in {shownIn.toLowerCase()}</p>
+		{/if}
+		<ChanceFan label={shownIn === null ? fanLabel : `${fanLabel}, ${shownIn}`} series={bands.series} />
 	</section>
 	<section aria-labelledby="chance-runs-out" class="space-y-3">
 		<h2 id="chance-runs-out" class="text-base font-semibold">When the failing paths run out</h2>
 		<RunsOutBars bars={view.runsOut} label="Failing Market paths by the year they run out" />
 	</section>
-	<ChanceFigures bandRows={bands.bandRows} runsOut={view.runsOut} currency={view.currency} />
-	<FuturesSection {futures} {plan} currency={view.currency} />
+	<ChanceFigures bandRows={bands.bandRows} runsOut={view.runsOut} currency={view.currency} money={shownIn} />
+	<FuturesSection {futures} {plan} currency={view.currency} futureMoney={view.today !== null} />
 	{#if view.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm">
 			{#each view.notes as note (note)}

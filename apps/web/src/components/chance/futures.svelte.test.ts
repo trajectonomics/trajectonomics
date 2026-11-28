@@ -109,6 +109,7 @@ describe("the Chance page's futures", () => {
 				futures: futuresViewOf({ ...chance, outcomes: undefined }),
 				plan: "base",
 				currency: "THB",
+				futureMoney: false,
 			},
 		}).body
 		expect(body).toContain("A live dashboard")
