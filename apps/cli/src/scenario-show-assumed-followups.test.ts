@@ -30,6 +30,25 @@ describe("the unlabelled-income hint's follow-ups", () => {
 		expect(unlabelled(await read(home))).toEqual([])
 	}, 30_000)
 
+	it("names an ownerless taxed Flow its own hint labelled, and its Owner lets the write run", async () => {
+		const home = await meOnly(["partner-salary", "bonus"])
+		const bonus = unlabelled(await read(home)).find((entry) => entry.path === "flows.bonus.label")
+		const set = commandOf(bonus?.hint ?? null).replace("@<person>", "@me")
+		expect((await runAsPrinted(home, set)).code).toBe(0)
+		const item = unlabelled(await read(home)).find(
+			(entry) => entry.path === "flows.partner-salary.label",
+		)
+		expect(item?.hint).toContain("Give flows.bonus an Owner first")
+		const file = documentFile(
+			coupleHousehold([...(COUPLE_OWNERS ?? []), { path: "flows.bonus", person: "me" }]),
+		)
+		const household = item?.hint?.match(/run "(traj .+?)"/)?.[1] ?? ""
+		expect((await runAsPrinted(home, household.replace("<path>", file))).code).toBe(0)
+		const next = unlabelled(await read(home))[0]
+		expect((await runAsPrinted(home, commandOf(next?.hint ?? null))).code).toBe(0)
+		expect(unlabelled(await read(home))).toEqual([])
+	}, 30_000)
+
 	it("states the tax whole when the plan keeps no stored profile, and that form clears the item", async () => {
 		const home = await meOnly(["partner-salary"])
 		const before = await read(home)
@@ -49,6 +68,9 @@ describe("the unlabelled-income hint's follow-ups", () => {
 		const item = unlabelled(await read(home))[0]
 		expect(item?.hint).toContain("--tax th-2026 --filing-status married_joint")
 		expect(item?.hint).not.toContain("--from-stored")
+		expect(item?.hint).toContain("This write replaces the plan's Levy")
+		expect(item?.hint).toContain("children, allowances and the rest")
+		expect(item?.hint).toContain("traj schema scenario tax")
 		expect((await runAsPrinted(home, commandOf(item?.hint ?? null))).code).toBe(0)
 		expect(unlabelled(await read(home))).toEqual([])
 	}, 30_000)

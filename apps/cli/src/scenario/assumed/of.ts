@@ -23,7 +23,7 @@ export function assumedOf(
 	return [
 		...templateDefaultItems(row, plain, printed),
 		...unlabelledIncomeItems(row.name, plain, household, taxAllowances !== undefined),
-		...unstatedAllowanceItems(row.name, taxAllowances, plain),
+		...unstatedAllowanceItems(row.name, taxAllowances, plain, household),
 		...taxFigureItems(plain),
 	]
 }

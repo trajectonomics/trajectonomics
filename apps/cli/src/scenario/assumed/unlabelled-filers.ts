@@ -5,7 +5,7 @@ import type { Household } from "../household/model"
 import { formatPath } from "../path"
 import { quotedName } from "../quoted-name"
 import { hasFilerLevy, levyTallyLabels } from "../tax/filer-label-check"
-import { earnersOf, type Flow, unlabelledFlowsOf } from "./unlabelled-flows"
+import { earnersOf, type Flow, ownerlessPathsOf, unlabelledFlowsOf } from "./unlabelled-flows"
 import { ownerHint, SALARY_LABEL, taxForm, taxHint } from "./unlabelled-forms"
 
 /** One unlabelled income Flow's id, and the hint that states its label. */
@@ -69,9 +69,9 @@ function hintFor(
 /**
  * The label hint for each unlabelled income Flow (cli ADR-0075, ADR-0083). A Levy with Filers reads
  * only the suffixes it tallies, so an Owner's suffix it does not read gives one `scenario tax` write
- * that labels every unlabelled Flow. That write needs every Flow to have an Owner, so while one has
- * none the hint says to give it an Owner first. A Flow with no Owner names the suffixes the Levies
- * read, or says to give it an Owner when they read none.
+ * that labels every unlabelled Flow. That write needs every taxed Flow and Account to have an Owner,
+ * so while one has none the hint says to give it an Owner first. A Flow with no Owner names the
+ * suffixes the Levies read, or says to give it an Owner when they read none.
  */
 export function unlabelledHintsOf(
 	name: string,
@@ -85,7 +85,7 @@ export function unlabelledHintsOf(
 	}
 	const read = levyTallyLabels(document)
 	const choices = choicesOf(read, household)
-	const ownerless = flows.flatMap((flow) => (flow.owner === undefined ? [flow.id] : []))
+	const ownerless = ownerlessPathsOf(household, document)
 	const fallback = taxWriteHint(name, document, flows, stored)
 	return flows.map((flow) => ({
 		id: flow.id,

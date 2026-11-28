@@ -34,18 +34,23 @@ export function taxForm(
 	return printedCommand("traj scenario tax", [name], [...mode, ...labelFlags(ids)])
 }
 
-/** The sentence above the tax form, naming what the write states (cli ADR-0083). */
+/**
+ * The sentence above the tax form, naming what the write states (cli ADR-0083). The whole form
+ * writes a new Levy rather than building on one, so it drops whatever flags the plan's Levy stated;
+ * the sentence says so before printing the form a person would run.
+ */
 export function taxHint(form: string, stored: boolean): string {
-	const write = stored ? "write every" : "write the tax and every"
-	return `Run "${form}" to ${write} unlabelled income Flow's salary label with its Owner's Filer suffix, or name another label from "traj schema scenario apply".`
+	if (!stored) {
+		return `This write replaces the plan's Levy, so add every flag the profile needs (children, allowances and the rest; "traj schema scenario tax" lists them) before running it. Run "${form}" to write the tax and every unlabelled income Flow's salary label with its Owner's Filer suffix, or name another label from "traj schema scenario apply".`
+	}
+	return `Run "${form}" to write every unlabelled income Flow's salary label with its Owner's Filer suffix, or name another label from "traj schema scenario apply".`
 }
 
-/** The way out for the unlabelled Flows no Owner can label: giving them an Owner comes first. */
-export function ownerHint(name: string, ids: readonly string[]): string {
+/** The way out for the items no Owner can label: giving them an Owner comes first. */
+export function ownerHint(name: string, paths: readonly string[]): string {
 	const form = printedCommand("traj scenario household", [name], ["--file", "<path>"])
-	const subject =
-		ids.length === 1 ? `flows.${ids[0]}` : `each of ${ids.map((id) => `flows.${id}`).join(", ")}`
-	const entries = ids.map((id) => `{"path": "flows.${id}", "person": "<person id>"}`).join(", ")
-	const ones = ids.length === 1 ? 'an "owners" entry such as' : '"owners" entries such as'
-	return `Give ${subject} an Owner first: run "${form}" with ${ones} ${entries} or "shared", so a tax write can label the Flow with its Owner's Filer suffix.`
+	const subject = paths.length === 1 ? paths[0] : `each of ${paths.join(", ")}`
+	const entries = paths.map((path) => JSON.stringify({ path, person: "<person id>" })).join(", ")
+	const ones = paths.length === 1 ? 'an "owners" entry such as' : '"owners" entries such as'
+	return `Give ${subject} an Owner first: run "${form}" with ${ones} ${entries} or "shared", so a tax write can label each with its Owner's Filer suffix.`
 }

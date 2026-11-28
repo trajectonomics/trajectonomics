@@ -36,9 +36,9 @@ export function unlabelled(shown: Shown): AssumedItem[] {
 	return shown.assumed.filter((item) => item.kind === "unlabelled-income")
 }
 
-/** The command a `Run "..."` hint prints. */
+/** The command a hint prints, after any sentence that comes before it. */
 export function commandOf(hint: string | null): string {
-	return hint?.match(/^Run "(traj .+?)" (?:for a salary|to write)/)?.[1] ?? ""
+	return hint?.match(/Run "(traj .+?)" (?:for a salary|to write)/)?.[1] ?? ""
 }
 
 /**
