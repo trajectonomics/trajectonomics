@@ -19,7 +19,10 @@ let { id, title, intro, children, figure }: Props = $props()
 <section aria-labelledby={id} class="grid gap-6 border-b border-border pb-8 lg:grid-cols-2">
 	<div class="min-w-0 space-y-3">
 		<h2 {id} class="text-base font-semibold">{title}</h2>
-		<p class="text-sm text-muted-foreground">{intro}</p>
+		<details class="text-sm text-muted-foreground">
+			<summary class="cursor-pointer hover:text-foreground">How this list works</summary>
+			<p>{intro}</p>
+		</details>
 		{@render children()}
 	</div>
 	<div class="min-w-0 space-y-2">

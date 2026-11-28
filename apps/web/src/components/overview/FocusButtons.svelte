@@ -7,14 +7,14 @@ import { PRIMARY_ACTION } from "../ui/focus"
 import SiteLink from "../ui/SiteLink.svelte"
 
 interface Props {
-	button: FocusButton
+	button: FocusButton | null
 	/** The CLI's notes worth checking, in their order. */
 	warnings: readonly HeroWarning[]
 	/** "1 thing to check", "2 things to check", or null when the CLI states none. */
 	warningsLabel: string | null
 }
 
-/** The focus point's one primary action, and beside it the notes the CLI asks the reader to check. */
+/** The focus point's one action when it has one, and beside it the notes the CLI asks the reader to check. */
 let { button, warnings, warningsLabel }: Props = $props()
 const CHIP =
 	"inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-accent hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring print:text-foreground"
@@ -26,10 +26,12 @@ const noteHref = $derived(
 
 <!-- The warning triangle is Lucide's triangle-alert (ISC), drawn here as SVG elements. -->
 <div class="flex flex-wrap items-center gap-3">
-	{#if button.external}
-		<a data-primary-action href={button.href} class={PRIMARY_ACTION}>{button.label}</a>
-	{:else}
-		<SiteLink data-primary-action href={button.href} class={PRIMARY_ACTION}>{button.label}</SiteLink>
+	{#if button !== null}
+		{#if button.external}
+			<a data-primary-action href={button.href} class={PRIMARY_ACTION}>{button.label}</a>
+		{:else}
+			<SiteLink data-primary-action href={button.href} class={PRIMARY_ACTION}>{button.label}</SiteLink>
+		{/if}
 	{/if}
 	{#if warnings.length > 0 && warningsLabel !== null}
 		<a data-focus-chip href={noteHref} aria-label={warningsLabel} class={CHIP}>

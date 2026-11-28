@@ -98,6 +98,20 @@ describe("FiResult: reachable", () => {
 	test("has no best case when the FI date is reachable", () => {
 		expect(renderFi(fiFixture(REACHABLE))).not.toContain("Best case")
 	})
+
+	test("on the lead plan the chart carries the date, so the figure and ages are for a screen reader", () => {
+		const reachable = fiFixture(REACHABLE)
+		if (!reachable.fi.reachable) throw new Error("expected a reachable answer")
+		const fi: Fi = {
+			...reachable,
+			fi: { ...reachable.fi, ages: [{ person: "me", age: 51 }] },
+		}
+		const body = render(FiResult, { props: { fi, argv: ARGV, lead: true } }).body
+		expect(body).not.toContain(">FI date<")
+		expect(body).toContain("The earliest month earned income could stop: 1 Mar 2041")
+		expect(body).toContain("Ages on that date: me 51.")
+		expect(body).toContain('class="sr-only"')
+	})
 })
 
 describe("FiResult: unreachable", () => {

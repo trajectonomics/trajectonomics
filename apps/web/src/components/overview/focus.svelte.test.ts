@@ -36,8 +36,8 @@ describe("OverviewFocus", () => {
 		expect(body).toContain("Oct 2040")
 		expect(body).toContain('data-focus-answer="true"')
 		expect(body).toContain('href="/fi/"')
-		expect(body).toContain("See your plan")
-		expect(body).toContain('href="/projection/"')
+		expect(body).not.toContain("See your plan")
+		expect(body).not.toContain('href="/projection/"')
 		expect(body).toContain(">193</span><span")
 		expect(body).toContain("/200")
 		expect(body).not.toContain("Where do you stand?")
@@ -70,14 +70,14 @@ describe("OverviewFocus", () => {
 		expect(body).toContain("<svg")
 	})
 
-	test("shows one primary action and, beside it, the FI notes worth checking", () => {
+	test("shows the FI notes worth checking, and no primary action on an answered plan", () => {
 		setTestUrl("http://127.0.0.1/?demo=1&scenario=base")
 		try {
 			const props = propsOf("base")
 			const first = props.warnings[0]
 			if (first === undefined) throw new Error("the Demo's base plan has a note to check")
 			const { body } = render(OverviewFocus, { props })
-			expect(body.match(/data-primary-action/g)).toHaveLength(1)
+			expect(body.match(/data-primary-action/g) ?? []).toHaveLength(0)
 			expect(body).toContain("data-focus-chip")
 			expect(body).toContain('aria-label="1 thing to check"')
 			expect(body).toContain(`href="/fi/?demo=1&amp;scenario=base#${first.anchor}"`)
@@ -123,12 +123,25 @@ describe("FocusButtons", () => {
 	test("draws one primary button and no chip without a warning", () => {
 		const { body } = render(FocusButtons, {
 			props: {
-				button: { label: "See your plan", href: "/projection/", external: false },
+				button: { label: "Set up a first plan", href: "/plans/new/", external: false },
 				warnings: [],
 				warningsLabel: null,
 			},
 		})
 		expect(body.match(/data-primary-action/g)).toHaveLength(1)
 		expect(body).not.toContain("data-focus-chip")
+	})
+
+	test("draws only the chip when the focus point has no button", () => {
+		const { body } = render(FocusButtons, {
+			props: {
+				button: null,
+				warnings: [{ text: "Note", anchor: "note-1", label: "Note 1" }],
+				warningsLabel: "1 thing to check",
+			},
+		})
+		expect(body).not.toContain("data-primary-action")
+		expect(body).toContain("data-focus-chip")
+		expect(body).toContain('aria-label="1 thing to check"')
 	})
 })

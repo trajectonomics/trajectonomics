@@ -34,16 +34,9 @@ const fanLabel = "Net worth Bands by year, from the 10th to the 90th Percentile"
 </script>
 
 <div class="space-y-8">
-	<section aria-labelledby="chance-source" class="space-y-2">
-		<h2 id="chance-source" class="sr-only">Where the Return model comes from</h2>
-		<ChanceSource source={view.source} />
-		<p class="text-sm text-muted-foreground">
-			Change the returns, the swings, the paths or the seed on <SiteLink href="/settings/assumptions/" class="underline">Assumptions</SiteLink>.
-		</p>
-	</section>
 	<section aria-labelledby="chance-bands" class="space-y-3">
 		<h2 id="chance-bands" class="text-base font-semibold">Net worth Bands by year</h2>
-		<p class="text-sm text-muted-foreground">
+		<p class="sr-only">
 			The shaded areas are the 10th to 90th and the 25th to 75th Percentiles; the line is the 50th.
 		</p>
 		{#if view.today !== null}
@@ -77,6 +70,10 @@ const fanLabel = "Net worth Bands by year, from the 10th to the 90th Percentile"
 	{/if}
 	<Provenance name={`Chance of success for ${plan}`} commands={[argv]}>
 		{#snippet details()}
+			<ChanceSource source={view.source} />
+			<p class="text-sm text-muted-foreground">
+				Change the returns, the swings, the paths or the seed on <SiteLink href="/settings/assumptions/" class="underline">Assumptions</SiteLink>.
+			</p>
 			<dl class="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
 				<Fact label="Seed"><code class="font-mono">{view.definition.seed}</code></Fact>
 				<Fact label="Return model">

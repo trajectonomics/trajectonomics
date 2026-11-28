@@ -14,16 +14,23 @@ interface Props {
 	pathname: string
 	/** Renders the page from the ready figures. Runs only when they are ready. */
 	children: Snippet<[Snapshot]>
+	/** Decoration placed beside the heading, such as the Overview's mascot. */
+	leading?: Snippet | undefined
 	/** A control placed at the heading's right, such as the Cash flow page's link to Where money goes. */
 	actions?: Snippet | undefined
 }
 
-let { title, state, pathname, children, actions }: Props = $props()
+let { title, state, pathname, children, leading, actions }: Props = $props()
 </script>
 
 <section aria-labelledby="page-title" class="space-y-6">
 	<header class="flex items-baseline justify-between gap-3">
-		<h1 id="page-title" class="text-xl font-semibold tracking-tight">{title}</h1>
+		<div class="flex min-w-0 items-center gap-3">
+			{#if leading}{@render leading()}{/if}
+			<h1 id="page-title" class="min-w-0 text-xl font-semibold tracking-tight wrap-anywhere">
+				{title}
+			</h1>
+		</div>
 		{#if actions}{@render actions()}{/if}
 	</header>
 	{#if state.status === "loading"}

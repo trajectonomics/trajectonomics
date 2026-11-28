@@ -72,7 +72,7 @@ export async function startLiveDemo(page: Page): Promise<void> {
 	await expect(page.locator("[data-live-start]")).toHaveCount(0, { timeout: 20_000 })
 	await expect(
 		page.frameLocator("iframe[data-live-frame]").getByRole("heading", {
-			name: "Overview",
+			name: /this is your current situation/,
 			level: 1,
 		}),
 	).toBeVisible({ timeout: 20_000 })

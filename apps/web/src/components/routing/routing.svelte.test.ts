@@ -39,6 +39,16 @@ describe("the Where money goes page at phone width", () => {
 		expect(said).toContain("home or a car")
 	})
 
+	test("opens each intro from a disclosure named How this list works, with the words inside it", () => {
+		const html = body()
+		const summaries = html.match(/<summary[^>]*>How this list works<\/summary>/g) ?? []
+		expect(summaries).toHaveLength(4)
+		const opened = html.slice(html.indexOf("How this list works"))
+		expect(opened.slice(0, opened.indexOf("</details>"))).toContain(
+			"The last step must take everything that is left.",
+		)
+	})
+
 	test("has Up and Down for each row, the first Up and the last Down turned off", () => {
 		const html = body()
 		const ups = html.match(/<button[^>]*>\s*Up<span class="sr-only">/g) ?? []

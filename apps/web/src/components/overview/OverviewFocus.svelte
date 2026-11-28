@@ -18,7 +18,7 @@ interface Props {
 	warningsLabel: string | null
 }
 
-/** The one answer Home opens on: a chart with the answer written on it, then its button and the counts behind it. */
+/** The one answer Home opens on: a chart with the answer written on it, then its action when it has one and the counts behind it. */
 let { focus, run, people, warnings, warningsLabel }: Props = $props()
 const shortfall = $derived(
 	focus.unmet === null
@@ -34,6 +34,8 @@ const shortfall = $derived(
 		{#if focus.counts}
 			<ChanceGrid counts={focus.counts} />
 		{/if}
-		<FocusButtons button={focus.button} {warnings} {warningsLabel} />
+		{#if focus.button !== null || warnings.length > 0}
+			<FocusButtons button={focus.button} {warnings} {warningsLabel} />
+		{/if}
 	</div>
 </section>

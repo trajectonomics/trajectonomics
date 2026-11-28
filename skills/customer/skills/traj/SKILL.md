@@ -123,7 +123,7 @@ This is the contract, not a recipe, and it is not a router either: a Skill the a
 When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/trajectonomics/blob/<commit>/skills/customer/skills.manifest.json), at the commit this Skill's scope pinned, names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it. Three reads come before any install.
 
 1. **The scope.** Run `npx -y skills@1.9.0 list --json` and `npx -y skills@1.9.0 list -g --json`. A project list that names `traj` is this session's copy; when it does not, a global list that does is. A `traj` in the other scope belongs to another setup.
-2. **The pin.** Read the `commit` the resolved scope's lock records for `traj`. A project lock is `./skills-lock.json`; a global lock is `${XDG_STATE_HOME}/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, and `~/.agents/.skill-lock.json` when it is not. The list reports no commit, so the lock is the only place it is read. Never install from `main`: a branch moves, and a person's setup must not.
+2. **The pin.** Read the `commit` the resolved scope's lock records for `traj`. A project lock is `./skills-lock.json`; a global lock is `${XDG_STATE_HOME}/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, and `~/.agents/.skill-lock.json` when it is not. The list reports no commit, so the lock is the only place it is read. Never install from `main`: a branch moves, and a person's setup must not; an `update` is the one sanctioned way the pin moves forward.
 3. **The row.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at that commit, and take the job's row and its `cliRange`. When the resolved scope's list already names that row's Skill, install nothing and follow it.
 
 **The version compared** is the session's pinned command-line version: the number from `traj --version`, or from `npx -y @trajectonomics/cli@latest --version` on the fallback. This Skill cannot read another Skill's file at run time, so the comparison rule is stated here: read the first `X.Y.Z` token, keeping any `-prerelease` suffix; compare the three numbers in turn and never the strings, so `0.10.0` is above `0.9.0`; and treat a pre-release as below its release, so `1.4.0-rc.1` is below `1.4.0`.
@@ -134,14 +134,36 @@ When the user's request is a job with a Recipe — a bank import, a periodic rev
 npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -y
 ```
 
-Add `-g` to it in the global scope. Then confirm from the same scope's list that it landed. A row whose upper bound the command line has passed — a pre-release of that bound's minor counts as past it — is installed all the same, and you say so in one sentence: name the range the Skill was checked through, and that `traj schema` is authoritative where the two differ.
+Add `-g` to it in the global scope. Then confirm from the same scope's list that it landed. When the command line is past a row's upper bound — a pre-release of that bound's minor counts as past it — run the update in "When something is missing, update the skills first" once, and read the row again. A row whose upper bound the command line has still passed is installed all the same, and you say so in one sentence: name the range the Skill was checked through, and that `traj schema` is authoritative where the two differ.
 
 Install nothing in these four cases:
 
 - **Below the floor.** Skip a row below its floor, and name the row, the range it wants and the reason in one sentence, then do the part the schema allows.
-- **No pin.** The lock is missing, or records no `commit` for `traj` in that scope because an older `skills` CLI wrote the entry, or the entry's `source` is `trajectonomics/skills`, which is archived and does not have that commit. Say in one sentence that there is no pin, and that the person should re-run setup with `traj-onboarding` to get a pinned copy; when the copy without a pin is a project copy, they first run `npx -y skills@1.9.0 remove traj` in that project, because setup now installs globally and the project copy would still win here. Then do the part the schema allows.
+- **No pin.** The lock is missing, or records no `commit` for `traj` in that scope because an older `skills` CLI wrote the entry, or the entry's `source` is `trajectonomics/skills`, which is archived and does not have that commit. Run the update in "When something is missing, update the skills first" once, then read the pin again. When the gap remains, say in one sentence that there is no pin, and that the person should re-run setup with `traj-onboarding` to get a pinned copy; when the copy without a pin is a project copy, they first run `npx -y skills@1.9.0 remove traj` in that project, because setup now installs globally and the project copy would still win here. Then do the part the schema allows.
 - **No manifest.** When `skills.manifest.json` cannot be fetched or read at the pin, say so in one sentence and do the part the schema allows: the contract stays authoritative, and nothing is installed blind.
-- **No row.** When the manifest has no row for the job, say `traj` has no Recipe for it yet and do the part the schema allows, rather than improvising the rest.
+- **No row.** Run the update in "When something is missing, update the skills first" once, and read the manifest again at the new pin. When the manifest has no row for the job, say `traj` has no Recipe for it yet and do the part the schema allows, rather than improvising the rest.
+
+## When something is missing, update the skills first
+
+A **gap** is any of these:
+
+- the session's pinned command-line version is past the upper bound of an installed skill's CLI Range, read from that skill's frontmatter `cli`;
+- `traj schema` lacks a command, a flag or an error code this Skill or its Recipe tells you to use, or the person asks for a job this Skill does not cover and `traj schema` lists a command for it;
+- the job's Recipe row is missing from `skills.manifest.json` at the pin, or the resolved scope has no pin: no `commit`, or the entry's `source` is `trajectonomics/skills`.
+
+When you find one, update the installed traj skills once, at most, in the session, naming all five so the person's other skills stay untouched, and say in one sentence that you updated the traj skills because of the gap you named:
+
+```bash
+npx -y skills@1.9.0 update traj-onboarding traj traj-import traj-review traj-plan -g -y
+```
+
+Use `-p` in place of `-g` when the copy you follow is a project copy.
+
+Then read the lock's `commit` for `traj` again, read the skill again at the `path` the same scope's list reports (`npx -y skills@1.9.0 list -g --json`, or `npx -y skills@1.9.0 list --json` for a project copy), and follow that newer copy. Re-check the gap against it: the manifest at the new pin, and the schema in front of you.
+
+When the gap remains, or the update fails — offline, or a Node older than the 22.20 `skills@1.9.0` needs — do what this Skill already says for that case: the one-sentence range disclosure, `No pin`, `No row`, or the missing-capability paragraph in "What this version covers". Never retry the update in the same session. A command line below the floor is not a gap: update the CLI, not the skills.
+
+**An `update` is the one sanctioned way the pin moves forward.** It writes the new `commit` to the lock, so the setup still moves only by a recorded step.
 
 ## What this version covers
 

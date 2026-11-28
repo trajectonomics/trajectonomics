@@ -65,7 +65,9 @@ for (const [label, name] of [
 			await expect(sentence).toBeFocused()
 			// Leaving and coming back keeps the sentence, with no What-if above it to settle.
 			await page.getByRole("link", { name: "Overview" }).click()
-			await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible()
+			await expect(
+				page.getByRole("heading", { level: 1, name: /this is your current situation/ }),
+			).toBeVisible()
 			await page.getByRole("button", { name: /Change plan/ }).click()
 			await page.getByRole("menuitem", { name: "New plan" }).click()
 			await page.getByRole("link", { name: "Set up step by step" }).click()

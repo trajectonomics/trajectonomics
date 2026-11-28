@@ -4,8 +4,8 @@ import { measureOverflow } from "./fit"
 import { outlineStyle, tabTo } from "./shell"
 
 // The Overview opens on one focus point (#704): the answer is the largest text on the page, its whole
-// sentence is in the heading a screen reader reads, one primary action sits under the chart, and the
-// summary heading is in the first screen at a desktop's height.
+// sentence is in the heading a screen reader reads, one primary action sits under the chart only when
+// the setup needs it, and the summary heading is in the first screen at a desktop's height.
 test("the answer on the chart is the largest text in main, and the focus point fits one screen", async ({
 	page,
 }) => {
@@ -47,7 +47,7 @@ test("the answer on the chart is the largest text in main, and the focus point f
 	await expect(page.locator("[data-focus-heading]")).toContainText(
 		"Your money lasts to 2053 in 193 of 200 markets tested.",
 	)
-	await expect(page.locator("[data-primary-action]")).toHaveCount(1)
+	await expect(page.locator("[data-primary-action]")).toHaveCount(0)
 
 	const focus = await page.locator("[data-focus-section]").boundingBox()
 	expect(focus, "the focus point is laid out").not.toBeNull()
@@ -62,9 +62,7 @@ test("the answer on the chart is the largest text in main, and the focus point f
 	).toBeLessThanOrEqual(800)
 })
 
-test("the answer, the notes chip and the primary action each draw a solid focus ring", async ({
-	page,
-}) => {
+test("the answer and the notes chip each draw a solid focus ring", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await openDemo(page, "/", { theme: "light" })
 	const chip = page.locator("[data-focus-chip]")
@@ -72,7 +70,6 @@ test("the answer, the notes chip and the primary action each draw a solid focus 
 	const targets = [
 		["the answer", page.locator("[data-focus-answer]")],
 		["the chip", chip],
-		["the primary action", page.locator("[data-primary-action]")],
 	] as const
 	for (const [name, target] of targets) {
 		await tabTo(page, target)

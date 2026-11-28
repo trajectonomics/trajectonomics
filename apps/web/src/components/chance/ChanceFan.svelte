@@ -2,6 +2,7 @@
 import { preferences } from "../../client/preferences.svelte.js"
 import { fanOf, type LineSeries, lineLayout } from "../../lib/chart"
 import { abbreviate, maskMoney } from "../../lib/format"
+import { fanEnds } from "../../lib/view/chance/fan-ends"
 import { HEIGHT, MARGIN } from "../chart/geometry"
 import EmptyState from "../ui/EmptyState.svelte"
 
@@ -25,6 +26,8 @@ const width = $derived(
 )
 const layout = $derived(lineLayout(series, { width, height: HEIGHT, margin: MARGIN }))
 const fan = $derived(layout === null ? null : fanOf(layout))
+
+const ends = $derived(layout === null ? [] : fanEnds(layout))
 </script>
 
 <div bind:clientWidth class="w-full">
@@ -72,6 +75,17 @@ const fan = $derived(layout === null ? null : fanOf(layout))
 				stroke-linecap="round"
 				class="stroke-foreground"
 			/>
+			{#each ends as end (end.text)}
+				<text
+					x={width - MARGIN.right - 4}
+					y={end.y}
+					text-anchor="end"
+					dominant-baseline="middle"
+					aria-hidden="true"
+					class="fill-foreground stroke-background stroke-[3px] text-[11px] [paint-order:stroke] print:stroke-background"
+					>{end.text}</text
+				>
+			{/each}
 		</svg>
 	{:else}
 		<EmptyState title="Nothing to chart yet" />

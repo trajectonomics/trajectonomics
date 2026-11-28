@@ -82,7 +82,7 @@ describe("focusOf, one case per row of the table", () => {
 			stopDate: "2040-10-01",
 			horizonYear: "2053",
 			counts: { succeeded: 193, paths: 200 },
-			button: { label: "See your plan", href: "/projection/" },
+			button: null,
 		})
 		expect(focus.sentence).toBe(
 			"You could stop working in Oct 2040, when you are 50 and your partner is 48. Your money lasts to 2053 in 193 of 200 markets tested.",
@@ -117,7 +117,7 @@ describe("focusOf, one case per row of the table", () => {
 			stopDate: null,
 			horizonYear: "2060",
 			faces: [],
-			button: { label: "See your plan", href: "/projection/" },
+			button: null,
 		})
 		expect(focus.sentence).toContain("You could not stop working before 31 Dec 2060.")
 	})

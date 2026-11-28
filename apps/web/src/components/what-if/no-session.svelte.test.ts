@@ -13,6 +13,7 @@ import { parseTerms } from "../../lib/view/compare"
 import { householdOf, personNames } from "../../lib/view/item-names"
 import { netWorthPageView } from "../../lib/view/net-worth/page"
 import { focusOf } from "../../lib/view/overview/focus"
+import { greetingOf } from "../../lib/view/overview/greeting"
 import { heroOf } from "../../lib/view/overview/hero"
 import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
@@ -27,6 +28,7 @@ import NetWorthContent from "../net-worth/NetWorthContent.svelte"
 import NetWorthFocus from "../net-worth/NetWorthFocus.svelte"
 import PnlCard from "../net-worth/PnlCard.svelte"
 import OverviewFocus from "../overview/OverviewFocus.svelte"
+import OverviewGreeting from "../overview/OverviewGreeting.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
 import ComparePage from "../pages/ComparePage.svelte"
 import NetWorthPage from "../pages/NetWorthPage.svelte"
@@ -58,10 +60,11 @@ function bodyOf(component: Component<any>, props: Record<string, unknown>): stri
 
 const MARK = "<i>content</i>"
 
-/** The page's frame (its heading) with `content` where the page puts its own. */
-function framed(title: string, content: string): string {
+/** The page's frame (its heading) with `content` where the page puts its own, and any art beside the title. */
+function framed(title: string, content: string, art = ""): string {
 	const mark = createRawSnippet(() => ({ render: () => MARK }))
-	return shown(bodyOf(PageShell, { title, children: mark })).replace(MARK, shown(content))
+	const leading = createRawSnippet(() => ({ render: () => art }))
+	return shown(bodyOf(PageShell, { title, children: mark, leading })).replace(MARK, shown(content))
 }
 
 /**
@@ -133,6 +136,6 @@ describe("with no session, a page is its content and nothing more", () => {
 			assumed === null ? null : assumedCard(assumed.items, assumed.groups, currentSearch())
 		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}<div></div><p role="status" class="sr-only"></p>${bodyOf(AssumedCard, { view: card })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
-		expect(shown(page)).toBe(framed("Overview", content))
+		expect(shown(page)).toBe(framed(greetingOf(DEMO), content, bodyOf(OverviewGreeting, {})))
 	})
 })

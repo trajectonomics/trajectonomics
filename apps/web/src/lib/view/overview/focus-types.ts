@@ -19,14 +19,15 @@ export interface FocusCounts {
 	readonly paths: number
 }
 
-/** Everything the focus point renders: the answer, the heading it labels the section with, and its one button. */
+/** Everything the focus point renders: the answer, the heading it labels the section with, and its action. */
 export interface FocusView {
 	readonly kind: FocusKind
 	/** The words written on the chart. */
 	readonly answer: string
 	/** The whole answer, read at the top of the focus point and hidden on screen. */
 	readonly sentence: string
-	readonly button: FocusButton
+	/** The one action the answer offers, or null when it stands without one. */
+	readonly button: FocusButton | null
 	/** The plan the answer belongs to, for the link to its FI page; null when no plan answers. */
 	readonly plan: string | null
 	/** The date the stop point sits at, or null when the chart has no stop point. */
@@ -38,13 +39,6 @@ export interface FocusView {
 	readonly currency: string | null
 	readonly faces: readonly FocusFace[]
 	readonly counts: FocusCounts | null
-}
-
-/** Case 3 and 4's one action: the Plan page. */
-export const SEE_PLAN: FocusButton = {
-	label: "See your plan",
-	href: "/projection/",
-	external: false,
 }
 
 /** Case 2's action: the Plan page, where the run-out is charted. */
