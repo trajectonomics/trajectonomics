@@ -26,6 +26,8 @@ name: CI
 # `bun run check` in apps/web (and at the root) still runs every web test. See docs/runbooks/ci.md.
 on:
   pull_request:
+  # A merge queue entry runs the same checks as its pull request, against the queue's base (see below).
+  merge_group:
   push:
     branches: [main]
   workflow_dispatch:
@@ -63,11 +65,11 @@ jobs:
         id: web
         env:
           EVENT_NAME: ${{ github.event_name }}
-          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
         run: |
           set -euo pipefail
           run=true
-          if [ "$EVENT_NAME" = pull_request ]; then
+          if [ "$EVENT_NAME" = pull_request ] || [ "$EVENT_NAME" = merge_group ]; then
             run=false
             affected=$(bunx turbo ls --affected --output=json 2>/dev/null | jq -r '.packages.items[].name')
             changed=$(git diff --name-only "$TURBO_SCM_BASE" HEAD)
@@ -90,11 +92,11 @@ jobs:
         id: auth
         env:
           EVENT_NAME: ${{ github.event_name }}
-          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
         run: |
           set -euo pipefail
           run=true
-          if [ "$EVENT_NAME" = pull_request ]; then
+          if [ "$EVENT_NAME" = pull_request ] || [ "$EVENT_NAME" = merge_group ]; then
             run=false
             affected=$(bunx turbo ls --affected --output=json 2>/dev/null | jq -r '.packages.items[].name')
             changed=$(git diff --name-only "$TURBO_SCM_BASE" HEAD)
@@ -137,20 +139,20 @@ jobs:
       # The web package is left out here: it has its own jobs below. `apps/cli/turbo.json` keeps the
       # command line's check from pulling the web check back in through `^check`.
       - name: Check the packages a pull request affects
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
         env:
-          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
         run: bunx turbo run check --affected --filter='!@trajectonomics/web' --concurrency=4
 
       # The guards read every tracked file, but `--affected` selects them only when a file inside
       # tooling/guards changes. Run them on every pull request so an archived link in any folder
       # fails before the merge, not after it.
       - name: Run the repository guards
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
         run: bun run --cwd tooling/guards test
 
       - name: Check every package
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
         run: bunx turbo run check --filter='!@trajectonomics/web' --concurrency=4
 
       - name: Save the Turborepo cache
