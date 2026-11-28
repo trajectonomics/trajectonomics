@@ -1,13 +1,15 @@
 /**
- * The one focus point rule (#707): in `main`, one element draws text above 28px and it sits inside the focus
- * point's visual, and at most one control is a primary action. The viewer is a person's words, and an empty
- * list means the page passes. Evaluated in the page, so it can only use the document.
+ * The one focus point rule (#707): a route with a `[data-focus-section]` draws exactly one element of text above
+ * 28px, inside the focus point's visual; a route still waiting for its focus point may draw at most one. At most
+ * one control is a primary action. The viewer is a person's words, and an empty list means the page passes.
+ * Evaluated in the page, so it can only use the document.
  */
 export function focusPointProblems(): string[] {
 	const main = document.querySelector("main")
 	if (main === null) return ["there is no main"]
 	const problems: string[] = []
 	const visual = main.querySelector("[data-focus-visual]")
+	const focused = main.querySelector("[data-focus-section]") !== null
 	const transparent = "rgba(0, 0, 0, 0)"
 
 	/** The text an element draws itself, trimmed, or "" when it draws none. */
@@ -39,12 +41,18 @@ export function focusPointProblems(): string[] {
 			(element) =>
 				`${Math.round(sizeOf(element))}px ${visual?.contains(element) ? "inside" : "outside"} the visual: ${ownText(element)}`,
 		)
-	if (large.length !== 1) {
+	if (focused) {
+		if (large.length !== 1) {
+			problems.push(
+				`${large.length} elements draw text above 28px (one expected): ${large.join("; ")}`,
+			)
+		} else if (large[0]?.includes("outside the visual")) {
+			problems.push(`the largest text is outside [data-focus-visual]: ${large[0]}`)
+		}
+	} else if (large.length > 1) {
 		problems.push(
-			`${large.length} elements draw text above 28px (one expected): ${large.join("; ")}`,
+			`${large.length} elements draw text above 28px and this route has no focus point (at most one expected): ${large.join("; ")}`,
 		)
-	} else if (large[0]?.includes("outside the visual")) {
-		problems.push(`the largest text is outside [data-focus-visual]: ${large[0]}`)
 	}
 
 	/** The first opaque background behind an element: what its own fill would have to differ from. */

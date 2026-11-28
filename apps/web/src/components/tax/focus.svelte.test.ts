@@ -20,6 +20,8 @@ describe("TaxFocus", () => {
 		expect(body).toContain("data-focus-answer")
 		expect(body).toContain("99k")
 		expect(body).toContain("Due 31 Mar 2027")
+		expect(body).toContain(">Save ")
+		expect(body).toContain("91.7k")
 		expect(body.match(/data-primary-action/g)).toHaveLength(1)
 		expect(body).toContain('href="/optimize/allowances/"')
 		expect(body).toContain(">Save tax<")

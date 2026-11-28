@@ -15,9 +15,10 @@ describe("ChanceFocus", () => {
 		)
 		expect(body).toContain("data-focus-answer")
 		expect(body).toContain("96.5%")
-		expect(body).toContain("To 2053")
-		expect(body.match(/bg-accent/g)?.length).toBe(193)
-		expect(body.match(/border-muted-foreground\/40/g)?.length).toBe(7)
+		expect(body).toContain("To 2053 · 193 of 200")
+		expect(body.match(/fill-accent/g)?.length).toBe(193)
+		expect(body.match(/stroke-muted-foreground\/40/g)?.length).toBe(7)
+		expect(body).toContain("h-[240px]")
 		expect(body).not.toContain("data-primary-action")
 	})
 

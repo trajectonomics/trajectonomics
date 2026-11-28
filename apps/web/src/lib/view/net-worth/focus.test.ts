@@ -26,17 +26,56 @@ const HISTORY: HistoryView = {
 }
 
 describe("netWorthFocusView", () => {
-	test("states the total and its As-of, and places the history's own numbers", () => {
+	test("states the total and its As-of, and places each month-end with its own month", () => {
 		const view = netWorthFocusView(VIEW, HISTORY, false)
 		expect(view?.label).toBe("What are you worth today? 1.21M THB as of 31 Oct 2026.")
 		expect(view?.total).toBe("1214900.00")
 		expect(view?.currency).toBe("THB")
-		expect(view?.values).toEqual([100, 200])
+		expect(view?.asOf).toBe("31 Oct 2026")
+		expect(view?.points).toEqual([
+			{ x: 0, y: 100, label: "Sep 2026" },
+			{ x: 1, y: 200, label: "Oct 2026" },
+		])
+		expect(view?.months).toBe(2)
+	})
+
+	test("keeps the history's own month count when the last month could not be read", () => {
+		const rows: HistoryView["rows"] = [0, 1, 2, 3].map((index) => ({
+			index,
+			asOf: "",
+			totals: null,
+			code: null,
+			unstated: false,
+		}))
+		const view = netWorthFocusView(VIEW, { ...HISTORY, rows }, false)
+		expect(view?.months).toBe(4)
+	})
+
+	test("names every currency total in its heading, and leaves the others for below it", () => {
+		const totals = [
+			{ currency: "THB", amount: "1214900.00" },
+			{ currency: "USD", amount: "33400.00" },
+		]
+		const view = netWorthFocusView({ ...VIEW, totals }, HISTORY, false)
+		expect(view?.label).toBe("What are you worth today? 1.21M THB, 33.4k USD as of 31 Oct 2026.")
+		expect(view?.others).toEqual([{ currency: "USD", amount: "33400.00" }])
 	})
 
 	test("says the amount is hidden with Hide amounts on, rather than stating it", () => {
 		const view = netWorthFocusView(VIEW, HISTORY, true)
 		expect(view?.label).toBe("What are you worth today? The amount is hidden. As of 31 Oct 2026.")
+	})
+
+	test("answers even with no month-end history, which is the page's mark without a line", () => {
+		const empty: HistoryView = {
+			...HISTORY,
+			series: { name: "Net worth", points: [] },
+			line: "The history has no month-end read to chart.",
+		}
+		const view = netWorthFocusView(VIEW, empty, false)
+		expect(view?.points).toEqual([])
+		expect(view?.months).toBe(1)
+		expect(view?.label).toBe("What are you worth today? 1.21M THB as of 31 Oct 2026.")
 	})
 
 	test("has no answer when the CLI states no total", () => {

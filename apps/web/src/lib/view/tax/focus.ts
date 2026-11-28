@@ -1,10 +1,10 @@
 import { shares, toChartNumber } from "../../chart"
 import type { ProjectionAllowances, ProjectionRun } from "../../contract"
-import { formatCompact, isAboveZero } from "../../format"
-import { dropLeadingMinus } from "../../format/direction"
-import { taxBody } from "./body"
+import { isAboveZero } from "../../format"
+import { taxBodyOf } from "./body"
 import type { BracketBar } from "./bracket-bars"
-import type { CurrentYear } from "./current-year"
+import { headWords, savingWords } from "./focus-words"
+import { focusYear } from "./focus-year"
 import { isRefund } from "./tax-rows"
 
 /** What the "Save tax" action opens: the Tax allowances page, with the address's query string kept. */
@@ -16,7 +16,7 @@ export interface TaxSegment {
 	readonly top: boolean
 }
 
-/** The Tax page's focus point: the first tax year as one bar of income split into its brackets. */
+/** The Tax page's focus point: the Return on screen's tax year as one bar of income split into its brackets. */
 export interface TaxFocus {
 	/** The question, the answer and the saving, for the sr-only heading. */
 	readonly label: string
@@ -25,38 +25,25 @@ export interface TaxFocus {
 	readonly currency: string
 	/** The settlement date, as a small tick under the bar. */
 	readonly due: string
+	/** The saving above zero the allowances read states for this Return, on the "Save" mark; null when none. */
+	readonly saving: string | null
 	readonly segments: readonly TaxSegment[]
+	/** True when no bracket put income on the bar, so it draws a thin baseline instead of nothing. */
+	readonly emptyBar: boolean
 	/** At most one primary action, and only when the allowances read states a saving above zero. */
 	readonly action: { readonly label: string; readonly href: string } | undefined
 }
 
-/** The saving the allowances read states for the tax year the As-of falls in, or null when it states none. */
-function currentSaving(data: ProjectionAllowances | null): string | null {
+/** The saving the allowances read states for the Return on screen and the tax year the As-of falls in. */
+function currentSaving(data: ProjectionAllowances | null, filer: string | null): string | null {
 	if (data === null) return null
-	const year = data.taxYears.find((one) => one.from <= data.asOf && data.asOf <= one.to) ?? null
+	const year = data.taxYears.find(
+		(one) =>
+			(filer === null ? one.filer === undefined : one.filer === filer) &&
+			one.from <= data.asOf &&
+			data.asOf <= one.to,
+	)
 	return year?.saving ?? null
-}
-
-/** The tax year's own answer in words: the year's tax, or a refund, and the date it settles. */
-function answerWords(current: CurrentYear, currency: string): string {
-	const amount = formatCompact(dropLeadingMinus(current.owed))
-	if (isRefund(current.owed)) {
-		return `How much tax for ${current.period}? A refund of ${amount} ${currency}, due ${current.settles}.`
-	}
-	return `How much tax for ${current.period}? ${amount} ${currency} due ${current.settles}.`
-}
-
-/** The year's figure, or the note that Hide amounts hides it; the date stays either way. */
-function headWords(current: CurrentYear, currency: string, hidden: boolean): string {
-	if (hidden)
-		return `How much tax for ${current.period}? The amount is hidden. Due ${current.settles}.`
-	return answerWords(current, currency)
-}
-
-/** "You could still save 91.7k THB.", or the note that the saving is hidden too. */
-function savingWords(saving: string, currency: string, hidden: boolean): string {
-	if (hidden) return " You could still save an amount that is hidden."
-	return ` You could still save ${formatCompact(saving)} ${currency}.`
 }
 
 /** Each reached bracket's share of the income bar, the last one marked as the top rate. */
@@ -66,29 +53,34 @@ function segmentShares(bars: readonly BracketBar[]): readonly TaxSegment[] {
 }
 
 /**
- * The focus point of one projection's tax, from the same body the page draws its brackets from. Null for a
- * plan with no tax rules, or one whose current year states no brackets to split. Every figure is the CLI's,
- * and the bar's widths are its bracket incomes placed for drawing only (web ADR 0002).
+ * The focus point of one projection's tax for the Return on screen (`filer`, null for a plan's one Return),
+ * from the same body the page draws its brackets from. Null for a plan with no tax rules or no tax year. Every
+ * figure is the CLI's, and the bar's widths are its bracket incomes placed for drawing only (web ADR 0002).
  */
 export function taxFocusView(
 	run: ProjectionRun,
 	allowances: ProjectionAllowances | null,
 	hidden: boolean,
+	filer: string | null = null,
 ): TaxFocus | null {
-	const body = taxBody(run)
-	if (body.kind !== "levies" || body.current === null) return null
-	const current = body.current
-	const bars = current.bars ?? []
-	if (bars.length === 0) return null
-	const saving = currentSaving(allowances)
+	const years = filer === null ? run.taxYears : run.taxYears.filter((one) => one.filer === filer)
+	const current = focusYear(taxBodyOf(years, run.tax, run.asOf), years, run.asOf)
+	if (current === null) return null
+	const saving = currentSaving(allowances, filer)
 	const canSave = saving !== null && isAboveZero(saving)
+	const stated = saving !== null && canSave ? saving : null
+	const segments = segmentShares(current.bars)
 	return {
-		label: `${headWords(current, run.currency, hidden)}${saving !== null && canSave ? savingWords(saving, run.currency, hidden) : ""}`,
+		label: `${headWords(current.period, current.owed, current.settles, run.currency, hidden)}${
+			stated === null ? "" : savingWords(stated, run.currency, hidden)
+		}`,
 		owed: current.owed,
 		refund: isRefund(current.owed),
 		currency: run.currency,
 		due: current.settles,
-		segments: segmentShares(bars),
+		saving: stated,
+		segments,
+		emptyBar: segments.every((segment) => segment.share === 0),
 		action: canSave ? SAVE_TAX : undefined,
 	}
 }

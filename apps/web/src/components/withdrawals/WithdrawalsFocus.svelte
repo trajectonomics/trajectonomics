@@ -55,7 +55,12 @@ const view = $derived(
 								</span>
 							{/each}
 						</div>
-						<p class="mt-2 text-xs text-muted-foreground tabular-nums">{focus.first}</p>
+						<div class="mt-2 flex flex-wrap items-baseline justify-between gap-2 text-xs text-muted-foreground">
+							<span>{focus.first}</span>
+							{#if focus.share !== ""}
+								<span class="tabular-nums">{focus.share} of savings</span>
+							{/if}
+						</div>
 					</div>
 				{/snippet}
 			</FocusPoint>

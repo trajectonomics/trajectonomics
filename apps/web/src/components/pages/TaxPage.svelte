@@ -9,9 +9,13 @@ interface Props {
 	scenario: string
 	/** Sets the Scenario in the address bar. */
 	onScenario: (name: string) => unknown
+	/** The Filer of the Return the address bar asks for, read by the route file. */
+	returned: string
+	/** Sets the Return in the address bar. */
+	onReturn: (value: string) => unknown
 }
 
-let { scenario, onScenario }: Props = $props()
+let { scenario, onScenario, returned, onReturn }: Props = $props()
 </script>
 
 <!-- Tax: per Levy and tax year, what is owed, what was prepaid, and whether it is settled. -->
@@ -27,6 +31,8 @@ let { scenario, onScenario }: Props = $props()
 			holders={snapshotClaimsHolders(snapshot, snapshot.params.scenarios)}
 			requested={scenario}
 			{onScenario}
+			{returned}
+			{onReturn}
 		/>
 	{/snippet}
 </PageShell>

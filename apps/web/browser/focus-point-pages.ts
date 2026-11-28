@@ -18,7 +18,17 @@ export const ANSWERS: Readonly<Record<string, readonly string[]>> = {
 	"/estate/": ["What would your heirs receive?", "15.6M THB in 2053."],
 }
 
-/** A phone keeps the focus point inside the page, its answer inside its box, and states the whole answer. */
+/** The six pages slice (a) gives a focus point, in #707's order. */
+export const FOCUS_PAGES = [
+	"/net-worth/",
+	"/chance/",
+	"/tax/",
+	"/optimize/allowances/",
+	"/optimize/withdrawals/",
+	"/estate/",
+] as const
+
+/** A phone keeps the focus point inside the page and its 300px, its answer inside its box, and states the whole answer. */
 export async function expectFocusOnAPhone(page: Page, path: string): Promise<void> {
 	const fit = await measureOverflow(page, true)
 	expect(fit.scrollWidth, "the phone's scroll width").toBeLessThanOrEqual(fit.innerWidth)
@@ -26,6 +36,7 @@ export async function expectFocusOnAPhone(page: Page, path: string): Promise<voi
 	const answer = await page.locator("[data-focus-answer]").boundingBox()
 	expect(answer, "the answer's box").not.toBeNull()
 	expect(visual, "the visual's box").not.toBeNull()
+	expect(visual?.height ?? 0, "the visual's height").toBeLessThanOrEqual(300)
 	expect((answer?.x ?? 0) + (answer?.width ?? 0)).toBeLessThanOrEqual(
 		(visual?.x ?? 0) + (visual?.width ?? 0) + 1,
 	)
@@ -39,15 +50,24 @@ export async function expectFocusOnAPhone(page: Page, path: string): Promise<voi
 	for (const words of ANSWERS[path] ?? []) expect(heading ?? "", words).toContain(words)
 }
 
-/** Hide amounts masks the focus point's money, and the heading says so; a rate is not money and stays. */
-export async function expectMaskedFocus(page: Page, path: string): Promise<void> {
-	const visual = await page.locator("[data-focus-visual]").textContent()
+/**
+ * Hide amounts masks each focus figure read from the unmasked page, and the heading says so; a rate is not money
+ * and stays.
+ */
+export async function expectMaskedFocus(
+	page: Page,
+	path: string,
+	figures: readonly string[],
+): Promise<void> {
+	const visual = page.locator("[data-focus-visual]")
+	const text = await visual.textContent()
 	const heading = await page.locator("[data-focus-heading]").textContent()
 	if (path === "/chance/") {
-		expect(visual).toContain("96.5%")
+		for (const figure of figures) expect(text, path).toContain(figure)
 		expect(heading).toContain("96.5% chance.")
 		return
 	}
-	expect(visual, path).toContain("•••••")
+	for (const figure of figures) expect(text, `${path}: ${figure}`).not.toContain(figure)
+	expect(text, path).toContain("•••••")
 	expect(heading, path).toContain("The amount is hidden")
 }

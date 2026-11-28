@@ -17,7 +17,7 @@ interface Props {
 let { body, currency }: Props = $props()
 </script>
 
-<!-- One Return: its headline, its walk, its years and rates. The page places no figure; each is the CLI's. -->
+<!-- One Return: its walk, its years, its chart and its rates. The page places no figure; each is the CLI's. -->
 <div class="space-y-8">
 	{#if body.current}<TaxCurrent year={body.current} {currency} />{/if}
 	<TaxTable rows={body.rows} {currency} />

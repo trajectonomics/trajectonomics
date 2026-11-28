@@ -23,6 +23,15 @@ describe("TaxPanel: the plan", () => {
 		expect(body).toContain("The Scenario is empty.")
 		expect(body).toContain('name="scenario"')
 	})
+
+	test("keeps the plan picker when the chosen plan has no Read at all", () => {
+		const body = panel({ base: ok(withLevy) }, "retire-early", {}, {}, {}, "", [
+			"base",
+			"retire-early",
+		])
+		expect(body).toContain("No Projection to read")
+		expect(body).toContain('name="scenario"')
+	})
 })
 
 describe("TaxPanel: the Returns of a separate filing", () => {

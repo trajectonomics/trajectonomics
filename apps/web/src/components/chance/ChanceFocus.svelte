@@ -21,12 +21,14 @@ let { read, plan }: Props = $props()
 		{@const focus = chanceFocusView(data)}
 		<FocusPoint label={focus.label}>
 			{#snippet visual(tone)}
-				<div class="flex min-h-[200px] w-full flex-wrap items-center gap-x-6 gap-y-3">
-					<div class="min-w-0 flex-1">
-						<ChanceGrid counts={focus} size="lg" />
-						<p class="mt-2 text-xs text-muted-foreground tabular-nums">To {focus.endYear}</p>
+				<div class="flex min-h-[200px] w-full flex-col justify-center gap-2">
+					<ChanceGrid counts={focus} size="lg" />
+					<div class="flex items-baseline justify-between gap-2">
+						<p class="min-w-0 text-xs text-muted-foreground tabular-nums">
+							To {focus.endYear} · {focus.succeeded} of {focus.paths}
+						</p>
+						<FocusAnswer {tone}>{focus.share}</FocusAnswer>
 					</div>
-					<FocusAnswer {tone}>{focus.share}</FocusAnswer>
 				</div>
 			{/snippet}
 		</FocusPoint>

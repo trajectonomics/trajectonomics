@@ -1,4 +1,6 @@
+import type { CurrencyTotal } from "../../contract"
 import { formatCompact } from "../../format"
+import type { FocusHistoryPoint } from "../focus/history"
 import type { HistoryView } from "./page"
 import type { NetWorthView } from "./view"
 
@@ -9,8 +11,19 @@ export interface NetWorthFocus {
 	/** The CLI's exact string, written compact and masked by Hide amounts. */
 	readonly total: string
 	readonly currency: string
-	/** The month-end totals as chart numbers, oldest first, for the line's positions only. */
-	readonly values: readonly number[]
+	/** The As-of as the read writes it, such as "31 Oct 2026", on the answer's mark. */
+	readonly asOf: string
+	/** Every other currency the read states, which the page shows below the focus point. */
+	readonly others: readonly CurrencyTotal[]
+	/** The month-end points as the line places them, each with its own month's label. */
+	readonly points: readonly FocusHistoryPoint[]
+	/** How many month-ends the history holds, so a failed month leaves its gap. */
+	readonly months: number
+}
+
+/** Every total in words, one after another; an amount Hide amounts hides is never written. */
+function totalsWords(totals: readonly CurrencyTotal[]): string {
+	return totals.map((one) => `${formatCompact(one.amount)} ${one.currency}`).join(", ")
 }
 
 /**
@@ -24,13 +37,22 @@ export function netWorthFocusView(
 ): NetWorthFocus | null {
 	const total = data.totals[0]
 	if (total === undefined) return null
+	const points = history.series.points.map((point) => ({
+		x: point.x,
+		y: point.y,
+		label: point.xLabel,
+	}))
+	const months = Math.max(history.rows.length, ...points.map((point) => point.x + 1), 1)
 	const label = hidden
 		? `What are you worth today? The amount is hidden. As of ${data.asOf}.`
-		: `What are you worth today? ${formatCompact(total.amount)} ${total.currency} as of ${data.asOf}.`
+		: `What are you worth today? ${totalsWords(data.totals)} as of ${data.asOf}.`
 	return {
 		label,
 		total: total.amount,
 		currency: total.currency,
-		values: history.series.points.map((point) => point.y),
+		asOf: data.asOf,
+		others: data.totals.slice(1),
+		points,
+		months,
 	}
 }

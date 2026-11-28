@@ -4,12 +4,12 @@ import type { ProjectionChance, Read } from "../../lib/contract"
 import { futuresViewOf } from "../../lib/view/chance/futures"
 import { chanceViewOf } from "../../lib/view/chance/page"
 import { chooseScenario } from "../../lib/view/plan"
-import ChanceFocus from "../chance/ChanceFocus.svelte"
-import ChanceResult from "../chance/ChanceResult.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import ChanceWhatIf from "../what-if/ChanceWhatIf.svelte"
+import ChanceFocus from "./ChanceFocus.svelte"
+import ChanceResult from "./ChanceResult.svelte"
 
 interface Props {
 	/** The Scenarios the Snapshot planned, main first; the plan switcher's choices. */
@@ -24,7 +24,7 @@ interface Props {
 /** The chance of the chosen Scenario: its focus point first, then the plan picker and the detail below. */
 let { names, chance, scenario, onScenario }: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
-const read = $derived(name === undefined || name === null ? undefined : chance[name])
+const read = $derived(name === null ? undefined : chance[name])
 const lens = $derived(name === null ? null : whatIfSession.lensFor(name))
 const options = $derived(names.map((value) => ({ value, label: value })))
 </script>

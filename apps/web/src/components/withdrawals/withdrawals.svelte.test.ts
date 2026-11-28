@@ -89,6 +89,13 @@ describe("the Withdrawals page", () => {
 		expect(bare).toContain("each is your own estimate")
 	})
 
+	test("offers the Set control on a plan with no rule when the server answers a session", () => {
+		const bare = render(WithdrawalsBody, {
+			props: { snapshot: DEMO, scenario: "retire-early", terms: "both", onTerms: () => {} },
+		}).body
+		expect(bare).toContain(">Set how you spend in retirement</button>")
+	})
+
 	test("a Saved plan block of a plan with no spending Flow says there is no rule yet, not that it is a level amount", () => {
 		const chance = DEMO.reads.chance["base"]
 		const view = withdrawalsView(

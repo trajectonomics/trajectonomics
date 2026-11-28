@@ -48,7 +48,7 @@ const note = $derived(plan === null ? null : noCostNote(plan))
 	{:else if run.ok && (dates === null || saved === null)}
 		<EmptyState title="No estate for this plan" />
 	{:else}
-		<EstateFocus read={run} figures={saved?.figures ?? null} plan={name} />
+		<EstateFocus read={run} figures={saved?.figures ?? null} plan={name} terms={chosen} />
 	{/if}
 	{#if editable && doc?.ok && plan}
 		<EstateActions {name} contentHash={doc.data.scenario.contentHash} {plan} />

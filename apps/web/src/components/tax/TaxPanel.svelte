@@ -3,6 +3,7 @@ import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionAllowances, ProjectionRun, Read } from "../../lib/contract"
 import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
 import { chooseScenario } from "../../lib/view/plan"
+import { returnOf, returnsOf } from "../../lib/view/tax"
 import TaxBodyView from "../tax/TaxBodyView.svelte"
 import TaxFocus from "../tax/TaxFocus.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
@@ -24,44 +25,67 @@ interface Props {
 	/** The Scenario the address bar asks for; empty or unknown falls back to the first one. */
 	requested: string
 	onScenario: (name: string) => unknown
+	/** The Filer of the Return the address bar asks for; empty or unknown opens the first Return. */
+	returned: string
+	onReturn: (value: string) => unknown
 }
 
-let { names, projections, allowances, people, holders, requested, onScenario }: Props = $props()
+let {
+	names,
+	projections,
+	allowances,
+	people,
+	holders,
+	requested,
+	onScenario,
+	returned,
+	onReturn,
+}: Props = $props()
 const options = $derived(names.map((value) => ({ value, label: value })))
 const name = $derived(chooseScenario(names, requested))
 /** The name the address bar asks for that is not one of the plans, said above the picker; none otherwise. */
 const unknown = $derived(requested !== "" && !names.includes(requested) ? requested : null)
 const read = $derived(name === null ? undefined : projections[name])
+const returns = $derived(read?.ok === true ? returnsOf(read.data.taxYears) : [])
+const picked = $derived(returns.length > 1 ? returnOf(returns, returned) : null)
+/** The Return the focus point answers for: the one the switch chose, or the plan's own when it has one Return. */
+const filer = $derived(picked?.filer ?? null)
 </script>
 
-<!-- The Tax page's body: the focus point of the chosen Scenario first, then the picker and its tax years. -->
+<!-- One plan's body: the focus point of the Return on screen first, then the plan picker, the Return switch and its years. -->
 {#snippet taxScenario(scenario: string, scenarioRead: Read<ProjectionRun>)}
 	{@const lens = whatIfSession.lensFor(scenario)}
-	<div class="space-y-8">
-		<TaxFocus read={scenarioRead} allowances={allowances[scenario]} plan={scenario} />
-		<SegmentedControl name="scenario" label="Plan" {options} value={scenario} onChange={onScenario} />
-		{#if scenario === name && unknown !== null}
-			<p role="status" class="text-sm text-muted-foreground">
-				There is no plan named {unknown}. Showing {name}.
-			</p>
-		{/if}
-		{#if scenarioRead.ok}
-			{#if lens}<TaxWhatIf {lens} people={people[scenario] ?? NO_PEOPLE} claimsHolder={holders[scenario] ?? null} />{/if}
-			<TaxBodyView
-				name={scenario}
-				run={scenarioRead.data}
-				people={people[scenario] ?? NO_PEOPLE}
-				claimsHolder={holders[scenario] ?? null}
-			/>
-		{/if}
-		<Provenance name={`Tax of ${scenario}`} commands={[scenarioRead.argv]} />
-	</div>
+	{#if scenarioRead.ok}
+		{#if lens}<TaxWhatIf {lens} people={people[scenario] ?? NO_PEOPLE} claimsHolder={holders[scenario] ?? null} />{/if}
+		<TaxBodyView
+			name={scenario}
+			run={scenarioRead.data}
+			people={people[scenario] ?? NO_PEOPLE}
+			claimsHolder={holders[scenario] ?? null}
+			chosen={returned}
+			onReturn={onReturn}
+		/>
+	{/if}
+	<Provenance name={`Tax of ${scenario}`} commands={[scenarioRead.argv]} />
 {/snippet}
 
 {#if name === null}
 	<EmptyState title="No plan to read" />
-{:else if read === undefined}
-	<EmptyState title="No Projection to read" />
 {:else}
-	{@render taxScenario(name, read)}
+	<div class="space-y-8">
+		{#if read === undefined}
+			<EmptyState title="No Projection to read" />
+		{:else}
+			<TaxFocus read={read} allowances={allowances[name]} filer={filer} plan={name} />
+		{/if}
+		<SegmentedControl name="scenario" label="Plan" {options} value={name} onChange={onScenario} />
+		{#if read !== undefined && unknown !== null}
+			<p role="status" class="text-sm text-muted-foreground">
+				There is no plan named {unknown}. Showing {name}.
+			</p>
+		{/if}
+		{#if read !== undefined}
+			{@render taxScenario(name, read)}
+		{/if}
+	</div>
 {/if}

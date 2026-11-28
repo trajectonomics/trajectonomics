@@ -13,18 +13,20 @@ interface Props {
 	read: Read<ProjectionRun>
 	/** The plan's allowances read, when the Snapshot has one: it states the tax a person could still save. */
 	allowances?: Read<ProjectionAllowances> | undefined
+	/** The Filer of the Return on screen; null for a plan's one Return, or before a separate filing chooses one. */
+	filer?: string | null
 	/** The plan the tax is of, which names the Read in an error. */
 	plan: string
 }
 
 /** The page's focus point: the year's income as one bar split by bracket, the tax owed at its end. */
-let { read, allowances, plan }: Props = $props()
+let { read, allowances, filer = null, plan }: Props = $props()
 const allowancesData = $derived(allowances?.ok === true ? allowances.data : null)
 </script>
 
 <ReadView {read} label={`The tax of ${plan}`}>
 	{#snippet children(run)}
-		{@const focus = taxFocusView(run, allowancesData, preferences.hidden)}
+		{@const focus = taxFocusView(run, allowancesData, preferences.hidden, filer)}
 		{#if focus}
 			<FocusPoint label={focus.label} action={focus.action}>
 				{#snippet visual(tone)}
@@ -41,18 +43,27 @@ const allowancesData = $derived(allowances?.ok === true ? allowances.data : null
 								/>
 							</FocusAnswer>
 						</div>
-						<div class="flex h-16 w-full gap-px overflow-hidden rounded-sm">
-							{#each focus.segments as segment, index (index)}
-								<span
-									class={cx(
-										"h-full",
-										segment.top ? "bg-accent print:bg-foreground/30" : "bg-foreground/20",
-									)}
-									style:width="{segment.share * 100}%"
-								></span>
-							{/each}
+						{#if focus.emptyBar}
+							<div class="h-px w-full bg-foreground/30"></div>
+						{:else}
+							<div class="flex h-16 w-full gap-px overflow-hidden rounded-sm">
+								{#each focus.segments as segment, index (index)}
+									<span
+										class={cx(
+											"h-full",
+											segment.top ? "bg-accent print:bg-foreground/30" : "bg-foreground/20",
+										)}
+										style:width="{segment.share * 100}%"
+									></span>
+								{/each}
+							</div>
+						{/if}
+						<div class="flex flex-wrap items-baseline justify-between gap-2 text-xs text-muted-foreground">
+							<span>Due {focus.due}</span>
+							{#if focus.saving !== null}
+								<span>Save <Money amount={focus.saving} currency={focus.currency} compact /></span>
+							{/if}
 						</div>
-						<p class="text-right text-xs text-muted-foreground">Due {focus.due}</p>
 					</div>
 				{/snippet}
 			</FocusPoint>

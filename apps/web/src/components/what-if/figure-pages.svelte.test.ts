@@ -103,6 +103,8 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 				holders: {},
 				requested: "base",
 				onScenario: () => {},
+				returned: "",
+				onReturn: () => {},
 			},
 		}).body
 		expect(tax).toContain("What-if on base")
@@ -137,6 +139,8 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 					holders: {},
 					requested: "base",
 					onScenario: () => {},
+					returned: "",
+					onReturn: () => {},
 				},
 			}).body,
 		]) {

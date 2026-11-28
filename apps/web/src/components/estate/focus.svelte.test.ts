@@ -23,22 +23,36 @@ const FIGURES =
 	DATES === null ? null : (estateView(READ.data, DATES.chosen.date, "both")?.figures ?? null)
 
 describe("EstateFocus", () => {
-	test("labels the section with what heirs receive and the year, and draws the deductions to it", () => {
+	test("labels the section with what heirs receive and the year, and draws the named deductions to it", () => {
 		const { body } = render(EstateFocus, {
-			props: { read: READ, figures: FIGURES, plan: "base" },
+			props: { read: READ, figures: FIGURES, terms: "both", plan: "base" },
 		})
 		expect(body).toContain("What would your heirs receive? 15.6M THB in 2053.")
 		expect(body).toContain("data-focus-answer")
 		expect(body).toContain("15.6M")
 		expect(body).toContain(">2053<")
+		expect(body).toContain("debts · costs · gifts · heirs")
 		expect(body).not.toContain("data-primary-action")
+	})
+
+	test("answers in today's money, with one full bar for the net and no deductions", () => {
+		const { body } = render(EstateFocus, {
+			props: { read: READ, figures: FIGURES, terms: "real", plan: "base" },
+		})
+		expect(body).toContain("in today's money.")
+		expect(body).toContain("today's money")
+		expect(body).toContain("7.02M")
+		expect(body).not.toContain("15.6M")
+		expect(body).not.toContain("debts · costs · gifts · heirs")
 	})
 
 	test("masks the net amount with Hide amounts on", () => {
 		preferences.hidden = true
 		let body = ""
 		try {
-			body = render(EstateFocus, { props: { read: READ, figures: FIGURES, plan: "base" } }).body
+			body = render(EstateFocus, {
+				props: { read: READ, figures: FIGURES, terms: "both", plan: "base" },
+			}).body
 		} finally {
 			preferences.hidden = false
 		}

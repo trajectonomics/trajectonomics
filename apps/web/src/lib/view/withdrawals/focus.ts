@@ -1,5 +1,5 @@
 import { barHeights, toChartNumber } from "../../chart"
-import { formatCompact, formatMonth } from "../../format"
+import { formatCompact, formatMonth, trimPercent } from "../../format"
 import type { Terms } from "../projection/terms"
 import type { WithdrawalsView } from "./view"
 
@@ -12,6 +12,8 @@ export interface WithdrawalsFocus {
 	readonly currency: string
 	/** The first Rule year's month, as a small tick under the columns: "Jan 2027". */
 	readonly first: string
+	/** The withdrawal rate the CLI states for the first year, trimmed: "3.99%", or "" when it states none. */
+	readonly share: string
 	/** Each column's height as a percent of the tallest, for drawing only. */
 	readonly heights: readonly number[]
 }
@@ -33,14 +35,20 @@ export function withdrawalsFocusView(
 	const amount = real ? firstRow.realAmount : firstRow.amount
 	const values = rule.rows.map((row) => toChartNumber(real ? row.realAmount : row.amount))
 	const first = formatMonth(firstRow.date)
-	const savings = firstRow.share === null ? "" : `, ${firstRow.share} of your savings`
+	const share = firstRow.share === null ? "" : trimPercent(firstRow.share)
+	const savings = share === "" ? "" : `, ${share} of your savings`
 	const tone = real ? ", in today's money" : ""
-	const money = hidden ? "The amount is hidden" : `${formatCompact(amount)} ${view.currency}`
+	const amountWords = hidden
+		? view.rules.length > 1
+			? "The first rule's amount is hidden."
+			: "The amount is hidden."
+		: `${formatCompact(amount)} ${view.currency}.`
 	return {
-		label: `What could you spend in retirement? ${money} from ${first}${savings}${tone}.`,
+		label: `What could you spend in retirement? ${amountWords} From ${first}${savings}${tone}.`,
 		amount,
 		currency: view.currency,
 		first,
+		share,
 		heights: barHeights(values, 100),
 	}
 }

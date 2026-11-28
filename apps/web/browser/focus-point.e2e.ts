@@ -1,12 +1,13 @@
 import { expect, test } from "@playwright/test"
 import { openDemo } from "./demo"
 import { focusPointProblems } from "./focus-point"
-import { expectFocusOnAPhone, expectMaskedFocus } from "./focus-point-pages"
+import { expectFocusOnAPhone, expectMaskedFocus, FOCUS_PAGES } from "./focus-point-pages"
 import { PAGES, pageName } from "./pages"
 
 /**
- * The routes a later slice of #707 gives their focus point. Every one must still fail the rule today, so
- * this list can only shrink: a route that starts passing fails its own check until it is removed here.
+ * The routes a later slice of #707 gives their focus point. Every one must still have no `[data-focus-section]`
+ * yet, or break the rule, so this list can only shrink: a route that starts passing fails its own check until
+ * it is removed here.
  */
 export const PENDING_707: Readonly<Record<string, "b" | "c">> = {
 	"/assets-and-debts/": "c",
@@ -29,16 +30,6 @@ export const PENDING_707: Readonly<Record<string, "b" | "c">> = {
 	"/settings/tax/": "c",
 }
 
-/** The six pages slice (a) gives a focus point, in #707's order. */
-const FOCUS_PAGES = [
-	"/net-worth/",
-	"/chance/",
-	"/tax/",
-	"/optimize/allowances/",
-	"/optimize/withdrawals/",
-	"/estate/",
-] as const
-
 for (const path of PAGES) {
 	const slice = PENDING_707[path]
 	const title =
@@ -48,9 +39,14 @@ for (const path of PAGES) {
 	test(`${pageName(path)} ${title}`, async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 })
 		await openDemo(page, path, { theme: "light" })
+		const focused = (await page.locator("main [data-focus-section]").count()) > 0
 		const problems = await page.evaluate(focusPointProblems)
 		if (slice === undefined) expect(problems, path).toEqual([])
-		else expect(problems.length, `${path} still fails for slice ${slice}`).toBeGreaterThan(0)
+		else
+			expect(
+				focused === false || problems.length > 0,
+				`${path}: this route has no [data-focus-section] yet, or still breaks the rule`,
+			).toBe(true)
 	})
 }
 
@@ -92,7 +88,9 @@ for (const path of FOCUS_PAGES) {
 for (const path of FOCUS_PAGES) {
 	test(`${pageName(path)} masks its focus amount with Hide amounts on`, async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 })
+		await openDemo(page, path, { theme: "light" })
+		const figures = await page.locator("[data-focus-answer]").allInnerTexts()
 		await openDemo(page, path, { theme: "light", hideAmounts: true })
-		await expectMaskedFocus(page, path)
+		await expectMaskedFocus(page, path, figures)
 	})
 }

@@ -64,7 +64,7 @@ const plan = $derived(
 			</EmptyState>
 		{/if}
 	{:else}
-		<AllowancesFocus {read} plan={name} />
+		<AllowancesFocus {read} plan={name} {people} {claimsHolder} />
 		{#if editable}<InputForm {inputs} />{:else}<InputSummary {inputs} />{/if}
 		{#if read.ok}
 			<AllowancesResult data={read.data} {plan} {people} {claimsHolder} />
