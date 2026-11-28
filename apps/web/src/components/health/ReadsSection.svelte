@@ -1,4 +1,5 @@
 <script lang="ts">
+import { preferences } from "../../client/preferences.svelte.js"
 import type { Snapshot } from "../../lib/contract"
 import { isCliError } from "../../lib/edit/failure"
 import { type AuditRow, readAudit } from "../../lib/view/health/read-audit"
@@ -15,11 +16,12 @@ let { snapshot }: Props = $props()
 // Failed Reads come first.
 const rows = $derived(readAudit(snapshot))
 
-const columns: Column<AuditRow>[] = [
+// The Command column is a traj command, so it follows the Display setting (#937).
+const columns: Column<AuditRow>[] = $derived([
 	{ key: "question", header: "Question", cell: questionCell },
-	{ key: "command", header: "Command", cell: commandCell },
+	...(preferences.showCommands ? [{ key: "command", header: "Command", cell: commandCell }] : []),
 	{ key: "status", header: "Status", cell: statusCell },
-]
+])
 </script>
 
 {#snippet questionCell(row: AuditRow)}{row.question}{/snippet}
@@ -44,7 +46,7 @@ const columns: Column<AuditRow>[] = [
 	{/if}
 {/snippet}
 
-<!-- Every Read the Snapshot holds, with its command and its status. Failed Reads come first. -->
+<!-- Every Read the Snapshot holds, with its status, and its command when the traj commands are on. Failed Reads come first. -->
 <ReportSection
 	id="every-read"
 	title="Every Read"

@@ -11,6 +11,9 @@ export const THEME_KEY = "traj.theme"
 /** The localStorage key of hide-amounts: "1" when on, "0" when off. */
 export const HIDE_KEY = "traj.hideAmounts"
 
+/** The localStorage key of the traj commands under Details: "1" when on, "0" when off; anything else is off. */
+export const COMMANDS_KEY = "traj.showCommands"
+
 /** The two Themes. Each is a `data-theme` value on `<html>`. */
 export type Theme = "light" | "dark"
 
@@ -32,4 +35,14 @@ export function parseHideAmounts(raw: string | null): boolean {
 /** The stored form of hide-amounts. */
 export function serializeHideAmounts(hidden: boolean): string {
 	return hidden ? "1" : "0"
+}
+
+/** Whether the traj commands are shown: only a stored "1" shows them. */
+export function parseShowCommands(raw: string | null): boolean {
+	return raw === "1"
+}
+
+/** The stored form of the traj commands switch. */
+export function serializeShowCommands(on: boolean): string {
+	return on ? "1" : "0"
 }

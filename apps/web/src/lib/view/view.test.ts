@@ -9,7 +9,13 @@ import { withSearch } from "./links"
 import { createSnapshotLoader } from "./loader"
 import { netWorthHistorySeries } from "./overview/net-worth-history"
 import { parseSnapshotText } from "./parse-snapshot"
-import { parseHideAmounts, resolveTheme, serializeHideAmounts } from "./preferences"
+import {
+	parseHideAmounts,
+	parseShowCommands,
+	resolveTheme,
+	serializeHideAmounts,
+	serializeShowCommands,
+} from "./preferences"
 import { DEMO_SNAPSHOT_PATH, isDemo, SNAPSHOT_PATH, snapshotUrl } from "./snapshot-url"
 
 const DEMO_TEXT = await demoSnapshotText()
@@ -169,5 +175,14 @@ describe("preferences", () => {
 		expect(parseHideAmounts("0")).toBe(false)
 		expect(parseHideAmounts(null)).toBe(false)
 		expect(serializeHideAmounts(true)).toBe("1")
+	})
+
+	test("shows the traj commands only when the stored value is 1, and off by default", () => {
+		expect(parseShowCommands("1")).toBe(true)
+		expect(parseShowCommands("0")).toBe(false)
+		expect(parseShowCommands(null)).toBe(false)
+		expect(parseShowCommands("true")).toBe(false)
+		expect(serializeShowCommands(true)).toBe("1")
+		expect(serializeShowCommands(false)).toBe("0")
 	})
 })

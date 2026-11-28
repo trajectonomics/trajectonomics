@@ -21,15 +21,10 @@
 @import "./landing.css";
 @import "./sections.css";
 @import "./app.css";
-@import "./app-side.css";
-@import "./app-chat.css";
-@import "./app-composer.css";
-@import "./app-stage.css";
-@import "./conversation.css";
-@import "./terminal.css";
 @import "./features.css";
 @import "./feature-sample.css";
 @import "./live-demo.css";
+@import "./live-facade.css";
 @import "./faq.css";
 @import "./closing.css";
 @import "./mascot.css";
@@ -44,8 +39,6 @@
 @import "./header-narrow.css";
 @import "./repo-link.css";
 @import "./motion.css";
-@import "./replay.css";
-@import "./motion-app.css";
 @import "./motion-mascot.css";
 @import "./openjot.css";
 @import "./openjot-privacy.css";

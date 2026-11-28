@@ -15,7 +15,7 @@ const DEMO_POLICY =
  * `Function("")` to choose its compiled path and falls back to its plain one when that throws, so
  * `script-src` blocks `eval` and the Demo works without it. The policy does not allow `'unsafe-eval'`
  * to silence the probe (ADR 0031). `frame-ancestors 'self'` lets the Site's own home frame the Demo
- * (ADR 0034).
+ * (ADR 0035).
  */
 const EVAL_PROBE = "script-src blocked eval"
 

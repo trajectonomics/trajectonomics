@@ -32,6 +32,8 @@ for (const theme of THEMES) {
 // card without `min-w-0` stretched its grid column and the page (#672).
 test("Home stays 360px wide with every Details open", async ({ page }) => {
 	await page.setViewportSize({ width: WIDTHS_PX[0], height: HEIGHT_PX })
+	// The long command is what widened the page, so the traj commands are on (#937).
+	await page.addInitScript(() => localStorage.setItem("traj.showCommands", "1"))
 	await openDemo(page, "/", { theme: "light" })
 	const summaries = page.locator("details > summary")
 	const count = await summaries.count()

@@ -23,7 +23,7 @@ for (const width of [360, 1280] as const) {
 	}) => {
 		await page.setViewportSize({ width, height: 800 })
 		await serveEstateLabels(page, await longEstateLabels(page))
-		await openDemo(page, "/estate/?at=end", { theme: "light" })
+		await openDemo(page, "/estate/?estate=end", { theme: "light" })
 		expect(await measureLabelClips(page)).toEqual([])
 		expect(await measureMarkedClip(page)).toEqual([])
 	})

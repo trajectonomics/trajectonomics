@@ -1,7 +1,8 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
+import { preferences } from "../../client/preferences.svelte.js"
 import type { Fi } from "../../lib/contract"
 import { insideDetails, outsideDetails } from "../../lib/view/details.test-support"
 import { bindingSentence } from "../../lib/view/fi/binding"
@@ -31,6 +32,14 @@ beforeEach(() => setTestUrl("http://127.0.0.1/"))
 afterAll(() => setTestUrl("http://127.0.0.1/"))
 
 describe("FiResult: reachable", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	test("shows the FI month as the main figure, under the label FI date", () => {
 		const body = renderFi(fiFixture(REACHABLE))
 		expect(body).toContain(">FI date<")

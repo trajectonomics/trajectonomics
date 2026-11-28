@@ -1,6 +1,7 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
+import { preferences } from "../../client/preferences.svelte.js"
 import DataTable from "./DataTable.svelte"
 import EmptyState from "./EmptyState.svelte"
 import Provenance from "./Provenance.svelte"
@@ -8,20 +9,47 @@ import SegmentedControl from "./SegmentedControl.svelte"
 import type { Column } from "./table-types"
 
 describe("Provenance, EmptyState and SegmentedControl", () => {
-	test("shows each command under 'Details', named for its result", () => {
-		const { body } = render(Provenance, {
-			props: {
-				name: "Doctor",
-				commands: [
-					["doctor", "--json"],
-					["accounts", "--json"],
-				],
-			},
-		})
+	// The suite runs with --no-isolate, so a leaked switch would hide failures in other files.
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
+	const commands = [
+		["doctor", "--json"],
+		["accounts", "--json"],
+	] as const
+
+	test("with the switch on, shows each command under 'Details', named for its result", () => {
+		preferences.showCommands = true
+		const { body } = render(Provenance, { props: { name: "Doctor", commands } })
 		expect(body).toContain(">Details</summary>")
 		expect(body).toContain('aria-label="Details of Doctor"')
 		expect(body).toContain("traj doctor --json")
 		expect(body).toContain("traj accounts --json")
+	})
+
+	test("with the switch on, keeps the details the result states", () => {
+		preferences.showCommands = true
+		const details = createRawSnippet(() => ({ render: () => "<p>hash 1234</p>" }))
+		const { body } = render(Provenance, { props: { name: "Doctor", commands, details } })
+		expect(body).toContain("traj doctor --json")
+		expect(body).toContain("hash 1234")
+	})
+
+	test("with the switch off, hides the commands and shows no Details without provenance", () => {
+		preferences.showCommands = false
+		const { body } = render(Provenance, { props: { name: "Doctor", commands } })
+		expect(body).not.toContain("<details")
+		expect(body).not.toContain("traj ")
+	})
+
+	test("with the switch off, keeps Details for the raw provenance it holds", () => {
+		preferences.showCommands = false
+		const details = createRawSnippet(() => ({ render: () => "<p>hash 1234</p>" }))
+		const { body } = render(Provenance, { props: { name: "Doctor", commands, details } })
+		expect(body).toContain("<details")
+		expect(body).toContain("hash 1234")
+		expect(body).not.toContain("traj ")
 	})
 
 	test("renders an empty state with its title", () => {

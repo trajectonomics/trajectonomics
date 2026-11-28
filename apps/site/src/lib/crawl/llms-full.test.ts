@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor, languageBuildUrl } from "../language/languages"
-import { FI_DEMO_COMMAND, FI_DEMO_SETUP_COMMANDS, INSTALL_PROMPT } from "../site"
+import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, FI_DEMO_SETUP_COMMANDS, INSTALL_PROMPT } from "../site"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "./llms-full"
 import { linkCount } from "./llms-markdown"
 
@@ -67,7 +67,16 @@ describe("the full Answer engine file", () => {
 				"```",
 			].join("\n"),
 		)
-		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
+		// The whole answer is here, line for line: the page no longer plays the demo, so this file is
+		// the only place an agent reads the JSON the command prints.
+		expect(LLMS_FULL_TXT).toContain(["```json", ...FI_DEMO_OUTPUT, "```"].join("\n"))
+	})
+
+	it("opens on the question and closes on the answer, in the page's own words", () => {
+		expect(LLMS_FULL_TXT).toContain(`- ${dictionary.actionYou}: ${dictionary.actionQuestion}`)
+		expect(LLMS_FULL_TXT).toContain(
+			`- ${dictionary.actionAgent}: ${dictionary.actionAnswer} (${dictionary.actionProvenance})`,
+		)
 	})
 
 	it("carries both transcripts, so the argument survives with no script", () => {

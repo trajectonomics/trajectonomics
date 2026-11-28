@@ -1,0 +1,140 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see DEMO_PATH.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { DEMO_PATH } from "../lib/site"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+{/*
+ * The hero's window is the hosted Dashboard behind a click-to-load facade (ADR 0035): the real Demo in
+ * a framed window, fully clickable, but it loads on the visitor's first interaction rather than with the
+ * page, so the Dashboard's own JavaScript and hydration never count against the home's mobile budget.
+ * Its zoom works like browser zoom: at zoom z the iframe lays out at 1/z of the visible box and is
+ * scaled by z, so a phone can zoom out and read the Dashboard's wide layout. The three controls ship
+ * disabled, so a page with no script offers no control that cannot work; a visitor with no script gets
+ * the iframe from `<noscript>` at 100%. The script is inline, in the hero's style, and its notes live
+ * here because every byte ships against the page's 10,000 (ADR 0005).
+ */}
+<div class="live" data-live>
+	<div class="live-bar">
+		<span class="app-dots" aria-hidden="true"><i /><i /><i /></span>
+		<span class="live-title">{dictionary.liveDemoTitle}</span>
+		<div class="live-zoom" role="group" aria-label={dictionary.liveDemoZoom}>
+			<button type="button" data-live-out aria-label={dictionary.liveDemoZoomOut} disabled>
+				<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
+					<path d="M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+				</svg>
+			</button>
+			<button type="button" data-live-reset disabled>
+				<span data-live-level>100%</span><span class="sr-only"> {dictionary.liveDemoZoomReset}</span>
+			</button>
+			<button type="button" data-live-in aria-label={dictionary.liveDemoZoomIn} disabled>
+				<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
+					<path
+						d="M1 6h10M6 1v10"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"></path>
+				</svg>
+			</button>
+		</div>
+		<span class="sr-only" role="status" data-live-said></span>
+		<a class="live-open" href={DEMO_PATH}>{dictionary.liveDemoOpen}</a>
+	</div>
+	<div class="live-viewport" data-live-viewport style="--zoom:1">
+		{/*
+		 * The facade is a real link, so it is the window's one Tab stop and its Enter key starts the
+		 * Dashboard; the script hides it until it has marked the window ready, which is why a page with
+		 * no script shows the iframe below instead and never this link.
+		 */}
+		<a
+			class="live-start"
+			data-live-start
+			data-live-title={dictionary.liveDemoFrameTitle}
+			href={DEMO_PATH}>{dictionary.liveDemoStart}</a>
+		{/* A visitor with no script still gets the Dashboard, whole and at 100%, as before. */}
+		<noscript>
+			<iframe
+				data-live-frame
+				src={DEMO_PATH}
+				title={dictionary.liveDemoFrameTitle}
+				loading="lazy"></iframe>
+		</noscript>
+	</div>
+</div>
+
+{/*
+ * The zoom: one step per press through the eight browser-zoom steps, from 50% to 125%, starting at
+ * 100%. The percentage button resets. The control enables its own buttons, so the markup's disabled
+ * state is the no-script state, and nothing is stored: the zoom is this visit's, never a cookie. At
+ * either end the button is aria-disabled rather than disabled, so the keyboard focus on it stays put,
+ * and the status line says each new level, because the percentage sits inside a button's name.
+ *
+ * The load: the window starts once, on a click on the facade or on the visitor's first pointerdown,
+ * keydown, touchstart, wheel or scroll anywhere on the page. Lighthouse never interacts, so the
+ * Dashboard never loads during its run, and a real visitor gets it on first contact. The frame enters
+ * hidden and is revealed two frames after its load event, so the Dashboard's own hydration shift stays
+ * inside the window instead of moving the page; the facade is removed only then, and focus moves to the
+ * frame when the facade had it, so a keyboard visitor does not lose their place.
+ */}
+<script is:inline>
+	;(() => {
+		const live = document.querySelector("[data-live]")
+		const box = live?.querySelector("[data-live-viewport]")
+		const level = live?.querySelector("[data-live-level]")
+		const said = live?.querySelector("[data-live-said]")
+		const start = live?.querySelector("[data-live-start]")
+		if (!box || !level || !said || !start) return
+		const [out, reset, up] = live.querySelectorAll("button")
+		const steps = [50, 67, 75, 80, 90, 100, 110, 125]
+		let at = 5
+		const show = (next) => {
+			at = Math.max(0, Math.min(7, next))
+			box.style.setProperty("--zoom", steps[at] / 100)
+			level.textContent = said.textContent = `${steps[at]}%`
+			out.setAttribute("aria-disabled", at === 0)
+			up.setAttribute("aria-disabled", at === 7)
+		}
+		out.onclick = () => show(at - 1)
+		up.onclick = () => show(at + 1)
+		reset.onclick = () => show(5)
+		for (const button of [out, reset, up]) button.disabled = false
+
+		const types = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"]
+		let started = false
+		const startDemo = (event) => {
+			if (event.type === "click") {
+				if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+				event.preventDefault()
+			}
+			if (started) return
+			started = true
+			for (const type of types) window.removeEventListener(type, startDemo, { passive: true })
+			const frame = document.createElement("iframe")
+			frame.src = start.href
+			frame.title = start.dataset.liveTitle
+			frame.setAttribute("data-live-frame", "")
+			frame.addEventListener("load", () => {
+				requestAnimationFrame(() =>
+					requestAnimationFrame(() => {
+						box.removeAttribute("data-live-loading")
+						if (document.activeElement === start) frame.focus()
+						start.remove()
+					}),
+				)
+			})
+			box.setAttribute("data-live-loading", "")
+			box.append(frame)
+		}
+		start.addEventListener("click", startDemo)
+		for (const type of types)
+			window.addEventListener(type, startDemo, { once: true, passive: true })
+		live.setAttribute("data-live-ready", "")
+	})()
+</script>

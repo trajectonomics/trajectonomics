@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { readdirSync, statSync } from "node:fs"
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
@@ -6,6 +6,7 @@ import type { Component } from "svelte"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
+import { preferences } from "../client/preferences.svelte"
 import { replaceSnapshot } from "../client/snapshot.svelte"
 import { useSessionHooks } from "../client/what-if.test-support"
 import { detailsPerSection, outsideDetails } from "../lib/view/details.test-support"
@@ -20,7 +21,15 @@ afterAll(() => {
 	setTestUrl("http://127.0.0.1/")
 })
 
-beforeEach(() => replaceSnapshot(DEMO))
+// The guards count the Provenance disclosures, so they run with the traj commands on (#937): with them
+// off, a Details without raw provenance is gone and the guards would pass without checking it.
+beforeEach(() => {
+	replaceSnapshot(DEMO)
+	preferences.showCommands = true
+})
+afterEach(() => {
+	preferences.showCommands = false
+})
 
 const ROUTES = import.meta.dir
 

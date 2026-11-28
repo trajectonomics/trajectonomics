@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-
+import { preferences } from "../../client/preferences.svelte.js"
 import type { NetWorth, Read } from "../../lib/contract"
 import { type NetWorthView, netWorthView } from "../../lib/view/net-worth/view"
 import { failedRead, netWorth, okRead, row } from "../../lib/view/overview/fixtures.test-support"
@@ -17,6 +17,14 @@ function readOf(
 }
 
 describe("NetWorthCard", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	test("shows the compact total, its As-of, a link to its page and its command", () => {
 		const { body } = render(NetWorthCard, { props: { netWorth: readOf() } })
 		expect(body).toContain("400.00")

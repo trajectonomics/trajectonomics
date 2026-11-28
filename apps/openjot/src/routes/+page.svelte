@@ -18,7 +18,7 @@
     Mail,
     Gift,
   } from "@lucide/svelte";
-  import { tick, untrack } from "svelte";
+  import { onMount, tick, untrack } from "svelte";
   import CategoryIcon from "$lib/components/CategoryIcon.svelte";
   import EmptyMonthArt from "$lib/components/EmptyMonthArt.svelte";
   import MooMascot, { type MascotMood } from "$lib/components/MooMascot.svelte";
@@ -86,7 +86,8 @@
   import { t } from "$lib/i18n";
   import { omitFromCompare, omitFromSummary, omitRecord } from "$lib/ledgerPatch";
   import { loadSavedHand, loadSavedTheme, saveHand, saveTheme, type AppTheme, type HandMode } from "$lib/theme";
-  import { activeTheme } from "$lib/themeStore";
+  import { hasSavedMascot, loadSavedMascot, mascotForTheme, saveMascot, syncMascotToNative, type Mascot } from "$lib/mascot";
+  import { activeMascot, activeTheme } from "$lib/themeStore";
   import type {
     Account,
     AppSettings,
@@ -250,6 +251,7 @@
   }
   let theme = $state<AppTheme>(loadSavedTheme());
   let hand = $state<HandMode>(loadSavedHand());
+  let mascot = $state<Mascot>(loadSavedMascot());
   let activeTab = $state<"home" | "summary" | "settings">("home");
   let settingsSubPage = $state<SettingsSubPage>(null);
   let periodOffset = $state<number>(0);
@@ -371,6 +373,20 @@
       theme === "pink-white" &&
       (lockState !== "open" || showOnboarding || (!hasColoredTopBar && activeTab !== "home"));
     window.MooJotAndroid?.setStatusBarLight?.(isLightStatusBar);
+  });
+
+  // The launcher icon follows the mascot, not the theme it was derived from before this
+  // setting existed. On an upgraded install, match it once at startup.
+  onMount(() => syncMascotToNative($activeMascot));
+
+  // Until someone picks a mascot, it follows the theme, including a theme picked during
+  // onboarding or in Settings, and the launcher icon follows with it.
+  $effect(() => {
+    const next = mascotForTheme(theme);
+    if (hasSavedMascot() || next === untrack(() => mascot)) return;
+    mascot = next;
+    activeMascot.set(next);
+    syncMascotToNative(next);
   });
 
   $effect(() => {
@@ -1853,6 +1869,7 @@
       {isScanning}
       {mascotMood}
       {theme}
+      {mascot}
       {hand}
       {shareStats}
       appLockAvailable={hasAndroidBridge()}
@@ -1871,6 +1888,12 @@
       onChangeTheme={(nextTheme) => {
         if (nextTheme !== theme) track("setting_changed", { setting: "theme", value: nextTheme });
         theme = nextTheme;
+      }}
+      onChangeMascot={(nextMascot) => {
+        if (nextMascot !== mascot) track("setting_changed", { setting: "mascot", value: nextMascot });
+        mascot = nextMascot;
+        activeMascot.set(nextMascot);
+        saveMascot(nextMascot);
       }}
       onChangeHand={(nextHand) => {
         if (nextHand !== hand) track("setting_changed", { setting: "hand", value: nextHand });

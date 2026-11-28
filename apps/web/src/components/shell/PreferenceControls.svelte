@@ -10,7 +10,7 @@ const TOGGLE = cx(
 )
 </script>
 
-<!-- The display switches: the dark Theme, and Hide amounts while that feature is on (#927 keeps it off until #926). -->
+<!-- The display switches: the dark Theme and the traj commands, and Hide amounts while that feature is on (#927 keeps it off until #926). Each is a button that says whether it is on. -->
 <div class="flex flex-col gap-2">
 	{#if HIDE_AMOUNTS_ENABLED}
 		<button
@@ -29,5 +29,13 @@ const TOGGLE = cx(
 		class={TOGGLE}
 	>
 		Dark theme
+	</button>
+	<button
+		type="button"
+		aria-pressed={preferences.showCommands}
+		onclick={() => preferences.setShowCommands(!preferences.showCommands)}
+		class={TOGGLE}
+	>
+		Show traj commands
 	</button>
 </div>

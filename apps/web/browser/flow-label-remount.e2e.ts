@@ -53,7 +53,7 @@ for (const width of [360, 1280] as const) {
 	test(`the Estate refits after a font change made on Net worth, ${width}px`, async ({ page }) => {
 		await page.setViewportSize({ width, height: 800 })
 		await serveEstateLabels(page, await longEstateLabels(page))
-		await openDemo(page, "/estate/?at=end", { theme: "light" })
+		await openDemo(page, "/estate/?estate=end", { theme: "light" })
 		expect(await measureFlowLabels(page), "before leaving").toEqual([])
 		await follow(page, "Net worth")
 		await expect(page).toHaveURL(/\/net-worth\//)

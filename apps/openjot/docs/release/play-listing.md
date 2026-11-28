@@ -70,7 +70,7 @@ OpenJot isn't affiliated with any bank or e-wallet. Bank and app names belong to
 
 ### Graphics
 
-- App icon (512×512): resize `static/app-icon.png`.
+- App icon (512×512): resize `src-tauri/icons/launcher-robot-1024.png` (the robot, the default launcher icon).
 - Feature graphic (1024×500): export [play-feature-graphic.svg](play-feature-graphic.svg) to PNG.
 - Phone screenshots: see "Listing assets" in [play-data-safety.md](play-data-safety.md). Use sample data only, never a real ledger.
 

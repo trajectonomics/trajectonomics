@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0035
 ---
 
 # A phone always has the Mascot on screen

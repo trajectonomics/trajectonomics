@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test"
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
@@ -130,17 +130,32 @@ describe("SiteNavLinks", () => {
 })
 
 describe("PreferenceControls", () => {
-	test("offers the Theme switch, and no Hide amounts switch while that feature is off", () => {
+	const switchState = (body: string, label: string) =>
+		body.match(new RegExp(`<button[^>]*aria-pressed="(true|false)"[^>]*>\\s*${label}`))?.[1]
+
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
+	test("gives each switch its name and says whether it is on, with no Hide amounts switch while that feature is off", () => {
 		const saved = preferences.theme
 		try {
 			preferences.theme = "light"
 			const { body } = render(PreferenceControls, {})
 			expect(body).toContain("Dark theme")
+			expect(body).toContain("Show traj commands")
 			expect(body).not.toContain("Hide amounts")
 			expect(body).toContain('aria-pressed="false"')
 		} finally {
 			preferences.theme = saved
 		}
+	})
+
+	test("says whether the traj commands are shown", () => {
+		preferences.showCommands = false
+		expect(switchState(render(PreferenceControls, {}).body, "Show traj commands")).toBe("false")
+		preferences.showCommands = true
+		expect(switchState(render(PreferenceControls, {}).body, "Show traj commands")).toBe("true")
 	})
 })
 

@@ -28,7 +28,7 @@
 }
 
 /*
- * The ground is the whole stage, the copy and the demo window under it, so the squares frame both: they
+ * The ground is the whole stage, the copy and the live window under it, so the squares frame both: they
  * gather at the top and run down the window's two sides, as twenty.com's do, and they leave a clearing
  * behind the headline, the subline and the buttons so the copy sits on clean ground (ADR 0014). The
  * window's own surface is opaque, so nothing needs to be cleared behind it.

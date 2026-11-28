@@ -1,6 +1,7 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { demoSnapshotText } from "../../../scripts/demo-snapshot"
+import { preferences } from "../../client/preferences.svelte.js"
 import {
 	type Doctor,
 	type Read,
@@ -90,7 +91,19 @@ describe("LedgerHealthSection", () => {
 })
 
 describe("ReadsSection", () => {
+	// The suite runs with --no-isolate, so a leaked switch would hide failures in other files.
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
+	test("with the traj commands off, has no Command column", () => {
+		const { body } = render(ReadsSection, { props: { snapshot: demo } })
+		expect(body).not.toContain(">Command</th>")
+		expect(body).not.toContain("<code")
+	})
+
 	test("lists every Read with its command, and puts a failed Read first with its code and message", () => {
+		preferences.showCommands = true
 		const failed: Snapshot = {
 			...demo,
 			reads: {
