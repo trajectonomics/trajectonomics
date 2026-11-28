@@ -1,5 +1,10 @@
 import { demoSnapshotText } from "../../../../scripts/demo-snapshot"
-import { type ProjectionCompare, type Snapshot, snapshot as snapshotSchema } from "../../contract"
+import {
+	type Doctor,
+	type ProjectionCompare,
+	type Snapshot,
+	snapshot as snapshotSchema,
+} from "../../contract"
 import type { WhatIfLens } from "../../what-if/lens"
 
 const DEMO_TEXT = await demoSnapshotText()
@@ -11,6 +16,9 @@ function dataOf<T>(read: { ok: true; data: T } | { ok: false } | null | undefine
 	if (read === null || read === undefined || !read.ok) throw new Error("the Demo lacks this read")
 	return read.data
 }
+
+/** The Demo's doctor result: every check passes in the Demo. */
+export const DEMO_DOCTOR: Doctor = dataOf(DEMO.reads.doctor)
 
 /** The Demo's compare, as the CLI states it: base is side A, retire-early side B. Several deltas are null here. */
 export const DEMO_COMPARE: ProjectionCompare = dataOf(DEMO.reads.compare)

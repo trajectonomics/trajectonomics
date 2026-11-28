@@ -39,7 +39,7 @@ Scenario to `planReturnModel`, and says what went in.
   command that works: no plan has a `volatility` until one is stated, and a `--set` could not create the key.
   `--set accounts.<id>.volatility=1500` writes it when the parent is an `accounts[]` item of `kind: "asset"`; a
   liability, and every other absent key, is still `No key or id "…"`. The value goes to the engine's `check()` like
-  any other, so 10001 is `RATE_OUT_OF_RANGE`. The rule lives with ADR-0065's begin entries, in `set-begin.ts`.
+  any other, so 10001 is `RATE_OUT_OF_RANGE`. The rule lives with ADR-0065's begin entries, in `set-begin-keys.ts`.
 - **`traj projection model --scenario <name> [--buckets N]` prints the model**, in the sim format and nothing else, so
   `--json > model.json` is a file `--return-model` reads and gives the same chance as `plan`. It takes the Overrides
   of the other projection leaves, reads no Ledger and takes no date: the model depends on the Scenario alone. A plan

@@ -17,6 +17,7 @@ export const band: z.ZodType<ChanceBandView> = z.strictObject({
 	netWorth: z.array(percentile).describe("The Percentiles of closing net worth, in level order."),
 })
 
+/** The same Bands in today's money, published only when the model has an inflation factor. */
 export const realBandsField: z.ZodOptional<z.ZodArray<z.ZodType<ChanceBandView>>> = z
 	.array(band)
 	.optional()

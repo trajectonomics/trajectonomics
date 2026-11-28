@@ -1,6 +1,7 @@
 <script lang="ts" generics="T">
 import type { Snippet } from "svelte"
 import { Reorder } from "../../client/reorder.svelte.js"
+import { origins } from "../../lib/view/routing/order"
 import OrderRow from "./OrderRow.svelte"
 
 interface Props {
@@ -20,8 +21,11 @@ interface Props {
 	onSave: (order: readonly T[]) => Promise<boolean>
 	onTry: (order: readonly T[]) => void
 	row: Snippet<[T, number, readonly T[]]>
-	/** The buttons after Up and Down: edit, try, remove. */
-	buttons?: Snippet<[T, number]>
+	/**
+	 * The buttons after Up and Down: edit, try, remove. The first number is the row's saved index in `items`, which a
+	 * button acts on after an order that is not saved yet; the second is the place the row shows, which names it.
+	 */
+	buttons?: Snippet<[T, number, number]>
 }
 
 let {
@@ -42,6 +46,8 @@ const reorder = new Reorder<T>(initial())
 /** The order the last save stored, while the page still shows the Snapshot from before it (a write that landed unread). */
 let stored = $state<readonly T[] | null>(null)
 const baseline = $derived(stored ?? items)
+/** Each shown row's place in `items`: the rows hold every item of `items`, so one of them is the row's own. */
+const saved = $derived(origins(items, reorder.items))
 const broken = $derived(rule(reorder.items))
 const changed = $derived(reorder.changed(baseline))
 const cannot = $derived(busy || broken !== null || locked)
@@ -63,7 +69,7 @@ async function dropped(event: DragEvent, index: number): Promise<void> {
 		<OrderRow rowKey={entry.key} {index} count={reorder.rows.length} label={labelOf(entry.item, reorder.items, index)} {reorder} {editable}
 			problem={broken?.index === index ? broken.message : refused(index)} onDrop={dropped}>
 			{@render row(entry.item, index, reorder.items)}
-			{#snippet actions()}{@render buttons?.(entry.item, index)}{/snippet}
+			{#snippet actions()}{@render buttons?.(entry.item, saved[index] ?? index, index)}{/snippet}
 		</OrderRow>
 	{/each}
 </ol>

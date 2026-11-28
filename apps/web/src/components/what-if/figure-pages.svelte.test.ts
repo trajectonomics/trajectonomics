@@ -23,13 +23,14 @@ import ChanceView from "../chance/ChanceView.svelte"
 import FiSections from "../fi/FiSections.svelte"
 import MilestonesView from "../milestones/MilestonesView.svelte"
 import TaxPanel from "../tax/TaxPanel.svelte"
+import { milestonePageProps } from "./milestone-page.test-support"
 import OverviewWhatIf from "./OverviewWhatIf.svelte"
 
 useSessionHooks()
 
-const projections = DEMO.reads.projections
 const names = DEMO.params.scenarios
-const run = { names, projections, scenario: "base", terms: "both", onTerms: () => {} }
+const projections = DEMO.reads.projections
+const run = milestonePageProps()
 
 describe("the Milestones page", () => {
 	test("with no session it renders as it does today", () => {
@@ -51,7 +52,7 @@ describe("the Milestones page", () => {
 
 	test("a page on another plan shows no what-if: the session belongs to its own plan", async () => {
 		await openDemoSession()
-		const body = render(MilestonesView, { props: { ...run, scenario: "retire-early" } }).body
+		const body = render(MilestonesView, { props: milestonePageProps("retire-early") }).body
 		expect(body).not.toContain("What-if on")
 	})
 

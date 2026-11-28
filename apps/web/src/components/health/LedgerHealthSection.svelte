@@ -48,6 +48,7 @@ const checkColumns: Column<CheckLine>[] = [
 					caption="Checks"
 					rows={view.checks}
 					rowKey={(check) => check.key}
+					rowId={(check) => `check-${check.key}`}
 					columns={checkColumns}
 				/>
 				<div class="grid gap-6 md:grid-cols-2">

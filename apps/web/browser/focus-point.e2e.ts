@@ -1,52 +1,20 @@
 import { expect, test } from "@playwright/test"
 import { openDemo } from "./demo"
 import { focusPointProblems } from "./focus-point"
-import { expectFocusOnAPhone, expectMaskedFocus, FOCUS_PAGES } from "./focus-point-pages"
+import {
+	expectFocusOnAPhone,
+	expectMaskedFocus,
+	FOCUS_PAGES,
+	MASKED_FOCUS_PAGES,
+} from "./focus-point-pages"
 import { PAGES, pageName } from "./pages"
 
-/**
- * The routes a later slice of #707 gives their focus point. Every one must still have no `[data-focus-section]`
- * yet, or break the rule, so this list can only shrink: a route that starts passing fails its own check until
- * it is removed here.
- */
-export const PENDING_707: Readonly<Record<string, "b" | "c">> = {
-	"/assets-and-debts/": "c",
-	"/cash-flow/": "b",
-	"/chance/path/": "c",
-	"/compare/": "c",
-	"/expenses/": "c",
-	"/fi/": "c",
-	"/health/": "b",
-	"/household/": "c",
-	"/income/": "c",
-	"/ledger/": "b",
-	"/milestones/": "b",
-	"/plans/": "c",
-	"/projection/": "c",
-	"/projection/years/": "c",
-	"/reports/": "c",
-	"/routing/": "c",
-	"/settings/assumptions/": "c",
-	"/settings/tax/": "c",
-}
-
 for (const path of PAGES) {
-	const slice = PENDING_707[path]
-	const title =
-		slice === undefined
-			? "has one focus point and one primary action"
-			: `waits for slice ${slice} of #707`
-	test(`${pageName(path)} ${title}`, async ({ page }) => {
+	test(`${pageName(path)} has one focus point and one primary action`, async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 })
 		await openDemo(page, path, { theme: "light" })
-		const focused = (await page.locator("main [data-focus-section]").count()) > 0
 		const problems = await page.evaluate(focusPointProblems)
-		if (slice === undefined) expect(problems, path).toEqual([])
-		else
-			expect(
-				focused === false || problems.length > 0,
-				`${path}: this route has no [data-focus-section] yet, or still breaks the rule`,
-			).toBe(true)
+		expect(problems, path).toEqual([])
 	})
 }
 
@@ -85,7 +53,7 @@ for (const path of FOCUS_PAGES) {
 	})
 }
 
-for (const path of FOCUS_PAGES) {
+for (const path of MASKED_FOCUS_PAGES) {
 	test(`${pageName(path)} masks its focus amount with Hide amounts on`, async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 })
 		await openDemo(page, path, { theme: "light" })

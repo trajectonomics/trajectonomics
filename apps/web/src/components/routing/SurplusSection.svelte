@@ -54,9 +54,9 @@ function remove(index: number, trying: boolean): void {
 				{#if echo}<span class="block text-xs text-muted-foreground"><Sentence parts={echo} currency={ctx.doc.currency} /></span>{/if}
 			{/if}
 		{/snippet}
-		{#snippet buttons(_step, at)}
-			<RowButtons label={`step ${at + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: at, trying: false })}
-				onTry={() => (drawer = { index: at, trying: true })} onRemove={() => remove(at, false)} onTryRemove={() => remove(at, true)} />
+		{#snippet buttons(_step, saved, shown)}
+			<RowButtons label={`step ${shown + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: saved, trying: false })}
+				onTry={() => (drawer = { index: saved, trying: true })} onRemove={() => remove(saved, false)} onTryRemove={() => remove(saved, true)} />
 		{/snippet}
 	</ReorderList>
 	{/key}

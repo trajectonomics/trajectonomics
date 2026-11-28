@@ -10,6 +10,7 @@ import { startDashboard } from "../scripts/serve"
 import { spawnCapture } from "../scripts/spawn"
 import type { PlanParams } from "../src/lib/snapshot"
 import { SCRATCH_ORIGIN, SCRATCH_PORT } from "./base-url"
+import { shapeRoutingPlan } from "./routing-plan"
 import { resolveScratchTraj } from "./scratch-cli"
 
 const PLANS = [
@@ -21,6 +22,7 @@ const PLANS = [
 	"labels-360",
 	"landed-notes-360",
 	"landed-order-360",
+	"row-order-360",
 ] as const
 const LOCKED_HOME_LOAN = 14444
 const PARAMS: PlanParams = {
@@ -56,6 +58,7 @@ async function run(argv: string[]): Promise<unknown> {
 }
 
 for (const name of PLANS) await run(["scenario", "fork", "separate", name])
+await shapeRoutingPlan(run, scratch, "row-order-360")
 
 /** The household of one plan with the holder and partner roles swapped, before `--from-stored` has run. */
 async function swapRoles(name: string): Promise<void> {
