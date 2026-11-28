@@ -6,7 +6,7 @@
  * where the fixed header's links sit, and the clearing is wider than the copy: the headline is at most
  * 56 rem wide and the subline and the install window 36 rem, so a 480 px radius holds every viewport, and
  * the phone, whose copy fills the hero, keeps no rim beside it at all. This layer sits in the drift
- * wrapper, which is inset 6%. The stage is now the copy and the demo window under it (ADR 0022), so the band
+ * wrapper, which is inset 6%. The stage is now the copy and the live window under it (ADR 0035), so the band
  * runs from a fifth of its height to three quarters of it, beside the window's top, and the clearing sits on the copy.
  */
 .hero-blast-rim {

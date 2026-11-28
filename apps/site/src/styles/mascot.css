@@ -11,9 +11,9 @@
 }
 
 /*
- * The hero: the robot peeks over the demo window's top edge, its hands resting on the title bar. The frame clips it,
- * so it climbs up from behind the edge (motion-mascot.css) and never covers a word of the chat. The negative bottom is
- * about the hands' half-height, so the fingers curl over the edge.
+ * The hero: the robot peeks over the live window's top edge, its hands resting on the title bar. The frame clips it,
+ * so it climbs up from behind the edge (motion-mascot.css) and never covers a word of the window's bar. The negative
+ * bottom is about the hands' half-height, so the fingers curl over the edge.
  */
 .mascot-peek {
 	position: absolute;

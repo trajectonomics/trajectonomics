@@ -40,7 +40,6 @@ export const THAI: LanguageEntry = Object.freeze({
 		openjotLink: "OpenJot",
 		repoLinkLabel: "ดาวบน GitHub",
 		cliInstallLink: "ติดตั้ง CLI โดยตรง",
-		demoLink: "ลองเดโม",
 		copy: "คัดลอกพรอมต์ให้เอเจนต์ของคุณ",
 		copied: "คัดลอกพรอมต์แล้ว",
 		copiedLabel: "คัดลอกแล้ว",

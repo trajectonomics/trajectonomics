@@ -33,7 +33,7 @@
 	max-width: 19rem;
 }
 
-/* The mascot peeks over the phone's top edge, as the home's does over the demo window (ADR 0027). */
+/* The mascot peeks over the phone's top edge, as the home's does over its live window (ADR 0027). */
 .openjot-hello {
 	position: absolute;
 	top: -52px;

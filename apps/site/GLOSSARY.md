@@ -127,7 +127,7 @@ A published Semantic Token Role a landmark paints behind its content, and the te
 _Avoid_: Background colour, band
 
 **Mascot**:
-The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is eleven poses, each a Gemini render cut out of a green screen into a transparent WebP. It peeks over the demo window and waves over its traj chat verdict. It holds a chart beside the Features heading, and each of the four small Features cards has its own pose that acts out the feature, each in a different place ([ADR 0028](docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md), [ADR 0029](docs/adr/0029-each-small-feature-card-puts-its-robot-somewhere-else.md)). It thinks beside the FAQ heading, waves above the closing call to action, sits in the footer, and is lost on the Not-found page. The home places it so a phone always has one on screen ([ADR 0027](docs/adr/0027-a-phone-always-has-the-mascot-on-screen.md)). It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
+The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is eleven poses, each a Gemini render cut out of a green screen into a transparent WebP. It peeks over the hero's live window. It holds a chart beside the Features heading, and each of the four small Features cards has its own pose that acts out the feature, each in a different place ([ADR 0028](docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md), [ADR 0029](docs/adr/0029-each-small-feature-card-puts-its-robot-somewhere-else.md)). It thinks beside the FAQ heading, waves above the closing call to action, sits in the footer, and is lost on the Not-found page. The home places it so a phone always has one on screen ([ADR 0027](docs/adr/0027-a-phone-always-has-the-mascot-on-screen.md)). It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
 _Avoid_: Bot icon, logo, avatar
 
 **Star snapshot**:
@@ -211,16 +211,12 @@ _Avoid_: Font limit, type limit
 The script text one page runs, uncompressed and under 10,000 bytes: inline scripts, same-origin files in the static import graph, and script preloads, each once. JSON-LD is data, not Program JavaScript. [ADR 0004 (landing page redesign)](docs/adr/0004-landing-page-redesign.md) raised the budget from ADR 0005's 5,000 bytes.
 _Avoid_: Bundle, JS payload
 
-**Reveal layer**:
-The one small script that sets the Demo window's stage and marks the chat on screen when the window's head first arrives, so the chat's timeline can play, and that wires the window's controls. It sequences nothing: the order and the timing are the timeline's, and the stylesheet only applies them. With no script, or with motion reduced, the window is complete and still.
-_Avoid_: Animation controller, trigger, observer
-
-**Demo window**:
-The hero's drawn picture of the app a visitor's agent runs in: a title bar, a sidebar with New chat and Recents, and a main pane holding one chat at a time. It plays the chat of the agent alone, then presses New chat and plays the chat with the traj Skill ([ADR 0022](docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)). Its composer is a picture and takes no input. With no script, or with motion reduced, both chats stand whole, one above the other.
-_Avoid_: Comparison, Before/After panels, mock app, chat widget
+**Live window**:
+The hero's window, which is the Hosted Demo itself in an iframe rather than a picture: its bar carries the window dots, the Dashboard's title, browser-style zoom, and the way out to `/demo/` ([ADR 0035](docs/adr/0035-the-hero-is-the-live-demo.md)). At zoom `z` the frame lays out at `1/z` of the visible box and is scaled by `z`, from 50% to 125%, and the controls ship disabled so a page with no script offers no zoom that cannot work. Nothing about the zoom is stored.
+_Avoid_: Demo window, chat widget, mock app, dashboard route
 
 **Hosted Demo**:
-The Dashboard's read-only build, `apps/web/dist-hosted/`, copied whole to `/demo/` by the Site's build and served as static assets, with a Content-Security-Policy scoped to `/demo/*` ([ADR 0031](docs/adr/0031-the-site-serves-the-hosted-demo-with-a-scoped-csp.md)). It is not the Demo window, which is a picture, and it is not a route: Workers Static Assets serves each file. No Demo page or asset is committed.
+The Dashboard's read-only build, `apps/web/dist-hosted/`, copied whole to `/demo/` by the Site's build and served as static assets, with a Content-Security-Policy scoped to `/demo/*` ([ADR 0031](docs/adr/0031-the-site-serves-the-hosted-demo-with-a-scoped-csp.md)). The hero's Live window embeds it. It is not a route: Workers Static Assets serves each file. No Demo page or asset is committed.
 _Avoid_: Live demo, hosted app, dashboard route
 
 **Web font**:

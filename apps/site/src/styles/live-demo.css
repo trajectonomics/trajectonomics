@@ -1,22 +1,16 @@
 /*
- * The live Demo on the home (ADR 0034): the hosted Dashboard in the hero window's frame, with
- * browser-style zoom (at zoom z the iframe lays out at 1/z of the box and is scaled by z). Every
- * colour is a Semantic Token Role, and the frame matches the hero's app window (ADR 0022).
+ * The hero's live window (ADR 0035): the hosted Dashboard in the frame the hero's drawn app window
+ * used to be, with browser-style zoom (at zoom z the iframe lays out at 1/z of the box and is scaled
+ * by z). Every colour is a Semantic Token Role. The window sits where the drawn one sat, so it takes
+ * no margin of its own: the hero's copy above it is the only gap.
  */
 
 .live {
-	margin-top: 40px;
 	overflow: hidden;
 	border: 1px solid var(--ds-color-border);
 	border-radius: 12px;
 	background: var(--ds-color-background);
 	color: var(--ds-color-foreground);
-}
-
-@media (min-width: 40rem) {
-	.live {
-		margin-top: 56px;
-	}
 }
 
 /* The bar wraps rather than overflowing: the title truncates, the controls stay whole. */

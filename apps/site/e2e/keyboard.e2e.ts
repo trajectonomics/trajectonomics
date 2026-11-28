@@ -25,19 +25,19 @@ for (const scheme of DEVICE_SCHEMES) {
 				// The Demo's own controls are a second document to walk through, which makes this the
 				// longest keyboard check; the extra room keeps a loaded machine from failing it.
 				test.setTimeout(60_000)
-				// Motion reduced, for this walk only, settles the hero's Demo window on its static state: the
-				// chat it would play swaps which controls are on screen mid-walk, and no fixed list of stops
-				// can hold still under that ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
+				// Motion reduced, for this walk only, settles the hero's load-in at once, so no control
+				// is still fading in or shifting the stops under the walk
+				// ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
 				await page.emulateMedia({ reducedMotion: "reduce" })
 				await openPage(page, underTest)
 				await expectShippedTheme(page)
 				const count = await focusableCount(page)
 				expect(count).toBeGreaterThan(0)
 				const visited: string[] = []
-				// The live Demo is a second document, not a control: Tab enters the Dashboard's own stops
-				// and leaves them at its end, and the Dashboard paints their rings (ADR 0034). Step over
-				// the frame, then judge the Site's next control without another press, so every control
-				// the Site ships is still reached and still paints its ring.
+				// The hero's live window is a second document, not a control: Tab enters the Dashboard's
+				// own stops and leaves them at its end, and the Dashboard paints their rings (ADR 0035).
+				// Step over the frame, then judge the Site's next control without another press, so every
+				// control the Site ships is still reached and still paints its ring.
 				let onControl = false
 				while (visited.length < count) {
 					if (!onControl) await page.keyboard.press("Tab")

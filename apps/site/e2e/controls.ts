@@ -15,8 +15,8 @@ export function focusableCount(page: Page): Promise<number> {
 			[...document.querySelectorAll(selector)].filter((element) => {
 				const panel = element.closest("details:not([open])")
 				if (panel !== null && element.tagName !== "SUMMARY") return false
-				// A control hidden at this width is out of the browser's tab order too, so it must
-				// not be counted here (the demo window's hidden chat is not laid out).
+				// A control the page does not lay out is out of the browser's tab order too, so only
+				// a control with client rects is counted.
 				return element.getClientRects().length > 0
 			}).length,
 		FOCUSABLE,

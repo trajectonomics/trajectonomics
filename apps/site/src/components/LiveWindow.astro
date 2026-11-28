@@ -12,60 +12,47 @@ const { dictionary } = Astro.props
 ---
 
 {/*
- * The hosted Dashboard, live on the home (ADR 0034): the real Demo in a framed window, fully
+ * The hero's window is the hosted Dashboard, live (ADR 0035): the real Demo in a framed window, fully
  * clickable. Its zoom works like browser zoom: at zoom z the iframe lays out at 1/z of the visible
  * box and is scaled by z, so a phone can zoom out and read the Dashboard's wide layout. The three
- * controls ship disabled, so a page with no script offers no control that cannot work (ADR 0022); the
+ * controls ship disabled, so a page with no script offers no control that cannot work (ADR 0035); the
  * iframe itself needs no script and stays usable at 100%. The script is inline, in the hero's style,
  * and its notes live here because every byte ships against the page's 10,000 (ADR 0005).
  */}
-<section id="demo" class="section-surface bg-background" data-live-demo>
-	<div class="section-inner">
-		<div class="section-head">
-			<p class="eyebrow">{dictionary.liveDemoEyebrow}</p>
-			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
-				{dictionary.liveDemoHeading}
-			</h2>
+<div class="live" data-live>
+	<div class="live-bar">
+		<span class="app-dots" aria-hidden="true"><i /><i /><i /></span>
+		<span class="live-title">{dictionary.liveDemoTitle}</span>
+		<div class="live-zoom" role="group" aria-label={dictionary.liveDemoZoom}>
+			<button type="button" data-live-out aria-label={dictionary.liveDemoZoomOut} disabled>
+				<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
+					<path d="M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+				</svg>
+			</button>
+			<button type="button" data-live-reset disabled>
+				<span data-live-level>100%</span><span class="sr-only"> {dictionary.liveDemoZoomReset}</span>
+			</button>
+			<button type="button" data-live-in aria-label={dictionary.liveDemoZoomIn} disabled>
+				<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
+					<path
+						d="M1 6h10M6 1v10"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"></path>
+				</svg>
+			</button>
 		</div>
-		<p class="section-lede mt-4 text-muted-foreground">{dictionary.liveDemoLead}</p>
-
-		<div class="live" data-live>
-			<div class="live-bar">
-				<span class="app-dots" aria-hidden="true"><i /><i /><i /></span>
-				<span class="live-title">{dictionary.liveDemoTitle}</span>
-				<div class="live-zoom" role="group" aria-label={dictionary.liveDemoZoom}>
-					<button type="button" data-live-out aria-label={dictionary.liveDemoZoomOut} disabled>
-						<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
-							<path d="M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-							></path>
-						</svg>
-					</button>
-					<button type="button" data-live-reset disabled>
-						<span data-live-level>100%</span><span class="sr-only"> {dictionary.liveDemoZoomReset}</span>
-					</button>
-					<button type="button" data-live-in aria-label={dictionary.liveDemoZoomIn} disabled>
-						<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
-							<path
-								d="M1 6h10M6 1v10"
-								stroke="currentColor"
-								stroke-width="1.5"
-								stroke-linecap="round"></path>
-						</svg>
-					</button>
-				</div>
-				<span class="sr-only" role="status" data-live-said></span>
-				<a class="live-open" href={DEMO_PATH}>{dictionary.liveDemoOpen}</a>
-			</div>
-			<div class="live-viewport" data-live-viewport style="--zoom:1">
-				<iframe
-					data-live-frame
-					src={DEMO_PATH}
-					title={dictionary.liveDemoFrameTitle}
-					loading="lazy"></iframe>
-			</div>
-		</div>
+		<span class="sr-only" role="status" data-live-said></span>
+		<a class="live-open" href={DEMO_PATH}>{dictionary.liveDemoOpen}</a>
 	</div>
-</section>
+	<div class="live-viewport" data-live-viewport style="--zoom:1">
+		<iframe
+			data-live-frame
+			src={DEMO_PATH}
+			title={dictionary.liveDemoFrameTitle}
+			loading="lazy"></iframe>
+	</div>
+</div>
 
 {/*
  * The zoom: one step per press through the eight browser-zoom steps, from 50% to 125%, starting at

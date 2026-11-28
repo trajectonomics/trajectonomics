@@ -11,9 +11,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 	actionYou: "You",
 	actionAgent: "Agent",
 	actionWithoutLabel: "Ask the agent alone",
-	actionWithoutNote: "Made up, then admitted when asked. No source, no date, nothing to check.",
 	actionWithLabel: "Agent + traj skill",
-	actionWithNote: "The figure came from the CLI, with the date it was computed. Nothing invented.",
 	actionGuesses: Object.freeze([
 		"Probably around 2040, if markets cooperate.",
 		"Closer to 2046. Hard to say.",
@@ -34,13 +32,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 	actionData: "I have 1.2M saved today and I put away 25,000 a month.",
 	actionSkillLine: "The traj skill records your balance, fills base.json and runs the CLI:",
 	actionProvenance: "traj fi · as of 31 Mar 2026",
-	replay: "Replay",
 	actionExampleNote: "Example output, abridged.",
-	appNewChat: "New chat",
-	appRecents: "Recents",
-	appTitleWithout: "Retirement age estimate",
-	appTitleWith: "Financial independence date",
-	appPlaceholder: "How can I help you today?",
 	featuresEyebrow: "Features",
 	featuresHeading: "Made for agents, built to be checked",
 	featureTitles: Object.freeze([

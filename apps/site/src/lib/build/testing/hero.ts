@@ -53,7 +53,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		`<h1>${headline}</h1>`,
 		`<p>${parts.subline ?? dictionary.heroSubline}</p>`,
 		installWindow(dictionary, parts),
-		`<p><a href="${DEMO_PATH}">${dictionary.demoLink}</a></p>`,
+		`<p><a href="${DEMO_PATH}">${dictionary.liveDemoOpen}</a></p>`,
 		'<p role="status"></p>',
 		"<section>",
 		`<h2>${dictionary.actionHeading}</h2>`,

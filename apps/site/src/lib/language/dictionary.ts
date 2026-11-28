@@ -53,12 +53,8 @@ export interface Dictionary extends LiveDemoWords {
 	readonly actionAgent: string
 	/** The left panel's tab: the agent asked alone. */
 	readonly actionWithoutLabel: string
-	/** The left panel's verdict under its transcript. */
-	readonly actionWithoutNote: string
 	/** The right panel's tab: the agent with the traj skill and CLI. */
 	readonly actionWithLabel: string
-	/** The right panel's verdict under its transcript. */
-	readonly actionWithNote: string
 	/** What the agent alone answers, twice, with a different guess each time. */
 	readonly actionGuesses: readonly string[]
 	/** The visitor's re-ask, which brings the contradictory second guess. */
@@ -87,20 +83,8 @@ export interface Dictionary extends LiveDemoWords {
 	readonly actionSkillLine: string
 	/** The date the figure was computed, under the agent's answer. */
 	readonly actionProvenance: string
-	/** The control that plays the demo window's two chats again. */
-	readonly replay: string
 	/** The caption under the output: it is an abridged example, not a live result. */
 	readonly actionExampleNote: string
-	/** The app window's New chat control, which opens the chat with the traj skill. */
-	readonly appNewChat: string
-	/** The label above the chats the window's sidebar lists. */
-	readonly appRecents: string
-	/** The title the agent alone's chat carries in the sidebar and above its transcript. */
-	readonly appTitleWithout: string
-	/** The title the chat with the traj skill carries in the sidebar and above its transcript. */
-	readonly appTitleWith: string
-	/** The composer's hint before anything is typed in it. */
-	readonly appPlaceholder: string
 	/** The small label above the Features heading. */
 	readonly featuresEyebrow: string
 	/** The Features section's `h2`. */
@@ -132,8 +116,6 @@ export interface Dictionary extends LiveDemoWords {
 	readonly ctaInstallLink: string
 	/** The way out under the prompt: the Docs Portal's CLI installation page, which needs no agent. */
 	readonly cliInstallLink: string
-	/** The hero's link to the hosted Demo Dashboard, under the demo window. */
-	readonly demoLink: string
 	readonly copy: string
 	/** What the toast announces once the prompt is on the clipboard. */
 	readonly copied: string

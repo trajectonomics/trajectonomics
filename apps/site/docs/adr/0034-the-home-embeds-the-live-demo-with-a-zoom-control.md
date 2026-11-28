@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by 0035
 ---
 
 # The home embeds the live Demo with a zoom control

@@ -98,23 +98,25 @@ describe("the Dictionary of every Language", () => {
 		}
 	})
 
-	it("names the demo window's own controls and chats, in both Languages", () => {
+	it("names the Answer engine file's one section, and keeps the retired window's controls out", () => {
 		const english = dictionaryFor("en")
 		expect(english.actionHeading).toBe("See it in action")
-		expect(english.appNewChat).toBe("New chat")
-		expect(english.appRecents).toBe("Recents")
-		expect(dictionaryFor("th").appNewChat).not.toBe(english.appNewChat)
 		for (const { language, dictionary } of LANGUAGES) {
-			// Two chats are listed side by side, so their titles must tell them apart.
-			expect({ language, apart: dictionary.appTitleWithout !== dictionary.appTitleWith }).toEqual({
-				language,
-				apart: true,
-			})
-			for (const key of ["appPlaceholder", "appTitleWithout", "appTitleWith"] as const) {
-				expect({ language, key, written: dictionary[key].trim().length > 0 }).toEqual({
+			for (const key of [
+				"actionWithoutNote",
+				"actionWithNote",
+				"replay",
+				"appNewChat",
+				"appRecents",
+				"appTitleWithout",
+				"appTitleWith",
+				"appPlaceholder",
+				"demoLink",
+			] as const) {
+				expect({ language, key, present: key in dictionary }).toEqual({
 					language,
 					key,
-					written: true,
+					present: false,
 				})
 			}
 		}

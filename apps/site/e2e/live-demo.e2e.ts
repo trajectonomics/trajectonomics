@@ -3,19 +3,19 @@ import { dictionaryFor } from "../src/lib/language/languages"
 import { DEMO_PATH } from "../src/lib/site"
 import { homeOf, openPage } from "./pages"
 
-/** The English home, whose live Demo section shows the hosted Dashboard (ADR 0034). */
+/** The English home, whose hero carries the hosted Dashboard in its window (ADR 0035). */
 const HOME = homeOf("en")
 
 /** That home's Dictionary. */
 const dictionary = dictionaryFor(HOME.language)
 
 /**
- * Open the home, scroll the live Demo section into view so its lazy iframe loads, and wait until the
+ * Open the home, scroll the hero's live window into view so its lazy iframe loads, and wait until the
  * Dashboard inside it has read the Snapshot. Returns the frame, so a check can drive the Dashboard.
  */
 async function openLiveDemo(page: Page) {
 	await openPage(page, HOME)
-	await page.locator("[data-live-demo]").scrollIntoViewIfNeeded()
+	await page.locator("[data-live]").scrollIntoViewIfNeeded()
 	const demo = page.frameLocator("iframe")
 	// The Dashboard's own Overview heading is the proof the frame runs the real build.
 	await expect(demo.getByRole("heading", { name: "Overview", level: 1 })).toBeVisible({
@@ -25,7 +25,7 @@ async function openLiveDemo(page: Page) {
 	return demo
 }
 
-test("the home embeds the real Dashboard and zooms it like browser zoom", async ({ page }) => {
+test("the hero embeds the real Dashboard and zooms it like browser zoom", async ({ page }) => {
 	await openLiveDemo(page)
 	await expect(page.getByRole("link", { name: dictionary.liveDemoOpen })).toHaveAttribute(
 		"href",
@@ -68,7 +68,7 @@ test("the home embeds the real Dashboard and zooms it like browser zoom", async 
 	await expect(page.locator("[data-live-said]")).toHaveText("125%")
 })
 
-test.describe("the live Demo on a phone", () => {
+test.describe("the hero's live window on a phone", () => {
 	test.use({ viewport: { width: 320, height: 720 } })
 
 	test("wraps its bar, keeps its controls visible and never scrolls the page sideways", async ({

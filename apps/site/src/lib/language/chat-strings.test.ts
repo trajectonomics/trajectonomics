@@ -18,8 +18,7 @@ describe("the strings the two conversations need", () => {
 		)
 		expect(english.actionGuessReason).toContain("7%")
 		expect(english.actionGuessReason).toContain("4%")
-		expect(english.actionWithoutNote).toContain("Made up")
-		expect(english.actionWithNote).toContain("CLI")
+		expect(english.actionWithoutLabel).toBe("Ask the agent alone")
 	})
 
 	it("takes the agent with traj from the guide question to the provenance line, in English", () => {
@@ -30,6 +29,7 @@ describe("the strings the two conversations need", () => {
 		expect(english.actionData).toContain("25,000")
 		expect(english.actionProvenance).toContain("traj fi")
 		expect(english.actionProvenance).toContain("2026")
+		expect(english.actionWithLabel).toBe("Agent + traj skill")
 	})
 
 	it("writes every new line in both Languages, and Thai is never the English line", () => {
@@ -45,12 +45,6 @@ describe("the strings the two conversations need", () => {
 			"actionNeedMore",
 			"actionData",
 			"actionProvenance",
-			"replay",
-			"appNewChat",
-			"appRecents",
-			"appTitleWithout",
-			"appTitleWith",
-			"appPlaceholder",
 		] as const
 		for (const { language, dictionary } of LANGUAGES) {
 			for (const key of keys) {
@@ -62,10 +56,5 @@ describe("the strings the two conversations need", () => {
 			}
 		}
 		expect(dictionaryFor("th").actionConfession).not.toBe(dictionaryFor("en").actionConfession)
-	})
-
-	it("names the one control the sections add, in every Language", () => {
-		expect(dictionaryFor("en").replay).toBe("Replay")
-		expect(dictionaryFor("th").replay).not.toBe("Replay")
 	})
 })

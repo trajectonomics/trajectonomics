@@ -15,11 +15,11 @@ describe("the Hero component in every Language", () => {
 			expect(headings(page).map((element) => element.tag)).toEqual(["h1"])
 		})
 
-		it(`carries the demo window inside the hero, after the copy, so it is seen on landing (${language})`, async () => {
+		it(`carries the live window inside the hero, after the copy, so it is seen on landing (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const hero = withAttribute(page, "data-hero")[0]
 			if (hero === undefined) throw new Error("the hero rendered no stage")
-			const windows = withAttribute(page, "data-app")
+			const windows = withAttribute(page, "data-live")
 			expect(windows).toHaveLength(1)
 			expect(windows[0]?.ancestors.includes(hero)).toBe(true)
 			const h1 = elementsByTag(page, "h1")[0]
@@ -34,7 +34,7 @@ describe("the Hero component in every Language", () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const hero = withAttribute(page, "data-hero")[0]
 			const blast = withClass(page, "hero-blast")[0]
-			const window = withAttribute(page, "data-app")[0]
+			const window = withAttribute(page, "data-live")[0]
 			if (hero === undefined || blast === undefined || window === undefined)
 				throw new Error("the hero lost its field or its window")
 			// The field is a direct child of the stage, so it spans the copy and the window.
@@ -79,13 +79,25 @@ describe("the Hero component in every Language", () => {
 			expect(codes).toContain("traj")
 		})
 
-		it(`links the hosted Demo under the window (${language})`, async () => {
+		it(`carries the way out to the hosted Demo in the window's bar, and no link under it (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const link = elementsByTag(page, "a").find(
 				(anchor) => anchor.attributes["href"] === DEMO_PATH,
 			)
 			if (link === undefined) throw new Error("the hero rendered no demo link")
-			expect(textOf(page, link)).toBe(dictionary.demoLink)
+			expect(textOf(page, link)).toBe(dictionary.liveDemoOpen)
+			const bar = withClass(page, "live-bar")[0]
+			if (bar === undefined) throw new Error("the hero rendered no window bar")
+			expect(link.ancestors.includes(bar)).toBe(true)
+			expect(withClass(page, "hero-demo")).toEqual([])
+		})
+
+		it(`names the window's anchor on the wrapper the window sits in (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const anchor = page.elements.find((element) => element.attributes["id"] === "demo")
+			if (anchor === undefined) throw new Error("the hero rendered no #demo anchor")
+			expect(anchor.attributes["class"]).toContain("hero-app")
+			expect(withAttribute(page, "data-live")[0]?.ancestors.includes(anchor)).toBe(true)
 		})
 
 		it(`carries no facts strip, which belongs to the footer (${language})`, async () => {
@@ -120,6 +132,9 @@ describe("the Hero component in every Language", () => {
 			expect(withAttribute(page, "data-ripple").length).toBe(1)
 			expect(withAttribute(page, "data-pointer-glow")).toEqual([])
 			expect(html).toContain('addEventListener("click"')
+			// A click inside the live window is the window's, not the ground's.
+			expect(html).toContain("[data-live]")
+			expect(html).not.toContain("[data-app]")
 			expect(html).not.toContain("pointermove")
 			expect(html).not.toContain("pointerleave")
 		})
