@@ -29,6 +29,31 @@ export type MeterHour = {
 }
 
 /**
+ * Whether a usage row's model draws on the plan's sampled quota meter. Antigravity's sampler reads
+ * only the Gemini quota buckets (`gemini-5h`, `gemini-weekly`), so third-party models billed under
+ * its separate `3p-*` pool are left out of Antigravity's meter hours.
+ */
+function countsTowardPlanMeter(plan: string, model: string): boolean {
+	if (plan !== "antigravity") return true
+	const lower = model.toLowerCase()
+	return lower.startsWith("gemini-") || lower === "unknown-gemini"
+}
+
+function rowCost(row: MeterHourRow): number | null {
+	const price = modelPriceOn(row.model)
+	if (price === null) return null
+	return tokenCost(
+		{
+			tokensIn: row.tokens_in,
+			tokensOut: row.tokens_out,
+			cacheRead: row.cache_read,
+			cacheWrite: row.cache_write,
+		},
+		price,
+	)
+}
+
+/**
  * Each plan's hours keyed by epoch hour. Summed per hour: a null `usd` makes the whole hour null,
  * because pricing only part of an hour would price a mix we never ran.
  */
@@ -37,6 +62,7 @@ export function meterHoursByPlan(
 ): Map<string, Map<number, MeterHour>> {
 	const plans = new Map<string, Map<number, MeterHour>>()
 	for (const row of rows) {
+		if (!countsTowardPlanMeter(row.plan, row.model)) continue
 		let hours = plans.get(row.plan)
 		if (hours === undefined) {
 			hours = new Map()
@@ -44,23 +70,10 @@ export function meterHoursByPlan(
 		}
 		const key = hourKey(row.hour_utc)
 		const hour = hours.get(key) ?? { uncached: 0, processed: 0, usd: 0 }
-		const total = row.tokens_total
-		const price = modelPriceOn(row.model)
-		const cost =
-			price === null
-				? null
-				: tokenCost(
-						{
-							tokensIn: row.tokens_in,
-							tokensOut: row.tokens_out,
-							cacheRead: row.cache_read,
-							cacheWrite: row.cache_write,
-						},
-						price,
-					)
+		const cost = rowCost(row)
 		hours.set(key, {
-			uncached: hour.uncached + Math.max(0, total - (row.cache_read ?? 0)),
-			processed: hour.processed + total,
+			uncached: hour.uncached + Math.max(0, row.tokens_total - (row.cache_read ?? 0)),
+			processed: hour.processed + row.tokens_total,
 			usd: hour.usd === null || cost === null ? null : hour.usd + cost,
 		})
 	}

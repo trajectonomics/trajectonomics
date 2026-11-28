@@ -3,6 +3,13 @@ import type { QuotaRow } from "../types"
 import { claudeCredential, openCodeCredential, skipReason } from "./credentials"
 import { type FetchLike, fetchQuotaRows } from "./fetch"
 import { parseClaudeQuota, parseOpenCodeQuota } from "./parse"
+import { sampleAntigravity, sampleCursor, sampleMuse } from "./sample-extra"
+
+/** Result of running a local CLI quota command; null means the binary could not be spawned. */
+export type CommandResult = { exitCode: number; stdout: string } | null
+
+/** Runs one local command without a shell; tests inject a fake. */
+export type CommandRunner = (argv: readonly string[]) => Promise<CommandResult>
 
 /** Everything one sample run needs, injected so tests touch no network and no real home. */
 export type SampleDeps = {
@@ -11,6 +18,12 @@ export type SampleDeps = {
 	fetch: FetchLike
 	readText: (path: string) => string | null
 	log: (line: string) => void
+	/** Finds the local Antigravity OAuth token file; omitted or null skips Antigravity. */
+	antigravityTokenPath?: (home: string) => string | null
+	/** Resolves the `muse` CLI path; defaults to `"muse"`. */
+	museBinary?: (home: string) => string
+	/** Runs `muse usage --json`; omitted skips Muse. */
+	runCommand?: CommandRunner
 }
 
 const HOUR_MS = 3_600_000
@@ -63,12 +76,15 @@ async function safely(
 	}
 }
 
-/** Samples both quota plans at the start of the current UTC hour; never throws. */
+/** Samples all supported quota plans at the start of the current UTC hour; never throws. */
 export async function sampleQuota(deps: SampleDeps): Promise<QuotaRow[]> {
 	const sampledAt = hourStartUtc(deps.nowMs)
 	const groups = await Promise.all([
 		safely("claude", () => sampleClaude(deps, sampledAt), deps.log),
 		safely("opencode-go", () => sampleOpenCode(deps, sampledAt), deps.log),
+		safely("antigravity", () => sampleAntigravity(deps, sampledAt), deps.log),
+		safely("cursor", () => sampleCursor(deps, sampledAt), deps.log),
+		safely("meta", () => sampleMuse(deps, sampledAt), deps.log),
 	])
 	return groups.flat()
 }
