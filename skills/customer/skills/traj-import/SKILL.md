@@ -14,6 +14,32 @@ the gap.
 
 The job: one statement becomes ledger rows once, correctly, and the person is shown a proof.
 
+## When something is missing, update the skills first
+
+A **gap** is any of these: `traj schema` lacks a command, a flag or an error code this Recipe tells
+you to use, or lists a command for a job this Recipe does not cover; the command line's version is
+past this skill's CLI Range in its frontmatter; or the job's row is missing from
+`skills.manifest.json` at the pin, or the scope has no pin.
+
+When you find one, update the installed traj skills first, once, at most, in the session, and say in
+one sentence that you updated them because of the gap you named:
+
+```bash
+npx -y skills@1.9.0 update traj-onboarding traj traj-import traj-review traj-plan -g -y
+```
+
+The five names are explicit, so the person's other skills stay untouched; use `-p` in place of `-g`
+when the copy you follow is a project copy. Then read the lock's `commit` for `traj` again, read this
+skill again at the `path` the list for that scope reports (`npx -y skills@1.9.0 list -g --json`, or
+`npx -y skills@1.9.0 list --json` for a project copy), and follow that newer copy. Re-check the gap
+against it.
+
+When the gap remains, or the update fails — offline, or a Node older than the 22.20 `skills@1.9.0`
+needs — stop and say what is missing, rather than filling the gap. When only the range is past, go
+on as the schema allows, and say in one sentence the range this skill was checked through and that
+`traj schema` is authoritative where the two differ. Never retry the update in the same session. An
+older command line is not a gap: it is fixed by updating the CLI, not the skills.
+
 ## Before the first row
 
 Collect these, and ask for whichever is missing:

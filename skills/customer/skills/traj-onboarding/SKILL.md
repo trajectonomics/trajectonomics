@@ -113,7 +113,8 @@ setup stopped here, with the entry's `source` and its hash (`skillFolderHash` in
 and install nothing else. Say what the person can do: `skills@1.9.0` needs Node 22.20 or later, and
 they can run `npx -y skills@1.9.0 add … -g -y` themselves, then run setup again. Treat it as a
 failed step (see below). Never install from `main` past that first global install of
-`traj-onboarding`: a branch moves, and a person's setup must not.
+`traj-onboarding`: a branch moves, and a person's setup must not; an `update` is the one sanctioned
+way the pin moves forward.
 
 **A project copy.** When the copy you are following sits in a project folder rather than at a `path`
 the global list reports, it stays. A project copy that was already there stays: never delete it, and say in
@@ -157,9 +158,18 @@ and that nothing is installed or downloaded to fix it. Setup still finishes.
 
 **Above a range.** Read the CLI Range each installed skill states in its own frontmatter. When the
 version that printed is past a range's upper bound — a pre-release of that bound's minor counts as
-past it — say so in one sentence before the handover: name each such skill, the range it was checked
-through, and that `traj schema` is authoritative where the two differ. Say nothing when every
-installed skill's range still covers the command line.
+past it — update the installed traj skills once, at most, in the session, before the disclosure:
+
+```bash
+npx -y skills@1.9.0 update traj-onboarding traj traj-import traj-review traj-plan -g -y
+```
+
+This updates the global set setup installed; a project copy that stays is not touched, and the global copy is the one you re-read. Say in one sentence that you updated them because of the gap, then read the global lock's `commit`
+for `traj` again — it is the new pin — read each skill again at the `path` the global list reports,
+and re-read its range. When a skill is still past its range, or the update failed — offline, or a Node
+older than the 22.20 `skills@1.9.0` needs — say so in one sentence before the handover: name each such
+skill, the range it was checked through, and that `traj schema` is authoritative where the two
+differ. Say nothing when every installed skill's range still covers the command line.
 
 - Every number you give them is one `traj` returned. The tool owns what its own command surface
   lists — balances, and, from the floor up, projections, a financial-independence date and Thai tax;
@@ -218,11 +228,12 @@ in this conversation.
 Tell them, once, before the handover:
 
 - **What was installed.** Name it in one short paragraph from what you hold, so they can say which
-  set they run when they come back: the `commit` from step 2 as the skills' version, the rows you
-  installed (and any you skipped, with the range each wanted), the `traj --version` that printed, and
-  the CLI Range this skill's own frontmatter `cli` states, which is the range of command lines it
-  expects. The `commit` is the set's version: the version in this skill's frontmatter is this
-  skill's own, and is not the set's. Name nothing you did not read, and no number from memory.
+  set they run when they come back: the `commit` the global lock records for `traj` now, as the
+  skills' version, the rows you installed (and any you skipped, with the range each wanted), the
+  `traj --version` that printed, and the CLI Range this skill's own frontmatter `cli` states, which is
+  the range of command lines it expects. The `commit` is the set's version: the version in this
+  skill's frontmatter is this skill's own, and is not the set's. Name nothing you did not read, and
+  no number from memory.
 - **Where the data lives.** Everything is in `~/.traj`, and `TRAJ_HOME` moves it. The ledger never
   leaves this machine: its figures, accounts and documents are computed and kept here, and no command
   sends them anywhere. Setup itself reaches the network twice, and only twice — the binary download,
