@@ -1,8 +1,9 @@
 import { shortDay } from "./collecting"
+import type { HourlyRow } from "./hourly-types"
 import { mondayOf } from "./period"
 import { comparePlans, planName } from "./plans"
 import { chartSeries } from "./series"
-import type { ChartSeries, HourlyRow, UsageRow } from "./types"
+import type { ChartSeries, UsageRow } from "./types"
 
 /** The daily buckets: one line per plan over the window's days. */
 export function daySeries(rows: readonly UsageRow[], days: readonly string[]): ChartSeries[] {

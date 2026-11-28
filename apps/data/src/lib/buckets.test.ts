@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { dayOnlyNote, dayOnlyPlans, daySeries, hourSeries, weekSeries } from "./buckets"
-import type { HourlyRow, UsageRow } from "./types"
+import type { HourlyRow } from "./hourly-types"
+import type { UsageRow } from "./types"
 
 function row(overrides: Partial<UsageRow> = {}): UsageRow {
 	return {

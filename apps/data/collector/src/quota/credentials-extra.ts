@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, statSync } from "node:fs"
 import { join } from "node:path"
-import { asObject, type Credential, parseObject } from "./credentials"
+import { asObject, type Credential, parseObject, readTextFile } from "./credentials"
 
 function checkExpiry(expiry: unknown, nowMs: number): "ok" | "expired" | "malformed" {
 	if (expiry === undefined || expiry === null) return "ok"
@@ -44,7 +44,10 @@ export function cursorCredential(contents: string | null, nowMs: number): Creden
 }
 
 function listAntigravityCandidates(home: string): string[] {
-	const candidates = [join(home, ".gemini/antigravity/antigravity-oauth-token")]
+	const candidates = [
+		join(home, ".gemini/antigravity/antigravity-oauth-token"),
+		join(home, ".gemini/antigravity-cli/antigravity-oauth-token"),
+	]
 	const providersDir = join(home, ".t3/userdata/providers/antigravity")
 	try {
 		for (const entry of readdirSync(providersDir)) {
@@ -56,19 +59,44 @@ function listAntigravityCandidates(home: string): string[] {
 	return candidates
 }
 
-/** Returns the newest Antigravity OAuth token file under `$HOME`, or null when none exist. */
-export function findAntigravityTokenPath(home: string): string | null {
+type AntigravityCandidate = { path: string; mtimeMs: number; expiryMs: number | null }
+
+function antigravityExpiryMs(contents: string | null): number | null {
+	if (contents === null) return null
+	const expiry = asObject(parseObject(contents)?.["token"])?.["expiry"]
+	if (typeof expiry !== "string") return null
+	const ms = Date.parse(expiry)
+	return Number.isNaN(ms) ? null : ms
+}
+
+/**
+ * Returns the best Antigravity OAuth token file under `$HOME`, or null when none exist. A token's
+ * own expiry is preferred so a valid token wins over a newer expired one; the file mtime ranks a
+ * token that states no usable expiry.
+ */
+export function findAntigravityTokenPath(
+	home: string,
+	readText: (path: string) => string | null = readTextFile,
+): string | null {
 	let bestPath: string | null = null
-	let bestMtime = -1
+	let bestRank = Number.NEGATIVE_INFINITY
 	for (const path of listAntigravityCandidates(home)) {
+		let mtimeMs: number
 		try {
-			const mtime = statSync(path).mtimeMs
-			if (mtime > bestMtime) {
-				bestMtime = mtime
-				bestPath = path
-			}
+			mtimeMs = statSync(path).mtimeMs
 		} catch {
 			// Candidate absent.
+			continue
+		}
+		const candidate: AntigravityCandidate = {
+			path,
+			mtimeMs,
+			expiryMs: antigravityExpiryMs(readText(path)),
+		}
+		const rank = candidate.expiryMs ?? candidate.mtimeMs
+		if (rank > bestRank) {
+			bestRank = rank
+			bestPath = candidate.path
 		}
 	}
 	return bestPath
@@ -78,4 +106,10 @@ export function findAntigravityTokenPath(home: string): string | null {
 export function resolveMuseBinary(home: string): string {
 	const localBin = join(home, ".local/bin/muse")
 	return existsSync(localBin) ? localBin : "muse"
+}
+
+/** Resolves the `agy` CLI, preferring `~/.local/bin/agy` for minimal systemd PATHs. */
+export function resolveAgyBinary(home: string): string {
+	const localBin = join(home, ".local/bin/agy")
+	return existsSync(localBin) ? localBin : "agy"
 }

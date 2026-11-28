@@ -1,5 +1,6 @@
 import type { D1Database } from "@cloudflare/workers-types"
 import type { CollectorRow } from "../core/collectors"
+import type { MeterReadingRow, RecentPlanRow } from "../core/meters"
 
 const SESSION_LOOKUP =
 	"SELECT auth_user_id FROM web_session WHERE session_hash = ? AND expires_at > ?"
@@ -15,9 +16,33 @@ JOIN usage_hourly u ON u.contributor_id = c.id
 WHERE s.session_hash = ? AND s.expires_at > ?
 GROUP BY u.machine
 ORDER BY last_received_at DESC, u.machine`
+const METER_READINGS = `
+SELECT q.plan AS plan,
+	MAX(q.sampled_at) AS last_sampled_at
+FROM web_session s
+JOIN contributor c ON c.auth_user_id = s.auth_user_id
+JOIN quota_sample q ON q.contributor_id = c.id
+WHERE s.session_hash = ? AND s.expires_at > ?
+GROUP BY q.plan
+ORDER BY q.plan`
+const RECENT_PLANS = `
+SELECT DISTINCT u.plan AS plan
+FROM web_session s
+JOIN contributor c ON c.auth_user_id = s.auth_user_id
+JOIN usage_hourly u ON u.contributor_id = c.id
+WHERE s.session_hash = ? AND s.expires_at > ? AND u.hour_utc >= ?
+ORDER BY u.plan`
 
-/** What a session read answers: whether it signed in, and the collectors it may see. */
-export type CollectorRead = { signedIn: boolean; rows: CollectorRow[] }
+/** How far back a usage row still counts as a plan in recent use. */
+const RECENT_USE_MS = 7 * 86_400_000
+
+/** What a session read answers: whether it signed in, and the collectors and meters it may see. */
+export type CollectorRead = {
+	signedIn: boolean
+	rows: CollectorRow[]
+	readings: MeterReadingRow[]
+	recentPlans: RecentPlanRow[]
+}
 
 type BatchRow = { results?: unknown[] }
 
@@ -53,19 +78,26 @@ export async function deleteWebSession(db: D1Database, sessionHash: string): Pro
 }
 
 /**
- * Reads the session and its collectors in one batch of two statements: the session statement
- * decides signed-in or not, and the second joins through the session so it needs no round trip.
+ * Reads the session, its collectors and its usage meters in one batch of four statements: the
+ * session statement decides signed-in or not, and the rest join through the session so they need no
+ * round trip. The meter statements return the newest reading per plan, and the plans used in the
+ * last seven days.
  */
 export async function readCollectors(
 	db: D1Database,
 	sessionHash: string,
 	nowIso: string,
 ): Promise<CollectorRead> {
+	const sinceIso = new Date(Date.parse(nowIso) - RECENT_USE_MS).toISOString()
 	const results = (await db.batch([
 		db.prepare(SESSION_LOOKUP).bind(sessionHash, nowIso),
 		db.prepare(COLLECTORS).bind(sessionHash, nowIso),
+		db.prepare(METER_READINGS).bind(sessionHash, nowIso),
+		db.prepare(RECENT_PLANS).bind(sessionHash, nowIso, sinceIso),
 	])) as BatchRow[]
 	const sessions = (results[0]?.results ?? []) as { auth_user_id: string }[]
 	const rows = (results[1]?.results ?? []) as CollectorRow[]
-	return { signedIn: sessions.length > 0, rows }
+	const readings = (results[2]?.results ?? []) as MeterReadingRow[]
+	const recentPlans = (results[3]?.results ?? []) as RecentPlanRow[]
+	return { signedIn: sessions.length > 0, rows, readings, recentPlans }
 }

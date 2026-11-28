@@ -1,5 +1,6 @@
 import { collectorsView } from "../core/collectors"
 import { sha256Hex } from "../core/hash"
+import { metersView } from "../core/meters"
 import { clearCookie, parseCookies, SESSION_COOKIE, SESSION_COOKIE_PATH } from "../core/web-auth"
 import { readCollectors } from "../db/web-session"
 import type { Env, RequestContext } from "../env"
@@ -14,8 +15,9 @@ function signedOut(clearSession: boolean): Response {
 }
 
 /**
- * `GET /data/api/me/collectors`: the signed-in person's machines, read through their session and
- * never mixed into a rollup or a public cache (ADR 0015). An absent or expired session is 401.
+ * `GET /data/api/me/collectors`: the signed-in person's machines and usage meters, read through
+ * their session and never mixed into a rollup or a public cache (ADR 0015). An absent or expired
+ * session is 401.
  */
 export async function handleMeCollectors(
 	request: Request,
@@ -31,7 +33,13 @@ export async function handleMeCollectors(
 			new Date(context.nowMs).toISOString(),
 		)
 		if (!read.signedIn) return signedOut(true)
-		return json({ collectors: collectorsView(read.rows) }, { headers: NO_STORE })
+		return json(
+			{
+				collectors: collectorsView(read.rows),
+				meters: metersView(read.readings, read.recentPlans, context.nowMs),
+			},
+			{ headers: NO_STORE },
+		)
 	} catch (error) {
 		console.error("data: collectors read failed", error)
 		return json({ error: "storage_error" }, { status: 503, headers: NO_STORE })

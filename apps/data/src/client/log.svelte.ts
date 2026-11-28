@@ -1,3 +1,4 @@
+import type { HourlyPayload } from "../lib/hourly-types"
 import {
 	type BucketKind,
 	DEFAULT_PERIOD,
@@ -5,7 +6,7 @@ import {
 	periodWindow,
 	resolveBucket,
 } from "../lib/period"
-import type { Health, HourlyPayload, UsagePayload } from "../lib/types"
+import type { Health, UsagePayload } from "../lib/types"
 import { type DayWindow, utcDay } from "../lib/window"
 import { loadLog } from "./api"
 

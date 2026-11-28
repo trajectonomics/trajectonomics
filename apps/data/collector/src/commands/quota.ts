@@ -1,6 +1,10 @@
 import { homedir } from "node:os"
 import { readTextFile } from "../quota/credentials"
-import { findAntigravityTokenPath, resolveMuseBinary } from "../quota/credentials-extra"
+import {
+	findAntigravityTokenPath,
+	resolveAgyBinary,
+	resolveMuseBinary,
+} from "../quota/credentials-extra"
 import { type CommandResult, type CommandRunner, sampleQuota } from "../quota/sample"
 import { fail } from "./errors"
 
@@ -64,6 +68,7 @@ export async function runQuotaCommand(argv: readonly string[]): Promise<void> {
 		log: (line) => console.error(line),
 		antigravityTokenPath: findAntigravityTokenPath,
 		museBinary: resolveMuseBinary,
+		agyBinary: resolveAgyBinary,
 		runCommand: defaultRunner,
 	})
 	for (const row of rows) console.log(JSON.stringify({ kind: "quota", ...row }))

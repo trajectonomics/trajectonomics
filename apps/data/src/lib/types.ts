@@ -1,10 +1,12 @@
 import type { Collector } from "../core/collectors"
+import type { Meter } from "../core/meters"
 
-export type { Collector }
+export type { Collector, Meter }
 
 /** The body of the signed-in collectors read. */
 export type CollectorsPayload = {
 	collectors: Collector[]
+	meters: Meter[]
 }
 
 /** One row of the usage API; it carries no machine, contributor or hour. */
@@ -28,24 +30,6 @@ export type UsagePayload = {
 	methodVersion: number
 	series: string
 	rows: UsageRow[]
-}
-
-/** One row of the hourly usage API: the org's sum for one plan at one UTC hour. */
-export type HourlyRow = {
-	hourUtc: string
-	plan: string
-	tokensTotal: number
-	requests: number
-}
-
-/** The body of the hourly usage API. */
-export type HourlyPayload = {
-	asOf: string
-	methodVersion: number
-	series: string
-	from: string
-	to: string
-	rows: HourlyRow[]
 }
 
 /** The body of the health API; an older cached body has neither collected-day field. */

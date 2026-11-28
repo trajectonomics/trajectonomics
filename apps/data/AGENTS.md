@@ -73,3 +73,5 @@ redirects its pages (ADR 0006).
 - The device-login polling counts against auth's `/api/auth/oauth2/token` rate limit (20 requests
   per 60 s per IP). Signing several hosts in behind one IP and then sending at once can get HTTP 429
   on the first token refresh; it clears within a minute.
+- A quota sampler that skips (expired sign-in) exits 0 and only logs; the Usage meters panel on
+  `/data/me` is where a stopped meter shows.

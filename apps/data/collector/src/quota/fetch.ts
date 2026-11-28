@@ -59,5 +59,6 @@ export async function fetchQuotaRows(
 		deps.log(`quota: ${plan} unexpected body (HTTP ${response.status})`)
 		return []
 	}
+	deps.log(`quota: ${plan} sampled ${rows.length} rows`)
 	return rows
 }

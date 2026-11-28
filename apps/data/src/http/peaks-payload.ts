@@ -4,6 +4,14 @@ import { type MeterHourRow, meterHoursByPlan } from "../core/meter-hours"
 import { peaksByPlanAndTier } from "../core/peaks"
 import type { PeakDbRow, QuotaDbRow } from "../db/read"
 
+/**
+ * The name of the tier a plan ran on a UTC day, or null when the plan's catalogue has none. Both
+ * sides of a tier comparison go through here, so an unknown tier compares equal to itself.
+ */
+function tierNameOn(plan: string, day: string): string | null {
+	return tierOn(plan, day)?.name ?? null
+}
+
 /** Each plan's quota readings, with their windows, in the order the read returned them. */
 function readingsByPlan(rows: readonly QuotaDbRow[]): Map<string, QuotaReadingWindow[]> {
 	const plans = new Map<string, QuotaReadingWindow[]>()
@@ -47,15 +55,15 @@ export function peaksPayload(
 			tokensTotal: row.tokens_total,
 			cacheRead: row.cache_read,
 		})),
-		(plan, day) => tierOn(plan, day)?.name ?? null,
+		(plan, day) => tierNameOn(plan, day),
 	).map((entry) => {
-		const tier = tierOn(entry.plan, asOf)?.name ?? null
+		const tier = tierNameOn(entry.plan, asOf)
 		const current = entry.tiers.find((peaks) => peaks.tier === tier)
 		const limits = planLimits(
 			entry.plan,
 			// Only readings taken on the current tier: another tier's meter measures another limit.
 			(readings.get(entry.plan) ?? []).filter(
-				(reading) => tierOn(entry.plan, reading.sampledAt.slice(0, 10))?.name === tier,
+				(reading) => tierNameOn(entry.plan, reading.sampledAt.slice(0, 10)) === tier,
 			),
 			hours.get(entry.plan) ?? new Map(),
 		)

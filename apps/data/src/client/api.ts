@@ -1,12 +1,7 @@
+import type { HourlyPayload } from "../lib/hourly-types"
 import type { BucketKind } from "../lib/period"
 import { API_PATH, COLLECTORS_PATH } from "../lib/site"
-import type {
-	CollectorsPayload,
-	Health,
-	HourlyPayload,
-	PeaksPayload,
-	UsagePayload,
-} from "../lib/types"
+import type { CollectorsPayload, Health, PeaksPayload, UsagePayload } from "../lib/types"
 import type { DayWindow } from "../lib/window"
 
 /** The three reads the overview needs; peaks may be absent when that read fails. */
@@ -92,16 +87,15 @@ export async function loadLog(
 }
 
 /**
- * Reads the signed-in person's collectors. A 401 is a signed-out browser, not an error; the page
- * then offers the one sign-in action instead of a failure panel.
+ * Reads the signed-in person's collectors and usage meters. A 401 is a signed-out browser, not an
+ * error; the page then offers the one sign-in action instead of a failure panel.
  */
-export async function loadCollectors(): Promise<CollectorsPayload["collectors"] | null> {
+export async function loadCollectors(): Promise<CollectorsPayload | null> {
 	const response = await fetch(COLLECTORS_PATH, {
 		headers: { accept: "application/json" },
 		credentials: "same-origin",
 	})
 	if (response.status === 401) return null
 	if (!response.ok) throw new Error(`${COLLECTORS_PATH} answered ${response.status}`)
-	const body = (await response.json()) as CollectorsPayload
-	return body.collectors
+	return (await response.json()) as CollectorsPayload
 }
