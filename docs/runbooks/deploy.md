@@ -82,7 +82,8 @@ migrations. The workflow applies `apps/data/migrations` with
 `bunx wrangler d1 migrations apply traj-data --remote` before it deploys the Worker, which declares
 its zone route. Its old host `data.trajectonomics.com` stays attached: it redirects its pages to
 `/data`, and it still answers `/api/*` and `/ingest`. The first deploy needs no secret:
-`/data/ingest` answers 401 until a collector signs in (`login`) and `ORG_AUTH_USER_ID` is set.
+`/data/ingest` answers 401 to any request without a valid auth token, and
+`403 not_a_contributor` to a signed-in collector until `ORG_AUTH_USER_ID` binds the org (below).
 
 ```sh
 cd apps/data

@@ -178,8 +178,11 @@ TRAJ_DATA_ALLOW_TOKEN_URL=1 bun apps/data/collector/src/cli.ts send \
 The URL defaults to `https://trajectonomics.com/data/ingest`; `TRAJ_DATA_URL` overrides it when
 `--url` is absent. Sending requires a signed-in machine: the sender reads
 `~/.config/traj-data/credentials.json` and refuses to run when it is absent, telling you to run
-`login`. A lapsed sign-in shows up as the "no ingest for 3 hours" health warning, and running
-`login` again fixes it.
+`login`. A lapsed sign-in fails that runner's hourly unit (exit 1, "sign-in expired" in its
+journal), and running `login` again fixes it. The "no ingest for 3 hours" health warning fires only
+when every runner has stopped, so check each runner's journal, or its last send on `/data/me/`.
+A local `wrangler dev` also needs `ORG_AUTH_USER_ID` in its variables (`.dev.vars`), or ingest
+answers `403 not_a_contributor`.
 
 A sign-in token goes only to `https://trajectonomics.com` or `https://data.trajectonomics.com`.
 For any other URL the sender fails before refreshing: set `TRAJ_DATA_ALLOW_TOKEN_URL=1` when the
@@ -261,8 +264,9 @@ send failed, after trying everything.
    ```
 
    It writes `~/.config/traj-data/credentials.json` (mode 600). Sending requires that file; a
-   lapsed sign-in shows up as the "no ingest for 3 hours" health warning, and running `login`
-   again fixes it.
+   lapsed sign-in fails the hourly unit with "sign-in expired" in its journal, and running `login`
+   again fixes it. A host that sent with the retired key still has `~/.config/traj-data/ingest.key`;
+   delete it (`rm -f ~/.config/traj-data/ingest.key`), since nothing reads it any more.
 
 3. Write `~/.config/traj-data/hosts.json` from
    [`deploy/hosts.example.json`](deploy/hosts.example.json), with absolute paths that exist on each

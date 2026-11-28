@@ -135,25 +135,28 @@ describe("POST /ingest with an auth token", () => {
 		// The retired secret's name must not bring its value back into the auth path.
 		const env = { ...context.env, INGEST_BOOTSTRAP_KEY: bearer } as unknown as Env
 		const logged = spyOn(console, "error").mockImplementation(() => {})
-		const apex = await handleRequest(request(bearer, { usage: [usageRow()] }), env, {
-			nowMs: NOW_MS,
-		})
-		expect(apex.status).toBe(401)
-		expect(await apex.json()).toEqual({ error: "unauthorized" })
-		const old = await handleRequest(
-			new Request(`https://${LEGACY_HOST}/ingest`, {
-				method: "POST",
-				headers: { authorization: `Bearer ${bearer}`, "content-type": "application/json" },
-				body: JSON.stringify({ usage: [usageRow()] }),
-			}),
-			env,
-			{ nowMs: NOW_MS },
-		)
-		expect(old.status).toBe(401)
-		expect(await old.json()).toEqual({ error: "unauthorized" })
-		expect(count(context, "usage_hourly")).toBe(0)
-		expect(logged).not.toHaveBeenCalled()
-		logged.mockRestore()
+		try {
+			const apex = await handleRequest(request(bearer, { usage: [usageRow()] }), env, {
+				nowMs: NOW_MS,
+			})
+			expect(apex.status).toBe(401)
+			expect(await apex.json()).toEqual({ error: "unauthorized" })
+			const old = await handleRequest(
+				new Request(`https://${LEGACY_HOST}/ingest`, {
+					method: "POST",
+					headers: { authorization: `Bearer ${bearer}`, "content-type": "application/json" },
+					body: JSON.stringify({ usage: [usageRow()] }),
+				}),
+				env,
+				{ nowMs: NOW_MS },
+			)
+			expect(old.status).toBe(401)
+			expect(await old.json()).toEqual({ error: "unauthorized" })
+			expect(count(context, "usage_hourly")).toBe(0)
+			expect(logged).not.toHaveBeenCalled()
+		} finally {
+			logged.mockRestore()
+		}
 	})
 
 	test("a JWT ingest makes at most two D1 calls", async () => {

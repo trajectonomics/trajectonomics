@@ -120,8 +120,8 @@ only the credential changed.
 ## Consequences
 
 - Ingest is one read plus one batch, two D1 queries per request, well inside the Free plan's 50.
-- The owner signs the collector in once every 90 days at most. A lapse shows up as the existing
-  "no ingest for 3 hours" health warning.
+- The owner signs the collector in once every 90 days at most. A lapse fails that runner's hourly
+  unit; the existing "no ingest for 3 hours" health warning fires only once every runner stops.
 - A leak of `traj-data` exposes auth user ids on contributor rows and on sessions, but never an
   email, and never the id of a deleted account.
 - Rejected alternatives:
