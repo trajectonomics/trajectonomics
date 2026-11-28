@@ -6,6 +6,9 @@ import { leavesOf } from "./tree"
 
 const demo = (argv: string[]) => capture(argv, {}, fixtureRoot)
 
+/** The commands this release does not ship yet, each with the note its page prints (ADR-0034). */
+const UNRELEASED: readonly (readonly string[])[] = []
+
 describe("usage", () => {
 	it("lists groups next to commands at the root", async () => {
 		const res = await demo([])
@@ -109,11 +112,15 @@ describe("a release note on a definition", () => {
 		for (const argv of [["help"], ["help", "tx"], ["help", "help"], ["help", "demo", "doc"]]) {
 			expect((await demo(argv)).out).not.toMatch(/\bships in \d/)
 		}
-		// The real tree notes only the commands this release does not ship yet (ADR-0034): every
-		// page is unmarked once the release that shipped what it describes is on npm.
+		// The real tree notes only the commands this release does not ship yet (ADR-0034): a page
+		// that names an unreleased command carries its note, and no other page does.
 		for (const { path } of leavesOf(root)) {
 			const out = (await capture(["help", ...path])).out
-			expect(out).not.toMatch(/\bships in \d/)
+			if (UNRELEASED.some((words) => words.join(" ") === path.join(" "))) {
+				expect(out).toMatch(/\bships in \d+\.\d+\.\d+\b/)
+			} else {
+				expect(out).not.toMatch(/\bships in \d/)
+			}
 		}
 	})
 
