@@ -26,13 +26,21 @@ function PortalLink({ href, prefetch: _prefetch, ...props }: PortalLinkProps) {
 	return <a href={href === undefined ? undefined : withPortalSlash(href)} {...props} />
 }
 
+/**
+ * Navigation Fumadocs starts itself, such as choosing a search result, with the same slash, so that
+ * click costs no 307 either: the search index keeps Fumadocs' slashless page URLs.
+ */
+function portalNavigate(url: string): ReturnType<typeof navigate> {
+	return navigate(withPortalSlash(url))
+}
+
 /** Fumadocs root provider wired to the local static search dialog. */
 export function Provider({ pathname, params, children }: ProviderProps) {
 	return (
 		<RootProvider
 			pathname={pathname}
 			params={params}
-			navigate={navigate}
+			navigate={portalNavigate}
 			components={{ Link: PortalLink }}
 			search={{ SearchDialog }}
 			// next-themes emits both attributes, so the design-system Theme CSS

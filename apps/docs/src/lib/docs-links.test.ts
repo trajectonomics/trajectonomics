@@ -6,6 +6,9 @@ describe("the trailing slash of a Portal page", () => {
 	test.each([
 		["/docs/cli", "/docs/cli/"],
 		["/docs", "/docs/"],
+		["/docs?q=fi", "/docs/?q=fi"],
+		["/docs#top", "/docs/#top"],
+		["/docs/cli/v0.7", "/docs/cli/v0.7/"],
 		["/docs/cli?tab=1", "/docs/cli/?tab=1"],
 		["/docs/cli#install", "/docs/cli/#install"],
 		["/docs/cli/?tab=1#install", "/docs/cli/?tab=1#install"],
@@ -19,6 +22,7 @@ describe("the trailing slash of a Portal page", () => {
 		["/docs/api/search.json"],
 		["/docs/cli.md"],
 		["/blog/launch/"],
+		["/docsearch"],
 		["https://example.com/docs/cli"],
 		["#top"],
 	])("a file or a link outside the Portal stays: %s", (href) => {

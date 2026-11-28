@@ -19,9 +19,29 @@ function names(href: string, path: string): boolean {
 	)
 }
 
-/** Whether a URL path's last segment names a file rather than a page, such as `/docs/llms.txt`. */
+/**
+ * Whether a URL path names a file the Portal serves as it is, such as `/docs/llms.txt`, rather than
+ * a page. Only these extensions count, so a dotted page slug such as `/docs/cli/v0.7` is a page.
+ */
 function namesFile(path: string): boolean {
-	return /\.[^/]+$/.test(path)
+	return /\.(md|txt|xml|json|js|css|png|jpe?g|gif|svg|webp|ico|woff2?)$/i.test(path)
+}
+
+/** The URL path of `href`, without its query or fragment. */
+function urlPath(href: string): string {
+	const end = href.search(/[?#]/)
+	return end === -1 ? href : href.slice(0, end)
+}
+
+/**
+ * Whether `href` links a Portal page without the trailing slash Static Assets serves it under, so a
+ * click costs a 307 redirect (trajectonomics#46). A file, a link outside the Portal and a path that
+ * already ends in a slash do not.
+ */
+export function lacksPortalSlash(href: string): boolean {
+	if (!names(href, DOCS_BASE_PATH)) return false
+	const path = urlPath(href)
+	return !path.endsWith("/") && !namesFile(path)
 }
 
 /**
@@ -32,11 +52,9 @@ function namesFile(path: string): boolean {
  * in a slash, and a file such as `/docs/llms.txt` or `/docs/cli.md` are returned unchanged.
  */
 export function withPortalSlash(href: string): string {
-	if (href !== DOCS_BASE_PATH && !href.startsWith(`${DOCS_BASE_PATH}/`)) return href
-	const end = href.search(/[?#]/)
-	const path = end === -1 ? href : href.slice(0, end)
-	if (path.endsWith("/") || namesFile(path)) return href
-	return `${path}/${end === -1 ? "" : href.slice(end)}`
+	if (!lacksPortalSlash(href)) return href
+	const path = urlPath(href)
+	return `${path}/${href.slice(path.length)}`
 }
 
 /**
