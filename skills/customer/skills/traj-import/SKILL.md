@@ -36,7 +36,7 @@ most one picture in a reply, and never inside a table or a figure. The Skill's f
 `npx -y skills@1.9.0 list --json` for a project copy — so a picture is a Markdown image at
 `<that path>/assets/<pose>.webp`. Its alt text names Traji and the pose, because a plain terminal
 shows only the alt text and the path, while an app that renders Markdown shows the picture. When the
-file is not there, skip the picture silently.
+file is not there, skip the picture silently. When the news is bad, show no picture.
 
 Show `chart` once, after Step 7's two proof figures agree:
 ![Traji holding a chart](<that path>/assets/chart.webp). That is the only picture in an import, and a

@@ -33,7 +33,7 @@ most one picture in a reply, and never inside a table or a figure. This Skill's 
 `path` `npx -y skills@1.9.0 list -g --json` reports for it, so a picture is a Markdown image at
 `<that path>/assets/<pose>.webp`. Its alt text names Traji and the pose, because a plain terminal
 shows only the alt text and the path, while an app that renders Markdown shows the picture. When the
-file is not there, skip the picture silently.
+file is not there, skip the picture silently. When the news is bad, show no picture.
 
 Show a picture only at these two moments, and nowhere else:
 
