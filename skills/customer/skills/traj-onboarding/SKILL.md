@@ -164,7 +164,7 @@ past it — update the installed traj skills once, at most, in the session, befo
 npx -y skills@1.9.0 update traj-onboarding traj traj-import traj-review traj-plan -g -y
 ```
 
-Say in one sentence that you updated them because of the gap, then read the global lock's `commit`
+This updates the global set setup installed; a project copy that stays is not touched, and the global copy is the one you re-read. Say in one sentence that you updated them because of the gap, then read the global lock's `commit`
 for `traj` again — it is the new pin — read each skill again at the `path` the global list reports,
 and re-read its range. When a skill is still past its range, or the update failed — offline, or a Node
 older than the 22.20 `skills@1.9.0` needs — say so in one sentence before the handover: name each such
