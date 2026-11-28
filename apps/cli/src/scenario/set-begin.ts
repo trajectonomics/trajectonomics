@@ -31,6 +31,15 @@ export function unbegunBlock(segment: string, ctx: SegmentContext): AppError {
 }
 
 /**
+ * The inflation spread a `--set` may add when `economy` leaves it out (cli ADR-0085, amending ADR-0065):
+ * `--set economy.inflationVolatility=150` is the what-if that gives the chance of success its first
+ * swing without a volatile Account.
+ */
+export function beginsInflationVolatility(segment: string, prefix: readonly string[]): boolean {
+	return segment === "inflationVolatility" && prefix.length === 1 && prefix[0] === "economy"
+}
+
+/**
  * The one key of an item a `--set` may add when the item leaves it out (cli ADR-0068, amending ADR-0065):
  * an asset Account's `volatility`, which no plan states by default, so `--set accounts.<id>.volatility=1500`
  * is the what-if that gives the chance of success its first swing. A liability has no volatility (the
@@ -75,7 +84,7 @@ export function beginsDisplayLabel(segment: string, prefix: readonly string[]): 
 	)
 }
 
-/** The keys a `--set` may add to an item that leaves them out: an Account's volatility, a display label, a surplus step's share or cap. */
+/** The keys a `--set` may add to an item that leaves them out: an Account's or the economy's volatility, a display label, a surplus step's share or cap. */
 export function beginsKey(
 	node: Record<string, unknown>,
 	segment: string,
@@ -83,6 +92,7 @@ export function beginsKey(
 ): boolean {
 	return (
 		beginsAccountVolatility(node, segment, prefix) ||
+		beginsInflationVolatility(segment, prefix) ||
 		beginsDisplayLabel(segment, prefix) ||
 		beginsSurplusKey(segment, prefix)
 	)
@@ -109,14 +119,15 @@ export function beginsWithdrawFloor(
 
 /**
  * The keys a `--set` may begin on the object at `prefix`, so a refusal that lists the keys there names them
- * too: the estate block at the root, an asset Account's `volatility`, a surplus step's `share` and `upTo`.
+ * too: the estate block at the root, an asset Account's `volatility`, the economy's `inflationVolatility`,
+ * a display label, a surplus step's `share` and `upTo`.
  */
 export function beginnableKeysAt(
 	node: Record<string, unknown>,
 	prefix: readonly string[],
 ): readonly string[] {
 	const keys = [...(prefix.length === 0 ? BEGINNABLE_BLOCKS : [])]
-	for (const key of ["volatility", "displayLabel", ...STEP_KEYS]) {
+	for (const key of ["volatility", "inflationVolatility", "displayLabel", ...STEP_KEYS]) {
 		if (beginsKey(node, key, prefix)) keys.push(key)
 	}
 	return keys.filter((key) => !Object.hasOwn(node, key))

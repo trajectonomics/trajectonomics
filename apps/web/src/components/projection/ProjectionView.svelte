@@ -1,5 +1,6 @@
 <script lang="ts">
 import { currentItemNames } from "../../client/item-names.svelte.js"
+import { currentSearch } from "../../client/location.svelte.js"
 import type {
 	Fi,
 	HouseholdDocument,
@@ -8,6 +9,7 @@ import type {
 	Read,
 	Snapshot,
 } from "../../lib/contract"
+import { withSearch } from "../../lib/view/links"
 import { chooseScenario } from "../../lib/view/plan"
 import { firstAges, planPeople, planStats } from "../../lib/view/projection/plan"
 import ProjectionCharts from "../charts/ProjectionCharts.svelte"
@@ -76,7 +78,12 @@ const charts = $derived({
 </script>
 
 {#if name === null || read === undefined}
-	<EmptyState title="No plan to project" />
+	<EmptyState title="No plan to project">
+		<p>
+			<a class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				href={withSearch("/plans/new/", currentSearch())}>Set up a first plan</a>
+		</p>
+	</EmptyState>
 {:else}
 	<div class="space-y-8">
 		<PlanPeople people={planPeople(household, ages)} hasHousehold={household !== null} {editable} />

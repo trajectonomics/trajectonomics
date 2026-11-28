@@ -9,6 +9,8 @@ const rollupReturns = z.strictObject({
 	index: integer,
 	from: dateString,
 	to: dateString,
+	// Present only when the Return model has an inflation factor (cli ADR-0085).
+	inflationBps: integer.optional(),
 	accounts: z.array(z.strictObject({ account: z.string(), returnBps: integer })),
 })
 

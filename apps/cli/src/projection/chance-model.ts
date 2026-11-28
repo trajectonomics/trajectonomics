@@ -29,6 +29,20 @@ const bucket = z.strictObject({
 		.describe("A non-negative integer. The weights of a model sum to 4294967296 (2^32)."),
 })
 
+const inflationBucket = z.strictObject({
+	rateBps: z
+		.number()
+		.int()
+		.describe(
+			"One year's inflation in basis points: 300 is 3% a year, and a negative one is deflation.",
+		),
+	weight: z
+		.number()
+		.int()
+		.min(0)
+		.describe("A non-negative integer. The weights of the factor sum to 4294967296 (2^32)."),
+})
+
 /** The Return model in the `sim` format. The engine checks it again against the Scenario. */
 export const returnModelDocument: z.ZodType<ReturnModel> = z
 	.strictObject({
@@ -41,6 +55,16 @@ export const returnModelDocument: z.ZodType<ReturnModel> = z
 		buckets: z
 			.array(bucket)
 			.describe("The weighted market months a Market path draws from, one per month."),
+		inflation: z
+			.strictObject({
+				buckets: z
+					.array(inflationBucket)
+					.describe("The weighted years of inflation a Market path draws from, one per year."),
+			})
+			.optional()
+			.describe(
+				"One year's inflation per Market path; absent when inflation stays at the Scenario's `inflation`.",
+			),
 	})
 	.meta({
 		description:

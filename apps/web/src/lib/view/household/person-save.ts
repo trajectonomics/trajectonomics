@@ -63,7 +63,7 @@ function personOf(draft: PersonDraft, id: string): HouseholdPerson | null {
  */
 export function personFromDraft(
 	draft: PersonDraft,
-	options: { existing?: HouseholdPerson | undefined; taken: readonly string[] },
+	options: { existing?: { readonly id: string } | undefined; taken: readonly string[] },
 ): PersonResult {
 	const problems = personProblems(draft, options.existing === undefined)
 	if (problems.size > 0) return { ok: false, problems: Object.fromEntries(problems) }
