@@ -79,6 +79,7 @@ for (const theme of THEMES) {
 test("a closed Details prints its contents, so the paper keeps the commands and the hashes", async ({
 	page,
 }) => {
+	await page.addInitScript(() => localStorage.setItem("traj.showCommands", "1"))
 	await openDemo(page, "/projection/years/", { theme: "light" })
 	await page.emulateMedia({ media: "print" })
 	const details = page.locator("details[data-provenance]").first()

@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { preferences } from "../../client/preferences.svelte.js"
 import type { Read, TxList } from "../../lib/contract"
 import { failure, leg, tx } from "./fixtures.test-support"
 import TransactionsBody from "./TransactionsBody.svelte"
@@ -27,6 +28,14 @@ const none = { account: "", memo: "" }
 const noop = () => undefined
 
 describe("TransactionsBody", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	test("shows the rows newest first with their period, the account choices and the command", () => {
 		const { body } = render(TransactionsBody, {
 			props: { read, filter: none, onAccount: noop, onMemo: noop },

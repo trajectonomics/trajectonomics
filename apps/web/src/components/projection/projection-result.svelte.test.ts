@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { preferences } from "../../client/preferences.svelte.js"
 
 import {
 	projectionRunFixture,
@@ -14,6 +15,14 @@ function renderResult(run: ReturnType<typeof projectionRunFixture>): string {
 }
 
 describe("ProjectionResult, the year tables", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	test("shows the annual table with every figure the CLI states, exact", () => {
 		const body = renderResult(projectionRunFixture())
 		expect(body).toContain("Opening net worth")
