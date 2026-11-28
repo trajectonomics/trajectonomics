@@ -26,6 +26,7 @@ export const EN: Dictionary = Object.freeze({
 	}),
 	filterLabel: "Filter posts",
 	filterAll: "All",
+	filterGeneralProduct: "General",
 	filterGroups: Object.freeze({ type: "Type", language: "Language", product: "Product" }),
 	noMatches: "No post matches these filters.",
 	filterResults: (count: number) =>
