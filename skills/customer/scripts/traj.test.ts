@@ -93,10 +93,14 @@ describe("the traj operating Skill", () => {
 				"result prints.",
 		)
 		expect(body).toContain(
-			"Inside a Scenario document — one you apply or read back, and the `--set` overrides that " +
-				"change it — money is an integer of minor units, so `100000` is 1,000.00 THB, which is " +
-				"that document's form of the same amount and not a restatement.",
+			"Inside a Scenario document money is an integer of minor units, so `100000` is 1,000.00 " +
+				"THB, which is that document's form of the same amount and not a restatement. Where a " +
+				"command publishes `--decimal`, it reads or writes the same amounts as decimal strings: " +
+				"beside a `--set` or an `--add` it reads those amounts (`--set " +
+				"'flows.salary.amount=\"90000.50\"' --decimal`), and a whole-document form reads or " +
+				"writes every amount in the document.",
 		)
+		expect(body).not.toContain("it is refused when there is no")
 		expect(body).toContain("`traj schema` is the authority wherever it states a unit.")
 		expect(body).toContain(
 			"Keep the unit the user's: restating one amount in a different unit is a second number " +
