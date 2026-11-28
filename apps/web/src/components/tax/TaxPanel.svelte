@@ -49,7 +49,7 @@ const read = $derived(name === null ? undefined : projections[name])
 const returns = $derived(read?.ok === true ? returnsOf(read.data.taxYears) : [])
 const picked = $derived(returns.length > 1 ? returnOf(returns, returned) : null)
 /** The Return the focus point answers for: the one the switch chose, or the plan's own when it has one Return. */
-const filer = $derived(picked?.filer ?? null)
+const filer = $derived(picked?.filer ?? (returns.length === 1 ? (returns[0]?.filer ?? null) : null))
 </script>
 
 <!-- One plan's body: the focus point of the Return on screen first, then the plan picker, the Return switch and its years. -->

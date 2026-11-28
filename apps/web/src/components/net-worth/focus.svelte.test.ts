@@ -39,10 +39,20 @@ describe("NetWorthFocus", () => {
 		expect(body).toContain("data-focus-answer")
 		expect(body).toContain("1.21M")
 		expect(body).toContain("<svg")
-		expect(body).toContain("As of Oct 2026")
+		expect(body).toContain("As of 31 Oct 2026")
 		expect(body).toContain('aria-hidden="true"')
 		expect(body).toContain("data-focus-visual")
 		expect(body).not.toContain("data-primary-action")
+	})
+
+	test("names the As-of the total is read at beside the last dot, not the last month-end", () => {
+		const base = props()
+		if (!base.read.ok) throw new Error("the Demo has a net worth read")
+		const read = { ...base.read, data: { ...base.read.data, asOf: "15 Nov 2026" } }
+		const { body } = render(NetWorthFocus, { props: { ...base, read } })
+		expect(body).toContain("<svg")
+		expect(body).toContain("As of 15 Nov 2026")
+		expect(body).not.toContain("As of Oct 2026")
 	})
 
 	test("masks the total with Hide amounts on, and keeps the note that it is hidden", () => {

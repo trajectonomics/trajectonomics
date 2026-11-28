@@ -59,4 +59,21 @@ describe("TaxPanel: the focus point of the Return on screen", () => {
 		expect(partner).not.toContain(">Save tax<")
 		expect(partner).toContain("th-2026-pit@partner")
 	})
+
+	test("a separate filing with one Filer's Return still states that Return's saving and Save tax", () => {
+		const one = projectionRun({
+			taxYears: [year({ levy: "th-2026-pit@me", filer: "me", due: "80000.00", owed: "80000.00" })],
+		})
+		const read = savingsRead(["1000.00", "0.00"])
+		const mine = read.ok
+			? {
+					...read,
+					data: { ...read.data, taxYears: read.data.taxYears.filter((t) => t.filer === "me") },
+				}
+			: read
+		const body = panel({ separate: ok(one) }, "separate", PEOPLE, {}, { separate: mine }, "")
+		expect(body).toContain("How much tax for 2026? 80k THB")
+		expect(body).toContain("You could still save 1k THB.")
+		expect(body).toContain(">Save tax<")
+	})
 })

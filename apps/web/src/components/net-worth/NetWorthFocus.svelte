@@ -39,6 +39,7 @@ const HEIGHT = 220
 							points={focus.points}
 							months={focus.months}
 							total={focus.total}
+							asOf={focus.asOf}
 							currency={focus.currency}
 							height={HEIGHT}
 							{tone}

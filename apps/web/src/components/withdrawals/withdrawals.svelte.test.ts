@@ -113,7 +113,13 @@ describe("the Withdrawals page", () => {
 		editSession.token = null
 		expect(page()).not.toContain("Change retirement-spending")
 		editSession.token = "t"
-		expect(page()).toContain("Change retirement-spending")
+		const body = page()
+		expect(body).toContain("Change retirement-spending")
+		// The focus point stays the first thing under the h1; the edit control follows it (#707).
+		expect(body.indexOf("data-focus-answer")).toBeGreaterThan(-1)
+		expect(body.indexOf("data-focus-answer")).toBeLessThan(
+			body.indexOf("Change retirement-spending"),
+		)
 	})
 })
 

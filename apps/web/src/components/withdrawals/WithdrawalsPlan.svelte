@@ -57,11 +57,8 @@ const spends = $derived(ctx === null ? true : mainFlow(ctx.doc.flows) !== undefi
 const names = $derived(snapshotItemNames(snapshot, name))
 </script>
 
-<!-- One plan: its edit control, its focus point, the what-if controls, what its spending rule pays year by year, and in good and bad markets. -->
+<!-- One plan: its focus point (or its empty state), its edit control, the what-if controls, what its spending rule pays year by year, and in good and bad markets. -->
 <div class="space-y-8">
-	{#if editable && doc?.ok && ctx}
-		<WithdrawalsActions {name} contentHash={doc.data.scenario.contentHash} {ctx} household={doc.data.scenario.household} />
-	{/if}
 	{#if run === undefined}
 		<EmptyState title="No projection for this plan" />
 	{:else if run.ok && none}
@@ -70,6 +67,11 @@ const names = $derived(snapshotItemNames(snapshot, name))
 		</EmptyState>
 	{:else}
 		<WithdrawalsFocus read={run} {chance} terms={chosen} plan={name} />
+	{/if}
+	{#if editable && doc?.ok && ctx}
+		<WithdrawalsActions {name} contentHash={doc.data.scenario.contentHash} {ctx} household={doc.data.scenario.household} />
+	{/if}
+	{#if run !== undefined && !(run.ok && none)}
 		<SegmentedControl name="terms" label="Terms" options={TERM_OPTIONS} value={chosen} onChange={onTerms} />
 		{#if run.ok && !none}
 			{#if tried}<WithdrawalsResult view={tried} terms={chosen} title="With your try" {names} />{/if}

@@ -9,13 +9,15 @@ interface Props {
 	/** How many month-ends the history holds, so a failed month leaves its gap. */
 	months: number
 	total: string
+	/** The As-of the total is read at, named by the mark beside the last dot (never the last month-end's date). */
+	asOf: string
 	currency: string
 	height: number
 	tone: FocusTone
 }
 
 /** The month-end line with the answer at its top and the last point's month beside its dot. */
-let { points, months, total, currency, height, tone }: Props = $props()
+let { points, months, total, asOf, currency, height, tone }: Props = $props()
 const HALO =
 	"[text-shadow:0_0_3px_var(--ds-color-background),0_0_6px_var(--ds-color-background),0_0_2px_var(--ds-color-background)]"
 let width = $state(0)
@@ -51,7 +53,7 @@ const chart = $derived(historyFocus(points, months, chartWidth, height))
 			style:left="{chart.last.x}px"
 			style:top="{chart.last.y + 8}px"
 			style:transform={chart.last.x > chartWidth / 2 ? "translate(-100%, 0)" : "translate(8px, 0)"}
-			>As of {chart.last.label}</span
+			>As of {asOf}</span
 		>
 	</div>
 {/if}
