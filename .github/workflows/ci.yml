@@ -190,8 +190,15 @@ jobs:
       # The same four steps as `bun run check` in apps/web (lint, typecheck, test, build), with the
       # `./scripts` half of `test` left to the shards below. tooling/guards pins that the split
       # still covers `test`.
-      - name: Lint, typecheck, test ./src and build the web package
-        run: bunx turbo run lint typecheck test:src build --filter=@trajectonomics/web --concurrency=4
+      #
+      # `svelte-kit sync` (in typecheck) and `vite build` (in build) both rewrite `.svelte-kit/` and
+      # `node_modules/$app/tsconfig.json`, so a step of its own owns them: typecheck runs first, alone,
+      # and the build cannot touch them while typecheck reads them (#864).
+      - name: Typecheck the web package
+        run: bunx turbo run typecheck --filter=@trajectonomics/web --concurrency=4
+
+      - name: Lint, test ./src and build the web package
+        run: bunx turbo run lint test:src build --filter=@trajectonomics/web --concurrency=4
 
       # SvelteKit's build stamp is the task's turbo hash (web ADR 0028), so two builds of the same inputs
       # must pack the same bytes. `--cache=local:` turns the cache off (the build runs and writes no entry)
@@ -291,8 +298,14 @@ jobs:
       # The suite serves `apps/web/dist` (the loopback build), `apps/web/dist-hosted` (the hosted Demo, web ADR 0028)
       # and an editable scratch Dashboard using the compiled workspace `traj` binary (`browser/serve-scratch.ts`).
       # No arguments after `--`: turbo hashes them into every task of the graph and the build would miss the cache.
-      - name: Build the CLI, the web package, the hosted Demo and the Demo snapshot
-        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=4
+      #
+      # `vite build` rewrites `.svelte-kit/` and `node_modules/$app/tsconfig.json`; the hosted build uses its own
+      # `.svelte-kit-dist-hosted/` but shares the tsconfig, so the two builds are steps of their own, one at a time (#864).
+      - name: Build the CLI, the web package and the Demo snapshot
+        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#build --concurrency=4
+
+      - name: Build the hosted Demo
+        run: bunx turbo run @trajectonomics/web#build:hosted --concurrency=4
 
       - name: Read the Playwright version
         id: playwright
