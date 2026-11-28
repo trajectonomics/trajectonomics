@@ -1,4 +1,5 @@
 import type { Leaf } from "../command"
+import { RUN_REPORTING_EXAMPLES } from "./run-examples-reporting"
 
 /** The help examples of `traj projection run` (cli ADR-0043): each runs against the projection fixture. */
 export const RUN_EXAMPLES: Leaf["examples"] = [
@@ -90,4 +91,5 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 		command: `traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal --json`,
 		description: "The annual roll-up with one new Flow added, and nothing saved.",
 	},
+	...RUN_REPORTING_EXAMPLES,
 ]

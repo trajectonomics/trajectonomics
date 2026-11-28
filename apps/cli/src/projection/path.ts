@@ -33,7 +33,7 @@ export function pathOf(
 	const hash = modelHashOf(model)
 	if (isAppError(hash)) return hash
 	const { breakdown, liabilities, spending, estate } = wants
-	const options = optionsOf(breakdown, liabilities, spending, estate)
+	const options = optionsOf(breakdown, liabilities, spending, estate, wants.reporting)
 	const { result, notes: unstated } = routedRun(placed.document, placed.timeline, (routing) =>
 		projectPath(
 			placed.baseline,

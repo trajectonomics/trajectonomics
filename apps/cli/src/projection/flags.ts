@@ -55,6 +55,29 @@ type OutputFlag = z.ZodDefault<z.ZodBoolean>
 /** One yes-or-no flag for more output: off unless given, so a run without it keeps its bytes. */
 const more = (what: string): OutputFlag => z.boolean().default(false).describe(what)
 
+/** The three flags that state the cash flow per Reporting year and month (cli ADR-0086). */
+export const reportingFlags: {
+	breakdownYears: OutputFlag
+	breakdownMonths: z.ZodOptional<z.ZodString>
+	yearStart: z.ZodOptional<z.ZodNumber>
+} = {
+	breakdownYears: more(
+		"Also report the cash flow per Reporting year: the lines and nine section totals of --breakdown over a year that begins on the 1st of the --year-start month (January by default).",
+	),
+	breakdownMonths: z
+		.string()
+		.optional()
+		.describe(
+			"Also report the cash flow per Reporting month of the years named: first (the Reporting year that holds --as-of), all (every Reporting year), or a year as YYYY (the year that begins in it).",
+		),
+	yearStart: z
+		.number()
+		.optional()
+		.describe(
+			"The month, 1 (January) to 12 (December), on whose 1st each Reporting year begins; default 1. Valid only with --breakdown-years or --breakdown-months.",
+		),
+}
+
 /** The flags that ask `projection run` for more than the annual roll-up (cli ADR-0027). */
 export const outputFlags: Record<
 	"monthly" | "breakdown" | "liabilities" | "accounts" | "spending" | "estate",

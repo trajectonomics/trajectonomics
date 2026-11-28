@@ -149,7 +149,7 @@ describe("projection run", () => {
 		expect(data.name).toBe("projection run")
 		expect(data.positionals).toEqual([])
 		expect(Object.keys(data.input.properties).sort().join(" ")).toBe(
-			"accounts add asOf breakdown carryIn decimal estate horizon liabilities monthly scenario set spending without",
+			"accounts add asOf breakdown breakdownMonths breakdownYears carryIn decimal estate horizon liabilities monthly scenario set spending without yearStart",
 		)
 		expect(data.input.required.sort()).toEqual(["asOf", "horizon", "scenario"])
 		expect(data.output.properties.tables.type).toBe("array")

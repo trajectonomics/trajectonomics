@@ -1,4 +1,4 @@
-import type { CashflowBreakdown } from "@trajectonomics/core/sim"
+import type { CashflowBreakdown, CashflowLines } from "@trajectonomics/core/sim"
 import { employerLines, type Line, payoutLines } from "./cashflow-income"
 import type { CashflowRow } from "./cashflow-view"
 import { moneyOf } from "./money"
@@ -11,11 +11,12 @@ import { moneyOf } from "./money"
  */
 
 /**
- * Every line of one roll-up in the engine's order, the groups in the order `CASHFLOW_GROUPS` lists.
- * A `contribution` line is the applied amount and an `unfunded` line the dropped part; a line whose
- * amount is zero is left out, as the engine leaves it out.
+ * Every line of one roll-up, or of one Reporting year or month, in the engine's order, the groups in
+ * the order `CASHFLOW_GROUPS` lists. A `contribution` line is the applied amount and an `unfunded` line
+ * the dropped part; a line whose amount is zero is left out, as the engine leaves it out. It reads no
+ * `index`, `from` or `to`, so a `CashflowBreakdown` and a `ReportingCashflow` share it.
  */
-function linesOf(breakdown: CashflowBreakdown): Line[] {
+export function linesOf(breakdown: CashflowLines): Line[] {
 	const none = { id: null, account: null, category: null }
 	const groups: Line[][] = [
 		breakdown.income.map((line) => ({

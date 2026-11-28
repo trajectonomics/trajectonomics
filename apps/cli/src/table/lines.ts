@@ -65,20 +65,36 @@ function shownColumns(columns: readonly ColumnHint[], rows: readonly unknown[]):
 	)
 }
 
-export function tableLines(
-	name: string,
-	count: number,
+function tableText(
+	heading: string,
 	rows: readonly unknown[],
 	allColumns: readonly ColumnHint[],
 ): string {
 	const columns = shownColumns(allColumns, rows)
 	const cells = rows.map((row) => cellsOf(row, columns))
 	const widths = widthsOf(columns, cells)
-	const heading = `${name} (${count} ${count === 1 ? "row" : "rows"})`
 	const header = line(
 		columns.map((column) => column.label),
 		columns,
 		widths,
 	)
 	return [heading, header, ...cells.map((row) => line(row, columns, widths))].join("\n")
+}
+
+export function tableLines(
+	name: string,
+	count: number,
+	rows: readonly unknown[],
+	allColumns: readonly ColumnHint[],
+): string {
+	return tableText(`${name} (${count} ${count === 1 ? "row" : "rows"})`, rows, allColumns)
+}
+
+/** A table whose heading the caller states whole, with no row count: a block whose heading already says its span. */
+export function blockLines(
+	heading: string,
+	rows: readonly unknown[],
+	allColumns: readonly ColumnHint[],
+): string {
+	return tableText(heading, rows, allColumns)
 }

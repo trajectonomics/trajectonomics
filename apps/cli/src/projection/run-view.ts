@@ -21,10 +21,21 @@ export type { AnnualRow, MonthlyRow } from "./rows-view"
 export { type ProjectionTable, projectionTable } from "./run-table-view"
 export type { TaxYearView } from "./tax-year-view"
 
+/** `yearStart`, present only with a Reporting year or month breakdown (cli ADR-0086). */
+const yearStartField: z.ZodType<number | undefined> = z
+	.number()
+	.int()
+	.describe(
+		"The month, 1 (January) to 12 (December), on whose 1st each Reporting year begins; present only with --breakdown-years or --breakdown-months.",
+	)
+	.optional()
+
 /** `traj projection run`: the Projection plus the echo block (ADR-0030). */
 export type ProjectionRunView = Echo & {
 	horizon: string
 	currency: string
+	/** The month each Reporting year begins in, present only with --breakdown-years or --breakdown-months (cli ADR-0086). */
+	yearStart?: number | undefined
 	/** The routing as the document states it; present only for a share, a floor or a target that keeps its value (cli ADR-0070). */
 	routing?: RoutingView | undefined
 	runsOut: RunsOutView | null
@@ -49,6 +60,7 @@ export const projectionRunFields: {
 	notes: notesField,
 	horizon: dateField("The date the Projection ends at"),
 	currency: z.string().describe("The Scenario's ISO 4217 currency; v1 is THB only."),
+	yearStart: yearStartField,
 	routing: routingField,
 	runsOut: runsOut
 		.nullable()
@@ -59,7 +71,7 @@ export const projectionRunFields: {
 	tables: z
 		.array(projectionTable)
 		.describe(
-			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, what the plan would leave and each cost and gift when --estate was given, what each fee Account was charged when an Account carries a fee, and the milestones when the Scenario declares them.",
+			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the Reporting years and their months when --breakdown-years or --breakdown-months was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, what the plan would leave and each cost and gift when --estate was given, what each fee Account was charged when an Account carries a fee, and the milestones when the Scenario declares them.",
 		),
 }
 

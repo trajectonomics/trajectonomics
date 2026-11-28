@@ -12,11 +12,13 @@ import {
 	horizonFlag,
 	outputFlags,
 	PROJECTION_ERROR_CODES,
+	reportingFlags,
 	scenarioFlag,
 	setFlag,
 } from "../../projection/flags"
 import { withProjection } from "../../projection/leaf"
 import { projectionHint } from "../../projection/render"
+import { reportingOptionsOf } from "../../projection/reporting-input"
 import { projectionOf } from "../../projection/run"
 import { RUN_EXAMPLES } from "../../projection/run-examples"
 import { projectionRunView } from "../../projection/run-view"
@@ -37,6 +39,7 @@ export const run: Leaf = defineCommand({
 		decimal: decimalFlag,
 		carryIn: carryInFlag,
 		...outputFlags,
+		...reportingFlags,
 	}),
 	flagDocuments: [carryInFlagDocument],
 	output: projectionRunView,
@@ -58,7 +61,9 @@ export const run: Leaf = defineCommand({
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
 			if (isAppError(placed)) return placed
-			return projectionOf(placed, input)
+			const reporting = reportingOptionsOf(input, placed.timeline)
+			if (isAppError(reporting)) return reporting
+			return projectionOf(placed, { ...input, reporting })
 		})
 	},
 })

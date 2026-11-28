@@ -20,7 +20,7 @@ import { moneyOf } from "./money"
  * disagree (cli ADR-0058, addendum).
  */
 
-const BLOCK_COLUMNS: readonly ColumnHint[] = [
+export const BLOCK_COLUMNS: readonly ColumnHint[] = [
 	{ key: "line", label: "line" },
 	{ key: "amount", label: "amount", align: "right" },
 ]
@@ -35,21 +35,6 @@ export function tableRows(
 	const table = tables.find((entry) => isRecord(entry) && entry["name"] === name)
 	if (!isRecord(table) || !Array.isArray(table["rows"])) return undefined
 	return table["rows"].filter(isRecord)
-}
-
-/** The cash-flow tables a person does not read: the long lines and the totals are JSON's; the blocks print instead. */
-const HIDDEN_TABLES = ["cashflow", "cashflowTotals", "transfers"]
-
-/** The result without its cash-flow tables: the long tables are for JSON, and the blocks print instead. */
-export function cashflowHidden(data: Record<string, unknown>): Record<string, unknown> {
-	const tables = data["tables"]
-	if (!Array.isArray(tables)) return data
-	return {
-		...data,
-		tables: tables.filter(
-			(entry) => !(isRecord(entry) && HIDDEN_TABLES.includes(String(entry["name"]))),
-		),
-	}
 }
 
 /** One roll-up's block rows: each section's total, then the lines a person reads under it. */

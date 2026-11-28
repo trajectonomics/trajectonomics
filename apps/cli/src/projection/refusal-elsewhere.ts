@@ -85,9 +85,10 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	INVALID_WEIGHT: input,
 	RETURN_WEIGHT_TOTAL: input,
 	INVALID_BUCKETS: input,
-	// Refused by `contributionSavings` only. `projection allowances` answers the first three at its
-	// flags (`allowancesRefusal`, cli ADR-0061); PERIOD_DUE_MISMATCH cannot happen on a correct call,
-	// since the period comes from the Projection of the same Levy, so it is an internal error.
+	// Refused by `contributionSavings` only, and by `project` and `projectPath` for `options.reporting`
+	// (cli ADR-0086), which the CLI's own check refuses first. `projection allowances` answers the first
+	// three at its flags (`allowancesRefusal`, cli ADR-0061); PERIOD_DUE_MISMATCH cannot happen on a
+	// correct call, since the period comes from the Projection of the same Levy, so it is an internal error.
 	UNKNOWN_FUNDED_LABEL: input,
 	TOO_MANY_STEPS: input,
 	INVALID_OPTION: input,

@@ -1,4 +1,8 @@
-import type { LiabilityStatement, ProjectionOptions } from "@trajectonomics/core/sim"
+import type {
+	LiabilityStatement,
+	ProjectionOptions,
+	ReportingOptions,
+} from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { fail } from "../errors"
 import type { LiabilityRow, PaidOffRow } from "./liabilities-view"
@@ -10,18 +14,20 @@ import type { ProjectionTable } from "./run-view"
  * Each figure is the engine's own, formatted at the Currency's scale; none is recomputed here.
  */
 
-/** The engine's options for one run: each optional output is asked for only by its own flag (cli ADR-0058, ADR-0059, ADR-0064). */
+/** The engine's options for one run: each optional output is asked for only by its own flag (cli ADR-0058, ADR-0059, ADR-0064, ADR-0086). */
 export function optionsOf(
 	breakdown: boolean,
 	liabilities: boolean,
 	spending: boolean,
 	estate: boolean,
+	reporting: ReportingOptions | undefined,
 ): ProjectionOptions {
 	return {
 		...(breakdown ? { cashflowBreakdown: true } : {}),
 		...(liabilities ? { liabilityStatements: true } : {}),
 		...(spending ? { spendingRules: true } : {}),
 		...(estate ? { estate: true } : {}),
+		...(reporting === undefined ? {} : { reporting }),
 	}
 }
 
