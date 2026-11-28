@@ -157,13 +157,13 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 
 		<h2>Limits from the meter</h2>
 		<p>
-			Claude and OpenCode Go publish their own usage meter, and the collector reads it every hour.
-			A window's 100% is estimated from how far that meter moved against the tokens we used
-			meanwhile: tokens used ÷ percentage points moved × 100. Consecutive readings that share a
-			reset time form one segment; a reset, a change of reset time or a fall in the percentage
-			starts a new one. Each reading is rounded to a whole percent, so the range widens by one
-			point per segment. Only the estimate, its range and its evidence leave the Worker, never a
-			reading, its time or its reset time.
+			Claude, OpenCode Go, Antigravity, Cursor and Meta (Muse) publish their own usage meters, and
+			the collector reads them every hour. A window's 100% is estimated from how far that meter
+			moved against the tokens we used meanwhile: tokens used ÷ percentage points moved × 100.
+			Consecutive readings that share a reset time form one segment; a reset, a change of reset
+			time or a fall in the percentage starts a new one. Each reading is rounded to a whole
+			percent, so the range widens by one point per segment. Only the estimate, its range and its
+			evidence leave the Worker, never a reading, its time or its reset time.
 		</p>
 		<p>
 			The estimate comes in three units. Tokens leaves cache reads out, as the peaks do. With cache
@@ -329,9 +329,9 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 
 		<h2>Quota numbers</h2>
 		<p>
-			Quota percentages exist only for plans with a readable meter. Claude and OpenCode Go are the
-			plans whose meter we can read, so they are the plans whose 100% is estimated. A plan with no
-			meter means no quota number on this site.
+			Quota percentages exist only for plans with a readable meter. Claude, OpenCode Go,
+			Antigravity, Cursor and Meta (Muse) are the plans whose meters we can read, so they are the
+			plans whose 100% is estimated. A plan with no meter means no quota number on this site.
 		</p>
 
 		<div class="method-repo">

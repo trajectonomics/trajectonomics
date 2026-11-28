@@ -7,11 +7,18 @@ export type FetchResponse = {
 	json: () => Promise<unknown>
 }
 
-/** The GET-only fetch signature the sampler needs; tests inject a fake. */
-export type FetchLike = (
-	url: string,
-	init: { method: "GET"; headers: Record<string, string> },
-) => Promise<FetchResponse>
+/** The request shape the sampler needs; tests inject a fake. */
+export type FetchInit = {
+	method: "GET" | "POST"
+	headers: Record<string, string>
+	body?: string
+	signal?: AbortSignal
+}
+
+/** The fetch signature the sampler needs; tests inject a fake. */
+export type FetchLike = (url: string, init: FetchInit) => Promise<FetchResponse>
+
+const FETCH_TIMEOUT_MS = 15_000
 
 /** Fetches one plan's usage body and parses it; a failure logs one line and yields no rows. */
 export async function fetchQuotaRows(
@@ -21,10 +28,17 @@ export async function fetchQuotaRows(
 	parse: (body: unknown, sampledAt: string) => QuotaRow[] | null,
 	sampledAt: string,
 	deps: { fetch: FetchLike; log: (line: string) => void },
+	options?: { method?: "GET" | "POST"; body?: string },
 ): Promise<QuotaRow[]> {
 	let response: FetchResponse
 	try {
-		response = await deps.fetch(url, { method: "GET", headers })
+		const init: FetchInit = {
+			method: options?.method ?? "GET",
+			headers,
+			signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+		}
+		if (options?.body !== undefined) init.body = options.body
+		response = await deps.fetch(url, init)
 	} catch {
 		deps.log(`quota: ${plan} request failed`)
 		return []

@@ -119,4 +119,30 @@ describe("meterHoursByPlan", () => {
 		expect(hours.get("opencode-go")?.size).toBe(1)
 		expect(hours.get("claude")?.get(ELEVEN)).toBeUndefined()
 	})
+
+	test("excludes third-party models from Antigravity's Gemini meter hours", () => {
+		const hours = meterHoursByPlan([
+			row({
+				plan: "antigravity",
+				model: "gemini-4-neon",
+				tokens_in: 1_000,
+				tokens_out: 500,
+				cache_read: 0,
+				cache_write: 0,
+				tokens_total: 1_500,
+			}),
+			row({
+				plan: "antigravity",
+				model: "claude-opus-5-5",
+				tokens_in: 9_000,
+				tokens_out: 1_000,
+				cache_read: 0,
+				cache_write: 0,
+				tokens_total: 10_000,
+			}),
+		])
+		const hour = hours.get("antigravity")?.get(TEN)
+		expect(hour?.uncached).toBe(1_500)
+		expect(hour?.processed).toBe(1_500)
+	})
 })

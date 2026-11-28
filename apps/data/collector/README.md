@@ -1,9 +1,9 @@
 # @trajectonomics/data-collector
 
 Reads the local logs of the AI coding tools on this machine and prints **hourly usage totals** as
-one JSON object per line. It can also sample the subscription quotas of Claude and OpenCode Go, and
-send both kinds of row to the `data` Worker in batches. Sending is a separate subcommand; reading
-logs alone does no network I/O.
+one JSON object per line. It can also sample the subscription quotas of Claude, OpenCode Go,
+Antigravity, Cursor and Meta (Muse), and send both kinds of row to the `data` Worker in batches.
+Sending is a separate subcommand; reading logs alone does no network I/O.
 
 ## Run
 
@@ -99,16 +99,19 @@ and `nb_api_calls`, and drop every id column. `bestEffort` is true only for Muse
 
 ## Quota samples
 
-`quota` reads two local credential files and never prints, refreshes or stores their tokens:
+`quota` reads local credentials or CLI allowance output and never prints, refreshes or stores tokens:
 
-| Plan | Credential file | Endpoint | Windows |
+| Plan | Source | Endpoint / Command | Windows |
 | --- | --- | --- | --- |
 | `claude` | `~/.claude/.credentials.json`, `claudeAiOauth.accessToken` | `https://api.anthropic.com/api/oauth/usage` | `five_hour`, `weekly` |
 | `opencode-go` | `~/.local/share/opencode/auth.json`, `["opencode-go"].key` | `https://opencode.ai/inference/go/v1/usage` | `five_hour`, `weekly`, `monthly` |
+| `antigravity` | `~/.gemini/antigravity/antigravity-oauth-token` or `~/.t3/userdata/providers/antigravity/*/antigravity-acp/antigravity-oauth-token` (`token.access_token`) | `https://daily-cloudcode-pa.googleapis.com/v1internal:retrieveUserQuotaSummary` | `five_hour`, `weekly` (Gemini buckets) |
+| `cursor` | `~/.config/cursor/auth.json`, `accessToken` | `https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage` | `monthly` |
+| `meta` | `muse` CLI (`~/.local/bin/muse` or `PATH`, with `MUSE_NO_AUTO_UPDATE=1`) | `muse usage --json` | `five_hour`, `weekly` |
 
-A missing file, an expired Claude token, a failed request or an unexpected body logs one stderr line
-naming the plan; the run still exits 0 and simply emits no row for that plan. Claude's token is never
-refreshed, because refreshing would rotate Claude Code's own credential.
+A missing file or binary, an expired token, a failed request or an unexpected body logs one stderr line
+naming the plan; the run still exits 0 and simply emits no row for that plan. File-backed tokens are
+never refreshed by the collector, because refreshing would rotate each tool's own credential.
 
 Each line is a quota row with a marker:
 

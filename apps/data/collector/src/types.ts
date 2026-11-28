@@ -24,7 +24,7 @@ export type UsageRow = {
 export type QuotaWindow = "five_hour" | "weekly" | "monthly"
 
 /** A plan whose subscription quota is sampled. */
-export type QuotaPlan = "claude" | "opencode-go"
+export type QuotaPlan = "claude" | "opencode-go" | "antigravity" | "cursor" | "meta"
 
 /** One observed quota percentage for a plan window, stamped at the start of a UTC hour. */
 export type QuotaRow = {
