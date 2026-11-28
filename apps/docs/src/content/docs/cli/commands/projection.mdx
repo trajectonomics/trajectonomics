@@ -1,12 +1,19 @@
 ---
 title: projection
-description: Project the future under a Scenario, and compare two of them.
+description: Project the future under a Scenario, compare two of them, and read the chance of success.
 ---
 
-`traj projection` runs the Baseline through a Scenario and compares the result. A Projection is
+`traj projection` runs the Baseline through a Scenario and reports the result. A Projection is
 deterministic: the same rows, the same Scenario and the same dates give the same answer. Every
 result states its As-of, the engine version, the Scenario's hashes, the Overrides it applied and its
 tax status.
+
+A what-if is `--set`, `--without` and `--add` together: `--set` replaces one existing dotted document
+path with a JSON value, `--without` takes one list item out by its id, and `--add` puts a new item on
+a list by its own id. The removals apply first, then the additions, then the sets, whatever order the
+flags are typed in. `--decimal` reads each money amount of a `--set` or `--add` item as a decimal
+string of the Currency's major unit, such as `"90000.50"`, instead of satang. A projection only reads
+the what-if; nothing is saved, and the result echoes `overrides`, `removals` and `additions`.
 
 ## `traj projection run`
 
@@ -16,14 +23,38 @@ Project the Baseline through a Scenario, year by year, nominal and real.
 - `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
 - `--scenario <string>` — the Scenario's exact name or its id; required
 - `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>` after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the major
+  unit instead of satang
 - `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
   path, or `-` for stdin
 - `--monthly` — also report the monthly rows
+- `--breakdown` — also report each year's cash flow by source, tax, category and Account, and its
+  nine section totals
+- `--liabilities` — also report each loan's statement: its months, the interest in each, and the date
+  it is paid off
+- `--accounts` — also report each Account's value on the row at each year's end, nominal and real
+- `--spending` — also report what each spending rule fixed and paid in each Rule year
+- `--estate` — also report what the plan would leave each year: the gross estate, the debts, each
+  cost and gift, and what heirs receive
 
 ```bash
 traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --json                                     # The annual roll-up of one Scenario.
-traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000 --monthly  # Try a raise without forking, and read the monthly rows.
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --monthly  # Try a raise without forking, and read the monthly rows.
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000 --decimal   # The same raise as a decimal amount of THB.
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.gym --json                   # Take one Flow out, without saving it.
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal --json  # Add one new Flow, without saving it.
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --breakdown --liabilities --accounts --json # Each year's cash flow, each loan's statement and each Account's value.
+traj projection run --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --spending --estate --json                # What a spending rule paid and what the plan would leave each year.
 ```
+
+With `--monthly`, `--accounts` and `--estate` state their figures on every month instead of on the row
+at each year's end. `--breakdown` states a zero total as `0.00` in JSON, while the human block leaves
+out a zero not funded or unmet.
+
+Each annual row carries each household person's age in `ages`. A plan with no household states none.
 
 ## `traj projection compare <a> [b]`
 
@@ -33,6 +64,11 @@ the ages you name and run-out year.
 - `--as-of <string>` — the date the Projection starts at, as `YYYY-MM-DD`; required
 - `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
 - `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>` after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the major
+  unit instead of satang
 - `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
   path, or `-` for stdin
 - `--birth-date <string>` — the birth date the ages count from, as `YYYY-MM-DD`; needed with `--age`
@@ -40,7 +76,150 @@ the ages you name and run-out year.
 
 ```bash
 traj projection compare base early --as-of 2026-03-31 --horizon 2027-03-30 --json                                                               # How two Scenarios differ in FI date, net worth and run-out.
-traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000 --birth-date 1985-06-15 --age 45 --age 50  # A what-if against the base, with net worth at two ages.
+traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --birth-date 1985-06-15 --age 45 --age 50  # A what-if against the base, with net worth at two ages.
+traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set 'flows.salary.amount="90000.50"' --decimal --json                     # The same what-if with a decimal amount of THB.
+```
+
+A what-if makes side `b`, and side `a` is the Scenario as it is. A second Scenario is refused beside
+`--set`, `--without` or `--add`.
+
+## `traj projection chance`
+
+Report the chance a Scenario holds to its Horizon, over seeded Market paths.
+
+- `--as-of <string>` — the date the Projection starts at, as `YYYY-MM-DD`; required
+- `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
+- `--scenario <string>` — the Scenario's exact name or its id; required
+- `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>` after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the major
+  unit instead of satang
+- `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
+  path, or `-` for stdin
+- `--return-model <string>` — the Return model JSON file the Market paths draw from, in the sim
+  format, or `-` for stdin, or `plan` to build it from the Scenario; required
+- `--buckets <number>` — with `--return-model plan`, the buckets the model is built in, a power of
+  two from 16 to 1024; default 256
+- `--paths <number>` — the number of Market paths to run, from 1 to 10,000; required
+- `--seed <string>` — sixteen lower-case hex digits; the same seed and model give the same paths;
+  required
+- `--outcomes` — also report what each Market path came to, and the paths worth opening first
+- `--milestone-dates` — also report when each Milestone fired across the Market paths
+
+`plan` builds the Return model from the Scenario: each asset Account's `rate` and `volatility`, and
+the plan's `economy.inflationVolatility`. Either a volatility on an Account or an inflation
+volatility above 0 is enough; `traj` ships no model and no figure of its own. A plan with neither is
+refused at `--return-model`.
+
+```bash
+traj projection chance --scenario volatile --as-of 2026-03-31 --horizon 2027-03-30 --return-model plan --paths 200 --seed 0123456789abcdef --json        # The chance from the plan's own Return model, with the inputs echoed as returnModel.
+traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef             # The success share and the net-worth Bands, in the human form.
+traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --outcomes  # What each of the 200 paths came to, worst closing net worth first.
+traj projection chance --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --milestone-dates --json  # The path count that reached each Milestone, its date Percentiles and each person's age then.
+```
+
+The Bands are the net-worth Percentiles across paths at each annual roll-up; with a spending rule,
+`spendingBands` add what the rule paid. `realBands`, present when the plan states an inflation
+volatility, are the same Bands in today's money. With `--outcomes`, `representative` names the paths
+worth opening first, and [`traj projection path --index`](#traj-projection-path) replays one.
+
+## `traj projection path`
+
+Replay one seeded Market path of a chance of success, year by year.
+
+- `--as-of <string>` — the date the Projection starts at, as `YYYY-MM-DD`; required
+- `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
+- `--scenario <string>` — the Scenario's exact name or its id; required
+- `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>` after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the major
+  unit instead of satang
+- `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
+  path, or `-` for stdin
+- `--return-model <string>` — the Return model JSON file the Market paths draw from, or `-`, or
+  `plan`; required
+- `--buckets <number>` — with `--return-model plan`, the buckets the model is built in; default 256
+- `--paths <number>` — the number of Market paths the run drew, from 1 to 10,000; required
+- `--seed <string>` — sixteen lower-case hex digits, the seed you gave `projection chance`; required
+- `--index <number>` — which Market path to replay, from 0 to `--paths` minus 1; required
+- `--monthly` — also report the monthly rows
+- `--breakdown` — also report each year's cash flow by section
+- `--liabilities` — also report each loan's statement
+- `--accounts` — also report each Account's value at each year's end
+- `--spending` — also report what each spending rule paid
+- `--estate` — also report what the plan would leave each year
+
+Pass the flags you gave `projection chance`, and an index from 0 to `--paths` minus 1. A path is
+named by its index under the run's seed, so the same flags always replay the same path. The result
+is `projection run`'s, plus the run it is a path of and `returns`: each Account's market return over
+each annual roll-up, in basis points, and each roll-up's inflation when the plan states it.
+
+```bash
+traj projection path --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --index 7 --json     # Market path 7 of a 200-path run, year by year.
+traj projection path --scenario volatile --as-of 2026-03-31 --horizon 2027-03-30 --return-model plan --paths 200 --seed 0123456789abcdef --index 0 --breakdown  # The first path of a run drawn from the plan's own Return model, with each year's cash flow.
+```
+
+## `traj projection model`
+
+Print the Return model a Scenario implies, as JSON.
+
+- `--scenario <string>` — the Scenario's exact name or its id; required
+- `--buckets <number>` — the buckets the model is built in, a power of two from 16 to 1024; default
+  256
+- `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>` after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the major
+  unit instead of satang
+
+Every asset Account with a `volatility` above 0 moves with one shared market factor around its own
+`rate`, and every other Account keeps its rate. When the Scenario states an
+`economy.inflationVolatility` above 0, the model carries an `inflation` factor too. The result is the
+model in the sim format, so saving it and passing it to `projection chance --return-model` gives the
+same chance as `--return-model plan`. It reads no Ledger and takes no date.
+
+```bash
+traj projection model --scenario volatile --json               # The Return model the plan implies, as JSON.
+traj projection model --scenario volatile --buckets 64 --json  # The same model in 64 buckets, smaller to print.
+```
+
+## `traj projection allowances`
+
+Report how much more each tax allowance could take, and the tax it would save.
+
+- `--as-of <string>` — the date the Projection starts at, as `YYYY-MM-DD`; required
+- `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
+- `--scenario <string>` — the Scenario's exact name or its id; required
+- `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
+- `--without <string>` — take one list item out by its id before any `--set`; repeatable
+- `--add <string>` — add one new list item as `list=<json>` after any `--without` and before any
+  `--set`; repeatable
+- `--decimal` — read each money amount of a `--set` or `--add` item as a decimal string of the major
+  unit instead of satang
+- `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
+  path, or `-` for stdin
+- `--labels <string>` — the contribution Tally labels to fill, separated by commas, in the order they
+  should fill; required
+- `--step <string>` — the size of one step in major units, larger than one major unit; required
+- `--budget <string>` — the most the extra contributions may add up to in each tax year, in major
+  units
+- `--min-saving <string>` — the least share of a step a step must save to be taken, as a percent
+  from 0 to 100 with at most two decimals
+
+For each whole tax year the Projection holds, it raises each label in the order given by whole steps
+while a step still lowers the Levy's tax, never past a cap and within the budget. Each suggestion is
+a contribution Flow the caller applies with [`scenario apply --decimal`](/cli/commands/scenario/),
+never one this command writes. The figures are one plan's own tax rules, not tax advice, and each
+fund's holding rules are not checked.
+
+```bash
+traj projection allowances --scenario base --as-of 2026-01-01 --horizon 2027-12-31 --labels allowance.retirement.rmf,allowance.thai_esg --step 10000 --json  # How much more RMF then ThaiESG would still lower each tax year's tax, in steps of 10,000.
+traj projection allowances --scenario base --as-of 2026-01-01 --horizon 2027-12-31 --labels allowance.retirement.rmf --step 10000 --budget 50000 --min-saving 10  # The same for RMF alone, at most 50,000 more a year and only while a step saves 10% of itself.
 ```
 
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

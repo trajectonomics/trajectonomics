@@ -1,10 +1,10 @@
 ---
 title: baseline
-description: Show the Baseline a Projection starts from.
+description: Show the Baseline a Projection starts from, and what each Account ran at.
 ---
 
-`traj baseline` shows the Baseline a Projection starts from. It is derived on demand from the stored
-rows and refuses what it cannot state.
+`traj baseline` shows the Baseline a Projection starts from, and what each income and expense Account
+ran at. The Baseline is derived on demand from the stored rows and refuses what it cannot state.
 
 ## What a Baseline holds
 
@@ -13,6 +13,44 @@ Equity, income and expense never do: equity is the contra side of an opening bal
 expense are flows. A header account never appears either, while an account closed with
 `traj account close` does, because closing keeps its history. Net worth is assets minus liabilities,
 and it counts nothing else.
+
+## `traj baseline rates`
+
+Show what each income and expense Account ran at over whole recorded months.
+
+- `--as-of <string>` — the date the rates are stated at, as `YYYY-MM-DD`; required
+- `--months <number>` — whole calendar months in the window, 3 to 36; default 12
+
+The window is the whole calendar months ending at the last full month on or before `--as-of`. Each
+income and expense Account with activity gets its total over the months the record covers, and a
+run-rate: the total divided by those months, or by the times its one calendar month falls in them
+when the window spans a year and every active month is that month. The rate divides by the months
+the record covers, never by the months you asked for, so a short record does not read as a low rate.
+A closed Account, a negative total and a zero total are stated and marked as left out.
+
+```bash exec
+traj baseline rates --as-of 2026-04-30
+```
+
+```text output
+rates (1 row)
+Account  Type     Per    Amount  Months  In plan
+Food     expense  month   30.13  1 of 4  yes
+
+totals (2 rows)
+Type      Total  Monthly
+income     0.00     0.00
+expense  120.50    30.13
+
+Covers 4 of the 12 months asked: 2026-01 to 2026-04.
+
+Amounts are rounded half away from zero to the satang.
+```
+
+The Quickstart has one expense, Food, on 2026-03-01, and the window covers 2026-01 to 2026-04, so
+120.50 THB over four months is `30.13` THB a month. The read states; the caller applies.
+[`traj scenario apply --template --from-history`](/cli/commands/scenario/) turns the carried rows
+into a Scenario's income and spending Flows.
 
 ## `traj baseline show`
 
