@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { itemNames } from "../item-names"
+import { buildCatalogue, defaultNameIndex } from "./catalogue"
 import { withCashLines } from "./flow-fixtures.test-support"
 import { seriesNames } from "./series-names"
 
@@ -69,5 +70,43 @@ describe("a kept series' category counts when a step is judged", () => {
 		expect(named.get(cashSeries("expense", "home-loan", null, "loan"))).toBe(
 			"Expense: home-loan (home-loan, loan)",
 		)
+	})
+
+	test("every line the selected plan states reads its own category", () => {
+		const categories = ["home", "loan", null, "car"]
+		const selected = withCashLines(
+			categories.map((category) => ({ group: "expense" as const, id: "home-loan", category })),
+		)
+		const named = seriesNames([selected], selected, NO_NAMES)
+		const names = categories.map(
+			(category) => named.get(cashSeries("expense", "home-loan", null, category)) ?? "",
+		)
+		expect(names).toEqual([
+			"Expense: home-loan (home-loan, home)",
+			"Expense: home-loan (home-loan, loan)",
+			"Expense: home-loan (home-loan, no category)",
+			"Expense: home-loan (home-loan, car)",
+		])
+	})
+
+	test("a category with no word of its own states itself on the picker and in the default name", () => {
+		const categories = ["fruit", "🍔", null]
+		const selected = withCashLines(
+			categories.map((category) => ({ group: "expense" as const, id: "food", category })),
+		)
+		const ids = categories.map((category) => cashSeries("expense", "food", null, category))
+		const expected = [
+			"Expense: food (food, fruit)",
+			"Expense: food (food, 🍔)",
+			"Expense: food (food, no category)",
+		]
+		const listed = new Map(
+			buildCatalogue([selected], selected, NO_NAMES)
+				.flatMap((group) => group.entries)
+				.map((entry) => [entry.id, entry.name]),
+		)
+		const defaults = defaultNameIndex([selected], NO_NAMES)
+		expect(ids.map((id) => listed.get(id) ?? "")).toEqual(expected)
+		expect(ids.map((id) => defaults.get(id) ?? "")).toEqual(expected)
 	})
 })
