@@ -73,6 +73,13 @@ describe("PlanCard's Milestones", () => {
 		expect(body).not.toContain('aria-label="Milestones reached"')
 		expect(body).not.toContain("<time")
 	})
+
+	test("renders its plan link with the plan's own scenario, as before", () => {
+		setTestUrl("http://127.0.0.1/plans/?scenario=retire-early&demo=1")
+		const body = cardBody(BASE)
+		expect(body).toContain('href="/projection/?scenario=base&amp;demo=1"')
+		expect(body).toContain("Open the Plan for base")
+	})
 })
 
 /** The Demo's base snapshot with its projection failed with this code, as a Read keeps it. */

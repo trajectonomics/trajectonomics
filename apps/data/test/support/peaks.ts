@@ -4,11 +4,16 @@ import { usageRow } from "./fixtures"
 /** One window's peak in a peaks body. */
 export type Peak = { tokens: number; fromDay: string; cacheRead: number }
 
+/** One measure's estimate in a peaks body. */
+export type Measure = { value: number; low: number; high: number | null }
+
 /** One window's meter estimate in a peaks body. */
 export type Limit = {
 	tokens: number
 	low: number
 	high: number | null
+	processed: Measure
+	usd: Measure | null
 	points: number
 	readings: number
 	rough: boolean

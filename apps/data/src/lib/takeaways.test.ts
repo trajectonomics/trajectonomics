@@ -9,6 +9,7 @@ function bar(overrides: Partial<PlanBar> = {}): PlanBar {
 		plan: "opencode-go",
 		planName: "OpenCode Go",
 		tier: "Go",
+		unit: "tokens",
 		kind: "estimate",
 		tokens: 86_000_000,
 		low: 80_000_000,
@@ -54,12 +55,24 @@ describe("planTakeaway", () => {
 	test("names the leader of the week with its estimated 100%", () => {
 		expect(
 			planTakeaway([bar(), bar({ plan: "claude", planName: "Claude", tokens: 50 })], "sevenDays"),
-		).toBe("OpenCode Go gives the most tokens a week: ≈ 86M at 100%.")
+		).toBe("OpenCode Go: ≈ 86M a week at 100%")
+	})
+
+	test("names the with-cache unit", () => {
+		expect(planTakeaway([bar({ unit: "processed" })], "sevenDays", "processed")).toBe(
+			"OpenCode Go: ≈ 86M a week with cache at 100%",
+		)
+	})
+
+	test("names the API $ unit in dollars", () => {
+		expect(planTakeaway([bar({ unit: "usd", tokens: 1_300 })], "sevenDays", "usd")).toBe(
+			"OpenCode Go: ≈ $1.3K API a week at 100%",
+		)
 	})
 
 	test("calls a most-we-used figure what it is", () => {
 		expect(planTakeaway([bar({ kind: "fallback", high: null })], "sevenDays")).toBe(
-			"OpenCode Go gives the most tokens a week: 86M most we used.",
+			"OpenCode Go: 86M a week, most we used",
 		)
 	})
 
@@ -75,19 +88,22 @@ describe("planTakeaway", () => {
 		expect(planTakeaway([bar({ kind: "collecting", tokens: null })], "sevenDays")).toBe(
 			"No plan has a full window yet.",
 		)
+		expect(planTakeaway([bar({ kind: "none", tokens: null })], "sevenDays", "usd")).toBe(
+			"No plan has an API $ figure yet.",
+		)
 	})
 })
 
 describe("valueTakeaway", () => {
 	test("names the plan with the most API value per dollar", () => {
 		expect(valueTakeaway([point(), point({ key: "cursor", label: "Cursor", x: 0.8 })])).toBe(
-			"Claude gives the most API value per dollar: $2.10 for every $1.",
+			"Claude: $2.10 API value per $1",
 		)
 	})
 
 	test("says when the leader's figure is only the most we used", () => {
 		expect(valueTakeaway([point({ hollow: true })])).toBe(
-			"Claude gives the most API value per dollar: $2.10 for every $1, counting only the most we used.",
+			"Claude: $2.10 API value per $1, most we used",
 		)
 	})
 
@@ -100,7 +116,7 @@ describe("cacheTakeaway", () => {
 	test("names the highest cache rate", () => {
 		expect(
 			cacheTakeaway([cacheRow({ rate: 0.94 }), cacheRow({ plan: "cursor", planName: "Cursor" })]),
-		).toBe("Claude serves the most of its tokens from cache: 94%.")
+		).toBe("Claude: 94% from cache")
 	})
 
 	test("says so when no plan reports a split", () => {

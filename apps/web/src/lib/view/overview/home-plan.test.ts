@@ -42,8 +42,8 @@ describe("the plan Home follows", () => {
 	test("the cards read that plan's figures", () => {
 		const snapshot = ledgerWith({ base: {}, "retire-early": { main: true } })
 		const view = overviewView(snapshot)
-		expect(view.fi.status === "ready" && view.fi.name).toBe("retire-early")
+		expect(view.projection.status === "ready" && view.projection.name).toBe("retire-early")
 		const named = overviewView(snapshot, "base")
-		expect(named.fi.status === "ready" && named.fi.name).toBe("base")
+		expect(named.projection.status === "ready" && named.projection.name).toBe("base")
 	})
 })

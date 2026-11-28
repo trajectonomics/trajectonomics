@@ -12,6 +12,10 @@ export type FailureCode =
 	| "shell-footer-missing"
 	| "llms-txt-missing"
 	| "post-structured-data-missing"
+	| "redirects-missing"
+	| "redirect-rule-missing"
+	| "redirect-target-unbuilt"
+	| "redirect-source-built"
 
 /** A broken rule, the built file that breaks it, and a sentence a reader can act on. */
 export interface Failure {

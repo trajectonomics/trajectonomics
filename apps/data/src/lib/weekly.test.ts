@@ -7,6 +7,7 @@ function bar(overrides: Partial<PlanBar> = {}): PlanBar {
 		plan: "claude",
 		planName: "Claude",
 		tier: "Max",
+		unit: "tokens",
 		kind: "estimate",
 		tokens: 100,
 		low: 90,

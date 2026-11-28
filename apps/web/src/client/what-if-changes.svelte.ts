@@ -74,7 +74,7 @@ export class WhatIfChanges extends WhatIfState {
 	/** A plan switch while changes are pending asks first. Returns true when the switch may run now. */
 	requestSwitch(name: string): boolean {
 		if (!this.active || this.whatIf?.plan === name) return true
-		this.asking = name
+		this.ask(name)
 		return false
 	}
 
@@ -91,11 +91,20 @@ export class WhatIfChanges extends WhatIfState {
 		this.asking = null
 	}
 
+	/** How many switches were refused so far. A request for the same plan again changes it, so the question comes back into view. */
+	asks = $state(0)
+
+	/** Asks the person to settle the pending changes first, and counts the request, so a repeat of it is a new request. */
+	private ask(plan: string): void {
+		this.asking = plan
+		this.asks += 1
+	}
+
 	/** The session a change to `plan` goes into: this one, a new one, or null when changes on another plan must be settled first. */
 	protected sessionFor(plan: string, contentHash: string): WhatIf | null {
 		if (this.whatIf !== null && this.whatIf.plan === plan) return this.whatIf
 		if (this.active) {
-			this.asking = plan
+			this.ask(plan)
 			return null
 		}
 		return startWhatIf(plan, contentHash)

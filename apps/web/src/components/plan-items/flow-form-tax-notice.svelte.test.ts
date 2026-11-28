@@ -35,15 +35,14 @@ describe("a new income's tax label notice", () => {
 	test("a new income in a taxed plan says where to give it a label, in plain words", () => {
 		const body = form(taxed)
 		expect(body).toContain("This plan's tax counts only income it knows by its label.")
-		expect(body).toContain("After you save, give this income a label in")
-		expect(body).toContain('href="/settings/tax/?scenario=base"')
-		expect(body).toMatch(/<a [^>]*href="\/settings\/tax\/\?scenario=base"[^>]*>.*Tax labels.*<\/a>/)
+		expect(body).toContain("After you save, give this income a label in Tax labels.")
+		expect(body).not.toContain("/settings/tax/")
 		expect(body).not.toContain("traj scenario tax")
 		expect(body).not.toContain("income.section40_1")
 	})
 
 	test("no notice for an edit, or for a plan without a Levy", () => {
-		expect(form(taxed, taxed.flows[0])).not.toContain("only counts income it knows by its label")
-		expect(form(untaxed)).not.toContain("only counts income it knows by its label")
+		expect(form(taxed, taxed.flows[0])).not.toContain("counts only income it knows by its label")
+		expect(form(untaxed)).not.toContain("counts only income it knows by its label")
 	})
 })

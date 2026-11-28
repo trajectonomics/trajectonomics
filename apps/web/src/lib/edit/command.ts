@@ -1,9 +1,11 @@
 /**
- * The `traj` write each Edit runs: the argv, and the standard input the write reads. Pure; the Edit list is
+ * The `traj` write each single-write Edit runs: the argv, and the standard input the write reads. Pure; the Edit list is
  * `edit.ts`, and each Edit maps to one `traj` write here (a `scenario` write, or `account value` for the ledger) ([web ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
+ * A guided plan runs two writes, and `scenario rm` when the household is refused, so its argv live in
+ * `edit-guided.ts` and `serve-guided.ts` runs them.
  */
 import { decimalTokens, overrideTokens } from "../what-if/argv"
-import type { Edit } from "./edit"
+import type { SingleWriteEdit } from "./edit"
 import { planCommand, startCommand } from "./plan-command"
 import { valuesDocument } from "./record-values"
 import { taxCommand } from "./tax-command"
@@ -12,12 +14,16 @@ import { taxCommand } from "./tax-command"
 export type WriteCommand = { argv: string[]; stdin?: string }
 
 /**
- * The `traj` write an Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
+ * The `traj` write a single-write Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
  * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). The
  * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055). A plan started
  * from the ledger's accounts also takes the template the server read (`templateRead`), which it applies.
  */
-export function writeCommand(edit: Edit, dryRun: boolean, template?: string): WriteCommand {
+export function writeCommand(
+	edit: SingleWriteEdit,
+	dryRun: boolean,
+	template?: string,
+): WriteCommand {
 	const flags = dryRun ? ["--dry-run", "--json"] : ["--json"]
 	switch (edit.kind) {
 		case "copy-plan": {

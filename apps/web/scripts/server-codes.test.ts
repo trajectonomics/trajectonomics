@@ -143,7 +143,7 @@ describe("the Dashboard's own error codes", () => {
 		const { codes } = scan(all)
 		const read = new Set(codes)
 		expect(allConstants(all).get("EDIT_RUNNING")).toBe("edit_running")
-		expect(read.size).toBe(41)
+		expect(read.size).toBe(44)
 		for (const code of SERVER_CODES) expect(read).toContain(code)
 		expect([...read].filter((code) => !SERVER_CODES.has(code) && !SHARED.has(code))).toEqual([])
 	})

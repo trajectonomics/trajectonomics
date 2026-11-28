@@ -17,6 +17,12 @@ export interface LabelDraft {
 	label: string
 }
 
+/** The label form's state a refusal is matched against: the selected `flow` may have moved on from the `sent` one. */
+export interface LabelFormState {
+	flow: string
+	sent: string
+}
+
 /** The document with one Flow's tax label set; every other part is as it was. */
 export function withFlowLabel(
 	plan: ScenarioDocument,
@@ -50,18 +56,19 @@ export function labelEdit(
 }
 
 /**
- * What the label form shows: its own problems, and a refusal at the field its path names. `flows` are the ids of the
- * document the Edit sent, in order, because `traj` may name the Flow by its position (`flows.2.label`).
+ * What the label form shows: its own problems, and a refusal at the field its path names. The refusal is matched to the
+ * Flow the save sent, which `state.sent` holds, so changing the select afterwards keeps it where it was. `flows` are the
+ * ids of the document the Edit sent, in order, because `traj` may name the Flow by its position (`flows.2.label`).
  */
 export function labelShown(
 	problems: Problems,
 	refusal: ErrorBody | null,
 	message: string | null,
-	flow: string,
+	state: LabelFormState,
 	flows: readonly string[],
 ): Shown {
 	const named = namedRefusal(refusal, flows)
-	return shownProblems(problems, named, message, ["label"], ["flows", flow])
+	return shownProblems(problems, named, message, ["label"], ["flows", state.sent])
 }
 
 /** The key of the problem at one Flow's label in the whole form. */

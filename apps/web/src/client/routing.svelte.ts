@@ -21,13 +21,12 @@ class Routing {
 	sent = $state<string[]>([])
 	private readonly failure = $derived(editSession.source === SOURCE ? editSession.failure : null)
 	/**
-	 * Whether this page's last Edit failed with words for a form. A write that landed and could not be read again is
-	 * the stale notice's to say, never a form's error (web ADR 0008).
+	 * Whether this page's last Edit failed with words for a form. A write that landed and could not be read again
+	 * has no error (its sentence is the page's notice, and stays until a read shows), and a refusal after one still
+	 * lands here (web ADR 0008).
 	 */
 	private readonly ownError = $derived(
-		editSession.source === SOURCE &&
-			!editSession.savedUnread &&
-			(editSession.failure !== null || editSession.error !== null),
+		editSession.source === SOURCE && (editSession.failure !== null || editSession.error !== null),
 	)
 	/** The message of a refusal or a failure to reach traj, as its source words it: the CLI's, or the server's own. */
 	readonly message = $derived.by(() => {

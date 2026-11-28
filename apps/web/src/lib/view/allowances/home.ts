@@ -17,6 +17,8 @@ export interface AllowancesSummary {
 	readonly savings: readonly AllowancesSaving[]
 	readonly currency: string
 	readonly period: string
+	/** The CLI's own sentences about the run. */
+	readonly notes: readonly string[]
 }
 
 /**
@@ -56,5 +58,6 @@ export function allowancesSummaryOf(
 		savings: currents.map((one) => ({ key: one.key, name: one.name, saving: one.year.saving })),
 		currency: data.currency,
 		period: currents[0]?.year.period ?? "",
+		notes: data.notes,
 	}
 }

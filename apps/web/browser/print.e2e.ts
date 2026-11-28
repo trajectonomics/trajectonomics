@@ -8,7 +8,7 @@ import { measureOverflow } from "./fit"
 // scroll box, the page must be black on white whichever theme the screen shows, and the theme must make no
 // difference to the surfaces that are printed. A semantic colour (a warning's orange) may differ by theme,
 // so text is checked for contrast on its own background instead.
-const PRINTED = ["/reports/", "/projection/years/", "/cash-flow/"] as const
+const PRINTED = ["/", "/reports/", "/projection/years/", "/cash-flow/"] as const
 const A4_LANDSCAPE_CONTENT_PX = Math.floor(((297 - 2 * 12) / 25.4) * 96)
 /** WCAG's floor for large text and graphics, a deliberately low bar: a dark theme's light text on white is near 1. */
 const MIN_CONTRAST = 3
@@ -41,7 +41,7 @@ for (const theme of THEMES) {
 			await openDemo(page, path, { theme })
 			await page.emulateMedia({ media: "print" })
 			await page.setViewportSize({ width: A4_LANDSCAPE_CONTENT_PX, height: 800 })
-			const name = path.replaceAll("/", "")
+			const name = path === "/" ? "home" : path.replaceAll("/", "")
 			await page.screenshot({ path: `${SCREENSHOTS}/print/${theme}/${name}.png`, fullPage: true })
 
 			// The page opens with the plan, the As-of date and the terms.

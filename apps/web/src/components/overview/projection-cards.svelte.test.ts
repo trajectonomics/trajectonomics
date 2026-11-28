@@ -13,35 +13,29 @@ import ProjectionCard from "./ProjectionCard.svelte"
 import TaxCard from "./TaxCard.svelte"
 
 describe("ProjectionCard", () => {
-	test("shows the closing net worth in future money and today's money, and that the money lasts", () => {
+	test("names the last year, and shows the closing net worth with its today's-money figure", () => {
 		const run = projectionRun({ annual: [annualRow("2060-12-31", "19756836.98", "7196252.23")] })
 		const read = okRead(["projection"], projectionView(run))
 		const { body } = render(ProjectionCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
+		expect(body).toContain("At the end, 2060")
 		expect(body).toContain("19.7M")
-		expect(body).toContain("Today's money")
 		expect(body).toContain("7.19M")
+		expect(body).toContain("in today's money")
 		expect(body).toContain('title="19,756,836.98"')
 		expect(body).toContain('title="7,196,252.23"')
-		expect(body).toContain("Money lasts to the end of the plan, 2060.")
+		expect(body).not.toContain("Money lasts to the end of the plan")
 	})
 
-	test("states when it runs out, and when there are no annual rows", () => {
-		const run = projectionRun({
-			annual: [annualRow("2060-12-31", "1.00", "1.00")],
-			runsOut: { date: "2056-05-01", unmet: "70359.24" },
-		})
-		const read = okRead(["projection"], projectionView(run))
-		expect(
-			render(ProjectionCard, { props: { scenario: { status: "ready", name: "base", read } } }).body,
-		).toContain("Runs out on 1 May 2056")
+	test("says when there are no annual rows, and still links to the Plan", () => {
 		const empty = okRead(["projection"], projectionView(projectionRun({ annual: [] })))
-		expect(
-			render(ProjectionCard, {
-				props: { scenario: { status: "ready", name: "base", read: empty } },
-			}).body,
-		).toContain("no annual rows")
+		const { body } = render(ProjectionCard, {
+			props: { scenario: { status: "ready", name: "base", read: empty } },
+		})
+		expect(body).toContain("At the end")
+		expect(body).toContain("no annual rows")
+		expect(body).toContain('href="/projection/"')
 	})
 })
 
@@ -53,19 +47,34 @@ describe("TaxCard", () => {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
 		expect(body).toContain("no tax rules, so every figure is before tax")
-		expect(body).toContain("Tax not applied")
+		expect(body).toContain(">Tax<")
 	})
 
-	test("shows what is owed, its period and its settlement date", () => {
+	test("names the year, shortens the figure, and says when it is due", () => {
 		const run = projectionRun({ taxYears: [taxYear("2026-01-01", "2026-12-31", "89000.00")] })
 		const read = okRead(["projection"], taxView(run))
 		const { body } = render(TaxCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
+		expect(body).toContain("Tax for 2026")
 		expect(body).toContain("89k")
 		expect(body).toContain('title="89,000.00"')
-		expect(body).toContain("Tax for 2026")
 		expect(body).toContain("Due 31 Mar 2027")
-		expect(body).toContain("Tax applied")
+		expect(body).toContain('href="/tax/"')
+	})
+
+	test("calls a negative owed a refund, drops its minus on the face and keeps it in Details", () => {
+		const run = projectionRun({ taxYears: [taxYear("2026-01-01", "2026-12-31", "-12000.00")] })
+		const read = okRead(["projection"], taxView(run))
+		const { body } = render(TaxCard, {
+			props: { scenario: { status: "ready", name: "base", read } },
+		})
+		expect(body).toContain("Refund for 2026")
+		expect(body).not.toContain("Tax for 2026")
+		expect(body).toContain("12k")
+		expect(body).not.toContain("−12k")
+		// Details keeps the CLI's signed string, so a reviewer can match it to the `traj` output.
+		expect(body).toContain("−12,000.00")
+		expect(body).not.toContain("text-destructive")
 	})
 })

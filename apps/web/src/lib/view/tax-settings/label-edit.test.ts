@@ -59,7 +59,10 @@ describe("the tax label form", () => {
 			{},
 			refusal("document.flows.salary.label"),
 			"the CLI's words",
-			"salary",
+			{
+				flow: "salary",
+				sent: "salary",
+			},
 			flows,
 		)
 		expect(at.at("label")).toBe("the CLI's words")
@@ -68,7 +71,10 @@ describe("the tax label form", () => {
 			{},
 			refusal("document.flows.bonus.label"),
 			"the CLI's words",
-			"salary",
+			{
+				flow: "salary",
+				sent: "salary",
+			},
 			flows,
 		)
 		expect(other.at("label")).toBeUndefined()
@@ -77,13 +83,42 @@ describe("the tax label form", () => {
 			{},
 			refusal("document.flows.2.label"),
 			"the CLI's words",
-			"side-gig",
+			{
+				flow: "side-gig",
+				sent: "side-gig",
+			},
 			flows,
 		)
 		expect(positional.at("label")).toBe("the CLI's words")
-		expect(labelShown({}, refusal("document"), "the CLI's words", "salary", flows).general).toBe(
-			"the CLI's words",
-		)
-		expect(labelShown({ label: "own" }, null, null, "salary", flows).at("label")).toBe("own")
+		expect(
+			labelShown(
+				{},
+				refusal("document"),
+				"the CLI's words",
+				{ flow: "salary", sent: "salary" },
+				flows,
+			).general,
+		).toBe("the CLI's words")
+		expect(
+			labelShown({ label: "own" }, null, null, { flow: "salary", sent: "salary" }, flows).at(
+				"label",
+			),
+		).toBe("own")
+	})
+
+	test("a refusal stays with the Flow the form sent after the select moves to another", () => {
+		const refusal = {
+			code: "invalid_input",
+			exitCode: 2,
+			message: "the CLI's words",
+			path: "document.flows.side-gig.label",
+		}
+		const moved = labelShown({}, refusal, "the CLI's words", { flow: "bonus", sent: "side-gig" }, [
+			"salary",
+			"bonus",
+			"side-gig",
+		])
+		expect(moved.at("label")).toBe("the CLI's words")
+		expect(moved.general).toBeUndefined()
 	})
 })

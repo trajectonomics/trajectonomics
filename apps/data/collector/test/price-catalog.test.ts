@@ -1,12 +1,14 @@
 import { describe, expect, test } from "bun:test"
 import {
 	MODEL_PRICES,
+	type ModelPrice,
 	modelKey,
 	modelPriceOn,
 	PLAN_PRICES,
 	type PlanPrice,
 	PRICE_READ,
 	planPriceOn,
+	tokenCost,
 } from "../src/price-catalog"
 import { TIERS } from "../src/tiers"
 
@@ -103,5 +105,49 @@ describe("the model price catalogue", () => {
 
 	test("gives an unknown model no price", () => {
 		expect(modelPriceOn("made-up-model")).toBeNull()
+	})
+})
+
+describe("tokenCost", () => {
+	/** A hand-written price: $4 in, $20 out, $0.20 a cache read and $5 a cache write a million. */
+	const price: ModelPrice = {
+		input: 4,
+		output: 20,
+		cacheRead: 0.2,
+		cacheWrite: 5,
+		source: { url: "", read: "", quote: "" },
+	}
+
+	test("prices all four kinds at their list price", () => {
+		const cost = tokenCost(
+			{
+				tokensIn: 1_000_000,
+				tokensOut: 1_000_000,
+				cacheRead: 2_000_000,
+				cacheWrite: 1_000_000,
+			},
+			price,
+		)
+		expect(cost).toBeCloseTo(29.4, 6)
+	})
+
+	test("prices a cache write at the input price when none is stated", () => {
+		const cost = tokenCost(
+			{ tokensIn: 1_000_000, tokensOut: null, cacheRead: null, cacheWrite: 1_000_000 },
+			{ ...price, cacheWrite: null },
+		)
+		expect(cost).toBeCloseTo(8, 6)
+	})
+
+	test("counts a missing kind as zero", () => {
+		expect(
+			tokenCost({ tokensIn: 1_000_000, tokensOut: null, cacheRead: null, cacheWrite: null }, price),
+		).toBe(4)
+	})
+
+	test("has no cost when the row has no input or output to price", () => {
+		expect(
+			tokenCost({ tokensIn: null, tokensOut: null, cacheRead: 5_000_000, cacheWrite: null }, price),
+		).toBeNull()
 	})
 })

@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
-import { disabledTitle } from "../components/hosted/message"
+import { disabledTitle, INSTALL_URL } from "../components/hosted/message"
 import { chanceHref, futureHref } from "./chance-links"
 import { postEdit, postPreview } from "./edit-post"
 import { editSession } from "./edit-session.svelte"
+import { setupButton } from "./focus-setup"
 import { withBase, withSearch } from "./links"
 import { postReread } from "./reread"
 import { navPath, pageTitle } from "./routes"
@@ -28,6 +29,12 @@ describe("the hosted twins", () => {
 		expect(futureHref("", "base", 3)).toBe("/demo/chance/path/?scenario=base&index=3")
 	})
 
+	test("keep a link's own scenario over the page's, with the page's other parameters", () => {
+		expect(withSearch("/tax/?scenario=separate", "?scenario=base&demo=1")).toBe(
+			"/demo/tax/?scenario=separate&demo=1",
+		)
+	})
+
 	test("find a page by its path with or without the base path", () => {
 		expect(navPath("/demo/net-worth/")).toBe("/net-worth/")
 		expect(navPath("/demo/chance/path/")).toBe("/chance/")
@@ -48,6 +55,14 @@ describe("the hosted twins", () => {
 		expect((await postPreview("t", { kind: "delete-plan", name: "base" })).ok).toBe(false)
 		expect((await postReread("t", {})).ok).toBe(false)
 		expect(typeof (await readWhatIf({} as never, null, () => true))).toBe("string")
+	})
+
+	test("point the setup action at the install, where a visitor can make a plan", () => {
+		expect(setupButton()).toEqual({
+			label: "Start a plan",
+			href: INSTALL_URL,
+			external: true,
+		})
 	})
 
 	test("say on a switched-off control what it would do and where to do it", () => {

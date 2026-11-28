@@ -36,6 +36,32 @@ export const MODEL_PRICES: Readonly<Record<string, ModelPrice>> = Object.freeze(
 	...otherModels,
 })
 
+/** The token kinds one hour or row reports; a null part is a kind its source did not report. */
+export type TokenParts = {
+	tokensIn: number | null
+	tokensOut: number | null
+	cacheRead: number | null
+	cacheWrite: number | null
+}
+
+const PER_MILLION = 1_000_000
+
+/**
+ * One set of token kinds at a model's list prices, in US dollars. Null when the row has no
+ * input/output split at all, because there is no usage to price; every null part otherwise counts
+ * as zero, and a cache write with no stated price is priced as input.
+ */
+export function tokenCost(parts: TokenParts, price: ModelPrice): number | null {
+	if (parts.tokensIn === null && parts.tokensOut === null) return null
+	const writePrice = price.cacheWrite ?? price.input
+	const tokens =
+		(parts.tokensIn ?? 0) * price.input +
+		(parts.tokensOut ?? 0) * price.output +
+		(parts.cacheRead ?? 0) * price.cacheRead +
+		(parts.cacheWrite ?? 0) * writePrice
+	return tokens / PER_MILLION
+}
+
 /** A model id without its provider prefix, which usage rows may carry. */
 export function modelKey(model: string): string {
 	const slash = model.lastIndexOf("/")

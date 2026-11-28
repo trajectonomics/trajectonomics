@@ -105,7 +105,10 @@ describe("the tax cards through traj", () => {
 				{},
 				refused.error,
 				refused.error.message,
-				"side-gig",
+				{
+					flow: "side-gig",
+					sent: "side-gig",
+				},
 				plan.document.flows.map((one) => one.id),
 			)
 			expect(shown.at("label")).toBe(refused.error.message)

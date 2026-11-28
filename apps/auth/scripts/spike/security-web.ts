@@ -3,10 +3,9 @@ import { json, type Session } from "./http"
 import { requestResult } from "./request"
 import { COLLECTOR, DATA, RELAY, reset, WEB, WEB_REDIRECT_URI } from "./security-shared"
 
-/** Drives authorize -> consent accept -> returns the issued code. */
-export async function authorizeCode(session: Session, verifier: string): Promise<string | null> {
+function authorizeParams(verifier: string): URLSearchParams {
 	const challenge = createHash("sha256").update(verifier).digest("base64url")
-	const params = new URLSearchParams({
+	return new URLSearchParams({
 		response_type: "code",
 		client_id: WEB,
 		redirect_uri: WEB_REDIRECT_URI,
@@ -16,12 +15,25 @@ export async function authorizeCode(session: Session, verifier: string): Promise
 		code_challenge_method: "S256",
 		resource: DATA,
 	})
-	const response = await session.request(`/api/auth/oauth2/authorize?${params}`, {
-		redirect: "manual",
-		headers: { accept: "text/html" },
-	})
-	const location = response.headers.get("location")
-	if (location === null || !location.includes("/consent?")) return null
+}
+
+/** The GET authorize redirect's Location, without accepting consent. */
+export async function authorizeLocation(session: Session, verifier: string): Promise<string> {
+	const response = await session.request(
+		`/api/auth/oauth2/authorize?${authorizeParams(verifier)}`,
+		{
+			redirect: "manual",
+			headers: { accept: "text/html" },
+		},
+	)
+	await response.text()
+	return response.headers.get("location") ?? ""
+}
+
+/** Drives authorize -> consent accept -> returns the issued code. */
+export async function authorizeCode(session: Session, verifier: string): Promise<string | null> {
+	const location = await authorizeLocation(session, verifier)
+	if (location === "") return null
 	const consent = await requestResult(
 		session,
 		"/api/auth/oauth2/consent",
@@ -31,21 +43,12 @@ export async function authorizeCode(session: Session, verifier: string): Promise
 	return url === null ? null : new URL(url).searchParams.get("code")
 }
 
-export async function checkDeleteConsentDisabled(session: Session): Promise<boolean> {
-	const result = await requestResult(
-		session,
-		"/api/auth/oauth2/delete-consent",
-		json({ id: "not-a-grant" }),
-	)
-	return result.status === 404
-}
-
 export async function checkSmuggledJsonResource(
 	session: Session,
 	scratch: string,
 ): Promise<boolean> {
 	reset(scratch)
-	const headers = { "content-type": "application/json; x=application/x-www-form-urlencoded" }
+	const headers = { "content-type": "application/json" }
 	const body = JSON.stringify({
 		client_id: COLLECTOR,
 		scope: "openid offline_access",

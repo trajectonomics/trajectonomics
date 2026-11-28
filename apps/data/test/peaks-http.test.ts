@@ -20,7 +20,7 @@ describe("GET /api/peaks", () => {
 		expect(response.status).toBe(200)
 		const body = (await response.json()) as PeaksBody
 		expect(body.asOf).toBe("2026-11-25")
-		expect(body.methodVersion).toBe(3)
+		expect(body.methodVersion).toBe(4)
 		expect(body.plans).toEqual([
 			{
 				plan: "claude",

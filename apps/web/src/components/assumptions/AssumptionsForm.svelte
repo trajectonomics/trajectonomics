@@ -61,7 +61,7 @@ function tryThem(): void {
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label="Assumptions of {name}">
-	<StaleNotice />
+	<StaleNotice shows="stale" />
 	<section class="space-y-3" aria-labelledby="prices">
 		<h2 id="prices" class="text-base font-semibold">Prices</h2>
 		<div class="max-w-xs">

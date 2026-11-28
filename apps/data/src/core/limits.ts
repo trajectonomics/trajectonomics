@@ -1,107 +1,98 @@
-import { type QuotaReading, segmentsOf, tokensBetween } from "./limits-readings"
-import { MONTH_FROM_WEEK } from "./plan-month"
-import type { QuotaWindow } from "./types"
+import { type Measure, measureOf, sumsBetween } from "./limits-measures"
+import { type QuotaReading, segmentsOf } from "./limits-readings"
+import type { MeterHour } from "./meter-hours"
+import { DAY_MS } from "./rules"
 
+export type { Measure } from "./limits-measures"
 export type { QuotaReading } from "./limits-readings"
 
 /**
- * One window's limit estimate: the tokens the plan would hold at 100%, the range its rounded
- * meter readings allow, and how much evidence stands behind it. `rough` marks fewer than three
- * percentage points of meter movement; `derived` marks a 30-day figure scaled from the week.
+ * One window's limit estimate in three measures: the uncached tokens at 100% (the peaks'
+ * measure), the processed tokens that count cache reads in full, and their API list dollars.
+ * `rough` marks thin evidence and `derived` a month scaled from the week.
  */
 export type LimitEstimate = {
 	tokens: number
 	low: number
 	high: number | null
+	processed: Measure
+	usd: Measure | null
 	points: number
 	readings: number
 	rough: boolean
 	derived?: boolean
 }
 
-/** One plan's quota sample with the window it belongs to. */
-export type QuotaReadingWindow = QuotaReading & { window: QuotaWindow }
-
-/** One plan's three limit estimates; a window whose meter never moved has none. */
-export type PlanLimits = {
-	fiveHours: LimitEstimate | null
-	sevenDays: LimitEstimate | null
-	thirtyDays: LimitEstimate | null
+/** Every contributing segment's measures and evidence, pooled. */
+type Pooled = {
+	tokens: number
+	processed: number
+	usd: number | null
+	points: number
+	segments: number
+	readings: number
+	firstMs: number
+	lastMs: number
 }
 
-const WEEK_DAYS = 7
-const MONTH_DAYS = 30
-
-/**
- * Estimates one plan window's 100% from its meter readings and its hourly uncached tokens:
- * tokens used ÷ percentage points the meter moved × 100, pooled over every segment whose meter
- * rose. Each reading is rounded to a whole percent, so a segment's movement is uncertain by one
- * point: `low` counts one extra point per segment and `high` one fewer, and `high` is null until
- * the movement exceeds the segments' rounding.
- */
-export function estimateLimit(
+/** Pools the segments whose meter rose and whose uncached tokens did not; null when none did. */
+function poolSegments(
 	readings: readonly QuotaReading[],
-	hourlyTokens: ReadonlyMap<number, number>,
-): LimitEstimate | null {
-	let tokens = 0
-	let points = 0
-	let segments = 0
-	let count = 0
+	hours: ReadonlyMap<number, MeterHour>,
+): Pooled | null {
+	const pooled: Pooled = {
+		tokens: 0,
+		processed: 0,
+		usd: 0,
+		points: 0,
+		segments: 0,
+		readings: 0,
+		firstMs: Number.POSITIVE_INFINITY,
+		lastMs: Number.NEGATIVE_INFINITY,
+	}
 	for (const segment of segmentsOf(readings)) {
 		const moved = segment.last.usedPct - segment.first.usedPct
 		if (moved <= 0) continue
 		// A segment with no hourly tokens behind it (day rows only, or use we never collected)
 		// says nothing about the limit, so it adds no points either.
-		const used = tokensBetween(hourlyTokens, segment.first.sampledAt, segment.last.sampledAt)
-		if (used <= 0) continue
-		tokens += used
-		points += moved
-		segments += 1
-		count += segment.readings
+		const sums = sumsBetween(hours, segment.first.sampledAt, segment.last.sampledAt)
+		if (sums.uncached <= 0) continue
+		pooled.tokens += sums.uncached
+		pooled.processed += sums.processed
+		pooled.usd = pooled.usd === null || sums.usd === null ? null : pooled.usd + sums.usd
+		pooled.points += moved
+		pooled.segments += 1
+		pooled.readings += segment.readings
+		pooled.firstMs = Math.min(pooled.firstMs, Date.parse(segment.first.sampledAt))
+		pooled.lastMs = Math.max(pooled.lastMs, Date.parse(segment.last.sampledAt))
 	}
-	if (points <= 0) return null
-	return {
-		tokens: Math.round((tokens / points) * 100),
-		low: Math.round((tokens / (points + segments)) * 100),
-		high: points - segments > 0 ? Math.round((tokens / (points - segments)) * 100) : null,
-		points,
-		readings: count,
-		rough: points < 3,
-	}
+	return pooled.points > 0 ? pooled : null
 }
 
-/** A week's estimate scaled to 30 days for a plan whose vendor states no monthly window. */
-function monthFromWeek(week: LimitEstimate | null): LimitEstimate | null {
-	if (week === null) return null
+/**
+ * Estimates one plan window's 100% as tokens used ÷ points the meter moved × 100, pooled over
+ * every segment whose meter rose and whose uncached tokens did not, in all three measures. Whole
+ * percent rounding widens the range by one point per segment, and an estimate is rough until it
+ * has three points over at least a day. Dollars are null when an hour of a contributing segment
+ * holds a model with no list price, because an hour is priced whole or not at all.
+ */
+export function estimateLimit(
+	readings: readonly QuotaReading[],
+	hours: ReadonlyMap<number, MeterHour>,
+): LimitEstimate | null {
+	const pooled = poolSegments(readings, hours)
+	if (pooled === null) return null
+	const uncached = measureOf(pooled.tokens, pooled.points, pooled.segments)
+	const usd =
+		pooled.usd === null ? null : measureOf(pooled.usd, pooled.points, pooled.segments, true)
 	return {
-		tokens: Math.floor((week.tokens * MONTH_DAYS) / WEEK_DAYS),
-		low: Math.floor((week.low * MONTH_DAYS) / WEEK_DAYS),
-		high: week.high === null ? null : Math.floor((week.high * MONTH_DAYS) / WEEK_DAYS),
-		points: week.points,
-		readings: week.readings,
-		rough: week.rough,
-		derived: true,
-	}
-}
-
-/** One plan's three estimates, from its readings and its hourly uncached tokens. */
-export function planLimits(
-	plan: string,
-	readings: readonly QuotaReadingWindow[],
-	hourlyTokens: ReadonlyMap<number, number>,
-): PlanLimits {
-	const windows: Record<QuotaWindow, QuotaReading[]> = {
-		five_hour: [],
-		weekly: [],
-		monthly: [],
-	}
-	for (const reading of readings) windows[reading.window].push(reading)
-	const week = estimateLimit(windows.weekly, hourlyTokens)
-	return {
-		fiveHours: estimateLimit(windows.five_hour, hourlyTokens),
-		sevenDays: week,
-		thirtyDays: MONTH_FROM_WEEK.has(plan)
-			? monthFromWeek(week)
-			: estimateLimit(windows.monthly, hourlyTokens),
+		tokens: uncached.value,
+		low: uncached.low,
+		high: uncached.high,
+		processed: measureOf(pooled.processed, pooled.points, pooled.segments),
+		usd,
+		points: pooled.points,
+		readings: pooled.readings,
+		rough: pooled.points < 3 || pooled.lastMs - pooled.firstMs < DAY_MS,
 	}
 }

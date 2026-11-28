@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite"
 import { join } from "node:path"
 
 const packageRoot = new URL("../../", import.meta.url).pathname
@@ -36,4 +37,33 @@ export function executeSql(directory: string, command: string): Array<Record<str
 /** The token endpoint allows 20 requests a minute, so each spike group starts from zero. */
 export function resetRateLimits(directory: string): void {
 	executeSql(directory, "delete from rateLimit")
+}
+
+/**
+ * The scratch D1 database file, opened directly. A case that must delete rows while the Worker is
+ * mid-request cannot wait for a `wrangler d1 execute` CLI start, so it writes to the same SQLite
+ * file Miniflare serves. The file is found by its `verification` table, not by a fixed path.
+ */
+export function openScratchDatabase(directory: string): Database {
+	for (const file of new Bun.Glob("**/*.sqlite").scanSync({
+		cwd: directory,
+		absolute: true,
+		dot: true,
+	})) {
+		let database: Database | undefined
+		try {
+			database = new Database(file)
+			const row = database
+				.query("select count(*) as n from sqlite_master where name='verification'")
+				.get() as { n?: number } | null
+			if (Number(row?.n ?? 0) > 0) {
+				database.run("pragma busy_timeout=5000")
+				return database
+			}
+			database.close()
+		} catch {
+			database?.close()
+		}
+	}
+	throw new Error("the scratch D1 database file was not found")
 }
