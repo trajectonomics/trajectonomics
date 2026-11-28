@@ -67,6 +67,7 @@ describe("planStats", () => {
 		)
 		expect(stats).toEqual({
 			stopWorking: { month: "Mar 2041", date: "1 Mar 2041" },
+			runsOut: null,
 			closing: { amount: "1550000.00", year: "2028" },
 			chance: "87%",
 		})
@@ -81,19 +82,32 @@ describe("planStats", () => {
 		}
 		expect(planStats(unreachable, failed, projectionRunFixture())).toEqual({
 			stopWorking: null,
+			runsOut: null,
 			closing: { amount: "1550000.00", year: "2028" },
 			chance: null,
 		})
 		expect(planStats(undefined, undefined, projectionRunFixture())).toEqual({
 			stopWorking: null,
+			runsOut: null,
 			closing: { amount: "1550000.00", year: "2028" },
 			chance: null,
 		})
 	})
 
+	test("states the month the money runs out, for a plan that states one", () => {
+		const stats = planStats(
+			okRead(fiFixture(UNREACHABLE.shortfallBeforeStop)),
+			undefined,
+			projectionRunFixture({ runsOut: { date: "2027-06-15", unmet: "1200.00" } }),
+		)
+		expect(stats.runsOut).toEqual({ month: "Jun 2027" })
+		expect(stats.stopWorking).toBeNull()
+	})
+
 	test("leaves the closing figure out when the projection has no year", () => {
 		expect(planStats(undefined, undefined, projectionRunFixture({ tables: [] }))).toEqual({
 			stopWorking: null,
+			runsOut: null,
 			closing: null,
 			chance: null,
 		})

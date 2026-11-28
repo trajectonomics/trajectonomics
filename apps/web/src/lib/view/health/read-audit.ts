@@ -93,6 +93,9 @@ function entriesOf(snapshot: Snapshot): Entry[] {
 		{ question: "Profit and loss for the period", read: reads.pnl },
 		{ question: "Transactions in the period", read: reads.transactions },
 		{ question: BASELINE, read: reads.baseline },
+		...(reads.rates === undefined
+			? []
+			: [{ question: "Run-rates at the As-of", read: reads.rates }]),
 		{ question: "Plans", read: reads.scenarios },
 		...projections,
 		...fi,

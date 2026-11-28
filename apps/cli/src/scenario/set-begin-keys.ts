@@ -64,6 +64,14 @@ export function beginsSurplusKey(segment: string, prefix: readonly string[]): bo
 	)
 }
 
+/**
+ * The inflation spread a `--set` may add when `economy` leaves it out (cli ADR-0085, amending ADR-0065):
+ * `--set economy.inflationVolatility=150` gives the chance of success a swing without a volatile Account.
+ */
+export function beginsInflationVolatility(segment: string, prefix: readonly string[]): boolean {
+	return segment === "inflationVolatility" && prefix.length === 1 && prefix[0] === "economy"
+}
+
 /** The keys a `--set` may add to an item that leaves them out: an Account's volatility, a label, a surplus step's share or cap. */
 export function beginsKey(
 	node: Record<string, unknown>,
@@ -72,6 +80,7 @@ export function beginsKey(
 ): boolean {
 	return (
 		beginsAccountVolatility(node, segment, prefix) ||
+		beginsInflationVolatility(segment, prefix) ||
 		beginsDisplayLabel(segment, prefix) ||
 		beginsFlowLabel(node, segment, prefix) ||
 		beginsSurplusKey(segment, prefix)
@@ -106,7 +115,7 @@ export function beginnableKeysAt(
 	prefix: readonly string[],
 ): readonly string[] {
 	const keys = [...(prefix.length === 0 ? BEGINNABLE_BLOCKS : [])]
-	for (const key of ["volatility", "displayLabel", "label", ...STEP_KEYS]) {
+	for (const key of ["volatility", "inflationVolatility", "displayLabel", "label", ...STEP_KEYS]) {
 		if (beginsKey(node, key, prefix)) keys.push(key)
 	}
 	return keys.filter((key) => !Object.hasOwn(node, key))

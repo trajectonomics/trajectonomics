@@ -1,5 +1,6 @@
 <script lang="ts">
 import AccountsSection from "../ledger/AccountsSection.svelte"
+import LedgerFocus from "../ledger/LedgerFocus.svelte"
 import PnlSection from "../ledger/PnlSection.svelte"
 import TransactionsSection from "../ledger/TransactionsSection.svelte"
 import TrialBalanceSection from "../ledger/TrialBalanceSection.svelte"
@@ -14,12 +15,17 @@ interface Props {
 let { account, onAccount }: Props = $props()
 </script>
 
-<!-- The Ledger: the accounts and their balances, the trial balance, profit and loss, and transactions. -->
+<!-- The Ledger: the focus point, then the accounts and their balances, the trial balance, profit and loss, and transactions. -->
 <PageShell
 	title="Ledger"
 >
 	{#snippet children(snapshot)}
 		<div class="space-y-12">
+			<LedgerFocus
+				accounts={snapshot.reads.accounts}
+				transactions={snapshot.reads.transactions}
+				asOf={snapshot.params.asOf}
+			/>
 			<AccountsSection accounts={snapshot.reads.accounts} balance={snapshot.reads.balance} />
 			<TrialBalanceSection balance={snapshot.reads.balance} />
 			<PnlSection pnl={snapshot.reads.pnl} />

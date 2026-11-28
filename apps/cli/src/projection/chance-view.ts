@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
-import { band, bandsTable, runsOut } from "./chance-band-view"
+import { band, bandsTable, realBandsField, runsOut } from "./chance-band-view"
 import { type ChanceMilestoneView, milestonesField } from "./chance-milestones-view"
 import {
 	type ChanceOutcomeView,
@@ -66,6 +66,8 @@ export type ChanceView = Echo & {
 	/** The floored share of Market paths that never run out, in basis points. */
 	successBps: number
 	bands: ChanceBandView[]
+	/** The same Bands in each path's own today's money; present only when the model has an inflation factor (cli ADR-0085). */
+	realBands?: ChanceBandView[] | undefined
 	runsOut: ChanceRunsOutView[]
 	/** Present only when the plan has a spending rule Flow. */
 	spendingBands?: ChanceSpendingBandView[] | undefined
@@ -111,6 +113,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 		.int()
 		.describe("The floored success share in basis points: 8730 is 87.30%."),
 	bands: z.array(band).describe("One Band per annual roll-up end, in order."),
+	realBands: realBandsField,
 	runsOut: z.array(runsOut).describe("One row per annual roll-up, zeros included."),
 	spendingBands: spendingBandField,
 	lowestYearSpending: lowestYearField,

@@ -3,7 +3,13 @@ import type { ScenarioProblem } from "./document"
 import { isOwnCode } from "./own-problems"
 
 /** The rate fields of a document: a rate is written in basis points, never as a fraction. */
-const RATE_SEGMENTS: ReadonlySet<string | number> = new Set(["rate", "bps", "inflation", "share"])
+const RATE_SEGMENTS: ReadonlySet<string | number> = new Set([
+	"rate",
+	"bps",
+	"inflation",
+	"inflationVolatility",
+	"share",
+])
 
 const GROWTH_FORMS = '"inflation", {"bps": <integer>}; {"bps": 0} is a fixed amount'
 

@@ -16,6 +16,7 @@ describe("the projection chance contract against the CLI's goldens", () => {
 		const chance = projectionChance.parse(await golden("chance.output"))
 		expect(chance.spendingBands).toBeUndefined()
 		expect(chance.lowestYearSpending).toBeUndefined()
+		expect(chance.realBands).toBeUndefined()
 		expect(chance.tables.map((table) => table.name)).toEqual(["bands"])
 	})
 
@@ -38,7 +39,32 @@ describe("the projection chance contract against the CLI's goldens", () => {
 		const chance = projectionChance.parse(await golden("chance-plan.output"))
 		expect(chance.returnModel).toMatchObject({ source: "plan", buckets: 16 })
 		expect(chance.returnModel?.accounts[0]).toMatchObject({ volatility: 1500 })
+		expect(chance.returnModel?.inflation).toBeUndefined()
+		expect(chance.realBands).toBeUndefined()
 		expect(chance.definition.modelId).toBe("plan-16")
+	})
+
+	it("parses the plan's inflation factor, the real Bands and the median in today's money (cli ADR-0085)", async () => {
+		const body = (await golden("chance-plan.output")) as {
+			returnModel: Record<string, unknown>
+			bands: { index: number; to: string; netWorth: { level: number; value: string }[] }[]
+			tables: { name: string; count: number; rows: Record<string, unknown>[] }[]
+		}
+		const median = body.bands[0]?.netWorth.find((entry) => entry.level === 50)?.value ?? ""
+		const parsed = projectionChance.parse({
+			...body,
+			returnModel: { ...body.returnModel, inflation: { rate: 250, volatility: 150 } },
+			realBands: body.bands,
+			tables: body.tables.map((table) =>
+				table.name === "bands"
+					? { ...table, rows: table.rows.map((row) => ({ ...row, p50Real: median })) }
+					: table,
+			),
+		})
+		expect(parsed.returnModel?.inflation).toEqual({ rate: 250, volatility: 150 })
+		expect(parsed.realBands?.[0]?.netWorth).toHaveLength(5)
+		const table = parsed.tables.find((entry) => entry.name === "bands")
+		if (table?.name === "bands") expect(table.rows[0]?.p50Real).toBe(median)
 	})
 
 	it("leaves the file model's read without a returnModel, and refuses one it does not name", async () => {

@@ -17,6 +17,8 @@ export type PathRollupReturnsView = {
 	index: number
 	from: string
 	to: string
+	/** The path's own inflation over the roll-up, in basis points; present only with an inflation factor (cli ADR-0085). */
+	inflationBps?: number | undefined
 	accounts: PathAccountReturnView[]
 }
 
@@ -45,6 +47,13 @@ const rollupReturns: z.ZodType<PathRollupReturnsView> = z.strictObject({
 	index: z.number().int().describe("The roll-up's index, from 0, as in the annual table."),
 	from: dateField("The roll-up's first day"),
 	to: dateField("The roll-up's last day"),
+	inflationBps: z
+		.number()
+		.int()
+		.optional()
+		.describe(
+			"The path's own inflation over the roll-up in basis points, rounded half away from zero; present only when the Return model has an inflation factor (cli ADR-0085).",
+		),
 	accounts: z.array(accountReturn).describe("One return per Account of the Return model."),
 })
 

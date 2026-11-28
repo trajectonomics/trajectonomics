@@ -8,9 +8,11 @@ interface Props {
 	columns: readonly Column<Row>[]
 	rows: readonly Row[]
 	rowKey: (row: Row) => string
+	/** The id a row answers to, so a link can land on it. A row without one has no id. */
+	rowId?: (row: Row) => string | undefined
 }
 
-let { caption, columns, rows, rowKey }: Props = $props()
+let { caption, columns, rows, rowKey, rowId }: Props = $props()
 </script>
 
 <!-- A semantic table with a sticky header. It scrolls inside its own wrapper, both ways, so the page
@@ -33,7 +35,14 @@ never scrolls sideways. The wrapper is `relative` so a screen-reader-only label 
 		</thead>
 		<tbody>
 			{#each rows as row (rowKey(row))}
-				<tr class="border-b border-border last:border-0">
+				{@const id = rowId?.(row)}
+				<tr
+					id={id}
+					class={cx(
+						"border-b border-border last:border-0",
+						id !== undefined && "scroll-mt-28",
+					)}
+				>
 					{#each columns as column (column.key)}
 						<td class={cx("px-3 py-2 align-top", column.numeric && "text-right tabular-nums")}
 							>{@render column.cell(row)}</td

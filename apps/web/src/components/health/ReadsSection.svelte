@@ -53,6 +53,12 @@ const columns: Column<AuditRow>[] = [
 	{#if rows.length === 0}
 		<EmptyState title="No Reads in these figures" />
 	{:else}
-		<DataTable caption="Reads" {rows} rowKey={(row) => row.key} {columns} />
+		<DataTable
+			caption="Reads"
+			{rows}
+			rowKey={(row) => row.key}
+			rowId={(row) => (row.failed ? `check-${row.key}` : undefined)}
+			{columns}
+		/>
 	{/if}
 </ReportSection>

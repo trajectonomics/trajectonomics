@@ -16,6 +16,7 @@ import { overviewView } from "../../lib/view/overview/view"
 import { LOADING } from "../../lib/view/state"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import ComparePanel from "../compare/ComparePanel.svelte"
+import MilestoneFocus from "../milestones/MilestoneFocus.svelte"
 import MilestonesBody from "../milestones/MilestonesBody.svelte"
 import MilestonesView from "../milestones/MilestonesView.svelte"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
@@ -74,12 +75,22 @@ describe("with no session, a page is its content and nothing more", () => {
 			terms: "both",
 			onTerms: () => {},
 		})
-		const inner = createRawSnippet(() => ({ render: () => body }))
+		const chance = DEMO.reads.chance["base"]
+		const focus = bodyOf(MilestoneFocus, {
+			run: read.data,
+			asOf: DEMO.params.asOf,
+			chance: chance?.ok === true ? chance.data : null,
+		})
+		const inner = createRawSnippet(() => ({
+			render: () => `<div class="space-y-8">${focus}${body}</div>`,
+		}))
 		const reference = bodyOf(ReadView, { read, label: "Milestones of base", children: inner })
 		const page = bodyOf(MilestonesView, {
 			names: DEMO.params.scenarios,
 			projections: DEMO.reads.projections,
+			chances: DEMO.reads.chance,
 			scenario: "base",
+			asOf: DEMO.params.asOf,
 			terms: "both",
 			onTerms: () => {},
 		})

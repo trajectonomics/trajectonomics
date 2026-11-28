@@ -215,8 +215,16 @@ The share of seeded Market paths on which a Scenario never runs out before its H
 _Avoid_: Probability, success rate, confidence
 
 **Return model**:
-The weighted table of monthly returns, one per Account, that Market paths draw from. The CLI ships none: a caller states one in a JSON file with `--return-model`, or says `--return-model plan` to build it from the Scenario's own Accounts, each asset's `rate` and `volatility` (ADR-0068; `traj projection model` prints it).
+The weighted table of monthly returns, one per Account, that Market paths draw from. The CLI ships none: a caller states one in a JSON file with `--return-model`, or says `--return-model plan` to build it from the Scenario's own Accounts, each asset's `rate` and `volatility` (ADR-0068; `traj projection model` prints it). A plan that states `economy.inflationVolatility` adds an Inflation factor (sim ADR 0033).
 _Avoid_: Market history, returns table, assumptions
+
+**Inflation factor**:
+The optional `inflation` of a Return model: one year's rate per bucket, drawn on each Market path. A plan states its mean as `economy.inflation` and its yearly spread as `economy.inflationVolatility`; absent or 0 holds inflation at the mean on every path and draws nothing (sim ADR 0033, cli ADR 0085).
+_Avoid_: Inflation model, CPI series
+
+**Price path**:
+The inflation one Market path follows, drawn from its Inflation factor (sim ADR 0033). Everything that follows inflation follows the path, and `projection path` states each Annual roll-up's own rate as `inflationBps`.
+_Avoid_: Inflation path, deflator
 
 **Market path**:
 One seeded run of a Return model's monthly draws over a Timeline. Paths differ only by their index, so the same seed and model always give the same set.
