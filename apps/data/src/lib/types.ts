@@ -30,6 +30,24 @@ export type UsagePayload = {
 	rows: UsageRow[]
 }
 
+/** One row of the hourly usage API: the org's sum for one plan at one UTC hour. */
+export type HourlyRow = {
+	hourUtc: string
+	plan: string
+	tokensTotal: number
+	requests: number
+}
+
+/** The body of the hourly usage API. */
+export type HourlyPayload = {
+	asOf: string
+	methodVersion: number
+	series: string
+	from: string
+	to: string
+	rows: HourlyRow[]
+}
+
 /** The body of the health API; an older cached body has neither collected-day field. */
 export type Health = {
 	lastIngestAt: string | null
@@ -113,9 +131,9 @@ export type PeaksPayload = {
 	plans: PlanPeak[]
 }
 
-/** A day's token total for one plan, as the chart plots it. */
+/** A bucket's token total for one plan, as the chart plots it; `label` is what it prints. */
 export type ChartPoint = {
-	day: string
+	label: string
 	tokens: number
 }
 

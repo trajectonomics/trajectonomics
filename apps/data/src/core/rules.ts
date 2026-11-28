@@ -20,6 +20,8 @@ export const MAX_INGEST_ERRORS = 10
 export const MIN_QUERY_DAY = "2020-01-01"
 /** The longest span, in days, the public query may ask for. */
 export const MAX_QUERY_SPAN_DAYS = 400
+/** The longest span, in days, the Log's hourly read may ask for. */
+export const MAX_HOURLY_SPAN_DAYS = 7
 /** The span, in days, a query reads when it names no `from`. */
 export const DEFAULT_QUERY_SPAN_DAYS = 30
 

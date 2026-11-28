@@ -7,6 +7,8 @@ export type CacheLike = {
 }
 
 const USAGE_PARAMS = ["asOf", "from", "model", "plan", "to"] as const
+/** The hourly read takes the day window and the as-of cap, and nothing else. */
+const HOURLY_PARAMS = ["asOf", "from", "to"] as const
 /** The peaks endpoint reads one parameter; its cache key keeps only that. */
 const PEAKS_PARAMS = ["asOf"] as const
 
@@ -58,6 +60,16 @@ export function usageCacheKey(request: Request): Request {
 /** The key the stale copy lives under; only this Worker writes it. */
 export function usageStaleCacheKey(request: Request): Request {
 	return staleKey(normalizedReadUrl(request, USAGE_PARAMS))
+}
+
+/** The cache key for an hourly read: the canonical URL, its window in a fixed order. */
+export function hourlyCacheKey(request: Request): Request {
+	return new Request(normalizedReadUrl(request, HOURLY_PARAMS).toString())
+}
+
+/** The key the hourly read's stale copy lives under. */
+export function hourlyStaleCacheKey(request: Request): Request {
+	return staleKey(normalizedReadUrl(request, HOURLY_PARAMS))
 }
 
 /**

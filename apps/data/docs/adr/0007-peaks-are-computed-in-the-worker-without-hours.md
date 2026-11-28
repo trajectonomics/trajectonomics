@@ -9,6 +9,8 @@ Partly superseded by [ADR 0009](0009-peaks-count-cache-reads-apart-and-anchor-cl
 
 Amended by [ADR 0010](0010-data-starts-when-collecting-starts.md), 2026-11-27: a window shows its figure only once the collected span covers the window's full length.
 
+Amended by [ADR 0016](0016-the-log-serves-hourly-sums-for-short-windows.md), 2026-11-28: the Log's hourly read serves the org's sums per plan and UTC hour for at most 7 days, without a machine, a contributor or a model.
+
 ## Context
 
 The site asks what each plan gives. Until #599 records quota samples, the only honest answer is

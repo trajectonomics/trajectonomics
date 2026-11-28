@@ -91,7 +91,8 @@ and Antigravity have one; every other plan shows its measured 30-day peak.
 ## Rollup
 
 One UTC day's totals for one plan and model, summed from that day's Usage Rows and stored in
-`rollup_daily`. The public API serves rollups only, never hourly rows.
+`rollup_daily`. The public API serves a rollup or a sum, never a stored row: daily rollups for the
+usage read, summed hours for the peaks and the Log's hour view (ADR 0016).
 
 ## Series
 
@@ -109,6 +110,18 @@ peaks window longer than the collected span shows its days so far instead of a f
 
 A `YYYY-MM-DD` cap on a read: the answer uses data up to and including that day. It is a
 query-time view, not a frozen snapshot (ADR 0003).
+
+## Period
+
+The Log's window ending on the day in view: `1d`, `3d`, `7d`, `wtd` (Monday of that week to the
+day), `mtd` (the 1st of that month to the day), `30d` or `90d`. It travels in the address as
+`period`; `30d` is the default and is left out.
+
+## Bucket
+
+How the Log groups a period's tokens: by UTC hour, day or week, with weeks starting on Monday. It
+travels as `by`; a period offers only the buckets it can fill, and its default depends on the
+period: `hour` for 1D and 3D, `week` for 3M, `day` otherwise (ADR 0016).
 
 ## Plan Table
 

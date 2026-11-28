@@ -1,17 +1,24 @@
 <script lang="ts">
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read a Svelte template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read a Svelte template, so it cannot see these.
-import { chartAriaLabel, chartGeometry } from "../lib/chart"
+import { type ChartUnit, chartAriaLabel, chartGeometry } from "../lib/chart"
 import { chartReadout, dayAt, keyDay } from "../lib/chart-pointer"
 import { compactCount, displayCount } from "../lib/format"
 import { planColour } from "../lib/plan-colour"
 import { type MarkerShape, seriesCue } from "../lib/series-style"
 import type { ChartSeries } from "../lib/types"
 
-let { series, from, to }: { series: ChartSeries[]; from: string; to: string } = $props()
+let {
+	series,
+	from,
+	to,
+	unit = "day",
+}: { series: ChartSeries[]; from: string; to: string; unit?: ChartUnit } = $props()
 
 const chart = $derived(chartGeometry(series))
-const label = $derived(chartAriaLabel(series, from, to))
+const label = $derived(chartAriaLabel(series, from, to, unit))
+const bucket = $derived(unit === "hour" ? "hour" : unit === "week" ? "week" : "day")
+const bucketName = $derived(bucket.charAt(0).toUpperCase() + bucket.slice(1))
 const days = $derived(series[0]?.points ?? [])
 let pinned = $state<string | null>(null)
 let hot = $state<string | null>(null)
@@ -109,7 +116,7 @@ function pin(plan: string) {
 								? "end"
 								: "middle"}
 				>
-					{tick.day}
+					{tick.label}
 				</text>
 			{/each}
 			{#if guideX !== null}
@@ -188,14 +195,14 @@ function pin(plan: string) {
 				<caption>{label}</caption>
 				<thead>
 					<tr>
-						<th scope="col">Day</th>
+						<th scope="col">{bucketName}</th>
 						{#each series as line}<th scope="col">{line.name}</th>{/each}
 					</tr>
 				</thead>
 				<tbody>
 					{#each days as day, index}
 						<tr>
-							<th scope="row">{day.day}</th>
+							<th scope="row">{day.label}</th>
 							{#each series as line}
 								<td>{displayCount(line.points[index]?.tokens ?? 0)}</td>
 							{/each}
@@ -205,7 +212,9 @@ function pin(plan: string) {
 			</table>
 		</div>
 		<figcaption class="chart-caption">
-			Total tokens per UTC day, {from} to {to} ({days.length} {days.length === 1 ? "day" : "days"}).
+			Total tokens per UTC {bucket}, {from} to {to} ({days.length} {days.length === 1
+				? bucket
+				: `${bucket}s`}).
 		</figcaption>
 	</figure>
 {/if}
