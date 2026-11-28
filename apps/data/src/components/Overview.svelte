@@ -30,17 +30,25 @@ const chartDays = $derived(
 	days === null ? [] : daysFromCollection(state.health?.collectingSince, days.days),
 )
 const chartFrom = $derived(chartDays[0] ?? days?.from ?? "")
-const week = $derived(
+const weekBars = $derived(
 	days === null
 		? []
-		: weeklyFigures(
-				planBars(peaks, {
-					day: days.to,
-					planSince: state.health?.planSince ?? {},
-					window: "sevenDays",
-				}),
-			),
+		: planBars(peaks, {
+				day: days.to,
+				planSince: state.health?.planSince ?? {},
+				window: "sevenDays",
+			}),
 )
+const monthBars = $derived(
+	days === null
+		? []
+		: planBars(peaks, {
+				day: days.to,
+				planSince: state.health?.planSince ?? {},
+				window: "thirtyDays",
+			}),
+)
+const week = $derived(weeklyFigures(weekBars, monthBars))
 const valueDots = $derived(valuePoints(week, usageRows))
 const cacheRows = $derived(cacheRateRows(totals, usageRows))
 const cacheDots = $derived(cachePoints(valueDots, cacheRows))

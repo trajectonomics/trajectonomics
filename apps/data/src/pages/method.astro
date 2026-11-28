@@ -190,6 +190,10 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 			list price of the plan's own mix ÷ the weekly price.
 		</p>
 		<p>
+			For a plan with a monthly allowance, the week's tokens are capped at the 30-day limit × 7 /
+			30, because the monthly allowance can stop you before the weekly limit does.
+		</p>
+		<p>
 			The blend prices what we used on each model at that model's list price, adds it up, and
 			divides by the tokens without cache reads. A model with no price stays out of the blend; a
 			plan whose models all lack one has no dot. A cache write with no stated price is priced as
@@ -296,6 +300,10 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 
 		<h3>Formulas</h3>
 		<ul>
+			<li>
+				Weekly tokens = the 7-day limit, or the 30-day limit × 7 / 30 when that is smaller and
+				the plan has a monthly allowance.
+			</li>
 			<li>Weekly price = monthly USD × 12 / 52.</li>
 			<li>Tokens per $1 = weekly tokens ÷ weekly price.</li>
 			<li>
