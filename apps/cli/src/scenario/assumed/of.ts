@@ -22,7 +22,7 @@ export function assumedOf(
 ): AssumedItem[] {
 	return [
 		...templateDefaultItems(row, plain, printed),
-		...unlabelledIncomeItems(row.name, plain, household),
+		...unlabelledIncomeItems(row.name, plain, household, taxAllowances !== undefined),
 		...unstatedAllowanceItems(row.name, taxAllowances, plain),
 		...taxFigureItems(plain),
 	]

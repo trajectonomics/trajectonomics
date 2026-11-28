@@ -11,8 +11,9 @@ const CONTRIBUTION_CLASSES: ReadonlySet<string> = new Set(["retirementContributi
 /** The command that states one contribution class, with the Owner note a Levy over Filers needs. */
 function contributionHint(name: string, filers: boolean): string {
 	const command = printedCommand("traj scenario apply", [name], ["--add", "flows=<json>"])
+	const tax = printedCommand("traj scenario tax", [name], ["--from-stored"])
 	const owner = filers
-		? " This plan's Levy reads Filer labels, so the label needs the Flow's Owner's Filer suffix (@<owner>) and the household must give the Flow that Owner."
+		? ` This plan's Levy reads Filer labels, so the label needs the Flow's Owner's Filer suffix (@<owner>) and the household must give the Flow that Owner. The suffix must be one the Levy reads: an Owner who is not yet a Filer has no income it taxes, so label an income Flow of theirs and run "${tax}".`
 		: ""
 	return `Add a contribution Flow with its label: run "${command}"; "traj schema scenario apply" shows the shape, and its target must be in cashflow.contribute.${owner}`
 }

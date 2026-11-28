@@ -72,7 +72,7 @@ export function beginsInflationVolatility(segment: string, prefix: readonly stri
 	return segment === "inflationVolatility" && prefix.length === 1 && prefix[0] === "economy"
 }
 
-/** The keys a `--set` may add to an item that leaves them out: an Account's volatility, a label, a surplus step's share or cap. */
+/** The keys a `--set` may add to an item that leaves them out: an Account's volatility, the inflation spread, a label, a surplus step's share or cap. */
 export function beginsKey(
 	node: Record<string, unknown>,
 	segment: string,
@@ -108,7 +108,8 @@ export function beginsWithdrawFloor(
 
 /**
  * The keys a `--set` may begin on the object at `prefix`, so a refusal that lists the keys there names them
- * too: the estate block at the root, an asset Account's `volatility`, a Flow's label, a surplus step's `share` and `upTo`.
+ * too: the estate block at the root, an asset Account's `volatility`, the economy's `inflationVolatility`,
+ * a Flow's label, a surplus step's `share` and `upTo`.
  */
 export function beginnableKeysAt(
 	node: Record<string, unknown>,
