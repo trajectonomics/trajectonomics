@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { runQuotaCommandProc } from "../src/commands/quota"
+import { listAcpTokenPaths } from "../src/quota/antigravity-acp"
 import {
 	findAntigravityTokenPath,
 	resolveAgyBinary,
@@ -63,6 +64,29 @@ describe("findAntigravityTokenPath", () => {
 			expect(findAntigravityTokenPath(home)).toBe(gemini)
 			writeFileSync(cli, token("2026-11-27T17:00:00.000Z"))
 			expect(findAntigravityTokenPath(home)).toBe(cli)
+		}))
+})
+
+describe("listAcpTokenPaths", () => {
+	test("lists existing acp_token.json files newest first", () =>
+		withTempHome((home) => {
+			expect(listAcpTokenPaths(home)).toEqual([])
+			const gemini = join(home, ".gemini/antigravity-acp/acp_token.json")
+			const t3 = join(home, ".t3/userdata/providers/antigravity/p1/antigravity-acp/acp_token.json")
+			for (const path of [gemini, t3]) mkdirSync(join(path, ".."), { recursive: true })
+			writeFileSync(gemini, "{}")
+			writeFileSync(t3, "{}")
+			utimesSync(gemini, new Date("2026-11-20T00:00:00Z"), new Date("2026-11-20T00:00:00Z"))
+			utimesSync(t3, new Date("2026-11-25T00:00:00Z"), new Date("2026-11-25T00:00:00Z"))
+			expect(listAcpTokenPaths(home)).toEqual([t3, gemini])
+		}))
+
+	test("ignores provider folders without an acp_token.json", () =>
+		withTempHome((home) => {
+			const dir = join(home, ".t3/userdata/providers/antigravity/p2/antigravity-acp")
+			mkdirSync(dir, { recursive: true })
+			writeFileSync(join(dir, "acp_token.json.example"), "{}")
+			expect(listAcpTokenPaths(home)).toEqual([])
 		}))
 })
 

@@ -99,21 +99,27 @@ and `nb_api_calls`, and drop every id column. `bestEffort` is true only for Muse
 
 ## Quota samples
 
-`quota` reads local credentials or CLI allowance output and never prints or stores tokens. The only
-refresh is Antigravity's own `agy models`, which rewrites the token file its CLI keeps:
+`quota` reads local credentials or CLI allowance output and never prints or stores tokens.
+Antigravity is the only plan whose credential the collector refreshes: it exchanges the ACP's own
+refresh token (`acp_token.json`, Google's token endpoint only) for an access token in memory, and
+runs Antigravity's own `agy models`, which rewrites the token file its CLI keeps:
 
 | Plan | Source | Endpoint / Command | Windows |
 | --- | --- | --- | --- |
 | `claude` | `~/.claude/.credentials.json`, `claudeAiOauth.accessToken` | `https://api.anthropic.com/api/oauth/usage` | `five_hour`, `weekly` |
 | `opencode-go` | `~/.local/share/opencode/auth.json`, `["opencode-go"].key` | `https://opencode.ai/inference/go/v1/usage` | `five_hour`, `weekly`, `monthly` |
-| `antigravity` | `~/.gemini/antigravity/antigravity-oauth-token`, `~/.gemini/antigravity-cli/antigravity-oauth-token` or `~/.t3/userdata/providers/antigravity/*/antigravity-acp/antigravity-oauth-token` (`token.access_token`) | `https://daily-cloudcode-pa.googleapis.com/v1internal:retrieveUserQuotaSummary` | `five_hour`, `weekly` (Gemini buckets) |
+| `antigravity` | `~/.gemini/antigravity/antigravity-oauth-token`, `~/.gemini/antigravity-cli/antigravity-oauth-token` or `~/.t3/userdata/providers/antigravity/*/antigravity-acp/antigravity-oauth-token` (`token.access_token`), else the ACP's `acp_token.json` refresh token | `https://daily-cloudcode-pa.googleapis.com/v1internal:retrieveUserQuotaSummary` | `five_hour`, `weekly` (Gemini buckets) |
 | `cursor` | `~/.config/cursor/auth.json`, `accessToken` | `https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage` | `monthly` |
 | `meta` | `muse` CLI (`~/.local/bin/muse` or `PATH`, with `MUSE_NO_AUTO_UPDATE=1`) | `muse usage --json` | `five_hour`, `weekly` |
 
 Antigravity's token candidates come from all three roots, and the file with the latest `token.expiry`
-wins, falling back to its mtime when the expiry is missing or unparseable. When the chosen token is
-expired or no candidate is usable, the collector runs `agy models` once, which lets Antigravity's own
-CLI refresh the token it keeps, then it reads the file again; it never writes a token file itself.
+wins, falling back to its mtime when the expiry is missing or unparseable. When no candidate is
+usable, the collector reads each `acp_token.json` (under `~/.gemini/antigravity-acp` and in T3
+Code's provider folders, newest first) and exchanges its refresh token with Google for an access
+token held in memory only: it never stores or prints it, never writes a file, and the refresh token
+does not rotate. If that yields no token, the collector runs `agy models` once, which lets
+Antigravity's own CLI refresh the token it keeps, then it reads the file again; it never writes a
+token file itself.
 
 A missing file or binary, an expired token, a failed request or an unexpected body logs one stderr line
 naming the plan, while a successful sample logs `quota: <plan> sampled <n> rows`. The run still exits 0
