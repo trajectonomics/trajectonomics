@@ -2,17 +2,23 @@
 import { editSession, STALE_PLAN } from "../../client/edit.svelte.js"
 import { focusWhenSeen } from "../../client/focus.js"
 import { WRITTEN_REREAD_FAILED_MESSAGE } from "../../lib/edit/failure"
+import { isActionSource } from "../../lib/view/action-source"
 import { type NoticeShows, noticeCase } from "../../lib/view/stale-notice"
 
 interface Props {
 	/** Which cases this copy says: both, only the plan moved on beside an inline form, or only the landed write above the page. */
 	shows?: NoticeShows
+	/** The inline action this copy sits beside (`actionSource`). Without one, the copy says no inline action's refusal. */
+	source?: string
 }
 
-let { shows = "both" }: Props = $props()
+let { shows = "both", source }: Props = $props()
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
-const notice = $derived(noticeCase(shows, editSession.stale, editSession.savedUnread))
+const mine = $derived(
+	source === undefined ? !isActionSource(editSession.source) : source === editSession.source,
+)
+const notice = $derived(noticeCase(shows, editSession.stale && mine, editSession.savedUnread))
 let box: HTMLDivElement | undefined = $state()
 
 // A save that could not be answered with a fresh Snapshot fills this notice: focus moves to it, so a keyboard

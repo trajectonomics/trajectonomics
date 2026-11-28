@@ -1,5 +1,5 @@
 <script lang="ts">
-import { routing } from "../../client/routing.svelte.js"
+import { orderSource, removeSource, routing } from "../../client/routing.svelte.js"
 import { formatMoney } from "../../lib/format"
 import type { RoutingContext } from "../../lib/view/routing/context"
 import { targetNote } from "../../lib/view/routing/echo"
@@ -8,6 +8,7 @@ import { sameOrder } from "../../lib/view/routing/order"
 import { rowRefusal } from "../../lib/view/routing/shown"
 import { lastStepProblem } from "../../lib/view/routing/surplus"
 import { plainText, stepWords } from "../../lib/view/routing/words"
+import ActionRefusal from "../ui/ActionRefusal.svelte"
 import AddButton from "./AddButton.svelte"
 import FigureChart from "./FigureChart.svelte"
 import LockedNote from "./LockedNote.svelte"
@@ -37,7 +38,9 @@ function remove(index: number, trying: boolean): void {
 	const rule = lastStepProblem(items)
 	note = rule === null ? null : rule.message
 	if (rule === null)
-		void (trying ? routing.tryIt(ctx, list(items)) : routing.save(ctx, list(items)))
+		void (trying
+			? routing.tryIt(ctx, list(items))
+			: routing.save(ctx, list(items), removeSource("surplus", index)))
 }
 </script>
 
@@ -46,7 +49,7 @@ function remove(index: number, trying: boolean): void {
 	<ReorderList items={steps} {locked} editable={ctx.editable} busy={false} rule={lastStepProblem}
 		labelOf={(step, order, at) => plainText(stepWords(step, at, order.length, ctx.names), formatMoney)}
 		refused={(at) => (drawer === null ? rowRefusal(routing.place, routing.message, "surplus", at) : undefined)}
-		onSave={(order) => routing.save(ctx, list(order))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
+		onSave={(order) => routing.save(ctx, list(order), orderSource("surplus"))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
 		{#snippet row(step, at, order)}
 			<Sentence parts={stepWords(step, at, order.length, ctx.names)} currency={ctx.doc.currency} />
 			{#if sameOrder(order, steps)}
@@ -57,7 +60,9 @@ function remove(index: number, trying: boolean): void {
 		{#snippet buttons(_step, saved, shown)}
 			<RowButtons label={`step ${shown + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: saved, trying: false })}
 				onTry={() => (drawer = { index: saved, trying: true })} onRemove={() => remove(saved, false)} onTryRemove={() => remove(saved, true)} />
+			<ActionRefusal source={removeSource("surplus", saved)} onRow={routing.onRow(ctx)} />
 		{/snippet}
+		{#snippet refusal()}<ActionRefusal source={orderSource("surplus")} onRow={routing.onRow(ctx)} />{/snippet}
 	</ReorderList>
 	{/key}
 	<LockedNote {locked} />

@@ -26,6 +26,8 @@ interface Props {
 	 * button acts on after an order that is not saved yet; the second is the place the row shows, which names it.
 	 */
 	buttons?: Snippet<[T, number, number]>
+	/** What the last save of the order was refused with, shown after Done. */
+	refusal?: Snippet
 }
 
 let {
@@ -40,6 +42,7 @@ let {
 	onTry,
 	row,
 	buttons,
+	refusal,
 }: Props = $props()
 const initial = () => items
 const reorder = new Reorder<T>(initial())
@@ -81,3 +84,4 @@ async function dropped(event: DragEvent, index: number): Promise<void> {
 		<button type="button" class={button} onclick={() => reorder.reset(baseline)}>Cancel</button>
 	</div>
 {/if}
+{@render refusal?.()}

@@ -4,6 +4,7 @@
  * failure to reach traj, is shown for the form as a whole.
  */
 import type { Shown } from "../plan-items/problems"
+import type { RoutingContext } from "./context"
 import type { ListName } from "./entries"
 import type { Place } from "./refusal"
 
@@ -81,4 +82,16 @@ export function rowRefusal(
 ): string | undefined {
 	const mine = place?.kind === "row" && place.list === list && place.index === index
 	return mine ? (message ?? undefined) : undefined
+}
+
+/** Whether the page draws the row or the move a refusal names. A place it draws nowhere, such as an income Flow, is not. */
+export function drawsPlace(
+	place: Place | null,
+	ctx: Pick<RoutingContext, "doc" | "shown">,
+): boolean {
+	if (place === null) return false
+	if (place.kind === "row") return place.index < (ctx.shown.cashflow?.[place.list]?.length ?? 0)
+	return [...ctx.doc.flows, ...ctx.shown.flows].some(
+		(flow) => flow.id === place.id && flow.kind === "transfer",
+	)
 }

@@ -8,6 +8,7 @@ afterEach(() => {
 	editSession.stale = false
 	editSession.savedUnread = false
 	editSession.failure = null
+	editSession.source = "form"
 })
 
 describe("StaleNotice", () => {
@@ -50,5 +51,14 @@ describe("StaleNotice", () => {
 		expect(body).toContain("focus-visible:outline-2")
 		expect(body).toContain("focus-visible:outline-offset-2")
 		expect(body).not.toContain("outline-none")
+	})
+
+	test("leaves an inline action's refusal to the copy beside that action", () => {
+		editSession.source = "action:main:base"
+		editSession.stale = true
+		expect(render(StaleNotice).body).not.toContain(STALE_PLAN)
+		const beside = (source: string) => render(StaleNotice, { props: { source } }).body
+		expect(beside("action:main:base")).toContain(STALE_PLAN)
+		expect(beside("action:main:extra")).not.toContain(STALE_PLAN)
 	})
 })

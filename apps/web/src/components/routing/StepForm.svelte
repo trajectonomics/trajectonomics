@@ -31,7 +31,7 @@ let draft = $state(stepDraftOf(existing()))
 let problems: Record<string, string> = $state({})
 let sentAt: number | null = $state(null)
 const shown = $derived(
-	shownForRow(problems, routing.place, routing.message, {
+	shownForRow(problems, routing.place, routing.formMessage, {
 		list: "surplus",
 		sentAt,
 		fields: STEP_FIELDS,

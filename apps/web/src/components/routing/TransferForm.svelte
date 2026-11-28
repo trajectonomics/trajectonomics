@@ -32,7 +32,7 @@ const initial = () => transferDraftOf(existing, transferContext(ctx))
 let draft = $state(initial())
 let problems: Problems = $state({})
 let sentId: string | null = $state(null)
-const shown = $derived(shownForFlow(problems, routing.place, routing.message, sentId))
+const shown = $derived(shownForFlow(problems, routing.place, routing.formMessage, sentId))
 const from = $derived(
 	accountOptions(
 		routableAccounts(ctx.doc, ctx.names),
