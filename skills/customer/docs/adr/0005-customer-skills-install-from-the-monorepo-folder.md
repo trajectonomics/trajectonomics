@@ -1,6 +1,6 @@
 # ADR 0005: Customer Skills install from the monorepo folder
 
-**Status**: Accepted. Amends [ADR 0003](./0003-customer-skills-publish-from-this-repository.md) on the source name only.
+**Status**: Accepted. Amends [ADR 0003](./0003-customer-skills-publish-from-this-repository.md) on the source name only. Superseded in part by [ADR 0007](./0007-customer-skills-install-globally.md): the source stays, the project scope does not.
 
 ## Context
 

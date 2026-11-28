@@ -29,8 +29,8 @@ export const INSTALL_CHECK = "scripts/check-skills-install.sh"
 /** The source every install command names: the folder of the monorepo the customer Skills publish from. */
 export const SKILLS_SOURCE = "trajectonomics/trajectonomics/skills/customer"
 
-/** The one install command the Site prints, which the README and the onboarding Skill both name. */
-export const WEBSITE_COMMAND = `npx skills add ${SKILLS_SOURCE} --skill traj-onboarding`
+/** The one install command the README and the onboarding Skill both name, which installs for the user. */
+export const WEBSITE_COMMAND = `npx skills add ${SKILLS_SOURCE} --skill traj-onboarding -g`
 
 /** The onboarding Skill's stable version: the repository tag, and the version the Site announces. */
 export const SKILL_VERSION = "0.1.0"

@@ -171,7 +171,7 @@ metadata_version() {
 	' "$1"
 }
 
-echo "Installing $ONBOARDING_SKILL into a scratch project, the way the website command does..."
+echo "Installing $ONBOARDING_SKILL into a scratch project, from the source the website command names..."
 mkdir -p "$SCRATCH/project"
 (
 	cd "$SCRATCH/project"
@@ -183,8 +183,8 @@ mkdir -p "$SCRATCH/project"
 	fail "skills add --skill $ONBOARDING_SKILL exited non-zero"
 }
 
-# The one-Skill claim, which is still true of the command the website shows: the onboarding Skill and
-# nothing else, in each directory the agent targets write to.
+# The one-Skill claim: the onboarding Skill and nothing else, in each directory the agent targets
+# write to.
 expect_installed "$SCRATCH/add-website.log" "$ONBOARDING_SKILL"
 
 [ -f "$SCRATCH/project/.agents/skills/$ONBOARDING_SKILL/SKILL.md" ] ||
