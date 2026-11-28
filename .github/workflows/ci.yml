@@ -2,8 +2,8 @@ name: CI
 
 # One CI for the whole monorepo. A pull request runs `turbo run check --affected`, so a PR that
 # touches only apps/site checks only what depends on it. Pull requests run on every base branch,
-# so a PR stacked on another phase branch is checked too. A push to main and a manual run check
-# every package.
+# so a PR stacked on another phase branch is checked too. A merge queue entry checks what its pull
+# request affects, against the queue's base. A push to main and a manual run check every package.
 #
 # The Dashboard (apps/web) is the slow package: its `scripts/` tests spawn the real `traj` binary
 # hundreds of times and took about 20 of the 22 minutes of a web pull request. So the web package
