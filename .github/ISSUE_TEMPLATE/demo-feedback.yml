@@ -1,0 +1,24 @@
+name: Demo feedback
+description: One tap from the hosted Demo. No ledger figures needed.
+title: "Demo: "
+labels: ["needs-triage", "apps/web"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks. The face you tapped and the page are filled in. Add a line only if you want to.
+  - type: input
+    id: rating
+    attributes:
+      label: Rating
+  - type: input
+    id: page
+    attributes:
+      label: Page
+  - type: textarea
+    id: details
+    attributes:
+      label: Anything to add?
+      description: Optional. The Demo's figures are made up, so there is nothing personal to share.
+    validations:
+      required: false
