@@ -1,10 +1,10 @@
-import type { Projection } from "@trajectonomics/core/sim"
-import type { AppError } from "../errors"
-import { fail, isAppError } from "../errors"
+import type { Projection, ReportingOptions } from "@trajectonomics/core/sim"
+import { type AppError, fail, isAppError } from "../errors"
 import { agesOn } from "../scenario/household/ages"
 import { balancesTableOf } from "./balances"
 import type { Placed } from "./carryin-apply"
 import { cashflowRowsOf } from "./cashflow"
+import { reportingTablesOf } from "./cashflow-reporting"
 import { cashflowTotalRowsOf } from "./cashflow-totals"
 import { estateTablesOf } from "./estate"
 import { feesTableOf } from "./fees"
@@ -20,6 +20,8 @@ import { transfersTableOf } from "./transfers"
 export type Wants = {
 	monthly: boolean
 	breakdown: boolean
+	/** The Reporting years and months asked for, or undefined when neither Reporting flag was given (cli ADR-0086). */
+	reporting: ReportingOptions | undefined
 	liabilities: boolean
 	accounts: boolean
 	spending: boolean
@@ -82,7 +84,8 @@ function oneTable(table: ProjectionTable | AppError): ProjectionTable[] | AppErr
 /**
  * The tables a run adds beyond the annual roll-up, each present only when its flag or Scenario asks for it,
  * so a run without them keeps its table list: the monthly rows (`--monthly`), the cash flow and its section
- * totals (`--breakdown`, cli ADR-0058), the loans (`--liabilities`, cli ADR-0059), each Account's value
+ * totals (`--breakdown`, cli ADR-0058), the Reporting years and months (`--breakdown-years` and
+ * `--breakdown-months`, cli ADR-0086), the loans (`--liabilities`, cli ADR-0059), each Account's value
  * (`--accounts`, cli ADR-0060), what each fee Account was charged when one carries a fee (cli ADR-0067), what each spending rule paid (`--spending`, cli ADR-0063), what the plan would leave (`--estate`, cli ADR-0064) and the milestones
  * (cli ADR-0049).
  */
@@ -96,6 +99,8 @@ export function extraTablesOf(
 	const asked: (ProjectionTable[] | AppError)[] = []
 	if (wants.monthly) asked.push([monthlyTableOf(prepared, projection)])
 	if (wants.breakdown) asked.push(cashflowTablesOf(projection, annual, currency))
+	if (wants.reporting !== undefined)
+		asked.push(reportingTablesOf(projection, wants.reporting, currency))
 	if (wants.liabilities) asked.push(liabilityTablesOf(projection.liabilities, currency))
 	if (wants.accounts) asked.push(oneTable(balancesOf(prepared, projection, wants.monthly)))
 	if (wants.spending) asked.push(oneTable(spendingTableOf(projection.spendingRules, currency)))
@@ -110,8 +115,7 @@ export function extraTablesOf(
 			),
 		)
 	}
-	asked.push(feeTablesOf(projection, currency))
-	asked.push(milestoneTablesOf(projection))
+	asked.push(feeTablesOf(projection, currency), milestoneTablesOf(projection))
 	const tables: ProjectionTable[] = []
 	for (const entry of asked) {
 		if (isAppError(entry)) return entry

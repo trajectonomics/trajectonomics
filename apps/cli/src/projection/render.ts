@@ -1,6 +1,8 @@
 import type { ColumnHint, RenderHint } from "../table"
 import { balanceBlocks, balancesHidden } from "./balances-human"
-import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
+import { cashflowHidden } from "./cashflow-hidden"
+import { cashflowBlocks } from "./cashflow-human"
+import { reportingBlocks } from "./cashflow-span-human"
 import { estateBlocks, estateHidden } from "./estate-human"
 import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
 import { lifetimeBlocks } from "./lifetime-human"
@@ -29,8 +31,9 @@ export const agesColumn: ColumnHint = { key: "ages", label: "ages", show: agesTe
 
 /**
  * `projection run`'s human view: the annual roll-up, the monthly rows when asked, the tax years the
- * Scenario's Levies settle, the notes under them, and with `--breakdown` a cash-flow block per
- * roll-up (cli ADR-0058). Only the human Format reads it; `--json` keeps the output schema as the
+ * Scenario's Levies settle, the notes under them, with `--breakdown` a cash-flow block per
+ * roll-up (cli ADR-0058) and with `--breakdown-years` or `--breakdown-months` the Reporting years
+ * and months (cli ADR-0086). Only the human Format reads it; `--json` keeps the output schema as the
  * contract.
  *
  * Every field of a row is a column, headed by its own key, so the table neither drops nor renames
@@ -85,6 +88,7 @@ export const projectionHint: RenderHint = {
 	blocks: (data) => [
 		...routingBlocks(data),
 		...cashflowBlocks(data),
+		...reportingBlocks(data),
 		...liabilityBlocks(data),
 		...balanceBlocks(data),
 		...spendingBlocks(data),

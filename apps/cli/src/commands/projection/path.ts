@@ -1,12 +1,10 @@
 import { z } from "zod"
-import type { Leaf } from "../../command"
-import { defineCommand } from "../../command"
-import { fail, isAppError } from "../../errors"
-import { readCarryIn } from "../../projection/carryin"
+import { defineCommand, type Leaf } from "../../command"
+import { isAppError } from "../../errors"
 import { withCarryInSide } from "../../projection/carryin-apply"
 import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../../projection/chance-bounds"
 import { returnModelFlagDocument } from "../../projection/chance-model"
-import { bucketsFlag, modelSourceOf, returnModelFlag } from "../../projection/chance-plan"
+import { bucketsFlag, returnModelFlag } from "../../projection/chance-plan"
 import {
 	asOfFlag,
 	carryInFlag,
@@ -14,13 +12,16 @@ import {
 	horizonFlag,
 	outputFlags,
 	PROJECTION_ERROR_CODES,
+	reportingFlags,
 	scenarioFlag,
 } from "../../projection/flags"
 import { withProjection } from "../../projection/leaf"
 import { pathOf } from "../../projection/path"
+import { pathDocumentsOf } from "../../projection/path-documents"
 import { PATH_EXAMPLES } from "../../projection/path-examples"
 import { pathHint } from "../../projection/path-human"
 import { projectionPathView } from "../../projection/path-view"
+import { reportingOptionsOf } from "../../projection/reporting-input"
 import { addFlag, decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
 
 /** The method in the words a help page prints: which path, and what the result adds to a run's. */
@@ -61,6 +62,7 @@ export const path: Leaf = defineCommand({
 				"Which Market path to replay, from 0 to --paths - 1: the index projection chance --outcomes lists.",
 			),
 		...outputFlags,
+		...reportingFlags,
 	}),
 	flagDocuments: [returnModelFlagDocument, carryInFlagDocument],
 	output: projectionPathView,
@@ -68,18 +70,8 @@ export const path: Leaf = defineCommand({
 	examples: PATH_EXAMPLES,
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
-		// Standard input can be read once, so only one of the two documents may come from it.
-		if (input.returnModel === "-" && input.carryIn === "-") {
-			return fail("invalid_input", {
-				path: "--carry-in",
-				message: "--carry-in: standard input already holds the Return model",
-				hint: "Read one of the two documents from a file: --return-model PATH or --carry-in PATH.",
-			})
-		}
-		const source = await modelSourceOf(input, ctx.stdin)
-		if (isAppError(source)) return source
-		const records = input.carryIn === undefined ? [] : await readCarryIn(input.carryIn, ctx.stdin)
-		if (isAppError(records)) return records
+		const documents = await pathDocumentsOf(input, ctx.stdin)
+		if (isAppError(documents)) return documents
 		return withProjection(input, ctx, (prepare) => {
 			const prepared = prepare({
 				scenario: input.scenario,
@@ -90,13 +82,19 @@ export const path: Leaf = defineCommand({
 				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared
-			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
+			const placed = withCarryInSide({
+				prepared,
+				records: documents.records,
+				asOf: input.asOf,
+			})
 			if (isAppError(placed)) return placed
+			const reporting = reportingOptionsOf(input, placed.timeline)
+			if (isAppError(reporting)) return reporting
 			return pathOf(
 				placed,
-				source,
+				documents.source,
 				{ seed: input.seed, paths: input.paths, index: input.index },
-				input,
+				{ ...input, reporting },
 			)
 		})
 	},

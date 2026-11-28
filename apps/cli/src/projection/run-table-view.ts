@@ -10,13 +10,28 @@ import {
 	paidOffTable,
 } from "./liabilities-view"
 import { type MilestonesTable, milestonesTable } from "./milestones-table"
+import {
+	type CashflowMonthsTable,
+	type CashflowMonthTotalsTable,
+	type CashflowMonthTransfersTable,
+	type CashflowYearsTable,
+	type CashflowYearTotalsTable,
+	type CashflowYearTransfersTable,
+	cashflowMonthsTable,
+	cashflowMonthTotalsTable,
+	cashflowMonthTransfersTable,
+	cashflowYearsTable,
+	cashflowYearTotalsTable,
+	cashflowYearTransfersTable,
+} from "./reporting-table-view"
 import { type AnnualRow, annualRow, type MonthlyRow, monthlyRow } from "./rows-view"
 import { type SpendingRulesTable, spendingRulesTable } from "./spending-view"
 import { type TransfersTable, transfersTable } from "./transfers-view"
 
 /**
  * The Projection's annual roll-up, its monthly rows with `--monthly`, its cash flow with `--breakdown`
- * (cli ADR-0058), its loans with `--liabilities` (cli ADR-0059), each Account's value with `--accounts` (cli ADR-0060), each spending rule's years with `--spending` (cli ADR-0063), the estate with `--estate` (cli ADR-0064) and its milestones (cli ADR-0049).
+ * (cli ADR-0058) and its Reporting years and months with `--breakdown-years` and `--breakdown-months`
+ * (cli ADR-0086), its loans with `--liabilities` (cli ADR-0059), each Account's value with `--accounts` (cli ADR-0060), each spending rule's years with `--spending` (cli ADR-0063), the estate with `--estate` (cli ADR-0064) and its milestones (cli ADR-0049).
  */
 export type ProjectionTable =
 	| { name: "annual"; count: number; rows: AnnualRow[] }
@@ -24,6 +39,12 @@ export type ProjectionTable =
 	| { name: "cashflow"; count: number; rows: CashflowRow[] }
 	| CashflowTotalsTable
 	| TransfersTable
+	| CashflowYearsTable
+	| CashflowYearTotalsTable
+	| CashflowYearTransfersTable
+	| CashflowMonthsTable
+	| CashflowMonthTotalsTable
+	| CashflowMonthTransfersTable
 	| LiabilityMonthsTable
 	| PaidOffTable
 	| BalancesTable
@@ -56,6 +77,12 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 	}),
 	cashflowTotalsTable,
 	transfersTable,
+	cashflowYearsTable,
+	cashflowYearTotalsTable,
+	cashflowYearTransfersTable,
+	cashflowMonthsTable,
+	cashflowMonthTotalsTable,
+	cashflowMonthTransfersTable,
 	liabilityMonthsTable,
 	paidOffTable,
 	balancesTable,

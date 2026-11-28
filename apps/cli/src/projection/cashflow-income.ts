@@ -1,4 +1,4 @@
-import type { CashflowBreakdown } from "@trajectonomics/core/sim"
+import type { CashflowLines } from "@trajectonomics/core/sim"
 import type { CashflowRow } from "./cashflow-view"
 
 /*
@@ -12,7 +12,7 @@ export type Line = Omit<CashflowRow, "index" | "from" | "to" | "amount"> & { min
 const NONE = { id: null, account: null, category: null }
 
 /** A roll-up's payouts, one `payout` line per Account, present only when the Scenario declares a payout. */
-export function payoutLines(breakdown: CashflowBreakdown): Line[] {
+export function payoutLines(breakdown: CashflowLines): Line[] {
 	return (breakdown.payouts ?? []).map((line) => ({
 		...NONE,
 		group: "payout",
@@ -22,7 +22,7 @@ export function payoutLines(breakdown: CashflowBreakdown): Line[] {
 }
 
 /** A roll-up's employer Contributions, one `employer` line per Flow, outside money in. */
-export function employerLines(breakdown: CashflowBreakdown): Line[] {
+export function employerLines(breakdown: CashflowLines): Line[] {
 	return (breakdown.employer ?? []).map((line) => ({
 		...NONE,
 		group: "employer",

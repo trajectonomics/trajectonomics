@@ -1,0 +1,36 @@
+annual (1 row)
+index  from        to          ages  openingNetWorth  closingNetWorth   income  expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
+    0  2026-11-15  2027-02-10                   0.00          1200.00  3000.00  1800.00           0.00                   0.00      0.00   0.00  true     {"date":"2027-02-10","amount":"1200.00"}
+
+No tax is applied; figures are before tax.
+This is path 1 of 4 seeded Market paths, over the Return model "reporting-flat" with seed 0123456789abcdef: the one projection chance --outcomes lists as outcomes[1]. The figures are nominal.
+
+cash flow 2026, 2026-11-15 to 2026-12-31 (partial)
+line                amount
+money in           2600.00
+  income           2000.00
+  drawn             600.00
+spending            600.00
+  (uncategorised)   600.00
+saving                0.00
+left over          2000.00
+
+cash flow 2027, 2027-01-01 to 2027-02-10 (partial)
+line                amount
+money in           2200.00
+  income           1000.00
+  drawn            1200.00
+spending           1200.00
+  (uncategorised)  1200.00
+saving                0.00
+left over          1000.00
+
+cash flow by month, 2026
+month     money in   tax  spending  saving  left over  unmet
+2026-11*   1000.00  0.00      0.00    0.00    1000.00   0.00
+2026-12    1600.00  0.00    600.00    0.00    1000.00   0.00
+* partial: the month is cut by the As-of, the horizon or the date the money runs out.
+
+returns (1 row)
+index  from        to          account                               returnBps
+    0  2026-11-15  2027-02-10  0194a000-0012-7000-8000-000000000012          0

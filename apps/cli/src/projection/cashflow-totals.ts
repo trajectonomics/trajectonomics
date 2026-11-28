@@ -58,7 +58,10 @@ function totalOverflow(date: string): AppError {
 }
 
 /** The totals as numbers, or the `VALUE_OVERFLOW` refusal on `date` when one leaves the safe integers. */
-function safeTotals(exact: Record<CashflowTotal, bigint>, date: string): CashflowTotals | AppError {
+export function safeTotals(
+	exact: Record<CashflowTotal, bigint>,
+	date: string,
+): CashflowTotals | AppError {
 	const totals = {} as CashflowTotals
 	for (const total of CASHFLOW_TOTALS) {
 		const value = Number(exact[total])
