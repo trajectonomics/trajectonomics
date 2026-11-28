@@ -5,9 +5,13 @@ import {
 	API_PATH,
 	assetPath,
 	BASE_PATH,
+	COLLECTORS_PATH,
 	DATA_PATH,
 	DOCS_URL,
+	ME_PATH,
 	METHOD_PATH,
+	SIGN_IN_PATH,
+	SIGN_OUT_PATH,
 	SITE_HOME_URL,
 } from "./site"
 
@@ -35,6 +39,10 @@ describe("the site's links", () => {
 		expect(METHOD_PATH).toBe("/data/method/")
 		expect(API_PATH).toBe(`${BASE_PATH}/api`)
 		expect(INGEST_PATH).toBe(`${BASE_PATH}/ingest`)
+		expect(ME_PATH).toBe(`${BASE_PATH}/me/`)
+		expect(SIGN_IN_PATH).toBe(`${BASE_PATH}/auth/sign-in`)
+		expect(SIGN_OUT_PATH).toBe(`${BASE_PATH}/auth/sign-out`)
+		expect(COLLECTORS_PATH).toBe(`${BASE_PATH}/api/me/collectors`)
 		expect(assetPath("/favicon/favicon.svg")).toBe("/data/favicon/favicon.svg")
 		expect(SITE_HOME_URL).toBe("/")
 		expect(DOCS_URL).toBe("/docs/")
