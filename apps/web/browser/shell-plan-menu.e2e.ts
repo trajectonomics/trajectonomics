@@ -38,11 +38,8 @@ test("the plan menu walks every item, picks with Enter, and shuts on Tab and on 
 	await expect(menu).toBeVisible()
 	await page.keyboard.press("Tab")
 	await expect(menu).toBeHidden()
-	const left = await page.evaluate(() => {
-		const active = document.activeElement
-		return active !== null && active !== document.body && active.closest("header") === null
-	})
-	expect(left, "focus left the top bar's menu").toBe(true)
+	// The page's own heading is inside `main` but under a `<header>`, so the check is that focus stands in `main`.
+	await expect(page.locator("main :focus")).toHaveCount(1)
 
 	// A click on blank content shuts the menu, and the button takes focus back from the page body.
 	await button.click()
