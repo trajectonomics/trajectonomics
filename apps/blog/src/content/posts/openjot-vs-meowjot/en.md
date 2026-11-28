@@ -50,14 +50,12 @@ Both read slips from **20 Thai banking and wallet apps**. The difference is the 
 
 ## What the pricing adds up to
 
-On MeowJot's [in-app plan screen](https://www.meowjot.com/pricing) (checked 24 Nov 2026), the free tier covers basic slip reading, 1 month of visible history, and 1 tag. If you want unlimited history, automatic categories, budgets, recurring records, and custom month cycles, you need **Silver**; if you want credit card statement import, custom categories, or CSV export, you need **Gold**.
+<figure>
+  <img src="/blog/posts/openjot-vs-meowjot/cost-3-years-en.webp" alt="Horizontal bar chart comparing 1-year and 3-year annual-billing costs: OpenJot 0 baht, MeowJot Free 0 baht (1-month history, 1 tag), MeowJot Silver 499 baht per year (1,497 baht over 3 years), and MeowJot Gold 799 baht per year (2,397 baht over 3 years)" width="1440" height="680" loading="lazy" />
+  <figcaption>Annual-billing totals from MeowJot's pricing page and Android app (checked 24 Nov 2026). Monthly billing is higher: 948 ฿/yr for Silver and 1,788 ฿/yr for Gold.</figcaption>
+</figure>
 
-| Plan | Monthly billing (1 year) | Annual billing (1 year) | Annual billing (3 years) |
-| --- | --- | --- | --- |
-| **OpenJot** | 0 ฿ | 0 ฿ | 0 ฿ |
-| **MeowJot Free** | 0 ฿ *(1-month history, 1 tag)* | 0 ฿ | 0 ฿ |
-| **MeowJot Silver** | 948 ฿ *(79 ฿ × 12)* | 499 ฿ | 1,497 ฿ |
-| **MeowJot Gold** | 1,788 ฿ *(149 ฿ × 12)* | 799 ฿ | 2,397 ฿ |
+On MeowJot's [in-app plan screen](https://www.meowjot.com/pricing) (checked 24 Nov 2026), the free tier covers basic slip reading, 1 month of visible history, and 1 tag. Unlimited history, automatic categories, budgets, recurring records, and custom month cycles sit in **Silver**; credit card statement import, custom categories, and CSV export sit in **Gold**.
 
 <figure>
   <img src="/blog/posts/openjot-vs-meowjot/plans-and-budget.webp" alt="Left: MeowJot in-app plan comparison screen showing Free, Silver and Gold tiers at 149 baht per month or 799 baht per year for Gold. Right: OpenJot budget screen with sample data showing a monthly gauge and remaining daily allowance" width="1200" height="1020" loading="lazy" />
@@ -65,6 +63,11 @@ On MeowJot's [in-app plan screen](https://www.meowjot.com/pricing) (checked 24 N
 </figure>
 
 ## Privacy and where your ledger lives
+
+<figure>
+  <img src="/blog/posts/openjot-vs-meowjot/account-comparison.webp" alt="Side-by-side Android screenshots: MeowJot Manage Account screen on the left tied to phone number and birthday with cloud backup, and OpenJot My Moo screen on the right showing open source, on-device ledger, and 247 free merchant rules" width="1200" height="1020" loading="lazy" />
+  <figcaption>Left: MeowJot ties your account to a mobile number and backs up your ledger online (personal details blurred). Right: OpenJot needs no account and keeps the ledger on your phone.</figcaption>
+</figure>
 
 - **MeowJot** requires a mobile number and SMS verification, and backs up your ledger to its servers under [KASIKORN X's privacy policy](https://www.meowjot.com/privacy-policy). The upside is convenience: sign in on a new phone and your history comes back automatically.
 - **OpenJot** has no account and no server that stores your ledger. Records, slip photos, and PDF statement imports stay in local SQLite storage on your phone, and OCR runs on-device (a QR decoder, Google ML Kit Latin for English text, and AksonOCR-Lite ONNX for Thai text). As documented in [OpenJot's privacy policy](https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs/privacy-policy.md), Google ML Kit still sends Google its own diagnostic metrics (such as device model and app version, never slip images or recognized text), and anonymous app usage statistics are off until you switch them on.
