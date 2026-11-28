@@ -183,11 +183,14 @@ The Open Graph and X meta a share sheet renders for a page: its title, descripti
 _Avoid_: Preview card, OG tags
 
 **Share image**:
-The 1200 × 630 PNG a page advertises as `og:image`: the page's value statement, the brand lockup and
-the host, painted in the shipped Theme's colours and written to `public/og/<name>.png` by
-`scripts/share-image.ts` before every build (`<language>.png` for a home, `openjot-<language>.png`
-for OpenJot). It is generated and never committed, and it is no page subresource, so no page budget
-counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.md)).
+The 1200 × 630 PNG a page advertises as `og:image`, painted in the shipped Theme's colours and
+written to `public/og/<name>.png` by `scripts/share-image.ts` before every build (`<language>.png`
+for a home, `openjot-<language>.png` for OpenJot). A home's card shows the answer as a picture: the
+Language's question above a net-worth line, grey while working and orange once free to stop, with the
+FI date written on the curve; OpenJot's card keeps the page's one-line summary. It is generated and
+never committed, and it is no page subresource, so no page budget counts it
+([ADR 0018](docs/adr/0018-the-share-image-is-generated-at-build-time.md),
+[ADR 0036](docs/adr/0036-the-home-share-card-shows-the-answer.md)).
 _Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:

@@ -1,7 +1,8 @@
 /** Every string one Language shows. Every Language has the same keys (`GLOSSARY.md`). */
 import type { LiveDemoWords } from "./live-demo-dictionary"
+import type { ShareWords } from "./share-dictionary"
 
-export interface Dictionary extends LiveDemoWords {
+export interface Dictionary extends LiveDemoWords, ShareWords {
 	/** The document title of this Language's home: what a tab and a search result show. */
 	readonly documentTitle: string
 	/** This Language's home one line of summary, for a search result and a shared link. */

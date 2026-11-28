@@ -33,6 +33,12 @@ export const ONBOARDING_SKILL_URL = `${SKILLS_RAW_PATH}/traj-onboarding/SKILL.md
  */
 export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and follow it.`
 
+/** The demo's as-of date: the date its Baseline is read at, and the start of its time axis. */
+export const FI_DEMO_AS_OF = "2026-03-31"
+
+/** The demo's horizon: the date its projection stops at, and the end of its time axis. */
+export const FI_DEMO_HORIZON = "2066-03-31"
+
 /**
  * The commands the demo window shows the agent running before the demo command: a fresh `traj` has
  * no ledger and no Scenario, so the example first writes the CLI's own template to `base.json`,
