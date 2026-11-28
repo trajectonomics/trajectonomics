@@ -26,7 +26,6 @@ export const allowances: Leaf = defineCommand({
 	name: "allowances",
 	summary: "Report how much more each tax allowance could take, and the tax it would save",
 	description: ALLOWANCES_METHOD,
-	note: "The tax allowance read ships in 0.8.0.",
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,

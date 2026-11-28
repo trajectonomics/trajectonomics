@@ -16,7 +16,6 @@ import { withStore } from "../../with-store"
 export const rename: Leaf = defineCommand({
 	name: "rename",
 	summary: "Give a Scenario another name; its id, document and hash stay",
-	note: "Renaming a plan ships in 0.8.0.",
 	positionals: ["scenario", "name"],
 	input: z.strictObject({
 		scenario: z.string().min(1).describe("The Scenario's exact name or its id."),

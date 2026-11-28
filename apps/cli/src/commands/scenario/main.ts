@@ -38,7 +38,6 @@ function refOrNull(row: ScenarioRow | null) {
 export const main: Leaf = defineCommand({
 	name: "main",
 	summary: "Mark a Scenario as the main plan, or take the mark off",
-	note: "The main plan ships in 0.8.0.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().min(1).optional().describe("The Scenario's exact name or its id."),

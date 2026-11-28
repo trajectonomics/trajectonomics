@@ -32,7 +32,6 @@ export const chance: Leaf = defineCommand({
 	name: "chance",
 	summary: "Report the chance a Scenario holds to its Horizon, over seeded Market paths",
 	description: CHANCE_METHOD,
-	note: "Chance of success ships in 0.8.0.",
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,

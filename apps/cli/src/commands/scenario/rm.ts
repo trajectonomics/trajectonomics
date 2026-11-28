@@ -23,7 +23,6 @@ function deletedReply(outcome: Extract<ScenarioDeleted, { status: "deleted" }>, 
 export const rm: Leaf = defineCommand({
 	name: "rm",
 	summary: "Tombstone a Scenario and free its name",
-	note: "The refusal of the main plan ships in 0.8.0, and so does --force.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().describe("The Scenario's exact name or its id."),
