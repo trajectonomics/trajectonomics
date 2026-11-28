@@ -26,7 +26,7 @@ let { rowKey, index, count, label, reorder, editable, problem, onDrop, children,
 let up: HTMLButtonElement | undefined = $state()
 let down: HTMLButtonElement | undefined = $state()
 
-/** Moves this row, then hands focus to its other button when the one pressed has reached the edge and turned off. */
+/** Moves this row, then hands focus back to that button at the row's new place, or to its other button at the edge. */
 async function press(by: -1 | 1): Promise<void> {
 	reorder.press(rowKey, by)
 	await tick()
