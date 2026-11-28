@@ -71,6 +71,28 @@ describe("the Snapshot against the real traj", () => {
 		SLOW_MS,
 	)
 
+	test(
+		"each plan's monthly read states a net worth row for each month after the As-of (web ADR 0033)",
+		async () => {
+			const run = await demoRun()
+			if (!run.ok) throw new Error(`the demo did not run: ${run.message}`)
+			for (const name of ["base", "retire-early"]) {
+				const read = run.snapshot.reads.monthly[name]
+				expect(read?.ok, name).toBe(true)
+				if (read?.ok !== true) continue
+				const monthly = read.data.tables.find((table) => table.name === "monthly")
+				if (monthly?.name !== "monthly") throw new Error(`${name} states no monthly table`)
+				expect(monthly.rows.length, name).toBeGreaterThan(0)
+				expect(monthly.rows[0]?.date, name).toBe("2026-10-31")
+				expect(
+					read.data.tables.map((table) => table.name),
+					name,
+				).toContain("monthly")
+			}
+		},
+		SLOW_MS,
+	)
+
 	test("the generated Demo snapshot parses with the Snapshot schema", async () => {
 		const demo = await demoSnapshotJson()
 		expect(snapshot.safeParse(demo).success).toBe(true)

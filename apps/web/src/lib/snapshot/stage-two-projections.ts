@@ -57,6 +57,22 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 }
 
 /**
+ * One bare `projection run --monthly` per Scenario, for the viewing date (web ADR 0033): the net worth at each month
+ * after the As-of, which no other read states. It takes no `--accounts`, because with `--monthly` that also states
+ * every Account's value on every month (cli ADR 0060), and none of the tables the pages read from the main run.
+ */
+export function planMonthly(params: PlanParams, names: string[]): Record<string, PlannedRead> {
+	return perScenario(params, names, (name) => [
+		"projection",
+		"run",
+		scenarioFlag(name),
+		...projectionFlags(params),
+		"--monthly",
+		"--json",
+	])
+}
+
+/**
  * One `scenario show --decimal` per Scenario: the document the planner pages edit, in the form where
  * money is a decimal string. The name follows the flags, after `--`, so a name that starts with a dash
  * is still read as a name.

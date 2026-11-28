@@ -62,6 +62,9 @@ export const snapshotReads = z.strictObject({
 	// Absent from a Snapshot made before the planner pages, so a document that never had the key reads as none.
 	documents: z.record(z.string(), readOf(scenarioShow)).default({}),
 	projections: z.record(z.string(), readOf(projectionRun)),
+	// One bare `projection run --monthly` per plan, the net worth row of each month after the As-of (web ADR 0033):
+	// absent from a Snapshot made before the viewing date, so a document that never had the key reads as none.
+	monthly: z.record(z.string(), readOf(projectionRun)).default({}),
 	fi: z.record(z.string(), readOf(fi)),
 	compare: readOf(projectionCompare).nullable(),
 	// Absent from a Snapshot made without a Return model, so a document that never had the key reads as none.

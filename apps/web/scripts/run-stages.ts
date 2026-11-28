@@ -77,6 +77,7 @@ export async function runStageTwo(
 			? Promise.resolve(null)
 			: pool(() => runPlanned(context, comparePlan, projectionCompare, records)),
 		pool(() => runPlanned(context, plan.rates, baselineRates, records)),
+		recordWithPool(pool, plan.monthly, (p) => runPlanned(context, p, projectionRun, records)),
 	])
 	const [documents, projections, chance] = phaseOne
 	const [paths, allowances, taxNotes] = await Promise.all([
@@ -94,6 +95,7 @@ export async function runStageTwo(
 		netWorthHistory: phaseOne[8],
 		documents,
 		projections,
+		monthly: phaseOne[12],
 		fi: phaseOne[9],
 		compare: phaseOne[10],
 		chance,

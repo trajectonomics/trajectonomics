@@ -11,6 +11,7 @@ import {
 	planCompare,
 	planDocuments,
 	planFi,
+	planMonthly,
 	planProjections,
 } from "./stage-two-projections"
 import { planTaxNotes } from "./stage-two-tax-notes"
@@ -32,6 +33,8 @@ export type StageTwoPlan = {
 	/** One `scenario show --decimal` per Scenario, the documents the planner pages show and edit. */
 	documents: Record<string, PlannedRead>
 	projections: Record<string, PlannedRead>
+	/** One bare `projection run --monthly` per Scenario, the net worth row of each month after the As-of (web ADR 0033). */
+	monthly: Record<string, PlannedRead>
 	fi: Record<string, PlannedRead>
 	compare: PlannedRead | null
 	/** One `projection chance` per Scenario; empty when the caller stated no Return model. */
@@ -65,11 +68,8 @@ function mainFirst(names: string[], read: StageOneReads["scenarios"]): string[] 
 /** The names of the Scenarios whose documents declare Milestones, from the list read. */
 function milestonedOf(read: StageOneReads["scenarios"]): Set<string> {
 	if (!read.ok) return new Set()
-	return new Set(
-		read.data.scenarios
-			.filter((scenario) => scenario.hasMilestones === true)
-			.map((scenario) => scenario.name),
-	)
+	const declared = read.data.scenarios.filter((scenario) => scenario.hasMilestones === true)
+	return new Set(declared.map((scenario) => scenario.name))
 }
 
 /** The first transaction date net worth reports, or null when the ledger has none. */
@@ -111,6 +111,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		netWorthHistory: planHistory(historyDates),
 		documents: planDocuments(scenarios),
 		projections: planProjections(params, scenarios),
+		monthly: planMonthly(params, scenarios),
 		fi: planFi(params, scenarios),
 		compare: planCompare(params),
 		chance: planChance(params, scenarios, milestonedOf(one.scenarios)),

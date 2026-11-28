@@ -48,4 +48,10 @@ describe("the read-leaf allowlist", () => {
 			"projection run",
 		)
 	})
+
+	test("the viewing date's bare monthly run is the same leaf", () => {
+		expect(leafOf(["projection", "run", "--scenario=base", "--monthly", "--json"])).toBe(
+			"projection run",
+		)
+	})
 })

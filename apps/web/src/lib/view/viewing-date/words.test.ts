@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test"
-import { offsetWords, rollupSentence, sideSentence } from "./words"
+import type { NetWorthAt } from "./rows"
+import { monthly, netWorthRead } from "./rows.test-support"
+import { netWorthLabel, offsetWords, rollupSentence, sideSentence } from "./words"
 
 /** The period each page reads against, as the page's own shape: a roll-up, a tax year, a Rule year's row. */
 const PERIOD = {
@@ -7,6 +9,8 @@ const PERIOD = {
 	tax: { from: "2026-01-01", to: "2026-12-31" },
 	rule: { date: "2050-06-01" },
 } as const
+
+const THB = [{ currency: "THB", amount: "1214900.00" }]
 
 describe("how far a month is from the As-of", () => {
 	test("today, a month either way, and whole years at each twelfth month", () => {
@@ -71,5 +75,63 @@ describe("the Cash flow sentence for a month inside a roll-up", () => {
 		expect(rollupSentence("2031-03", "2030-10-31", "2031-10-30")).toBe(
 			"Mar 2031 is in the year from 31 Oct 2030 to 30 Oct 2031.",
 		)
+	})
+})
+
+describe("the Net worth page's focus label for a viewing month", () => {
+	const PLAN = { name: "base", currency: "THB" }
+
+	test("today keeps the page's question, the totals and the As-of", () => {
+		const at = { kind: "today", read: netWorthRead("2026-10-31", THB) } as const
+		expect(netWorthLabel(at, "2026-10", PLAN, false)).toBe(
+			"What are you worth today? 1.21M THB as of 31 Oct 2026.",
+		)
+	})
+
+	test("a past month asks what you were worth at its end, and states every currency total", () => {
+		const read = netWorthRead("2025-03-31", [
+			{ currency: "THB", amount: "1020000.00" },
+			{ currency: "USD", amount: "33400.00" },
+		])
+		const at = { kind: "past", read } as const
+		expect(netWorthLabel(at, "2025-03", PLAN, false)).toBe(
+			"What were you worth at the end of Mar 2025? 1.02M THB, 33.4k USD as of 31 Mar 2025.",
+		)
+	})
+
+	test("a future month states the monthly row in the plan's currency, at the row's own date", () => {
+		const at = { kind: "future", row: monthly("2031-03-31", "3400000.00") } as const
+		expect(netWorthLabel(at, "2031-03", PLAN, false)).toBe(
+			"What will you be worth at the end of Mar 2031? 3.4M THB on 31 Mar 2031, in the plan base.",
+		)
+	})
+
+	test("a month after the plan ran out names the plan and the run-out date", () => {
+		const at = { kind: "ranOut", date: "2053-02-01" } as const
+		const plan = { name: "retire-early", currency: "THB" }
+		expect(netWorthLabel(at, "2053-03", plan, false)).toBe(
+			"What will you be worth in Mar 2053? The plan retire-early runs out on 1 Feb 2053.",
+		)
+	})
+
+	test("Hide amounts hides the figure, and the exact amount is never written", () => {
+		const at = { kind: "future", row: monthly("2031-03-31", "3400000.00") } as const
+		expect(netWorthLabel(at, "2031-03", PLAN, true)).toBe(
+			"What will you be worth at the end of Mar 2031? The amount is hidden. On 31 Mar 2031, in the plan base.",
+		)
+		expect(
+			netWorthLabel({ kind: "past", read: netWorthRead("2025-03-31", THB) }, "2025-03", PLAN, true),
+		).toBe("What were you worth at the end of Mar 2025? The amount is hidden. As of 31 Mar 2025.")
+	})
+
+	test("no row, a failed Read and a Read with no total have no label, so the page shows its own notice", () => {
+		expect(netWorthLabel({ kind: "missing" }, "2031-03", PLAN, false)).toBeNull()
+		const failed: NetWorthAt = {
+			kind: "today",
+			read: { argv: [], ok: false, error: { code: "x", exitCode: 1, message: "x" } },
+		}
+		expect(netWorthLabel(failed, "2026-10", PLAN, false)).toBeNull()
+		const noTotals = { kind: "today", read: netWorthRead("2026-10-31", null) } as const
+		expect(netWorthLabel(noTotals, "2026-10", PLAN, false)).toBeNull()
 	})
 })

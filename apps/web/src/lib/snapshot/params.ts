@@ -23,7 +23,8 @@ export type PlanInput = {
 	/**
 	 * Whether the chance reads list every Market path (`--outcomes`) and the Snapshot reads the five representative paths
 	 * ([web ADR 0020](../../../docs/adr/0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md)). Left out, it is true;
-	 * only the Demo snapshot says false, to stay under Biome's size limit.
+	 * only the Demo snapshot says false, as web ADR 0020 decided. Its file is gitignored (web ADR 0021), so no
+	 * formatter's size limit applies to it.
 	 */
 	futures?: boolean | undefined
 	/**

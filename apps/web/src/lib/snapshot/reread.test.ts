@@ -24,6 +24,7 @@ function holding(over: Record<string, unknown> = {}): Snapshot {
 		netWorthHistory: [],
 		documents: {},
 		projections: {},
+		monthly: {},
 		fi: {},
 		chance: {},
 		paths: {},
