@@ -1,6 +1,6 @@
 <script lang="ts">
 interface Props {
-	/** What the row is called to a screen reader, such as "Take from Funds". */
+	/** The place the row shows, which names it to a screen reader, such as "entry 1". */
 	label: string
 	busy: boolean
 	/** True while the what-if changes the list: saving would carry the try into the plan, so Edit and Remove wait. */
