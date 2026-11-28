@@ -8,6 +8,6 @@ import PageShell from "../ui/PageShell.svelte"
 	title="FI date"
 >
 	{#snippet children(snapshot)}
-		<FiSections fi={snapshot.reads.fi} />
+		<FiSections {snapshot} />
 	{/snippet}
 </PageShell>

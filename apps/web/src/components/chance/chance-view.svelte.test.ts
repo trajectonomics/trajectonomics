@@ -152,3 +152,12 @@ describe("ChanceView's text alternatives", () => {
 		}
 	})
 })
+
+describe("ChanceView's fan", () => {
+	test("labels the median at the plot's edge, and keeps the shaded areas' legend for a screen reader", () => {
+		const body = renderView({ base: { argv: ARGV, ok: true, data: chanceFixture() } })
+		expect(body).toContain("50th</text>")
+		expect(body).toContain('aria-hidden="true"')
+		expect(body).toMatch(/class="sr-only">\s*The shaded areas are the 10th to 90th/)
+	})
+})
