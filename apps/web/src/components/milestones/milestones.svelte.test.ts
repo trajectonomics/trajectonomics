@@ -62,7 +62,15 @@ describe("MilestonesBody", () => {
 describe("MilestonesView", () => {
 	test("says there is no plan to show when the Snapshot holds no projection", () => {
 		const body = render(MilestonesView, {
-			props: { names: [], projections: {}, scenario: "", terms: "both", onTerms: () => {} },
+			props: {
+				names: [],
+				projections: {},
+				chances: {},
+				scenario: "",
+				asOf: "2026-10-31",
+				terms: "both",
+				onTerms: () => {},
+			},
 		}).body
 		expect(body).toContain("No plan to show milestones for")
 	})
@@ -73,7 +81,9 @@ describe("MilestonesView", () => {
 			props: {
 				names: ["base"],
 				projections: { base: read },
+				chances: {},
 				scenario: "",
+				asOf: "2026-10-31",
 				terms: "both",
 				onTerms: () => {},
 			},
