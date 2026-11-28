@@ -121,26 +121,28 @@ describe("milestone dates over a flat market", () => {
 })
 
 describe("milestone dates over two buckets", () => {
-	// Seed 0's January draw is flat on path 0 and -99.99% on path 1. After one month of growth the
-	// flat path opens 1 Feb with 1,000 and the crashed one cannot, so path 0 pays the 950 bill and
-	// path 1 runs out on it. The Milestone fires on 1 Mar, and only path 0 is alive to reach it.
-	it("counts only the path that fired, hand-checked from the monthly balance", () => {
-		const chance = withMilestones(twoWay, [onDate("stop", "2026-03-01")], 2, false, bills)
+	// Seed 0's January draw is flat on paths 0, 2 and 3 and -99.99% on path 1. After one month of
+	// growth the flat paths open 1 Feb with 1,000 and the crashed one cannot, so they pay the 950
+	// bill and it runs out on it. The Milestone fires on 1 Mar, and three paths are alive to reach it.
+	it("counts the paths that fired, hand-checked from the monthly balance", () => {
+		const chance = withMilestones(twoWay, [onDate("stop", "2026-03-01")], 4, false, bills)
 		expect(chance.milestones).toEqual([
 			{
 				id: "stop",
-				reached: 1,
+				reached: 3,
 				dates: everyLevel("2026-03-01"),
-				byYear: [{ year: 2026, paths: 1 }],
+				byYear: [{ year: 2026, paths: 3 }],
 			},
 		])
 	})
 
 	it("gives each Path outcome the fire dates of the Milestones it fired", () => {
-		const chance = withMilestones(twoWay, [onDate("stop", "2026-03-01")], 2, true, bills)
+		const chance = withMilestones(twoWay, [onDate("stop", "2026-03-01")], 4, true, bills)
 		expect(chance.outcomes?.map((outcome) => outcome.milestones)).toEqual([
 			{ stop: "2026-03-01" },
 			{},
+			{ stop: "2026-03-01" },
+			{ stop: "2026-03-01" },
 		])
 	})
 })
