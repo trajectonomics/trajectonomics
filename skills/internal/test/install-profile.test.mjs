@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { delimiter, join } from 'node:path';
@@ -14,6 +15,17 @@ const NPX_STUB = `const { mkdir, readFile, writeFile } = require('node:fs/promis
 const { join } = require('node:path');
 
 (async () => {
+  const record = process.env.RECORD_ENV_FILE;
+  if (record) {
+    await writeFile(
+      record,
+      JSON.stringify({
+        npm_config_package: process.env.npm_config_package ?? '<unset>',
+        NPM_CONFIG_PACKAGE: process.env.NPM_CONFIG_PACKAGE ?? '<unset>',
+      })
+    );
+  }
+
   const expected = process.env.EXPECTED_ARGS;
   const actual = process.argv.slice(2);
   if (expected && JSON.stringify(actual) !== expected) {
@@ -46,11 +58,12 @@ const { join } = require('node:path');
 });
 `;
 
-async function runInstaller(packageJson) {
+async function runInstaller(packageJson, extraEnv = {}) {
   const scratch = await mkdtemp(join(tmpdir(), 'skill-profile-install-'));
   try {
     const target = join(scratch, 'target');
     const bin = join(scratch, 'bin');
+    const record = join(scratch, 'nested-env.json');
     await mkdir(target);
     await mkdir(bin);
 
@@ -82,15 +95,18 @@ async function runInstaller(packageJson) {
         ...process.env,
         PATH: `${bin}${delimiter}${process.env.PATH ?? ''}`,
         EXPECTED_ARGS: JSON.stringify(expectedArgs),
+        RECORD_ENV_FILE: record,
+        ...extraEnv,
       },
     });
     const packageRaw = await readFile(packagePath, 'utf8');
+    const nestedEnv = existsSync(record) ? JSON.parse(await readFile(record, 'utf8')) : null;
     const lock =
       result.status === 0
         ? JSON.parse(await readFile(join(target, 'skills-lock.json'), 'utf8'))
         : null;
 
-    return { result, packageRaw, lock };
+    return { result, packageRaw, lock, nestedEnv };
   } finally {
     await rm(scratch, { recursive: true, force: true });
   }
@@ -124,6 +140,21 @@ test('installer merges the profile and writes pinned lock refs through sync', as
   assert.ok(cloudflare, 'factory profile has a cloudflare/skills source');
   assert.equal(lock.skills.wrangler.source, 'cloudflare/skills');
   assert.equal(lock.skills.wrangler.ref, cloudflare.ref);
+});
+
+test('installer does not leak npm_config_package into the nested npx', async () => {
+  const { result, nestedEnv } = await runInstaller(
+    '{\n\t"name": "leak",\n\t"private": true\n}',
+    {
+      npm_config_package: 'github:example/whatever',
+      NPM_CONFIG_PACKAGE: 'github:example/whatever',
+    }
+  );
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.deepEqual(nestedEnv, {
+    npm_config_package: '<unset>',
+    NPM_CONFIG_PACKAGE: '<unset>',
+  });
 });
 
 test('installer accepts a target package.json with a UTF-8 BOM', async () => {
