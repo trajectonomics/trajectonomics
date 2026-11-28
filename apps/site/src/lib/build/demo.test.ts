@@ -4,7 +4,7 @@ import { checkDemoHome } from "./demo"
 import { checkDemoHeaders } from "./demo-headers"
 
 const POLICY =
-	"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'"
+	"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'self'; frame-ancestors 'self'"
 
 const HEADERS = `# The hosted Demo\n/demo/*\n  Content-Security-Policy: ${POLICY}\n`
 
@@ -57,7 +57,14 @@ describe("the policy the headers file sets for the Demo", () => {
 	})
 
 	it("fails a policy with no frame-ancestors", () => {
-		const content = HEADERS.replace("; frame-ancestors 'none'", "")
+		const content = HEADERS.replace("; frame-ancestors 'self'", "")
+		expect(codes(checkDemoHeaders([{ path: "_headers", content }]))).toEqual([
+			"DEMO_HEADERS_CSP_WRONG",
+		])
+	})
+
+	it("fails a policy that refuses to be framed by the Site's own home", () => {
+		const content = HEADERS.replace("frame-ancestors 'self'", "frame-ancestors 'none'")
 		expect(codes(checkDemoHeaders([{ path: "_headers", content }]))).toEqual([
 			"DEMO_HEADERS_CSP_WRONG",
 		])

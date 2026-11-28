@@ -1,5 +1,8 @@
 /** The Thai strings of the sections below the hero and of the footer's link columns (ADR 0012). */
+import { THAI_LIVE_DEMO } from "./th-live-demo"
+
 export const THAI_SECTIONS = Object.freeze({
+	...THAI_LIVE_DEMO,
 	actionEyebrow: "เทียบกันให้เห็น",
 	actionHeading: "ดูการทำงานจริง",
 	actionLede:

@@ -61,10 +61,20 @@ const NOTICE_TIMEOUT_MS = 6000
 </div>
 
 {/*
-	Two notes live here rather than in the script, because every byte of an inline script ships against
-	the page's 10,000 (ADR 0005): the Copy button keeps its full width while it says the short word, so
-	the CLI link cannot jump up beside it on a phone and back down six seconds later; and the closing
-	section's link is parsed after this script runs, so it is revealed once the document is.
+	Notes live here rather than in the script, because every byte of an inline script ships against
+	the page's 10,000 (ADR 0005, ADR 0019).
+	- The toast confirms the copy and the button says what it did, then both clear together so one
+	  timer drives them and they cannot disagree.
+	- The button paints the accent role and shortens its word, or keeps both for a failed copy.
+	- Re-attaching the state restarts the countdown, so a second copy gets its own six seconds.
+	- The prompt stays in the page for this button to copy, but the CTA shows only two controls: this
+	  one and the CLI link. With JavaScript off, the CLI link is the remaining way out.
+	- The closing section's link back up to this control appears only when the control does, once the
+	  document is parsed.
+	- A copy says so once on the copy event, so the page can count it; the event's name and value are
+	  frozen, because a metric that changes its name breaks its series.
+	- The Copy button keeps its full width while it says the short word, so the CLI link cannot jump
+	  up beside it on a phone and back down six seconds later.
 */}
 <script is:inline>
 	;(() => {
@@ -85,19 +95,13 @@ const NOTICE_TIMEOUT_MS = 6000
 		const timeoutMs = Number(button.dataset.noticeTimeout ?? "6000")
 		const label = button.textContent ?? ""
 		let notice = null
-		/**
-		 * The toast confirms the copy and the button says what it did, then both clear together so one
-		 * timer drives them and they cannot disagree.
-		 */
 		const notify = (message, failed) => {
 			status.textContent = message
 			if (check instanceof HTMLElement) check.hidden = failed
-			// The button paints the accent role and shortens its word, or keeps both for a failed copy.
 			if (failed) button.removeAttribute("data-copy-state")
 			else button.setAttribute("data-copy-state", "copied")
 			if (notice === null) button.style.minWidth = `${button.getBoundingClientRect().width}px`
 			button.textContent = failed ? label : (button.dataset.copiedLabel ?? label)
-			// Re-attaching the state restarts the countdown, so a second copy gets its own six seconds.
 			toast.removeAttribute("data-visible")
 			void toast.offsetWidth
 			toast.setAttribute("data-visible", "")
@@ -112,10 +116,7 @@ const NOTICE_TIMEOUT_MS = 6000
 			}, timeoutMs)
 		}
 
-		// The prompt stays in the page for this button to copy, but the CTA shows only two controls:
-		// this one and the CLI link. With JavaScript off, the CLI link is the remaining way out.
 		button.hidden = false
-		// The closing section's link back up to this control appears only when the control does.
 		document.addEventListener("DOMContentLoaded", () => {
 			const back = document.querySelector("[data-closing-prompt]")
 			if (back instanceof HTMLElement) back.hidden = false
@@ -125,8 +126,6 @@ const NOTICE_TIMEOUT_MS = 6000
 			try {
 				await navigator.clipboard.writeText(text)
 				notify(button.dataset.copied ?? "", false)
-				// The prompt reached the clipboard: say so once, so the page can count the copy. The
-				// name and the value are frozen, because a metric that changes its name breaks its series.
 				window.dispatchEvent(
 					new CustomEvent("traj:site-command-copied", { detail: { command: "install" } }),
 				)

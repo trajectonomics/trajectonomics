@@ -1,5 +1,7 @@
 /** Every string one Language shows. Every Language has the same keys (`GLOSSARY.md`). */
-export interface Dictionary {
+import type { LiveDemoWords } from "./live-demo-dictionary"
+
+export interface Dictionary extends LiveDemoWords {
 	/** The document title of this Language's home: what a tab and a search result show. */
 	readonly documentTitle: string
 	/** This Language's home one line of summary, for a search result and a shared link. */

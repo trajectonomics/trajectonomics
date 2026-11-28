@@ -5,8 +5,10 @@ import {
 	COPY_PROMPT_TEXT,
 	copiedLabel,
 	copiedMessage,
+	expectRingVisible,
 	focusableCount,
-	ringVisible,
+	focusedControl,
+	tabOutOfFrame,
 	tabToCopyButton,
 } from "./controls"
 import { DEVICE_SCHEMES, expectShippedTheme, openPage, PAGES } from "./pages"
@@ -17,30 +19,42 @@ const HOMES = PAGES.filter((underTest) => underTest.status === 200)
 for (const scheme of DEVICE_SCHEMES) {
 	for (const underTest of HOMES) {
 		test.describe(`${underTest.name} on a ${scheme} device`, () => {
-			test.use({ colorScheme: scheme })
+			// Motion reduced settles the hero's Demo window on its static state: the chat it would play
+			// swaps which controls are on screen mid-walk, and no fixed list of stops can hold still
+			// under that ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
+			test.use({ colorScheme: scheme, reducedMotion: "reduce" })
 
 			test("Tab reaches every control and each one paints its ring", async ({ page }) => {
+				// The Demo's own controls are a second document to walk through, which makes this the
+				// longest keyboard check; the extra room keeps a loaded machine from failing it.
+				test.setTimeout(60_000)
 				await openPage(page, underTest)
 				await expectShippedTheme(page)
 				const count = await focusableCount(page)
 				expect(count).toBeGreaterThan(0)
 				const visited: string[] = []
-				for (let stop = 1; stop <= count; stop++) {
-					await page.keyboard.press("Tab")
-					// The ring colour transitions from currentColor, so read it once the page has settled.
-					await page.waitForTimeout(200)
-					const reached = await page.evaluate(() => {
-						const focused = document.activeElement
-						if (!(focused instanceof HTMLElement)) return "none"
-						const href = focused.getAttribute("href") ?? ""
-						// The accessible name, not the text: two Replays in two sections are two controls.
-						const name = focused.getAttribute("aria-label") ?? focused.textContent ?? ""
-						return `${focused.tagName}:${href}:${name.trim()}`
-					})
-					expect(reached, `Tab stop ${stop} is a control`).not.toBe("none")
-					expect(visited, `Tab stop ${stop} is a control not reached yet`).not.toContain(reached)
+				// The live Demo is a second document, not a control: Tab enters the Dashboard's own stops
+				// and leaves them at its end, and the Dashboard paints their rings (ADR 0034). Step over
+				// the frame, then judge the Site's next control without another press, so every control
+				// the Site ships is still reached and still paints its ring.
+				let onControl = false
+				while (visited.length < count) {
+					if (!onControl) await page.keyboard.press("Tab")
+					onControl = false
+					const reached = await focusedControl(page)
+					if (reached.startsWith("IFRAME:")) {
+						expect(await tabOutOfFrame(page), "Tab leaves the embedded Demo").toBe(true)
+						// The press that left the frame landed on the Site's next control.
+						onControl = true
+						continue
+					}
+					expect(reached, `Tab stop ${visited.length + 1} is a control`).not.toBe("none")
+					expect(
+						visited,
+						`Tab stop ${visited.length + 1} is a control not reached yet`,
+					).not.toContain(reached)
 					visited.push(reached)
-					expect(await ringVisible(page), `Tab stop ${stop} paints its ring`).toBe(true)
+					await expectRingVisible(page, `Tab stop ${visited.length} (${reached}) paints its ring`)
 				}
 				expect(visited).toHaveLength(count)
 			})

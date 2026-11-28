@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
 import type { Language } from "../src/lib/language/language"
 import { dictionaryFor } from "../src/lib/language/languages"
 import { INSTALL_PROMPT } from "../src/lib/site"
@@ -44,6 +44,44 @@ export function ringVisible(page: Page): Promise<boolean> {
 			style.outlineColor === ring
 		return outline || (style.boxShadow !== "none" && style.boxShadow.includes(ring))
 	})
+}
+
+/** The control the focused element is, by tag, href and accessible name; `none` when nothing is. */
+export function focusedControl(page: Page): Promise<string> {
+	return page.evaluate(() => {
+		const focused = document.activeElement
+		if (!(focused instanceof HTMLElement)) return "none"
+		const href = focused.getAttribute("href") ?? ""
+		// The accessible name, not the text: two Replays in two sections are two controls.
+		const name = focused.getAttribute("aria-label") ?? focused.textContent ?? ""
+		return `${focused.tagName}:${href}:${name.trim()}`
+	})
+}
+
+/** Wait for the focused control to paint its ring, so a busy machine cannot beat the transition. */
+export async function expectRingVisible(page: Page, label: string): Promise<void> {
+	await expect.poll(() => ringVisible(page), { message: label, timeout: 3_000 }).toBe(true)
+}
+
+/**
+ * Put focus on the embedded iframe's last control and press Tab once. The frame's own tab stops are the
+ * Dashboard's to test; this checks that the keyboard leaves the frame onto the document's next control,
+ * so the Site's controls on both sides are still reached in order.
+ */
+export async function tabOutOfFrame(page: Page): Promise<boolean> {
+	await page.evaluate((selector) => {
+		const frame = document.querySelector("iframe")
+		if (!(frame instanceof HTMLIFrameElement)) return
+		const controls = [...(frame.contentDocument?.querySelectorAll(selector) ?? [])].filter(
+			(element) => element.getClientRects().length > 0,
+		)
+		const last = controls.at(-1)
+		// The frame's elements belong to the frame's realm, so the parent's `instanceof` cannot see them;
+		// focus the last one by its own method.
+		if (last !== undefined) (last as HTMLElement).focus()
+	}, FOCUSABLE)
+	await page.keyboard.press("Tab")
+	return page.evaluate(() => !(document.activeElement instanceof HTMLIFrameElement))
 }
 
 /** Press Tab until the Copy button has focus, and return whether it gets there at all. */

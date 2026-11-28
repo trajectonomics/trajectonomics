@@ -1,5 +1,8 @@
 /** The English strings of the sections below the hero and of the footer's link columns (ADR 0012). */
+import { ENGLISH_LIVE_DEMO } from "./en-live-demo"
+
 export const ENGLISH_SECTIONS = Object.freeze({
+	...ENGLISH_LIVE_DEMO,
 	actionEyebrow: "Without vs with",
 	actionHeading: "See it in action",
 	actionLede:
