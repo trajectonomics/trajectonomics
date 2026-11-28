@@ -1,0 +1,14 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import Collectors from "../components/Collectors.svelte"
+import Layout from "../layouts/Layout.astro"
+---
+
+<Layout
+	title="Your collectors · Trajectonomics Data"
+	description="The machines your account sends usage from."
+	current={null}
+>
+	<Collectors client:load />
+</Layout>

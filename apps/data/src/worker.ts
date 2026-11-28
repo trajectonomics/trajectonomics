@@ -2,6 +2,7 @@ import { healthReport } from "./core/health"
 import { readLastIngest } from "./db/read"
 import type { Env } from "./env"
 import type { CacheLike } from "./http/cache"
+import { defaultJwksSource } from "./http/jwks"
 import { handleRequest } from "./http/router"
 
 function cache(): CacheLike {
@@ -10,7 +11,11 @@ function cache(): CacheLike {
 
 export default {
 	fetch(request: Request, env: Env): Promise<Response> {
-		return handleRequest(request, env, { nowMs: Date.now(), cache: cache() })
+		return handleRequest(request, env, {
+			nowMs: Date.now(),
+			cache: cache(),
+			jwks: defaultJwksSource,
+		})
 	},
 	async scheduled(_controller: { cron: string }, env: Env): Promise<void> {
 		const lastIngestAt = await readLastIngest(env.DB)

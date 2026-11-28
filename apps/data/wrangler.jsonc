@@ -17,8 +17,13 @@
 		"directory": "./dist",
 		// The build's root is served at /data/; nothing is emitted at the host root.
 		"base_path": "/data",
-		// The API and ingest go to the Worker; every other path under /data/ is an asset.
-		"run_worker_first": ["/data/api/*", "/data/ingest"]
+		// The API, the browser auth routes, ingest and the service-binding endpoint go to the
+		// Worker; every other path under /data/ is an asset.
+		"run_worker_first": ["/data/api/*", "/data/auth/*", "/data/ingest", "/internal/*"]
+	},
+	// The issuer of the access tokens ingest trusts (ADR 0015). Not a secret.
+	"vars": {
+		"AUTH_ISSUER": "https://auth.trajectonomics.com"
 	},
 	"d1_databases": [
 		{

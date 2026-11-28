@@ -1,92 +1,79 @@
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
+import { readFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { credentialsPath } from "../auth/credentials"
+import type { AuthFetch } from "../auth/http"
 import { parseHostsConfig } from "../hourly/config"
-import { cursorPath } from "../hourly/cursor"
+import { defaultStateDir, parseConfigPath } from "../hourly/paths"
 import { runHourly } from "../hourly/run"
 import { spawnInheritStderr } from "../hourly/spawn"
+import { readCursor, writeCursor } from "../hourly/state"
 import { errorMessage } from "../message"
-import {
-	DEFAULT_INGEST_URL,
-	defaultKeyFile,
-	type FetchLike,
-	readIngestKey,
-	sendRows,
-} from "../send"
-import { fail } from "./errors"
+import { DEFAULT_INGEST_URL, defaultKeyFile, type FetchLike, sendRows } from "../send"
+import { lazyBearer, realBearerDeps, resolveBearer } from "../send/bearer"
+import { tokenAllowedFor } from "../send/token-url"
+import { type HourlyCommandDeps, runSend } from "./hourly-send"
 
-const USAGE = "Usage: bun src/cli.ts hourly [--config <path>]"
-
-const log = (line: string): void => console.error(line)
-const postFetch: FetchLike = (url, init) => fetch(url, init)
-
-/** The default hosts file. */
-export function defaultConfigPath(home: string): string {
-	return join(home, ".config/traj-data/hosts.json")
-}
-
-/** The default state directory that holds one cursor per host. */
-export function defaultStateDir(home: string): string {
-	return join(home, ".local/state/traj-data")
-}
-
-function parseConfigPath(argv: readonly string[], home: string): string {
-	let path = defaultConfigPath(home)
-	for (let i = 0; i < argv.length; i += 1) {
-		const arg = argv[i] ?? ""
-		if (arg === "--help" || arg === "-h") {
-			console.log(USAGE)
-			process.exit(0)
-		}
-		if (arg !== "--config") fail(`Unknown argument: ${arg}`, USAGE)
-		const value = argv[i + 1]
-		if (value === undefined) fail("--config needs a value", USAGE)
-		path = value
-		i += 1
-	}
-	return path
-}
-
-function readCursor(stateDir: string, name: string): string | null {
-	try {
-		const text = readFileSync(cursorPath(stateDir, name), "utf8").trim()
-		return text.length === 0 ? null : text
-	} catch {
-		return null
-	}
-}
-
-function writeCursor(stateDir: string, name: string, iso: string): void {
-	mkdirSync(stateDir, { recursive: true })
-	const path = cursorPath(stateDir, name)
-	const temporary = `${path}.${process.pid}.tmp`
-	writeFileSync(temporary, `${iso}\n`, { mode: 0o600 })
-	renameSync(temporary, path)
-}
+export type { HourlyCommandDeps } from "./hourly-send"
 
 /** Runs every host's collector, sends the rows, and advances the accepted cursors. */
-export async function runHourlyCommand(argv: readonly string[]): Promise<void> {
-	const home = homedir()
-	const path = parseConfigPath(argv, home)
+export async function runHourlyCommand(
+	argv: readonly string[],
+	deps: HourlyCommandDeps = realHourlyCommandDeps(),
+): Promise<void> {
+	const path = parseConfigPath(argv, deps.home)
 	let config: ReturnType<typeof parseHostsConfig>
-	let key: string
 	try {
-		config = parseHostsConfig(JSON.parse(readFileSync(path, "utf8")))
-		key = readIngestKey(defaultKeyFile(home))
+		config = parseHostsConfig(deps.readConfig(path))
 	} catch (error) {
-		console.error(`hourly: ${errorMessage(error)}`)
-		process.exitCode = 1
+		deps.log(`hourly: ${errorMessage(error)}`)
+		deps.exit(1)
 		return
 	}
-	const stateDir = defaultStateDir(home)
-	const url = process.env["TRAJ_DATA_URL"] ?? DEFAULT_INGEST_URL
+	const url = deps.env["TRAJ_DATA_URL"] ?? DEFAULT_INGEST_URL
+	const bearer = lazyBearer(() =>
+		resolveBearer(
+			{
+				credentialsPath: credentialsPath(deps.home),
+				keyFile: defaultKeyFile(deps.home),
+				url,
+				tokenUrlAllowed: tokenAllowedFor(url, deps.env),
+				forceKey: false,
+			},
+			deps.bearer,
+		),
+	)
 	const report = await runHourly(config, {
-		nowMs: Date.now(),
+		nowMs: deps.nowMs(),
+		spawn: deps.spawn,
+		readCursor: deps.readCursor,
+		writeCursor: deps.writeCursor,
+		send: runSend(deps, url, bearer),
+		log: deps.log,
+	})
+	deps.exit(report.ok ? 0 : 1)
+}
+
+const postFetch: FetchLike = (url, init) => fetch(url, init)
+const authFetch: AuthFetch = (url, init) => fetch(url, init)
+
+function realHourlyCommandDeps(): HourlyCommandDeps {
+	const log = (line: string): void => console.error(line)
+	const home = homedir()
+	const stateDir = defaultStateDir(home)
+	return {
+		env: process.env,
+		home,
+		nowMs: () => Date.now(),
+		readConfig: (path) => JSON.parse(readFileSync(path, "utf8")),
 		spawn: spawnInheritStderr,
 		readCursor: (name) => readCursor(stateDir, name),
 		writeCursor: (name, iso) => writeCursor(stateDir, name, iso),
-		send: (rows) => sendRows(rows, { url, key, fetch: postFetch, log }),
+		bearer: realBearerDeps(authFetch, log),
+		fetch: postFetch,
+		send: sendRows,
 		log,
-	})
-	process.exitCode = report.ok ? 0 : 1
+		exit: (code) => {
+			process.exitCode = code
+		},
+	}
 }
