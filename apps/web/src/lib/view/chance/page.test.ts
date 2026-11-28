@@ -10,6 +10,7 @@ describe("chanceSummaryOf", () => {
 			paths: 200,
 			lasts: "Lasts to 2028 in 174 of 200 markets.",
 			currency: "THB",
+			notes: ["Every figure is nominal."],
 		})
 	})
 })

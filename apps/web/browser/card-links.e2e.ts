@@ -8,7 +8,7 @@ test("a keyboard-focused card link draws its ring around the card", async ({ pag
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await openDemo(page, "/", { theme: "light" })
 
-	const link = page.getByRole("heading", { level: 2, name: "Net worth" }).getByRole("link")
+	const link = page.getByRole("heading", { level: 3, name: "Net worth" }).getByRole("link")
 	await expect(link).toBeVisible()
 	await link.focus()
 	await page.keyboard.press("Shift+Tab")

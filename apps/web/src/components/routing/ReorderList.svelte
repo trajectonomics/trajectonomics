@@ -39,15 +39,22 @@ let {
 }: Props = $props()
 const initial = () => items
 const reorder = new Reorder<T>(initial())
+/** The order the last save stored, while the page still shows the Snapshot from before it (a write that landed unread). */
+let stored = $state<readonly T[] | null>(null)
+const baseline = $derived(stored ?? items)
 const broken = $derived(rule(reorder.items))
-const changed = $derived(reorder.changed(items))
+const changed = $derived(reorder.changed(baseline))
 const cannot = $derived(busy || broken !== null || locked)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
+async function save(order: readonly T[]): Promise<void> {
+	if (await onSave(order)) stored = order
+}
+
 async function dropped(event: DragEvent, index: number): Promise<void> {
 	const order = reorder.drop(event, index)
-	if (order !== null && rule(order) === null && !locked) await onSave(order)
+	if (order !== null && rule(order) === null && !locked) await save(order)
 }
 </script>
 
@@ -63,8 +70,8 @@ async function dropped(event: DragEvent, index: number): Promise<void> {
 {#if editable && changed}
 	<div class="flex flex-wrap items-center gap-2" role="group" aria-label="The new order">
 		<span class="text-sm text-muted-foreground">The new order is not saved yet.</span>
-		<button type="button" class={button} disabled={cannot} onclick={() => onSave(reorder.items)}>Done</button>
+		<button type="button" class={button} disabled={cannot} onclick={() => save(reorder.items)}>Done</button>
 		<button type="button" class={button} disabled={busy || broken !== null} onclick={() => onTry(reorder.items)}>Try this order</button>
-		<button type="button" class={button} onclick={() => reorder.reset(items)}>Cancel</button>
+		<button type="button" class={button} onclick={() => reorder.reset(baseline)}>Cancel</button>
 	</div>
 {/if}

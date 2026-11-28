@@ -20,8 +20,7 @@ export const POST_LOGIN_PAGE = "/welcome"
 /** The plugin list, split out so `auth-options.ts` stays readable. */
 export function buildPlugins(input: {
 	baseURL: string
-	/** The database the consent record's withdrawal and answer are written to in one batch. */
-	db: D1Database | undefined
+	database: D1Database
 	passkeyRpID: string
 	passkeyOrigin: string
 	/** True when this person has never answered the marketing question. */
@@ -74,8 +73,8 @@ export function buildPlugins(input: {
 		// The CLI prints this page as the verification address; the trailing slash is the page's
 		// built address, so the person never goes through a redirect.
 		oauthDeviceAuthorization({ verificationUri: "/device/" }),
-		grantManagement(),
-		marketingConsent({ db: input.db }),
+		grantManagement({ database: input.database }),
+		marketingConsent({ db: input.database }),
 		pendingDeletion(),
 	]
 }

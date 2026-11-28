@@ -70,6 +70,6 @@ async function addToPlan(): Promise<void> {
 			</ul>
 		</div>
 	{/if}
-	<StaleNotice />
+	<StaleNotice shows="stale" />
 	{#if editSession.error !== null && editSession.source === year.key}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
 </div>

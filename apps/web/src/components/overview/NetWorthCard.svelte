@@ -1,37 +1,42 @@
 <script lang="ts">
 import type { Read } from "../../lib/contract"
-import type { NetWorthCardView } from "../../lib/view/overview/view"
-import Sparkline from "../chart/Sparkline.svelte"
+import type { NetWorthView } from "../../lib/view/net-worth/view"
+import type { CardFigure } from "../../lib/view/overview/card-details"
 import Card from "../ui/Card.svelte"
-import Money from "../ui/Money.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import Totals from "../ui/Totals.svelte"
+import CardDetails from "./CardDetails.svelte"
 
 interface Props {
-	netWorth: Read<NetWorthCardView>
+	netWorth: Read<NetWorthView>
 }
 
 let { netWorth }: Props = $props()
+/** Each currency's total at the CLI's exact figure, and the CLI's note, both in Details. */
+const figures = $derived<CardFigure[]>(
+	netWorth.ok
+		? netWorth.data.totals.map((total) => ({
+				label: `Net worth in ${total.currency}`,
+				value: total.amount,
+				money: true,
+				currency: total.currency,
+				key: total.currency,
+			}))
+		: [],
+)
+const notes = $derived(netWorth.ok && netWorth.data.note !== null ? [netWorth.data.note] : [])
 </script>
 
-<!-- Net worth: the total as the largest figure, its As-of, a sparkline of the month-ends and any note. -->
-<Card title="Net worth" href="/net-worth/" argv={netWorth.argv}>
+<!-- Net worth: the compact total and its As-of, with the exact figures and the CLI's note in Details. -->
+<Card quiet level={3} title="Net worth" href={netWorth.ok ? "/net-worth/" : undefined} argv={netWorth.argv}>
+	{#snippet details()}
+		<CardDetails {figures} {notes} />
+	{/snippet}
 	<ReadView read={netWorth} label="Net worth">
 		{#snippet children(view)}
-			<div class="space-y-4">
-				<div>
-					<Totals totals={view.totals} className="text-3xl font-semibold tracking-tight" compact />
-					<p class="mt-1 text-sm text-muted-foreground">As of {view.asOf}</p>
-				</div>
-				{#if view.fees}
-					<p class="text-sm">Fees over the plan: <Money amount={view.fees.amount} currency={view.fees.currency} /></p>
-				{/if}
-				{#if view.note}
-					<p class="text-sm">{view.note}</p>
-				{/if}
-				{#if view.sparkline.length > 1}
-					<Sparkline label="Net worth at each month-end" values={view.sparkline} />
-				{/if}
+			<div class="space-y-1">
+				<Totals totals={view.totals} className="text-lg font-semibold tracking-tight" compact />
+				<p class="text-sm text-muted-foreground">As of {view.asOf}</p>
 			</div>
 		{/snippet}
 	</ReadView>

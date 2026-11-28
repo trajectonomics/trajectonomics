@@ -7,16 +7,15 @@
  * endpoint.
  *
  * A grant is one consent per user and client, which is also how 1.7.28's refresh-token family is
- * keyed. Revoking it deletes that family, so the refresh token fails at once.
+ * keyed. Revoking it deletes every consent row for that user and client, so a duplicate cannot
+ * outlive the revoke, and the codes and the token family with it, in one atomic batch.
  */
+
+import type { D1Database } from "@cloudflare/workers-types"
 import { APIError, createAuthEndpoint, sessionMiddleware } from "better-auth/api"
-import {
-	deleteConsentRow,
-	deleteDeviceCodes,
-	deletePendingAuthorizationCodes,
-	deleteTokenFamily,
-} from "./oauth/family"
+import { findAllPages } from "./oauth/adapter"
 import { asIsoString, stringArray } from "./oauth/format"
+import { revokeGrantFamily } from "./oauth/revoke"
 
 type StoredConsent = {
 	id: string
@@ -32,7 +31,7 @@ type StoredClient = {
 	name?: string | null
 }
 
-export function grantManagement() {
+export function grantManagement(input: { database: D1Database }) {
 	return {
 		id: "grant-management",
 		endpoints: {
@@ -41,11 +40,11 @@ export function grantManagement() {
 				{ method: "GET", use: [sessionMiddleware] },
 				async (ctx) => {
 					const userId = ctx.context.session.user.id
-					const rows = await ctx.context.adapter.findMany({
-						model: "oauthConsent",
-						where: [{ field: "userId", value: userId }],
-					})
-					const consents = rows as StoredConsent[]
+					// Paged: the adapter's default limit is 100 rows, and a missing grant would be a
+					// grant the owner cannot see or revoke.
+					const consents = await findAllPages<StoredConsent>(ctx, "oauthConsent", [
+						{ field: "userId", value: userId },
+					])
 					const grants = await Promise.all(
 						consents.map(async (consent) => {
 							const client = (await ctx.context.adapter.findOne({
@@ -89,12 +88,16 @@ export function grantManagement() {
 							error_description: "grant not found",
 						})
 					}
-					// Consent first, then the rest: a concurrent rotation that slips through lands on a
-					// grant with no approval record, and its next refresh fails closed (ADR 0002).
-					await deleteConsentRow(ctx, id)
-					await deleteTokenFamily(ctx, { userId, clientId: consent.clientId })
-					await deleteDeviceCodes(ctx, { userId, clientId: consent.clientId })
-					await deletePendingAuthorizationCodes(ctx, { userId, clientId: consent.clientId })
+					const owner = { userId, clientId: consent.clientId }
+					// One atomic batch: a failure deletes nothing, so the consent stays, the retry
+					// still finds the grant, and no pending code outlives a revoke that said 200.
+					const complete = await revokeGrantFamily(ctx, input.database, owner)
+					if (!complete) {
+						throw new APIError("INTERNAL_SERVER_ERROR", {
+							error: "server_error",
+							error_description: "the grant could not be fully revoked",
+						})
+					}
 					return ctx.json({ revoked: true })
 				},
 			),

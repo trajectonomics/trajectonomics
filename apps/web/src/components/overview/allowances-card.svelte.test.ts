@@ -37,7 +37,8 @@ function summaryOf(name: string): Summary {
 describe("the Home card: tax you could still save this year", () => {
 	test("states the saving and links to the Tax allowances page", () => {
 		const body = card(allowancesSummaryOf(GOLDEN_ALLOWANCES))
-		expect(body).toContain("Tax you could still save this year")
+		expect(body).toContain("Tax you could save")
+		expect(body).toContain("With more allowances this year.")
 		expect(body).toContain("28.1k")
 		expect(body).toContain('title="28,100.00"')
 		expect(body).toContain("/optimize/allowances/")
@@ -62,7 +63,7 @@ describe("the Home card: tax you could still save this year", () => {
 		}
 		const people = snapshotPeople(DEMO, ["separate"])["separate"] ?? NO_PEOPLE
 		const body = card(allowancesSummaryOf(holderSavesNothing, people), "separate")
-		expect(body).toContain("Tax you could still save this year")
+		expect(body).toContain("Tax you could save")
 		expect(body).toContain(">Your partner<")
 		expect(body).toContain("4.6k")
 		expect(body).toContain('title="4,600.00"')
@@ -77,14 +78,14 @@ describe("the Home card: tax you could still save this year", () => {
 	})
 
 	test("is not shown when the year saves nothing more", () => {
-		expect(card(null)).not.toContain("Tax you could still save")
+		expect(card(null)).not.toContain("Tax you could save")
 	})
 
 	test("is not shown for a Snapshot that holds no allowance read", () => {
 		const bare = structuredClone(DEMO)
 		bare.reads.allowances = {}
 		const body = render(OverviewGrid, { props: { view: overviewView(bare) } }).body
-		expect(body).not.toContain("Tax you could still save")
+		expect(body).not.toContain("Tax you could save")
 	})
 
 	test("Hide amounts masks every Return's figure", () => {
@@ -95,7 +96,7 @@ describe("the Home card: tax you could still save this year", () => {
 		} finally {
 			preferences.hidden = false
 		}
-		expect(body.match(/•••••/g)).toHaveLength(2)
+		expect(body.match(/•••••/g)).toHaveLength(4)
 		expect(body).not.toContain("84,950.00")
 		expect(body).not.toContain("4,600.00")
 	})

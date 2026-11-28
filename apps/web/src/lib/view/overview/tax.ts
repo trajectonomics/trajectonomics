@@ -16,6 +16,8 @@ export interface TaxView {
 	readonly currency: string
 	readonly status: string
 	readonly first: TaxPeriod | null
+	/** The CLI's own sentences about the run. */
+	readonly notes: readonly string[]
 }
 
 const STATUS_LABELS: Readonly<Record<ProjectionRun["tax"], string>> = {
@@ -41,5 +43,6 @@ export function taxView(run: ProjectionRun): TaxView {
 						settled: row.settled,
 						partial: row.partial,
 					},
+		notes: run.notes,
 	}
 }

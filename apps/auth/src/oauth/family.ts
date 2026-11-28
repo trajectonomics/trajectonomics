@@ -1,33 +1,32 @@
 /**
  * The rows that make up one user+client grant family, and their deletion order.
  *
- * Revocation deletes the consent first, then the token family (the same user+client family
- * 1.7.28 uses for replay detection), the pending device codes and the pending authorization
- * codes. Deleting the consent first narrows the concurrent-rotation window: a refresh that
- * slips through after the token delete lands on a grant with no approval record, so the next
- * refresh fails closed (ADR 0002).
+ * `revoke.ts` deletes a grant's consents, device codes, tokens and pending authorization codes in
+ * one D1 batch, so the whole family goes or none of it does. A consent created for a fresh approval
+ * deletes its token family through here first, so an old token does not attach to a new approval
+ * (ADR 0002 names the in-flight exchange that can still slip past).
+ * Pending authorization codes live in `verification` and are deleted by `verification-sql.ts`.
  *
- * Authorization codes are not a table of their own in 1.7.28: the provider stores each one in
- * `verification` under the hashed code, with `value` holding the JSON `authorization_code`
- * record (user id and `query.client_id`). There is no client index, so finding the pending
- * codes for a grant is a scan of that table; the row count is small and a revoke is rare.
+ * Both steps cost a constant number of statements however large the family is: one for the
+ * snapshot, and one batch of at most two deletes. The library keeps every rotated refresh row, so
+ * one machine refreshing hourly leaves about 2,160 rows in ninety days; a paged scan or a delete
+ * per hundred ids would pass D1's fifty-query cap for one invocation and fail the approval.
  */
-import { adapterOf } from "./store"
+import type { D1Database, D1PreparedStatement } from "@cloudflare/workers-types"
+import { adapterOf } from "./adapter"
 
 export type GrantOwner = {
 	userId: string
 	clientId: string
 }
 
-type StoredVerification = {
-	id: string
-	value?: unknown
-}
-
-type AuthorizationCodeValue = {
-	type?: unknown
-	userId?: unknown
-	query?: { client_id?: unknown } | null
+/**
+ * The owner's token ids at one instant. Everything the family may delete is listed here, and a
+ * token minted after the snapshot is not.
+ */
+export type TokenIds = {
+	accessTokenIds: string[]
+	refreshTokenIds: string[]
 }
 
 export async function deleteConsentRow(ctx: { context: unknown }, id: string): Promise<void> {
@@ -37,67 +36,54 @@ export async function deleteConsentRow(ctx: { context: unknown }, id: string): P
 	})
 }
 
-export async function deleteTokenFamily(
-	ctx: { context: unknown },
-	owner: GrantOwner,
-): Promise<void> {
-	const adapter = adapterOf(ctx)
-	const where = [
-		{ field: "clientId", value: owner.clientId },
-		{ field: "userId", value: owner.userId },
-	]
-	await adapter.deleteMany({ model: "oauthAccessToken", where })
-	await adapter.deleteMany({ model: "oauthRefreshToken", where })
-}
+/** The real table and column names, from `migrations/0001_init.sql`. */
+const SELECT_TOKEN_IDS = `select 'a' as kind, "id" from "oauthAccessToken"
+where "clientId" = ?1 and "userId" = ?2
+union all
+select 'r', "id" from "oauthRefreshToken" where "clientId" = ?1 and "userId" = ?2`
 
-export async function deleteDeviceCodes(
-	ctx: { context: unknown },
+/**
+ * The family as it stands now, in one statement. The ids, not a timestamp, are the boundary: the
+ * library stores a token's `createdAt` in whole seconds, so a token minted later in the same second
+ * carries an earlier `createdAt` than a millisecond read time, and a time filter would delete it.
+ */
+export async function snapshotTokenFamily(
+	database: D1Database,
 	owner: GrantOwner,
-): Promise<void> {
-	await adapterOf(ctx).deleteMany({
-		model: "deviceCode",
-		where: [
-			{ field: "clientId", value: owner.clientId },
-			{ field: "userId", value: owner.userId },
-		],
-	})
-}
-
-export async function deletePendingAuthorizationCodes(
-	ctx: { context: unknown },
-	owner: GrantOwner,
-): Promise<void> {
-	const adapter = adapterOf(ctx)
-	const rows = (await adapter.findMany({
-		model: "verification",
-		where: [],
-	})) as StoredVerification[]
-	for (const row of rows) {
-		if (typeof row.id !== "string" || !isAuthorizationCodeFor(row.value, owner)) continue
-		await adapter.delete({
-			model: "verification",
-			where: [{ field: "id", value: row.id }],
-		})
+): Promise<TokenIds> {
+	const { results } = await database
+		.prepare(SELECT_TOKEN_IDS)
+		.bind(owner.clientId, owner.userId)
+		.all<{ kind?: unknown; id?: unknown }>()
+	const ids: TokenIds = { accessTokenIds: [], refreshTokenIds: [] }
+	for (const row of results) {
+		if (typeof row.id !== "string") continue
+		if (row.kind === "a") ids.accessTokenIds.push(row.id)
+		else if (row.kind === "r") ids.refreshTokenIds.push(row.id)
 	}
+	return ids
 }
 
-/** True only for an unconsumed authorization code issued to this user and client. */
-function isAuthorizationCodeFor(value: unknown, owner: GrantOwner): boolean {
-	const parsed = parseAuthorizationCodeValue(value)
-	return (
-		parsed !== null &&
-		parsed.type === "authorization_code" &&
-		parsed.userId === owner.userId &&
-		parsed.query?.client_id === owner.clientId
-	)
-}
+const DELETE_ACCESS_TOKENS = `delete from "oauthAccessToken"
+where "id" in (select value from json_each(?1))`
+const DELETE_REFRESH_TOKENS = `delete from "oauthRefreshToken"
+where "id" in (select value from json_each(?1))`
 
-function parseAuthorizationCodeValue(value: unknown): AuthorizationCodeValue | null {
-	if (typeof value !== "string") return null
-	try {
-		const parsed = JSON.parse(value) as unknown
-		return parsed !== null && typeof parsed === "object" ? (parsed as AuthorizationCodeValue) : null
-	} catch {
-		return null
-	}
+/**
+ * Deletes exactly the tokens a snapshot listed, and nothing else, in one batch of at most two
+ * statements. Any token minted after the snapshot survives: another approval issued it with a
+ * consent this delete cannot see, so it is that approval's grant, not a leftover of the one being
+ * replaced. An empty list skips its statement, and an empty snapshot deletes nothing.
+ *
+ * Access tokens go first: `oauthAccessToken.refreshId` references the refresh row.
+ */
+export async function deleteTokenFamily(database: D1Database, ids: TokenIds): Promise<void> {
+	const statements: D1PreparedStatement[] = []
+	if (ids.accessTokenIds.length > 0)
+		statements.push(database.prepare(DELETE_ACCESS_TOKENS).bind(JSON.stringify(ids.accessTokenIds)))
+	if (ids.refreshTokenIds.length > 0)
+		statements.push(
+			database.prepare(DELETE_REFRESH_TOKENS).bind(JSON.stringify(ids.refreshTokenIds)),
+		)
+	if (statements.length > 0) await database.batch(statements)
 }

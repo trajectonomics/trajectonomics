@@ -1,10 +1,8 @@
 // The fees and payouts over the plan against the real traj (sim ADR 0027, 0028; cli ADR 0067; web ADR 0017): a 1% fee on the
-// fund shows on its card and on Home, each the figure `projection run` states, and each equal to the years the card lists.
+// fund shows on its card, the figure `projection run` states, equal to the years the card lists.
 import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { render } from "svelte/server"
-import NetWorthCard from "../src/components/overview/NetWorthCard.svelte"
 import AccountLifetimes from "../src/components/plan-items/AccountLifetimes.svelte"
-import { overviewView } from "../src/lib/view/overview/view"
 import { accountItems } from "../src/lib/view/what-if/plan-items"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import { settle } from "./editor-running.test-support"
@@ -50,16 +48,4 @@ describe("a 1% fee and a quarterly payout, over the whole plan", () => {
 			expect(body).toContain("Paid out over the plan")
 		},
 	)
-
-	slow("Home's Net worth card says the fees over the plan, the figure the run states", async () => {
-		const snapshot = snapshotOf(await savePayoutAndFee(fund))
-		const view = overviewView(snapshot)
-		if (!view.netWorth.ok) throw new Error("the net worth card failed")
-		expect(view.netWorth.data.fees).toEqual({
-			amount: runOf(snapshot).lifetimeFees ?? "",
-			currency: "THB",
-		})
-		const { body } = render(NetWorthCard, { props: { netWorth: view.netWorth } })
-		expect(body).toContain("Fees over the plan")
-	})
 })

@@ -6,7 +6,6 @@ import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/opt
 import type { Shown } from "../../lib/view/plan-items/problems"
 import FormAlert from "../ui/FormAlert.svelte"
 import ItemName from "../ui/ItemName.svelte"
-import SiteLink from "../ui/SiteLink.svelte"
 import AnchoredNote from "./AnchoredNote.svelte"
 import EmployerFields from "./EmployerFields.svelte"
 import Field from "./Field.svelte"
@@ -28,8 +27,8 @@ interface Props {
 	/** What the employer adds to a salary, and the Accounts it may pay into. */
 	employer?: EmployerDraft
 	targets?: readonly string[]
-	/** The Tax labels page a new income in a taxed plan must be given its label on, or null. */
-	note?: string | null
+	/** Whether a new income in a taxed plan must be given its label after the save. */
+	needsTaxLabel?: boolean
 }
 
 let {
@@ -43,7 +42,7 @@ let {
 	categories = [],
 	employer = $bindable({ account: "", share: "", rounding: "" }),
 	targets = [],
-	note = null,
+	needsTaxLabel = false,
 }: Props = $props()
 
 /** What the Ends field says: the once rule, the household's date, or both when the household pins a once Flow's end. */
@@ -58,7 +57,7 @@ const endHint = $derived.by(() => {
 
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
 <div class="space-y-4">
-	{#if note}<p class="text-sm text-muted-foreground">This plan's tax counts only income it knows by its label. After you save, give this income a label in <SiteLink href={note} class="underline underline-offset-4">Tax labels</SiteLink>.</p>{/if}
+	{#if needsTaxLabel}<p class="text-sm text-muted-foreground">This plan's tax counts only income it knows by its label. After you save, give this income a label in Tax labels.</p>{/if}
 	{#if existing}
 		<p class="text-sm text-foreground">Item <span class="font-medium"><ItemName kind="flow" id={existing.id} /></span></p>
 	{:else}

@@ -6,6 +6,7 @@ import type { PlanDensity } from "../../lib/view/plan-items/tabs"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"
+import TaxLabelNotice from "./TaxLabelNotice.svelte"
 
 interface Props {
 	snapshot: Snapshot
@@ -31,6 +32,7 @@ const projection = $derived(name === null ? undefined : snapshot.reads.projectio
 {:else}
 	<ReadView {read} label={`The plan of ${name}`}>
 		{#snippet children(data)}
+			{#if kind === "income"}<TaxLabelNotice plan={name} doc={data.scenario.document} />{/if}
 			<PlanItemsList
 				{kind}
 				{name}
