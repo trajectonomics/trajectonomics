@@ -13,9 +13,20 @@ export interface ChartSide {
 	readonly dashed: boolean
 }
 
+/** One point of a comparison's line, with the period it closes, so the focus point finds the year an FI date is in. */
+export interface CompareChartPoint extends LinePoint {
+	readonly from: string
+	readonly to: string
+}
+
+/** One line of the comparison, its points carrying the periods the annual rows cover. */
+export interface CompareChartSeries extends Omit<LineSeries, "points"> {
+	readonly points: readonly CompareChartPoint[]
+}
+
 /** The chart is either drawn, or not, and then the reasons are the words the page shows. */
 export type ChartState =
-	| { readonly kind: "chart"; readonly series: readonly LineSeries[] }
+	| { readonly kind: "chart"; readonly series: readonly CompareChartSeries[] }
 	| { readonly kind: "unavailable"; readonly reasons: readonly string[] }
 
 type AnnualRow = Extract<ProjectionRun["tables"][number], { name: "annual" }>["rows"][number]
@@ -47,13 +58,15 @@ function annualRows(run: ProjectionRun): readonly AnnualRow[] {
 	return run.tables.flatMap((table) => (table.name === "annual" ? table.rows : []))
 }
 
-function point(row: AnnualRow, index: number, terms: Terms): LinePoint {
+function point(row: AnnualRow, index: number, terms: Terms): CompareChartPoint {
 	const amount = terms === "real" ? row.realNetWorth.amount : row.closingNetWorth
 	return {
 		x: index,
 		xLabel: formatMonth(row.to),
 		y: toChartNumber(amount),
 		display: formatMoney(amount),
+		from: row.from,
+		to: row.to,
 	}
 }
 
