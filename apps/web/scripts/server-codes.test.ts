@@ -49,8 +49,12 @@ const NOT_A_CODE: readonly Allowed[] = [
 	{
 		file: "scripts/serve-edit.ts",
 		text: "refusal.code",
-		count: 2,
-		why: "it passes the guard's own `Refusal.code` through to `refused`, once per answer path",
+		why: "it passes the guard's own `Refusal.code` through to `refused`",
+	},
+	{
+		file: "scripts/serve-session.ts",
+		text: "refusal.code",
+		why: "it passes the session guard's own `Refusal.code` through to `refused`",
 	},
 	{
 		file: "src/lib/contract/read.ts",

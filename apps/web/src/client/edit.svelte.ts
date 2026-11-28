@@ -1,4 +1,3 @@
-import type { AccountValues, ErrorBody } from "../lib/contract"
 import { editAnswer, type PreviewAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { type EditOutcome, editOutcome } from "../lib/edit/outcome"
@@ -6,7 +5,8 @@ import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
 import { isActionSource } from "../lib/view/action-source"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
-import { fetchEditToken, postEdit, postPreview } from "./edit-post.js"
+import { fetchEditSession, postEdit, postPreview } from "./edit-post.js"
+import { EditState } from "./edit-state.svelte.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
@@ -17,34 +17,13 @@ export const STALE_PLAN = "This plan changed since the page read it."
  * The page's write path: the session token the server gives this page, and one Edit at a time. The
  * token is held in memory only, so a reload asks again. Controls show only while `token` is set.
  */
-class EditSession {
-	token = $state<string | null>(null)
-	busy = $state(false)
-	error = $state<string | null>(null)
-	/** Who sent the last request, so only that control shows its error: "form", or a year's key. */
-	source = $state<string>("form")
-	/** The CLI's error envelope of the last refused Edit, so a form can show it at the field it names. */
-	failure = $state<ErrorBody | null>(null)
-	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
-	stale = $state(false)
-	/** True from a write that landed while the read after it failed, until the page shows a Snapshot read since. `clear()` leaves it. */
-	savedUnread = $state(false)
-	/** What the last Edit that ran stated, as the CLI stated it: the batch of `record-values`. Null for any other. */
-	result = $state<AccountValues | null>(null)
+class EditSession extends EditState {
 	private opened: Promise<void> | null = null
 
-	/** Asks the server for the token once. A server that does not answer (`vite preview`) leaves it null. */
+	/** Asks the server for the session once. A server that does not answer (`vite preview`) leaves the token null. */
 	open(): Promise<void> {
-		this.opened ??= this.fetchToken()
+		this.opened ??= this.fetchSession()
 		return this.opened
-	}
-
-	/** Forgets the last Edit's error, so a form opened afterwards shows none of it. */
-	clear(): void {
-		this.error = null
-		this.failure = null
-		this.stale = false
-		this.result = null
 	}
 
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
@@ -97,17 +76,31 @@ class EditSession {
 		return this.sendReread({ addPlan: name })
 	}
 
-	private async sendReread(body: RereadBody): Promise<boolean> {
+	/** The Reload of the notice copy `from`: only that copy says why it failed, and no form's error or source moves. */
+	reload(from: string): Promise<boolean> {
+		return this.sendReread({}, from)
+	}
+
+	private async sendReread(body: RereadBody, from: string | null = null): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
-		// Reload beside an inline action keeps its source, so a Reload that fails is said there too.
-		if (Object.keys(body).length > 0 || !isActionSource(this.source)) this.source = "form"
-		this.error = null
+		this.reloadError = null
+		this.reloadFrom = null
+		if (from === null) {
+			// A plain reread beside an inline action keeps its source, so one that fails is said there too.
+			if (Object.keys(body).length > 0 || !isActionSource(this.source)) this.source = "form"
+			this.error = null
+		}
 		const answer = await postReread(this.token, body)
 		this.busy = false
-		if (answer.ok) this.savedUnread = false
-		if (answer.ok) this.clear()
-		else this.error = answer.message
+		if (answer.ok) {
+			this.savedUnread = false
+			this.clear()
+		} else if (from === null) this.error = answer.message
+		else {
+			this.reloadFrom = from
+			this.reloadError = answer.message
+		}
 		return answer.ok
 	}
 
@@ -127,11 +120,15 @@ class EditSession {
 		showDropped(plan, outcome)
 		if (outcome.snapshot !== null) replaceSnapshot(outcome.snapshot)
 		this.savedUnread = outcome.snapshot === null
+		if (this.savedUnread) this.landings += 1
 		return true
 	}
 
-	private async fetchToken(): Promise<void> {
-		this.token = await fetchEditToken()
+	private async fetchSession(): Promise<void> {
+		const session = await fetchEditSession()
+		// A page loaded while the server's Snapshot lacks a landed write says so, as the page that wrote did.
+		if (session?.unread === true) this.savedUnread = true
+		this.token = session?.token ?? null
 	}
 }
 

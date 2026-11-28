@@ -1,11 +1,13 @@
-import { afterAll, afterEach, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { snapshotLoader } from "../../client/browser"
 import { editSession } from "../../client/edit.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { fakeServer, HASH, held, settle, useSessionHooks } from "../../client/what-if.test-support"
 import { scenarioFlow } from "../../lib/contract"
 import { NO_ITEM_NAMES } from "../../lib/view/item-names"
+import { LOADING } from "../../lib/view/state"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import { withdrawalsView } from "../../lib/view/withdrawals"
 import { CTX } from "../../lib/view/withdrawals/fixtures.test-support"
@@ -23,6 +25,8 @@ const form = (flowId?: string, ctx = CTX) =>
 		props: { name: "base", contentHash: HASH, ctx, household: null, flowId, onDone: () => {} },
 	}).body
 
+// The names come from the shown Snapshot, so a Snapshot another file left shown would rename every item here.
+beforeEach(() => snapshotLoader.replace(LOADING))
 afterEach(() => {
 	editSession.token = null
 	editSession.error = null

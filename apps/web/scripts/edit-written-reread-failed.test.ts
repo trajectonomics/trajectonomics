@@ -9,7 +9,7 @@ import { WRITTEN_REREAD_FAILED, WRITTEN_REREAD_FAILED_MESSAGE } from "../src/lib
 import { demoCarryIn } from "./demo/carry-in"
 import { copyDemoLedger } from "./demo-ledger.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
-import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { editRequest, getRequest, PARAMS, PORT, TOKEN } from "./edit-request.test-support"
 import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
@@ -147,6 +147,8 @@ describe("a write that landed while its answer is an error", () => {
 				message: WRITTEN_REREAD_FAILED_MESSAGE,
 			})
 			expect(accountValues.parse(body.result).counts.added).toBe(1)
+			const session = await editing.session(getRequest("/edit-session"), PORT).json()
+			expect(session).toEqual({ token: TOKEN, unread: true })
 			await rm(marker, { force: true })
 			const reread = await editing.reread(editRequest({}, "{}"), 4321)
 			expect(reread.status).toBe(200)
@@ -176,6 +178,29 @@ describe("a write that landed while its answer is an error", () => {
 			)
 			expect(reread.status).toBe(200)
 			expect(editing.body).toContain("saved-behind")
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"the session says unread, for a page loaded again, from a landed write until a whole read succeeds",
+		async () => {
+			const editing = editor
+			if (editing === null) throw new Error("no editor")
+			const session = () => editing.session(getRequest("/edit-session"), PORT).json()
+			const reread = () => editing.reread(editRequest({}, "{}"), PORT)
+			await writeFile(marker, "")
+			// A read that fails with no write before it is not a saved change.
+			await reread()
+			expect(await session()).toEqual({ token: TOKEN })
+			const copy = { kind: "copy-plan", from: "base", name: "saved-session" }
+			await editing.edit(editRequest({}, JSON.stringify(copy)), PORT)
+			expect(await session()).toEqual({ token: TOKEN, unread: true })
+			await reread()
+			expect(await session()).toEqual({ token: TOKEN, unread: true })
+			await rm(marker, { force: true })
+			await reread()
+			expect(await session()).toEqual({ token: TOKEN })
 		},
 		SLOW_MS,
 	)

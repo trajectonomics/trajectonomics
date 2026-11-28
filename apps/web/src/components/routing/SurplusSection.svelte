@@ -32,15 +32,15 @@ const locked = $derived(!sameOrder(steps, ctx.doc.cashflow?.surplus ?? []))
 const filled = $derived(ctx.run === undefined ? null : filledFigure(ctx.run, ctx.names))
 const list = (items: readonly unknown[]) => ({ kind: "list", list: "surplus", items }) as const
 
-/** Takes a step out, unless the step before it would then be last and take less than everything. */
-function remove(index: number, trying: boolean): void {
+/** Takes a step out, unless the step before it would then be last and take less than everything. True when it ran. */
+function remove(index: number, trying: boolean): boolean | Promise<boolean> {
 	const items = steps.filter((_, at) => at !== index)
 	const rule = lastStepProblem(items)
 	note = rule === null ? null : rule.message
-	if (rule === null)
-		void (trying
-			? routing.tryIt(ctx, list(items))
-			: routing.save(ctx, list(items), removeSource("surplus", index)))
+	if (rule !== null) return false
+	return trying
+		? routing.tryIt(ctx, list(items))
+		: routing.save(ctx, list(items), removeSource("surplus", index))
 }
 </script>
 

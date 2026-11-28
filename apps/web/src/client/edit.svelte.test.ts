@@ -10,6 +10,9 @@ const result = accountValues.parse(JSON.parse(await Bun.file(GOLDEN).text()))
 /** A write that landed while the Snapshot read after it failed, with the batch it wrote. */
 const LANDED = { ok: false, error: writtenRereadFailed(), result }
 
+/** A reread that could not read the ledger. */
+const BUSY = { ok: false, error: { code: "database_busy", exitCode: 3, message: "busy" } }
+
 /** A server whose every answer is the given JSON. */
 function answers(value: unknown): void {
 	globalThis.fetch = (async () => new Response(JSON.stringify(value))) as unknown as typeof fetch
@@ -77,8 +80,58 @@ describe("the page's Edit session", () => {
 		editSession.token = "token"
 		answers(LANDED)
 		await editSession.run({ kind: "delete-plan", name: "base" })
-		answers({ ok: false, error: { code: "database_busy", exitCode: 3, message: "busy" } })
+		answers(BUSY)
 		expect(await editSession.reread()).toBe(false)
 		expect(editSession.savedUnread).toBe(true)
+	})
+
+	test("a Reload that fails says why to the notice alone: no form's error or source moves", async () => {
+		editSession.token = "token"
+		answers(LANDED)
+		await editSession.run({ kind: "delete-plan", name: "base" }, "routing")
+		answers(BUSY)
+		expect(await editSession.reload("copy")).toBe(false)
+		expect(editSession.reloadError).toBe("busy")
+		expect(editSession.error).toBeNull()
+		expect(editSession.source).toBe("routing")
+		expect(editSession.savedUnread).toBe(true)
+	})
+
+	test("a Reload that succeeds clears the notice and why the last one failed", async () => {
+		editSession.token = "token"
+		answers(LANDED)
+		await editSession.run({ kind: "delete-plan", name: "base" })
+		answers(BUSY)
+		await editSession.reload("copy")
+		answers(RAN)
+		expect(await editSession.reload("copy")).toBe(true)
+		expect(editSession.reloadError).toBeNull()
+		expect(editSession.reloadFrom).toBeNull()
+		expect(editSession.savedUnread).toBe(false)
+	})
+
+	test("counts each write that lands unread, and none whose read succeeded", async () => {
+		editSession.token = "token"
+		const before = editSession.landings
+		answers(LANDED)
+		await editSession.run({ kind: "delete-plan", name: "base" })
+		await editSession.run({ kind: "delete-plan", name: "base" })
+		expect(editSession.landings).toBe(before + 2)
+		answers(RAN)
+		await editSession.run({ kind: "delete-plan", name: "base" })
+		expect(editSession.landings).toBe(before + 2)
+	})
+
+	test("a page loaded while a landed write is unread says so, from the session answer", async () => {
+		answers({ token: "token", unread: true })
+		// `open` asks once per session, so this is a session of its own, as a page loaded again has.
+		const loaded: typeof editSession = Reflect.construct(editSession.constructor, [])
+		await loaded.open()
+		expect(loaded.token).toBe("token")
+		expect(loaded.savedUnread).toBe(true)
+		answers({ token: "token" })
+		const current: typeof editSession = Reflect.construct(editSession.constructor, [])
+		await current.open()
+		expect(current.savedUnread).toBe(false)
 	})
 })

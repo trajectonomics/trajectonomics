@@ -17,7 +17,7 @@ export type Editor = {
 	readonly body: string | null
 	/** Runs the Snapshot Plan with the current parameters and keeps the result as the served body. */
 	refresh: () => Promise<SnapshotRun>
-	/** Answers GET /edit-session: the token, to this machine's page only. */
+	/** Answers GET /edit-session: the token, to this machine's page only, and whether a landed write is unread. */
 	session: (request: Request, port: number) => Response
 	/** Answers POST /edit: refused, or run and answered with the new Snapshot or the error as data. */
 	edit: (request: Request, port: number) => Promise<Response>
