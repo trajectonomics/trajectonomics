@@ -44,6 +44,7 @@ class TestD1 {
 	calls = 0
 	batches: Statement[][] = []
 	maxCalls: number | undefined
+	beforeBatchHook: (() => void | Promise<void>) | null = null
 
 	constructor(private readonly database: Database) {}
 
@@ -61,6 +62,9 @@ class TestD1 {
 	async batch(statements: Statement[]): Promise<unknown[]> {
 		this.call()
 		this.batches.push(statements)
+		const hook = this.beforeBatchHook
+		this.beforeBatchHook = null
+		if (hook !== null) await hook()
 		const run = this.database.transaction(() => {
 			for (const statement of statements) statement.execute()
 		})
@@ -74,11 +78,15 @@ export type TestDb = {
 	db: D1Database
 	calls: () => number
 	batches: () => Statement[][]
+	/** Runs a one-shot callback just before the next real batch commits, so a test can interleave. */
+	beforeNextBatch: (hook: () => void | Promise<void>) => void
 }
 
 /** Applies the real migrations, in order, to an in-memory SQLite database behind D1's methods. */
 export function testDb(options: { maxCalls?: number } = {}): TestDb {
 	const database = new Database(":memory:")
+	// D1 enforces foreign keys, so the shim must too.
+	database.exec("PRAGMA foreign_keys = ON")
 	const migrations = join(import.meta.dir, "../../migrations")
 	for (const file of readdirSync(migrations)
 		.filter((name) => name.endsWith(".sql"))
@@ -92,5 +100,8 @@ export function testDb(options: { maxCalls?: number } = {}): TestDb {
 		db: d1 as unknown as D1Database,
 		calls: () => d1.calls,
 		batches: () => d1.batches,
+		beforeNextBatch: (hook) => {
+			d1.beforeBatchHook = hook
+		},
 	}
 }

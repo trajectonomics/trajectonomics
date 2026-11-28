@@ -31,7 +31,7 @@ async function post(
 	const env = { ...context.env, ...options.env } as Env
 	return handleRequest(request(token, options.body ?? { usage: [usageRow()] }), env, {
 		nowMs: NOW_MS,
-		jwks: options.jwks ?? { get: async () => signer.jwks },
+		jwks: options.jwks ?? { get: async () => ({ set: signer.jwks, fetched: false }) },
 	})
 }
 

@@ -11,24 +11,24 @@ export type IngestOutcome = {
 
 /**
  * Upserts a whole validated batch and rebuilds the affected days in one transaction. A token that
- * binds the org row does it as the batch's first statement, so the usage lands in the same commit
- * (ADR 0015).
+ * binds the org row does it as the batch's first statement, inside the same commit (ADR 0015). The
+ * bind also refuses a `sub` whose hash is already tombstoned, so a deletion cannot race it.
  */
 export async function writeIngest(
 	db: D1Database,
 	batch: IngestBatch,
 	receivedAt: string,
-	bindOrgSub: string | null = null,
+	bind: { sub: string; subHash: string } | null = null,
 ): Promise<IngestOutcome> {
 	const days = affectedDays(batch.usage)
 	const statements: D1PreparedStatement[] = []
-	if (bindOrgSub !== null) {
+	if (bind !== null) {
 		statements.push(
 			db
 				.prepare(
-					"UPDATE contributor SET auth_user_id = ? WHERE id = 'trajectonomics' AND auth_user_id IS NULL",
+					"UPDATE contributor SET auth_user_id = ? WHERE id = 'trajectonomics' AND auth_user_id IS NULL AND NOT EXISTS (SELECT 1 FROM contributor_tombstone WHERE auth_user_hash = ?)",
 				)
-				.bind(bindOrgSub),
+				.bind(bind.sub, bind.subHash),
 		)
 	}
 	for (const row of batch.usage) {

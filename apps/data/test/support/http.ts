@@ -21,17 +21,19 @@ export type Harness = {
 	database: TestDb["database"]
 	calls: () => number
 	batches: () => Statement[][]
+	beforeNextBatch: TestDb["beforeNextBatch"]
 }
 
 /** An in-memory D1, the test key, and a cache that honours each response's max-age. */
 export function harness(options: { maxCalls?: number } = {}): Harness {
-	const { db, database, calls, batches } = testDb(options)
+	const { db, database, calls, batches, beforeNextBatch } = testDb(options)
 	return {
 		env: { DB: db, AUTH_ISSUER: TEST_ISSUER, INGEST_BOOTSTRAP_KEY: TEST_KEY },
 		cache: memoryCache(),
 		database,
 		calls,
 		batches,
+		beforeNextBatch,
 	}
 }
 

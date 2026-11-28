@@ -74,6 +74,16 @@ describe("verifyAccessToken accepts", () => {
 		const token = await signer.sign({ scope: null })
 		expect(await verify(token, null)).toEqual({ ok: true, sub: "auth-user-a" })
 	})
+
+	test("a token whose life is exactly one hour", async () => {
+		const token = await signer.sign({ iat: NOW - 1_000, exp: NOW - 1_000 + 3_600 })
+		expect(await verify(token)).toEqual({ ok: true, sub: "auth-user-a" })
+	})
+
+	test("an nbf 20 seconds in the future, inside the skew", async () => {
+		const token = await signer.sign({ nbf: NOW + 20 })
+		expect(await verify(token)).toEqual({ ok: true, sub: "auth-user-a" })
+	})
 })
 
 describe("verifyAccessToken refuses", () => {
@@ -86,6 +96,8 @@ describe("verifyAccessToken refuses", () => {
 		["an nbf in the future", () => signer.sign({ nbf: NOW + 31 })],
 		["an iat in the future", () => signer.sign({ iat: NOW + 31, exp: NOW + 900 })],
 		["a lifetime over one hour", () => signer.sign({ iat: NOW - 4_000, exp: NOW + 600 })],
+		["a missing exp", () => signer.sign({ exp: null })],
+		["a missing iat", () => signer.sign({ iat: null })],
 		["a missing sub", () => signer.sign({ sub: null })],
 		["an HS256 token", async () => compact({ alg: "HS256", typ: "JWT" }, claims(), "c2ln")],
 		["an alg none token", async () => compact({ alg: "none", typ: "JWT" }, claims())],

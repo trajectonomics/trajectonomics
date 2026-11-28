@@ -1,5 +1,5 @@
 import type { JSONWebKeySet } from "jose"
-import { type JwksSource, JwksUnavailableError } from "../../src/http/jwks"
+import { type JwksResult, type JwksSource, JwksUnavailableError } from "../../src/http/jwks"
 
 export type FakeJwks = JwksSource & {
 	calls: () => number
@@ -7,8 +7,8 @@ export type FakeJwks = JwksSource & {
 }
 
 /**
- * A JWKS source over fixed sets. A `refresh` swaps in `fresh` when it is given; the counters let a
- * test assert that an unknown `kid` caused exactly one refetch.
+ * A JWKS source over fixed sets. A `refresh` counts as a fetch and swaps in `fresh` when it is
+ * given; the counters let a test assert that an unknown `kid` caused exactly one refetch.
  */
 export function fakeJwks(initial: JSONWebKeySet, fresh?: JSONWebKeySet): FakeJwks {
 	let served = initial
@@ -17,13 +17,12 @@ export function fakeJwks(initial: JSONWebKeySet, fresh?: JSONWebKeySet): FakeJwk
 	return {
 		calls: () => calls,
 		refreshes: () => refreshes,
-		async get(_issuer, _nowMs, options = {}) {
+		async get(_issuer, _nowMs, options = {}): Promise<JwksResult> {
 			calls += 1
-			if (options.refresh === true) {
-				refreshes += 1
-				if (fresh !== undefined) served = fresh
-			}
-			return served
+			if (options.refresh !== true) return { set: served, fetched: false }
+			refreshes += 1
+			if (fresh !== undefined) served = fresh
+			return { set: served, fetched: true }
 		},
 	}
 }

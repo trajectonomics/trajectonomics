@@ -63,7 +63,7 @@ export async function handleIngest(
 			env.DB,
 			validation.batch,
 			new Date(context.nowMs).toISOString(),
-			authorization.bindOrgSub,
+			authorization.bind,
 		)
 		return json({ accepted: outcome.accepted, days: outcome.days })
 	} catch (error) {

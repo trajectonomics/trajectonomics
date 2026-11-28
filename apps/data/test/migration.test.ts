@@ -61,6 +61,17 @@ describe("the migration constraints", () => {
 		).toThrow()
 	})
 
+	test("enforces foreign keys as D1 does", () => {
+		const { database } = harness()
+		expect(() =>
+			database
+				.prepare(
+					"INSERT INTO ingest_log (contributor_id, received_at, rows, status) VALUES (?, ?, 1, 'accepted')",
+				)
+				.run("missing", NOW_ISO),
+		).toThrow()
+	})
+
 	test("stores one tombstone per deleted account hash", () => {
 		const { database } = harness()
 		const insert = database.prepare(

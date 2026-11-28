@@ -1,4 +1,4 @@
-import type { D1Database, D1PreparedStatement } from "@cloudflare/workers-types"
+import type { D1Database } from "@cloudflare/workers-types"
 import type { SenderLookup } from "../core/sender"
 
 /** One row for any `sub`: the contributor holding it, its tombstone, and the org's binding. */
@@ -35,9 +35,9 @@ export async function readSender(
 }
 
 /**
- * Writes auth's deletion notice (ADR 0015). A tombstone always lands. A community contributor's
- * rows and row go; the org is only unbound, so the published series survives. One batch does it all,
- * and an id no contributor holds still leaves its tombstone.
+ * Writes auth's deletion notice (ADR 0015) with no prior read, so it cannot race a first bind. One
+ * batch: the tombstone, then a set-based delete of a community contributor's rows and its row, then
+ * the org unbind, which keeps the published series. An id no contributor holds still tombstones.
  */
 export async function deleteContributor(
 	db: D1Database,
@@ -45,28 +45,21 @@ export async function deleteContributor(
 	hash: string,
 	nowIso: string,
 ): Promise<void> {
-	const found = await db
-		.prepare("SELECT id, kind FROM contributor WHERE auth_user_id = ?")
-		.bind(authUserId)
-		.first<{ id: string; kind: "org" | "community" }>()
-	const statements: D1PreparedStatement[] = [
+	const community = "SELECT id FROM contributor WHERE auth_user_id = ? AND kind = 'community'"
+	await db.batch([
 		db
 			.prepare(
 				"INSERT OR IGNORE INTO contributor_tombstone (auth_user_hash, deleted_at) VALUES (?, ?)",
 			)
 			.bind(hash, nowIso),
-	]
-	if (found?.kind === "community") {
-		statements.push(
-			db.prepare("DELETE FROM usage_hourly WHERE contributor_id = ?").bind(found.id),
-			db.prepare("DELETE FROM quota_sample WHERE contributor_id = ?").bind(found.id),
-			db.prepare("DELETE FROM ingest_log WHERE contributor_id = ?").bind(found.id),
-			db.prepare("DELETE FROM contributor WHERE id = ?").bind(found.id),
-		)
-	} else if (found?.kind === "org") {
-		statements.push(
-			db.prepare("UPDATE contributor SET auth_user_id = NULL WHERE id = ?").bind(found.id),
-		)
-	}
-	await db.batch(statements)
+		db.prepare(`DELETE FROM usage_hourly WHERE contributor_id IN (${community})`).bind(authUserId),
+		db.prepare(`DELETE FROM quota_sample WHERE contributor_id IN (${community})`).bind(authUserId),
+		db.prepare(`DELETE FROM ingest_log WHERE contributor_id IN (${community})`).bind(authUserId),
+		db
+			.prepare("DELETE FROM contributor WHERE auth_user_id = ? AND kind = 'community'")
+			.bind(authUserId),
+		db
+			.prepare("UPDATE contributor SET auth_user_id = NULL WHERE auth_user_id = ? AND kind = 'org'")
+			.bind(authUserId),
+	])
 }

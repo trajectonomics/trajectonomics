@@ -1,18 +1,17 @@
-import type { JSONWebKeySet } from "jose"
 import { sha256Hex } from "../core/hash"
 import { resolveSender } from "../core/sender"
 import { DATA_AUDIENCE, INGEST_SCOPE, verifyAccessToken } from "../core/token"
 import type { Principal } from "../core/types"
 import { readSender } from "../db/contributor"
 import type { Env, RequestContext } from "../env"
-import { JwksUnavailableError } from "./jwks"
+import { type JwksResult, JwksUnavailableError } from "./jwks"
 
-// The token may be empty, so an unset bootstrap key still reports itself once (existing tests).
-const BEARER = /^Bearer ?(.*)$/
+// A space must follow `Bearer`, so `Bearertest-key` is refused; an unset key still reports itself.
+const BEARER = /^Bearer(?: (.*))?$/
 
 /** Who an ingest may send as, or the status and error the body answers with. */
 export type IngestAuthorization =
-	| { ok: true; principal: Principal; bindOrgSub: string | null }
+	| { ok: true; principal: Principal; bind: { sub: string; subHash: string } | null }
 	| { ok: false; status: 401 | 403 | 503; error: string }
 
 function failure(status: 401 | 403 | 503, error: string): IngestAuthorization {
@@ -35,7 +34,7 @@ async function readKeys(
 	env: Env,
 	context: RequestContext,
 	refresh: boolean,
-): Promise<JSONWebKeySet | null> {
+): Promise<JwksResult | null> {
 	if (source === undefined) return null
 	try {
 		return await source.get(env.AUTH_ISSUER, context.nowMs, { refresh })
@@ -59,21 +58,23 @@ async function authorizeJwt(
 		requiredScope: INGEST_SCOPE,
 		nowSeconds: Math.floor(context.nowMs / 1000),
 	}
-	let verified = await verifyAccessToken(token, { ...input, jwks: first })
+	let verified = await verifyAccessToken(token, { ...input, jwks: first.set })
 	if (!verified.ok && verified.reason === "unknown_kid") {
 		const refreshed = await readKeys(context.jwks, env, context, true)
-		if (refreshed === null) return failure(503, "auth_unavailable")
-		verified = await verifyAccessToken(token, { ...input, jwks: refreshed })
+		// A suppressed refresh is retried next hour, so it is unavailable rather than signed out.
+		if (refreshed === null || !refreshed.fetched) return failure(503, "auth_unavailable")
+		verified = await verifyAccessToken(token, { ...input, jwks: refreshed.set })
 	}
 	if (!verified.ok) return failure(401, "unauthorized")
 	const sub = verified.sub
+	const subHash = await sha256Hex(sub)
 	const sender = resolveSender({
 		sub,
-		lookup: await readSender(env.DB, sub, await sha256Hex(sub)),
+		lookup: await readSender(env.DB, sub, subHash),
 		orgAuthUserId: env.ORG_AUTH_USER_ID,
 	})
 	if (sender.kind === "rejected") return failure(403, sender.error)
-	return { ok: true, principal: sender.principal, bindOrgSub: sender.bindOrg ? sub : null }
+	return { ok: true, principal: sender.principal, bind: sender.bindOrg ? { sub, subHash } : null }
 }
 
 /** The temporary shared key, which still sends as the org until it is retired (ADR 0015). */
@@ -88,7 +89,7 @@ function authorizeBootstrap(token: string, env: Env): IngestAuthorization {
 	return {
 		ok: true,
 		principal: { contributorId: "trajectonomics", series: "measured-by-us" },
-		bindOrgSub: null,
+		bind: null,
 	}
 }
 

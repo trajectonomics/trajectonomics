@@ -97,6 +97,25 @@ bunx wrangler d1 migrations apply traj-data --local   # local development only
 (ADR 0004); never commit it and never put it in `wrangler.jsonc`. The read API caches for an hour, so
 a fresh batch appears within that window without a deploy.
 
+`INGEST_BOOTSTRAP_KEY` is transitional (ADR 0015): `/data/ingest` and the old host's `/ingest`
+accept it only until our own collector sends with an auth token, and the pull request after that
+removes the key branch and deletes the secret.
+
+After the collector's first `login`, set the org owner's auth user id as a Worker secret, from
+`apps/data`:
+
+```sh
+cd apps/data
+bunx wrangler secret put ORG_AUTH_USER_ID
+```
+
+The value is the auth user id `login` prints for the sign-in; `bunx wrangler whoami` shows the
+Cloudflare account the secret goes to. The first verified ingest whose token `sub` equals it binds
+the org contributor row (`trajectonomics`) and writes its batch in the same commit. After that the
+binding alone decides, and the secret no longer matters. If the owner's auth account is deleted,
+auth's notice unbinds the org row and tombstones that id; to re-bind, sign in with the new account
+and set the secret to the new id.
+
 ## The auth Worker's first deploy
 
 The `auth` Worker owns `auth.trajectonomics.com` as a Custom Domain (`routes` with
