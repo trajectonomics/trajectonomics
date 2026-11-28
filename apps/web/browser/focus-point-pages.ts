@@ -2,8 +2,8 @@ import { expect, type Page } from "@playwright/test"
 import { measureOverflow } from "./fit"
 
 /**
- * The answer each page of slice (a) states, and the words its screen-reader heading must carry. The heading
- * is the whole answer: the picture is `aria-hidden`, so a screen reader hears only this.
+ * The answer each page of slices (a) and (b) states, and the words its screen-reader heading must carry.
+ * The heading is the whole answer: the picture is `aria-hidden`, so a screen reader hears only this.
  */
 export const ANSWERS: Readonly<Record<string, readonly string[]>> = {
 	"/net-worth/": ["What are you worth today?", "1.21M THB as of 31 Oct 2026."],
@@ -16,9 +16,21 @@ export const ANSWERS: Readonly<Record<string, readonly string[]>> = {
 		"3.99% of your savings.",
 	],
 	"/estate/": ["What would your heirs receive?", "15.6M THB in 2053."],
+	"/cash-flow/": [
+		"Where does your money go in 2026?",
+		"295k THB left over.",
+		"2.42M THB coming in.",
+	],
+	"/milestones/": ["What's next?", "Car paid off in Jan 2031.", "At 40."],
+	"/health/": ["Is everything in order?", "All good."],
+	"/ledger/": [
+		"When did you last record your accounts?",
+		"28 Oct 2026.",
+		"9 accounts, 0 not recorded in the month before it.",
+	],
 }
 
-/** The six pages slice (a) gives a focus point, in #707's order. */
+/** The ten pages #707 gives a focus point so far, in the issue's order. */
 export const FOCUS_PAGES = [
 	"/net-worth/",
 	"/chance/",
@@ -26,6 +38,21 @@ export const FOCUS_PAGES = [
 	"/optimize/allowances/",
 	"/optimize/withdrawals/",
 	"/estate/",
+	"/cash-flow/",
+	"/milestones/",
+	"/health/",
+	"/ledger/",
+] as const
+
+/** The focus pages whose answer is money, which Hide amounts must mask. Chance states a rate, and stays. */
+export const MASKED_FOCUS_PAGES = [
+	"/net-worth/",
+	"/chance/",
+	"/tax/",
+	"/optimize/allowances/",
+	"/optimize/withdrawals/",
+	"/estate/",
+	"/cash-flow/",
 ] as const
 
 /** A phone keeps the focus point inside the page and its 300px, its answer inside its box, and states the whole answer. */

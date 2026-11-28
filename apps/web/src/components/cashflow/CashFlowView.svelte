@@ -8,6 +8,7 @@ import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import CashFlowWhatIf from "../what-if/CashFlowWhatIf.svelte"
 import CashFlowBody from "./CashFlowBody.svelte"
+import CashFlowFocus from "./CashFlowFocus.svelte"
 
 interface Props {
 	/** The Scenarios the Snapshot planned, main first; the plan switcher's choices. */
@@ -36,12 +37,13 @@ const names = $derived(currentItemNames())
 	</EmptyState>
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}
-	<div class="space-y-8">
-		{#if lens}<CashFlowWhatIf {lens} baseline={read.ok ? read.data : null} {year} />{/if}
-		<ReadView {read} label={`Cash flow of ${name}`}>
-			{#snippet children(run)}
+	<ReadView {read} label={`Cash flow of ${name}`}>
+		{#snippet children(run)}
+			<div class="space-y-8">
+				<CashFlowFocus {run} {year} />
+				{#if lens}<CashFlowWhatIf {lens} baseline={run} {year} />{/if}
 				<CashFlowBody {run} {year} {onYear} {names} />
-			{/snippet}
-		</ReadView>
-	</div>
+			</div>
+		{/snippet}
+	</ReadView>
 {/if}

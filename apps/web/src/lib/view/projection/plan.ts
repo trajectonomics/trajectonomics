@@ -21,6 +21,8 @@ export interface PlanPerson {
 export interface PlanStats {
 	/** The month earned income could stop, and the day the FI read states. */
 	readonly stopWorking: { readonly month: string; readonly date: string } | null
+	/** The month the projection runs out of money, when it states one; the stat replaces Stop working. */
+	readonly runsOut: { readonly month: string } | null
 	/** The last annual row's closing net worth in future money, and the year it ends in. */
 	readonly closing: { readonly amount: string; readonly year: string } | null
 	/** The chance of success, through `trimPercent`, such as "96.5%". */
@@ -52,6 +54,7 @@ export function planStats(
 			answer?.reachable === true
 				? { month: formatMonth(answer.fiDate), date: formatDate(answer.fiDate) }
 				: null,
+		runsOut: run.runsOut === null ? null : { month: formatMonth(run.runsOut.date) },
 		closing:
 			closing === null ? null : { amount: closing.closing.amount, year: closing.horizonYear },
 		chance: chance?.ok === true ? chanceSummaryOf(chance.data).share : null,

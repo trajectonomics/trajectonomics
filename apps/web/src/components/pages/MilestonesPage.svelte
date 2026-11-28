@@ -21,7 +21,9 @@ let { scenario, terms, onTerms }: Props = $props()
 		<MilestonesView
 			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
+			chances={snapshot.reads.chance}
 			{scenario}
+			asOf={snapshot.params.asOf}
 			{terms}
 			{onTerms}
 		/>

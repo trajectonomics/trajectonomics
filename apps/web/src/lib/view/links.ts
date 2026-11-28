@@ -5,6 +5,8 @@
  * `scenario` on the address: the path's parameters come first, then the page's others.
  */
 export function withSearch(path: string, search: string): string {
+	// A fragment stays on the page it is in, which already carries the query string.
+	if (path.startsWith("#")) return path
 	const mark = path.indexOf("?")
 	const stated = new Set(new URLSearchParams(mark === -1 ? "" : path.slice(mark + 1)).keys())
 	const page = new URLSearchParams(search)
