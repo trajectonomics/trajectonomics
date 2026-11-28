@@ -6,7 +6,7 @@ import { taxLabelAlert } from "./tax-label-alert"
 import { taxLabelRefusalAtFlow } from "./tax-label-wiring"
 
 // The write checks of the editable scratch Dashboard (cli ADR-0075): the shared home-loan interest of the Tax profile
-// page, a masked amount in the Income drawer (#761), and the Tax labels form's refusal alert (#761).
+// page and the Tax labels form's refusal alert (#761). The masked-amount checks are in `masked-amount.e2e.ts`.
 
 // The server runs one Edit at a time, so every check here takes turns rather than racing for it.
 test.describe.configure({ mode: "serial" })
