@@ -25,6 +25,7 @@ export const TH: Dictionary = Object.freeze({
 	}),
 	filterLabel: "กรองบทความ",
 	filterAll: "ทั้งหมด",
+	filterGeneralProduct: "ทั่วไป",
 	filterGroups: Object.freeze({ type: "ประเภท", language: "ภาษา", product: "ผลิตภัณฑ์" }),
 	noMatches: "ไม่มีบทความที่ตรงกับตัวกรองนี้",
 	filterResults: (count: number) =>

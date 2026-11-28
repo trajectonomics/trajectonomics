@@ -11,6 +11,7 @@ describe("filter query parameters", () => {
 	test("reads only known values and drops unknown ones", () => {
 		const search = new URLSearchParams("type=compare&language=fr&product=traj&extra=1")
 		expect(chosenFilters(search)).toEqual({ type: "compare", product: "traj" })
+		expect(chosenFilters(new URLSearchParams("product=general"))).toEqual({ product: "general" })
 	})
 
 	test("drops valid values that are not offered in the bar", () => {

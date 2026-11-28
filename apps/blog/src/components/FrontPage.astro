@@ -4,7 +4,7 @@
 import { postPagePath, readPosts, shownTranslation } from "../content/read-posts"
 import Layout from "../layouts/Layout.astro"
 import { dictionaryFor } from "../lib/dictionary"
-import { filterGroups } from "../lib/filters"
+import { filterGroups, filterValues } from "../lib/filters"
 import { DEFAULT_LANGUAGE, LANGUAGES, type Language, perLanguage, treePath } from "../lib/languages"
 import { BLOG_PATH } from "../lib/site"
 import CoverImage from "./CoverImage.astro"
@@ -56,7 +56,7 @@ const alternates = [
 					data-filter-item
 					data-type={featured.post.type}
 					data-language={featured.post.languages.join(" ")}
-					data-product={featured.post.products.join(" ")}
+					data-product={filterValues(featured.post).product.join(" ")}
 				>
 					<CoverImage cover={featured.translation.cover} />
 					<div class="featured-text">
@@ -79,7 +79,7 @@ const alternates = [
 							data-filter-item
 							data-type={entry.post.type}
 							data-language={entry.post.languages.join(" ")}
-							data-product={entry.post.products.join(" ")}
+							data-product={filterValues(entry.post).product.join(" ")}
 						>
 							<a class="post-card" href={entry.path}>
 								<CoverImage cover={entry.translation.cover} lazy={true} />

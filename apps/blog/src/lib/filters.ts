@@ -11,11 +11,14 @@ export const FILTER_GROUPS = Object.freeze(["type", "language", "product"] as co
 /** One filter group. */
 export type FilterGroupName = (typeof FILTER_GROUPS)[number]
 
+/** The Product filter value that matches general Posts (those with an empty `products` list). */
+export const GENERAL_PRODUCT_FILTER = "general"
+
 /** Every value each group can take, in the blog's order. */
 export const GROUP_VALUES: Readonly<Record<FilterGroupName, readonly string[]>> = Object.freeze({
 	type: POST_TYPES,
 	language: LANGUAGES,
-	product: PRODUCTS,
+	product: Object.freeze([...PRODUCTS, GENERAL_PRODUCT_FILTER]),
 })
 
 /** Whether a string names one of the front page's filter groups. */
@@ -40,7 +43,11 @@ export type ChosenFilters = Readonly<Partial<Record<FilterGroupName, string>>>
 
 /** The values one Post has in every group. */
 export function filterValues(post: Filterable): FilterValues {
-	return Object.freeze({ type: [post.type], language: post.languages, product: post.products })
+	return Object.freeze({
+		type: [post.type],
+		language: post.languages,
+		product: post.products.length === 0 ? [GENERAL_PRODUCT_FILTER] : post.products,
+	})
 }
 
 /** One group the bar shows, with the values a reader can choose in it. */

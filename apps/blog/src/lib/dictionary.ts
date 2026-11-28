@@ -29,6 +29,7 @@ export interface Dictionary {
 	/** The front page's filter bar: its name, the option that clears a group, and each group's name. */
 	readonly filterLabel: string
 	readonly filterAll: string
+	readonly filterGeneralProduct: string
 	readonly filterGroups: Readonly<Record<FilterGroupName, string>>
 	/** The line the front page shows when no Post matches the chosen filters. */
 	readonly noMatches: string

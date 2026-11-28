@@ -4,6 +4,7 @@ import {
 	type Filterable,
 	filterGroups,
 	filterValues,
+	GENERAL_PRODUCT_FILTER,
 	isFilterGroup,
 	matchesFilters,
 } from "./filters"
@@ -26,7 +27,7 @@ describe("filter groups", () => {
 		expect(filterGroups(POSTS)).toEqual([
 			{ name: "type", values: ["compare", "guide", "essay"] },
 			{ name: "language", values: ["en", "th"] },
-			{ name: "product", values: ["traj", "openjot"] },
+			{ name: "product", values: ["traj", "openjot", GENERAL_PRODUCT_FILTER] },
 		])
 	})
 
@@ -38,25 +39,35 @@ describe("filter groups", () => {
 		expect(filterGroups(same)).toEqual([])
 	})
 
-	test("keeps a single-value Product group when some Posts have no Product", () => {
+	test("includes the general Product option when some Posts have no Product", () => {
 		const mixed: readonly Filterable[] = [
 			{ type: "essay", languages: ["en"], products: ["traj"] },
 			{ type: "essay", languages: ["en"], products: [] },
 		]
-		expect(filterGroups(mixed)).toEqual([{ name: "product", values: ["traj"] }])
+		expect(filterGroups(mixed)).toEqual([
+			{ name: "product", values: ["traj", GENERAL_PRODUCT_FILTER] },
+		])
 	})
 })
 
 describe("matching filters", () => {
 	const values = filterValues({ type: "essay", languages: ["en", "th"], products: ["traj"] })
+	const general = filterValues({ type: "compare", languages: ["th"], products: [] })
 
 	test("matches every Post when nothing is chosen", () => {
 		expect(matchesFilters(values, {})).toBe(true)
+		expect(matchesFilters(general, {})).toBe(true)
 	})
 
 	test("requires every chosen group to match", () => {
 		expect(matchesFilters(values, { type: "essay", language: "en", product: "traj" })).toBe(true)
 		expect(matchesFilters(values, { type: "compare" })).toBe(false)
 		expect(matchesFilters(values, { type: "essay", product: "openjot" })).toBe(false)
+		expect(matchesFilters(values, { product: GENERAL_PRODUCT_FILTER })).toBe(false)
+	})
+
+	test("matches general Posts under the non-product filter", () => {
+		expect(matchesFilters(general, { product: GENERAL_PRODUCT_FILTER })).toBe(true)
+		expect(matchesFilters(general, { product: "traj" })).toBe(false)
 	})
 })
