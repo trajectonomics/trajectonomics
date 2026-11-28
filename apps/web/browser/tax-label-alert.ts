@@ -24,9 +24,12 @@ export async function taxLabelAlert(page: Page): Promise<void> {
 
 	// The page the drawer closes to offers the Tax labels page for the income just saved, its plan named once and
 	// the rest of the page's query kept.
-	await expect(page.getByText("Give this income a label in Tax labels.")).toBeVisible({
+	// The sentence shows once as a paragraph; its screen-reader copy is the status region beside it.
+	const sentence = "Give this income a label in Tax labels."
+	await expect(page.getByRole("paragraph").filter({ hasText: sentence })).toBeVisible({
 		timeout: SLOW,
 	})
+	await expect(page.getByRole("status").filter({ hasText: sentence })).toHaveCount(1)
 	const link = page.getByRole("link", { name: "Tax labels", exact: true })
 	await expect(link).toHaveAttribute("href", `/settings/tax/?scenario=${plan}&terms=today`)
 	await link.click()
