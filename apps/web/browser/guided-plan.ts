@@ -9,9 +9,9 @@ export async function expectNoSideScroll(page: Page): Promise<void> {
 
 /** Fills the one empty account holder: no plan of the Demo or the scratch ledger is marked main. */
 export async function fillHolder(page: Page): Promise<void> {
-	await page.getByLabel("Name").first().fill("Me")
-	await page.getByLabel("Born").first().fill("1990-06")
-	await page.getByLabel("Life expectancy").first().fill("90")
+	await page.getByLabel("Name", { exact: true }).first().fill("Me")
+	await page.getByLabel("Born", { exact: true }).first().fill("1990-06")
+	await page.getByLabel("Life expectancy", { exact: true }).first().fill("90")
 }
 
 /** Walks from a filled holder to the stop step, filling the two totals when the short path asks for them. */

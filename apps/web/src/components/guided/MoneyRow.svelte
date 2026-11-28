@@ -22,13 +22,17 @@ interface Props {
 let { row, draft, problem, showProblems, onKeep, onAmount, onEarned }: Props = $props()
 /** The CLI's amount behind the hide-amounts mask, in the field until a number is typed. */
 const stated = $derived(formatMoney(row.amount))
-const placeholder = $derived(preferences.hidden ? maskMoney(stated) : stated)
 let focused = $state(false)
+/** The hint the field shows: masked while it is not focused, and the CLI's amount on focus, so the person reads it. */
+const placeholder = $derived(preferences.hidden && !focused ? maskMoney(stated) : stated)
 let touched = $state(false)
 /** True while the digits show as the mask: a focused field shows the real value, so the person can edit it. */
 const masked = $derived(preferences.hidden && !focused && draft.amount.trim() !== "")
 const shown = $derived(masked ? maskMoney(draft.amount) : draft.amount)
-const shownProblem = $derived(problem !== null && (showProblems || touched) ? problem : null)
+/** A dropped row holds no amount, so it shows no problem: its field is off and the CLI never reads it. */
+const shownProblem = $derived(
+	problem !== null && draft.keep && (showProblems || touched) ? problem : null,
+)
 const described = $derived(
 	[
 		shownProblem ? `guided-amount-${row.id}-problem` : undefined,

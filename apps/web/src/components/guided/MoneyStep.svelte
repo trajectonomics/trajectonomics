@@ -2,6 +2,7 @@
 import type { MoneyView } from "../../lib/view/guided/money"
 import { amountProblem, type RowDraft, type RowDrafts } from "../../lib/view/guided/money-draft"
 import Money from "../ui/Money.svelte"
+import MoneyKeepAlert from "./MoneyKeepAlert.svelte"
 import MoneyRow from "./MoneyRow.svelte"
 import { HINT } from "./styles"
 
@@ -63,6 +64,7 @@ const groups = $derived([
 			</section>
 		{/if}
 	{/each}
+	<MoneyKeepAlert {rows} {showProblems} />
 	{#if money.leftOut.length > 0}
 		<section class="space-y-1">
 			<h3 class="text-sm font-semibold text-foreground">Not carried in</h3>

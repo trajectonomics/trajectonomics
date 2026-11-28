@@ -12,6 +12,7 @@ import {
 	problemsOf,
 	type Step,
 } from "../../lib/view/guided/steps"
+import GuidedSaved from "./GuidedSaved.svelte"
 import GuidedSteps from "./GuidedSteps.svelte"
 import HouseholdStep from "./HouseholdStep.svelte"
 import MoneyStep from "./MoneyStep.svelte"
@@ -31,7 +32,6 @@ const problems = $derived(problemsOf(guidedSession.step, draft))
 const peopleProblems = $derived(peopleOf(draft.people).problems)
 const lifeExpectancy = $derived(peopleOf(draft.people).holderLifeExpectancy)
 const step = $derived(guidedSession.step)
-const onStep = (one: string) => step === one
 /** The step's heading, focused whenever the step changes so a reader hears where they are. */
 let heading = $state<HTMLHeadingElement | undefined>()
 let lastStep: Step | null = null
@@ -58,17 +58,20 @@ function advance(): void {
 
 <div class="space-y-6" data-guided>
 	<GuidedSteps {step} />
-	{#if onStep("household")}
+	{#if guidedSession.saved !== null}
+		<GuidedSaved name={guidedSession.saved} onOpen={() => guidedSession.openSaved()} />
+	{:else}
+	{#if step === "household"}
 		<HouseholdStep people={draft.people} problems={peopleProblems}
-			showProblems={guidedSession.showProblems} bind:heading
+			keys={guidedSession.keysFor(seed.people)} showProblems={guidedSession.showProblems} bind:heading
 			onName={(index, name) => guidedSession.changePerson(seed.people, index, nameChange(name))}
 			onChange={(index, change) => guidedSession.changePerson(seed.people, index, change)}
 			onAdd={(role) => guidedSession.addPerson(seed.people, role)}
 			onRemove={(index) => guidedSession.removePerson(seed.people, index)} />
-	{:else if onStep("money") && seed.money.path === "history"}
+	{:else if step === "money" && seed.money.path === "history"}
 		<MoneyStep money={seed.money} rows={draft.rows} showProblems={guidedSession.showProblems} bind:heading
 			onRow={(id, change) => guidedSession.changeRow(seed.rows, id, change)} />
-	{:else if onStep("money")}
+	{:else if step === "money"}
 		<TotalsStep totals={draft.totals} showProblems={guidedSession.showProblems} bind:heading
 			onTotal={(field, value) => guidedSession.changeTotal(seed.totals, field, value)} />
 	{:else}
@@ -92,5 +95,6 @@ function advance(): void {
 		<p class="text-sm text-muted-foreground">
 			Saving is off here: run <code class="font-mono">traj dashboard</code> to save a plan.
 		</p>
+	{/if}
 	{/if}
 </div>

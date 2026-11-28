@@ -47,6 +47,38 @@ afterEach(() => {
 })
 
 describe("the money step", () => {
+	test("says to keep a row once every row is dropped, only after Next finds it", () => {
+		const dropped = Object.fromEntries(
+			MONEY.rows.map((row) => [row.id, { keep: false, amount: "", earned: true }]),
+		)
+		const quiet = render(MoneyStep, {
+			props: { money: MONEY, rows: dropped, showProblems: false, onRow: () => undefined },
+		}).body
+		expect(quiet).not.toContain("Keep at least one row.")
+
+		const found = render(MoneyStep, {
+			props: { money: MONEY, rows: dropped, showProblems: true, onRow: () => undefined },
+		}).body
+		expect(found).toContain('role="alert"')
+		expect(found).toContain("Keep at least one row.")
+	})
+
+	test("shows no problem at a row the person dropped", () => {
+		const row = render(MoneyRow, {
+			props: {
+				row: SALARY,
+				draft: { keep: false, amount: "not a number", earned: true },
+				problem: "Enter an amount such as 12500 or 12500.50.",
+				showProblems: true,
+				onKeep: () => undefined,
+				onAmount: () => undefined,
+				onEarned: () => undefined,
+			},
+		}).body
+		expect(row).not.toContain("Enter an amount")
+		expect(row).not.toContain('role="alert"')
+	})
+
 	test("groups the rows under Income and Spending, income first, and says the coverage once", () => {
 		const body = moneyStep()
 		const income = body.indexOf(">Income</h3>")

@@ -49,19 +49,18 @@ let {
 }: Props = $props()
 const nameProblem = $derived(planNameError(name, stored, "plan"))
 const ageText = $derived(ageProblem(age, lifeExpectancy))
-/** Save waits on every problem, but a field only shows its own after Next or once the person touched it. */
+/** Save waits on every problem. */
 const held = $derived(saving || nameProblem !== null || ageText !== null)
 interface Touched {
 	name?: boolean
 	age?: boolean
 }
 let touched = $state<Touched>({})
-const shownName = $derived(
-	nameProblem !== null && (showProblems || touched.name === true) ? nameProblem : null,
-)
-const shownAge = $derived(
-	ageText !== null && (showProblems || touched.age === true) ? ageText : null,
-)
+/** A field shows its own problem after Next, once it holds text, or once the person has touched it. */
+const shows = (problem: string | null, text: string, wasTouched: boolean | undefined) =>
+	problem !== null && (showProblems || text.trim() !== "" || wasTouched === true) ? problem : null
+const shownName = $derived(shows(nameProblem, name, touched.name))
+const shownAge = $derived(shows(ageText, age, touched.age))
 </script>
 
 <section class="space-y-4">

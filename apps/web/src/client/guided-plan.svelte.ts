@@ -10,6 +10,15 @@ import { selectPlan } from "./select-plan.svelte.js"
 
 /** The guided first plan with its one Edit: Save, and the Reload a moved ledger asks for. */
 class GuidedPlanSession extends GuidedPlanState {
+	/** The plan a Save wrote while a What-if held the page: the page says so until the plan is opened. */
+	saved = $state<string | null>(null)
+
+	/** Cancel forgets the sentence too. */
+	override cancel(): void {
+		super.cancel()
+		this.saved = null
+	}
+
 	/** Saves the one Edit, selects the plan it made and opens Home; a refusal stays above Save. */
 	async save(snapshot: Snapshot): Promise<void> {
 		const made = guidedEditOf(this.draftOf(snapshot), snapshot.params.asOf)
@@ -24,11 +33,17 @@ class GuidedPlanSession extends GuidedPlanState {
 		this.hint = null
 		this.reloadable = false
 		if (await editSession.run(made.edit)) {
-			// A What-if pending on another plan keeps this page: the person settles it first, then saves again.
-			if (!selectPlan(made.edit.name)) return
-			const search = withParam(currentSearch(), "scenario", made.edit.name)
+			if (selectPlan(made.edit.name)) {
+				const search = withParam(currentSearch(), "scenario", made.edit.name)
+				this.cancel()
+				await goto(withSearch("/", search))
+				return
+			}
+			// The plan is in the ledger, but a What-if on another plan refuses the switch. Say it saved, and keep the
+			// page on a sentence that opens it once the What-if is settled.
 			this.cancel()
-			await goto(withSearch("/", search))
+			this.step = "stop"
+			this.saved = made.edit.name
 			return
 		}
 		const failure = editSession.failure
@@ -37,6 +52,15 @@ class GuidedPlanSession extends GuidedPlanState {
 		this.reloadable = failure?.code === "guided_ledger_changed"
 		// A plan saved without its household is in the ledger already: read again so Plans lists it.
 		if (failure?.code === "guided_plan_half_saved") await editSession.addPlan(made.edit.name)
+	}
+
+	/** Opens the plan a Save wrote while a What-if held the page, once the What-if is settled. */
+	async openSaved(): Promise<void> {
+		const name = this.saved
+		if (name === null || !selectPlan(name)) return
+		const search = withParam(currentSearch(), "scenario", name)
+		this.cancel()
+		await goto(withSearch("/", search))
 	}
 
 	/** Reads the Snapshot again and keeps every answer, then walks the money again; a failed read keeps the page. */

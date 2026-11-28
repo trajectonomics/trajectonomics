@@ -1,6 +1,13 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdPerson } from "../../contract"
-import { blankPerson, nameChange, peopleOf, personWords, startingPeople } from "./people"
+import {
+	blankPerson,
+	nameChange,
+	peopleOf,
+	personWords,
+	startingKeys,
+	startingPeople,
+} from "./people"
 
 /** One person of a household, from an id and the fields this test leaves out. */
 function person(id: string, over: Partial<HouseholdPerson> = {}): HouseholdPerson {
@@ -61,5 +68,18 @@ describe("personWords", () => {
 		expect(personWords({ ...blankPerson("partner"), name: "Mali" })).toBe("Mali")
 		expect(personWords(blankPerson("partner"))).toBe("Your partner")
 		expect(personWords(blankPerson("holder"))).toBe("You")
+	})
+})
+
+describe("startingKeys", () => {
+	test("gives every starting person a key of its own, and a typed label never moves it", () => {
+		const people = [blankPerson("holder"), blankPerson("partner"), blankPerson("dependent")]
+		const keys = startingKeys(people)
+		expect(new Set(keys).size).toBe(people.length)
+		expect(startingKeys([{ ...people[0]!, displayLabel: "Me" }])[0]).toBe(keys[0])
+	})
+
+	test("keys a seeded person by the id the read stated", () => {
+		expect(startingKeys(startingPeople([person("Mali")]))[0]).toBe("seed-id-Mali")
 	})
 })

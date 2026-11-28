@@ -22,7 +22,7 @@ test("Set up step by step closes the New plan drawer and leaves the steps intera
 }) => {
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await page.goto(`${SCRATCH_ORIGIN}/plans/`)
-	await expect(page.getByRole("heading", { name: "Plans" })).toBeVisible()
+	await expect(page.getByRole("heading", { name: "Plans", exact: true })).toBeVisible()
 	await page.getByRole("button", { name: /^Plan: .+\. Change plan$/ }).click()
 	await page.getByRole("menuitem", { name: "New plan" }).click()
 	const drawer = page.getByRole("dialog")

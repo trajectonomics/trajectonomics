@@ -51,6 +51,16 @@ export function blankPerson(role: string): PersonDraft {
 	return personDraftOf(undefined, role)
 }
 
+/**
+ * One durable key per starting person, so a Remove never hands another person's answers to their fields: the id
+ * the read stated, or the person's place when the read stated none. A label typed later never moves the key.
+ */
+export function startingKeys(people: readonly PersonDraft[]): string[] {
+	return people.map((person, index) =>
+		person.name === "" ? `seed-index-${index}` : `seed-id-${person.name}`,
+	)
+}
+
 /** The name a person is typed: the label only, so a seeded person keeps its id exactly (ADR 0029). */
 export function nameChange(name: string): Partial<PersonDraft> {
 	return { displayLabel: name }

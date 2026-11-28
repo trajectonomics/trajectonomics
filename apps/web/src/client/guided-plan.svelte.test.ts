@@ -104,15 +104,26 @@ describe("saving", () => {
 		expect(navigations.at(-1)).toContain("scenario=guided")
 	})
 
-	test("keeps the page when a What-if on another plan refuses the switch", async () => {
+	test("says the plan saved when a What-if refuses the switch, and opens it once it is settled", async () => {
 		answerEveryStep()
 		guidedSession.step = "stop"
 		expect(whatIfSession.setOff("base", HASH, "flows.rent", true)).toBe(true)
 		expect(whatIfSession.active).toBe(true)
 		answers({ ok: true, snapshot: DEMO })
 		await guidedSession.save(DEMO)
+		// The plan is in the ledger, but the What-if belongs to another plan: the page says it saved, and goes nowhere.
 		expect(navigations).toEqual([])
-		expect(guidedSession.step).toBe("stop")
+		expect(guidedSession.saved).toBe("guided")
+		expect(guidedSession.name).toBe("")
+		expect(guidedSession.refusal).toBeNull()
+		expect(String(guidedSession.step)).toBe("stop")
+
+		// The form is replaced, so the sentence opens the plan only once the What-if is settled.
+		await guidedSession.openSaved()
+		expect(navigations).toEqual([])
+		whatIfSession.end()
+		await guidedSession.openSaved()
+		expect(navigations.at(-1)).toContain("scenario=guided")
 	})
 
 	test("shows the CLI's refusal with its hint, and offers Reload", async () => {

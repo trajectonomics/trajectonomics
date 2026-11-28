@@ -105,6 +105,38 @@ describe("the guided plan page", () => {
 		expect(body).toContain('aria-label="Remove Your partner"')
 		expect(body.match(/aria-label="Remove /g)).toHaveLength(1)
 	})
+
+	test("replaces the form with one sentence that says the plan saved", () => {
+		guidedSession.saved = "guided"
+		const body = page()
+		expect(body).toContain("Settle the What-if above, then open it.")
+		expect(body).toContain("Open guided")
+		expect(body).toContain('tabindex="-1"')
+		expect(body).not.toContain("Save plan")
+		expect(body).not.toContain("Stop-work age")
+	})
+
+	test("shows the age problem when the stop step comes back with the age already filled", () => {
+		editSession.token = "t"
+		const holder = {
+			...blankPerson("holder"),
+			displayLabel: "Me",
+			born: "1990-06",
+			lifeExpectancy: "90",
+		}
+		guidedSession.people = [holder]
+		guidedSession.step = "stop"
+		guidedSession.age = "60"
+		guidedSession.name = "guided"
+		guidedSession.back()
+		guidedSession.back()
+		guidedSession.changePerson(guidedSession.people ?? [], 0, { lifeExpectancy: "50" })
+		guidedSession.advance()
+		guidedSession.advance()
+		const body = page()
+		expect(body).toContain("Choose an age before your life expectancy (50).")
+		expect(body).toContain("disabled")
+	})
 })
 
 describe("back and cancel", () => {

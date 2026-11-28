@@ -2,7 +2,7 @@ import { goto } from "$app/navigation"
 import type { Snapshot } from "../lib/contract"
 import { seedOf } from "../lib/view/guided/compose"
 import type { RowDraft, RowDrafts, TotalsDraft } from "../lib/view/guided/money-draft"
-import { blankPerson } from "../lib/view/guided/people"
+import { blankPerson, startingKeys } from "../lib/view/guided/people"
 import { type GuidedDraft, nextOf, previousOf, type Step } from "../lib/view/guided/steps"
 import type { PersonDraft } from "../lib/view/household/person-draft"
 import { withSearch } from "../lib/view/links"
@@ -18,6 +18,9 @@ import { currentSearch } from "./location.svelte.js"
 export class GuidedPlanState {
 	step = $state<Step>("household")
 	people = $state<readonly PersonDraft[] | null>(null)
+	/** One durable key per person, so a Remove never hands another person's answers to their fields. */
+	personKeys = $state<readonly string[] | null>(null)
+	private added = 0
 	rows = $state<RowDrafts | null>(null)
 	totals = $state<TotalsDraft | null>(null)
 	name = $state("")
@@ -68,21 +71,26 @@ export class GuidedPlanState {
 	changePerson(seed: readonly PersonDraft[], index: number, change: Partial<PersonDraft>): void {
 		const people = [...(this.people ?? seed)]
 		const person = people[index]
-		if (person === undefined) return
-		people[index] = { ...person, ...change }
-		this.people = people
+		if (person !== undefined) this.people = people.with(index, { ...person, ...change })
 	}
+
+	/** One key per person as they show now: the read's own, or one this tab gave a person it added. */
+	keysFor = (seed: readonly PersonDraft[]) => this.personKeys ?? startingKeys(seed)
 
 	addPerson(seed: readonly PersonDraft[], role: "partner" | "dependent"): void {
 		this.people = [...(this.people ?? seed), blankPerson(role)]
+		this.personKeys = [...this.keysFor(seed), `added-${this.added++}`]
 	}
 
 	/** A person the page added leaves the household; the holder stays, because the stop-work age is theirs. */
 	removePerson(seed: readonly PersonDraft[], index: number): void {
 		const people = [...(this.people ?? seed)]
 		if (people[index] === undefined || people[index].role === "holder") return
+		const keys = [...this.keysFor(seed)]
 		people.splice(index, 1)
+		keys.splice(index, 1)
 		this.people = people
+		this.personKeys = keys
 	}
 
 	/**
@@ -109,6 +117,8 @@ export class GuidedPlanState {
 	cancel(): void {
 		this.step = "household"
 		this.people = null
+		this.personKeys = null
+		this.added = 0
 		this.rows = null
 		this.totals = null
 		this.name = ""
