@@ -54,7 +54,7 @@ describe("the traj-onboarding Skill", () => {
 		expect(description).toContain("already has a ledger")
 	})
 
-	it("names one install command, the one the Site prints, with -y stated once", () => {
+	it("names one install command, the one the README documents, with -y stated once", () => {
 		const installLines = body
 			.split("\n")
 			.filter((line) => line.trim().startsWith(`npx skills add ${SKILLS_SOURCE} --skill`))
@@ -62,17 +62,32 @@ describe("the traj-onboarding Skill", () => {
 		expect(body.split("an unattended run appends `-y`")).toHaveLength(2)
 	})
 
-	it("installs the published set from the commit the lock records, in this Skill's own scope", () => {
+	it("installs the published set globally, from the commit the global lock records", () => {
 		const stepTwo = section(body, "Step 2: Install the skill that operates `traj`")
-		expect(stepTwo).toContain("skills-lock.json")
+		expect(stepTwo).toContain(`\`\${XDG_STATE_HOME}/skills/.skill-lock.json\``)
+		expect(stepTwo).toContain("`~/.agents/.skill-lock.json`")
+		expect(stepTwo).not.toContain("`./skills-lock.json`")
 		expect(stepTwo).toContain("Never install from `main`")
 		expect(stepTwo).toContain("skills.manifest.json")
-		expect(stepTwo).toContain(`npx -y skills@1.9.0 add ${SKILLS_SOURCE}#<commit> --skill <name>`)
-		expect(stepTwo).toContain("add `-g` when the project list did not name `traj-onboarding`")
+		expect(stepTwo).toContain(`npx -y skills@1.9.0 add ${SKILLS_SOURCE}#<commit> --skill <name> -g`)
+		expect(stepTwo).toContain("into the global scope with `-g`")
+		expect(stepTwo).not.toContain("add `-g` when the project list")
 		expect(stepTwo).toContain("Skip a row below its floor")
 		expect(stepTwo).toContain("install `traj` alone from the pin")
-		expect(body).toContain("skills@1.9.0 list --json")
+		expect(body).toContain("skills@1.9.0 list -g --json")
+		expect(body).not.toContain("skills@1.9.0 list --json")
 		expect(body).not.toContain("internal-skills")
+	})
+
+	it("installs this skill globally first when the global lock has no entry, then reads its pin", () => {
+		const stepTwo = section(body, "Step 2: Install the skill that operates `traj`")
+		expect(stepTwo).toContain(
+			"npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -g -y",
+		)
+		expect(stepTwo).toContain("then read the global lock again")
+		expect(stepTwo).toContain("A project copy that was already")
+		expect(stepTwo).toContain("never delete it")
+		expect(stepTwo).toContain("`npx -y skills@1.9.0 remove <name>`")
 	})
 
 	it("runs the scoped command line package and points PATH installs at the CLI repository", () => {

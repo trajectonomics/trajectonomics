@@ -14,7 +14,7 @@ const PRIVATE_PACKAGE = "bun add @trajectonomics/skills"
 describe("the README the website links to", () => {
 	const readme = read("README.md")
 
-	it("leads with the website command as written, without -y or an agent flag", () => {
+	it("leads with the install command as written, without -y or an agent flag", () => {
 		const commandLines = readme
 			.split("\n")
 			.filter((line) => line.startsWith(`npx skills add ${SKILLS_SOURCE}`))
