@@ -1,11 +1,11 @@
 import type { UsageRow } from "@trajectonomics/data-collector/types"
 import type { QuotaSample } from "../../src/core/types"
 
-/** A synthetic ingest key; never a real secret. */
-export const TEST_KEY = "test-key"
-
 /** The issuer tests configure; the verifier never calls it. */
 export const TEST_ISSUER = "https://auth.trajectonomics.com"
+
+/** The token subject every ingest test sends as; the harness binds it as the org (ADR 0015). */
+export const TEST_SUB = "auth-user-a"
 
 /** A fixed clock: 2026-11-25T12:34:56Z. */
 export const NOW_MS = Date.parse("2026-11-25T12:34:56.000Z")

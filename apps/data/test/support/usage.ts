@@ -3,6 +3,7 @@ import type { Env } from "../../src/env"
 import { handleRequest } from "../../src/http/router"
 import { NOW_MS } from "./fixtures"
 import { get, type harness, ingestRequest } from "./http"
+import { TEST_JWKS } from "./token"
 
 /** Seeds rows through the real ingest route, failing loudly if the seed is rejected. */
 export async function seed(
@@ -13,6 +14,7 @@ export async function seed(
 	const response = await handleRequest(ingestRequest({ usage: rows, quota }), context.env, {
 		nowMs: NOW_MS,
 		cache: context.cache,
+		jwks: TEST_JWKS,
 	})
 	if (response.status !== 200) throw new Error(`seed failed with ${response.status}`)
 }

@@ -43,14 +43,9 @@ function makeDeps(options: {
 		saveCredentials: () => {
 			events.push("save")
 		},
-		readKey: () => {
-			events.push("key")
-			return "synthetic-ingest-key"
-		},
 		fetch: options.fetch,
 		nowIso: () => "2026-11-28T12:00:00.000Z",
 		sleep: async () => {},
-		log: (line) => logs.push(line),
 	}
 	const deps: HourlyCommandDeps = {
 		env: {},
@@ -140,7 +135,6 @@ describe("runHourlyCommand wiring", () => {
 		await runHourlyCommand([], run.deps)
 
 		expect(run.logs.some((line) => line.includes("must be a regular file"))).toBe(true)
-		expect(run.events).not.toContain("key")
 		expect(run.exits).toEqual([1])
 	})
 })

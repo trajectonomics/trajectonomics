@@ -4,11 +4,13 @@ import { handleRequest } from "../src/http/router"
 import { NOW_ISO, NOW_MS, usageRow } from "./support/fixtures"
 import { get, harness, ingestRequest } from "./support/http"
 import { silenceConsoleError } from "./support/log"
+import { TEST_JWKS } from "./support/token"
 
 async function seed(context: ReturnType<typeof harness>, rows = [usageRow()]): Promise<void> {
 	const response = await handleRequest(ingestRequest({ usage: rows }), context.env, {
 		nowMs: NOW_MS,
 		cache: context.cache,
+		jwks: TEST_JWKS,
 	})
 	expect(response.status).toBe(200)
 }

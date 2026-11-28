@@ -13,6 +13,10 @@ package records them in
 `/jwks` and separate-service decisions stand, and the `data:ingest` key fallback is not needed
 because the spike issued refresh tokens through the device flow.
 
+**2026-11-28:** [ADR 0015](0015-ingest-trusts-auth-tokens-and-deletion-leaves-a-tombstone.md)
+replaced the bootstrap key with auth access tokens and retired it: the key is history, not a
+current option.
+
 ## Context
 
 People will sign in to contribute their own usage, and the collector and future clients need

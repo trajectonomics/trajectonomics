@@ -1,8 +1,9 @@
-import { describe, expect, test } from "bun:test"
+import { describe, expect, spyOn, test } from "bun:test"
 import type { Credentials } from "../src/auth/credentials"
 import type { AuthFetch } from "../src/auth/http"
 import type { SendCommandDeps } from "../src/commands/send"
 import { runSendCommand } from "../src/commands/send"
+import { parseSendArgs } from "../src/commands/send-args"
 import type { SendConfig, SendReport } from "../src/send"
 import type { BearerDeps } from "../src/send/bearer"
 import { credentials, queueFetch, ROTATED_ACCESS, ROTATED_REFRESH, tokenBody } from "./support/auth"
@@ -31,14 +32,9 @@ function makeDeps(options: {
 		saveCredentials: () => {
 			events.push("save")
 		},
-		readKey: () => {
-			events.push("key")
-			return "synthetic-ingest-key"
-		},
 		fetch: options.fetch,
 		nowIso: () => "2026-11-28T12:00:00.000Z",
 		sleep: async () => {},
-		log: (line) => printed.push(line),
 	}
 	const deps: SendCommandDeps = {
 		env: {},
@@ -89,15 +85,36 @@ describe("runSendCommand wiring", () => {
 		expect(run.exits).toEqual([0])
 	})
 
-	test("an explicit --key-file skips the credentials file", async () => {
+	test("no credentials file asks for a login and never fetches", async () => {
 		const fetched = queueFetch([])
-		const run = makeDeps({ fetch: fetched.fetch, credentials: credentials() })
+		const run = makeDeps({ fetch: fetched.fetch })
 
-		await runSendCommand(["--key-file", KEY_FILE], run.deps)
+		await runSendCommand([], run.deps)
 
-		expect(run.events).toEqual(["input", "key", "send:synthetic rows:synthetic-ingest-key"])
+		expect(run.printed).toEqual(["send: not signed in: run `bun src/cli.ts login` first"])
+		expect(run.events).toEqual(["input", "credentials"])
 		expect(fetched.calls).toHaveLength(0)
-		expect(run.exits).toEqual([0])
+		expect(run.exits).toEqual([1])
+	})
+
+	test("--key-file is refused as an unknown argument", () => {
+		const errors: string[] = []
+		const exits: number[] = []
+		const consoleError = spyOn(console, "error").mockImplementation((line) => {
+			errors.push(String(line))
+		})
+		const exit = spyOn(process, "exit").mockImplementation(((code?: number) => {
+			exits.push(code ?? 0)
+			throw new Error("synthetic exit")
+		}) as never)
+		try {
+			expect(() => parseSendArgs(["--key-file", KEY_FILE], {})).toThrow("synthetic exit")
+			expect(exits).toEqual([1])
+			expect(errors.join("\n")).toContain("Unknown argument: --key-file")
+		} finally {
+			exit.mockRestore()
+			consoleError.mockRestore()
+		}
 	})
 
 	test("reports a bearer failure with the send prefix and exits 1", async () => {

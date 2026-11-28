@@ -6,26 +6,22 @@ import { type BearerDeps, type BearerRequest, resolveBearer } from "../src/send/
 import { credentials, queueFetch, ROTATED_ACCESS, ROTATED_REFRESH, tokenBody } from "./support/auth"
 
 const CREDENTIALS_PATH = "/home/synthetic/.config/traj-data/credentials.json"
-const KEY_FILE = "/home/synthetic/.config/traj-data/ingest.key"
 const URL = "https://trajectonomics.com/data/ingest"
 
 function request(overrides: Partial<BearerRequest> = {}): BearerRequest {
 	return {
 		credentialsPath: CREDENTIALS_PATH,
-		keyFile: KEY_FILE,
 		url: URL,
 		tokenUrlAllowed: true,
-		forceKey: false,
 		...overrides,
 	}
 }
 
 function makeDeps(
 	fetch: AuthFetch,
-	options: { credentials?: Credentials | null; key?: string; saveError?: Error } = {},
+	options: { credentials?: Credentials | null; saveError?: Error } = {},
 ) {
 	const saved: Credentials[] = []
-	const logs: string[] = []
 	const calls: string[] = []
 	const deps: BearerDeps = {
 		readCredentials: () => {
@@ -37,16 +33,11 @@ function makeDeps(
 			if (options.saveError !== undefined) throw options.saveError
 			saved.push(next)
 		},
-		readKey: () => {
-			calls.push("key")
-			return options.key ?? "synthetic-ingest-key"
-		},
 		fetch,
 		nowIso: () => "2026-11-28T12:00:00.000Z",
 		sleep: async () => {},
-		log: (line) => logs.push(line),
 	}
-	return { calls, deps, logs, saved }
+	return { calls, deps, saved }
 }
 
 describe("resolveBearer", () => {
@@ -61,35 +52,22 @@ describe("resolveBearer", () => {
 
 		const bearer = await resolveBearer(request(), run.deps)
 
-		expect(bearer).toEqual({ bearer: ROTATED_ACCESS, kind: "token" })
+		expect(bearer).toBe(ROTATED_ACCESS)
 		expect(run.saved).toEqual([
 			credentials(),
 			{ ...credentials(), refreshToken: ROTATED_REFRESH, refreshedAt: "2026-11-28T12:00:00.000Z" },
 		])
 		expect(run.calls).toEqual(["credentials", "save", "save"])
-		expect(run.logs).toEqual([])
 	})
 
-	test("uses the key only when the credentials file is absent", async () => {
+	test("with no credentials file it asks for a login and never fetches", async () => {
 		const fetched = queueFetch([])
-		const run = makeDeps(fetched.fetch, { credentials: null })
+		const run = makeDeps(fetched.fetch)
 
-		const bearer = await resolveBearer(request(), run.deps)
-
-		expect(bearer).toEqual({ bearer: "synthetic-ingest-key", kind: "key" })
-		expect(run.logs).toEqual(["send: using the temporary ingest key; run login to switch"])
-		expect(fetched.calls).toHaveLength(0)
-	})
-
-	test("an explicit --key-file skips the credentials file", async () => {
-		const fetched = queueFetch([])
-		const run = makeDeps(fetched.fetch, { credentials: credentials() })
-
-		const bearer = await resolveBearer(request({ forceKey: true }), run.deps)
-
-		expect(bearer).toEqual({ bearer: "synthetic-ingest-key", kind: "key" })
-		expect(run.calls).toEqual(["key"])
-		expect(run.logs).toEqual(["send: using the ingest key from --key-file"])
+		await expect(resolveBearer(request(), run.deps)).rejects.toThrow(
+			"not signed in: run `bun src/cli.ts login` first",
+		)
+		expect(run.calls).toEqual(["credentials"])
 		expect(fetched.calls).toHaveLength(0)
 	})
 
@@ -103,13 +81,13 @@ describe("resolveBearer", () => {
 		).catch((reason: unknown) => reason)
 
 		expect((error as Error).message).toBe(
-			"refusing to send a sign-in token to http://127.0.0.1:8787; pass --key-file or set TRAJ_DATA_ALLOW_TOKEN_URL=1",
+			"refusing to send a sign-in token to http://127.0.0.1:8787; set TRAJ_DATA_ALLOW_TOKEN_URL=1 if it is an auth-backed Worker",
 		)
 		expect(fetched.calls).toHaveLength(0)
 		expect(run.calls).toEqual(["credentials"])
 	})
 
-	test("a broken credentials read never falls back to the key", async () => {
+	test("a broken credentials read fails without a fetch", async () => {
 		const fetched = queueFetch([])
 		const run = makeDeps(fetched.fetch)
 		const deps: BearerDeps = {
@@ -124,13 +102,11 @@ describe("resolveBearer", () => {
 		expect(fetched.calls).toHaveLength(0)
 	})
 
-	test("never falls back to the key when the refresh says the grant is gone", async () => {
+	test("a gone grant fails with the expiry error", async () => {
 		const fetched = queueFetch([{ status: 400, body: { error: "invalid_grant" } }])
 		const run = makeDeps(fetched.fetch, { credentials: credentials() })
 
 		await expect(resolveBearer(request(), run.deps)).rejects.toBeInstanceOf(SignInExpiredError)
-		expect(run.calls).not.toContain("key")
-		expect(run.logs).toEqual([])
 	})
 
 	test("a failed preflight save names the credentials file and never fetches", async () => {

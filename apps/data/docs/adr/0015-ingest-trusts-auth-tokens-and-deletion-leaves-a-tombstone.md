@@ -8,11 +8,12 @@ mode those ADRs define.
 
 ## Context
 
-`/data/ingest` and the old host's `/ingest` accept one shared secret, `INGEST_BOOTSTRAP_KEY`, which
-maps to contributor `trajectonomics`. The auth Worker now issues access tokens for this audience:
+`/data/ingest` and the old host's `/ingest` accepted one shared secret, `INGEST_BOOTSTRAP_KEY`,
+which mapped to contributor `trajectonomics`, until #601's last pull request retired it (see
+"Retiring the bootstrap key"). The auth Worker now issues access tokens for this audience:
 15-minute EdDSA JWTs that `https://auth.trajectonomics.com/jwks` signs. It also queues account
 deletions and posts each one to `https://data.internal/internal/contributors/delete` through its
-`DATA` service binding, and that route answers 404 until this ADR ships.
+`DATA` service binding, and that route answered 404 until this ADR shipped.
 
 ## Decision
 
@@ -109,10 +110,12 @@ deletions and posts each one to `https://data.internal/internal/contributors/del
 
 ### Retiring the bootstrap key
 
-The key path stays only until our own collector sends with a token. The pull request after that
-removes `authorizeIngest`'s key branch, `Env.INGEST_BOOTSTRAP_KEY`, the collector's `--key-file`
-fallback and the `ingest.key` file, and then the secret itself is deleted. The old host's `/ingest`
-and `/api/*` keep answering (root AGENTS.md rule 11). Only the credential changes.
+The key path stayed only until our own collector sent with a token. #601's last pull request
+removed `authorizeIngest`'s key branch, `Env.INGEST_BOOTSTRAP_KEY`, the collector's `--key-file`
+fallback and the `ingest.key` file, and the secret is deleted after that deploy
+(`bunx wrangler secret delete INGEST_BOOTSTRAP_KEY --name data`). A bearer that is not auth's JWT is
+now `401 unauthorized`. The old host's `/ingest` and `/api/*` still answer (root AGENTS.md rule 11);
+only the credential changed.
 
 ## Consequences
 
