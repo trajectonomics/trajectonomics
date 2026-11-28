@@ -27,7 +27,9 @@ let { title, state, pathname, children, leading, actions }: Props = $props()
 	<header class="flex items-baseline justify-between gap-3">
 		<div class="flex min-w-0 items-center gap-3">
 			{#if leading}{@render leading()}{/if}
-			<h1 id="page-title" class="text-xl font-semibold tracking-tight">{title}</h1>
+			<h1 id="page-title" class="min-w-0 text-xl font-semibold tracking-tight wrap-anywhere">
+				{title}
+			</h1>
 		</div>
 		{#if actions}{@render actions()}{/if}
 	</header>

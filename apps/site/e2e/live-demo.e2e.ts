@@ -17,10 +17,10 @@ async function openLiveDemo(page: Page) {
 	await openPage(page, HOME)
 	await page.locator("[data-live-demo]").scrollIntoViewIfNeeded()
 	const demo = page.frameLocator("iframe")
-	// The Dashboard's own Overview heading is the proof the frame runs the real build.
-	await expect(demo.getByRole("heading", { name: "Overview", level: 1 })).toBeVisible({
-		timeout: 20_000,
-	})
+	// The Dashboard's own greeting is the proof the frame runs the real build.
+	await expect(
+		demo.getByRole("heading", { name: /this is your current situation/, level: 1 }),
+	).toBeVisible({ timeout: 20_000 })
 	await expect(demo.getByText("Loading…")).toHaveCount(0, { timeout: 20_000 })
 	return demo
 }

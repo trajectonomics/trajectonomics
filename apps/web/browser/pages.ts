@@ -25,3 +25,15 @@ export const PAGES: readonly string[] = routesUnder(ROUTES, "/").sort()
 export function pageName(path: string): string {
 	return path === "/" ? "home" : path.replace(/^\/|\/$/g, "").replaceAll("/", "-")
 }
+
+/** Pages with Edit controls: each must show at least one that is switched off, or the hosted fence is not running. */
+export const EDIT_PAGES: readonly string[] = [
+	"/assets-and-debts/",
+	"/expenses/",
+	"/household/",
+	"/income/",
+	"/plans/",
+	"/routing/",
+	"/settings/assumptions/",
+	"/settings/tax/",
+]
