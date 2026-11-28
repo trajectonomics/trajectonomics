@@ -3,7 +3,6 @@ import { ENGLISH_LIVE_DEMO } from "./en-live-demo"
 
 export const ENGLISH_SECTIONS = Object.freeze({
 	...ENGLISH_LIVE_DEMO,
-	actionEyebrow: "Without vs with",
 	actionHeading: "See it in action",
 	actionLede:
 		"The agent alone answers from memory. The agent with traj asks what it needs, runs the skill and the CLI, then reads the figure back.",

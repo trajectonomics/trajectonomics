@@ -1,0 +1,41 @@
+/*
+ * The hero's click-to-load facade (ADR 0035): the window waits as an app surface that has not started,
+ * and one control starts the Dashboard. It is hidden until the script marks the window ready, so a page
+ * with no script shows the `<noscript>` iframe instead and never a control that cannot work.
+ */
+
+.live-start {
+	display: none;
+	min-height: 2.5rem;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 20px;
+	border: 1px solid var(--ds-color-primary);
+	border-radius: 4px;
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+	font-family: var(--font-meta);
+	font-size: 12px;
+	letter-spacing: 0.06em;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.live[data-live-ready] .live-start {
+	display: inline-flex;
+}
+
+.live-start:hover {
+	opacity: 0.9;
+}
+
+.live-start:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* The frame is in the window but out of sight until it has loaded, so no half-hydrated Dashboard paints. */
+.live-viewport[data-live-loading] iframe {
+	visibility: hidden;
+}

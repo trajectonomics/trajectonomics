@@ -12,12 +12,14 @@ const { dictionary } = Astro.props
 ---
 
 {/*
- * The hero's window is the hosted Dashboard, live (ADR 0035): the real Demo in a framed window, fully
- * clickable. Its zoom works like browser zoom: at zoom z the iframe lays out at 1/z of the visible
- * box and is scaled by z, so a phone can zoom out and read the Dashboard's wide layout. The three
- * controls ship disabled, so a page with no script offers no control that cannot work (ADR 0035); the
- * iframe itself needs no script and stays usable at 100%. The script is inline, in the hero's style,
- * and its notes live here because every byte ships against the page's 10,000 (ADR 0005).
+ * The hero's window is the hosted Dashboard behind a click-to-load facade (ADR 0035): the real Demo in
+ * a framed window, fully clickable, but it loads on the visitor's first interaction rather than with the
+ * page, so the Dashboard's own JavaScript and hydration never count against the home's mobile budget.
+ * Its zoom works like browser zoom: at zoom z the iframe lays out at 1/z of the visible box and is
+ * scaled by z, so a phone can zoom out and read the Dashboard's wide layout. The three controls ship
+ * disabled, so a page with no script offers no control that cannot work; a visitor with no script gets
+ * the iframe from `<noscript>` at 100%. The script is inline, in the hero's style, and its notes live
+ * here because every byte ships against the page's 10,000 (ADR 0005).
  */}
 <div class="live" data-live>
 	<div class="live-bar">
@@ -46,11 +48,24 @@ const { dictionary } = Astro.props
 		<a class="live-open" href={DEMO_PATH}>{dictionary.liveDemoOpen}</a>
 	</div>
 	<div class="live-viewport" data-live-viewport style="--zoom:1">
-		<iframe
-			data-live-frame
-			src={DEMO_PATH}
-			title={dictionary.liveDemoFrameTitle}
-			loading="lazy"></iframe>
+		{/*
+		 * The facade is a real link, so it is the window's one Tab stop and its Enter key starts the
+		 * Dashboard; the script hides it until it has marked the window ready, which is why a page with
+		 * no script shows the iframe below instead and never this link.
+		 */}
+		<a
+			class="live-start"
+			data-live-start
+			data-live-title={dictionary.liveDemoFrameTitle}
+			href={DEMO_PATH}>{dictionary.liveDemoStart}</a>
+		{/* A visitor with no script still gets the Dashboard, whole and at 100%, as before. */}
+		<noscript>
+			<iframe
+				data-live-frame
+				src={DEMO_PATH}
+				title={dictionary.liveDemoFrameTitle}
+				loading="lazy"></iframe>
+		</noscript>
 	</div>
 </div>
 
@@ -60,6 +75,13 @@ const { dictionary } = Astro.props
  * state is the no-script state, and nothing is stored: the zoom is this visit's, never a cookie. At
  * either end the button is aria-disabled rather than disabled, so the keyboard focus on it stays put,
  * and the status line says each new level, because the percentage sits inside a button's name.
+ *
+ * The load: the window starts once, on a click on the facade or on the visitor's first pointerdown,
+ * keydown, touchstart, wheel or scroll anywhere on the page. Lighthouse never interacts, so the
+ * Dashboard never loads during its run, and a real visitor gets it on first contact. The frame enters
+ * hidden and is revealed two frames after its load event, so the Dashboard's own hydration shift stays
+ * inside the window instead of moving the page; the facade is removed only then, and focus moves to the
+ * frame when the facade had it, so a keyboard visitor does not lose their place.
  */}
 <script is:inline>
 	;(() => {
@@ -67,7 +89,8 @@ const { dictionary } = Astro.props
 		const box = live?.querySelector("[data-live-viewport]")
 		const level = live?.querySelector("[data-live-level]")
 		const said = live?.querySelector("[data-live-said]")
-		if (!box || !level || !said) return
+		const start = live?.querySelector("[data-live-start]")
+		if (!box || !level || !said || !start) return
 		const [out, reset, up] = live.querySelectorAll("button")
 		const steps = [50, 67, 75, 80, 90, 100, 110, 125]
 		let at = 5
@@ -82,5 +105,33 @@ const { dictionary } = Astro.props
 		up.onclick = () => show(at + 1)
 		reset.onclick = () => show(5)
 		for (const button of [out, reset, up]) button.disabled = false
+
+		const types = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"]
+		let started = false
+		const startDemo = (event) => {
+			if (event.type === "click") event.preventDefault()
+			if (started) return
+			started = true
+			for (const type of types) window.removeEventListener(type, startDemo, { passive: true })
+			const frame = document.createElement("iframe")
+			frame.src = start.href
+			frame.title = start.dataset.liveTitle
+			frame.setAttribute("data-live-frame", "")
+			frame.addEventListener("load", () => {
+				requestAnimationFrame(() =>
+					requestAnimationFrame(() => {
+						box.removeAttribute("data-live-loading")
+						if (document.activeElement === start) frame.focus()
+						start.remove()
+					}),
+				)
+			})
+			box.setAttribute("data-live-loading", "")
+			box.append(frame)
+		}
+		start.addEventListener("click", startDemo)
+		for (const type of types)
+			window.addEventListener(type, startDemo, { once: true, passive: true })
+		live.setAttribute("data-live-ready", "")
 	})()
 </script>

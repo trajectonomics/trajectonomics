@@ -60,7 +60,22 @@ export function focusedControl(page: Page): Promise<string> {
 
 /** Wait for the focused control to paint its ring, so a busy machine cannot beat the transition. */
 export async function expectRingVisible(page: Page, label: string): Promise<void> {
-	await expect.poll(() => ringVisible(page), { message: label, timeout: 3_000 }).toBe(true)
+	await expect.poll(() => ringVisible(page), { message: label, timeout: 5_000 }).toBe(true)
+}
+
+/**
+ * Start the hero's live Dashboard and wait for it, without a keypress: the window drops its facade once
+ * the frame has loaded, which would change the page's controls under a keyboard walk (ADR 0035).
+ */
+export async function startLiveDemo(page: Page): Promise<void> {
+	await page.evaluate(() => window.dispatchEvent(new Event("scroll")))
+	await expect(page.locator("[data-live-start]")).toHaveCount(0, { timeout: 20_000 })
+	await expect(
+		page.frameLocator("iframe[data-live-frame]").getByRole("heading", {
+			name: "Overview",
+			level: 1,
+		}),
+	).toBeVisible({ timeout: 20_000 })
 }
 
 /**

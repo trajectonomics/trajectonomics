@@ -3,7 +3,6 @@ import { THAI_LIVE_DEMO } from "./th-live-demo"
 
 export const THAI_SECTIONS = Object.freeze({
 	...THAI_LIVE_DEMO,
-	actionEyebrow: "เทียบกันให้เห็น",
 	actionHeading: "ดูการทำงานจริง",
 	actionLede:
 		"เอเจนต์เดี่ยวตอบจากความจำ ส่วนเอเจนต์ที่ใช้ traj จะถามข้อมูลที่ยังขาด สั่งสกิลและ CLI แล้วอ่านตัวเลขกลับมาให้",

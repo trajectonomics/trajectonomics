@@ -30,6 +30,28 @@ describe("the Hero component in every Language", () => {
 			expect(page.elements.indexOf(prompt)).toBeLessThan(page.elements.indexOf(windows[0]))
 		})
 
+		it(`shows the window as a click-to-load facade, with the iframe only inside <noscript> (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const start = withAttribute(page, "data-live-start")
+			expect(start).toHaveLength(1)
+			const [facade] = start
+			if (facade === undefined) throw new Error("the hero rendered no facade")
+			expect(facade.tag).toBe("a")
+			expect(facade.attributes["href"]).toBe(DEMO_PATH)
+			expect(textOf(page, facade)).toBe(dictionary.liveDemoStart)
+			const frames = elementsByTag(page, "iframe")
+			expect(frames).toHaveLength(1)
+			const [frame] = frames
+			if (frame === undefined) throw new Error("the hero rendered no no-script iframe")
+			expect(
+				frame.ancestors.some((ancestor) => ancestor.tag === "noscript"),
+				"the iframe is inside <noscript>, so a scripted page has no frame in its DOM",
+			).toBe(true)
+			expect(frame.attributes["src"]).toBe(DEMO_PATH)
+			expect(frame.attributes["title"]).toBe(dictionary.liveDemoFrameTitle)
+			expect(frame.attributes["loading"]).toBe("lazy")
+		})
+
 		it(`lets the pixel field run behind the copy and the window alike (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const hero = withAttribute(page, "data-hero")[0]

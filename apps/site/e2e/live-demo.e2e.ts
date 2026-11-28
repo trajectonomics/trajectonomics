@@ -10,13 +10,14 @@ const HOME = homeOf("en")
 const dictionary = dictionaryFor(HOME.language)
 
 /**
- * Open the home, scroll the hero's live window into view so its lazy iframe loads, and wait until the
- * Dashboard inside it has read the Snapshot. Returns the frame, so a check can drive the Dashboard.
+ * Open the home, click the window's start facade so its Dashboard loads, and wait until the Dashboard
+ * inside the frame has read the Snapshot. Returns the frame, so a check can drive the Dashboard.
  */
 async function openLiveDemo(page: Page) {
 	await openPage(page, HOME)
 	await page.locator("[data-live]").scrollIntoViewIfNeeded()
-	const demo = page.frameLocator("iframe")
+	await page.locator("[data-live-start]").click()
+	const demo = page.frameLocator("iframe[data-live-frame]")
 	// The Dashboard's own Overview heading is the proof the frame runs the real build.
 	await expect(demo.getByRole("heading", { name: "Overview", level: 1 })).toBeVisible({
 		timeout: 20_000,

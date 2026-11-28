@@ -163,7 +163,7 @@ The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /`, one `Allow: /` g
 _Avoid_: Crawl rules, allowlist
 
 **Answer engine file**:
-A file an answer engine reads instead of the HTML: `/llms.txt`, the Site's name, its one-line summary and its links in the llmstxt.org shape, and `/llms-full.txt`, the landing page's copy in the fallback Language rendered as Markdown. Both are generated from the Dictionary before every build and judged by a built-file check; neither is committed ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
+A file an answer engine reads instead of the HTML: `/llms.txt`, the Site's name, its one-line summary and its links in the llmstxt.org shape, and `/llms-full.txt`, the Site's words in the fallback Language rendered as Markdown, including the two demo transcripts the page no longer plays and the JSON answer they end on. Both are generated from the Dictionary before every build and judged by a built-file check; neither is committed ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
 _Avoid_: llm file, AI sitemap, RAG index
 
 **IndexNow key**:

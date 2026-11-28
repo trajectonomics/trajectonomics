@@ -49,7 +49,7 @@ for (const underTest of HOMES) {
 		await expect(page.locator("[data-hero-accent]")).toBeVisible()
 	})
 
-	test(`${underTest.name}: the hero's live window is the Dashboard at 100%, and offers no control that cannot work`, async ({
+	test(`${underTest.name}: the hero's live window is the Dashboard at 100% from <noscript>, with no start link, and offers no control that cannot work`, async ({
 		page,
 	}) => {
 		await visit(page, underTest)
@@ -59,6 +59,8 @@ for (const underTest of HOMES) {
 		for (const button of await zoom.all()) await expect(button).toBeDisabled()
 		await expect(page.locator("[data-live-level]")).toHaveText("100%")
 		await expect(page.locator("[data-live-viewport]")).toHaveAttribute("style", /--zoom:1/)
+		// The facade is a start control the script would show; with no script the iframe stands instead.
+		await expect(page.locator(".live-start")).toBeHidden()
 		const frame = page.locator("iframe[data-live-frame]")
 		await expect(frame).toHaveAttribute("title", dictionary.liveDemoFrameTitle)
 		await expect(frame).toHaveAttribute("src", "/demo/")
