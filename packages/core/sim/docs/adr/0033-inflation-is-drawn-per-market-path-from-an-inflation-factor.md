@@ -81,6 +81,13 @@ was 1.5x, and the run stays inside it; the review re-measured 7,132 ms against 1
 costs can be removed without changing a figure (issue #815). A larger Timeline costs
 the same words, and a plan with no volatility draws none of them.
 
+Since #815, a chance run with inflation keys its event dates on the declared Scenario and rebuilds only the fixed
+Flows' amounts for each path's inflation, so the dates are worked out once per run. On the same benchmark the ratio
+fell to about 1.27 (4,772 ms against 6,021 ms, then 4,630 ms against 5,956 ms), with every parity case unchanged.
+`inflateBy` keeps `growthYears`: replacing it with whole 365-day counts differs for a Timeline that starts on
+29 February, at 28 February of each later leap year (2024-02-29 to 2028-02-28 counts 3 years against 4), so it
+would change figures.
+
 ## Tests
 
 Each check has a test that fails on the previous engine except the three guards: the already-recorded parity
