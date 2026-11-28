@@ -9,10 +9,19 @@ export type FetchResponse = {
 	json: () => Promise<unknown>
 }
 
-/** The POST-only fetch signature the sender needs; tests inject a fake. */
+/** How long one ingest POST may take before the batch counts as failed. */
+export const INGEST_TIMEOUT_MS = 30_000
+
+/** The POST-only fetch signature the sender needs: no redirects, bounded in time. */
 export type FetchLike = (
 	url: string,
-	init: { method: "POST"; headers: Record<string, string>; body: string },
+	init: {
+		method: "POST"
+		headers: Record<string, string>
+		body: string
+		signal: AbortSignal
+		redirect: "error"
+	},
 ) => Promise<FetchResponse>
 
 /** One batch's outcome with the rows it carried. */
@@ -21,10 +30,10 @@ export type BatchReport = { rows: IngestRow[]; ok: boolean }
 /** The outcome of a whole send, batch by batch. */
 export type SendReport = { ok: boolean; batches: BatchReport[] }
 
-/** Where and how one send runs; the key is never logged. */
+/** Where and how one send runs; the bearer is never logged. */
 export type SendOptions = {
 	url: string
-	key: string
+	bearer: string
 	fetch: FetchLike
 	log: (line: string) => void
 }
@@ -81,10 +90,13 @@ export async function sendRows(
 			response = await options.fetch(options.url, {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${options.key}`,
+					Authorization: `Bearer ${options.bearer}`,
 					"Content-Type": "application/json",
 				},
 				body: batch.body,
+				// A redirect would turn the POST into a GET whose 200 looks like accepted rows.
+				redirect: "error",
+				signal: AbortSignal.timeout(INGEST_TIMEOUT_MS),
 			})
 		} catch (error) {
 			options.log(`send: request failed: ${errorMessage(error)}`)

@@ -9,7 +9,9 @@ redirects its pages (ADR 0006).
 
 1. Stats only leave the machine. The collector prints plan, model, UTC bucket and numbers; it
    never prints or commits prompts, session titles, project names, paths, account ids or times of
-   day. Never commit a real log, a real collector output or a hostname.
+   day. The exception is `login` and `whoami` printing the person's own Trajectonomics auth
+   account id to their own terminal, which they need to set up the org binding. Never commit a real
+   log, a real collector output or a hostname.
 2. `apps/data/collector/src/extract/` and `src/aggregate.ts` are pure: data in, data out, no `fs`,
    no SQLite, no network, no clock. File and database access stays in `src/cli.ts`,
    `src/collect.ts` and `src/stores/`.
