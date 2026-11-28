@@ -18,7 +18,7 @@ function makeConfig(fetch: FetchLike) {
 	const logs: string[] = []
 	return {
 		logs,
-		config: { url: URL, key: "synthetic-key", fetch, log: (line: string) => logs.push(line) },
+		config: { url: URL, bearer: "synthetic-bearer", fetch, log: (line: string) => logs.push(line) },
 	}
 }
 

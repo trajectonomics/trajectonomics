@@ -21,10 +21,10 @@ export type BatchReport = { rows: IngestRow[]; ok: boolean }
 /** The outcome of a whole send, batch by batch. */
 export type SendReport = { ok: boolean; batches: BatchReport[] }
 
-/** Where and how one send runs; the key is never logged. */
+/** Where and how one send runs; the bearer is never logged. */
 export type SendOptions = {
 	url: string
-	key: string
+	bearer: string
 	fetch: FetchLike
 	log: (line: string) => void
 }
@@ -81,7 +81,7 @@ export async function sendRows(
 			response = await options.fetch(options.url, {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${options.key}`,
+					Authorization: `Bearer ${options.bearer}`,
 					"Content-Type": "application/json",
 				},
 				body: batch.body,

@@ -1,13 +1,8 @@
 import { readFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { errorMessage } from "../message"
-import {
-	DEFAULT_INGEST_URL,
-	defaultKeyFile,
-	type FetchLike,
-	readIngestKey,
-	sendText,
-} from "../send"
+import { DEFAULT_INGEST_URL, defaultKeyFile, type FetchLike, sendText } from "../send"
+import { realBearerOptions, resolveBearer } from "../send/bearer"
 import { fail } from "./errors"
 
 const USAGE = "Usage: bun src/cli.ts send [--url <url>] [--key-file <path>] [files...]"
@@ -67,23 +62,25 @@ async function readInput(files: readonly string[]): Promise<string> {
 
 const postFetch: FetchLike = (url, init) => fetch(url, init)
 
-/** Reads key and rows, posts them, and exits non-zero on any failure. */
+/** Reads credentials and rows, posts them, and exits non-zero on any failure. */
 export async function runSendCommand(argv: readonly string[]): Promise<void> {
 	const args = parseSendArgs(argv, process.env)
-	let key: string
+	const log = (line: string): void => console.error(line)
+	let bearer: string
 	try {
-		key = readIngestKey(args.keyFile)
+		const resolved = await resolveBearer(realBearerOptions(args.keyFile, postFetch, log))
+		bearer = resolved.bearer
 	} catch (error) {
-		console.error(errorMessage(error))
+		log(errorMessage(error))
 		process.exitCode = 1
 		return
 	}
 	try {
 		const report = await sendText(await readInput(args.files), {
 			url: args.url,
-			key,
+			bearer,
 			fetch: postFetch,
-			log: (line) => console.error(line),
+			log,
 		})
 		process.exitCode = report.ok ? 0 : 1
 	} catch (error) {

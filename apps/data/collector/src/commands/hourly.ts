@@ -6,13 +6,8 @@ import { cursorPath } from "../hourly/cursor"
 import { runHourly } from "../hourly/run"
 import { spawnInheritStderr } from "../hourly/spawn"
 import { errorMessage } from "../message"
-import {
-	DEFAULT_INGEST_URL,
-	defaultKeyFile,
-	type FetchLike,
-	readIngestKey,
-	sendRows,
-} from "../send"
+import { DEFAULT_INGEST_URL, defaultKeyFile, type FetchLike, sendRows } from "../send"
+import { realBearerOptions, resolveBearer } from "../send/bearer"
 import { fail } from "./errors"
 
 const USAGE = "Usage: bun src/cli.ts hourly [--config <path>]"
@@ -69,10 +64,11 @@ export async function runHourlyCommand(argv: readonly string[]): Promise<void> {
 	const home = homedir()
 	const path = parseConfigPath(argv, home)
 	let config: ReturnType<typeof parseHostsConfig>
-	let key: string
+	let bearer: string
 	try {
 		config = parseHostsConfig(JSON.parse(readFileSync(path, "utf8")))
-		key = readIngestKey(defaultKeyFile(home))
+		const resolved = await resolveBearer(realBearerOptions(defaultKeyFile(home), postFetch, log))
+		bearer = resolved.bearer
 	} catch (error) {
 		console.error(`hourly: ${errorMessage(error)}`)
 		process.exitCode = 1
@@ -85,7 +81,7 @@ export async function runHourlyCommand(argv: readonly string[]): Promise<void> {
 		spawn: spawnInheritStderr,
 		readCursor: (name) => readCursor(stateDir, name),
 		writeCursor: (name, iso) => writeCursor(stateDir, name, iso),
-		send: (rows) => sendRows(rows, { url, key, fetch: postFetch, log }),
+		send: (rows) => sendRows(rows, { url, bearer, fetch: postFetch, log }),
 		log,
 	})
 	process.exitCode = report.ok ? 0 : 1
