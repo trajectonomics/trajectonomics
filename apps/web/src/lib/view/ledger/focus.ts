@@ -52,13 +52,18 @@ function extentOf(dates: readonly string[]): { readonly start: string; readonly 
 	return { start, end }
 }
 
+/** The accounts a person records a value for: what they hold and what they owe, never income, spending or equity. */
+const RECORDED: ReadonlySet<string> = new Set(["asset", "liability"])
+
 /**
  * The focus point of the accounts Read and the transactions Read. Null when there is no account, or none
  * with a record to place, which is the page's own empty state. Every date is the CLI's string; a day becomes
  * a number only to place its dot (web ADR 0002).
  */
 export function ledgerFocusView(accounts: AccountList, transactions: TxList): LedgerFocus | null {
-	const active = accounts.accounts.filter((account) => account.archivedAt === null)
+	const active = accounts.accounts.filter(
+		(account) => account.archivedAt === null && RECORDED.has(account.type),
+	)
 	if (active.length === 0) return null
 	const last = lastDates(transactions)
 	const dates = active.flatMap((account) => {

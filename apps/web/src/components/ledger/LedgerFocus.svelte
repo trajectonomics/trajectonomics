@@ -1,5 +1,8 @@
 <script lang="ts">
+import { editSession } from "../../client/edit.svelte.js"
+import { currentSearch } from "../../client/location.svelte.js"
 import type { AccountList, Read, TxList } from "../../lib/contract"
+import { editsShown } from "../../lib/edit/shown"
 import { formatDate } from "../../lib/format"
 import { ledgerFocusView } from "../../lib/view/ledger/focus"
 import FocusAnswer from "../ui/FocusAnswer.svelte"
@@ -17,6 +20,12 @@ let { accounts, transactions }: Props = $props()
 const focus = $derived(
 	accounts.ok && transactions.ok ? ledgerFocusView(accounts.data, transactions.data) : null,
 )
+/** Values are recorded on Net worth, and only where an Edit is shown, so the Demo has no button. */
+const action = $derived(
+	editsShown(editSession.token, currentSearch())
+		? { label: "Record values", href: "/net-worth/" }
+		: undefined,
+)
 const ROW_MAX = 22
 const ROWS_TOTAL = 240
 const rowHeight = $derived(
@@ -25,7 +34,7 @@ const rowHeight = $derived(
 </script>
 
 {#if focus}
-	<FocusPoint label={focus.label}>
+	<FocusPoint label={focus.label} {action}>
 		{#snippet visual()}
 			<div class="flex min-h-[200px] w-full flex-col justify-center gap-2">
 				<div class="flex min-w-0 items-baseline justify-between gap-2">

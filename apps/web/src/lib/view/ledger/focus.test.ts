@@ -8,11 +8,12 @@ function account(
 	id: string,
 	name: string,
 	archivedAt: string | null = null,
+	type: AccountList["accounts"][number]["type"] = "asset",
 ): AccountList["accounts"][number] {
 	return {
 		id,
 		name,
-		type: "asset",
+		type,
 		currency: "THB",
 		parentId: null,
 		archivedAt,
@@ -46,6 +47,9 @@ const ACCOUNTS: AccountList = {
 		account("rent", "Rent"),
 		account("cash", "Cash"),
 		account("old", "Old card", "2026-02-01"),
+		// Income and spending are not recorded as values, so they get no row.
+		account("salary", "Salary", null, "income"),
+		account("food", "Food", null, "expense"),
 	],
 }
 

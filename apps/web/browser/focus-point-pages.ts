@@ -26,7 +26,7 @@ export const ANSWERS: Readonly<Record<string, readonly string[]>> = {
 	"/ledger/": [
 		"When did you last record your accounts?",
 		"28 Oct 2026.",
-		"9 accounts, 0 not recorded in the month before it.",
+		"3 accounts, 0 not recorded in the month before it.",
 	],
 }
 
