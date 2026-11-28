@@ -92,7 +92,7 @@ export function planModelOf(
 export const returnModelFlag: z.ZodString = z
 	.string()
 	.describe(
-		"The Return model JSON file the Market paths draw from, in the sim format, or `-` for standard input, or the word `plan`: build the model from the Scenario's own Accounts, each asset's `rate` and `volatility` (a file named plan is written ./plan). `traj projection model` prints what `plan` builds.",
+		"The Return model JSON file the Market paths draw from, in the sim format, or `-` for standard input, or the word `plan`: build the model from the Scenario's own Accounts, each asset's `rate` and `volatility`, and the Scenario's `economy.inflationVolatility` when above 0 (a file named plan is written ./plan). `traj projection model` prints what `plan` builds.",
 	)
 
 /** `--buckets`: the size of a plan model. */

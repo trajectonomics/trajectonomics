@@ -5,6 +5,7 @@ import { milestonesOf } from "./chance-milestones"
 import { modelHashOf } from "./chance-model"
 import { outcomesOf } from "./chance-outcomes"
 import { type ModelSource, type PlanModel, planModelOf } from "./chance-plan"
+import { planNotes } from "./chance-plan-notes"
 import { realBandsOf, withRealMedian } from "./chance-real"
 import { chanceRefusal } from "./chance-refusal"
 import { shareText } from "./chance-share"
@@ -78,7 +79,7 @@ function viewOf(
 		notes: [
 			...echo.notes,
 			`${SUCCESS_NOTE_PREFIX}${placed.timeline.horizon} on ${chance.succeeded} of ${chance.paths} seeded Market paths: a success share of ${shareText(chance.successBps)}.`,
-			`The chance is over the Return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal.`,
+			`The chance is over the Return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal${realBands === undefined ? "" : " except the median in today's money"}.`,
 			...(plan === undefined ? [] : planNotes(plan)),
 			...spending.notes,
 			...(outcomes === undefined ? [] : [outcomesNote(chance.paths)]),
@@ -98,18 +99,6 @@ function viewOf(
 		...(chance.milestones === undefined ? {} : { milestones: milestonesOf(chance, placed) }),
 		tables: [{ name: "bands", count: rows.length, rows }, ...spending.tables],
 	}
-}
-
-/** What a plan-built model says beside the chance: where it came from, and what the engine clamped. */
-function planNotes(plan: PlanModel): string[] {
-	const accounts = plan.view.accounts
-		.map((a) => `${a.id} (rate ${a.rate} bps, volatility ${a.volatility} bps)`)
-		.join(", ")
-	const built =
-		plan.view.accounts.length === 0
-			? `The Return model is the plan's own, built in ${plan.view.buckets} buckets from the Scenario's inflation spread; every Account keeps its rate.`
-			: `The Return model is the plan's own, built in ${plan.view.buckets} buckets from the Accounts that swing: ${accounts}. Every Account without a volatility keeps its rate.`
-	return [built, ...plan.notes]
 }
 
 /** What `--outcomes` lists, and the command that opens one path (cli ADR-0040, ADR-0069). */
