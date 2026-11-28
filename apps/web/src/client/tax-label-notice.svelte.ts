@@ -2,7 +2,8 @@ import type { TaxLabelOffer } from "../lib/view/plan-items/tax-label"
 import { withParam } from "./query-string"
 
 /**
- * The Tax labels page a just-saved new income in a taxed plan needs its label on, offered where the drawer closes to.
+ * The plan and Flow of a just-saved new income in a taxed plan that needs its tax label, offered where the drawer
+ * closes to. The notice builds the Tax labels link from the current address when it shows.
  * It holds one offer at a time, so a later save replaces an earlier notice.
  */
 class TaxLabelNotice {
@@ -22,5 +23,5 @@ export function taxLabelsHref(search: string, plan: string): string {
 	return `/settings/tax/${withParam(search, "scenario", plan)}`
 }
 
-/** The notice one page holds: the last saved income's Tax labels page, or null. */
+/** The notice one page holds: the plan and Flow of the last saved income, or null. */
 export const taxLabelNotice = new TaxLabelNotice()

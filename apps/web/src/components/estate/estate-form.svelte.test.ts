@@ -47,6 +47,13 @@ describe("the form", () => {
 		expect(body).toContain("Try as a what-if")
 		expect(body).toContain("Move up")
 	})
+
+	test("with amounts hidden, an unfocused line amount shows the mask and not its digits", () => {
+		preferences.hidden = true
+		const body = form()
+		expect(body).toMatch(/id="estate-costs-1-amount"[^>]*value="•••••"/)
+		expect(body).not.toContain('value="50000.00"')
+	})
 })
 
 describe("the Home card: your heirs would receive", () => {
