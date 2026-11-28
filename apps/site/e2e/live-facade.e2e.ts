@@ -41,3 +41,30 @@ test("the facade is a Tab stop that paints the Site's ring", async ({ page }) =>
 	expect(reached, "Tab reaches the live window's start facade").toBe(true)
 	await expectRingVisible(page, "the live window's start facade paints its ring")
 })
+
+test("Enter on the facade hands the focus to the Dashboard, under reduced motion too", async ({
+	page,
+}) => {
+	// The kill switch gives every property a 0.01 ms transition; the frame must still be visible, and so
+	// focusable, when the script hands it the focus (ADR 0035).
+	await page.emulateMedia({ reducedMotion: "reduce" })
+	await openPage(page, HOME)
+	await page.locator("[data-live-start]").focus()
+	await page.keyboard.press("Enter")
+	await expect(page.locator("[data-live-start]")).toHaveCount(0, { timeout: 10_000 })
+	expect(
+		await page.evaluate(() => document.activeElement?.hasAttribute("data-live-frame") ?? false),
+		"the focus is on the Dashboard's frame, not dropped to the page",
+	).toBe(true)
+	expect(page.url()).toBe(new URL(HOME.path, page.url()).href)
+})
+
+test("a modified click on the facade opens the Dashboard in a new tab", async ({ page }) => {
+	await openPage(page, HOME)
+	const opened = page.context().waitForEvent("page")
+	await page.locator("[data-live-start]").click({ modifiers: ["ControlOrMeta"] })
+	const tab = await opened
+	await tab.waitForURL((url) => url.pathname === DEMO_PATH)
+	await tab.close()
+	expect(page.url()).toBe(new URL(HOME.path, page.url()).href)
+})

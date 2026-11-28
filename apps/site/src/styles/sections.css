@@ -52,7 +52,7 @@
 	gap: 16px;
 }
 
-/* The head and the Replay control beside it: the control holds the column's top right corner. */
+/* A section head and the picture beside it: the picture holds the column's top right corner. */
 .section-head-row {
 	display: flex;
 	align-items: flex-start;

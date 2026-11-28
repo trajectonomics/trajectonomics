@@ -215,7 +215,7 @@ The script text one page runs, uncompressed and under 10,000 bytes: inline scrip
 _Avoid_: Bundle, JS payload
 
 **Live window**:
-The hero's window, which is the Hosted Demo itself in an iframe rather than a picture: its bar carries the window dots, the Dashboard's title, browser-style zoom, and the way out to `/demo/` ([ADR 0035](docs/adr/0035-the-hero-is-the-live-demo.md)). At zoom `z` the frame lays out at `1/z` of the visible box and is scaled by `z`, from 50% to 125%, and the controls ship disabled so a page with no script offers no zoom that cannot work. Nothing about the zoom is stored.
+The hero's window, which is the Hosted Demo itself in an iframe rather than a picture: its bar carries the window dots, the Dashboard's title, browser-style zoom, and the way out to `/demo/` ([ADR 0035](docs/adr/0035-the-hero-is-the-live-demo.md)). With a script, the frame waits behind a click-to-load facade, a "Try the live Dashboard" link, and loads on the visitor's first click, tap, key, wheel or scroll; with none, a `<noscript>` iframe shows it at once. At zoom `z` the frame lays out at `1/z` of the visible box and is scaled by `z`, from 50% to 125%, and the controls ship disabled so a page with no script offers no zoom that cannot work. Nothing about the zoom is stored.
 _Avoid_: Demo window, chat widget, mock app, dashboard route
 
 **Hosted Demo**:

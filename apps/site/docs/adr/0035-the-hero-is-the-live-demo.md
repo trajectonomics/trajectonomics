@@ -18,7 +18,7 @@ That first version failed the Site's own mobile performance budget. A same-origi
 Dashboard's JavaScript on the home page's main thread, which took Total Blocking Time to 390 ms
 (score 0.69), and the Dashboard's hydration reflowed inside the hero's first view: its `main` moved
 28 px, its footer dropped and the plan picker widened, for a Cumulative Layout Shift of 0.194 (score
-0.63). The page measured 0.79–0.82 against the 0.95 median of
+0.63). The page measured 0.79 in English and 0.84 in Thai against the 0.95 median of
 [ADR 0005](./0005-page-weight-and-web-font-budget.md). This record is the approved repair: the hero
 window is a click-to-load facade, and the Dashboard loads on the visitor's first interaction or on a
 click.
@@ -40,15 +40,18 @@ click.
   app window waiting to start. The viewport keeps its fixed `min(75svh, 46rem)` height, so nothing on
   the page moves when the Dashboard arrives.
 - **The inline script starts it once.** It marks `[data-live]` with `data-live-ready`, the only state
-  in which `.live-start` is shown, so a page with no script never offers the link. `start()` runs on a
-  click on the facade (the default is prevented, so the visitor stays on the page) or on the
+  in which `.live-start` is shown, so a page with no script never offers the link. `startDemo()` runs on a
+  plain click on the facade (the default is prevented, so the visitor stays on the page; a click with
+  a modifier key or another button keeps its browser meaning and opens `/demo/` elsewhere) or on the
   visitor's first `pointerdown`, `keydown`, `touchstart`, `wheel` or `scroll` anywhere on the window;
   each listener is `{ once: true, passive: true }` and the others are removed when the first fires. It
   creates the iframe (`data-live-frame`, the facade's `href`, its title from `data-live-title`, and no
   `loading="lazy"`) and inserts it hidden through `data-live-loading`, which is `visibility: hidden`.
   On the frame's `load` event it waits two `requestAnimationFrame`s, then reveals the frame, removes
   the facade, and moves the focus to the frame when the facade had it, so a keyboard visitor does not
-  lose their place. Nothing starts on a timer, and nothing follows the pointer.
+  lose their place. The frame has no transition, so the reduced-motion kill switch cannot leave it
+  hidden at that moment, and it draws the `--ds-color-ring` outline inside its box while it has the
+  focus. Nothing starts on a timer, and nothing follows the pointer.
 - **A visitor with no script gets the iframe.** The same iframe, with `data-live-frame`,
   `src="/demo/"`, the Dictionary's title and `loading="lazy"`, ships inside `<noscript>` in the
   viewport. A page with no script therefore shows the Dashboard at 100% as before, and `.live-start`
@@ -80,6 +83,11 @@ click.
 
 ## Retired from earlier records
 
+- **[ADR 0017](./0017-the-hero-rim-brightens-the-field-outside-the-copy.md): the rim's numbers.**
+  The live window makes the hero shorter, so the percentages that placed the rim moved: its empty band
+  now runs to 38% of the hero and fills by 50%, and its clearing is an ellipse of 480 px by 330 px at
+  50% by 30%, so the headline, the subline and the call to action still sit on the plain field. The
+  rim itself, its tile, its strength and why the cap does not apply stand.
 - **[ADR 0019](./0019-the-sections-motion-plays-once-on-entry.md): the Reveal script, the timeline and
   the `Replay` control.** Nothing on the page stages a section from a script any more; the timeline
   module and the control that replayed a section are gone with the drawn chats, so the page's motion
@@ -105,7 +113,7 @@ click.
 
 - **Load the Dashboard on page load, as the first version did.** Rejected: it is the measured failure
   this record repairs. The same-origin frame puts the Dashboard's JavaScript on the home's main thread
-  and its hydration in the home's first view, and the page scores 0.79–0.82 against a 0.95 budget.
+  and its hydration in the home's first view, and the page scores 0.79 in English and 0.84 in Thai against a 0.95 budget.
 - **Start it on a timer after load.** Rejected: a timer still fires inside Lighthouse's measurement
   window, so it moves the same work into the audit and hides the cost rather than removing it; a
   visitor on a slow phone would meet the same main-thread work a few seconds in.
@@ -131,16 +139,17 @@ click.
 - The Dashboard's own hydration shift — the `main` moving 28 px, the footer dropping and the plan
   picker widening — is a known issue in `apps/web`, tracked separately. The facade keeps it outside
   the home's Cumulative Layout Shift; it does not fix it inside the Dashboard.
-- The page's inline JavaScript is 8,718 bytes of the 10,000 budget ([ADR 0005](./0005-page-weight-and-web-font-budget.md));
-  the facade's start, the two-frame reveal and the trigger list are the growth.
+- The page's inline JavaScript is 8,826 bytes of the 10,000 budget ([ADR 0005](./0005-page-weight-and-web-font-budget.md));
+  the facade's start, its modified-click check, the two-frame reveal and the trigger list are the growth.
 - The keyboard check still steps over the frame: Tab enters the Dashboard's own controls, and leaves
-  them at the Dashboard's end onto the Site's next control. The facade is itself a Tab stop with a
-  ring, so a keyboard visitor starts the Dashboard with Enter.
+  them at the Dashboard's end onto the Site's next control. A keyboard visitor's first key already
+  starts the Dashboard, so the facade is usually gone before Tab reaches it; while it is there it is a
+  Tab stop with a ring, and Enter on it hands the focus to the frame.
 - The accessibility check keeps excluding `[data-live-frame]` from its context, because the Dashboard's
   chart labels sit over drawn shapes axe cannot judge. The window's bar, zoom controls, facade and way
   out remain in the scan.
 - The committed visual baselines keep masking `[data-live-viewport]`, because the Dashboard's pixels
-  are not the Site's; the facade sits inside that mask and the window keeps its height, so the home's
-  baselines do not move for this change.
+  are not the Site's; the facade sits inside that mask and the window keeps its height. The Mascot's
+  clearance above the bar moves it a few pixels at 68 rem and wider, inside the baselines' tolerance.
 - `/llms-full.txt` now carries the demo the page no longer plays. The Glossary says so, and the file's
   checks assert every line of the answer, not only its opening brace.

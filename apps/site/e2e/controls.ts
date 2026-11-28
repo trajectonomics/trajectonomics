@@ -52,7 +52,7 @@ export function focusedControl(page: Page): Promise<string> {
 		const focused = document.activeElement
 		if (!(focused instanceof HTMLElement)) return "none"
 		const href = focused.getAttribute("href") ?? ""
-		// The accessible name, not the text: two Replays in two sections are two controls.
+		// The accessible name, not the text: two controls with the same text can have different names.
 		const name = focused.getAttribute("aria-label") ?? focused.textContent ?? ""
 		return `${focused.tagName}:${href}:${name.trim()}`
 	})

@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0035
 ---
 
 # The hero's rim brightens the field outside the copy, and the 0.30 cap holds only behind it

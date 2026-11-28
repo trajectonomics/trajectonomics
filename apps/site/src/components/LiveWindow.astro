@@ -109,7 +109,10 @@ const { dictionary } = Astro.props
 		const types = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"]
 		let started = false
 		const startDemo = (event) => {
-			if (event.type === "click") event.preventDefault()
+			if (event.type === "click") {
+				if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+				event.preventDefault()
+			}
 			if (started) return
 			started = true
 			for (const type of types) window.removeEventListener(type, startDemo, { passive: true })

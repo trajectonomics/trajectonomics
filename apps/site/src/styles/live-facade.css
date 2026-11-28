@@ -35,7 +35,22 @@
 	outline-offset: 4px;
 }
 
-/* The frame is in the window but out of sight until it has loaded, so no half-hydrated Dashboard paints. */
+/*
+ * No transition on the frame: the reduced-motion kill switch gives every property a 0.01 ms transition,
+ * `visibility` included, so the frame would still be hidden when the script moves the focus to it and
+ * the focus would fall to the page.
+ */
+.live-viewport iframe {
+	transition-property: none;
+}
+
+/* The frame is in the window but out of sight until it has loaded, so the Dashboard appears whole. */
 .live-viewport[data-live-loading] iframe {
 	visibility: hidden;
+}
+
+/* The frame takes the focus from the facade, so it shows the ring the facade had, inside the clipped box. */
+.live-viewport iframe:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: -2px;
 }
