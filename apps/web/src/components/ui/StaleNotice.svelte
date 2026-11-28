@@ -13,6 +13,9 @@ interface Props {
 }
 
 let { shows = "both", source }: Props = $props()
+/** This copy's own name: a page can show two copies, and only the one whose Reload was pressed says why it failed. */
+const id = $props.id()
+const failed = $derived(editSession.reloadFrom === id ? editSession.reloadError : null)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-disabled:opacity-50"
 const mine = $derived(
@@ -32,14 +35,14 @@ $effect(() => {
 </script>
 
 <!-- Shown when a save could not be answered with a fresh Snapshot: the CLI refused it over a plan that changed,
-or the write landed and the Snapshot read that answers it failed. Reload reads the Snapshot again, and says here
-why when it cannot. Its button is only marked disabled while a request runs, so it keeps keyboard focus. -->
+or the write landed and the Snapshot read that answers it failed. Reload reads the Snapshot again, and the copy
+that was pressed says why when it cannot. Its button is only marked disabled while a request runs, so it keeps keyboard focus. -->
 {#if notice !== null}
 	{#key landing}
 		<div bind:this={box} role="alert" tabindex="-1" class="space-y-3 rounded-md border border-border bg-muted p-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 			<p class="text-sm text-foreground">{notice === "stale" ? STALE_PLAN : WRITTEN_REREAD_FAILED_MESSAGE}</p>
-			{#if editSession.reloadError !== null}<p class="text-sm text-destructive wrap-anywhere">{editSession.reloadError}</p>{/if}
-			<button type="button" onclick={() => editSession.reload()} aria-disabled={editSession.busy} class={button}>Reload</button>
+			{#if failed !== null}<p class="text-sm text-destructive wrap-anywhere">{failed}</p>{/if}
+			<button type="button" onclick={() => editSession.reload(id)} aria-disabled={editSession.busy} class={button}>Reload</button>
 		</div>
 	{/key}
 {/if}

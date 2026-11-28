@@ -25,6 +25,7 @@ class HostedEditSession implements Session {
 	savedUnread = $state(false)
 	landings = $state(0)
 	reloadError = $state<string | null>(null)
+	reloadFrom = $state<string | null>(null)
 	result = $state<AccountValues | null>(null)
 
 	open(): Promise<void> {
@@ -55,7 +56,7 @@ class HostedEditSession implements Session {
 		return Promise.resolve(false)
 	}
 
-	reload(): Promise<boolean> {
+	reload(_from: string): Promise<boolean> {
 		return Promise.resolve(false)
 	}
 }

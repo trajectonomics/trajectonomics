@@ -17,6 +17,8 @@ export class EditState {
 	landings = $state(0)
 	/** Why the notice's own Reload failed. Only the notice says it: no form's `error` holds it. */
 	reloadError = $state<string | null>(null)
+	/** The notice copy whose Reload failed, so no other copy says `reloadError` too. */
+	reloadFrom = $state<string | null>(null)
 	/** What the last Edit that ran stated, as the CLI stated it: the batch of `record-values`. Null for any other. */
 	result = $state<AccountValues | null>(null)
 
@@ -26,6 +28,7 @@ export class EditState {
 		this.failure = null
 		this.stale = false
 		this.reloadError = null
+		this.reloadFrom = null
 		this.result = null
 	}
 }

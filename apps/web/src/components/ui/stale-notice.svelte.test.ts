@@ -10,6 +10,7 @@ afterEach(() => {
 	editSession.failure = null
 	editSession.source = "form"
 	editSession.reloadError = null
+	editSession.reloadFrom = null
 })
 
 describe("StaleNotice", () => {
@@ -49,6 +50,8 @@ describe("StaleNotice", () => {
 	test("says why its Reload failed inside the alert, and leaves the button focusable", () => {
 		editSession.savedUnread = true
 		editSession.reloadError = "The ledger is busy."
+		// The id the copy rendered below names itself with, as if its Reload had been pressed.
+		editSession.reloadFrom = "s1"
 		editSession.busy = true
 		const { body } = render(StaleNotice, { props: { shows: "landed" } })
 		editSession.busy = false
@@ -57,6 +60,22 @@ describe("StaleNotice", () => {
 		expect(body).toContain('aria-disabled="true"')
 		// A `disabled` button drops keyboard focus to the page body while its own request runs.
 		expect(body).not.toMatch(/<button[^>]*\sdisabled/)
+	})
+
+	test("says a failed Reload only in the copy that was pressed", () => {
+		editSession.savedUnread = true
+		editSession.stale = true
+		editSession.source = "action:main:base"
+		editSession.reloadError = "The ledger is busy."
+		editSession.reloadFrom = "beside-s1"
+		// Two copies a page shows at once: the landed one above it, and the stale one beside an inline action.
+		const above = render(StaleNotice, { idPrefix: "above", props: { shows: "landed" } }).body
+		const props = { shows: "stale", source: "action:main:base" } as const
+		const beside = render(StaleNotice, { idPrefix: "beside", props }).body
+		expect(above).toContain(WRITTEN_REREAD_FAILED_MESSAGE)
+		expect(above).not.toContain("The ledger is busy.")
+		expect(beside).toContain(STALE_PLAN)
+		expect(beside).toContain("The ledger is busy.")
 	})
 
 	test("draws a focus ring on its button and never turns the ring off", () => {

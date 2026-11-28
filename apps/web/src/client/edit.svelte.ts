@@ -76,16 +76,17 @@ class EditSession extends EditState {
 		return this.sendReread({ addPlan: name })
 	}
 
-	/** The notice's own Reload: a reread whose failure the notice says, so no form's error or source moves. */
-	reload(): Promise<boolean> {
-		return this.sendReread({}, "reload")
+	/** The Reload of the notice copy `from`: only that copy says why it failed, and no form's error or source moves. */
+	reload(from: string): Promise<boolean> {
+		return this.sendReread({}, from)
 	}
 
-	private async sendReread(body: RereadBody, from: "form" | "reload" = "form"): Promise<boolean> {
+	private async sendReread(body: RereadBody, from: string | null = null): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
 		this.reloadError = null
-		if (from === "form") {
+		this.reloadFrom = null
+		if (from === null) {
 			// A plain reread beside an inline action keeps its source, so one that fails is said there too.
 			if (Object.keys(body).length > 0 || !isActionSource(this.source)) this.source = "form"
 			this.error = null
@@ -95,8 +96,11 @@ class EditSession extends EditState {
 		if (answer.ok) {
 			this.savedUnread = false
 			this.clear()
-		} else if (from === "reload") this.reloadError = answer.message
-		else this.error = answer.message
+		} else if (from === null) this.error = answer.message
+		else {
+			this.reloadFrom = from
+			this.reloadError = answer.message
+		}
 		return answer.ok
 	}
 
