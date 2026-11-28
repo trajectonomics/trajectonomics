@@ -1,5 +1,6 @@
 import { shares, toChartNumber } from "../../chart"
 import { formatCompact, yearOf } from "../../format"
+import { isZeroAmount } from "../compare/cell"
 import type { Rollup } from "./cashflow"
 
 /** The uses the focus bar draws, in the order a person reads them. */
@@ -53,7 +54,7 @@ function amountOf(rollup: Rollup, total: string): string | null {
 	return rollup.totals.find((row) => row.total === total)?.amount ?? null
 }
 
-/** The heading: the amount and its mark, then where the money came from. Hide amounts hides both. */
+/** The heading: the amount and its mark, then where the money came from. Hide amounts hides both figures, never the mark. */
 function labelOfFocus(
 	year: string,
 	answer: string,
@@ -63,8 +64,10 @@ function labelOfFocus(
 	hidden: boolean,
 ): string {
 	const question = `Where does your money go in ${year}?`
-	if (hidden) return `${question} The amount is hidden. From an amount that is hidden coming in.`
 	const mark = short ? "short" : "left over"
+	if (hidden) {
+		return `${question} The amount is hidden, and it is ${mark}. From an amount that is hidden coming in.`
+	}
 	return `${question} ${formatCompact(answer)} ${currency} ${mark}. From ${formatCompact(moneyIn)} ${currency} coming in.`
 }
 
@@ -93,10 +96,12 @@ export function cashflowFocusView(
 	const moneyIn = amountOf(rollup, "money in")
 	const unmet = amountOf(rollup, "unmet")
 	const uses = usesOf(rollup)
-	if (moneyIn === null || unmet === null || uses === null) return null
+	if (moneyIn === null || uses === null) return null
 	const year = yearOf(rollup.from)
-	const short = toChartNumber(unmet) !== 0
-	const answer = short ? unmet : (uses.at(-1)?.amount ?? "0.00")
+	const shortAmount = unmet !== null && !isZeroAmount(unmet) ? unmet : null
+	const leftOver = uses.at(-1)?.amount
+	if (leftOver === undefined) return null
+	const answer = shortAmount ?? leftOver
 	const widths = shares(uses.map((use) => Math.max(0, toChartNumber(use.amount))))
 	const segments = uses.map((use, index) => ({
 		key: use.name,
@@ -106,15 +111,15 @@ export function cashflowFocusView(
 		label: labelOf(use.name, widths[index] ?? 0),
 	}))
 	return {
-		label: labelOfFocus(year, answer, moneyIn, currency, short, hidden),
+		label: labelOfFocus(year, answer, moneyIn, currency, shortAmount !== null, hidden),
 		currency,
 		year,
 		moneyIn,
 		answer,
-		short,
-		segments: short ? [] : segments,
-		shortBar: short ? shortBarOf(moneyIn, unmet) : null,
-		emptyBar: !short && segments.every((segment) => segment.share === 0),
+		short: shortAmount !== null,
+		segments: shortAmount === null ? segments : [],
+		shortBar: shortAmount === null ? null : shortBarOf(moneyIn, shortAmount),
+		emptyBar: shortAmount === null && segments.every((segment) => segment.share === 0),
 	}
 }
 

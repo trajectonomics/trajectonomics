@@ -14,7 +14,7 @@ let { stats }: Props = $props()
 const link =
 	"block min-w-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const figure = "text-lg sm:text-2xl"
-const warning = "text-lg sm:text-2xl text-accent"
+const warning = "text-lg sm:text-2xl text-accent print:text-foreground"
 </script>
 
 <div class="grid grid-cols-3 gap-3 sm:gap-6">

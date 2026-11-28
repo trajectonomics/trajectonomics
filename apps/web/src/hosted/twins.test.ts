@@ -25,6 +25,8 @@ describe("the hosted twins", () => {
 		expect(withBase("/demo/tax/")).toBe("/demo/tax/")
 		expect(withSearch("/", "")).toBe("/demo/")
 		expect(withSearch("/tax/", "?scenario=base")).toBe("/demo/tax/?scenario=base")
+		expect(withBase("#check-ledger")).toBe("#check-ledger")
+		expect(withSearch("#check-ledger", "?scenario=base")).toBe("#check-ledger")
 		expect(chanceHref("", "base")).toBe("/demo/chance/?scenario=base")
 		expect(futureHref("", "base", 3)).toBe("/demo/chance/path/?scenario=base&index=3")
 	})

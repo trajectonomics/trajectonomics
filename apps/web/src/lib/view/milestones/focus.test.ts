@@ -43,6 +43,7 @@ describe("milestoneFocusView", () => {
 		expect(focus?.label).toBe("What's next? First year in Dec 2026. At 37.")
 		expect(focus?.tone).toBe("plain")
 		expect(focus?.month).toBe("Dec 2026")
+		expect(focus?.age).toBe(37)
 		expect(focus?.nextId).toBe("first-year")
 		expect(focus?.unreachedId).toBeNull()
 		expect(focus?.mark).toBeNull()
@@ -59,6 +60,17 @@ describe("milestoneFocusView", () => {
 	test("leaves the age out when no Read states one, and keeps the id of an unnamed milestone", () => {
 		const focus = milestoneFocusView(withMilestones(MILESTONE_ROWS), "2026-10-31", null)
 		expect(focus?.label).toBe("What's next? first-year in Dec 2026.")
+		expect(focus?.age).toBeNull()
+	})
+
+	test("states no age when the chance read's median date is not the milestone's own", () => {
+		const shifted = structuredClone(CHANCE)
+		const median = shifted.milestones?.find((one) => one.id === "first-year")?.dates?.p50
+		if (median === null || median === undefined) throw new Error("the fixture states a median")
+		median.date = "2026-12-30"
+		const focus = milestoneFocusView(withMilestones(MILESTONE_ROWS), "2026-10-31", shifted, NAMES)
+		expect(focus?.age).toBeNull()
+		expect(focus?.label).toBe("What's next? First year in Dec 2026.")
 	})
 
 	test("answers with the first unreached milestone in warn tone when none is ahead", () => {

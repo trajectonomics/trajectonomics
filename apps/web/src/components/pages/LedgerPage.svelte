@@ -24,6 +24,7 @@ let { account, onAccount }: Props = $props()
 			<LedgerFocus
 				accounts={snapshot.reads.accounts}
 				transactions={snapshot.reads.transactions}
+				asOf={snapshot.params.asOf}
 			/>
 			<AccountsSection accounts={snapshot.reads.accounts} balance={snapshot.reads.balance} />
 			<TrialBalanceSection balance={snapshot.reads.balance} />

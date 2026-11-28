@@ -37,13 +37,15 @@ const names = $derived(currentItemNames())
 	</EmptyState>
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}
-	<ReadView {read} label={`Cash flow of ${name}`}>
-		{#snippet children(run)}
-			<div class="space-y-8">
-				<CashFlowFocus {run} {year} />
-				{#if lens}<CashFlowWhatIf {lens} baseline={run} {year} />{/if}
-				<CashFlowBody {run} {year} {onYear} {names} />
-			</div>
-		{/snippet}
-	</ReadView>
+	<div class="space-y-8">
+		{#if lens}<CashFlowWhatIf {lens} baseline={read.ok ? read.data : null} {year} />{/if}
+		<ReadView {read} label={`Cash flow of ${name}`}>
+			{#snippet children(run)}
+				<div class="space-y-8">
+					<CashFlowFocus {run} {year} />
+					<CashFlowBody {run} {year} {onYear} {names} />
+				</div>
+			{/snippet}
+		</ReadView>
+	</div>
 {/if}

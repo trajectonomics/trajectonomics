@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { dateShare, monthIndex } from "./focus-axis"
+import { dateShare, monthIndex, pinAnchor } from "./focus-axis"
 
 describe("monthIndex", () => {
 	test("counts whole months from January of year 0, whatever the day", () => {
@@ -26,5 +26,16 @@ describe("dateShare", () => {
 
 	test("places every day at the start of a timeline one month long", () => {
 		expect(dateShare("2026-10-31", "2026-10-31", "2026-10-31")).toBe(0)
+	})
+})
+
+describe("pinAnchor", () => {
+	test("grows a pin's label inward at either end, and centres it between", () => {
+		expect(pinAnchor(0)).toBe("left")
+		expect(pinAnchor(0.249)).toBe("left")
+		expect(pinAnchor(0.25)).toBe("centre")
+		expect(pinAnchor(0.75)).toBe("centre")
+		expect(pinAnchor(0.751)).toBe("right")
+		expect(pinAnchor(1)).toBe("right")
 	})
 })

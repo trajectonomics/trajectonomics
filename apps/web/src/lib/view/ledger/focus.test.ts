@@ -3,6 +3,8 @@ import type { AccountList, TxList } from "../../contract"
 import { ledgerFocusView } from "./focus"
 
 const STAMP = "2026-01-01T00:00:00.000Z"
+const AS_OF = "2026-10-31"
+const SINCE = "2026-08-01"
 
 function account(
 	id: string,
@@ -66,47 +68,84 @@ const TRANSACTIONS: TxList = {
 
 describe("ledgerFocusView", () => {
 	test("answers with the newest last record, one row per active account", () => {
-		const focus = ledgerFocusView(ACCOUNTS, TRANSACTIONS)
+		const focus = ledgerFocusView(ACCOUNTS, TRANSACTIONS, AS_OF, SINCE)
 		expect(focus?.label).toBe(
-			"When did you last record your accounts? 28 Oct 2026. 4 accounts, 1 not recorded in the month before it.",
+			"When did you last record your accounts? 28 Oct 2026. 4 accounts, 2 not recorded in the last month.",
 		)
 		expect(focus?.newest).toBe("2026-10-28")
-		expect(focus?.start).toBe("2026-09-01")
+		expect(focus?.start).toBe(SINCE)
+		expect(focus?.asOf).toBe(AS_OF)
 		expect(focus?.accounts).toBe(4)
-		expect(focus?.stale).toBe(1)
+		expect(focus?.stale).toBe(2)
 		expect(focus?.rows.map((row) => [row.key, row.last, row.stale])).toEqual([
 			["bank", "2026-10-28", false],
 			["card", "2026-10-10", false],
 			["rent", "2026-09-01", true],
-			["cash", null, false],
+			["cash", null, true],
 		])
 	})
 
-	test("places each last record on the shared axis, and an account with none at its start", () => {
-		const focus = ledgerFocusView(ACCOUNTS, TRANSACTIONS)
+	test("places each last record between the window's start and its As-of", () => {
+		const focus = ledgerFocusView(ACCOUNTS, TRANSACTIONS, AS_OF, SINCE)
 		const rows = new Map(focus?.rows.map((row) => [row.key, row.x]))
-		expect(rows.get("rent")).toBe(0)
-		expect(rows.get("bank")).toBe(1)
+		expect(rows.get("rent")).toBeGreaterThan(0)
 		expect(rows.get("cash")).toBe(0)
-		const card = rows.get("card") ?? -1
-		expect(card).toBeGreaterThan(0)
-		expect(card).toBeLessThan(1)
+		const bank = rows.get("bank") ?? 0
+		expect(bank).toBeGreaterThan(0)
+		expect(bank).toBeLessThan(1)
 	})
 
-	test("counts only an account whose last record is before the newest month's same day", () => {
+	test("places a newest record two months before the As-of away from the axis's end", () => {
+		const focus = ledgerFocusView(
+			{ accounts: [account("bank", "Bank")] },
+			{ transactions: [tx("t1", "2026-08-31", "bank")] },
+			AS_OF,
+			SINCE,
+		)
+		expect(focus?.newest).toBe("2026-08-31")
+		const x = focus?.rows[0]?.x ?? 1
+		expect(x).toBeGreaterThan(0)
+		expect(x).toBeLessThan(1)
+	})
+
+	test("keeps a focus point when no account has a record in the window", () => {
+		const focus = ledgerFocusView(
+			{ accounts: [account("bank", "Bank"), account("card", "Card")] },
+			{ transactions: [tx("t1", "2026-07-31", "bank", "card")] },
+			AS_OF,
+			SINCE,
+		)
+		expect(focus?.label).toBe(
+			"When did you last record your accounts? Not since 1 Aug 2026. 2 accounts, 2 not recorded in the last month.",
+		)
+		expect(focus?.newest).toBeNull()
+		expect(focus?.stale).toBe(2)
+		expect(focus?.rows.map((row) => [row.last, row.stale, row.x])).toEqual([
+			[null, true, 0],
+			[null, true, 0],
+		])
+	})
+
+	test("counts only an account whose last record is before the As-of's month", () => {
 		const focus = ledgerFocusView(
 			{ accounts: [account("bank", "Bank"), account("edge", "Edge")] },
 			{
 				transactions: [tx("t1", "2026-09-28", "edge", "bank"), tx("t2", "2026-10-28", "bank")],
 			},
+			"2026-10-28",
+			SINCE,
 		)
 		expect(focus?.rows.find((row) => row.key === "edge")?.stale).toBe(false)
 	})
 
-	test("has no focus point without an active account, or without a record to place", () => {
+	test("has no focus point without an active account", () => {
 		expect(
-			ledgerFocusView({ accounts: [account("old", "Old", "2026-02-01")] }, TRANSACTIONS),
+			ledgerFocusView(
+				{ accounts: [account("old", "Old", "2026-02-01")] },
+				TRANSACTIONS,
+				AS_OF,
+				SINCE,
+			),
 		).toBeNull()
-		expect(ledgerFocusView(ACCOUNTS, { transactions: [] })).toBeNull()
 	})
 })

@@ -35,7 +35,14 @@ never scrolls sideways. The wrapper is `relative` so a screen-reader-only label 
 		</thead>
 		<tbody>
 			{#each rows as row (rowKey(row))}
-				<tr id={rowId?.(row)} class="border-b border-border last:border-0">
+				{@const id = rowId?.(row)}
+				<tr
+					id={id}
+					class={cx(
+						"border-b border-border last:border-0",
+						id !== undefined && "scroll-mt-28",
+					)}
+				>
 					{#each columns as column (column.key)}
 						<td class={cx("px-3 py-2 align-top", column.numeric && "text-right tabular-nums")}
 							>{@render column.cell(row)}</td

@@ -1,5 +1,12 @@
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/
 
+/** Where a pin's label is anchored: a pin near either end grows inward, so a phone never clips it. */
+export function pinAnchor(x: number): "left" | "centre" | "right" {
+	if (x < 0.25) return "left"
+	if (x > 0.75) return "right"
+	return "centre"
+}
+
 /** The month's index of a YYYY-MM-DD date: year * 12 + month - 1. It places a day on a time axis. */
 export function monthIndex(date: string): number {
 	const match = DATE.exec(date)

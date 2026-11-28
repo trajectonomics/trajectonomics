@@ -35,15 +35,15 @@ const chance = $derived(name === null ? undefined : chances[name])
 	<EmptyState title="No plan to show milestones for" />
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}
-	<ReadView {read} label={`Milestones of ${name}`}>
-		{#snippet children(run)}
-			<div class="space-y-8">
-				<MilestoneFocus {run} {asOf} chance={chance?.ok === true ? chance.data : null} />
-				<WhatIfAbove open={lens !== null}>
-					{#snippet whatIf()}{#if lens}<MilestonesWhatIf {lens} />{/if}{/snippet}
+	<WhatIfAbove open={lens !== null}>
+		{#snippet whatIf()}{#if lens}<MilestonesWhatIf {lens} />{/if}{/snippet}
+		<ReadView {read} label={`Milestones of ${name}`}>
+			{#snippet children(run)}
+				<div class="space-y-8">
+					<MilestoneFocus {run} {asOf} chance={chance?.ok === true ? chance.data : null} />
 					<MilestonesBody {run} argv={read.argv} {terms} {onTerms} />
-				</WhatIfAbove>
-			</div>
-		{/snippet}
-	</ReadView>
+				</div>
+			{/snippet}
+		</ReadView>
+	</WhatIfAbove>
 {/if}

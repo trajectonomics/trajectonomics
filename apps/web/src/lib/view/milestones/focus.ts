@@ -21,6 +21,8 @@ export interface MilestoneFocus {
 	readonly tone: "plain" | "warn"
 	/** The next reached milestone's month, the display answer; null when none is ahead. */
 	readonly month: string | null
+	/** The age the chance read states at the next milestone, when its median date is the milestone's; else null. */
+	readonly age: number | null
 	/** The first unreached milestone, whose name is the answer when none is ahead. */
 	readonly unreachedId: string | null
 	/** The next reached milestone, whose name sits above its pin. */
@@ -32,10 +34,12 @@ export interface MilestoneFocus {
 	readonly endYear: string
 }
 
-/** The age the chance read states at a milestone, from its median path; null when it states none. */
-function ageAt(chance: ProjectionChance | null, id: string): number | null {
+/** The age the chance read states at a milestone, when its median date is that milestone's own; else null. */
+function ageAt(chance: ProjectionChance | null, id: string, date: string): number | null {
 	const one = chance?.milestones?.find((milestone) => milestone.id === id)
-	return one?.dates?.p50?.ages[0]?.age ?? null
+	const median = one?.dates?.p50
+	if (median?.date !== date) return null
+	return median.ages[0]?.age ?? null
 }
 
 /**
@@ -72,11 +76,12 @@ export function milestoneFocusView(
 	if (next !== undefined) {
 		const name = itemLabel(names, "milestone", next.id).text
 		const month = formatMonth(next.date)
-		const age = ageAt(chance, next.id)
+		const age = ageAt(chance, next.id, next.date)
 		return {
 			label: `What's next? ${name} in ${month}.${age === null ? "" : ` At ${age}.`}`,
 			tone: "plain",
 			month,
+			age,
 			unreachedId: null,
 			nextId: next.id,
 			mark: null,
@@ -90,6 +95,7 @@ export function milestoneFocusView(
 		label: `What's next? ${name} not by ${by}.`,
 		tone: "warn",
 		month: null,
+		age: null,
 		unreachedId: unreached.id,
 		nextId: null,
 		mark: `not by ${by}`,

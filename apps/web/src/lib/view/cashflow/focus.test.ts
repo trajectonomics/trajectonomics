@@ -71,11 +71,11 @@ describe("cashflowFocusView", () => {
 		expect(focus?.emptyBar).toBe(false)
 	})
 
-	test("has no focus point when the year states no totals row to draw", () => {
+	test("has no focus point when the year states no money in or no use total to draw", () => {
 		const rollup = rollupAt(0)
 		expect(
 			cashflowFocusView(
-				{ ...rollup, totals: rollup.totals.filter((total) => total.total !== "unmet") },
+				{ ...rollup, totals: rollup.totals.filter((total) => total.total !== "money in") },
 				"THB",
 				false,
 			),
@@ -89,12 +89,27 @@ describe("cashflowFocusView", () => {
 		).toBeNull()
 	})
 
-	test("says the amount is hidden with Hide amounts on, and keeps no figure in the heading", () => {
-		const focus = cashflowFocusView(rollupAt(0), "THB", true)
-		expect(focus?.label).toBe(
-			"Where does your money go in 2026? The amount is hidden. From an amount that is hidden coming in.",
+	test("treats a missing unmet total as no shortfall, without inventing an amount", () => {
+		const rollup = rollupAt(0)
+		const focus = cashflowFocusView(
+			{ ...rollup, totals: rollup.totals.filter((total) => total.total !== "unmet") },
+			"THB",
+			false,
 		)
-		expect(focus?.label).not.toContain("4.8k")
-		expect(focus?.label).not.toContain("124k")
+		expect(focus?.short).toBe(false)
+		expect(focus?.answer).toBe("4800.00")
+		expect(focus?.shortBar).toBeNull()
+	})
+
+	test("says the amount is hidden with Hide amounts on, and still says where the year landed", () => {
+		const leftOver = cashflowFocusView(rollupAt(0), "THB", true)
+		expect(leftOver?.label).toBe(
+			"Where does your money go in 2026? The amount is hidden, and it is left over. From an amount that is hidden coming in.",
+		)
+		expect(leftOver?.label).not.toContain("4.8k")
+		expect(leftOver?.label).not.toContain("124k")
+		const short = cashflowFocusView(rollupAt(1), "THB", true)
+		expect(short?.label).toContain("it is short")
+		expect(short?.label).not.toContain("500.00")
 	})
 })

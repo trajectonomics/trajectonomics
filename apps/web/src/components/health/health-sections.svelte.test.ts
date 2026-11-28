@@ -35,6 +35,7 @@ describe("LedgerHealthSection", () => {
 		expect(body).not.toContain("traj 9.9.9")
 		expect(body).toContain("0 transactions validate.")
 		expect(body).toContain('id="check-ledger"')
+		expect(body).toContain("scroll-mt-28")
 		expect(body).toContain("4,096 bytes")
 		expect(body).toContain("The doctor did not check the trial balance.")
 	})
@@ -110,6 +111,7 @@ describe("ReadsSection", () => {
 		expect(body).toContain("Failed: LEDGER_EMPTY")
 		expect(body).toContain("The ledger is empty.")
 		expect(body).toMatch(/<tr id="check-\d+"/)
+		expect(body).toContain("scroll-mt-28")
 		expect(body).toContain("Add one.")
 		expect(body.indexOf("Profit and loss for the period")).toBeLessThan(
 			body.indexOf("Chart of accounts"),

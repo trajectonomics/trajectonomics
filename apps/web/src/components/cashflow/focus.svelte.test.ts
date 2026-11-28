@@ -35,7 +35,7 @@ describe("CashFlowFocus", () => {
 			preferences.hidden = false
 		}
 		expect(body).toContain(
-			"Where does your money go in 2026? The amount is hidden. From an amount that is hidden coming in.",
+			"Where does your money go in 2026? The amount is hidden, and it is left over. From an amount that is hidden coming in.",
 		)
 		expect(body).toContain("•••••")
 		expect(body).not.toContain("295k")

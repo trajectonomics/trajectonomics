@@ -2,6 +2,7 @@
 import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { ProjectionChance, ProjectionRun } from "../../lib/contract"
 import { milestoneFocusView } from "../../lib/view/milestones/focus"
+import { pinAnchor } from "../../lib/view/milestones/focus-axis"
 import FocusAnswer from "../ui/FocusAnswer.svelte"
 import FocusPoint from "../ui/FocusPoint.svelte"
 import ItemName from "../ui/ItemName.svelte"
@@ -18,6 +19,11 @@ interface Props {
 /** The page's focus point: the next milestone as a pin on the timeline from the As-of to the Horizon. */
 let { run, asOf, chance }: Props = $props()
 const focus = $derived(milestoneFocusView(run, asOf, chance, currentItemNames()))
+const ANCHOR = {
+	left: "left-0 text-left",
+	centre: "left-1/2 -translate-x-1/2 text-center",
+	right: "right-0 text-right",
+} as const
 </script>
 
 {#if focus}
@@ -46,9 +52,17 @@ const focus = $derived(milestoneFocusView(run, asOf, chance, currentItemNames())
 								<span class="block size-4 rounded-full bg-accent print:bg-foreground"></span>
 								{#if focus.nextId}
 									<span
-										class="absolute bottom-full left-1/2 mb-6 max-w-[9rem] -translate-x-1/2 truncate text-xs text-muted-foreground"
+										class="absolute bottom-full mb-6 max-w-[9rem] text-xs text-muted-foreground {ANCHOR[
+											pinAnchor(pin.x)
+										]}"
+										data-pin-label={pinAnchor(pin.x)}
 									>
-										<ItemName kind="milestone" id={focus.nextId} />
+										<span class="block truncate"
+											><ItemName kind="milestone" id={focus.nextId} /></span
+										>
+										{#if focus.age !== null}
+											<span class="block" data-focus-age>At {focus.age}</span>
+										{/if}
 									</span>
 								{/if}
 							{:else if pin.unreached}
