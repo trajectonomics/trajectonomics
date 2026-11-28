@@ -6,6 +6,7 @@ export { type DaySpan, dayNumber, dayPosition } from "./date-position"
 export { type EndLabel, endLabels } from "./end-labels"
 export { type Extent, extent } from "./extent"
 export { FAN_LEVELS, type Fan, fanOf, fanSeriesName } from "./fan"
+export { type FanLabelEnd, fanLabels } from "./fan-labels"
 export { keyTarget } from "./hover"
 export {
 	LABEL_OFFSET_PX,

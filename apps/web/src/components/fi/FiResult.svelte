@@ -13,17 +13,19 @@ interface Props {
 	fi: Fi
 	/** The argv of the Read the answer came from, for its command. */
 	argv: readonly string[]
+	/** The page's first plan: its chart carries the date, so the figure below it is for a screen reader. */
+	lead?: boolean
 }
 
 /** One plan's FI answer: the date or what binds it, its definition, its statement and its tax pointer. */
-let { fi, argv }: Props = $props()
+let { fi, argv, lead = false }: Props = $props()
 const model = $derived(fiModelOf(fi, currentItemNames().people))
 const reference = $derived(model.kind === "reachable" ? model.reference : null)
 </script>
 
 <div class="space-y-8">
 	{#if model.kind === "reachable"}
-		<FiReachable {model} currency={fi.currency} />
+		<FiReachable {model} currency={fi.currency} {lead} />
 	{:else}
 		<FiUnreachable {model} currency={fi.currency} />
 	{/if}

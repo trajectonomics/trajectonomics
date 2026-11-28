@@ -84,7 +84,7 @@ describe("the Milestones page", () => {
 describe("the FI date, the chance, the tax and the cash flow", () => {
 	test("each page shows the what-if beside the baseline on the session's plan only", async () => {
 		await openDemoSession()
-		const fi = render(FiSections, { props: { fi: DEMO.reads.fi } }).body
+		const fi = render(FiSections, { props: { snapshot: DEMO } }).body
 		expect(fi).toContain("What-if on base")
 		expect(fi).toContain("−3 months, earlier")
 		expect(fi.match(/What-if on/g)).toHaveLength(1)
@@ -127,7 +127,7 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 
 	test("with no session none of them shows a what-if", () => {
 		for (const body of [
-			render(FiSections, { props: { fi: DEMO.reads.fi } }).body,
+			render(FiSections, { props: { snapshot: DEMO } }).body,
 			render(ChanceView, {
 				props: { names, chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
 			}).body,
