@@ -8,6 +8,7 @@ import { whatIfSession } from "../client/what-if.svelte"
 import { HASH, useSessionHooks } from "../client/what-if.test-support"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { milestoneLabel, type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
+import { greetingOf } from "../lib/view/overview/greeting"
 import { scenarioNames } from "../lib/view/plan"
 import { ROUTES } from "../lib/view/routes"
 import { LOADING } from "../lib/view/state"
@@ -57,12 +58,13 @@ afterAll(() => {
 describe("a page of the Demo Snapshot", () => {
 	beforeEach(() => replaceSnapshot(DEMO))
 
-	test("heads the page a navigation item opens with that item's label", () => {
+	test("heads the page a navigation item opens with that item's label, and Home with its greeting", () => {
 		for (const route of ROUTES) {
 			const page = PAGES.find((one) => one.path === route.path)
 			if (page === undefined) throw new Error(`no page renders ${route.path}`)
 			setTestUrl(`http://127.0.0.1${route.path}?demo=1&scenario=base`)
-			expect(h1Of(render(page.page).body), route.path).toBe(route.label)
+			const expected = route.path === "/" ? greetingOf(DEMO) : route.label
+			expect(h1Of(render(page.page).body), route.path).toBe(expected)
 		}
 	})
 

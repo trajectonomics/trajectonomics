@@ -50,6 +50,11 @@ export function snapshotsRead(requests: Requests): string[] {
 	]
 }
 
+/** An image's own bitmap width, or 0 when its src did not load: a broken image still draws the box its attributes give it. */
+export function imageWidth(page: Page, selector: string): Promise<number> {
+	return page.locator(selector).evaluate((image) => (image as HTMLImageElement).naturalWidth)
+}
+
 /**
  * Opens a page of the hosted Demo at its path under the base path, with no `?demo=1`: the build reads the Demo snapshot
  * on its own. Waits until the snapshot is read and drawn, in the pinned font.

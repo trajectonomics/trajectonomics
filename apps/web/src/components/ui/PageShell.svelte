@@ -10,11 +10,13 @@ interface Props {
 	title: string
 	/** Renders the page from the ready Snapshot. */
 	children: Snippet<[Snapshot]>
+	/** Decoration placed beside the heading, such as the Overview's mascot. */
+	leading?: Snippet | undefined
 	/** A control placed at the heading's right, such as a link the page offers besides its body. */
 	actions?: Snippet | undefined
 }
 
-let { title, children, actions }: Props = $props()
+let { title, children, leading, actions }: Props = $props()
 </script>
 
-<PageFrame {title} state={currentSnapshot()} pathname={currentPathname()} {children} {actions} />
+<PageFrame {title} {leading} state={currentSnapshot()} pathname={currentPathname()} {children} {actions} />

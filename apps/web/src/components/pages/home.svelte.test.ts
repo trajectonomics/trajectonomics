@@ -59,9 +59,9 @@ describe("Home after a guided save", () => {
 		expect(body).toContain('role="status"')
 		expect(body).toContain("Next: give your income its tax labels in")
 		expect(body).toContain('href="/settings/tax/?demo=1&amp;scenario=base"')
-		const action = body.indexOf("data-primary-action")
-		expect(action).toBeGreaterThan(-1)
-		expect(action).toBeLessThan(body.indexOf("Next:"))
+		const answer = body.indexOf("data-focus-section")
+		expect(answer).toBeGreaterThan(-1)
+		expect(answer).toBeLessThan(body.indexOf("Next:"))
 		expect(body.indexOf("Next:")).toBeLessThan(body.indexOf("Your summary"))
 	})
 
@@ -125,5 +125,34 @@ describe("Home after a guided save", () => {
 			props: { snapshot: saved(), kind: "income", scenario: "base", editable: false },
 		}).body
 		expect(body).not.toContain("Give this income a label in")
+	})
+})
+
+describe("Home's greeting", () => {
+	test("heads the page with the greeting and draws the hello mascot beside it", () => {
+		const body = page()
+		expect(body).toContain("<h1")
+		expect(body).toContain("Hello there, this is your current situation")
+		expect(body).toContain("data-overview-mascot")
+		expect(body).toContain('src="/mascot/hello.webp"')
+		expect(body).toContain('alt=""')
+		expect(body).toContain('aria-hidden="true"')
+		expect(body).toContain("print:hidden")
+	})
+
+	test("names the holder the main plan's household states", () => {
+		const next = structuredClone(DEMO)
+		const list = next.reads.scenarios
+		if (!list.ok) throw new Error("the Demo lists its plans")
+		const base = list.data.scenarios.find((plan) => plan.name === "base")
+		if (base === undefined) throw new Error("the Demo has base")
+		base.main = true
+		const read = next.reads.documents["base"]
+		if (read === undefined || !read.ok) throw new Error("the Demo reads base")
+		const holder = read.data.scenario.household?.people.find((person) => person.role === "holder")
+		if (holder === undefined) throw new Error("the Demo's base has a holder")
+		holder.displayLabel = "Ao"
+		replaceSnapshot(next)
+		expect(page("base")).toContain("Hello Ao, this is your current situation")
 	})
 })

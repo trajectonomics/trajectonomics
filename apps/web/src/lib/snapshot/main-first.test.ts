@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { chooseScenario } from "../view/plan"
 import { stageOne } from "./fixtures.test-support"
 import { checkParams, type PlanInput } from "./params"
 import { planStageTwo } from "./stage-two"
@@ -40,5 +41,11 @@ describe("the plans the Snapshot projects", () => {
 	test("put the main plan first in a list the person named, and only when it is in the list", () => {
 		expect(plan(["base", "zed"], "zed")).toEqual(["zed", "base"])
 		expect(plan(["base", "alpha"], "zed")).toEqual(["base", "alpha"])
+	})
+
+	test("open a page with no plan in the address on the main plan, even when its name sorts last", () => {
+		const names = plan([], "zed")
+		expect(names[0]).toBe("zed")
+		expect(chooseScenario(names, "")).toBe("zed")
 	})
 })

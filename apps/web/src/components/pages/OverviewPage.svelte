@@ -1,16 +1,19 @@
 <script lang="ts">
 import { currentSearch } from "../../client/location.svelte.js"
+import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { assumedCard } from "../../lib/view/assumed/card"
 import { planAssumed } from "../../lib/view/assumed/snapshot"
 import { householdOf, personNames } from "../../lib/view/item-names"
 import { focusOf } from "../../lib/view/overview/focus"
+import { greetingOf } from "../../lib/view/overview/greeting"
 import { heroOf } from "../../lib/view/overview/hero"
 import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
 import AssumedCard from "../assumed/AssumedCard.svelte"
 import OverviewFocus from "../overview/OverviewFocus.svelte"
+import OverviewGreeting from "../overview/OverviewGreeting.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
 import TaxLabelNotice from "../plan-items/TaxLabelNotice.svelte"
 import PageShell from "../ui/PageShell.svelte"
@@ -23,11 +26,16 @@ interface Props {
 }
 
 let { scenario = "" }: Props = $props()
+const state = $derived(currentSnapshot())
+const greeting = $derived(greetingOf(state.status === "ready" ? state.snapshot : null))
 </script>
 
 <!-- The Overview: one focus point with the answer written on its chart, then the step after a guided save, then what the
 plan assumes and the quiet cards. -->
-<PageShell title="Overview">
+<PageShell title={greeting}>
+	{#snippet leading()}
+		<OverviewGreeting />
+	{/snippet}
 	{#snippet children(snapshot)}
 		{@const plan = homePlan(snapshot, scenario)}
 		{@const planDoc = plan === null ? undefined : snapshot.reads.documents[plan]}

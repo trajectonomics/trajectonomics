@@ -2,25 +2,24 @@ import { expect, test } from "@playwright/test"
 import { HOSTED_PREFIX } from "./base-url"
 import { SCREENSHOTS } from "./demo"
 import { labelsEscaping, measureOverflow } from "./fit"
-import { DEMO_SNAPSHOT, failures, logRequests, openHosted, snapshotsRead, strays } from "./hosted"
-import { PAGES, pageName } from "./pages"
+import {
+	DEMO_SNAPSHOT,
+	failures,
+	imageWidth,
+	logRequests,
+	openHosted,
+	snapshotsRead,
+	strays,
+} from "./hosted"
+import { EDIT_PAGES, PAGES, pageName } from "./pages"
 
 // The hosted Demo (web ADR 0028), served under /demo/ as the Site serves it: every page at a phone and a desktop,
 // with the fit rules of the loopback Demo plus the hosted promise: only own GETs, only the Demo snapshot, all Edits off.
 const WIDTHS_PX = [360, 1280] as const
 const HEIGHT_PX = 800
 
-/** Pages with Edit controls: each must show at least one that is switched off, or the fence is not running. */
-const EDIT_PAGES: readonly string[] = [
-	"/assets-and-debts/",
-	"/expenses/",
-	"/household/",
-	"/income/",
-	"/plans/",
-	"/routing/",
-	"/settings/assumptions/",
-	"/settings/tax/",
-]
+/** Home's greeting mascot: its bitmap width proves the hosted build served the image itself. */
+const MASCOT = "[data-overview-mascot]"
 
 for (const width of WIDTHS_PX) {
 	for (const path of PAGES) {
@@ -46,6 +45,10 @@ for (const width of WIDTHS_PX) {
 			expect(failures(requests), "responses with an error status under /demo/").toEqual([])
 			expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
 			await expect(page.getByRole("note", { name: "About this demo" })).toBeVisible()
+			// Home's mascot is an image of this build: a broken src still draws its 60x40 box, so only
+			// the image's own width proves the src under /demo/ loaded.
+			if (path === "/")
+				expect(await imageWidth(page, MASCOT), "the mascot's image loads").toBeGreaterThan(0)
 		})
 	}
 }
