@@ -135,7 +135,7 @@ describe("scenario apply --template --as-of refusals", () => {
 		expect(res.code).toBe(2)
 		expect(errorOf(res)).toMatchObject({
 			path: "--dry-run",
-			message: "--template takes no --dry-run",
+			message: "--template without a name prints a document and writes nothing",
 		})
 	})
 

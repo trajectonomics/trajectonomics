@@ -3,9 +3,12 @@ import { type Component, createRawSnippet } from "svelte"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../../client/browser"
+import { currentSearch } from "../../client/location.svelte"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
 import { useSessionHooks } from "../../client/what-if.test-support"
 import type { ProjectionRun } from "../../lib/contract"
+import { assumedCard } from "../../lib/view/assumed/card"
+import { planAssumed } from "../../lib/view/assumed/snapshot"
 import { parseTerms } from "../../lib/view/compare"
 import { householdOf, personNames } from "../../lib/view/item-names"
 import { netWorthPageView } from "../../lib/view/net-worth/page"
@@ -15,6 +18,7 @@ import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { LOADING } from "../../lib/view/state"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
+import AssumedCard from "../assumed/AssumedCard.svelte"
 import ComparePanel from "../compare/ComparePanel.svelte"
 import MilestoneFocus from "../milestones/MilestoneFocus.svelte"
 import MilestonesBody from "../milestones/MilestonesBody.svelte"
@@ -124,7 +128,10 @@ describe("with no session, a page is its content and nothing more", () => {
 		const run = projection?.ok === true ? projection.data : null
 		const people = personNames(householdOf(DEMO, plan))
 		const hero = heroOf(DEMO, "")
-		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}<div role="status"></div>${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
+		const assumed = planAssumed(DEMO, plan, currentSearch())
+		const card =
+			assumed === null ? null : assumedCard(assumed.items, assumed.groups, currentSearch())
+		const content = `<div class="space-y-6">${bodyOf(OverviewFocus, { focus, run, people, warnings: hero?.warnings ?? [], warningsLabel: hero?.warningsLabel ?? null })}<div role="status"></div>${bodyOf(AssumedCard, { view: card })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
 		expect(shown(page)).toBe(framed("Overview", content))
 	})

@@ -18,7 +18,7 @@ async function homeWithNotesAndMain(): Promise<string> {
 	return home
 }
 
-const MAIN_LINE = `,"notes":${JSON.stringify(GOLDEN_NOTES)},"main":true}`
+const MAIN_LINE = `,"notes":${JSON.stringify(GOLDEN_NOTES)},"main":true,"unstated":null}`
 
 describe("notes and the main plan through backup and restore (cli ADR-0071)", () => {
 	it("carries both into a restored database, with every version and hash", async () => {
@@ -42,7 +42,7 @@ describe("notes and the main plan through backup and restore (cli ADR-0071)", ()
 		const out = backupPath()
 		await capture(["export", "--format", "jsonl", "--out", out, "--json"], { TRAJ_HOME: home })
 		const text = await Bun.file(`${out}/traj.jsonl`).text()
-		expect(text).toContain(`"notes":${JSON.stringify(NOTES)},"main":true}`)
+		expect(text).toContain(`"notes":${JSON.stringify(NOTES)},"main":true,"unstated":null}`)
 		const store = mustOpen(ledgerHome())
 		must(importJsonl(text, store))
 		expect(must(exportJsonl(store))).toBe(text)
@@ -62,8 +62,8 @@ describe("notes and the main plan through backup and restore (cli ADR-0071)", ()
 	it("restores a schema 4 backup, which has neither, with no notes and no main plan", async () => {
 		const current = await goldenWithoutNotes()
 		const version4 = current
-			.replace('"schemaVersion":5', '"schemaVersion":4')
-			.replaceAll(',"notes":null,"main":false}', "}")
+			.replace('"schemaVersion":6', '"schemaVersion":4')
+			.replaceAll(',"notes":null,"main":false,"unstated":null}', "}")
 		const store = mustOpen(ledgerHome())
 		expect(must(importJsonl(version4, store))).toMatchObject({ scenario: 3 })
 		expect(must(exportJsonl(store))).toBe(current)
@@ -72,12 +72,15 @@ describe("notes and the main plan through backup and restore (cli ADR-0071)", ()
 
 	it("refuses a second main plan, a deleted main plan and a main that is not a boolean", async () => {
 		const golden = await goldenJsonl()
-		const second = golden.replace(',"notes":null,"main":false}', ',"notes":null,"main":true}')
-		const deleted = golden.replace(
-			'"deletedAt":"2026-02-04T10:00:00.040Z","household":null,"tax":null,"notes":null,"main":false}',
-			'"deletedAt":"2026-02-04T10:00:00.040Z","household":null,"tax":null,"notes":null,"main":true}',
+		const second = golden.replace(
+			',"notes":null,"main":false,"unstated":null}',
+			',"notes":null,"main":true,"unstated":null}',
 		)
-		const text = golden.replace(',"main":true}', ',"main":"yes"}')
+		const deleted = golden.replace(
+			'"deletedAt":"2026-02-04T10:00:00.040Z","household":null,"tax":null,"notes":null,"main":false,"unstated":null}',
+			'"deletedAt":"2026-02-04T10:00:00.040Z","household":null,"tax":null,"notes":null,"main":true,"unstated":null}',
+		)
+		const text = golden.replace(',"main":true,', ',"main":"yes",')
 		const messages = [
 			[second, "a ledger has one main plan"],
 			[deleted, "a deleted scenario is not the main plan"],

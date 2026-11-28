@@ -7,6 +7,7 @@ import { write } from "./guard"
 import type { ScenarioRow } from "./rows"
 import { canonicalDocument, liveScenario, replaceScenario } from "./scenario-rows"
 import type { HouseholdOptions, HouseholdPlanner, HouseholdSet } from "./scenario-types"
+import { unstatedFor } from "./scenario-unstated"
 
 /**
  * The refusal of a household write whose caller named a householdHash other than the stored one: the
@@ -40,9 +41,11 @@ export function replaceHousehold(
 			const planned = plan(JSON.parse(current.document) as ScenarioDocument)
 			if (isAppError(planned)) return planned
 			const document = canonicalDocument(planned.document)
+			const unstated = unstatedFor(current, JSON.parse(document) as ScenarioDocument, null, [])
 			if (
 				current.contentHash === contentHash(document) &&
-				current.household === planned.household
+				current.household === planned.household &&
+				current.unstated === unstated
 			) {
 				return { status: "unchanged", scenario: current }
 			}
@@ -51,6 +54,7 @@ export function replaceHousehold(
 				scenario: replaceScenario(ctx, current, document, {
 					household: planned.household,
 					tax: current.tax,
+					unstated,
 				}),
 			}
 		},

@@ -15,9 +15,10 @@ export function unlabelledIncomeItems(
 	name: string,
 	document: ScenarioDocument,
 	household: Household | null,
+	stored: boolean,
 ): UnlabelledIncome[] {
 	if (!isTaxed(document)) return []
-	return unlabelledHintsOf(name, document, household).map(({ id, hint }) => ({
+	return unlabelledHintsOf(name, document, household, stored).map(({ id, hint }) => ({
 		kind: "unlabelled-income" as const,
 		path: formatPath(["flows", id, "label"]),
 		value: null,

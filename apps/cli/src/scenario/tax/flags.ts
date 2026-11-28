@@ -72,6 +72,7 @@ export function labelFlagDescription(): string {
 		"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax.",
 		"A label replaces that Flow's label and adds to the labels the other Flows already carry; --none clears them all.",
 		labelSetsSentence(),
+		"A value splits at its last =, so a Flow id may hold one (bonus=extra=income.section40_1).",
 	].join(" ")
 }
 

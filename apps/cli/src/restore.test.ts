@@ -76,7 +76,7 @@ describe("restore", () => {
 		const backup = await goldenBackup()
 		const file = Bun.file(join(backup, "traj.jsonl"))
 		const text = await file.text()
-		await Bun.write(file, text.replace('"schemaVersion":5', '"schemaVersion":99'))
+		await Bun.write(file, text.replace('"schemaVersion":6', '"schemaVersion":99'))
 		const res = await capture(["restore", backup, "--json"], { TRAJ_HOME: tempHome() })
 		expect(res.code).toBe(2)
 		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "line.1.schemaVersion" })

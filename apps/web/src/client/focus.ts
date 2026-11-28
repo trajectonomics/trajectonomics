@@ -1,12 +1,14 @@
 /**
- * After an Up or Down press moved a row to the edge, the button that was pressed is turned off and the browser drops focus
- * with it. This hands focus to the row's other button, so a keyboard keeps going.
+ * After an Up or Down press moved a row, the browser moves its buttons in the document and drops focus with them. This
+ * hands focus back to the pressed button at the row's new place, or, when the move turned it off at the top or the bottom,
+ * to the row's other button, so a keyboard keeps going.
  */
 export function keepFocus(
 	pressed: HTMLButtonElement | undefined,
 	other: HTMLButtonElement | undefined,
 ): void {
 	if (pressed?.disabled === true) other?.focus()
+	else pressed?.focus()
 }
 
 /**

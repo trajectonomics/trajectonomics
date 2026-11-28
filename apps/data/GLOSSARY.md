@@ -49,7 +49,7 @@ identity is machine, plan, model, bucket and source, so replaying it is an upser
 ## Quota Sample
 
 One observation of a plan window's meter: the percentage used and the reset time, at a UTC hour.
-Claude and OpenCode Go are the plans with a readable meter.
+Claude, OpenCode Go, Antigravity, Cursor and Meta (Muse) are the plans with a readable meter.
 
 ## Limit estimate
 

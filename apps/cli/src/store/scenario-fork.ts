@@ -10,11 +10,21 @@ import {
 	liveScenario,
 	taxKept,
 } from "./scenario-rows"
+import { unstatedFor } from "./scenario-unstated"
 import type { ForkOptions, ScenarioForked, ScenarioRow } from "./types"
 
 /** The notes a copy keeps: the source's, unless the caller left them behind. */
 function notesFor(source: ScenarioRow, options: ForkOptions): string | null {
 	return options.notes === false ? null : source.notes
+}
+
+/** The copy's unstated column: the source's entries minus the paths the fork's Sets state. */
+function unstatedOf(
+	source: ScenarioRow,
+	document: ScenarioDocument,
+	options: ForkOptions,
+): string | null {
+	return unstatedFor(source, document, null, options.stated?.() ?? [])
 }
 
 /**
@@ -56,6 +66,7 @@ export function forkScenario(
 					household: resolved.household,
 					tax: taxKept(source, resolved.document),
 					notes: notesFor(source, options),
+					unstated: unstatedOf(source, resolved.document as ScenarioDocument, options),
 				}),
 				droppedAnchors: resolved.dropped,
 				droppedOwners: resolved.droppedOwners,

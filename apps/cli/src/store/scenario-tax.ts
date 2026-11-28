@@ -6,6 +6,7 @@ import type { Ctx } from "./context"
 import { write } from "./guard"
 import { canonicalDocument, liveScenario, replaceScenario } from "./scenario-rows"
 import type { TaxOptions, TaxPlanner, TaxSet } from "./scenario-types"
+import { unstatedFor } from "./scenario-unstated"
 
 /**
  * Replaces a live Scenario's tax profile and its document in one write: `plan` reads the document
@@ -35,7 +36,12 @@ export function replaceTax(
 			)
 			if (isAppError(planned)) return planned
 			const document = canonicalDocument(planned.document)
-			if (current.contentHash === contentHash(document) && current.tax === planned.tax) {
+			const unstated = unstatedFor(current, JSON.parse(document) as ScenarioDocument, null, [])
+			if (
+				current.contentHash === contentHash(document) &&
+				current.tax === planned.tax &&
+				current.unstated === unstated
+			) {
 				return { status: "unchanged", scenario: current }
 			}
 			return {
@@ -43,6 +49,7 @@ export function replaceTax(
 				scenario: replaceScenario(ctx, current, document, {
 					household: current.household,
 					tax: planned.tax,
+					unstated,
 				}),
 			}
 		},

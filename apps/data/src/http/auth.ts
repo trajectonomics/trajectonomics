@@ -2,12 +2,11 @@ import { sha256Hex } from "../core/hash"
 import { resolveSender } from "../core/sender"
 import { DATA_AUDIENCE, INGEST_SCOPE, verifyAccessToken } from "../core/token"
 import type { Principal } from "../core/types"
-import { equalConstantTime } from "../core/web-auth"
 import { readSender } from "../db/contributor"
 import type { Env, RequestContext } from "../env"
 import { type JwksResult, JwksUnavailableError } from "./jwks"
 
-// A space must follow `Bearer`, so `Bearertest-key` is refused; an unset key still reports itself.
+// A space must follow `Bearer`, so `Bearer<synthetic-token>` with no space is refused.
 const BEARER = /^Bearer(?: (.*))?$/
 
 /** Who an ingest may send as, or the status and error the body answers with. */
@@ -88,22 +87,6 @@ async function authorizeJwt(
 	return { ok: true, principal: sender.principal, bind: sender.bindOrg ? { sub, subHash } : null }
 }
 
-/** The temporary shared key, which still sends as the org until it is retired (ADR 0015). */
-function authorizeBootstrap(token: string, env: Env): IngestAuthorization {
-	const expected = env.INGEST_BOOTSTRAP_KEY
-	if (typeof expected !== "string" || expected.length === 0) {
-		// Visible on the first request, without ever printing the key or the bearer token.
-		console.error("INGEST_BOOTSTRAP_KEY is not set")
-		return failure(401, "unauthorized")
-	}
-	if (!equalConstantTime(token, expected)) return failure(401, "unauthorized")
-	return {
-		ok: true,
-		principal: { contributorId: "trajectonomics", series: "measured-by-us" },
-		bind: null,
-	}
-}
-
 /** Resolves the bearer token to the contributor it sends as; the body never names one. */
 export async function authorizeIngest(
 	request: Request,
@@ -113,6 +96,7 @@ export async function authorizeIngest(
 	const match = BEARER.exec(request.headers.get("authorization") ?? "")
 	if (match === null) return failure(401, "unauthorized")
 	const token = match[1] ?? ""
-	if (token.split(".").length === 3) return authorizeJwt(token, env, context)
-	return authorizeBootstrap(token, env)
+	// Only auth's access tokens are accepted; a bearer that is not a JWT is refused unread.
+	if (token.split(".").length !== 3) return failure(401, "unauthorized")
+	return authorizeJwt(token, env, context)
 }

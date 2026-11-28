@@ -48,19 +48,17 @@ export async function runSendCommand(
 		return
 	}
 	try {
-		const resolved = await resolveBearer(
+		const bearer = await resolveBearer(
 			{
 				credentialsPath: credentialsPath(deps.home),
-				keyFile: args.keyFile,
 				url: args.url,
 				tokenUrlAllowed: tokenAllowedFor(args.url, deps.env),
-				forceKey: args.keyFileExplicit,
 			},
 			deps.bearer,
 		)
 		const report = await deps.send(text, {
 			url: args.url,
-			bearer: resolved.bearer,
+			bearer,
 			fetch: deps.fetch,
 			log: deps.log,
 		})
@@ -77,7 +75,7 @@ function realSendCommandDeps(): SendCommandDeps {
 		env: process.env,
 		home: homedir(),
 		readInput,
-		bearer: realBearerDeps(authFetch, log),
+		bearer: realBearerDeps(authFetch),
 		fetch: postFetch,
 		send: sendText,
 		log,

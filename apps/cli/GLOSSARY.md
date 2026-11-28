@@ -189,7 +189,7 @@ Plain text a person keeps on a Scenario in `scenario.notes`: what the plan assum
 _Avoid_: Description, comment, memo (a `tx` has a memo)
 
 **Assumed value**:
-A value a plan rests on that nobody stated: an income Flow with no tax label, a deduction class the plan leaves out, or a tax figure whose source is not yet confirmed. `scenario show` lists them in its `assumed` field in a fixed kind order, and its human form prints them after the body with the command that states each one (ADR-0083). A value the template wrote and no edit has touched joins them with the stored column (#689 part 2), and a Stream built from history with #687. It is not a **Tax assumption**, which is one of its kinds.
+A value a plan rests on that nobody stated: a template default, an income Flow with no tax label, a deduction class the plan leaves out, or a tax figure whose source is not yet confirmed. `scenario show` lists them in its `assumed` field in a fixed kind order, and its human form prints them after the body with the command that states each one (ADR-0083, ADR-0084). A Stream built from history joins them with #687. It is not a **Tax assumption**, which is one of its kinds.
 _Avoid_: Assumption (the tax figures alone), default (a template default is one kind, not the whole)
 
 **Main plan**:
@@ -205,8 +205,12 @@ The household person whose money a Flow, Account or liability is, or `shared` fo
 _Avoid_: Holder (a role), payee, account owner, filer
 
 **Template**:
-The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline, and it writes nothing (ADR-0044).
+The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline. Printing writes nothing; with a name and an As-of it saves the plan instead, and the paths `traj` wrote become its **Unstated paths** (ADR-0044, ADR-0084).
 _Avoid_: Sample, skeleton, example
+
+**Unstated path**:
+A document path a write of `traj`'s own put a value at, kept in the plan's `unstated` column: inflation, an Account's rate or a Flow's amount from the template write. `scenario show` lists it as a **template default** until a Set names the path or an ancestor, a write changes or removes the value, or nothing is left to compare (ADR-0084). A path is not unstated once a person states it, even at the same value.
+_Avoid_: Default (says nothing about who wrote it), touched value
 
 ### Chance
 

@@ -13,12 +13,22 @@ export function returnAccounts(path: ProjectionPath): string[] {
 	return (path.returns[0]?.accounts ?? []).map((entry) => entry.account)
 }
 
+/**
+ * Whether the CLI stated each roll-up's own inflation, so the table has an Inflation column (cli ADR-0085):
+ * a path read without an inflation factor states none, and the table stays as it was.
+ */
+export function pathInflationShown(path: ProjectionPath): boolean {
+	return path.returns.some((rollup) => rollup.inflationBps !== undefined)
+}
+
 /** One year of the path in the table. */
 export interface PathRow {
 	readonly key: string
 	/** The month the year ends in, "Oct 2052". */
 	readonly ends: string
 	readonly ages: string
+	/** The inflation the CLI drew for that year, in percent; null where `traj` states none. */
+	readonly inflation: string | null
 	/** The Account returns of that year, in the order of the table's Account columns; null where `traj` states none. */
 	readonly returns: readonly (string | null)[]
 	readonly income: string
@@ -44,9 +54,10 @@ export function pathRowsOf(
 	names: ItemNames = NO_ITEM_NAMES,
 ): PathRow[] {
 	const accounts = returnAccounts(path)
-	const returns = new Map(path.returns.map((rollup) => [rollup.index, rollup.accounts]))
+	const returns = new Map(path.returns.map((rollup) => [rollup.index, rollup]))
 	return annualRowsOf(path).map((row) => {
-		const states = returns.get(row.index) ?? []
+		const rollup = returns.get(row.index)
+		const states = rollup?.accounts ?? []
 		const marks = [
 			...(lowestDay !== null && holds(row, lowestDay) ? ["Lowest point"] : []),
 			...(path.runsOut !== null && holds(row, path.runsOut.date) ? [RUN_OUT_LABEL] : []),
@@ -55,6 +66,7 @@ export function pathRowsOf(
 			key: String(row.index),
 			ends: formatMonth(row.to),
 			ages: agesText(row.ages, names.people),
+			inflation: rollup?.inflationBps === undefined ? null : returnText(rollup.inflationBps),
 			returns: accounts.map((id) => {
 				const found = states.find((entry) => entry.account === id)
 				return found === undefined ? null : returnText(found.returnBps)

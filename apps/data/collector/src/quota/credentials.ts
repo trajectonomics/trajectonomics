@@ -18,14 +18,17 @@ export function skipReason(reason: CredentialFailure): string {
 	}
 }
 
-type JsonObject = Record<string, unknown>
+/** A plain JSON object with unknown property values. */
+export type JsonObject = Record<string, unknown>
 
-function asObject(value: unknown): JsonObject | null {
+/** Narrows an unknown JSON value to a plain object, or returns null. */
+export function asObject(value: unknown): JsonObject | null {
 	if (typeof value !== "object" || value === null || Array.isArray(value)) return null
 	return value as JsonObject
 }
 
-function parseObject(contents: string): JsonObject | null {
+/** Parses JSON text into a plain object, or returns null when invalid or non-object. */
+export function parseObject(contents: string): JsonObject | null {
 	try {
 		return asObject(JSON.parse(contents))
 	} catch {

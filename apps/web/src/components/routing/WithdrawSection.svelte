@@ -1,5 +1,5 @@
 <script lang="ts">
-import { routing } from "../../client/routing.svelte.js"
+import { orderSource, removeSource, routing } from "../../client/routing.svelte.js"
 import { formatMoney } from "../../lib/format"
 import { ILLIQUID_NOTE } from "../../lib/view/routing/accounts"
 import type { RoutingContext } from "../../lib/view/routing/context"
@@ -9,6 +9,7 @@ import { sameOrder } from "../../lib/view/routing/order"
 import { rowRefusal } from "../../lib/view/routing/shown"
 import { strandedFloors } from "../../lib/view/routing/withdraw"
 import { entryWords, plainText } from "../../lib/view/routing/words"
+import ActionRefusal from "../ui/ActionRefusal.svelte"
 import AddButton from "./AddButton.svelte"
 import EntryForm from "./EntryForm.svelte"
 import FigureChart from "./FigureChart.svelte"
@@ -38,7 +39,7 @@ const without = (index: number) => list(entries.filter((_, at) => at !== index))
 	<ReorderList items={entries} {locked} editable={ctx.editable} busy={false} rule={() => null}
 		labelOf={(_entry, order, at) => plainText(entryWords(order, at, ctx.names), formatMoney)}
 		refused={(at) => (drawer === null ? rowRefusal(routing.place, routing.message, "withdraw", at) : undefined)}
-		onSave={(order) => routing.save(ctx, list(order))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
+		onSave={(order) => routing.save(ctx, list(order), orderSource("withdraw"))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
 		{#snippet row(_entry, at, order)}
 			<Sentence parts={entryWords(order, at, ctx.names)} currency={ctx.doc.currency} />
 			{#if sameOrder(order, entries)}
@@ -51,8 +52,10 @@ const without = (index: number) => list(entries.filter((_, at) => at !== index))
 		{/snippet}
 		{#snippet buttons(_entry, saved, shown)}
 			<RowButtons label={`entry ${shown + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: saved, trying: false })}
-				onTry={() => (drawer = { index: saved, trying: true })} onRemove={() => routing.save(ctx, without(saved))} onTryRemove={() => routing.tryIt(ctx, without(saved))} />
+				onTry={() => (drawer = { index: saved, trying: true })} onRemove={() => routing.save(ctx, without(saved), removeSource("withdraw", saved))} onTryRemove={() => routing.tryIt(ctx, without(saved))} />
+			<ActionRefusal source={removeSource("withdraw", saved)} onRow={routing.onRow(ctx)} />
 		{/snippet}
+		{#snippet refusal()}<ActionRefusal source={orderSource("withdraw")} onRow={routing.onRow(ctx)} />{/snippet}
 	</ReorderList>
 	{/key}
 	<LockedNote {locked} />

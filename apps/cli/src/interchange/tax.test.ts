@@ -56,7 +56,9 @@ describe("a tax profile through backup and restore", () => {
 		await capture(["export", "--format", "jsonl", "--out", out, "--json"], { TRAJ_HOME: home })
 		const text = await Bun.file(`${out}/traj.jsonl`).text()
 		const lines = text.split("\n").filter((line) => line.includes('"record":"scenario"'))
-		expect(lines.some((line) => line.endsWith(',"tax":null,"notes":null,"main":false}'))).toBe(true)
+		expect(
+			lines.some((line) => line.endsWith(',"tax":null,"notes":null,"main":false,"unstated":null}')),
+		).toBe(true)
 		expect(text).toContain(
 			'"tax":{"children":1,"childrenAtHigherRate":0,"filingStatus":"single","mortgageInterest":30000,"tax":"th-2026"},"notes"',
 		)
@@ -65,8 +67,8 @@ describe("a tax profile through backup and restore", () => {
 	it("restores a version 3 backup, which has no tax column, with every profile null", async () => {
 		const current = await goldenWithoutNotes()
 		const version3 = current
-			.replace('"schemaVersion":5', '"schemaVersion":3')
-			.replaceAll(',"tax":null,"notes":null,"main":false}', "}")
+			.replace('"schemaVersion":6', '"schemaVersion":3')
+			.replaceAll(',"tax":null,"notes":null,"main":false,"unstated":null}', "}")
 		const store = mustOpen(ledgerHome())
 		expect(must(importJsonl(version3, store))).toEqual({
 			entity: 1,

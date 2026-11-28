@@ -59,7 +59,13 @@ export const scenarioDocument = z.looseObject({
 	// Where the money goes: the routing forms (cli ADR-0070). Optional so a document without it still decodes, and kept as it is.
 	cashflow: scenarioCashflow.optional(),
 	// The assumptions of the whole plan: inflation per year in basis points, which is an integer in the decimal form too.
-	economy: z.looseObject({ inflation: z.number().int() }).optional(),
+	// The inflation swing is optional (cli ADR-0085), and the page only shows it: its Edit field is a later issue.
+	economy: z
+		.looseObject({
+			inflation: z.number().int(),
+			inflationVolatility: z.number().int().optional(),
+		})
+		.optional(),
 	// The Levies the plan is taxed under; the page reads only whether there is one, so each is kept as it is.
 	levies: z.array(z.unknown()).optional(),
 	// The costs and gifts of the estate, when the plan states them (cli ADR 0064); none is shipped, each is the person's own.
@@ -93,9 +99,8 @@ export const scenarioShow = z.strictObject({
 		// The stored tax profile, whether the plan is taxed and which deduction classes it states (cli ADR-0066, ADR-0073).
 		...taxShown,
 		/**
-		 * The values the plan assumes that nobody stated, in kind order (cli ADR-0083), empty when it
-		 * assumes none. `template-default` arrives with #689 part 2, and the field is absent in an
-		 * older Snapshot.
+		 * The values the plan assumes that nobody stated, in kind order (cli ADR-0083, ADR-0084), empty
+		 * when it assumes none. The field is absent in an older Snapshot.
 		 */
 		assumed: z.array(assumedItem).optional(),
 		/** The notes kept on the plan, or null when it has none (cli ADR-0071); absent in an older Snapshot. */

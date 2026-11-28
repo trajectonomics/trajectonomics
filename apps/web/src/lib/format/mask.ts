@@ -22,3 +22,31 @@ export function maskMoney(display: string): string {
 export function draftAfterInput(held: string, typed: string): string {
 	return typed.includes(MASK_CHARACTER) ? held : typed
 }
+
+/** What an `input` event leaves at a masked money field: the draft it means, and the draft the last Undo took away. */
+export interface MaskedDraft {
+	/** The draft the field holds after the event. */
+	draft: string
+	/** The draft the last Undo took away, which only its Redo puts back. */
+	undone: string | null
+}
+
+/**
+ * The draft a change makes at a money field with Hide amounts on. The mask writes text the browser's own history does
+ * not hold, so an Undo or a Redo is read for what it means rather than for the text it composes: a step whose text
+ * holds the mask keeps the draft it hides, an Undo takes the text it restores, and a Redo lands only when it restores
+ * what its Undo took away, so a Redo never doubles an amount.
+ */
+export function maskedDraft(
+	held: string,
+	undone: string | null,
+	typed: string,
+	inputType: string,
+): MaskedDraft {
+	if (inputType !== "historyUndo" && inputType !== "historyRedo") {
+		return { draft: draftAfterInput(held, typed), undone: null }
+	}
+	if (typed.includes(MASK_CHARACTER)) return { draft: held, undone: held }
+	if (inputType === "historyUndo") return { draft: typed, undone: held }
+	return { draft: undone === typed ? typed : held, undone: null }
+}

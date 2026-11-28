@@ -1,4 +1,4 @@
-/** The `traj` write each plan-managing Edit runs, and the read behind a new plan's template. Pure. */
+/** The `traj` write each plan-managing Edit runs, and a new plan's. Pure. */
 import type { WriteCommand } from "./command"
 import type { Edit } from "./edit"
 
@@ -8,15 +8,14 @@ export type PlanEdit = Extract<Edit, { kind: "rename-plan" | "set-plan-notes" | 
 /** An `apply-plan` that starts a plan from the ledger's accounts, rather than saving a document. */
 export type StartPlan = Extract<Edit, { template: unknown }>
 
-/** The read of the template a new plan starts from: the ledger's accounts declared at the As-of (cli ADR 0044). */
-export function templateRead(asOf: string): string[] {
-	return ["scenario", "apply", "--template", "--as-of", asOf, "--json"]
-}
-
-/** The write of a new plan: the template, as the CLI printed it, applied under the name. */
-export function startCommand(edit: StartPlan, template: string, flags: string[]): WriteCommand {
-	// The template prints minor units, so it is applied without --decimal.
-	return { argv: ["scenario", "apply", edit.name, "--file", "-", ...flags], stdin: template }
+/**
+ * The write of a new plan: `traj` fills the template at the As-of and saves it under a free name in one step, so the
+ * plan records which values `traj` wrote, and a taken name is refused (cli ADR 0084).
+ */
+export function startCommand(edit: StartPlan, flags: string[]): WriteCommand {
+	return {
+		argv: ["scenario", "apply", edit.name, "--template", "--as-of", edit.template.asOf, ...flags],
+	}
 }
 
 /** The write of a rename, a notes change or a main-plan change. */

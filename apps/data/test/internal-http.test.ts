@@ -5,6 +5,7 @@ import { INTERNAL_HOST, LEGACY_HOST, SITE_ORIGIN } from "../src/core/urls"
 import { handleRequest } from "../src/http/router"
 import { NOW_ISO, NOW_MS, quotaSample, usageRow } from "./support/fixtures"
 import { harness, ingestRequest } from "./support/http"
+import { TEST_JWKS } from "./support/token"
 
 const DELETE_PATH = "/internal/contributors/delete"
 const DELETE_URL = `https://${INTERNAL_HOST}${DELETE_PATH}`
@@ -107,7 +108,7 @@ describe("POST /internal/contributors/delete", () => {
 		const seeded = await handleRequest(
 			ingestRequest({ usage: [usageRow()], quota: [quotaSample()] }),
 			context.env,
-			{ nowMs: NOW_MS },
+			{ nowMs: NOW_MS, jwks: TEST_JWKS },
 		)
 		expect(seeded.status).toBe(200)
 		context.database

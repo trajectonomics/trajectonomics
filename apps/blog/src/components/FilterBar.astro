@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import { dictionaryFor } from "../lib/dictionary"
 import { filterQuery } from "../lib/filter-query"
-import type { FilterGroup, FilterGroupName } from "../lib/filters"
+import { type FilterGroup, type FilterGroupName, GENERAL_PRODUCT_FILTER } from "../lib/filters"
 import { type Language, treePath } from "../lib/languages"
 import type { PostType } from "../lib/posts"
 import { type Product, productName } from "../lib/products"
@@ -28,7 +28,9 @@ function optionLabel(group: FilterGroupName, value: string): string {
 		case "language":
 			return words.languageNames[value as Language]
 		case "product":
-			return productName(value as Product)
+			return value === GENERAL_PRODUCT_FILTER
+				? words.filterGeneralProduct
+				: productName(value as Product)
 	}
 }
 ---

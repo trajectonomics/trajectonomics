@@ -1,15 +1,17 @@
-import { describe, expect, spyOn, test } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import type { D1Database } from "@cloudflare/workers-types"
 import { INGEST_PATH, SITE_ORIGIN } from "../src/core/urls"
 import { handleRequest } from "../src/http/router"
-import { NOW_MS, quotaSample, TEST_KEY, usageRow } from "./support/fixtures"
+import { NOW_MS, quotaSample, usageRow } from "./support/fixtures"
 import { get, harness, ingestRequest } from "./support/http"
 import { silenceConsoleError } from "./support/log"
+import { TEST_JWKS, TEST_TOKEN } from "./support/token"
 
-async function post(context: ReturnType<typeof harness>, body: unknown, key?: string) {
-	return handleRequest(ingestRequest(body, key), context.env, {
+async function post(context: ReturnType<typeof harness>, body: unknown, token?: string) {
+	return handleRequest(ingestRequest(body, token), context.env, {
 		nowMs: NOW_MS,
 		cache: context.cache,
+		jwks: TEST_JWKS,
 	})
 }
 
@@ -19,48 +21,6 @@ function count(context: ReturnType<typeof harness>, table: string): number {
 }
 
 describe("POST /ingest", () => {
-	test("rejects a wrong key with 401 and logs nothing", async () => {
-		const context = harness()
-		const logged = spyOn(console, "error").mockImplementation(() => {})
-		const response = await post(context, { usage: [usageRow()] }, "wrong")
-		expect(response.status).toBe(401)
-		expect(count(context, "usage_hourly")).toBe(0)
-		expect(logged).not.toHaveBeenCalled()
-		logged.mockRestore()
-	})
-
-	test("rejects every request when the bootstrap key is unset, and says so once", async () => {
-		const context = harness()
-		const logged = spyOn(console, "error").mockImplementation(() => {})
-		const env = {
-			...context.env,
-			INGEST_BOOTSTRAP_KEY: undefined,
-		} as unknown as typeof context.env
-		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }), env, {
-			nowMs: NOW_MS,
-		})
-		expect(response.status).toBe(401)
-		expect(count(context, "usage_hourly")).toBe(0)
-		expect(logged).toHaveBeenCalledTimes(1)
-		expect(logged).toHaveBeenCalledWith("INGEST_BOOTSTRAP_KEY is not set")
-		expect(JSON.stringify(logged.mock.calls)).not.toContain("test-key")
-		logged.mockRestore()
-	})
-
-	test("rejects every request when the bootstrap key is empty, and says so once", async () => {
-		const context = harness()
-		const logged = spyOn(console, "error").mockImplementation(() => {})
-		const env = { ...context.env, INGEST_BOOTSTRAP_KEY: "" }
-		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }, ""), env, {
-			nowMs: NOW_MS,
-		})
-		expect(response.status).toBe(401)
-		expect(count(context, "usage_hourly")).toBe(0)
-		expect(logged).toHaveBeenCalledTimes(1)
-		expect(logged).toHaveBeenCalledWith("INGEST_BOOTSTRAP_KEY is not set")
-		logged.mockRestore()
-	})
-
 	test("rejects an empty bearer token", async () => {
 		const context = harness()
 		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }, ""), context.env, {
@@ -74,7 +34,7 @@ describe("POST /ingest", () => {
 		const context = harness()
 		const request = new Request(`${SITE_ORIGIN}${INGEST_PATH}`, {
 			method: "POST",
-			headers: { authorization: `Bearer${TEST_KEY}`, "content-type": "application/json" },
+			headers: { authorization: `Bearer${TEST_TOKEN}`, "content-type": "application/json" },
 			body: JSON.stringify({ usage: [usageRow()] }),
 		})
 		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
@@ -110,10 +70,13 @@ describe("POST /ingest", () => {
 		const context = harness()
 		const request = new Request(`${SITE_ORIGIN}${INGEST_PATH}`, {
 			method: "POST",
-			headers: { authorization: "Bearer test-key", "content-type": "application/json" },
+			headers: { authorization: `Bearer ${TEST_TOKEN}`, "content-type": "application/json" },
 			body: "{",
 		})
-		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
+		const response = await handleRequest(request, context.env, {
+			nowMs: NOW_MS,
+			jwks: TEST_JWKS,
+		})
 		expect(response.status).toBe(400)
 	})
 
@@ -128,7 +91,10 @@ describe("POST /ingest", () => {
 		const context = harness()
 		const request = ingestRequest({ usage: [usageRow({ model: "x".repeat(1_100_000) })] })
 		request.headers.delete("content-length")
-		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
+		const response = await handleRequest(request, context.env, {
+			nowMs: NOW_MS,
+			jwks: TEST_JWKS,
+		})
 		expect(response.status).toBe(413)
 		expect(count(context, "usage_hourly")).toBe(0)
 	})
@@ -137,7 +103,10 @@ describe("POST /ingest", () => {
 		const context = harness()
 		const request = ingestRequest({ usage: [usageRow({ model: "x".repeat(1_100_000) })] })
 		request.headers.set("content-length", "10")
-		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
+		const response = await handleRequest(request, context.env, {
+			nowMs: NOW_MS,
+			jwks: TEST_JWKS,
+		})
 		expect(response.status).toBe(413)
 		expect(count(context, "usage_hourly")).toBe(0)
 	})
@@ -184,6 +153,7 @@ describe("POST /ingest", () => {
 		}
 		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }), failing, {
 			nowMs: NOW_MS,
+			jwks: TEST_JWKS,
 		})
 		expect(response.status).toBe(500)
 		expect(count(context, "usage_hourly")).toBe(0)

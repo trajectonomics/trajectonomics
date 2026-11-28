@@ -21,7 +21,7 @@ const row = (name: string, main = false): PlanRow => ({
 	projected: true,
 })
 const argv = (edit: Parameters<typeof singleWriteEditSchema.parse>[0], dryRun = false) =>
-	writeCommand(singleWriteEditSchema.parse(edit), dryRun, "TEMPLATE")
+	writeCommand(singleWriteEditSchema.parse(edit), dryRun)
 
 describe("a plan's menu", () => {
 	test("lists rename, notes, make main, copy and delete, and not make main on the main plan", () => {
@@ -77,22 +77,12 @@ describe("the argv of each plan Edit", () => {
 		])
 	})
 
-	test("a plan from my accounts applies the template under the new name, with no hash and no --decimal", () => {
+	test("a plan from my accounts is the template write under the new name, with no hash and no stdin", () => {
 		const edit = newPlanEdit(" fresh ", { from: "accounts" }, "2026-11-25")
 		expect(edit).toEqual({ kind: "apply-plan", name: "fresh", template: { asOf: "2026-11-25" } })
-		expect(argv(edit)).toEqual({
-			argv: ["scenario", "apply", "fresh", "--file", "-", "--json"],
-			stdin: "TEMPLATE",
-		})
-		expect(argv(edit, true).argv).toEqual([
-			"scenario",
-			"apply",
-			"fresh",
-			"--file",
-			"-",
-			"--dry-run",
-			"--json",
-		])
+		const write = ["scenario", "apply", "fresh", "--template", "--as-of", "2026-11-25"]
+		expect(argv(edit)).toEqual({ argv: [...write, "--json"] })
+		expect(argv(edit, true)).toEqual({ argv: [...write, "--dry-run", "--json"] })
 	})
 
 	test("a copy of a plan is the existing copy-plan", () => {

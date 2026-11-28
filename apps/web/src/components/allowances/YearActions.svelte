@@ -2,6 +2,7 @@
 import { editSession } from "../../client/edit.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioDocument } from "../../lib/contract"
+import { actionSource } from "../../lib/view/action-source"
 import {
 	documentWithSuggestions,
 	suggestionAdditions,
@@ -9,9 +10,9 @@ import {
 	type YearView,
 } from "../../lib/view/allowances"
 import type { PersonNames } from "../../lib/view/item-names"
+import ActionRefusal from "../ui/ActionRefusal.svelte"
 import ItemWords from "../ui/ItemWords.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
-import StaleNotice from "../ui/StaleNotice.svelte"
 
 interface Props {
 	year: YearView
@@ -28,6 +29,8 @@ let { year, plan, people, claimsHolder }: Props = $props()
 const unplaced = $derived(unplacedOf(year, people, claimsHolder))
 /** True when a what-if of this plan is open: Add to plan waits for it, a what-if of another plan does not. */
 const planOpen = $derived(whatIfSession.active && whatIfSession.whatIf?.plan === plan.name)
+/** A refusal shows only in the year that sent the Edit, so the page says it once. */
+const source = $derived(actionSource("allowances", year.key))
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
@@ -45,7 +48,7 @@ async function addToPlan(): Promise<void> {
 			contentHash: plan.contentHash,
 			document: documentWithSuggestions(plan.doc, year.placeable),
 		},
-		year.key,
+		source,
 	)
 }
 </script>
@@ -70,6 +73,5 @@ async function addToPlan(): Promise<void> {
 			</ul>
 		</div>
 	{/if}
-	<StaleNotice shows="stale" />
-	{#if editSession.error !== null && editSession.source === year.key}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
+	<ActionRefusal {source} />
 </div>

@@ -23,7 +23,7 @@ let draft = $state(entryDraftOf(existing()))
 let problems: Record<string, string> = $state({})
 let sentAt: number | null = $state(null)
 const shown = $derived(
-	shownForRow(problems, routing.place, routing.message, {
+	shownForRow(problems, routing.place, routing.formMessage, {
 		list: "withdraw",
 		sentAt,
 		fields: ENTRY_FIELDS,

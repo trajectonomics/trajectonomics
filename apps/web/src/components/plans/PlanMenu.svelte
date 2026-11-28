@@ -1,8 +1,10 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
 import { planEditor } from "../../client/plan-editor.svelte.js"
+import { actionSource } from "../../lib/view/action-source"
 import { ACTION_LABELS, mainEdit, type PlanAction, planActions } from "../../lib/view/plans/edits"
 import type { PlanRow } from "../../lib/view/plans/rows"
+import ActionRefusal from "../ui/ActionRefusal.svelte"
 import { BUTTON } from "./styles"
 
 interface Props {
@@ -11,10 +13,12 @@ interface Props {
 
 let { row }: Props = $props()
 let menu: HTMLDetailsElement | undefined = $state()
+/** "Make this my main plan" saves from the menu itself, so its refusal shows beside the menu. */
+const source = $derived(actionSource("main", row.name))
 
 async function choose(action: PlanAction): Promise<void> {
 	if (menu) menu.open = false
-	if (action === "main") await editSession.run(mainEdit(row.name))
+	if (action === "main") await editSession.run(mainEdit(row.name), source)
 	else planEditor.open(action, row.name)
 }
 </script>
@@ -42,3 +46,4 @@ async function choose(action: PlanAction): Promise<void> {
 		{/each}
 	</ul>
 </details>
+<ActionRefusal {source} />

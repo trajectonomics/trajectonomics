@@ -9,9 +9,9 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 |---|---|---|
 | `Plan` | decides whether the web jobs and the auth browser job run | always |
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
-| `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
+| `Check web` | the web package's typecheck (`turbo run typecheck`), then its lint, `./src` tests and build (`turbo run lint test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
 | `Check web scripts (1)` ... `(6)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/6` | same as `Check web` |
-| `Check web browser (1)` ... `(2)` | one shard of the browser checks over the built Demo: `turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted`, then `bun run test:browser --shard=N/2` in `apps/web` | same as `Check web` |
+| `Check web browser (1)` ... `(2)` | one shard of the browser checks over the built Demo: `turbo run @trajectonomics/cli#build @trajectonomics/web#build`, then `turbo run @trajectonomics/web#build:hosted`, then `bun run test:browser --shard=N/2` in `apps/web` | same as `Check web` |
 | `Check auth browser` | `turbo run build --filter=@trajectonomics/brand`, then `bun run test:e2e` in `apps/auth`: the built pages, a scratch local D1 and Chromium | a pull request that affects `@trajectonomics/auth`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
 | `Check` | fails unless every job above passed (a skipped web or auth job passes only when `Plan` said to skip it) | always |
 
@@ -26,6 +26,20 @@ id of any new job to its `needs`: `tooling/guards/ci-web-split.test.ts` fails wh
 - **`Check` runs with `if: always()`,** not `!cancelled()`. A cancelled run (a new push, or a person)
   then fails `Check`. GitHub counts a skipped required check as passing, so a skipped `Check` would let a
   cancelled run look green.
+
+**`.svelte-kit/` has one writer at a time in each job (#864):** `Check web` runs the `Typecheck the web
+package` step alone first (its `svelte-kit sync` writes it), then the step that lints, tests `./src` and
+builds (`vite build` rewrites it); `Check web browser` runs `Build the CLI, the web package and the Demo
+snapshot` before `Build the hosted Demo`. Both writers also rewrite the shared `node_modules/$app/tsconfig.json`.
+
+## The merge queue
+
+`main` has a merge queue (ruleset "main: merge queue", added 2026-11-28; Settings → Rules). `gh pr merge --auto` puts a pull request in the queue. For each entry, the queue builds the pull request merged onto `main` and the entries ahead of it, and `ci.yml` and `pr-title.yml` run on that `merge_group` event.
+
+- **`ci.yml`:** an entry runs the same affected-only path as a pull request, taking turbo's base from `merge_group.base_sha`.
+- **`pr-title.yml`:** it reports without checking, since the title passed on the pull request.
+- **Settings:** the queue squash-merges when every required check of a group passes (`ALLGREEN`). It builds up to 5 entries at once and waits up to 60 minutes for a check.
+- **To go back to merging by hand,** set the ruleset's enforcement to disabled (Settings → Rules → "main: merge queue" → Enforcement: Disabled, or `gh api -X PUT repos/trajectonomics/trajectonomics/rulesets/28284166 -f enforcement=disabled`). The workflows need no change, since `merge_group` then never fires.
 
 ## Why the web tests are split
 
@@ -102,8 +116,10 @@ the shards, which it runs beside.
   A4 landscape (tables fit 1032px, black on white, the same surfaces from either theme). The suite is
   `apps/web/browser/`, and `tooling/guards/ci-web-split.test.ts` pins the job.
 - **The hosted Demo.** The same job also builds `build:hosted` and checks `dist-hosted/` served under `/demo/` (`apps/web/browser/hosted.e2e.ts`, [web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)): every page at 360px and 1280px, no request but a GET of its own files, only the Demo snapshot read, and every Edit control switched off.
-- **Steps.** The build is `bunx turbo run @trajectonomics/cli#build @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=4`, with no arguments after
-  `--` for the reason in the cache section below. Chromium comes from `actions/cache` on `~/.cache/ms-playwright`
+- **Steps.** The build is two steps, `bunx turbo run @trajectonomics/cli#build @trajectonomics/web#build --concurrency=4`
+  then `bunx turbo run @trajectonomics/web#build:hosted --concurrency=4`, with no arguments after
+  `--` for the reason in the cache section below (the two builds would otherwise race on the generated
+  `node_modules/$app/tsconfig.json`, #864). Chromium comes from `actions/cache` on `~/.cache/ms-playwright`
   with the same key as `browser.yml` and `docs-browser.yml` (`playwright-<os>-<version>`), so one download serves
   all three; a cache hit still runs `playwright install-deps`, because the system libraries are not cached. The
   suite runs sharded across two runners as `bun run test:browser --shard=N/2` in `apps/web`.

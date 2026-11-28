@@ -1,84 +1,57 @@
 import type { ResolvedCalendar } from "../calendar/business"
-import { feeEvents } from "../fee/flows"
-import { resolveLoan } from "../loan/resolve"
-import { movedOnceStarts } from "../milestone/spec"
-import type { DateString, Flow, Scenario, Timeline } from "../types"
+import type { Inflation } from "../money/inflation"
+import type { DateString, Scenario, Timeline } from "../types"
 import { isFixed } from "../types"
 import { fixedAmountAt } from "./amount"
-import { flowOccurrences } from "./flow-occurrences"
-import { compareIds } from "./order"
-import { inflationOf } from "./run-scenario"
+import { type DatedOccurrence, occurrenceDates, spanKey } from "./occurrence-dates"
+import { inflationOf, type RunScenario } from "./run-scenario"
 
-export interface DatedEvent {
-	readonly date: DateString
-	readonly flow: Flow
-	readonly years: number
-	/** The grown amount, when the scan computed it once per event instead of per candidate. */
-	readonly amount?: bigint
-	/** Lands on a static Milestone's fire date rather than its recurrence, so it is no evaluation date. */
-	readonly deferred?: boolean
+/** A Flow's Occurrence on its Landed date, with its amount grown by the inflation one run follows. */
+export type DatedEvent = DatedOccurrence
+
+interface Kept {
+	readonly dates: readonly DatedOccurrence[]
+	readonly full?: readonly DatedEvent[]
 }
 
-const built: WeakMap<Scenario, Map<string, readonly DatedEvent[]>> = new WeakMap()
+const built: WeakMap<Scenario, Map<string, Kept>> = new WeakMap()
+
+/** The events with every fixed Flow's amount grown once, instead of per candidate on each date. */
+function withAmounts(
+	events: readonly DatedOccurrence[],
+	inflation: Inflation,
+): readonly DatedEvent[] {
+	return Object.freeze(
+		events.map((event) =>
+			event.amount !== undefined || !isFixed(event.flow)
+				? event
+				: { ...event, amount: fixedAmountAt(event.flow, event.years, inflation, event.date) },
+		),
+	)
+}
 
 /**
  * All flow Occurrences in the timeline, on their Landed dates, sorted by date then flow id. The
- * `calendar` is the Scenario's own, so every run of a Scenario over one span shares its events, as
- * its Market paths and FI candidates do.
+ * `calendar` is the Scenario's own. Occurrence dates are cached on the declared Scenario, so every
+ * Market path of a chance run shares them; only a fixed Flow's grown amount is built again for the
+ * `inflation` its run follows (the price path), unless that is the Scenario's own rate.
  */
 export function buildEvents(
-	scenario: Scenario,
+	scenario: RunScenario,
 	timeline: Timeline,
 	calendar: ResolvedCalendar | undefined,
+	inflation: Inflation = inflationOf(scenario),
 ): readonly DatedEvent[] {
-	const bySpan = built.get(scenario) ?? new Map<string, readonly DatedEvent[]>()
+	const bySpan = built.get(scenario) ?? new Map<string, Kept>()
 	built.set(scenario, bySpan)
-	const key = `${timeline.start}|${timeline.horizon}|${calendar === undefined}`
-	const kept = bySpan.get(key)
-	if (kept !== undefined) return kept
-	const events = eventsOf(scenario, timeline, calendar)
-	bySpan.set(key, events)
+	const key = spanKey(timeline, calendar)
+	const kept = bySpan.get(key) ?? { dates: occurrenceDates(scenario, timeline, calendar) }
+	bySpan.set(key, kept)
+	const declared = typeof inflation === "number" && inflation === scenario.economy.inflation
+	if (declared && kept.full !== undefined) return kept.full
+	const events = withAmounts(kept.dates, inflation)
+	if (declared) bySpan.set(key, { dates: kept.dates, full: events })
 	return events
-}
-
-function eventsOf(
-	scenario: Scenario,
-	timeline: Timeline,
-	calendar: ResolvedCalendar | undefined,
-): readonly DatedEvent[] {
-	const events: DatedEvent[] = []
-	const moved = movedOnceStarts(scenario, calendar)
-	for (const declared of scenario.flows) {
-		const flow = resolveLoan(declared, scenario.accounts)
-		const shifted = moved.get(flow.id)
-		const found = flowOccurrences(flow, shifted, timeline, calendar)
-		for (const occurrence of found) {
-			const event = {
-				date: occurrence.date,
-				flow,
-				years: occurrence.years,
-				...(shifted === undefined ? {} : { deferred: true }),
-			}
-			events.push(
-				isFixed(flow)
-					? {
-							...event,
-							amount: fixedAmountAt(flow, occurrence.years, inflationOf(scenario), occurrence.date),
-						}
-					: event,
-			)
-		}
-	}
-	events.push(...feeEvents(scenario, timeline, calendar))
-	events.sort((left, right) =>
-		left.date === right.date
-			? compareIds(left.flow.id, right.flow.id)
-			: left.date < right.date
-				? -1
-				: 1,
-	)
-	// Shared by every run of the Scenario over the span, so it is kept as built.
-	return Object.freeze(events)
 }
 
 /** The slice of events sharing `date`, starting at `index`, and the index just past them. */

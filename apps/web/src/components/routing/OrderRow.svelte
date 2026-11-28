@@ -26,7 +26,7 @@ let { rowKey, index, count, label, reorder, editable, problem, onDrop, children,
 let up: HTMLButtonElement | undefined = $state()
 let down: HTMLButtonElement | undefined = $state()
 
-/** Moves this row, then hands focus to its other button when the one pressed has reached the edge and turned off. */
+/** Moves this row, then hands focus back to that button at the row's new place, or to its other button at the edge. */
 async function press(by: -1 | 1): Promise<void> {
 	reorder.press(rowKey, by)
 	await tick()
@@ -50,7 +50,7 @@ const button =
 	<div class="flex flex-wrap items-center justify-between gap-2">
 		<span class="min-w-0 flex-1">{@render children()}</span>
 		{#if editable}
-			<span class="flex flex-wrap gap-1.5">
+			<div class="flex flex-wrap gap-1.5">
 				<button bind:this={up} type="button" class={button} disabled={index === 0} onclick={() => press(-1)}>
 					Up<span class="sr-only">: move {label} up</span>
 				</button>
@@ -58,7 +58,7 @@ const button =
 					Down<span class="sr-only">: move {label} down</span>
 				</button>
 				{@render actions?.()}
-			</span>
+			</div>
 		{/if}
 	</div>
 	{#if problem}<p role="alert" class="text-sm text-destructive">{problem}</p>{/if}

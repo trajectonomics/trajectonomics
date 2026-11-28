@@ -11,6 +11,11 @@ export const APPLY_EXAMPLES: Example[] = [
 		description: "Print a Scenario pre-filled from the Baseline at one date, to edit and apply.",
 	},
 	{
+		command: "traj scenario apply start --template --as-of 2026-03-31 --dry-run",
+		description:
+			"Save the pre-filled template under a new name and roll the write back; without --dry-run it creates the plan and lists what the template assumed.",
+	},
+	{
 		command: "traj scenario apply --template --as-of 2026-03-31 --from-history",
 		description:
 			"Print a Scenario whose income and spending Streams are what the Ledger ran at, to edit and apply.",

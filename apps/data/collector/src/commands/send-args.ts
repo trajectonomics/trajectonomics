@@ -1,15 +1,10 @@
-import { homedir } from "node:os"
-import { DEFAULT_INGEST_URL, defaultKeyFile } from "../send"
+import { DEFAULT_INGEST_URL } from "../send"
 import { fail } from "./errors"
 
-const USAGE = "Usage: bun src/cli.ts send [--url <url>] [--key-file <path>] [files...]"
+const USAGE = "Usage: bun src/cli.ts send [--url <url>] [files...]"
 
-/** Parsed `send` arguments; `keyFileExplicit` is true only when `--key-file` was given. */
-export type SendArgs = { url: string; keyFile: string; keyFileExplicit: boolean; files: string[] }
-
-type Flag = "url" | "keyFile"
-
-const FLAGS: Record<string, Flag> = { "--url": "url", "--key-file": "keyFile" }
+/** Parsed `send` arguments. */
+export type SendArgs = { url: string; files: string[] }
 
 function valueAfter(argv: readonly string[], index: number, flag: string): string {
 	const value = argv[index + 1]
@@ -19,10 +14,8 @@ function valueAfter(argv: readonly string[], index: number, flag: string): strin
 
 function applyFlag(args: SendArgs, argv: readonly string[], index: number): number {
 	const arg = argv[index] ?? ""
-	const key = FLAGS[arg]
-	if (key === undefined) return index
-	args[key] = valueAfter(argv, index, arg)
-	if (key === "keyFile") args.keyFileExplicit = true
+	if (arg !== "--url") return index
+	args.url = valueAfter(argv, index, arg)
 	return index + 1
 }
 
@@ -31,12 +24,7 @@ export function parseSendArgs(
 	argv: readonly string[],
 	env: Record<string, string | undefined>,
 ): SendArgs {
-	const args: SendArgs = {
-		url: env["TRAJ_DATA_URL"] ?? DEFAULT_INGEST_URL,
-		keyFile: defaultKeyFile(homedir()),
-		keyFileExplicit: false,
-		files: [],
-	}
+	const args: SendArgs = { url: env["TRAJ_DATA_URL"] ?? DEFAULT_INGEST_URL, files: [] }
 	for (let i = 0; i < argv.length; i += 1) {
 		const arg = argv[i] ?? ""
 		if (arg === "--help" || arg === "-h") {

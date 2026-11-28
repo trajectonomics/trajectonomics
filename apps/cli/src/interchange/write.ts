@@ -7,8 +7,8 @@ import { FIELDS, FORMAT_VERSION, RECORD_ORDER, type RecordType } from "./format"
 function encode(type: RecordType, row: Record<string, unknown>): string {
 	const members = Object.entries(FIELDS[type]).map(([key, kind]) => {
 		// Stored canonical text is already the JCS serialisation of the object it holds, so it is
-		// written as is; a household or tax profile that is not set is `null`.
-		const stored = kind === "household?" || kind === "tax?"
+		// written as is; a household, tax profile or unstated list that is not set is `null`.
+		const stored = kind === "household?" || kind === "tax?" || kind === "unstated?"
 		if (kind === "document" || (stored && row[key] !== null)) {
 			return `"${key}":${row[key] as string}`
 		}

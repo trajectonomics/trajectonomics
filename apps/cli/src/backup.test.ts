@@ -18,7 +18,7 @@ describe("backup", () => {
 		const data = JSON.parse(res.out)
 		expect(data).toEqual({
 			directory: resolve(out),
-			schemaVersion: 5,
+			schemaVersion: 6,
 			files: ["traj.jsonl"],
 			rows: { entity: 1, account: 7, tx: 4, posting: 8, scenario: 3 },
 		})
@@ -58,6 +58,6 @@ describe("backup", () => {
 		const res = await capture(["backup", "--out", out], { TRAJ_HOME: await goldenHome() })
 		expect(res.code).toBe(0)
 		expect(res.out).toContain("traj.jsonl")
-		expect(res.out).toContain("schemaVersion: 5")
+		expect(res.out).toContain("schemaVersion: 6")
 	})
 })

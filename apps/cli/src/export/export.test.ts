@@ -22,7 +22,7 @@ describe("export --format jsonl", () => {
 		const data = JSON.parse(res.out)
 		expect(data.format).toBe("jsonl")
 		expect(data.files).toEqual(["traj.jsonl"])
-		expect(data.schemaVersion).toBe(5)
+		expect(data.schemaVersion).toBe(6)
 		expect(data.directory).toBe(resolve(out))
 		expect(data.rows).toEqual({ entity: 1, account: 7, tx: 4, posting: 8, scenario: 3 })
 		expect(await Bun.file(join(out, "traj.jsonl")).text()).toBe(await goldenJsonl())
@@ -42,7 +42,7 @@ describe("export --format jsonl", () => {
 		const res = await capture(["export", "--out", out, "--json"], { TRAJ_HOME: ledgerHome() })
 		expect(res.code).toBe(0)
 		expect(await Bun.file(join(out, "traj.jsonl")).text()).toBe(
-			`{"record":"header","formatVersion":1,"schemaVersion":5}\n${SEEDED}\n`,
+			`{"record":"header","formatVersion":1,"schemaVersion":6}\n${SEEDED}\n`,
 		)
 		expect(JSON.parse(res.out).rows).toEqual({
 			entity: 1,

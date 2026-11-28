@@ -1,9 +1,9 @@
 # @trajectonomics/data-collector
 
 Reads the local logs of the AI coding tools on this machine and prints **hourly usage totals** as
-one JSON object per line. It can also sample the subscription quotas of Claude and OpenCode Go, and
-send both kinds of row to the `data` Worker in batches. Sending is a separate subcommand; reading
-logs alone does no network I/O.
+one JSON object per line. It can also sample the subscription quotas of Claude, OpenCode Go,
+Antigravity, Cursor and Meta (Muse), and send both kinds of row to the `data` Worker in batches.
+Sending is a separate subcommand; reading logs alone does no network I/O.
 
 ## Run
 
@@ -99,16 +99,19 @@ and `nb_api_calls`, and drop every id column. `bestEffort` is true only for Muse
 
 ## Quota samples
 
-`quota` reads two local credential files and never prints, refreshes or stores their tokens:
+`quota` reads local credentials or CLI allowance output and never prints, refreshes or stores tokens:
 
-| Plan | Credential file | Endpoint | Windows |
+| Plan | Source | Endpoint / Command | Windows |
 | --- | --- | --- | --- |
 | `claude` | `~/.claude/.credentials.json`, `claudeAiOauth.accessToken` | `https://api.anthropic.com/api/oauth/usage` | `five_hour`, `weekly` |
 | `opencode-go` | `~/.local/share/opencode/auth.json`, `["opencode-go"].key` | `https://opencode.ai/inference/go/v1/usage` | `five_hour`, `weekly`, `monthly` |
+| `antigravity` | `~/.gemini/antigravity/antigravity-oauth-token` or `~/.t3/userdata/providers/antigravity/*/antigravity-acp/antigravity-oauth-token` (`token.access_token`) | `https://daily-cloudcode-pa.googleapis.com/v1internal:retrieveUserQuotaSummary` | `five_hour`, `weekly` (Gemini buckets) |
+| `cursor` | `~/.config/cursor/auth.json`, `accessToken` | `https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage` | `monthly` |
+| `meta` | `muse` CLI (`~/.local/bin/muse` or `PATH`, with `MUSE_NO_AUTO_UPDATE=1`) | `muse usage --json` | `five_hour`, `weekly` |
 
-A missing file, an expired Claude token, a failed request or an unexpected body logs one stderr line
-naming the plan; the run still exits 0 and simply emits no row for that plan. Claude's token is never
-refreshed, because refreshing would rotate Claude Code's own credential.
+A missing file or binary, an expired token, a failed request or an unexpected body logs one stderr line
+naming the plan; the run still exits 0 and simply emits no row for that plan. File-backed tokens are
+never refreshed by the collector, because refreshing would rotate each tool's own credential.
 
 Each line is a quota row with a marker:
 
@@ -131,9 +134,7 @@ point is 1% of the limit, so a limit estimate needs a large change in percent be
 ## Sign in
 
 `login` runs the device flow against auth.trajectonomics.com and stores a refresh token; the send
-commands then use a 15-minute access token instead of the temporary ingest key. Run `login` only
-after the data Worker that accepts auth tokens is deployed (the Worker part of #601): a token sent
-to a Worker that still checks only the key is rejected.
+commands then use a 15-minute access token. Sending requires this sign-in.
 
 ```sh
 bun apps/data/collector/src/cli.ts login
@@ -173,25 +174,23 @@ of at most 5,000 rows and 1 MB of JSON body to the Worker:
 ```sh
 bun apps/data/collector/src/cli.ts send rows.jsonl
 some-command | bun apps/data/collector/src/cli.ts send
-bun apps/data/collector/src/cli.ts send --url http://127.0.0.1:8787/data/ingest \
-  --key-file ~/.config/traj-data/ingest.key rows.jsonl
+TRAJ_DATA_ALLOW_TOKEN_URL=1 bun apps/data/collector/src/cli.ts send \
+  --url http://127.0.0.1:8787/data/ingest rows.jsonl
 ```
 
 The URL defaults to `https://trajectonomics.com/data/ingest`; `TRAJ_DATA_URL` overrides it when
-`--url` is absent. The sender uses the access token from
-`~/.config/traj-data/credentials.json` when the machine is signed in. With no credentials file it
-uses the temporary ingest key at `~/.config/traj-data/ingest.key`; a failed token refresh never
-falls back to the key. `--key-file <path>` selects a key explicitly and skips the credentials file
-entirely.
+`--url` is absent. Sending requires a signed-in machine: the sender reads
+`~/.config/traj-data/credentials.json` and refuses to run when it is absent, telling you to run
+`login`. A lapsed sign-in fails that runner's hourly unit (exit 1, "sign-in expired" in its
+journal), and running `login` again fixes it. The "no ingest for 3 hours" health warning fires only
+when every runner has stopped, so check each runner's journal, or its last send on `/data/me/`.
+A local `wrangler dev` also needs `ORG_AUTH_USER_ID` in its variables (`.dev.vars`), or ingest
+answers `403 not_a_contributor`.
 
 A sign-in token goes only to `https://trajectonomics.com` or `https://data.trajectonomics.com`.
-For any other URL the sender fails before refreshing: pass `--key-file`, or set
-`TRAJ_DATA_ALLOW_TOKEN_URL=1` when the target really is an auth-backed Worker, for example a local
-`wrangler dev`. To roll back to the key, delete `~/.config/traj-data/credentials.json`; sends then
-use the key file again.
-
-The key file must be mode 600 or stricter; the sender refuses to run when group or others can read
-or write it, and it never prints either credential.
+For any other URL the sender fails before refreshing: set `TRAJ_DATA_ALLOW_TOKEN_URL=1` when the
+target really is an auth-backed Worker, for example a local `wrangler dev`. The sender never prints
+the token.
 
 There are no retries. The Worker upserts rows, so the next hourly run resends the same hours and
 converges. A non-2xx response prints its HTTP status and the error codes in its body (never the
@@ -260,22 +259,17 @@ send failed, after trying everything.
 
    The collector has no runtime dependencies outside bun and the files under `src/`.
 
-2. Deploy the Worker part of #601 first: run `login` only against a Worker that accepts auth
-   tokens. Then sign the runner in once (the grant lasts at most 90 days):
+2. The data Worker accepts auth tokens (ADR 0015). Sign the runner in once (the grant lasts at
+   most 90 days):
 
    ```sh
    ~/.cache/traj-collector/bun ~/.cache/traj-collector/src/cli.ts login
    ```
 
-   It writes `~/.config/traj-data/credentials.json` (mode 600). To roll back to the temporary key,
-   delete that file and write the key on the runner host only, readable by its owner alone:
-
-   ```sh
-   rm ~/.config/traj-data/credentials.json
-   install -d -m 700 ~/.config/traj-data
-   printf '%s\n' '<the ingest key>' > ~/.config/traj-data/ingest.key
-   chmod 600 ~/.config/traj-data/ingest.key
-   ```
+   It writes `~/.config/traj-data/credentials.json` (mode 600). Sending requires that file; a
+   lapsed sign-in fails the hourly unit with "sign-in expired" in its journal, and running `login`
+   again fixes it. A host that sent with the retired key still has `~/.config/traj-data/ingest.key`;
+   delete it (`rm -f ~/.config/traj-data/ingest.key`), since nothing reads it any more.
 
 3. Write `~/.config/traj-data/hosts.json` from
    [`deploy/hosts.example.json`](deploy/hosts.example.json), with absolute paths that exist on each
@@ -313,10 +307,9 @@ there asks for a browser check.
 | the dev machine (prameubuntu) | itself | yes: Claude Code runs there, so its OAuth token stays fresh |
 
 Each host keeps the collector in `~/.cache/traj-collector` (`bun` is a link to `~/.local/bin/bun`,
-or homeserver2's own binary), its `hosts.json` and, when signed in, `credentials.json` in
-`~/.config/traj-data/` (`ingest.key` there only for a rollback), and its cursors in
-`~/.local/state/traj-data/`. To update, copy `src/`, `deploy/` and `package.json` from `main` over
-the old copy on every host. A run peaks at about 1.4 GB of memory.
+or homeserver2's own binary), its `hosts.json` and `credentials.json` in `~/.config/traj-data/`, and
+its cursors in `~/.local/state/traj-data/`. To update, copy `src/`, `deploy/` and `package.json` from
+`main` over the old copy on every host. A run peaks at about 1.4 GB of memory.
 
 ## Rules
 

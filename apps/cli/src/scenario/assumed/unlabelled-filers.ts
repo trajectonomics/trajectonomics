@@ -2,35 +2,14 @@ import { thFilerLabel } from "@trajectonomics/core/tax/th"
 import type { ScenarioDocument } from "../document"
 import { printedCommand } from "../hint-command"
 import type { Household } from "../household/model"
-import { resolveOwners } from "../household/owner-held"
-import { ownedSegments } from "../household/owner-rules"
 import { formatPath } from "../path"
 import { quotedName } from "../quoted-name"
 import { hasFilerLevy, levyTallyLabels } from "../tax/filer-label-check"
-import { flowsOf } from "../tax/labels"
+import { earnersOf, type Flow, ownerlessPathsOf, unlabelledFlowsOf } from "./unlabelled-flows"
+import { ownerHint, SALARY_LABEL, taxForm, taxHint } from "./unlabelled-forms"
 
-/** The label a salary Flow is tallied under, before a Levy with Filers adds its suffix. */
-const SALARY_LABEL = "income.section40_1"
-
+/** One unlabelled income Flow's id, and the hint that states its label. */
 export type UnlabelledHint = { id: string; hint: string }
-
-/** The people who can own an income Flow and file: the holder and the partner, never a dependent. */
-function earnersOf(household: Household | null): string[] {
-	return (household?.people ?? [])
-		.filter((person) => person.role !== "dependent")
-		.map((person) => person.id)
-}
-
-/** Each owned Flow's person, keyed as its tax slot names it, `flows.<id>`. */
-function ownersOf(household: Household | null, document: ScenarioDocument): Map<string, string> {
-	const owners = household === null ? [] : (resolveOwners(household, document).owners ?? [])
-	return new Map(
-		owners.flatMap((owner) => {
-			const segments = ownedSegments(owner.path)
-			return segments === null ? [] : [[segments.join("."), owner.person] as const]
-		}),
-	)
-}
 
 /** The label with `filer`'s suffix, or null when the CLI's own rule refuses that id as a suffix. */
 function suffixed(label: string, filer: string): string | null {
@@ -58,45 +37,58 @@ function setHint(name: string, id: string, label: string, words: string): string
 	return `Run "${command}" for a salary${words}, or name another label from "traj schema scenario apply".`
 }
 
-/** The hint that writes every unlabelled Flow's label through a `scenario tax --from-stored` write. */
-function taxHint(name: string, ids: readonly string[]): string {
-	const labels = ids.flatMap((id) => ["--label", quotedName(`${id}=${SALARY_LABEL}`)])
-	const command = printedCommand("traj scenario tax", [name], ["--from-stored", ...labels])
-	return `Run "${command}" to write every unlabelled income Flow's salary label with its Owner's Filer suffix, or name another label from "traj schema scenario apply".`
+/** The hint that writes every unlabelled Flow's label through one `scenario tax` write. */
+function taxWriteHint(
+	name: string,
+	document: ScenarioDocument,
+	flows: readonly Flow[],
+	stored: boolean,
+): string {
+	const ids = flows.map((flow) => flow.id)
+	return taxHint(taxForm(name, document, ids, stored), stored)
+}
+
+/** One Flow's hint: a suffix the Levy reads, the tax write, or giving an Ownerless Flow an Owner. */
+function hintFor(
+	name: string,
+	flow: Flow,
+	read: ReadonlySet<string>,
+	choices: readonly string[],
+	ownerless: readonly string[],
+	fallback: string,
+): string {
+	const { id, owner } = flow
+	const label = owner === undefined ? null : suffixed(SALARY_LABEL, owner)
+	if (label !== null && read.has(label)) return setHint(name, id, label, "")
+	if (owner !== undefined) return ownerless.length === 0 ? fallback : ownerHint(name, ownerless)
+	if (choices.length === 0) return ownerHint(name, ownerless)
+	const words = `, with the Filer suffix of whoever earns it (@<person>: one of ${choices.join(", ")})`
+	return setHint(name, id, `${SALARY_LABEL}@<person>`, words)
 }
 
 /**
  * The label hint for each unlabelled income Flow (cli ADR-0075, ADR-0083). A Levy with Filers reads
- * only the suffixes it tallies, so an Owner's suffix it does not read gives the `--from-stored` form,
- * which writes the label under the Owner's suffix and adds that person to the Levy. A Flow with no
- * Owner names the suffixes the Levies do read, or falls back to the same form.
+ * only the suffixes it tallies, so an Owner's suffix it does not read gives one `scenario tax` write
+ * that labels every unlabelled Flow. That write needs every taxed Flow and Account to have an Owner,
+ * so while one has none the hint says to give it an Owner first. A Flow with no Owner names the
+ * suffixes the Levies read, or says to give it an Owner when they read none.
  */
 export function unlabelledHintsOf(
 	name: string,
 	document: ScenarioDocument,
 	household: Household | null,
+	stored: boolean,
 ): UnlabelledHint[] {
-	const owners = ownersOf(household, document)
-	const flows = flowsOf(document)
-		.filter((flow) => flow["kind"] === "income" && typeof flow["label"] !== "string")
-		.map((flow) => {
-			const id = String(flow["id"] ?? "")
-			return { id, owner: owners.get(`flows.${id}`) }
-		})
+	const flows = unlabelledFlowsOf(household, document)
 	if (!hasFilerLevy(document)) {
 		return flows.map(({ id }) => ({ id, hint: setHint(name, id, SALARY_LABEL, "") }))
 	}
 	const read = levyTallyLabels(document)
-	const fallback = taxHint(
-		name,
-		flows.map((flow) => flow.id),
-	)
 	const choices = choicesOf(read, household)
-	return flows.map(({ id, owner }) => {
-		const label = owner === undefined ? null : suffixed(SALARY_LABEL, owner)
-		if (label !== null && read.has(label)) return { id, hint: setHint(name, id, label, "") }
-		if (owner !== undefined || choices.length === 0) return { id, hint: fallback }
-		const words = `, with the Filer suffix of whoever earns it (@<person>: one of ${choices.join(", ")})`
-		return { id, hint: setHint(name, id, `${SALARY_LABEL}@<person>`, words) }
-	})
+	const ownerless = ownerlessPathsOf(household, document)
+	const fallback = taxWriteHint(name, document, flows, stored)
+	return flows.map((flow) => ({
+		id: flow.id,
+		hint: hintFor(name, flow, read, choices, ownerless, fallback),
+	}))
 }
