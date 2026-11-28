@@ -74,12 +74,12 @@ cannot do, so setup skips the skill.
 ## Add the agent skill
 
 Both skills publish from the `skills/customer` folder of the `trajectonomics/trajectonomics`
-repository, and `-y` keeps the install non-interactive. The setup skill is the front door: it asks
-about your situation and goal, installs the command line, and installs the operating skill as its
-second step.
+repository, `-g` installs them for your user so every folder and every new agent session finds them,
+and `-y` keeps the install non-interactive. The setup skill is the front door: it asks about your
+situation and goal, installs the command line, and installs the operating skill as its second step.
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -g -y
 ```
 
 The operating skill expects a recent `traj`: it describes a projection, a financial-independence
@@ -96,12 +96,12 @@ The operating skill on its own, for an Agent that is already set up on a `traj` 
 This line skips the setup skill's version check, so that precondition is yours to check:
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer --skill traj -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj -g -y
 ```
 
-That is the command the setup skill's second step runs, from the same folder, so a project's
-`skills-lock.json` records one source whichever line you use. What the Agent asks you for, and where
-the tool stops, is on [Agent](/cli/agent/).
+That is the command the setup skill's second step runs, from the same folder, so the one global lock
+records one source whichever line you use. What the Agent asks you for, and where the tool stops, is
+on [Agent](/cli/agent/).
 
 ## Check the installed version
 

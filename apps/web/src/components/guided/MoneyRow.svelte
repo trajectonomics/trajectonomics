@@ -1,7 +1,7 @@
 <script lang="ts">
 import { maskedFocus } from "../../client/masked-focus.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { formatMoney, maskMoney } from "../../lib/format"
+import { draftAfterInput, formatMoney, maskMoney } from "../../lib/format"
 import type { GuidedMoneyRow } from "../../lib/view/guided/money"
 import type { RowDraft } from "../../lib/view/guided/money-draft"
 import Badge from "../ui/Badge.svelte"
@@ -41,6 +41,20 @@ const described = $derived(
 		.filter((one) => one !== undefined)
 		.join(" ") || undefined,
 )
+
+/** The draft a typed amount makes. Undo can put the mask back, which is no amount, so it keeps the draft and the field. */
+function onInput(event: Event & { currentTarget: HTMLInputElement }): void {
+	const field = event.currentTarget
+	const typed = field.value
+	const next = draftAfterInput(draft.amount, typed)
+	const caret = (field.selectionStart ?? typed.length) - (typed.length - next.length)
+	touched = true
+	onAmount(next)
+	if (next !== typed) {
+		field.value = shown
+		field.setSelectionRange(caret, caret)
+	}
+}
 </script>
 
 <!-- One Account: kept or dropped, the CLI's amount, its frequency, and for income the stop-work and tax facts. -->
@@ -63,10 +77,7 @@ const described = $derived(
 			}}
 			aria-invalid={shownProblem ? "true" : undefined}
 			aria-describedby={described}
-			oninput={(event) => {
-				touched = true
-				onAmount(event.currentTarget.value)
-			}} />
+			oninput={onInput} />
 		<span class="text-sm text-muted-foreground">{row.frequency === "yearly" ? "per year" : "per month"}</span>
 	</div>
 	{#if masked}<span id="guided-amount-{row.id}-masked" class="sr-only">Amount hidden. Select the field to see and edit it.</span>{/if}

@@ -27,8 +27,8 @@ const BUNX_INSTALL = "bunx @trajectonomics/cli@latest --version"
 // no `traj` once the internal copy is retired, and one that drops `--skill traj` would add an
 // internal session's Skills to their repository (cli#152).
 const SKILL_SOURCE = "trajectonomics/trajectonomics/skills/customer"
-const SETUP_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj-onboarding -y`
-const OPERATOR_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj -y`
+const SETUP_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj-onboarding -g -y`
+const OPERATOR_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj -g -y`
 const INSTALL_COMMANDS = [SCRIPT_INSTALL, WINDOWS_INSTALL, NPM_INSTALL, BUNX_INSTALL]
 
 // The section that describes projections, fi and scenario tax, which the release ships (ADR-0034).

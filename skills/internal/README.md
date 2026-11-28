@@ -14,13 +14,15 @@ Internal AI coding agent skills for the Trajectonomics ecosystem, managed via [s
 
 ## Curated Engineering Profile
 
-Factory repositories install a pinned set of upstream engineering skills (grilling, grill-with-docs, domain-modeling, to-spec, to-tickets, implement, implement-spec, tdd, code-review, pr, triage, diagnosing-bugs, retro) from [`mattpocock/skills`](https://github.com/mattpocock/skills), plus Cloudflare skills (cloudflare, cf-cli, wrangler, workers-best-practices, workers-development, cloudflare-email-service, durable-objects, cloudflare-one) from [`cloudflare/skills`](https://github.com/cloudflare/skills), with one command:
+Factory repositories install a pinned set of upstream engineering skills (grilling, grill-with-docs, domain-modeling, to-spec, to-tickets, implement, implement-spec, tdd, code-review, pr, triage, diagnosing-bugs, retro) from [`mattpocock/skills`](https://github.com/mattpocock/skills), plus Cloudflare skills (cloudflare, cf-cli, wrangler, workers-best-practices, workers-development, cloudflare-email-service, durable-objects, cloudflare-one) from [`cloudflare/skills`](https://github.com/cloudflare/skills), with one command, run from the repository that should receive the profile:
 
 ```bash
-npx -y --package=github:trajectonomics/internal-skills#main install-skills-profile
+node <path-to-trajectonomics-checkout>/skills/internal/scripts/install-profile.mjs
 ```
 
-Factory repositories intentionally track this profile on `main`: the upstream skill pins are fixed, but the profile contents are not. Editing `profiles/factory.json` on `main` changes every repository that re-runs the installer.
+The installer reads the profile from your checkout, so update it to the latest `main` first (`git switch main && git pull`). The old `npx -y --package=github:trajectonomics/internal-skills#main install-skills-profile` command no longer works: `trajectonomics/internal-skills` is archived and will never receive this fix.
+
+Factory repositories intentionally track this profile on `main`: the upstream skill pins are fixed, but the profile contents are not. Editing `profiles/factory.json` on `main` changes every repository that re-runs the installer from an up-to-date checkout.
 
 The installer requires `npx` and network access at install time.
 

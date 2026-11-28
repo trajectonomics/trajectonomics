@@ -1,4 +1,9 @@
-import { type PreviewAnswer, previewAnswer, sessionAnswer } from "../lib/edit/answer"
+import {
+	type PreviewAnswer,
+	previewAnswer,
+	type SessionAnswer,
+	sessionAnswer,
+} from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER } from "../lib/edit/guard"
 
@@ -13,12 +18,12 @@ export async function postEdit(token: string, edit: EditInput): Promise<unknown>
 	return response.json()
 }
 
-/** Asks the server for this page's session token; null when no server answers (`vite preview`). */
-export async function fetchEditToken(): Promise<string | null> {
+/** Asks the server for this page's session; null when no server answers (`vite preview`). */
+export async function fetchEditSession(): Promise<SessionAnswer | null> {
 	try {
 		const response = await fetch(EDIT_SESSION_PATH, { cache: "no-store" })
 		const session = response.ok ? sessionAnswer.safeParse(await response.json()) : null
-		return session?.success === true ? session.data.token : null
+		return session?.success === true ? session.data : null
 	} catch {
 		return null
 	}

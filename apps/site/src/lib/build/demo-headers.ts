@@ -14,7 +14,7 @@ const EXACT = [
 	["style-src-attr", "'unsafe-inline'"],
 	["form-action", "'none'"],
 	["base-uri", "'self'"],
-	["frame-ancestors", "'none'"],
+	["frame-ancestors", "'self'"],
 ] as const
 
 /** The directives that may name the Site's own origin and nothing else. */

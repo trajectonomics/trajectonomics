@@ -36,10 +36,10 @@ describe("Step 2, installing the published set", () => {
 		expect(stepTwo).toContain("a branch moves")
 	})
 
-	it("reads the pin from the lock of the scope it installed in, project or global", () => {
-		expect(stepTwo).toContain("`./skills-lock.json` for the project")
+	it("reads the pin from the global lock, and never the project one", () => {
 		expect(stepTwo).toContain(`\`\${XDG_STATE_HOME}/skills/.skill-lock.json\``)
 		expect(stepTwo).toContain("`~/.agents/.skill-lock.json` when it is not")
+		expect(stepTwo).not.toContain("`./skills-lock.json`")
 		expect(stepTwo).toContain("the list reports none, so the lock is the only place it is read")
 	})
 
@@ -51,52 +51,54 @@ describe("Step 2, installing the published set", () => {
 
 	it("re-runs the install on the pinned skills CLI when the entry has no commit, and reads it again", () => {
 		expect(stepTwo).toContain("has no `commit`, or its `source` is")
-		expect(stepTwo).toContain("`npx -y skills@1.9.0 add …`")
+		expect(stepTwo).toContain("`npx -y skills@1.9.0 add … -g -y`")
 		expect(stepTwo).toContain("carries the `commit` that run installed")
 		expect(stepTwo).toContain("A `commit` comes from the lock and from nowhere else")
 	})
 
 	it("reports the source and hash, and stops, when the lock still has no commit", () => {
 		expect(stepTwo).toContain("setup stopped here, with the entry's `source` and its hash")
-		expect(stepTwo).toContain("`computedHash` in a project lock, `skillFolderHash` in a global one")
+		expect(stepTwo).toContain("`skillFolderHash` in the global lock")
 		expect(stepTwo).toContain("install nothing else")
 		expect(stepTwo).toContain("Treat it as a failed step")
 		expect(section(body, "If a step fails")).toContain("the pin in step 2")
 	})
 
-	it("makes every skills call itself on skills@1.9.0, so a 1.7.6 never meets the version 2 lock", () => {
-		expect(body).toContain("`npx -y skills@1.9.0 list --json` and")
+	it("makes every skills call itself on skills@1.9.0, so a 1.7.6 never writes a row without a pin", () => {
 		expect(body).toContain("`npx -y skills@1.9.0 list -g --json`")
+		expect(body).not.toContain("`npx -y skills@1.9.0 list --json`")
 		expect(stepTwo).toContain(
-			"npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name>",
+			"npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -g",
 		)
 		expect(stepTwo).toContain("Every `skills` call this skill makes is `npx -y skills@1.9.0 …`")
-		expect(stepTwo).toContain("refuses the version 2 lock that 1.9.0 writes")
+		expect(stepTwo).toContain("resolves to 1.7.6 writes no `commit`, so the row has no pin")
 		const plain = body.split("\n").filter((line) => /npx (-y )?skills (add|list)/.test(line))
 		expect(plain).toEqual([WEBSITE_COMMAND])
 	})
 
 	it("reads this skill again after the re-run, which may have installed a newer copy", () => {
 		expect(stepTwo).toContain("newer `traj-onboarding`")
-		expect(stepTwo).toContain("read this skill again at the `path` the list reports")
+		expect(stepTwo).toContain("read this skill again at the `path` the global list reports")
 	})
 
 	it("tells the person the way on when the stop is reached: Node 22.20, run it themselves, set up again", () => {
 		expect(stepTwo).toContain("`skills@1.9.0` needs Node 22.20 or later")
-		expect(stepTwo).toContain("run `npx -y skills@1.9.0 add … -y` themselves")
+		expect(stepTwo).toContain("run `npx -y skills@1.9.0 add … -g -y` themselves")
 		expect(stepTwo).toContain("then run setup again")
 	})
 
-	it("is done only with the commit in hand", () => {
+	it("is done only with the commit in hand, from the global list", () => {
+		expect(stepTwo).toContain("Done when the global list names every row you installed")
 		expect(stepTwo).toContain("and you hold the `commit` they installed from")
 	})
 
-	it("reads the manifest at that commit and installs one explicit --skill per row", () => {
+	it("reads the manifest at that commit and installs one explicit --skill per row, globally", () => {
 		expect(stepTwo).toContain(
 			"Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at the",
 		)
 		expect(stepTwo).toContain("in install order")
-		expect(stepTwo).toContain("with an explicit `--skill` per")
+		expect(stepTwo).toContain("into the global scope with `-g`")
+		expect(stepTwo).toContain("and an explicit `--skill` per row")
 	})
 
 	it("skips and names a row below its floor, with its range and the reason", () => {

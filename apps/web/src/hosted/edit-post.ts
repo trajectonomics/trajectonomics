@@ -1,4 +1,4 @@
-import type { PreviewAnswer } from "../lib/edit/answer"
+import type { PreviewAnswer, SessionAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 
 /** The sentence every refused request of the hosted build answers with. */
@@ -18,7 +18,7 @@ export function postPreview(_token: string, _edit: EditInput): Promise<PreviewAn
 	})
 }
 
-/** The loopback client asks the server for a token. The hosted build has none: it answers null and sends nothing. */
-export function fetchEditToken(): Promise<string | null> {
+/** The loopback client asks the server for a session. The hosted build has none: it answers null and sends nothing. */
+export function fetchEditSession(): Promise<SessionAnswer | null> {
 	return Promise.resolve(null)
 }

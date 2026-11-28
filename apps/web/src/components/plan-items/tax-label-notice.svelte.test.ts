@@ -29,14 +29,22 @@ afterEach(() => {
 })
 
 describe("the notice a saved income shows", () => {
-	test("keeps a status mounted with the sentence in it, and a link with the focus ring", () => {
+	test("keeps a status mounted empty, with the sentence beside it", () => {
 		setTestUrl("http://127.0.0.1/income/?scenario=base&terms=today")
 		taxLabelNotice.offer(offer)
 		const rendered = body()
-		expect(rendered).toContain('role="status"')
+		expect(rendered).toContain('<p role="status" class="sr-only"></p>')
 		expect(rendered).toContain("Give this income a label in")
 		expect(rendered).toContain('href="/settings/tax/?scenario=base&amp;terms=today"')
 		expect(rendered).toContain("focus-visible:outline-2")
+	})
+
+	test("mounts the status region empty, so the sentence is announced once the region is on the page", () => {
+		setTestUrl("http://127.0.0.1/?scenario=base&demo=1")
+		taxLabelNotice.offer({ ...offer, origin: "guided" })
+		const rendered = body({ source: "guided", next: true })
+		expect(rendered).toContain('<p role="status" class="sr-only"></p>')
+		expect(rendered).toContain("Next: give your income its tax labels in")
 	})
 
 	test("links with the query the page shows now, not the one it showed when the income was saved", () => {

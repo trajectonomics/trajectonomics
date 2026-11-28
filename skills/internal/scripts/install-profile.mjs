@@ -93,6 +93,15 @@ async function main(argv) {
     `Recorded ${profile.name ?? 'skill'} profile (${entries.length} source(s)) in ${packagePath}`
   );
 
+  // `npx --package=X` exports npm_config_package=X, which would make the nested
+  // npx resolve `skills@<pin>` as an alias for X instead of the skills CLI, and
+  // `npx -c` exports npm_config_call, which makes the nested npx fail (EUSAGE).
+  const childEnv = { ...process.env };
+  for (const key of ['npm_config_package', 'npm_config_call']) {
+    delete childEnv[key];
+    delete childEnv[key.toUpperCase()];
+  }
+
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const result = spawnSync(
     npx,
@@ -104,7 +113,7 @@ async function main(argv) {
       '--no-frozen-lockfile',
       ...syncArgs,
     ],
-    { cwd: process.cwd(), stdio: 'inherit', env: process.env }
+    { cwd: process.cwd(), stdio: 'inherit', env: childEnv }
   );
 
   if (result.error) throw result.error;

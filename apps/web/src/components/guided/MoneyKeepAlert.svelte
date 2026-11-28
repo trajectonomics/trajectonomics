@@ -12,16 +12,17 @@ interface Props {
 let { rows, showProblems }: Props = $props()
 const text = $derived(showProblems ? keepProblem(rows) : null)
 let sentence = $state<HTMLParagraphElement>()
-let last: string | null = null
+let shown = false
 
-// Next moved no step because no row is kept: focus the sentence that says so, as a refusal's alert is focused.
+// Next is what puts the problems on the step, so it moves focus to the sentence that says why no step moved. Once
+// they are shown, unticking the last kept row changes these words but is not Next: the checkbox keeps the focus.
 $effect(() => {
-	if (text === null) {
-		last = null
+	if (!showProblems) {
+		shown = false
 		return
 	}
-	if (text === last) return
-	last = text
+	if (shown) return
+	shown = true
 	sentence?.focus()
 })
 </script>

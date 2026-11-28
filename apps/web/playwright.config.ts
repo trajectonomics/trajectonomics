@@ -16,6 +16,7 @@ import {
  */
 const SCRATCH_WRITERS = [
 	"**/guided-save.e2e.ts",
+	"**/masked-amount.e2e.ts",
 	"**/tax-shared-interest.e2e.ts",
 	"**/written-unread.e2e.ts",
 ]

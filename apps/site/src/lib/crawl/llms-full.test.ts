@@ -55,8 +55,12 @@ describe("the full Answer engine file", () => {
 		expect(LLMS_FULL_TXT).toContain(
 			[
 				"```bash",
-				"# First-time setup: record your balance, then fill base.json with your numbers before applying it.",
-				...FI_DEMO_SETUP_COMMANDS,
+				"# First-time setup:",
+				FI_DEMO_SETUP_COMMANDS[0],
+				"# Record your balance in the ledger first: an opening on or before the as-of date.",
+				FI_DEMO_SETUP_COMMANDS[1],
+				"# Fill base.json with your numbers, then apply it.",
+				FI_DEMO_SETUP_COMMANDS[2],
 				"",
 				"# Ask when you reach financial independence:",
 				FI_DEMO_COMMAND,

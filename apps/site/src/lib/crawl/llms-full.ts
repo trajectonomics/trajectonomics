@@ -26,9 +26,21 @@ const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent
 /** The pill's two runs: the licence and the release, both facts the page prints. */
 const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 
-/** The first line of the demo's bash fence: what the setup does, named because the window shortens it. */
-const SETUP_NOTE =
-	"# First-time setup: record your balance, then fill base.json with your numbers before applying it."
+/**
+ * The comment above each setup command, in order: what happens before it, named because the window
+ * shortens the setup. The template's `--as-of` reads the ledger, so the balance is recorded first.
+ */
+const SETUP_NOTES: readonly string[] = [
+	"# First-time setup:",
+	"# Record your balance in the ledger first: an opening on or before the as-of date.",
+	"# Fill base.json with your numbers, then apply it.",
+]
+
+/** The setup commands, each under the comment that says what comes before it. */
+const SETUP_LINES = FI_DEMO_SETUP_COMMANDS.flatMap((command, at) => {
+	const note = SETUP_NOTES[at]
+	return note === undefined ? [command] : [note, command]
+})
 
 /** The line above the demo command: the question that command answers. */
 const ASK_NOTE = "# Ask when you reach financial independence:"
@@ -40,8 +52,7 @@ const ASK_NOTE = "# Ask when you reach financial independence:"
  */
 const DEMO = [
 	"```bash",
-	SETUP_NOTE,
-	...FI_DEMO_SETUP_COMMANDS,
+	...SETUP_LINES,
 	"",
 	ASK_NOTE,
 	FI_DEMO_COMMAND,

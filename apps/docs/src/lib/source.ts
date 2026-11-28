@@ -9,6 +9,10 @@ const meta = await getCollection("meta")
 /**
  * The Fumadocs source over the authored Docs Portal pages. The collection types are named
  * explicitly, so a page's own frontmatter (the `mascot` pose, ADR 0018) reaches `page.data`.
+ *
+ * The loader's page URLs carry no trailing slash, because Fumadocs matches the current pathname
+ * against them to find the page in the tree; `PortalLink` adds the slash the Portal serves each
+ * page under when it renders a link (trajectonomics#46).
  */
 export const source = loader({
 	source: toFumadocsSource<CollectionEntry<"docs">, CollectionEntry<"meta">>(docs, meta),

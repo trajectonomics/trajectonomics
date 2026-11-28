@@ -17,6 +17,7 @@ function figure(overrides: Partial<WeeklyFigure> = {}): WeeklyFigure {
 		rough: false,
 		derived: false,
 		collecting: null,
+		monthCapped: false,
 		...overrides,
 	}
 }

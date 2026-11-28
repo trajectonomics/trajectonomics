@@ -10,16 +10,25 @@ needed here. The MIT skills vendored under `.agents/skills/` are credited in
 
 ## Install
 
-From the repository that should receive the profile:
+From a checkout of this monorepo, run the installer from the repository that
+should receive the profile:
 
 ```bash
-npx -y --package=github:trajectonomics/internal-skills#main install-skills-profile
+node <path-to-trajectonomics-checkout>/skills/internal/scripts/install-profile.mjs
 ```
 
-`#main` is intentional. Factory repositories track the profile itself on `main`:
+The installer acts on the current working directory and reads the profile from
+your checkout, so update the checkout to the latest `main` first
+(`git switch main && git pull`).
+
+The old `npx -y --package=github:trajectonomics/internal-skills#main
+install-skills-profile` command no longer works: `trajectonomics/internal-skills`
+is archived and will never receive this fix.
+
+`main` is intentional. Factory repositories use the profile itself from `main`:
 the upstream skill pins are fixed, but the profile contents are not. Editing
 `profiles/factory.json` on `main` changes every repository that re-runs the
-installer.
+installer from an up-to-date checkout.
 
 The installer requires `npx` and network access at install time: `npx` fetches
 `skills@1.7.6`, and `experimental_sync` fetches the pinned upstream commit.
@@ -31,12 +40,6 @@ The command:
    field. Entries for the same source are replaced; unrelated sources are
    preserved.
 3. Runs `npx -y skills@1.7.6 experimental_sync -y --no-frozen-lockfile`.
-
-From a checkout of this repository, the equivalent is:
-
-```bash
-node scripts/install-profile.mjs
-```
 
 Extra arguments are passed to `experimental_sync`, for example
 `--agent claude-code` or `--copy`. Use `--dry-run` to print the `package.json`

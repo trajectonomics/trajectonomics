@@ -22,17 +22,18 @@ Give a coding agent that can run commands (Claude Code, Codex, Cursor and simila
 Set up traj: read https://raw.githubusercontent.com/trajectonomics/trajectonomics/main/skills/customer/skills/traj-onboarding/SKILL.md and follow it.
 ```
 
-Or install the setup skill yourself. It asks about your situation and your goal, installs the
-command line and the skill that operates it, and hands the conversation over:
+Or install the setup skill yourself. `-g` installs it for your user, so every folder and every new
+agent session finds it. It asks about your situation and your goal, installs the command line and
+the skill that operates it, and hands the conversation over:
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -g -y
 ```
 
 An agent that is already set up needs only the operating skill:
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer --skill traj -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj -g -y
 ```
 
 To run the command line yourself, see [Install](apps/cli/README.md#install): one line for Linux,

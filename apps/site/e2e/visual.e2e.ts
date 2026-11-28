@@ -62,6 +62,9 @@ test.describe("the built pages as screenshots", () => {
 				const slug = underTest.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 				await expect(page).toHaveScreenshot(`${slug}-${snapshot}.png`, {
 					fullPage: true,
+					// The live Demo's lazy iframe loads when it nears the viewport, so its pixels are not
+					// the Site's own; the frame is masked (ADR 0034).
+					mask: [page.locator("[data-live-viewport]")],
 				})
 			})
 		}

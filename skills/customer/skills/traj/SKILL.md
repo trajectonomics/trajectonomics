@@ -111,7 +111,7 @@ Add `-g` to it in the global scope. Then confirm from the same scope's list that
 Install nothing in these four cases:
 
 - **Below the floor.** Skip a row below its floor, and name the row, the range it wants and the reason in one sentence, then do the part the schema allows.
-- **No pin.** The lock is missing, or records no `commit` for `traj` in that scope because an older `skills` CLI wrote the entry, or the entry's `source` is `trajectonomics/skills`, which is archived and does not have that commit. Say in one sentence that there is no pin, and that the person should re-run setup with `traj-onboarding` to get a pinned copy; then do the part the schema allows.
+- **No pin.** The lock is missing, or records no `commit` for `traj` in that scope because an older `skills` CLI wrote the entry, or the entry's `source` is `trajectonomics/skills`, which is archived and does not have that commit. Say in one sentence that there is no pin, and that the person should re-run setup with `traj-onboarding` to get a pinned copy; when the copy without a pin is a project copy, they first run `npx -y skills@1.9.0 remove traj` in that project, because setup now installs globally and the project copy would still win here. Then do the part the schema allows.
 - **No manifest.** When `skills.manifest.json` cannot be fetched or read at the pin, say so in one sentence and do the part the schema allows: the contract stays authoritative, and nothing is installed blind.
 - **No row.** When the manifest has no row for the job, say `traj` has no Recipe for it yet and do the part the schema allows, rather than improvising the rest.
 

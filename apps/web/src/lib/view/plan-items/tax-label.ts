@@ -58,6 +58,21 @@ export function heldTaxStep(
 	return unlabelledIncome(doc).length > 0
 }
 
+/** The words of a notice's one sentence, split around the page it links to. */
+export interface TaxLabelSentence {
+	readonly lead: string
+	readonly link: string
+	readonly tail: string
+}
+
+/** The sentence a notice shows: its page as the link, and Next first on the page a guided save lands on. */
+export function taxLabelSentence(next: boolean, untaxed: boolean): TaxLabelSentence {
+	if (untaxed) return { lead: "Next: set up tax in ", link: "Tax profile", tail: "." }
+	return next
+		? { lead: "Next: give your income its tax labels in ", link: "Tax labels", tail: "." }
+		: { lead: "Give this income a label in ", link: "Tax labels", tail: "." }
+}
+
 /** The first income of a plan in the Snapshot that has no tax label yet, or null when its document is not read. */
 export function firstTaxLabelOffer(snapshot: Snapshot, plan: string): TaxLabelOffer | null {
 	const read = snapshot.reads.documents[plan]

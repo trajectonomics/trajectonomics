@@ -1,5 +1,8 @@
 /** The English strings of the sections below the hero and of the footer's link columns (ADR 0012). */
+import { ENGLISH_LIVE_DEMO } from "./en-live-demo"
+
 export const ENGLISH_SECTIONS = Object.freeze({
+	...ENGLISH_LIVE_DEMO,
 	actionEyebrow: "Without vs with",
 	actionHeading: "See it in action",
 	actionLede:
@@ -29,8 +32,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 	actionNeedMore:
 		"This covers your spending, but not what you have saved. What is your balance today?",
 	actionData: "I have 1.2M saved today and I put away 25,000 a month.",
-	actionSkillLine:
-		"The agent's traj skill records your balance, fills base.json with your numbers and runs the CLI:",
+	actionSkillLine: "The traj skill records your balance, fills base.json and runs the CLI:",
 	actionProvenance: "traj fi · as of 31 Mar 2026",
 	replay: "Replay",
 	actionExampleNote: "Example output, abridged.",

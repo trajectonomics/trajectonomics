@@ -6,8 +6,15 @@
 import { z } from "zod"
 import { accountValues, errorBody, snapshot } from "../contract"
 
-/** The session answer: the token the page sends in `EDIT_TOKEN_HEADER`. */
-export const sessionAnswer = z.strictObject({ token: z.string().min(1) })
+/**
+ * The session answer: the token the page sends in `EDIT_TOKEN_HEADER`, and `unread` while the served Snapshot
+ * lacks a write that landed.
+ */
+export const sessionAnswer = z.strictObject({
+	token: z.string().min(1),
+	unread: z.literal(true).optional(),
+})
+export type SessionAnswer = z.infer<typeof sessionAnswer>
 
 /** The answer of an Edit that did not run: the error that stopped it, as the CLI stated it. */
 const refusedAnswer = z.strictObject({ ok: z.literal(false), error: errorBody })

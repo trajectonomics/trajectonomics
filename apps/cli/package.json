@@ -1,7 +1,21 @@
 {
 	"name": "@trajectonomics/cli",
 	"version": "0.0.0",
-	"description": "trajectonomics command line",
+	"description": "A free, open-source money command line that AI agents operate. Deterministic, local-first, Thai tax first.",
+	"keywords": [
+		"personal-finance",
+		"financial-planning",
+		"financial-independence",
+		"fire",
+		"plaintext-accounting",
+		"double-entry",
+		"tax",
+		"thailand",
+		"cli",
+		"ai-agents",
+		"agent-skills",
+		"claude-code"
+	],
 	"license": "AGPL-3.0-only",
 	"type": "module",
 	"packageManager": "bun@1.4.4",

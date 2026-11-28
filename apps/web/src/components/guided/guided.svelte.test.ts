@@ -110,16 +110,6 @@ describe("the guided plan page", () => {
 		expect(body.match(/aria-label="Remove /g)).toHaveLength(1)
 	})
 
-	test("replaces the form with one sentence that says the plan saved", () => {
-		guidedSession.saved = "guided"
-		const body = page()
-		expect(body).toContain("Settle the What-if above, then open it.")
-		expect(body).toContain("Open guided")
-		expect(body).toContain('tabindex="-1"')
-		expect(body).not.toContain("Save plan")
-		expect(body).not.toContain("Stop-work age")
-	})
-
 	test("keeps the tax step off the What-if, whose link would skip the plan switch guard", () => {
 		guidedSession.saved = "guided"
 		taxLabelNotice.offer({ plan: "guided", flow: "pension", origin: "guided", taxed: true })

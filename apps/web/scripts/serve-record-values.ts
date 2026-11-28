@@ -9,7 +9,7 @@ import { answerPreview, failure } from "./serve-edit-answer"
 import { answerWritten } from "./serve-snapshot-answer"
 import type { SnapshotRun } from "./snapshot-run"
 
-/** What the run needs: how to run traj, the Snapshot the page reads, and how to read it again. */
+/** What the run needs: how to run traj, the Snapshot the page reads, and how to read it after the write. */
 export type RecordValuesRun = {
 	traj: RunContext
 	held: Snapshot | null
