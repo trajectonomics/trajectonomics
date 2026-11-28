@@ -54,7 +54,7 @@ export function composeShareChart(input: ShareChartComposition): ShareImage {
 		`<svg xmlns="http://www.w3.org/2000/svg" width="${SHARE_IMAGE_WIDTH}" height="${SHARE_IMAGE_HEIGHT}" viewBox="0 0 ${SHARE_IMAGE_WIDTH} ${SHARE_IMAGE_HEIGHT}">`,
 		`<rect width="${SHARE_IMAGE_WIDTH}" height="${SHARE_IMAGE_HEIGHT}" fill="${colours.background}"/>`,
 		placedLockup(input.lockup, MARGIN, MARGIN, LOCKUP_HEIGHT, colours.foreground),
-		metaText(input.host, CHART_RIGHT, META_BASELINE, colours.mutedForeground, true),
+		metaText(input.host, SHARE_IMAGE_WIDTH - MARGIN, META_BASELINE, colours.mutedForeground, true),
 		statementText(
 			dictionary.actionQuestion,
 			MARGIN,

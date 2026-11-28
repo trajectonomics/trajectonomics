@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import type { Dictionary } from "../language/dictionary"
 import { dictionaryFor } from "../language/languages"
-import { CHART_RIGHT, QUESTION_BASELINE, QUESTION_SIZE } from "./chart-layout"
+import { QUESTION_BASELINE, QUESTION_SIZE } from "./chart-layout"
 import {
 	LOCKUP_HEIGHT,
 	MARGIN,
@@ -80,7 +80,7 @@ describe("one Language's home share image", () => {
 
 	it("names the host in the corner, and no longer the Language", () => {
 		expect(imageOf("en").svg).toContain(
-			`<text x="${CHART_RIGHT}" y="${META_BASELINE}" text-anchor="end" font-family="Azeret Mono" font-size="${META_SIZE}" fill="${COLOURS.mutedForeground}">trajectonomics.com</text>`,
+			`<text x="${SHARE_IMAGE_WIDTH - MARGIN}" y="${META_BASELINE}" text-anchor="end" font-family="Azeret Mono" font-size="${META_SIZE}" fill="${COLOURS.mutedForeground}">trajectonomics.com</text>`,
 		)
 		for (const language of ["en", "th"]) {
 			expect(imageOf(language).svg).not.toContain(`>${dictionaryFor(language).languageName}<`)
