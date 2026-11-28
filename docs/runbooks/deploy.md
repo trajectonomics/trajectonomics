@@ -101,16 +101,15 @@ a fresh batch appears within that window without a deploy.
 accept it only until our own collector sends with an auth token, and the pull request after that
 removes the key branch and deletes the secret.
 
-After the collector's first `login`, set the org owner's auth user id as a Worker secret, from
-`apps/data`:
+Once the collector can sign in (its `login` command arrives with the collector half of #601) and
+has signed in once, set the org owner's auth user id as a Worker secret, from `apps/data`:
 
 ```sh
 cd apps/data
 bunx wrangler secret put ORG_AUTH_USER_ID
 ```
 
-The value is the auth user id `login` prints for the sign-in; `bunx wrangler whoami` shows the
-Cloudflare account the secret goes to. The first verified ingest whose token `sub` equals it binds
+The value is the account id that the collector's `login` and `whoami` print. The first verified ingest whose token `sub` equals it binds
 the org contributor row (`trajectonomics`) and writes its batch in the same commit. After that the
 binding alone decides, and the secret no longer matters. If the owner's auth account is deleted,
 auth's notice unbinds the org row and tombstones that id; to re-bind, sign in with the new account

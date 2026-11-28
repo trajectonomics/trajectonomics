@@ -6,6 +6,12 @@ export const JWKS_TTL_MS = 3_600_000
 /** The shortest gap between two fetches of one issuer, in milliseconds. */
 export const JWKS_REFRESH_MS = 60_000
 
+/**
+ * The oldest set served while auth's JWKS cannot be fetched, in milliseconds. Past it, ingest
+ * answers 503, so a key auth has withdrawn stops working within a day even through an outage.
+ */
+export const JWKS_MAX_STALE_MS = 86_400_000
+
 /** The timeout of one fetch when none is injected, in milliseconds. */
 export const JWKS_TIMEOUT_MS = 5_000
 
@@ -38,9 +44,10 @@ function isKeySet(value: unknown): value is JSONWebKeySet {
 	return keys.every(hasKty)
 }
 
-/** The cached set, or null when nothing is cached. */
-function cached(state: IssuerState): JSONWebKeySet | null {
-	return state.entry === undefined ? null : state.entry.set
+/** The cached set while it is younger than a day, or null. */
+function cached(state: IssuerState, nowMs: number): JSONWebKeySet | null {
+	if (state.entry === undefined || nowMs - state.entry.atMs >= JWKS_MAX_STALE_MS) return null
+	return state.entry.set
 }
 
 /** The cached set as a result while it is inside its hour, or null. */
@@ -57,14 +64,14 @@ function throttled(state: IssuerState, nowMs: number): boolean {
 /** The stale set while a fetch is throttled, or an unavailable error when nothing is cached. */
 function held(state: IssuerState, nowMs: number): JwksResult | null {
 	if (!throttled(state, nowMs)) return null
-	const stale = cached(state)
+	const stale = cached(state, nowMs)
 	if (stale === null) throw new JwksUnavailableError()
 	return { set: stale, fetched: false }
 }
 
-/** A failed fetch hands back a stale set when one exists, and is unavailable without one. */
-function fallback(error: unknown, state: IssuerState): JwksResult {
-	const stale = cached(state)
+/** A failed fetch hands back a set younger than a day when one exists, else is unavailable. */
+function fallback(error: unknown, state: IssuerState, nowMs: number): JwksResult {
+	const stale = cached(state, nowMs)
 	if (stale === null) throw error
 	return { set: stale, fetched: false }
 }
@@ -116,7 +123,7 @@ export function createJwksSource(
 			state.entry = { set, atMs: nowMs }
 			return { set, fetched: true }
 		} catch (error) {
-			return fallback(error, state)
+			return fallback(error, state, nowMs)
 		}
 	}
 	return { get }

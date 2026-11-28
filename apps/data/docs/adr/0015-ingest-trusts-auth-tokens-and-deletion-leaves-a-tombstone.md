@@ -32,9 +32,12 @@ deletions and posts each one to `https://data.internal/internal/contributors/del
 - The JWKS is fetched over plain `fetch` from `<issuer>/jwks`, which works because the auth Worker
   runs on a Custom Domain in the same zone. The isolate keeps the set in memory for an hour. A token
   whose `kid` is not in the set triggers one refetch, at most once a minute per isolate, so a stream
-  of made-up `kid`s cannot turn into a stream of subrequests. When the set cannot be fetched, ingest
-  answers `503 auth_unavailable` rather than `401`, so a collector retries next hour instead of
-  being told it has signed out.
+  of made-up `kid`s cannot turn into a stream of subrequests. A fetch starts at most once a minute
+  whatever asks for it, including a cold start, and a set fetched during the request is never
+  refetched, so a `kid` missing from it is `401`. When the set cannot be fetched, the isolate keeps
+  serving the last set it fetched for up to 24 hours, so a short auth outage does not stop ingest;
+  past that, or with no set at all, ingest answers `503 auth_unavailable` rather than `401`, so a
+  collector retries next hour instead of being told it has signed out.
 - The issuer is the Worker variable `AUTH_ISSUER`, `https://auth.trajectonomics.com` in
   `wrangler.jsonc`.
 

@@ -59,7 +59,8 @@ async function authorizeJwt(
 		nowSeconds: Math.floor(context.nowMs / 1000),
 	}
 	let verified = await verifyAccessToken(token, { ...input, jwks: first.set })
-	if (!verified.ok && verified.reason === "unknown_kid") {
+	// A set fetched during this request already is auth's current one, so a missing kid is a 401.
+	if (!verified.ok && verified.reason === "unknown_kid" && !first.fetched) {
 		const refreshed = await readKeys(context.jwks, env, context, true)
 		// A suppressed refresh is retried next hour, so it is unavailable rather than signed out.
 		if (refreshed === null || !refreshed.fetched) return failure(503, "auth_unavailable")

@@ -1,7 +1,12 @@
 import { beforeAll, describe, expect, test } from "bun:test"
 import { INGEST_PATH, LEGACY_HOST, SITE_ORIGIN } from "../src/core/urls"
 import type { Env } from "../src/env"
-import { type JwksResult, type JwksSource, JwksUnavailableError } from "../src/http/jwks"
+import {
+	createJwksSource,
+	type JwksResult,
+	type JwksSource,
+	JwksUnavailableError,
+} from "../src/http/jwks"
 import { handleRequest } from "../src/http/router"
 import { NOW_MS, usageRow } from "./support/fixtures"
 import { harness } from "./support/http"
@@ -87,6 +92,20 @@ describe("ingest with a token auth refuses", () => {
 		const response = await post(context, await rotated.sign(), { jwks: keys })
 		expect(response.status).toBe(401)
 		expect(keys.refreshes()).toBe(1)
+	})
+
+	test("a kid missing from a set fetched by this request is 401 after one fetch", async () => {
+		const context = harness()
+		let fetches = 0
+		const cold = createJwksSource(async () => {
+			fetches += 1
+			return Response.json(signer.jwks)
+		})
+		const rotated = await testSigner({ kid: "never-published" })
+		const response = await post(context, await rotated.sign(), { jwks: cold })
+		expect(response.status).toBe(401)
+		expect(await response.json()).toEqual({ error: "unauthorized" })
+		expect(fetches).toBe(1)
 	})
 })
 
