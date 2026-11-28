@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { NetWorth, Snapshot } from "../../contract"
+import type { NetWorth, ProjectionRun, Snapshot } from "../../contract"
 import { failedRead } from "../../snapshot/fixtures.test-support"
 import { DEMO } from "../what-if/fixtures.test-support"
 import { netWorthAt, periodFor, ruleYearFor } from "./rows"
@@ -82,12 +82,27 @@ describe("net worth at a viewing month", () => {
 		expect(netWorthAt(noTotals, "base", "2025-03")).toEqual({ kind: "missing" })
 
 		expect(netWorthAt(demoMonthly({}), "base", "2027-01")).toEqual({ kind: "missing" })
+
+		const monthlyFailed = demoMonthly({ base: failedRead<ProjectionRun>(["project"]) })
+		expect(netWorthAt(monthlyFailed, "base", "2027-01")).toEqual({ kind: "missing" })
 	})
 
 	test("a future month with no row and no run-out is missing, and so is one with no monthly row at all", () => {
 		const gap = monthlyRun([monthly("2027-01-31", "1.00")])
 		const snapshot = demoMonthly({ base: { argv: [], ok: true, data: gap } })
 		expect(netWorthAt(snapshot, "base", "2027-02")).toEqual({ kind: "missing" })
+
+		const runsOut = { date: "2053-02-01", unmet: "1.00" }
+		const ranOutLater = monthlyRun([monthly("2027-01-31", "1.00")], runsOut)
+		const later = demoMonthly({ base: { argv: [], ok: true, data: ranOutLater } })
+		expect(netWorthAt(later, "base", "2027-02")).toEqual({ kind: "missing" })
+		expect(
+			netWorthAt(
+				demoMonthly({ base: { argv: [], ok: true, data: monthlyRun([]) } }),
+				"base",
+				"2027-01",
+			),
+		).toEqual({ kind: "missing" })
 	})
 })
 
@@ -146,6 +161,18 @@ describe("the Rule year a month falls in", () => {
 		})
 		expect(ruleYearFor(ROWS, "2053-12", "2053-12-31", null)).toEqual({
 			period: LAST,
+			side: "in",
+		})
+	})
+
+	test("the month the plan ran out in is in its last Rule year, and a rule starting mid-month holds its month", () => {
+		expect(ruleYearFor([FIRST, SECOND, THIRD], "2053-02", "2053-02-01", "2053-02-01")).toEqual({
+			period: THIRD,
+			side: "in",
+		})
+		const midMonth = { date: "2050-06-15" }
+		expect(ruleYearFor([midMonth, SECOND], "2050-06", "2053-12-31", null)).toEqual({
+			period: midMonth,
 			side: "in",
 		})
 	})

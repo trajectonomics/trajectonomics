@@ -24,7 +24,7 @@ export const DEMO_INPUT: PlanInput = {
 	returnModel: null,
 	paths: null,
 	seed: null,
-	// The Demo snapshot lists no future and reads no path, as web ADR 0020 decided: the file is gitignored
+	// The Demo snapshot lists no future and reads no path, as web ADR 0020 decided. The file is gitignored
 	// (web ADR 0021), so no formatter's size limit applies to it.
 	futures: false,
 	// The allowances page reads RMF, then ThaiESG, a thousand baht at a time: the inputs a person would choose.

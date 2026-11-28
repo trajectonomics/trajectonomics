@@ -84,10 +84,6 @@ describe("the Snapshot against the real traj", () => {
 				if (monthly?.name !== "monthly") throw new Error(`${name} states no monthly table`)
 				expect(monthly.rows.length, name).toBeGreaterThan(0)
 				expect(monthly.rows[0]?.date, name).toBe("2026-10-31")
-				expect(
-					read.data.tables.map((table) => table.name),
-					name,
-				).toContain("monthly")
 			}
 		},
 		SLOW_MS,
