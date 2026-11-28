@@ -5,7 +5,7 @@ import { SLOW } from "./shared-interest"
 
 // The Tax labels form keeps a refusal at the Flow it names after the Flow select moves (web #761). The answer is the
 // CLI's envelope for a refusal at one Flow's label, stated here so the check reads the form's own match on the sent
-// Flow, not the server's.
+// Flow, not the server's. The new income takes an Owner, because the form sends no Edit for an ownerless one (web #766).
 export async function taxLabelRefusalAtFlow(page: Page): Promise<void> {
 	const plan = "labels-360"
 	await page.setViewportSize({ width: 360, height: 800 })
@@ -13,10 +13,11 @@ export async function taxLabelRefusalAtFlow(page: Page): Promise<void> {
 	await page.goto(`${SCRATCH_ORIGIN}/income/?scenario=${plan}`)
 	await settle(page, "light")
 
-	// A new income in a taxed plan has no label, so the Tax labels form offers it after the save.
+	// A new income in a taxed plan has no label, so the Tax labels form offers it after the save of it and its Owner.
 	await page.getByRole("button", { name: "Add income", exact: true }).click()
 	const dialog = page.getByRole("dialog")
 	await dialog.getByLabel("Id", { exact: true }).fill("wired")
+	await dialog.getByLabel("Owner", { exact: true }).selectOption("me")
 	await dialog.getByLabel("Starts", { exact: true }).fill("2026-11-01")
 	await dialog.getByLabel("Amount per occurrence", { exact: true }).fill("1000")
 	await dialog.getByRole("button", { name: "Save", exact: true }).click()
