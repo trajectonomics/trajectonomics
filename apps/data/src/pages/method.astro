@@ -2,6 +2,7 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the layout it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import { MODEL_PRICES, PLAN_PRICES, PRICE_READ } from "@trajectonomics/data-collector/price-catalog"
+import CollectFlow from "../components/CollectFlow.astro"
 import Layout from "../layouts/Layout.astro"
 import { planName } from "../lib/plans"
 import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
@@ -47,66 +48,67 @@ const modelPriceRows = Object.entries(MODEL_PRICES).map(([model, price]) => ({
 	<article class="method">
 		<p class="meta-label">Method</p>
 		<h1 class="method-title">How we count</h1>
-		<p class="method-lede">
-			Tokens from the local logs of the AI coding tools we run, rolled up by UTC day.
-		</p>
+		<CollectFlow />
 
-		<h2>The collector</h2>
-		<ul>
-			<li>The collector reads the local logs of the AI coding tools on our machines.</li>
-			<li>
-				It prints one total per plan, model and UTC hour, or one total per UTC day for the
-				Mistral console export.
-			</li>
-			<li>
-				Only those totals, a hashed machine label, plan and model ids, UTC buckets and numbers leave
-				the machine. Prompts, session titles, project names, paths and account ids never do.
-			</li>
-			<li>
-				Writes are idempotent upserts keyed by machine, plan, model and UTC bucket, so a missed
-				hour heals on the next run.
-			</li>
-		</ul>
+		<details class="method-details">
+			<summary>Details</summary>
+			<h2>The collector</h2>
+			<ul>
+				<li>The collector reads the local logs of the AI coding tools on our machines.</li>
+				<li>
+					It prints one total per plan, model and UTC hour, or one total per UTC day for the
+					Mistral console export.
+				</li>
+				<li>
+					Only those totals, a hashed machine label, plan and model ids, UTC buckets and numbers leave
+					the machine. Prompts, session titles, project names, paths and account ids never do.
+				</li>
+				<li>
+					Writes are idempotent upserts keyed by machine, plan, model and UTC bucket, so a missed
+					hour heals on the next run.
+				</li>
+			</ul>
 
-		<h2>Which tool feeds each plan</h2>
-		<table class="source-table">
-			<thead>
-				<tr>
-					<th scope="col">Source</th>
-					<th scope="col">Plan</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Claude Code session logs</td>
-					<td>Claude</td>
-				</tr>
-				<tr>
-					<td>OpenCode's local database</td>
-					<td>OpenCode Go, OpenCode (free)</td>
-				</tr>
-				<tr>
-					<td>Antigravity's <code>transcript.jsonl</code></td>
-					<td>Antigravity</td>
-				</tr>
-				<tr>
-					<td>Cursor's agent store</td>
-					<td>Cursor</td>
-				</tr>
-				<tr>
-					<td>T3 Code provider logs</td>
-					<td>Meta (Muse), and Cursor when its agent store has no usage</td>
-				</tr>
-				<tr>
-					<td>Mistral console CSV export</td>
-					<td>Mistral, one row per day</td>
-				</tr>
-				<tr>
-					<td>Pi session logs</td>
-					<td>The plan named by each record's provider id</td>
-				</tr>
-			</tbody>
-		</table>
+			<h2>Which tool feeds each plan</h2>
+			<table class="source-table">
+				<thead>
+					<tr>
+						<th scope="col">Source</th>
+						<th scope="col">Plan</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Claude Code session logs</td>
+						<td>Claude</td>
+					</tr>
+					<tr>
+						<td>OpenCode's local database</td>
+						<td>OpenCode Go, OpenCode (free)</td>
+					</tr>
+					<tr>
+						<td>Antigravity's <code>transcript.jsonl</code></td>
+						<td>Antigravity</td>
+					</tr>
+					<tr>
+						<td>Cursor's agent store</td>
+						<td>Cursor</td>
+					</tr>
+					<tr>
+						<td>T3 Code provider logs</td>
+						<td>Meta (Muse), and Cursor when its agent store has no usage</td>
+					</tr>
+					<tr>
+						<td>Mistral console CSV export</td>
+						<td>Mistral, one row per day</td>
+					</tr>
+					<tr>
+						<td>Pi session logs</td>
+						<td>The plan named by each record's provider id</td>
+					</tr>
+				</tbody>
+			</table>
+		</details>
 
 		<h2>What is excluded</h2>
 		<ul>

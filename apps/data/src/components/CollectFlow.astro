@@ -1,0 +1,76 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import PlanMark from "./PlanMark.svelte"
+
+/** The sources the collector reads, each with the mark drawn for it; an unknown id draws its initial. */
+const sources = [
+	{ plan: "claude", name: "Claude Code" },
+	{ plan: "opencode-go", name: "OpenCode" },
+	{ plan: "antigravity", name: "Antigravity" },
+	{ plan: "cursor", name: "Cursor" },
+	{ plan: "t3-code", name: "T3 Code" },
+	{ plan: "mistral", name: "Mistral" },
+	{ plan: "pi", name: "Pi" },
+]
+
+/** What never leaves the machine. */
+const kept = ["Prompts", "Titles", "Projects", "Paths", "Accounts"]
+---
+
+<figure class="flow">
+	<figcaption class="visually-hidden">
+		The collector reads the local logs of our AI coding tools and a Mistral console export, on our
+		machines. It sends a hashed machine label, plan and model ids, UTC hour or day buckets and
+		numbers: token totals and quota meter readings. Prompts, titles, projects, paths and accounts
+		stay on the machine. The site publishes totals per plan and day.
+	</figcaption>
+
+	<div class="flow-steps" aria-hidden="true">
+		<div class="flow-stage flow-local">
+			<p class="flow-label">Our machines</p>
+			<ul class="flow-sources">
+				{
+					sources.map((source) => (
+						<li class="flow-source">
+							<PlanMark plan={source.plan} name={source.name} size={32} />
+							<span>{source.name}</span>
+						</li>
+					))
+				}
+			</ul>
+			<svg class="flow-arrow flow-arrow-down" viewBox="0 0 24 24" focusable="false">
+				<path d="M12 4v15m-6-6 6 6 6-6" />
+			</svg>
+			<p class="flow-collector">Collector</p>
+		</div>
+
+		<div class="flow-link">
+			<svg class="flow-arrow" viewBox="0 0 24 24" focusable="false">
+				<path d="M4 12h15m-6-6 6 6-6 6" />
+			</svg>
+			<span class="flow-link-label">Totals and meters only</span>
+		</div>
+
+		<div class="flow-stage flow-public">
+			<p class="flow-label">This site</p>
+			<p class="flow-result">Tokens per plan, per day</p>
+		</div>
+	</div>
+
+	<div class="flow-never" aria-hidden="true">
+		<ul class="flow-kept" aria-hidden="true">
+			{
+				kept.map((word) => (
+					<li>
+						<svg viewBox="0 0 24 24" focusable="false">
+							<path d="m6 6 12 12M18 6 6 18" />
+						</svg>
+						{word}
+					</li>
+				))
+			}
+		</ul>
+		<p class="flow-kept-label" aria-hidden="true">Never leave the machine</p>
+	</div>
+</figure>
