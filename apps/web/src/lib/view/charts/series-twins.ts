@@ -5,8 +5,8 @@ import type { Series } from "./series-numbering"
 /** The twin steps a clash takes before a number: "(item)", "(item, category)", "(item, category, Account)". */
 export const TWIN_STEPS = 3
 
-/** A word, or a run of anything that is neither space nor punctuation, so an emoji category still counts. */
-const PIECES = /[\p{L}\p{M}\p{N}]+|[^\s\p{P}]+/gu
+/** A word, or a run of symbols (an emoji category still counts); a symbol never swallows the word after it, and invisible characters say nothing. */
+const PIECES = /[\p{L}\p{M}\p{N}]+|\p{S}+/gu
 
 /** The pieces a name says, in lower case, so a suffix that only repeats them adds no information. */
 function piecesOf(text: string): ReadonlySet<string> {
