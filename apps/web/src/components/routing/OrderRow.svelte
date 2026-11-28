@@ -50,7 +50,7 @@ const button =
 	<div class="flex flex-wrap items-center justify-between gap-2">
 		<span class="min-w-0 flex-1">{@render children()}</span>
 		{#if editable}
-			<span class="flex flex-wrap gap-1.5">
+			<div class="flex flex-wrap gap-1.5">
 				<button bind:this={up} type="button" class={button} disabled={index === 0} onclick={() => press(-1)}>
 					Up<span class="sr-only">: move {label} up</span>
 				</button>
@@ -58,7 +58,7 @@ const button =
 					Down<span class="sr-only">: move {label} down</span>
 				</button>
 				{@render actions?.()}
-			</span>
+			</div>
 		{/if}
 	</div>
 	{#if problem}<p role="alert" class="text-sm text-destructive">{problem}</p>{/if}

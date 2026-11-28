@@ -1,12 +1,13 @@
 <script lang="ts">
 import { currentItemNames } from "../../client/item-names.svelte.js"
-import { routing } from "../../client/routing.svelte.js"
+import { removeSource, routing } from "../../client/routing.svelte.js"
 import type { ScenarioFlow } from "../../lib/contract"
 import { formatMoney } from "../../lib/format"
 import type { RoutingContext } from "../../lib/view/routing/context"
 import { movedFigure } from "../../lib/view/routing/figures"
 import { transferWords } from "../../lib/view/routing/transfer-words"
 import { plainText } from "../../lib/view/routing/words"
+import ActionRefusal from "../ui/ActionRefusal.svelte"
 import AddButton from "./AddButton.svelte"
 import FigureChart from "./FigureChart.svelte"
 import RoutingDrawer from "./RoutingDrawer.svelte"
@@ -47,7 +48,7 @@ const remove = (id: string) => ({ kind: "remove", id }) as const
 						<span class="flex flex-wrap gap-1.5">
 							<RowButtons label={plainText(transferWords(flow, ctx.names, items), formatMoney)} busy={false}
 								onEdit={() => (drawer = { id: flow.id, trying: isTried })} onTry={() => (drawer = { id: flow.id, trying: true })}
-								onRemove={() => (isTried ? routing.tryIt(ctx, remove(flow.id)) : routing.save(ctx, remove(flow.id)))}
+								onRemove={() => (isTried ? routing.tryIt(ctx, remove(flow.id)) : routing.save(ctx, remove(flow.id), removeSource("flows", flow.id)))}
 								onTryRemove={() => routing.tryIt(ctx, remove(flow.id))} />
 						</span>
 					{/if}
@@ -55,6 +56,7 @@ const remove = (id: string) => ({ kind: "remove", id }) as const
 				{#if routing.place?.kind === "flow" && routing.place.id === flow.id && drawer === null && routing.message}
 					<p role="alert" class="text-sm text-destructive" data-cli={routing.messageFromCli ? "" : undefined}>{routing.message}</p>
 				{/if}
+				<ActionRefusal source={removeSource("flows", flow.id)} onRow={routing.onRow(ctx)} />
 			</li>
 		{:else}
 			<li class="text-sm text-muted-foreground">No planned moves.</li>

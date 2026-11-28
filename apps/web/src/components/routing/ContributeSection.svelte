@@ -1,10 +1,11 @@
 <script lang="ts">
-import { routing } from "../../client/routing.svelte.js"
+import { orderSource, routing } from "../../client/routing.svelte.js"
 import { nameOf } from "../../lib/view/account-names"
 import type { RoutingContext } from "../../lib/view/routing/context"
 import { savedFigure } from "../../lib/view/routing/figures"
 import { sameOrder } from "../../lib/view/routing/order"
 import { rowRefusal } from "../../lib/view/routing/shown"
+import ActionRefusal from "../ui/ActionRefusal.svelte"
 import FigureChart from "./FigureChart.svelte"
 import LockedNote from "./LockedNote.svelte"
 import ReorderList from "./ReorderList.svelte"
@@ -27,8 +28,9 @@ const list = (items: readonly unknown[]) => ({ kind: "list", list: "contribute",
 	<ReorderList items={listed} {locked} editable={ctx.editable} busy={false} rule={() => null}
 		labelOf={(id) => nameOf(ctx.names, id)}
 		refused={(at) => rowRefusal(routing.place, routing.message, "contribute", at)}
-		onSave={(order) => routing.save(ctx, list(order))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
+		onSave={(order) => routing.save(ctx, list(order), orderSource("contribute"))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
 		{#snippet row(id, at)}<span>{at + 1}. {nameOf(ctx.names, id)}</span>{/snippet}
+		{#snippet refusal()}<ActionRefusal source={orderSource("contribute")} onRow={routing.onRow(ctx)} />{/snippet}
 	</ReorderList>
 	{/key}
 	<LockedNote {locked} />

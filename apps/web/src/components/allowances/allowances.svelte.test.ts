@@ -4,6 +4,7 @@ import { editSession } from "../../client/edit.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionAllowances, Snapshot } from "../../lib/contract"
+import { actionSource } from "../../lib/view/action-source"
 import { allowancesView } from "../../lib/view/allowances"
 import {
 	GOLDEN_ALLOWANCES,
@@ -181,7 +182,7 @@ describe("the cards, the errors and the what-if of another plan", () => {
 	test("an Edit's error shows once, at the control that sent it, and a read's error at the form", () => {
 		const year = allowancesView(GOLDEN_ALLOWANCES).current?.key ?? ""
 		editSession.error = "Another Edit is running."
-		editSession.source = year
+		editSession.source = actionSource("allowances", year)
 		expect(result(GOLDEN_ALLOWANCES, PLAN).match(/Another Edit is running/g)).toHaveLength(1)
 		expect(render(InputForm, { props: { inputs: null } }).body).not.toContain("Another Edit")
 		editSession.source = "form"

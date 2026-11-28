@@ -4,6 +4,7 @@ import type { EditInput } from "../lib/edit/edit"
 import { type EditOutcome, editOutcome } from "../lib/edit/outcome"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
+import { isActionSource } from "../lib/view/action-source"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
 import { fetchEditToken, postEdit, postPreview } from "./edit-post.js"
 import { postReread, type RereadBody } from "./reread.js"
@@ -99,7 +100,8 @@ class EditSession {
 	private async sendReread(body: RereadBody): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
-		this.source = "form"
+		// Reload beside an inline action keeps its source, so a Reload that fails is said there too.
+		if (Object.keys(body).length > 0 || !isActionSource(this.source)) this.source = "form"
 		this.error = null
 		const answer = await postReread(this.token, body)
 		this.busy = false

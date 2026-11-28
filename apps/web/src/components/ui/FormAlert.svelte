@@ -2,9 +2,11 @@
 interface Props {
 	/** The message for the whole form: its own problem, or the CLI's refusal when the refusal names no field of it. */
 	message: string
+	/** True when the words are the CLI's own. */
+	fromCli?: boolean
 }
 
-let { message }: Props = $props()
+let { message, fromCli = false }: Props = $props()
 let alert: HTMLParagraphElement | undefined = $state()
 /** The text the alert last took focus for; plain, so comparing it never schedules an effect of its own. */
 let focused = ""
@@ -22,4 +24,4 @@ $effect(() => {
 })
 </script>
 
-<p bind:this={alert} role="alert" tabindex="-1" class="text-sm text-destructive focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{message}</p>
+<p bind:this={alert} role="alert" tabindex="-1" data-cli={fromCli ? "" : undefined} class="text-sm text-destructive focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{message}</p>

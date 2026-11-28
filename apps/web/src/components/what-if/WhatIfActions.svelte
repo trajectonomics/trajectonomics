@@ -4,6 +4,7 @@ import { selectPlan } from "../../client/select-plan.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { planNameError } from "../../lib/edit/name"
+import { isActionSource } from "../../lib/view/action-source"
 import { scenarioNames } from "../../lib/view/plan"
 
 let name = $state("")
@@ -11,6 +12,8 @@ const problem = $derived(
 	name.trim() === "" ? null : planNameError(name, scenarioNames(currentSnapshot())),
 )
 const blocked = $derived(editSession.busy || whatIfSession.reading || !whatIfSession.active)
+/** The bar says what its own Edits answered; an inline action's refusal shows beside that action. */
+const mine = $derived(!isActionSource(editSession.source))
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
@@ -47,11 +50,11 @@ async function keep(event: SubmitEvent): Promise<void> {
 		Revert
 	</button>
 </div>
-{#if editSession.stale}
+{#if editSession.stale && mine}
 	<p role="alert" class="text-sm text-destructive">
 		{STALE_PLAN}
 		<button type="button" onclick={() => whatIfSession.reload()} class="underline">Reload</button>
 	</p>
-{:else if editSession.error !== null}
+{:else if editSession.error !== null && mine}
 	<p role="alert" class="text-sm text-destructive">{editSession.error}</p>
 {/if}
