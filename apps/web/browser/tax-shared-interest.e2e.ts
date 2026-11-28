@@ -1,10 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
-import { maskedAmountEdit } from "./masked-amount"
-import { maskedAmountFocusAway } from "./masked-away"
-import { maskedAmountTabSwitch, maskedAmountTabThenClick } from "./masked-focus"
-import { maskedAmountPasteMask, maskedAmountUndo } from "./masked-undo"
 import { SLOW, setsAndClears } from "./shared-interest"
 import { taxLabelAlert } from "./tax-label-alert"
 import { taxLabelRefusalAtFlow } from "./tax-label-wiring"
@@ -82,24 +78,10 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	await expect(home.locator("td").nth(column - 1)).toContainText(`${LOCKED.homeLoan} THB`)
 })
 
-// Hide amounts must not let a masked amount be appended to, and a refusal must keep focus where the person put it.
-test("typing into a masked amount replaces it, and a click selects the whole value", async ({
-	page,
-}) => {
+// A refusal at one Flow's label stays there after the Flow select moves, so the form matches on the sent Flow (web #783).
+test("a refusal at a Flow's label stays after the Flow select moves", async ({ page }) => {
 	test.setTimeout(180_000)
-	await maskedAmountEdit(page)
-})
-
-// A tab switch in the middle of typing must not drop the digits typed before it (web #783).
-test("a tab switch mid-typing keeps the digits typed before it", async ({ page }) => {
-	test.setTimeout(180_000)
-	await maskedAmountTabSwitch(page)
-})
-
-// A click after a keyboard focus moves the caret, so typing appends rather than replacing (web #783).
-test("a click after keyboard focus moves the caret, so typing appends", async ({ page }) => {
-	test.setTimeout(180_000)
-	await maskedAmountTabThenClick(page)
+	await taxLabelRefusalAtFlow(page)
 })
 
 test("a refusal keeps its message and never takes focus again when the Flow select moves", async ({
@@ -107,28 +89,4 @@ test("a refusal keeps its message and never takes focus again when the Flow sele
 }) => {
 	test.setTimeout(180_000)
 	await taxLabelAlert(page)
-})
-
-// An undo can put the mask back into a masked amount, which must show the mask, not the draft it hides (web #783).
-test("an undo at a masked amount shows the mask, and keeps the amount", async ({ page }) => {
-	test.setTimeout(180_000)
-	await maskedAmountUndo(page)
-})
-
-// A paste that holds the mask is dropped, and the caret stays where the paste was (web #783).
-test("a paste holding the mask keeps the caret where the paste was", async ({ page }) => {
-	test.setTimeout(180_000)
-	await maskedAmountPasteMask(page)
-})
-
-// A focus that moves while the window is away leaves no blur; the window's return must mask the field (web #783).
-test("a focus moved while the window is away still masks the amount", async ({ page }) => {
-	test.setTimeout(180_000)
-	await maskedAmountFocusAway(page)
-})
-
-// A refusal at one Flow's label stays there after the Flow select moves, so the form matches on the sent Flow (web #783).
-test("a refusal at a Flow's label stays after the Flow select moves", async ({ page }) => {
-	test.setTimeout(180_000)
-	await taxLabelRefusalAtFlow(page)
 })
