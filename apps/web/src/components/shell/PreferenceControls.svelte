@@ -1,5 +1,6 @@
 <script lang="ts">
 import { preferences } from "../../client/preferences.svelte.js"
+import { HIDE_AMOUNTS_ENABLED } from "../../lib/view/preferences"
 import { cx } from "../ui/cx"
 
 const TOGGLE = cx(
@@ -9,16 +10,18 @@ const TOGGLE = cx(
 )
 </script>
 
-<!-- The display switches: hide amounts, the dark Theme, and the traj commands. Each is a button that says whether it is on. -->
+<!-- The display switches: the dark Theme and the traj commands, and Hide amounts while that feature is on (#927 keeps it off until #926). Each is a button that says whether it is on. -->
 <div class="flex flex-col gap-2">
-	<button
-		type="button"
-		aria-pressed={preferences.hidden}
-		onclick={() => preferences.setHidden(!preferences.hidden)}
-		class={TOGGLE}
-	>
-		Hide amounts
-	</button>
+	{#if HIDE_AMOUNTS_ENABLED}
+		<button
+			type="button"
+			aria-pressed={preferences.hidden}
+			onclick={() => preferences.setHidden(!preferences.hidden)}
+			class={TOGGLE}
+		>
+			Hide amounts
+		</button>
+	{/if}
 	<button
 		type="button"
 		aria-pressed={preferences.theme === "dark"}

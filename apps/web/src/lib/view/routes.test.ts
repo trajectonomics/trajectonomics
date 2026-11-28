@@ -51,7 +51,7 @@ describe("the navigation's routes", () => {
 		])
 	})
 
-	test("the sixteen pages are in navigation order, with unique paths", () => {
+	test("the seventeen pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
@@ -69,6 +69,7 @@ describe("the navigation's routes", () => {
 			"/health/",
 			"/settings/tax/",
 			"/settings/assumptions/",
+			"/settings/display/",
 		])
 		expect(new Set(ROUTES.map((route) => route.path)).size).toBe(ROUTES.length)
 	})
@@ -80,7 +81,7 @@ describe("the navigation's routes", () => {
 			[null, ["Cash flow", "Chance of success", "Tax"]],
 			["Optimize", ["Tax allowances", "Withdrawals", "Estate"]],
 			["Records", ["Ledger", "Health"]],
-			["Settings", ["Tax profile", "Assumptions"]],
+			["Settings", ["Tax profile", "Assumptions", "Display"]],
 		])
 	})
 
@@ -147,13 +148,14 @@ describe("the navigation's routes", () => {
 		])
 	})
 
-	test("the Settings pages are listed only when the selected plan has a document", () => {
+	test("the Settings pages are listed only when the selected plan has a document, but Display always is", () => {
 		const settings = groupAt("Settings")
 		expect(routesShown(settings, true).map((route) => route.label)).toEqual([
 			"Tax profile",
 			"Assumptions",
+			"Display",
 		])
-		expect(routesShown(settings, false)).toEqual([])
+		expect(routesShown(settings, false).map((route) => route.label)).toEqual(["Display"])
 	})
 })
 

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { HIDE_AMOUNTS_ENABLED } from "../src/lib/view/preferences"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
 import { SLOW, setsAndClears } from "./shared-interest"
@@ -29,19 +30,26 @@ const LOCKED = { plan: "locked-save-360", homeLoan: "14,444" } as const
 test("a save from a locked drawer keeps the stored home-loan interest", async ({ page }) => {
 	test.setTimeout(180_000)
 	await page.setViewportSize({ width: 360, height: 800 })
-	await chooseBeforeLoad(page, { theme: "light", hideAmounts: true })
+	await chooseBeforeLoad(page, { theme: "light", hideAmounts: HIDE_AMOUNTS_ENABLED })
 	await page.goto(`${SCRATCH_ORIGIN}/settings/tax/?scenario=${LOCKED.plan}`)
 	await settle(page, "light")
 
 	await page.getByRole("button", { name: "Edit home", exact: true }).click()
 	const dialog = page.getByRole("dialog")
 	await expect(dialog).toContainText("still recorded under your partner")
-	// Hide amounts masks the locked field, so neither its digits nor its value reaches the drawer.
-	const locked = dialog.locator("output#tax-mortgageInterest")
-	await expect(locked).toBeVisible()
-	await expect(locked).toContainText("amount hidden")
-	await expect(dialog).not.toContainText("14,444")
-	await expect(dialog).not.toContainText("14444")
+	if (HIDE_AMOUNTS_ENABLED) {
+		// Hide amounts masks the locked field, so neither its digits nor its value reaches the drawer.
+		const masked = dialog.locator("output#tax-mortgageInterest")
+		await expect(masked).toBeVisible()
+		await expect(masked).toContainText("amount hidden")
+		await expect(dialog).not.toContainText("14,444")
+		await expect(dialog).not.toContainText("14444")
+	} else {
+		// With Hide amounts off (#927) the locked field keeps its disabled input and the value stored before the swap.
+		const locked = dialog.locator("input#tax-mortgageInterest")
+		await expect(locked).toBeDisabled()
+		await expect(locked).toHaveValue(LOCKED.homeLoan.replace(",", ""))
+	}
 
 	// Only the shared interest, which is not a flat claim, takes input; the plan stores none yet.
 	const shared = dialog.getByLabel("Shared home-loan interest", { exact: true })
@@ -55,18 +63,18 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	// The save sends the shared interest alone: a locked field sends nothing, not even a removal.
 	expect((await sent).postDataJSON().flags).toEqual({ sharedMortgageInterest: "30000" })
 	await expect(dialog).toBeHidden({ timeout: SLOW })
-	// The page read the plan again after the save: the shared interest is stored, still hidden.
+	// The page read the plan again after the save: the shared interest is stored, and still masked while Hide amounts is on.
 	await expect(
 		page.getByText(
 			"Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all:",
 		),
 	).toBeVisible({ timeout: SLOW })
-	await expect(page.locator("main")).toContainText("amount hidden")
+	if (HIDE_AMOUNTS_ENABLED) await expect(page.locator("main")).toContainText("amount hidden")
 
-	// Show the amounts: the earlier holder's own interest is still stored, on the column of their Return.
-	await page.getByRole("button", { name: "Display options" }).click()
-	await page.getByRole("dialog").getByRole("button", { name: "Hide amounts" }).click()
-	await page.getByRole("button", { name: "Close Display options" }).click()
+	// Show the amounts again, as a person does from Settings → Display (#927): the choice is set before the next load.
+	await chooseBeforeLoad(page, { theme: "light", hideAmounts: false })
+	await page.goto(`${SCRATCH_ORIGIN}/settings/tax/?scenario=${LOCKED.plan}`)
+	await settle(page, "light")
 	const claims = page.locator("section[aria-labelledby='tax-claims-title']")
 	await expect(claims).toContainText("30,000 THB")
 	const home = claims

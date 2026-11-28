@@ -3,6 +3,7 @@
 import { expect, type Locator, type Page, test } from "@playwright/test"
 import { AMOUNT_MASK } from "../src/lib/format/mask"
 import { openScratch } from "./edit-answers"
+import { skipMaskingCheck } from "./masking"
 
 const PLAN = "shared-360"
 const pressed = (page: Page, name: string | RegExp) => page.getByRole("button", { name }).first()
@@ -23,6 +24,7 @@ async function masks(field: Locator): Promise<void> {
 }
 
 test("a routing step's amount is masked", async ({ page }) => {
+	skipMaskingCheck()
 	await openScratch(page, "/routing/", PLAN, true)
 	await pressed(page, "Add a step").click()
 	const dialog = page.getByRole("dialog")
@@ -31,6 +33,7 @@ test("a routing step's amount is masked", async ({ page }) => {
 })
 
 test("the spending amount and its limits are masked", async ({ page }) => {
+	skipMaskingCheck()
 	await openScratch(page, "/optimize/withdrawals/", PLAN, true)
 	await pressed(page, /^(Set how you spend|Change )/).click()
 	const dialog = page.getByRole("dialog")
@@ -43,18 +46,21 @@ test("the spending amount and its limits are masked", async ({ page }) => {
 })
 
 test("a tax profile's amount is masked", async ({ page }) => {
+	skipMaskingCheck()
 	await openScratch(page, "/settings/tax/", PLAN, true)
 	await pressed(page, "Edit insurance").click()
 	await masks(page.getByRole("dialog").locator('input[inputmode="decimal"]').first())
 })
 
 test("the allowance step and budget are masked", async ({ page }) => {
+	skipMaskingCheck()
 	await openScratch(page, "/optimize/allowances/", PLAN, true)
 	await masks(page.locator("#allowance-step"))
 	await masks(page.locator("#allowance-budget"))
 })
 
 test("a value being recorded is masked", async ({ page }) => {
+	skipMaskingCheck()
 	await openScratch(page, "/net-worth/", PLAN, true)
 	await pressed(page, "Record today's values").click()
 	await masks(page.locator('li input[id^="value-"]').first())

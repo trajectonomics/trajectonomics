@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test"
-import { openDemo } from "./demo"
+import { openDemo, settle } from "./demo"
+import { outlineStyle, tabTo } from "./shell"
 
-// The top bar (web #698): one title in the page, icon-only display actions, the As-of date as a chip, and
-// the CLI version only in the Display options drawer.
-test("the top bar has one page title, icon-only actions and the As-of date", async ({ page }) => {
+// The top bar (web #927): the menu button and the plan switcher only. Display settings live on Settings → Display,
+// and the As-of date is stated by the pages that read it.
+test("the top bar holds only the menu button and the plan switcher", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await openDemo(page, "/net-worth/", { theme: "light" })
 
@@ -11,48 +12,59 @@ test("the top bar has one page title, icon-only actions and the As-of date", asy
 	await expect(page.locator("header h1 + p")).toHaveCount(0)
 	expect(await page.getByRole("banner").textContent()).not.toContain("Net worth")
 
-	const display = page.getByRole("button", { name: "Display options" })
-	await expect(display).toHaveText("")
-	await expect(display).toHaveAttribute("title", "Display options")
-
-	const hide = page.getByRole("button", { name: "Hide amounts" })
-	await expect(hide).toHaveText("")
-	await expect(hide).toHaveAttribute("aria-pressed", "false")
-
-	await expect(page.getByTitle(/^Figures as of \d{1,2} [A-Z][a-z]{2} \d{4}$/)).toBeVisible()
+	await expect(page.getByRole("button", { name: /^Plan: .+\. Change plan$/ })).toBeVisible()
+	await expect(page.getByRole("button", { name: "Hide amounts" })).toHaveCount(0)
+	await expect(page.getByRole("button", { name: "Display options" })).toHaveCount(0)
+	await expect(page.getByTitle(/^Figures as of /)).toHaveCount(0)
 	expect(await page.getByRole("banner").textContent()).not.toMatch(/traj \d/)
-	expect(await page.locator("main").textContent()).not.toMatch(/traj \d/)
-
-	await display.click()
-	await expect(page.getByRole("dialog").getByText(/^Read by traj /)).toBeVisible()
 })
 
-test("Hide amounts masks the page's figures and stays on in Display options", async ({ page }) => {
+test("the plan button shows a focus ring to a keyboard", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await openDemo(page, "/net-worth/", { theme: "light" })
-
-	const hide = page.getByRole("button", { name: "Hide amounts" })
-	await expect(page.locator("main").getByText("amount hidden")).toHaveCount(0)
-	await hide.click()
-	await expect(hide).toHaveAttribute("aria-pressed", "true")
-	await expect(page.locator("main").getByText("amount hidden").first()).toBeAttached()
-	await expect(page.locator("main").getByText("•••••").first()).toBeVisible()
-
-	await page.getByRole("button", { name: "Display options" }).click()
-	await expect(
-		page.getByRole("dialog").getByRole("button", { name: "Hide amounts" }),
-	).toHaveAttribute("aria-pressed", "true")
+	const button = page.getByRole("button", { name: /^Plan: .+\. Change plan$/ })
+	await button.focus()
+	await page.keyboard.press("Shift+Tab")
+	await page.keyboard.press("Tab")
+	const style = await button.evaluate((element) => getComputedStyle(element).outlineStyle)
+	expect(style).toBe("solid")
 })
 
-test("the top bar's icon buttons show a focus ring to a keyboard", async ({ page }) => {
+test("the Theme switch draws a focus ring to a keyboard", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 800 })
-	await openDemo(page, "/net-worth/", { theme: "light" })
-	for (const name of ["Hide amounts", "Display options"]) {
-		const button = page.getByRole("button", { name }).first()
-		await button.focus()
-		await page.keyboard.press("Shift+Tab")
-		await page.keyboard.press("Tab")
-		const style = await button.evaluate((element) => getComputedStyle(element).outlineStyle)
-		expect(style, name).not.toBe("none")
-	}
+	await openDemo(page, "/settings/display/", { theme: "light" })
+	const dark = page.getByRole("button", { name: "Dark theme" })
+	await tabTo(page, dark)
+	expect(await outlineStyle(dark), "the Theme switch's focus ring").toBe("solid")
+})
+
+test("Settings → Display offers the Theme switch and keeps the choice", async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await openDemo(page, "/settings/display/", { theme: "light" })
+	const dark = page.getByRole("button", { name: "Dark theme" })
+	await expect(dark).toHaveAttribute("aria-pressed", "false")
+
+	await dark.click()
+	await expect(page.locator("html")).toHaveAttribute("data-theme", "dark")
+	await expect(dark).toHaveAttribute("aria-pressed", "true")
+	// The choice is a preference, stored where the next load reads it.
+	expect(await page.evaluate(() => localStorage.getItem("traj.theme")), "the stored theme").toBe(
+		"dark",
+	)
+
+	// `openDemo`'s own script stores light before the page's script runs, so this load states light: the page reads
+	// the theme in storage either way, and the switch states the theme it read.
+	await page.goto("/settings/display/?demo=1")
+	await settle(page, "light")
+	await expect(page.getByRole("button", { name: "Dark theme" })).toHaveAttribute(
+		"aria-pressed",
+		"false",
+	)
+})
+
+test("a stored Hide amounts is ignored", async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await openDemo(page, "/cash-flow/", { theme: "light", hideAmounts: true })
+	await expect(page.locator("[data-flow-amount]").first()).toBeVisible()
+	await expect(page.getByText("amount hidden")).toHaveCount(0)
 })

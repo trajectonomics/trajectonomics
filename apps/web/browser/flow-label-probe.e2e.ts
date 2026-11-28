@@ -1,4 +1,5 @@
 import { expect, type Page, test } from "@playwright/test"
+import { HIDE_AMOUNTS_ENABLED } from "../src/lib/view/preferences"
 import { openDemo } from "./demo"
 import { longFlowLabels, serveFlowLabels } from "./flow-labels"
 
@@ -49,26 +50,36 @@ test("the probe leaves no amount in the page while amounts are hidden", async ({
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await serveFlowLabels(page, await longFlowLabels(page))
 	await openDemo(page, "/cash-flow/", { theme: "light" })
-	const hide = page.getByRole("button", { name: "Hide amounts" }).first()
-	const hiddenAmount = page.locator("main").getByText("amount hidden").first()
 
-	// Hide and show once, so the mask's width is already measured when the year changes below.
-	await hide.click()
-	await expect(hiddenAmount).toBeAttached()
-	await hide.click()
-	await expect(hide).toHaveAttribute("aria-pressed", "false")
-
-	// A year change measures its amounts again, now that the probe is the one the page measures through.
+	// The year's own amount, read while it is shown: find-in-page must not find it once amounts are hidden.
 	await page.locator('select[name="year"]').selectOption(await otherYear(page))
 	await frames(page)
 	const amounts = await page.locator("[data-flow-amount]:visible").allTextContents()
 	const amount = amounts.at(-1)
 	expect(amount, "the year draws an amount").toBeDefined()
 
-	// Hiding amounts then measures nothing new, so only an emptied probe leaves no amount behind.
-	await hide.click()
-	await expect(hiddenAmount).toBeAttached()
+	// Hide amounts as the switch does, on the page already drawn: the page measures its masks through the probe.
+	await page.evaluate(() => {
+		localStorage.setItem("traj.hideAmounts", "1")
+		window.dispatchEvent(new StorageEvent("storage"))
+	})
 	await frames(page)
+
+	if (!HIDE_AMOUNTS_ENABLED) {
+		// The switch is off (#927): a stored "1" is ignored, so the amount is still drawn and nothing is masked.
+		await expect(page.locator("main")).not.toContainText("amount hidden")
+		expect(
+			await page.locator("[data-flow-amount]:visible").allTextContents(),
+			"the amount is still drawn",
+		).toContain(amount ?? "")
+		return
+	}
+
+	const hiddenAmount = page.locator("main").getByText("amount hidden").first()
+	await expect(hiddenAmount).toBeAttached()
+	await page.locator('select[name="year"]').selectOption(await otherYear(page))
+	await frames(page)
+	await expect(hiddenAmount).toBeAttached()
 	expect(await probeText(page), "the probe is empty").toBe("")
 	expect(await probeVisibility(page), "the probe is hidden").toBe("hidden")
 	expect(await found(page, amount ?? ""), "find-in-page finds no hidden amount").toBe(false)

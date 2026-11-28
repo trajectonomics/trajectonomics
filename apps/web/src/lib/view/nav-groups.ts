@@ -63,6 +63,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 				icon: "sliders-horizontal",
 				needsDocument: true,
 			},
+			{
+				path: "/settings/display/",
+				label: "Display",
+				page: "DisplaySettingsPage",
+				icon: "sliders-horizontal",
+			},
 		],
 	},
 ]

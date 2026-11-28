@@ -11,7 +11,6 @@ import { currentSnapshot, loadSnapshot } from "../client/snapshot.svelte.js"
 import { whatIfSession } from "../client/what-if.svelte.js"
 import PlanDrawer from "../components/plans/PlanDrawer.svelte"
 import { brandArtwork } from "../components/shell/brand-artwork"
-import DisplayOptions from "../components/shell/DisplayOptions.svelte"
 import PrintHeader from "../components/shell/PrintHeader.svelte"
 import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
@@ -99,4 +98,3 @@ $effect(() => {
 		</p>
 	</footer>
 </div>
-<DisplayOptions />

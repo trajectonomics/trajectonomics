@@ -1,3 +1,10 @@
+/**
+ * Whether the Hide amounts switch is on (#927). It is off: the top bar's eye is gone, and a value stored earlier is
+ * ignored, so nobody is left with masked amounts and no way back. The masking components and `parseHideAmounts` stay
+ * for the share feature (#926); turn the switch back on by setting this to `true`.
+ */
+export const HIDE_AMOUNTS_ENABLED = false
+
 /** The localStorage key of the theme: "light" or "dark". Absent means follow the system. */
 export const THEME_KEY = "traj.theme"
 

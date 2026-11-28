@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test"
 import { openDemo } from "./demo"
 import { measureOverflow } from "./fit"
+import { skipMaskingCheck } from "./masking"
 
 // The Demo's `separate` Scenario files separately (cli ADR-0075), so the Tax page has two Returns to switch between.
 // These checks run at 360px, the phone width of #352: the switch works, and neither page scrolls sideways.
@@ -40,6 +41,7 @@ for (const width of [360, 1280]) {
 	test(`the profile page hides every amount of a separate filing at ${width}px`, async ({
 		page,
 	}) => {
+		skipMaskingCheck()
 		await page.setViewportSize({ width, height: 800 })
 		await openDemo(page, "/settings/tax/?scenario=separate", {
 			theme: "light",

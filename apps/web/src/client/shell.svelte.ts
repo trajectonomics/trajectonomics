@@ -2,28 +2,22 @@ import { subscribeEscape } from "./browser"
 import { subscribeWide } from "./media"
 
 /**
- * The two shell panels: the page menu on a narrow screen, and the Display options drawer. Each is open
- * or shut, Escape shuts both, and widening to `lg` shuts the menu. Every shell component reads the one
- * instance.
+ * The shell's page menu on a narrow screen: open or shut, Escape shuts it, and widening to `lg` shuts it. Every
+ * shell component reads the one instance.
  */
 export class ShellPanels {
 	menu = $state(false)
-	options = $state(false)
 	/** Whether a link in the menu was followed: the menu button then takes focus after the new page shows. */
 	menuFocusPending = false
 
 	constructor() {
 		if (typeof window === "undefined") return
-		subscribeEscape(() => this.closeAll())
+		subscribeEscape(() => this.closeMenu())
 		subscribeWide(() => this.closeMenu())
 	}
 
 	openMenu(): void {
 		this.menu = true
-	}
-
-	openOptions(): void {
-		this.options = true
 	}
 
 	/** A link in the menu is followed, so the drawer shuts. */
@@ -35,16 +29,6 @@ export class ShellPanels {
 	navigateFromMenu(): void {
 		this.menuFocusPending = true
 		this.menu = false
-	}
-
-	/** The Display options drawer is shut by its close button, its backdrop, or its own close. */
-	closeOptions(): void {
-		this.options = false
-	}
-
-	closeAll(): void {
-		this.closeMenu()
-		this.closeOptions()
 	}
 }
 

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { openDemo, SCREENSHOTS } from "./demo"
+import { skipMaskingCheck } from "./masking"
 import { measureStats } from "./plan-stats"
 
 // The Plan opens on its chart (#702): its top edge is in the first screen at a phone and at a desktop,
@@ -72,6 +73,7 @@ test("the Plan fits a phone: its chart is in the first screen, and so is the Cha
 })
 
 test("the three figures stay in their cells with amounts hidden at 360px", async ({ page }) => {
+	skipMaskingCheck()
 	await page.setViewportSize({ width: 360, height: 640 })
 	await openDemo(page, "/projection/?scenario=base", { theme: "light", hideAmounts: true })
 	const stats = await measureStats(page)

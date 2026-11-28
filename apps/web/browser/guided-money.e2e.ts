@@ -4,6 +4,7 @@ import { formatMoney } from "../src/lib/format/money"
 import { BASE_URL } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
 import { fillHolder } from "./guided-plan"
+import { skipMaskingCheck } from "./masking"
 
 // The guided money step tells the person why it stays (web ADR 0031): every row dropped says so, and Hide amounts
 // shows the CLI's figure when a masked amount is focused.
@@ -75,6 +76,7 @@ test("problems shown keep focus on the checkbox when the last kept row is untick
 test("a masked amount shows the CLI's figure on focus and the mask again on blur", async ({
 	page,
 }) => {
+	skipMaskingCheck()
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await chooseBeforeLoad(page, { theme: "light", hideAmounts: true })
 	await page.goto(`${BASE_URL}/plans/new/?demo=1`)

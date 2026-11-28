@@ -4,7 +4,7 @@
 
 import type { IconElement } from "./nav-icons"
 
-/** The eye icons the top bar's Hide amounts switch draws, by name. */
+/** The eye icons, kept for the share feature (#926): the top bar's Hide amounts switch is off (#927). */
 export const EYE_ICON_NODES: Readonly<Record<"eye" | "eye-off", readonly IconElement[]>> = {
 	eye: [
 		[

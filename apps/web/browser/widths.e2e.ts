@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { HIDE_AMOUNTS_ENABLED } from "../src/lib/view/preferences"
 import { openDemo, SCREENSHOTS, THEMES } from "./demo"
 import { labelsEscaping, measureOverflow } from "./fit"
 import { PAGES, pageName } from "./pages"
@@ -49,8 +50,8 @@ test("Home stays 360px wide with every Details open", async ({ page }) => {
 
 // A scroll box around a table holds the screen-reader-only labels in its cells (#352). Only a phone shows it.
 // Hiding amounts masks each figure with a label that is for a screen reader, so the second pass runs the
-// pages' own labels as well as the synthetic one.
-for (const hideAmounts of [false, true]) {
+// pages' own labels as well as the synthetic one, while that feature is on (#927).
+for (const hideAmounts of HIDE_AMOUNTS_ENABLED ? [false, true] : [false]) {
 	for (const path of PAGES) {
 		const state = hideAmounts ? ", with amounts hidden" : ""
 		test(`${pageName(path)} keeps screen-reader-only labels inside its tables at 360px${state}`, async ({

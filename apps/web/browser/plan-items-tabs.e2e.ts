@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { openDemo, SCREENSHOTS } from "./demo"
 import { measureOverflow } from "./fit"
+import { skipMaskingCheck } from "./masking"
 
 // The Plan's compact cards under their tabs (#703): each Milestone's link, Hide amounts on every tab, and the
 // phone width of every tab.
@@ -20,6 +21,7 @@ test("a Milestone card links to its own row on the Milestones page", async ({ pa
 
 for (const items of ["income", "expenses", "assets", "milestones"]) {
 	test(`Hide amounts masks every compact amount on the ${items} tab`, async ({ page }) => {
+		skipMaskingCheck()
 		await page.setViewportSize({ width: 1280, height: 800 })
 		await openDemo(page, `/projection/?scenario=base&items=${items}`, {
 			theme: "light",

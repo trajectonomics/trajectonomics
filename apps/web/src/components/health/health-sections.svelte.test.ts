@@ -30,7 +30,7 @@ const doctor: Doctor = {
 const ok = (data: Doctor): Read<Doctor> => ({ argv: ["doctor", "--json"], ok: true, data })
 
 describe("LedgerHealthSection", () => {
-	test("shows OK and the checks when the doctor passes, and leaves the CLI version to Display options", () => {
+	test("shows OK and the checks when the doctor passes, and leaves the CLI version to the Health page", () => {
 		const { body } = render(LedgerHealthSection, { props: { doctor: ok(doctor) } })
 		expect(body).toContain("OK")
 		expect(body).not.toContain("traj 9.9.9")

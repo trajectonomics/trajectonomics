@@ -7,6 +7,7 @@ import {
 	FOCUS_PAGES,
 	MASKED_FOCUS_PAGES,
 } from "./focus-point-pages"
+import { skipMaskingCheck } from "./masking"
 import { PAGES, pageName } from "./pages"
 
 for (const path of PAGES) {
@@ -55,6 +56,7 @@ for (const path of FOCUS_PAGES) {
 
 for (const path of MASKED_FOCUS_PAGES) {
 	test(`${pageName(path)} masks its focus amount with Hide amounts on`, async ({ page }) => {
+		skipMaskingCheck()
 		await page.setViewportSize({ width: 1280, height: 800 })
 		await openDemo(page, path, { theme: "light" })
 		const figures = await page.locator("[data-focus-answer]").allInnerTexts()
