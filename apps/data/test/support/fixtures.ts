@@ -4,6 +4,9 @@ import type { QuotaSample } from "../../src/core/types"
 /** A synthetic ingest key; never a real secret. */
 export const TEST_KEY = "test-key"
 
+/** The issuer tests configure; the verifier never calls it. */
+export const TEST_ISSUER = "https://auth.trajectonomics.com"
+
 /** A fixed clock: 2026-11-25T12:34:56Z. */
 export const NOW_MS = Date.parse("2026-11-25T12:34:56.000Z")
 export const NOW_ISO = new Date(NOW_MS).toISOString()

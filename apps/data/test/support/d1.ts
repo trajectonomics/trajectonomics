@@ -1,6 +1,6 @@
 import type { SQLQueryBindings } from "bun:sqlite"
 import { Database } from "bun:sqlite"
-import { readFileSync } from "node:fs"
+import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import type { D1Database } from "@cloudflare/workers-types"
 
@@ -76,10 +76,15 @@ export type TestDb = {
 	batches: () => Statement[][]
 }
 
-/** Applies the real migration to an in-memory SQLite database behind the D1 methods we use. */
+/** Applies the real migrations, in order, to an in-memory SQLite database behind D1's methods. */
 export function testDb(options: { maxCalls?: number } = {}): TestDb {
 	const database = new Database(":memory:")
-	database.exec(readFileSync(join(import.meta.dir, "../../migrations/0001_init.sql"), "utf8"))
+	const migrations = join(import.meta.dir, "../../migrations")
+	for (const file of readdirSync(migrations)
+		.filter((name) => name.endsWith(".sql"))
+		.sort()) {
+		database.exec(readFileSync(join(migrations, file), "utf8"))
+	}
 	const d1 = new TestD1(database)
 	d1.maxCalls = options.maxCalls
 	return {

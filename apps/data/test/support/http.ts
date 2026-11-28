@@ -2,7 +2,7 @@ import { BASE_PATH, INGEST_PATH, LEGACY_HOST, SITE_ORIGIN } from "../../src/core
 import type { Env } from "../../src/env"
 import type { CacheLike } from "../../src/http/cache"
 import { type Statement, type TestDb, testDb } from "./d1"
-import { NOW_MS, TEST_KEY } from "./fixtures"
+import { NOW_MS, TEST_ISSUER, TEST_KEY } from "./fixtures"
 
 type CacheEntry = {
 	response: Response
@@ -27,7 +27,7 @@ export type Harness = {
 export function harness(options: { maxCalls?: number } = {}): Harness {
 	const { db, database, calls, batches } = testDb(options)
 	return {
-		env: { DB: db, INGEST_BOOTSTRAP_KEY: TEST_KEY },
+		env: { DB: db, AUTH_ISSUER: TEST_ISSUER, INGEST_BOOTSTRAP_KEY: TEST_KEY },
 		cache: memoryCache(),
 		database,
 		calls,

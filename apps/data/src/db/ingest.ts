@@ -9,16 +9,31 @@ export type IngestOutcome = {
 	days: string[]
 }
 
-/** Upserts a whole validated batch and rebuilds the affected days in one transaction. */
+/**
+ * Upserts a whole validated batch and rebuilds the affected days in one transaction. A token that
+ * binds the org row does it as the batch's first statement, so the usage lands in the same commit
+ * (ADR 0015).
+ */
 export async function writeIngest(
 	db: D1Database,
 	batch: IngestBatch,
 	receivedAt: string,
+	bindOrgSub: string | null = null,
 ): Promise<IngestOutcome> {
 	const days = affectedDays(batch.usage)
-	const statements: D1PreparedStatement[] = batch.usage.map((row) =>
-		usageStatement(db, batch.contributorId, row, receivedAt),
-	)
+	const statements: D1PreparedStatement[] = []
+	if (bindOrgSub !== null) {
+		statements.push(
+			db
+				.prepare(
+					"UPDATE contributor SET auth_user_id = ? WHERE id = 'trajectonomics' AND auth_user_id IS NULL",
+				)
+				.bind(bindOrgSub),
+		)
+	}
+	for (const row of batch.usage) {
+		statements.push(usageStatement(db, batch.contributorId, row, receivedAt))
+	}
 	for (const row of batch.quota) {
 		statements.push(quotaStatement(db, batch.contributorId, row, receivedAt))
 	}
