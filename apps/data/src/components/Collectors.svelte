@@ -18,6 +18,9 @@ const geometry = $derived(
 </script>
 
 {#snippet signOut()}
+	{#if state.signOutFailed}
+		<p class="collectors-note">Sign-out did not finish. Try again.</p>
+	{/if}
 	<form class="collectors-signout" method="post" action={SIGN_OUT_PATH}>
 		<button class="collectors-secondary" type="submit">Sign out</button>
 	</form>

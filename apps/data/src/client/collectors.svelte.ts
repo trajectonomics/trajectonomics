@@ -10,12 +10,15 @@ export class CollectorsState {
 	collectors = $state<Collector[]>([])
 	nowMs = $state(0)
 	signInFailed = $state(false)
+	signOutFailed = $state(false)
 	#run = 0
 
 	async load(search: string): Promise<void> {
 		const run = ++this.#run
 		this.status = "loading"
-		this.signInFailed = new URLSearchParams(search).get("signin") === "failed"
+		const query = new URLSearchParams(search)
+		this.signInFailed = query.get("signin") === "failed"
+		this.signOutFailed = query.get("signout") === "failed"
 		try {
 			const collectors = await loadCollectors()
 			if (run !== this.#run) return

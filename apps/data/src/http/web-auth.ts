@@ -78,9 +78,9 @@ export async function handleSignOut(
 		try {
 			await deleteWebSession(env.DB, await sha256Hex(sessionId))
 		} catch (error) {
-			// The row may still exist, so the person is not told they signed out.
+			// The row may still exist, so the cookie stays and the page says to try again.
 			console.error("data: web session delete failed", error)
-			return json({ error: "unavailable" }, { status: 503 })
+			return redirectWithCookies(`${ME_PATH}?signout=failed`, [])
 		}
 	}
 	return redirectWithCookies(`${BASE_PATH}/`, [clearCookie(SESSION_COOKIE, BASE_PATH)])

@@ -28,6 +28,9 @@ export function relativeAge(lastSendAt: string, nowMs: number): string {
 	return `${Math.floor(hours / 24)} d ago`
 }
 
+/** The narrowest bar, as a fraction of the axis, so a one-day machine stays visible. */
+export const COLLECTORS_MIN_WIDTH = 0.01
+
 function clamp(value: number): number {
 	return Math.min(1, Math.max(0, value))
 }
@@ -40,6 +43,10 @@ export type CollectorBar = Collector & {
 	start: number
 	/** The bar's right edge as the same fraction; a bar covers whole days. */
 	end: number
+	/** Where the drawn bar starts: `start`, moved left when the minimum width would pass the end. */
+	left: number
+	/** The drawn bar's width, at least `COLLECTORS_MIN_WIDTH`. */
+	width: number
 }
 
 /** Everything the collectors picture draws, computed without a browser. */
@@ -64,12 +71,15 @@ export function collectorsGeometry(
 	const bars = rows.map((row) => {
 		const start = clamp(daysBetween(from, row.firstDay) / days)
 		const end = clamp((daysBetween(from, row.lastDay) + 1) / days)
+		const width = Math.max(end - start, COLLECTORS_MIN_WIDTH)
 		return {
 			...row,
 			state: collectorState(row.lastSendAt, nowMs),
 			ageLabel: relativeAge(row.lastSendAt, nowMs),
 			start,
 			end,
+			left: Math.min(start, 1 - width),
+			width,
 		}
 	})
 	return { from, to, bars }

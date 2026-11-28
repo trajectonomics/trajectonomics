@@ -63,17 +63,21 @@ describe("one user's collectors", () => {
 })
 
 describe("a sign-out D1 cannot finish", () => {
-	test("answers 503 and keeps the cookie, so it never claims a sign-out", async () => {
+	test("keeps the cookie and sends the person back to try again", async () => {
 		const logged = spyOn(console, "error").mockImplementation(() => {})
-		const context = harness({ maxCalls: 0 })
-		const response = await request(context, SIGN_OUT_PATH, "session-a", {
-			method: "POST",
-			headers: { origin: SITE_ORIGIN },
-		})
-		expect(logged).toHaveBeenCalled()
-		logged.mockRestore()
-		expect(response.status).toBe(503)
-		expect(await response.json()).toEqual({ error: "unavailable" })
+		let response: Response
+		try {
+			const context = harness({ maxCalls: 0 })
+			response = await request(context, SIGN_OUT_PATH, "session-a", {
+				method: "POST",
+				headers: { origin: SITE_ORIGIN },
+			})
+			expect(logged).toHaveBeenCalled()
+		} finally {
+			logged.mockRestore()
+		}
+		expect(response.status).toBe(303)
+		expect(response.headers.get("location")).toBe("/data/me/?signout=failed")
 		expect(setCookies(response)).toEqual([])
 	})
 })

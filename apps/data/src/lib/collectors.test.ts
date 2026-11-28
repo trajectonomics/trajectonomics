@@ -119,6 +119,9 @@ describe("collectorsGeometry", () => {
 		if (geometry === null) throw new Error("no geometry")
 		expect(geometry.bars[1]?.start).toBe(1)
 		expect(geometry.bars[1]?.end).toBe(1)
+		// The minimum width stays on the axis instead of being clipped past its end.
+		expect(geometry.bars[1]?.width).toBe(0.01)
+		expect(geometry.bars[1]?.left).toBeCloseTo(0.99, 10)
 	})
 
 	test("carries the state and age onto each bar", () => {

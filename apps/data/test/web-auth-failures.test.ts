@@ -91,14 +91,16 @@ describe("the callback's failures", () => {
 		],
 		[
 			"a token endpoint that redirects",
-			(context) =>
-				callback(context, signer.jwks, {
+			async (context) => {
+				const token = await signer.sign({ scope: null })
+				return callback(context, signer.jwks, {
 					authFetch: (async () =>
-						new Response(null, {
-							status: 302,
-							headers: { location: "https://example.test/" },
-						})) as unknown as typeof fetch,
-				}),
+						Response.json(
+							{ access_token: token },
+							{ status: 302, headers: { location: "https://example.test/" } },
+						)) as unknown as typeof fetch,
+				})
+			},
 		],
 		[
 			"a token from another issuer",

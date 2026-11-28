@@ -12,7 +12,6 @@ const label = $derived(collectorsAriaLabel(geometry.bars))
 	<figcaption class="visually-hidden">{label}</figcaption>
 	<ol class="collectors-rows">
 		{#each geometry.bars as bar (bar.machine)}
-			{@const width = Math.max(bar.end - bar.start, 0.01) * 100}
 			<li class="collectors-row">
 				<p class="collectors-line">
 					<span class="collectors-machine">
@@ -27,7 +26,7 @@ const label = $derived(collectorsAriaLabel(geometry.bars))
 				<div class="collectors-track" aria-hidden="true">
 					<div
 						class={`collectors-bar collectors-bar-${bar.state}`}
-						style={`left: ${bar.start * 100}%; width: ${width}%`}
+						style={`left: ${bar.left * 100}%; width: ${bar.width * 100}%`}
 					></div>
 				</div>
 			</li>
