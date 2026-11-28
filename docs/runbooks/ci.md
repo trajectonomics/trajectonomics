@@ -34,7 +34,7 @@ id of any new job to its `needs`: `tooling/guards/ci-web-split.test.ts` fails wh
 - **`ci.yml`:** an entry runs the same affected-only path as a pull request, taking turbo's base from `merge_group.base_sha`.
 - **`pr-title.yml`:** it reports without checking, since the title passed on the pull request.
 - **Settings:** the queue squash-merges when every required check of a group passes (`ALLGREEN`). It builds up to 5 entries at once and waits up to 60 minutes for a check.
-- **To go back to merging by hand,** set the ruleset's enforcement to disabled. The workflows need no change, since `merge_group` then never fires.
+- **To go back to merging by hand,** set the ruleset's enforcement to disabled (Settings → Rules → "main: merge queue" → Enforcement: Disabled, or `gh api -X PUT repos/trajectonomics/trajectonomics/rulesets/28284166 -f enforcement=disabled`). The workflows need no change, since `merge_group` then never fires.
 
 ## Why the web tests are split
 
