@@ -1,12 +1,37 @@
 import { describe, expect, test } from "bun:test"
-import { prefixDocsLinks, withDocsBase } from "./docs-links"
+import { prefixDocsLinks, withDocsBase, withPortalSlash } from "./docs-links"
 import type { HastNode } from "./hast"
+
+describe("the trailing slash of a Portal page", () => {
+	test.each([
+		["/docs/cli", "/docs/cli/"],
+		["/docs", "/docs/"],
+		["/docs/cli?tab=1", "/docs/cli/?tab=1"],
+		["/docs/cli#install", "/docs/cli/#install"],
+		["/docs/cli/?tab=1#install", "/docs/cli/?tab=1#install"],
+	])("a page path gains its slash: %s", (href, expected) => {
+		expect(withPortalSlash(href)).toBe(expected)
+	})
+
+	test.each([
+		["/docs/llms.txt"],
+		["/docs/sitemap.xml"],
+		["/docs/api/search.json"],
+		["/docs/cli.md"],
+		["/blog/launch/"],
+		["https://example.com/docs/cli"],
+		["#top"],
+	])("a file or a link outside the Portal stays: %s", (href) => {
+		expect(withPortalSlash(href)).toBe(href)
+	})
+})
 
 describe("a root-relative link in authored content", () => {
 	test.each([
 		["/cli/commands/", "/docs/cli/commands/"],
 		["/contribute/tax/", "/docs/contribute/tax/"],
-		["/operators", "/docs/operators"],
+		["/cli", "/docs/cli/"],
+		["/operators", "/docs/operators/"],
 	])("a Portal link gains the base: %s", (href, expected) => {
 		expect(withDocsBase(href)).toBe(expected)
 	})

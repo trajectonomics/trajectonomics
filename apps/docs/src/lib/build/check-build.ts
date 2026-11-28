@@ -8,6 +8,7 @@ import { checkHeaderMark } from "./header-mark"
 import { checkHeaderTabs } from "./header-tabs"
 import { checkImportTemplate } from "./import-template"
 import { checkInstallationPage } from "./installation-page"
+import { checkInternalLinks } from "./internal-links"
 import { checkLandingPage } from "./landing-page"
 import { checkMarkdownTwins } from "./markdown-twins"
 import { checkMascotAssets } from "./mascot-assets"
@@ -46,6 +47,7 @@ export function checkBuild(
 		...checkHeaderTabs(files),
 		...checkHeaderMark(files),
 		...checkSidebarTitles(files),
+		...checkInternalLinks(files),
 		...checkTocPlaceholder(files),
 		...checkInstallationPage(files),
 		...checkPlaceholderCopy(files),
