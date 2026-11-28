@@ -8,7 +8,7 @@ Scope: Trajectonomics (`trajectonomics/*`).
 
 Trajectonomics makes free, open-source money tools that help people make informed decisions easily and reach financial independence. AI agents operate the tools for the people they help.
 
-We build in this order: the `traj` command line with an agent skill first; then a sync relay, end-to-end encrypted and self-hostable before any hosted version; then a read-only MCP server on that relay, so chat apps can reach `traj`; then a desktop app for Linux and Windows (macOS once it can be built and tested) and a web app that work with a backend the user brings; then a mobile app once the desktop app is mature; then a LINE bot.
+We build in this order: the `traj` command line with an agent skill first; then a sync relay, end-to-end encrypted and self-hostable before any hosted version; then a read-only MCP server, so chat apps can reach `traj`: the relay cannot read synced data, so the MCP server reads it only with a key the person chooses to give it and can take back; then a desktop app for Linux and Windows (macOS once it can be built and tested) and a web app that work with a backend the user brings; then a mobile app once the desktop app is mature; then a LINE bot.
 
 ## Who it is for
 
