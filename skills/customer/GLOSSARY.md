@@ -8,7 +8,7 @@ Ubiquitous language for `skills/customer` (`@trajectonomics/skills`). Every term
 A packaged set of agent instructions, defined by a `SKILL.md`, that an agent loads for a particular kind of task.
 
 ### Skill Pin
-An entry in `skills-lock.json` recording a skill's source and content hash so installs are reproducible.
+An entry in a skills lock (the project `skills-lock.json`, or the global `.skill-lock.json` the customer skills install into) recording a skill's source, commit and content hash so installs are reproducible.
 
 ### Skill Manifest
 `skills.manifest.json` at the repository root: the allowlist of the Customer Skills this repository publishes, one row per Skill naming its directory and the CLI Range it expects, in install order. It is the one authored place a range lives — each Skill's frontmatter copy is written from it and checked, and a directory under `skills/` with no row, or a row with no directory, fails `bun run check`.

@@ -29,7 +29,7 @@ global skills and from the one commit it was installed from, and tells you at th
 which `traj` version and which CLI Range it set up. The `skills` CLI version this skill is checked
 against, `skills@1.9.0`, needs Node 22.20 or later, and it is the oldest that writes that `commit`
 into the lock. Where the lock has none (`skills@1.7.6` writes none), the skill runs the install
-again as `npx -y skills@1.9.0 add …` and reads the new entry. The `traj` command line the skill
+again as `npx -y skills@1.9.0 add … -g -y` and reads the new entry. The `traj` command line the skill
 installs needs Node 20 or later.
 
 ---

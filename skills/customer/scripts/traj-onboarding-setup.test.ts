@@ -64,21 +64,21 @@ describe("Step 2, installing the published set", () => {
 		expect(section(body, "If a step fails")).toContain("the pin in step 2")
 	})
 
-	it("makes every skills call itself on skills@1.9.0, so a 1.7.6 never meets the version 2 lock", () => {
+	it("makes every skills call itself on skills@1.9.0, so a 1.7.6 never writes a row without a pin", () => {
 		expect(body).toContain("`npx -y skills@1.9.0 list -g --json`")
 		expect(body).not.toContain("`npx -y skills@1.9.0 list --json`")
 		expect(stepTwo).toContain(
 			"npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -g",
 		)
 		expect(stepTwo).toContain("Every `skills` call this skill makes is `npx -y skills@1.9.0 …`")
-		expect(stepTwo).toContain("refuses the version 2 lock that 1.9.0 writes")
+		expect(stepTwo).toContain("resolves to 1.7.6 writes no `commit`, so the row has no pin")
 		const plain = body.split("\n").filter((line) => /npx (-y )?skills (add|list)/.test(line))
 		expect(plain).toEqual([WEBSITE_COMMAND])
 	})
 
 	it("reads this skill again after the re-run, which may have installed a newer copy", () => {
 		expect(stepTwo).toContain("newer `traj-onboarding`")
-		expect(stepTwo).toContain("read this skill again at the `path` the list reports")
+		expect(stepTwo).toContain("read this skill again at the `path` the global list reports")
 	})
 
 	it("tells the person the way on when the stop is reached: Node 22.20, run it themselves, set up again", () => {

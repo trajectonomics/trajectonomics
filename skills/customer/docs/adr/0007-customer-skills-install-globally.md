@@ -11,7 +11,8 @@ skill available to one project, not to the person (#139). Setup also followed th
 a project-scoped copy kept every later folder blind.
 
 The skills CLI can install for the user instead, with `-g`. It writes the skills under the user's
-agents directory and a global lock, and `npx -y skills@1.9.0 list -g --json` reads that lock's list.
+agents directory and a global lock. `npx -y skills@1.9.0 list -g --json` scans the global skill
+folders and annotates each skill with its `source` from that lock.
 
 ## Decision
 
@@ -36,5 +37,8 @@ agents directory and a global lock, and `npx -y skills@1.9.0 list -g --json` rea
 - A person who installed before this ADR keeps a project-scoped copy that still works in that one
   project. The next setup installs the set globally beside it, and the global copy is what every
   other folder sees.
+- In the folder where that older copy lives, the operating skill still prefers the project `traj`.
+  When that entry has no pin, the operating skill tells the person to remove the project copy before
+  re-running setup, since setup no longer repairs a project entry.
 - The internal skills keep their project scope: `skills/internal` is for a session working in this
   repository, not for a person.

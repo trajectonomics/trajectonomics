@@ -38,10 +38,10 @@ person who has done this before is noticed before anything is installed.
   that prints is the command line. When the machine has neither, that first run of the scoped package
   fetches the binary once and caches it, so this check is also the install; it narrates the download
   on stderr, and a download line is not an error.
-- **Scope and operating skill**: `npx -y skills@1.9.0 list -g --json`. A global list that names
-  `traj-onboarding` is this session's copy; when it does not name it, step 2 installs this skill
-  there first. The operating skill comes from that same list: a skill named `traj`, whose `source`
-  is the same as this one's, is the operating skill, and its `path` is where you read it.
+- **Scope and operating skill**: `npx -y skills@1.9.0 list -g --json`. The check passes only when
+  that global list names both `traj-onboarding` and `traj`, each with the `source`
+  `trajectonomics/trajectonomics`; the `traj` row is the operating skill, and its `path` is where you
+  read it. When the list lacks either one, run step 2.
 
 When the two install checks pass and step 3 has ended — its question answered by the person directly
 or grounded in the Ledger File they already have, or, where the read failed, that failure reported and
@@ -94,35 +94,37 @@ npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboar
 
 That is the command the README documents. `-g` installs for the person, not the folder, so every
 project and every new agent session finds this skill, which is what step 3 promises. What this step
-installs is the published set, at the commit this copy came from.
+installs is the published set, at the commit the global lock records for this skill.
 
 **Find the pin.** Read this skill's own entry, `traj-onboarding`, in the global lock:
 `${XDG_STATE_HOME}/skills/.skill-lock.json` when `XDG_STATE_HOME` is set and
 `~/.agents/.skill-lock.json` when it is not. When that lock has no such entry — the copy is only in
 a project, or the person pasted this file's URL and installed nothing — run
 `npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -g -y`
-first, then read the global lock again. That run may have installed a newer `traj-onboarding` than
-the copy you are following: read this skill again at the `path` the global list reports, and follow
-that copy. A project copy that was already there stays: never delete it, and say in one sentence
-that `npx -y skills@1.9.0 remove <name>` in that project removes it if they want only the global
-one. The entry's `commit` is the pin, and everything below installs from it. `skills@1.9.0` writes a
-`commit`; `skills@1.7.6` and older write none, and the list reports none, so the lock is the only
-place it is read. When the entry has no `commit`, or its `source` is `trajectonomics/skills` (this
-copy predates the move to this source, and its `commit` does not exist here), run the command above
-once more as `npx -y skills@1.9.0 add … -g -y`, and read the entry again: it now carries the
-`commit` that run installed. That run may also have installed a newer `traj-onboarding` than the
-copy you are following: read this skill again at the `path` the list reports, and follow that copy.
-A `commit` comes from the lock and from nowhere else. When the entry still has none, report that
+first, then read the global lock again. The entry's `commit` is the pin, and everything below
+installs from it. `skills@1.9.0` writes a `commit`; `skills@1.7.6` and older write none, and the list
+reports none, so the lock is the only place it is read. When the entry has no `commit`, or its
+`source` is `trajectonomics/skills` (this copy predates the move to this source, and its `commit` does
+not exist here), run that same global install once more and read the entry again: it now carries the
+`commit` that run installed. Either run may have installed a newer `traj-onboarding` than the copy
+you are following: read this skill again at the `path` the global list reports, and follow that
+copy. A `commit` comes from the lock and from nowhere else. When the entry still has none, report that
 setup stopped here, with the entry's `source` and its hash (`skillFolderHash` in the global lock),
 and install nothing else. Say what the person can do: `skills@1.9.0` needs Node 22.20 or later, and
 they can run `npx -y skills@1.9.0 add … -g -y` themselves, then run setup again. Treat it as a
-failed step (see below). Never install from `main`: a branch moves, and a person's setup must not.
+failed step (see below). Never install from `main` past that first global install of
+`traj-onboarding`: a branch moves, and a person's setup must not.
+
+**A project copy.** When the copy you are following sits in a project folder rather than at a `path`
+the global list reports, it stays. A project copy that was already there stays: never delete it, and say in
+one sentence that `npx -y skills@1.9.0 remove <name>` in that project removes it, and that they
+should remove a project `traj` so every session in that folder reads the pinned global one.
 
 **Read the set at that commit.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at the
 pinned commit. It lists every published skill, its directory and the CLI Range it expects, in install
 order. Install each row into the global scope with `-g` and an explicit `--skill` per row, from the
 pin. Every `skills` call this skill makes is `npx -y skills@1.9.0 …`: a `skills` that
-resolves to 1.7.6 refuses the version 2 lock that 1.9.0 writes, and no row would install.
+resolves to 1.7.6 writes no `commit`, so the row has no pin.
 
 ```bash
 npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -g
