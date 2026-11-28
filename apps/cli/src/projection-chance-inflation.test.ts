@@ -1,9 +1,10 @@
 import { describe, expect, it } from "bun:test"
 import type { ReturnModel } from "@trajectonomics/core/sim"
-import { projection } from "./projection/testing"
+import { VOLATILE_PLAN } from "./projection/plan-model-testing"
+import { projection, projectionHome } from "./projection/testing"
 import { FULL, inflationHome, planFlags } from "./projection-chance-inflation-support"
 import { chanceBody } from "./projection-chance-support"
-import { errorOf } from "./scenario-test-support"
+import { applyScenario, errorOf } from "./scenario-test-support"
 import { capture } from "./test-support"
 
 /*
@@ -99,5 +100,46 @@ describe("a plan with neither kind of swing", () => {
 		expect(model.code).toBe(2)
 		expect(errorOf(model).path).toBe("--scenario")
 		expect(errorOf(model).message).toContain("economy.inflationVolatility")
+	})
+})
+
+describe("the chance's notes with an inflation factor", () => {
+	it("says only the median is in today's money", async () => {
+		const home = await inflationHome()
+		const body = chanceBody(await projection(home, planFlags("inflationary")))
+		const note = body.notes.find((entry) => entry.startsWith("The chance is over the Return model"))
+		expect(note).toContain("and every figure is nominal except the Bands stated in today's money.")
+	})
+
+	it("keeps the nominal sentence when the model has no inflation factor", async () => {
+		const home = await projectionHome()
+		const applied = await applyScenario(home, "volatile", VOLATILE_PLAN)
+		expect(applied.code).toBe(0)
+		const body = chanceBody(await projection(home, planFlags("volatile")))
+		expect(body.realBands).toBeUndefined()
+		expect(body.notes).toContain(
+			`The chance is over the Return model "${body.definition.modelId}" with seed ${body.definition.seed}, and every figure is nominal.`,
+		)
+	})
+
+	it("names the Scenario's inflation spread beside the Accounts that swing", async () => {
+		const home = await inflationHome()
+		const body = chanceBody(await projection(home, planFlags("swinging")))
+		const note = body.notes.find((entry) => entry.startsWith("The Return model is the plan's own"))
+		expect(note).toContain("and the Scenario's inflation spread (rate 250 bps, volatility 150 bps)")
+	})
+})
+
+describe("the chance's help texts", () => {
+	it("name economy.inflationVolatility in the method and the --return-model description", async () => {
+		const res = await capture(["projection", "chance", "--help"])
+		expect(res.code).toBe(0)
+		const lines = res.out.split("\n")
+		expect(lines.find((line) => line.startsWith("Runs the Scenario"))).toContain(
+			"economy.inflationVolatility",
+		)
+		expect(lines.find((line) => line.includes("--return-model <string>"))).toContain(
+			"economy.inflationVolatility",
+		)
 	})
 })
