@@ -19,7 +19,7 @@
 	},
 	"scripts": {
 		"build": "vite build && bun scripts/pack.ts",
-		"build:hosted": "TRAJ_WEB_TARGET=hosted vite build",
+		"build:hosted": "TRAJ_WEB_TARGET=hosted vite build && bun scripts/hosted-share.ts",
 		"typecheck": "svelte-kit sync && bun ../../tooling/scripts/run-parallel.ts \"tsc -p tsconfig.json\" \"svelte-check --tsconfig ./tsconfig.json --fail-on-warnings\"",
 		"test": "bun test --parallel=2 --no-isolate ./src ./scripts",
 		"test:src": "bun test ./src",

@@ -3,10 +3,6 @@ import { queryParam, setQueryParam } from "../../client/query-param.svelte.js"
 import EstatePage from "../../components/pages/EstatePage.svelte"
 </script>
 
-<svelte:head>
-	<title>Estate · Dashboard</title>
-</svelte:head>
-
 <EstatePage
 	scenario={queryParam("scenario", "")}
 	terms={queryParam("terms", "both")}

@@ -1,13 +1,13 @@
 import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
-import { setTestUrl } from "../../scripts/svelte/app-stub"
+import { clearTestError, setTestError, setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
 import { shellPanels } from "../client/shell.svelte"
 import { replaceSnapshot } from "../client/snapshot.svelte"
 import { chooseScenario } from "../lib/view/plan"
 import { ledgerWith } from "../lib/view/plans/fixtures.test-support"
-import { routeAt } from "../lib/view/routes"
+import { documentTitle, ROUTES, routeAt } from "../lib/view/routes"
 import { LOADING } from "../lib/view/state"
 import Layout from "./+layout.svelte"
 
@@ -34,11 +34,13 @@ function menuButton(body: string): string {
 beforeEach(() => {
 	replaceSnapshot(SNAPSHOT)
 	shellPanels.closeAll()
+	clearTestError()
 })
 
 afterAll(() => {
 	snapshotLoader.replace(LOADING)
 	shellPanels.closeAll()
+	clearTestError()
 	setTestUrl("http://127.0.0.1/")
 })
 
@@ -67,5 +69,22 @@ describe("the shell's wiring", () => {
 		expect(menuButton(renderLayout())).toContain('aria-expanded="false"')
 		shellPanels.openMenu()
 		expect(menuButton(renderLayout())).toContain('aria-expanded="true"')
+	})
+})
+
+describe("the layout's title", () => {
+	test("gives every page's tab the page's heading and the product's name", () => {
+		for (const route of ROUTES) {
+			setTestUrl(`http://127.0.0.1${route.path}`)
+			const { head } = render(Layout, { props: { children: page } })
+			expect(head, route.path).toContain(`<title>${documentTitle(route.label)}</title>`)
+		}
+	})
+
+	test("names an error page by its status, not the page's heading", () => {
+		setTestUrl("http://127.0.0.1/nowhere/")
+		setTestError(404, "Not Found")
+		const { head } = render(Layout, { props: { children: page } })
+		expect(head).toContain("<title>Page not found · Trajectonomics</title>")
 	})
 })
