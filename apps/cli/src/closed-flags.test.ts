@@ -59,7 +59,7 @@ describe("a closed flag names the values it accepts", () => {
 
 	it("prints --set's own description and repeatable once, on each of its five pages", async () => {
 		const satang =
-			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\), or decimal strings with --decimal\. The paths a plan may lack are the estate block \(--set estate=<json> begins it whole\), an asset Account's volatility, a Flow's or Milestone's displayLabel, a surplus step's share and upTo, and a withdraw entry's downTo\. Items of cashflow\.surplus and cashflow\.withdraw are addressed by position from 0, such as cashflow\.withdraw\.0\.downTo; repeatable$/
+			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\), or decimal strings with --decimal\. The paths a plan may lack are the estate block \(--set estate=<json> begins it whole\), an asset Account's volatility, a Flow's or Milestone's displayLabel, an income or contribution Flow's label, a surplus step's share and upTo, and a withdraw entry's downTo\. Items of cashflow\.surplus and cashflow\.withdraw are addressed by position from 0, such as cashflow\.withdraw\.0\.downTo; repeatable$/
 		expect(flagLine((await help(["scenario", "fork"])).out, "set")).toMatch(satang)
 		for (const path of [
 			["fi"],

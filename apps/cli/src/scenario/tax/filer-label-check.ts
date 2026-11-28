@@ -36,6 +36,11 @@ export function hasFilerLevy(document: ScenarioDocument): boolean {
 	return taxLeviesOf(document).some((levy) => filerIds(levy) !== null)
 }
 
+/** Every label the document's tax Levies read through their own `tally` measures. */
+export function levyTallyLabels(document: ScenarioDocument): Set<string> {
+	return new Set(taxLeviesOf(document).flatMap(tallyLabels))
+}
+
 /** The items, in document order, each once. */
 function itemsOf(bad: readonly string[]): string[] {
 	return [...new Set(bad)]
