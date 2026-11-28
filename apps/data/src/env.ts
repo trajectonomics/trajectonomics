@@ -17,4 +17,8 @@ export type RequestContext = {
 	nowMs: number
 	cache?: CacheLike
 	jwks?: JwksSource
+	/** Random bytes for the OAuth state, PKCE verifier and session id; tests inject a fixed one. */
+	random?: (length: number) => Uint8Array
+	/** The fetch the token exchange uses; tests inject a fake auth endpoint. */
+	authFetch?: typeof fetch
 }
