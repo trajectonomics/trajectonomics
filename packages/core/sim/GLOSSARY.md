@@ -50,6 +50,14 @@ _Avoid_: Tick, step, period
 Totals over one twelve-month period of a Projection, running from an anniversary of `start` to the day before the next one. The last period is cut short by the horizon or a Shortfall and marked partial.
 _Avoid_: Year, fiscal year
 
+**Reporting year**:
+Twelve calendar months of a Projection from the 1st of a chosen month (`yearStart`, 1 to 12) to the day before the same day a year later, named by the calendar year it begins in. The first one starts on `start` and the last ends on the horizon or a run-out date; a cut edge, or a run-out, marks it partial. With `yearStart: 1` it is the calendar year. It reports a Cash-flow breakdown only (ADR 0034) and never moves an Annual roll-up.
+_Avoid_: Fiscal year, tax year, calendar year (unless `yearStart` is 1), period
+
+**Reporting month**:
+A calendar month inside a Reporting year, cut and marked partial as a Statement month is, over which the engine states a Cash-flow breakdown (ADR 0034).
+_Avoid_: Period, month bucket
+
 **Lifetime totals**:
 What a Projection states over the whole horizon for the Accounts that declare a fee or a payout above 0 bps: `accountLifetimes`, one `{ account, lifetimeFees?, lifetimePayouts? }` per such Account in Scenario order (each figure only when the Account declares that item), and a plan-wide `lifetimeFees`, present only when a fee is declared. Each is the sum of the Annual roll-up figures of that Account and comes from the same run. Without a fee or a payout above 0 bps no field appears.
 _Avoid_: Cumulative, running total
