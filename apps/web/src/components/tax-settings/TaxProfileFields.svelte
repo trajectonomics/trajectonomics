@@ -49,6 +49,6 @@ const amounts = $derived(
 	{#if lockedFlat && field.key !== "sharedMortgageInterest" && preferences.hidden && draft[field.key].trim() !== ""}
 		<TaxLockedAmount id={`tax-${field.key}`} label={field.label} hint={field.hint} problem={shown.at(field.key)} digits={draft[field.key]} />
 	{:else}
-		<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" bind:value={draft[field.key]} problem={shown.at(field.key)} disabled={lockedFlat && field.key !== "sharedMortgageInterest"} />
+		<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" money bind:value={draft[field.key]} problem={shown.at(field.key)} disabled={lockedFlat && field.key !== "sharedMortgageInterest"} />
 	{/if}
 {/each}

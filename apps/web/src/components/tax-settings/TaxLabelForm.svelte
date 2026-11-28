@@ -43,10 +43,8 @@ const button =
 /** Saves the label as one Edit that names the hash the page read; a refusal lands at its field. */
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	const result = labelEdit(
-		{ name, contentHash: show.contentHash, plan: show.document },
-		{ flow, label },
-	)
+	const { contentHash, household } = show
+	const result = labelEdit({ name, contentHash, plan, household }, { flow, label })
 	editSession.clear()
 	problems = result.ok ? {} : result.problems
 	sent = flow

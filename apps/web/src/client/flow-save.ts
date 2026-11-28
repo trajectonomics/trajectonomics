@@ -4,11 +4,12 @@ import { type EmployerDraft, employerDraftOf } from "../lib/view/plan-items/empl
 import { employerStart } from "../lib/view/plan-items/flow-try-draft"
 import type { FlowDraft, FlowKind } from "../lib/view/plan-items/flows"
 import type { Problems } from "../lib/view/plan-items/problems"
-import { salaryFromDraft, withoutSalary, withSalary } from "../lib/view/plan-items/salary-draft"
+import { salaryFromDraft, withoutSalary } from "../lib/view/plan-items/salary-draft"
 import { withTriedSalary } from "../lib/what-if/salary-try"
 import { clearedFields, recordOf, triedItemSets } from "../lib/what-if/session"
 import type { TriedFlow } from "../lib/what-if/try-flow"
 import { editSession } from "./edit.svelte.js"
+import { applySalary } from "./flow-apply.js"
 import { whatIfSession } from "./what-if.svelte.js"
 
 /** What a Flow form hands to its save: the plan, what the form holds, and whether the value is tried and not saved. */
@@ -21,6 +22,8 @@ export interface FlowSave {
 	draft: FlowDraft
 	employer: EmployerDraft
 	tryValue: boolean
+	/** The Owner to write after the Flow, "" to take it out; absent where the form changes none. */
+	owner?: string | undefined
 }
 
 /**
@@ -32,6 +35,8 @@ export interface FlowSaved {
 	problems: Problems
 	cleared: string[]
 	sent: string[]
+	/** The id of the Flow this save added to the plan, once its Edit ran. */
+	added?: string | undefined
 }
 
 /** Whether the employer section differs from the share the form started from. */
@@ -67,11 +72,7 @@ export async function saveFlow(input: FlowSave): Promise<FlowSaved> {
 		editSession.clear()
 		return { done: false, problems: result.problems, cleared: [], sent: [] }
 	}
-	if (!input.tryValue) {
-		const document = withSalary(doc, result)
-		const done = await editSession.run({ kind: "apply-plan", name, contentHash, document })
-		return { done, problems: {}, cleared: [], sent: document.flows.map((flow) => flow.id) }
-	}
+	if (!input.tryValue) return applySalary(input, result)
 	if (existing === undefined) return { done: true, problems: {}, cleared: [], sent: [] }
 	// A what-if cannot clear a field, so a once value whose stored Flow has an end sends that end as its start: the CLI
 	// accepts a once Flow that ends on its start, and refuses one that keeps an end from before the try (ONCE_FLOW_END_MISMATCH).

@@ -1,11 +1,13 @@
 import { expect, type Page } from "@playwright/test"
+import { OWNER_FIRST } from "../src/lib/view/tax-settings/label-edit"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
 import { SLOW } from "./shared-interest"
 
-// The `labels-360` plan is a separate filing whose Levies read Filer labels. A new income Flow has no tax label, and the
-// Tax labels form writes a bare one, which the CLI refuses at the whole document. The refusal's alert takes focus once;
-// moving the Flow select afterwards leaves the same message shown and focus where the person put it (web #761).
+// The `labels-360` plan is a separate filing whose Levies read Filer labels. A new income Flow saved here has no Owner,
+// so the Tax labels form refuses it at the Income Flow field before it sends any Edit (web #766): the CLI never answers,
+// so the alert takes no focus. Moving the Flow select afterwards leaves the same message shown and focus where the
+// person put it (web #761).
 export async function taxLabelAlert(page: Page): Promise<void> {
 	const plan = "labels-360"
 	await page.setViewportSize({ width: 360, height: 800 })
@@ -41,9 +43,8 @@ export async function taxLabelAlert(page: Page): Promise<void> {
 	await form.getByRole("button", { name: "Save the tax label" }).click()
 
 	const alert = form.getByRole("alert")
-	await expect(alert).toBeVisible({ timeout: SLOW })
-	await expect(alert).toBeFocused()
-	const words = await alert.textContent()
+	await expect(alert).toHaveId("tax-label-flow-problem")
+	await expect(alert).toHaveText(OWNER_FIRST)
 
 	// The refusal is shown again on every derivation of the form's state; the select keeps focus throughout.
 	const select = form.getByLabel("Income Flow", { exact: true })
@@ -51,5 +52,5 @@ export async function taxLabelAlert(page: Page): Promise<void> {
 	await select.press("ArrowUp")
 	expect(await select.inputValue(), "the select moved to its blank choice").toBe("")
 	await expect(select).toBeFocused()
-	await expect(alert).toHaveText(words ?? "")
+	await expect(alert).toHaveText(OWNER_FIRST)
 }

@@ -39,8 +39,8 @@ async function read(event: SubmitEvent): Promise<void> {
 	<p class="text-sm text-muted-foreground">{ORDER_NOTE} {SSF_WORDS}</p>
 	<OrderList bind:order problem={problems.labels} />
 	<div class="grid gap-4 sm:grid-cols-3">
-		<Field id="allowance-step" label="Step" inputmode="decimal" hint="One step, such as 1000" bind:value={draft.step} problem={problems.step} />
-		<Field id="allowance-budget" label="Yearly budget (optional)" inputmode="decimal" hint="The most to add in a year" bind:value={draft.budget} problem={problems.budget} />
+		<Field id="allowance-step" label="Step" inputmode="decimal" money hint="One step, such as 1000" bind:value={draft.step} problem={problems.step} />
+		<Field id="allowance-budget" label="Yearly budget (optional)" inputmode="decimal" money hint="The most to add in a year" bind:value={draft.budget} problem={problems.budget} />
 		<Field id="allowance-min" label="Least saving per step, % (optional)" inputmode="decimal" hint="From 0 to 100" bind:value={draft.minSaving} problem={problems.minSaving} />
 	</div>
 	<button type="submit" disabled={editSession.busy} class="rounded-md border border-border bg-card px-3 py-1.5 text-sm outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50">

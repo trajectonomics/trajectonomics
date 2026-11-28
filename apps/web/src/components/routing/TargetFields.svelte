@@ -18,7 +18,7 @@ let { draft = $bindable(), id, label, problem, rateProblem, disabled = false }: 
 </script>
 
 <!-- A target: an amount as typed, which may keep its value in today's money or grow by a fixed rate. Nothing is filled in. -->
-<Field id="{id}-amount" {label} inputmode="decimal" hint="A decimal number, such as 300000" bind:value={draft.amount} {problem} {disabled} />
+<Field id="{id}-amount" {label} inputmode="decimal" money hint="A decimal number, such as 300000" bind:value={draft.amount} {problem} {disabled} />
 <Field id="{id}-growth" label="Over the years" options={GROWTH_CHOICES} bind:value={draft.growth} {disabled} />
 {#if draft.growth === "fixed"}
 	<Field id="{id}-rate" label="Percent a year" inputmode="decimal" hint="Your own estimate: up to two places, such as 3" bind:value={draft.rate} problem={rateProblem} {disabled} />

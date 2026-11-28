@@ -49,8 +49,16 @@ describe("where a refusal of a payout, a fee or an employer's share lands", () =
 		expect(at("document.flows.salary-employer.target")).toBe("employerAccount")
 		expect(at("document.flows.salary-employer.derive.measures.1.rounding")).toBe("employerRounding")
 		expect(at("document.flows.salary-employer.derive.measures.1.num")).toBe("employerShare")
-		expect(at("document.flows.salary-employer.start")).toBe("employerAccount")
 		expect(at("document.flows.salary.amount")).toBe("amount")
+	})
+
+	test("a date the employer's Flow copies from the salary lands at the salary's date field", () => {
+		const at = (path: string) =>
+			fieldOfRefusal(refusal(path), SALARY, ["flows", "salary"], ["flows", "salary-employer"])
+		expect(at("document.flows.salary-employer.start")).toBe("start")
+		expect(at("document.flows.salary-employer.startAt")).toBe("start")
+		expect(at("document.flows.salary-employer.end")).toBe("end")
+		expect(at("document.flows.salary-employer.endAt.milestone")).toBe("end")
 	})
 
 	test("a refusal deeper under a payout is no field of it: the key straight after `payout` names the field", () => {

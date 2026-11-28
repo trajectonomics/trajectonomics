@@ -95,7 +95,7 @@ describe("the tax cards through traj", () => {
 			})
 			const plan = storedPlan(name)
 			const edit = labelEdit(
-				{ name, contentHash: plan.hash, plan: plan.document },
+				{ name, contentHash: plan.hash, plan: plan.document, household: null },
 				{ flow: "side-gig", label: "income.section40_2" },
 			)
 			if (!edit.ok) throw new Error("the draft makes an Edit")
@@ -141,7 +141,7 @@ describe("the tax cards through traj", () => {
 			expect(unlabelledIncome(storedPlan(name).document)).toEqual(["side-gig"])
 			const plan = storedPlan(name)
 			const edit = labelEdit(
-				{ name, contentHash: plan.hash, plan: plan.document },
+				{ name, contentHash: plan.hash, plan: plan.document, household: null },
 				{ flow: "side-gig", label: "income.section40_2" },
 			)
 			if (!edit.ok) throw new Error("the draft makes an Edit")

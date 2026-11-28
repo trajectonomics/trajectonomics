@@ -1,12 +1,11 @@
 import { editAnswer, type PreviewAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { type EditOutcome, editOutcome } from "../lib/edit/outcome"
-import type { AllowancePlan } from "../lib/snapshot/allowance-params"
-import type { ChanceInputs } from "../lib/snapshot/chance-params"
 import { isActionSource } from "../lib/view/action-source"
 import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
 import { fetchEditSession, postEdit, postPreview } from "./edit-post.js"
 import { EditState } from "./edit-state.svelte.js"
+import { focused, focusRefusal } from "./refused-focus.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
@@ -22,13 +21,18 @@ class EditSession extends EditState {
 
 	/** Asks the server for the session once. A server that does not answer (`vite preview`) leaves the token null. */
 	open(): Promise<void> {
-		this.opened ??= this.fetchSession()
+		// A page loaded while the server's Snapshot lacks a landed write says so, as the page that wrote did.
+		this.opened ??= fetchEditSession().then((session) => {
+			if (session?.unread === true) this.savedUnread = true
+			this.token = session?.token ?? null
+		})
 		return this.opened
 	}
 
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
 	async run(edit: EditInput, source = "form"): Promise<boolean> {
 		if (this.token === null || this.busy) return false
+		const pressed = focused()
 		this.busy = true
 		this.source = source
 		this.clear()
@@ -42,6 +46,7 @@ class EditSession extends EditState {
 			return false
 		} finally {
 			this.busy = false
+			if (this.error !== null || this.stale) void focusRefusal(pressed)
 		}
 	}
 
@@ -62,12 +67,12 @@ class EditSession extends EditState {
 	 * `allowances`, the read uses those inputs for the allowance reads (null clears them); nothing is written.
 	 * Returns true when the new Snapshot is shown.
 	 */
-	reread(allowances?: AllowancePlan | null): Promise<boolean> {
+	reread(allowances?: RereadBody["allowances"]): Promise<boolean> {
 		return this.sendReread(allowances === undefined ? {} : { allowances })
 	}
 
 	/** A reread with new paths and seed for the chance reads (web ADR 0018); nothing is written. */
-	rereadChance(chance: ChanceInputs): Promise<boolean> {
+	rereadChance(chance: Required<RereadBody>["chance"]): Promise<boolean> {
 		return this.sendReread({ chance })
 	}
 
@@ -122,13 +127,6 @@ class EditSession extends EditState {
 		this.savedUnread = outcome.snapshot === null
 		if (this.savedUnread) this.landings += 1
 		return true
-	}
-
-	private async fetchSession(): Promise<void> {
-		const session = await fetchEditSession()
-		// A page loaded while the server's Snapshot lacks a landed write says so, as the page that wrote did.
-		if (session?.unread === true) this.savedUnread = true
-		this.token = session?.token ?? null
 	}
 }
 

@@ -2,11 +2,12 @@
 import type { ScenarioFlow } from "../../lib/contract"
 import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
-import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
+import { type Choice, FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import FormAlert from "../ui/FormAlert.svelte"
 import ItemName from "../ui/ItemName.svelte"
 import AnchoredNote from "./AnchoredNote.svelte"
+import CategoryField from "./CategoryField.svelte"
 import EmployerFields from "./EmployerFields.svelte"
 import Field from "./Field.svelte"
 
@@ -29,6 +30,9 @@ interface Props {
 	targets?: readonly string[]
 	/** Whether a new income in a taxed plan must be given its label after the save. */
 	needsTaxLabel?: boolean
+	/** The choices of whose income this is, where the household states Owners; absent hides the field. */
+	owners?: readonly Choice[] | undefined
+	owner?: string
 }
 
 let {
@@ -43,6 +47,8 @@ let {
 	employer = $bindable({ account: "", share: "", rounding: "" }),
 	targets = [],
 	needsTaxLabel = false,
+	owners,
+	owner = $bindable(""),
 }: Props = $props()
 
 /** What the Ends field says: the once rule, the household's date, or both when the household pins a once Flow's end. */
@@ -57,13 +63,14 @@ const endHint = $derived.by(() => {
 
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
 <div class="space-y-4">
-	{#if needsTaxLabel}<p class="text-sm text-muted-foreground">This plan's tax counts only income it knows by its label. After you save, give this income a label in Tax labels.</p>{/if}
+	{#if needsTaxLabel}<p class="text-sm text-muted-foreground">This plan's tax counts only income it knows by its label. {owners ? "Choose its Owner, then after you save," : "After you save,"} give this income a label in Tax labels.</p>{/if}
 	{#if existing}
 		<p class="text-sm text-foreground">Item <span class="font-medium"><ItemName kind="flow" id={existing.id} /></span></p>
 	{:else}
 		<Field id="flow-name" label="Id" hint="The name this plan addresses the item by; it never changes" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
 	<Field id="flow-label" label="Name" hint="Shown in place of the id, on cards, charts and pickers. Optional." bind:value={draft.displayLabel} problem={shown.at("displayLabel")} />
+	{#if owners}<Field id="flow-owner" label="Owner" hint="Whose income this is" options={owners} bind:value={owner} />{/if}
 	<Field id="flow-amount" label="Amount per occurrence" inputmode="decimal" money hint="A decimal number, such as 9000.50" bind:value={draft.amount} problem={shown.at("amount")} />
 	<Field id="flow-frequency" label="How often" options={FREQUENCY_CHOICES} bind:value={draft.frequency} problem={shown.at("frequency")} />
 	<Field id="flow-start" label="Starts" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} disabled={anchors.start !== null} />
@@ -87,16 +94,6 @@ const endHint = $derived.by(() => {
 		{#if shown.at("earned")}<p role="alert" class="text-sm text-destructive">{shown.at("earned")}</p>{/if}
 		{#if draft.earned}<EmployerFields bind:draft={employer} {shown} {targets} />{/if}
 	{/if}
-	{#if kind === "expense"}
-		<div class="space-y-1.5">
-			<label for="flow-category" class="block text-sm font-medium text-foreground">Category</label>
-			<p id="flow-category-hint" class="text-xs text-muted-foreground">Groups this expense on the Expenses page. Optional.</p>
-			<input id="flow-category" list="flow-categories" bind:value={draft.category} autocomplete="off" aria-invalid={shown.at("category") ? "true" : undefined} aria-describedby="flow-category-hint" class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring" />
-			<datalist id="flow-categories">
-				{#each categories as category (category)}<option value={category}></option>{/each}
-			</datalist>
-			{#if shown.at("category")}<p role="alert" class="text-sm text-destructive">{shown.at("category")}</p>{/if}
-		</div>
-	{/if}
+	{#if kind === "expense"}<CategoryField bind:value={draft.category} {categories} problem={shown.at("category")} />{/if}
 	{#if shown.general}<FormAlert message={shown.general} />{/if}
 </div>

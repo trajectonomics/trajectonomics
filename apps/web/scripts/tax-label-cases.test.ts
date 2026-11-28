@@ -70,7 +70,7 @@ describe("the tax labels through traj", () => {
 			expect(flowsSentence(refused.error)).toContain("bonus")
 			const plan = storedPlan(name)
 			const edit = labelEdit(
-				{ name, contentHash: plan.hash, plan: plan.document },
+				{ name, contentHash: plan.hash, plan: plan.document, household: null },
 				{ flow: "bonus", label: "income.section40_2" },
 			)
 			if (!edit.ok) throw new Error("the draft makes an Edit")
