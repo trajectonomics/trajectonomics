@@ -1,7 +1,8 @@
 import type { Database } from "bun:sqlite"
+import type { UsageRow } from "@trajectonomics/data-collector/types"
 import { sha256Hex } from "../../src/core/hash"
 import { OAUTH_COOKIE } from "../../src/core/web-auth"
-import { NOW_ISO, usageRow } from "./fixtures"
+import { NOW_ISO, quotaSample, usageRow } from "./fixtures"
 
 /** Deterministic bytes for state, verifier and the session id, seeded per test. */
 export function testRandom(seed = 1): (length: number) => Uint8Array {
@@ -56,8 +57,9 @@ export function seedUsage(
 	machine: string,
 	hourUtc: string,
 	receivedAt: string,
+	overrides: Partial<UsageRow> = {},
 ): void {
-	const row = usageRow({ machine, hourUtc })
+	const row = usageRow({ machine, hourUtc, ...overrides })
 	database
 		.prepare(
 			`INSERT INTO usage_hourly (
@@ -83,4 +85,22 @@ export function seedUsage(
 			row.bestEffort ? 1 : 0,
 			receivedAt,
 		)
+}
+
+/** Inserts one synthetic quota reading for a contributor, plan and UTC hour. */
+export function seedQuota(
+	database: Database,
+	contributorId: string,
+	plan: string,
+	sampledAt: string,
+	receivedAt = sampledAt,
+): void {
+	const row = quotaSample({ plan, sampledAt })
+	database
+		.prepare(
+			`INSERT INTO quota_sample (
+				contributor_id, plan, window, sampled_at, used_pct, resets_at, received_at
+			) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		)
+		.run(contributorId, row.plan, row.window, row.sampledAt, row.usedPct, row.resetsAt, receivedAt)
 }

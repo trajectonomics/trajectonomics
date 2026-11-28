@@ -1,8 +1,9 @@
 import { join } from "node:path"
-import type { QuotaRow } from "../types"
+import type { QuotaPlan, QuotaRow } from "../types"
 import { claudeCredential, openCodeCredential, skipReason } from "./credentials"
 import { type FetchLike, fetchQuotaRows } from "./fetch"
 import { parseClaudeQuota, parseOpenCodeQuota } from "./parse"
+import { QUOTA_PLANS } from "./plans"
 import { sampleAntigravity, sampleCursor, sampleMuse } from "./sample-extra"
 
 /** Result of running a local CLI quota command; null means the binary could not be spawned. */
@@ -78,15 +79,20 @@ async function safely(
 	}
 }
 
+/** The sampler bound to each metered plan; `QUOTA_PLANS` keeps the list in one place. */
+const SAMPLERS: Record<QuotaPlan, (deps: SampleDeps, sampledAt: string) => Promise<QuotaRow[]>> = {
+	claude: sampleClaude,
+	"opencode-go": sampleOpenCode,
+	antigravity: sampleAntigravity,
+	cursor: sampleCursor,
+	meta: sampleMuse,
+}
+
 /** Samples all supported quota plans at the start of the current UTC hour; never throws. */
 export async function sampleQuota(deps: SampleDeps): Promise<QuotaRow[]> {
 	const sampledAt = hourStartUtc(deps.nowMs)
-	const groups = await Promise.all([
-		safely("claude", () => sampleClaude(deps, sampledAt), deps.log),
-		safely("opencode-go", () => sampleOpenCode(deps, sampledAt), deps.log),
-		safely("antigravity", () => sampleAntigravity(deps, sampledAt), deps.log),
-		safely("cursor", () => sampleCursor(deps, sampledAt), deps.log),
-		safely("meta", () => sampleMuse(deps, sampledAt), deps.log),
-	])
+	const groups = await Promise.all(
+		QUOTA_PLANS.map((plan) => safely(plan, () => SAMPLERS[plan](deps, sampledAt), deps.log)),
+	)
 	return groups.flat()
 }

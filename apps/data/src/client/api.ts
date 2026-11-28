@@ -68,16 +68,15 @@ export async function loadLog(window: DayWindow, asOf: string | null): Promise<L
 }
 
 /**
- * Reads the signed-in person's collectors. A 401 is a signed-out browser, not an error; the page
- * then offers the one sign-in action instead of a failure panel.
+ * Reads the signed-in person's collectors and usage meters. A 401 is a signed-out browser, not an
+ * error; the page then offers the one sign-in action instead of a failure panel.
  */
-export async function loadCollectors(): Promise<CollectorsPayload["collectors"] | null> {
+export async function loadCollectors(): Promise<CollectorsPayload | null> {
 	const response = await fetch(COLLECTORS_PATH, {
 		headers: { accept: "application/json" },
 		credentials: "same-origin",
 	})
 	if (response.status === 401) return null
 	if (!response.ok) throw new Error(`${COLLECTORS_PATH} answered ${response.status}`)
-	const body = (await response.json()) as CollectorsPayload
-	return body.collectors
+	return (await response.json()) as CollectorsPayload
 }

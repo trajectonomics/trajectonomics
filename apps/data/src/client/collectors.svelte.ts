@@ -1,4 +1,4 @@
-import type { Collector } from "../lib/types"
+import type { Collector, Meter } from "../lib/types"
 import { loadCollectors } from "./api"
 
 /** The collectors page's four states: reading, signed out, loaded, or a failed read. */
@@ -8,6 +8,7 @@ export type CollectorsStatus = "loading" | "signed_out" | "ready" | "error"
 export class CollectorsState {
 	status = $state<CollectorsStatus>("loading")
 	collectors = $state<Collector[]>([])
+	meters = $state<Meter[]>([])
 	nowMs = $state(0)
 	signInFailed = $state(false)
 	signOutFailed = $state(false)
@@ -20,13 +21,14 @@ export class CollectorsState {
 		this.signInFailed = query.get("signin") === "failed"
 		this.signOutFailed = query.get("signout") === "failed"
 		try {
-			const collectors = await loadCollectors()
+			const payload = await loadCollectors()
 			if (run !== this.#run) return
-			if (collectors === null) {
+			if (payload === null) {
 				this.status = "signed_out"
 				return
 			}
-			this.collectors = collectors
+			this.collectors = payload.collectors
+			this.meters = payload.meters ?? []
 			this.nowMs = Date.now()
 			this.status = "ready"
 		} catch {
