@@ -1,5 +1,5 @@
 /** Checks shared by the cash-flow breakdown tests: the identity, and each total against its roll-up. */
-import type { AnnualRollup, CashflowBreakdown } from "../types"
+import type { AnnualRollup, CashflowBreakdown, CashflowLines } from "../types"
 
 interface Amounts {
 	readonly amount: number
@@ -10,7 +10,7 @@ function sum(lines: readonly Amounts[]): number {
 }
 
 /** Money in and money out of one period, the two sides of the identity, in minor units. */
-export function identitySides(line: CashflowBreakdown): {
+export function identitySides(line: CashflowLines): {
 	readonly moneyIn: number
 	readonly moneyOut: number
 } {

@@ -9,6 +9,7 @@ import type {
 	FlowLine,
 	LevyLine,
 } from "../types/breakdown"
+import type { CashflowLines } from "../types/reporting"
 import { drawnLines } from "./cashflow-drawn"
 import {
 	type CategoryTotal,
@@ -37,14 +38,13 @@ export function lines<T>(
 	return out
 }
 
-/** The breakdown of one period, from its sums; every amount is a sum the engine applied. */
-export function breakdownOf(
+/** Every line list of one span, from its sums; every amount is a sum the engine applied. */
+export function linesOf(
 	scenario: Scenario,
-	period: Period,
 	sums: PeriodSums,
 	categories: readonly CategoryTotal[],
 	unmet: bigint,
-): CashflowBreakdown {
+): CashflowLines {
 	const levyIds = (scenario.levies ?? []).map((levy) => levy.id)
 	const incomeIds = ofKind(scenario.flows, "income")
 		.filter((flow) => !isPayout(flow))
@@ -53,9 +53,6 @@ export function breakdownOf(
 	const flowLine = (flow: string, amount: MinorUnits): FlowLine => ({ flow, amount })
 	const accountLine = (account: string, amount: MinorUnits): AccountLine => ({ account, amount })
 	return {
-		index: period.index,
-		from: period.from,
-		to: period.to,
 		income: lines(incomeIds, sums.planned, flowLine),
 		prepaid: lines(levyIds, sums.prepaid, levyLine),
 		settlements: lines(levyIds, sums.settled, levyLine),
@@ -75,5 +72,21 @@ export function breakdownOf(
 			accountLine,
 		),
 		unmet: Number(unmet),
+	}
+}
+
+/** The breakdown of one period, from its sums; every amount is a sum the engine applied. */
+export function breakdownOf(
+	scenario: Scenario,
+	period: Period,
+	sums: PeriodSums,
+	categories: readonly CategoryTotal[],
+	unmet: bigint,
+): CashflowBreakdown {
+	return {
+		index: period.index,
+		from: period.from,
+		to: period.to,
+		...linesOf(scenario, sums, categories, unmet),
 	}
 }

@@ -11,6 +11,7 @@ import { PATH_PARITY_CASES } from "./path-parity-cases"
 import { PAYOUT_PARITY_CASES } from "./payout-cases"
 import { PLAN_MODEL_PARITY_CASES } from "./plan-model-cases"
 import { REAL_ASSET_PARITY_CASES } from "./real-asset-cases"
+import { REPORTING_PARITY_CASES } from "./reporting-parity-cases"
 import { ROUTING_PARITY_CASES } from "./routing-parity-cases"
 import { RULE_PARITY_CASES } from "./rule-parity-cases"
 import { SAVINGS_PARITY_CASES } from "./savings-parity-cases"
@@ -40,4 +41,5 @@ export const EVERY_PARITY_CASE: readonly ParityCase[] = [
 	...PATH_PARITY_CASES,
 	...LIFETIME_PARITY_CASES,
 	...INFLATION_PARITY_CASES,
+	...REPORTING_PARITY_CASES,
 ]

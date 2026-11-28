@@ -1,8 +1,10 @@
 import type { EngineRun } from "../engine/result"
 import { inflationOf } from "../engine/run-scenario"
-import type { Baseline, Scenario, Timeline } from "../types"
+import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
+import type { ReportingOptions } from "../types/reporting"
 import { buildCashflow } from "./cashflow"
+import { buildReportingCashflow } from "./cashflow-reporting"
 import { declaredBy } from "./declared"
 import { buildLevies } from "./levy"
 import { buildLifetimes } from "./lifetime"
@@ -32,14 +34,17 @@ function buildReports(
 	periods: readonly Period[],
 	scenario: Scenario,
 	timeline: Timeline,
+	end: DateString,
 	breakdown: boolean,
 	stateRouting: boolean,
+	reporting: ReportingOptions | undefined,
 ): ReportOutcome {
 	const cashflow = buildCashflow(run, periods, scenario, breakdown)
+	const stated = buildReportingCashflow(run, scenario, timeline.start, end, reporting)
 	const routing = stateRouting ? buildRouting(scenario, timeline) : NO_ROUTING
-	const problem = cashflow.problem ?? routing.problem
+	const problem = cashflow.problem ?? stated.problem ?? routing.problem
 	if (problem !== undefined) return { fields: {}, problem }
-	return { fields: { ...cashflow.fields, ...routing.fields }, problem: undefined }
+	return { fields: { ...cashflow.fields, ...stated.fields, ...routing.fields }, problem: undefined }
 }
 
 export function buildProjection(
@@ -49,6 +54,7 @@ export function buildProjection(
 	timeline: Timeline,
 	breakdown = false,
 	stateRouting = false,
+	reporting: ReportingOptions | undefined = undefined,
 ): BuildResult {
 	const rules = accountRules(scenario)
 	const reported = new Set<string>(rowDates(timeline))
@@ -71,7 +77,16 @@ export function buildProjection(
 		scenario.accounts.map((account) => account.id),
 	)
 	if (lifetimes.problem !== undefined) return { problem: lifetimes.problem }
-	const reports = buildReports(run, periods, scenario, timeline, breakdown, stateRouting)
+	const reports = buildReports(
+		run,
+		periods,
+		scenario,
+		timeline,
+		end,
+		breakdown,
+		stateRouting,
+		reporting,
+	)
 	if (reports.problem !== undefined) return { problem: reports.problem }
 	const levies = buildLevies(run.levies)
 	if (levies.problem !== undefined) return { problem: levies.problem }
