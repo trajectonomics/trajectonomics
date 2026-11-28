@@ -35,6 +35,8 @@ beforeEach(() => {
 afterEach(() => {
 	guidedSession.cancel()
 	editSession.token = null
+	// The entry-point tests set `?demo=1`: put the default address back, so no later file reads it.
+	setTestUrl("http://127.0.0.1/")
 })
 
 describe("the guided plan page", () => {

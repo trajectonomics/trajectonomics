@@ -54,6 +54,7 @@ beforeEach(() => {
 	guidedSession.cancel()
 })
 afterEach(() => {
+	setTestUrl("http://127.0.0.1/")
 	guidedSession.cancel()
 	whatIfSession.end()
 	editSession.token = null

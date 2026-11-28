@@ -39,16 +39,15 @@ test("a plan saved under a What-if says it saved, and opens once the What-if is 
 	await page.getByLabel("Stop-work age").fill("60")
 	await page.getByLabel("Plan name", { exact: true }).fill("guided-whatif")
 
-	// A Save while the What-if's own read runs is refused as another Edit running, so try again when the server is free.
+	// The scratch server runs one Edit at a time, and other tests' saves share it: a Save refused as another Edit
+	// running is clicked again until the plan is saved, for as long as those saves can take under a shard's load.
+	test.setTimeout(300_000)
 	const sentence = page.getByText("Settle the What-if above, then open it.")
-	for (let attempt = 0; attempt < 8; attempt += 1) {
-		await page.getByRole("button", { name: "Save plan" }).click()
-		const busy = page.getByText("Another Edit is running. Wait for it.").first()
-		await expect(busy.or(sentence)).toBeVisible({ timeout: 60_000 })
-		if (await sentence.isVisible()) break
-		await page.waitForTimeout(1000)
-	}
-	await expect(sentence).toBeVisible({ timeout: 90_000 })
+	const save = page.getByRole("button", { name: "Save plan" })
+	await expect(async () => {
+		if (await save.isVisible()) await save.click({ timeout: 5_000 })
+		await expect(sentence).toBeVisible({ timeout: 30_000 })
+	}).toPass({ timeout: 180_000, intervals: [2_000] })
 	await expect(sentence).toBeFocused()
 	await expect(page.getByRole("button", { name: "Save plan" })).toHaveCount(0)
 
