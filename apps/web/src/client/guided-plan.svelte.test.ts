@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { demoSnapshotJson } from "../../scripts/demo-snapshot"
 import { navigations, setTestUrl } from "../../scripts/svelte/app-stub"
 import { type Snapshot, snapshot } from "../lib/contract"
@@ -7,6 +7,8 @@ import type { RowDrafts } from "../lib/view/guided/money-draft"
 import { keepProblem } from "../lib/view/guided/money-draft"
 import type { PersonDraft } from "../lib/view/household/person-draft"
 import { documentRead, planDocument } from "../lib/view/plan-items/fixtures.test-support"
+import { LOADING } from "../lib/view/state"
+import { snapshotLoader } from "./browser"
 import { editSession } from "./edit.svelte.js"
 import { guidedSession } from "./guided-plan.svelte.js"
 import { taxLabelNotice } from "./tax-label-notice.svelte.js"
@@ -55,6 +57,9 @@ beforeEach(() => {
 	sent.length = 0
 	guidedSession.cancel()
 })
+// A save shows the Snapshot it answers with; the next test file starts with none (as every other file that shows one).
+afterAll(() => snapshotLoader.replace(LOADING))
+
 afterEach(() => {
 	setTestUrl("http://127.0.0.1/")
 	guidedSession.cancel()
