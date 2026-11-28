@@ -1,4 +1,4 @@
-import type { ScenarioDocument, ScenarioFlow } from "../../contract"
+import type { ScenarioDocument, ScenarioFlow, Snapshot } from "../../contract"
 import { unlabelledIncome } from "../tax-settings/labels"
 import type { FlowKind } from "./flows"
 
@@ -31,4 +31,12 @@ export function heldTaxLabel(
 ): boolean {
 	if (offer === null || offer.plan !== plan) return false
 	return unlabelledIncome(doc).includes(offer.flow)
+}
+
+/** The first income of a plan in the Snapshot that has no tax label yet, or null when its document is not read. */
+export function firstTaxLabelOffer(snapshot: Snapshot, plan: string): TaxLabelOffer | null {
+	const read = snapshot.reads.documents[plan]
+	if (read?.ok !== true) return null
+	const [flow] = unlabelledIncome(read.data.scenario.document)
+	return flow === undefined ? null : { plan, flow }
 }

@@ -5,6 +5,7 @@ import { snapshotLoader } from "../../client/browser"
 import { editSession } from "../../client/edit.svelte.js"
 import { planEditor } from "../../client/plan-editor.svelte.js"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
+import { withSearch as hostedWithSearch } from "../../hosted/links"
 import { ledgerWith } from "../../lib/view/plans/fixtures.test-support"
 import { type PlanRow, planRows } from "../../lib/view/plans/rows"
 import { LOADING } from "../../lib/view/state"
@@ -114,6 +115,23 @@ describe("the plans page", () => {
 		expect(body).toContain("flex flex-wrap")
 		expect(body).not.toMatch(/min-w-\[|(?<!max-)w-\[\d/)
 		expect(body).not.toContain("overflow-x")
+	})
+
+	test("offers the guided first plan when the dashboard holds none, under the page's query", () => {
+		setTestUrl("http://127.0.0.1/plans/?demo=1")
+		replaceSnapshot({
+			...SNAPSHOT,
+			params: { ...SNAPSHOT.params, scenarios: [], compare: null },
+		})
+		const body = page()
+		expect(body).toContain("Set up a first plan")
+		expect(body).toContain('href="/plans/new/?demo=1"')
+		expect(hostedWithSearch("/plans/new/", "?demo=1")).toBe("/demo/plans/new/?demo=1")
+		expect(body).not.toContain("plan-range")
+	})
+
+	test("shows no guided first-plan entry while a plan exists", () => {
+		expect(page()).not.toContain("Set up a first plan")
 	})
 })
 
