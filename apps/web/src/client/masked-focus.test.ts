@@ -59,4 +59,19 @@ describe("a masked amount's focus", () => {
 		expect(send("mouseup").prevented).toBe(false)
 		action.destroy()
 	})
+
+	test("without a drag, the mouseup of the click that focused the field is held", async () => {
+		Object.defineProperty(globalThis, "window", {
+			value: { addEventListener: () => {}, removeEventListener: () => {} },
+			configurable: true,
+			writable: true,
+		})
+		const { node, send } = fakeInput()
+		const action = maskedFocus(node, () => true)
+		send("mousedown")
+		send("focus")
+		await tick()
+		expect(send("mouseup").prevented).toBe(true)
+		action.destroy()
+	})
 })
