@@ -1,6 +1,6 @@
 // A reread that changes only the chance inputs, against the real traj (web ADR 0018): the three stage-one checks and the
 // chance reads run, every other Read is kept as it was, a plan changed since the Snapshot was read makes a full read, and
-// the partial answer equals the full one. The timings are printed for the ADR.
+// the partial answer equals the full one. The traj reads each one runs are printed for the ADR.
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import type { Snapshot } from "../src/lib/contract"
 import { sameRun } from "../src/lib/snapshot/paths"
@@ -162,20 +162,26 @@ describe("a reread after the ledger moved", () => {
 	)
 })
 
-describe("what a chance change costs", () => {
+describe("what a chance change runs", () => {
 	test(
-		"takes about as long as the chance read alone, far less than a full read",
+		"runs the chance read alone: far fewer traj reads than a full read, and no full read",
 		async () => {
-			const timed = async (work: () => Promise<unknown>) => {
-				const start = performance.now()
-				await work()
-				return Math.round(performance.now() - start)
+			// Counting reads, not wall-clock time: a loaded runner moves the clock, not the count.
+			const readsOf = async (body: unknown) => {
+				await clearCalls(logOf())
+				await reread(body)
+				return calls(logOf())
 			}
 			await reread({ chance: FIRST })
-			const full = await timed(() => reread({}))
-			const kept = await timed(() => reread({ chance: { ...FIRST, seed: SECOND.seed } }))
-			console.log(`full read ${full} ms, chance change ${kept} ms`)
-			expect(kept).toBeLessThan(full)
+			const full = await readsOf({})
+			const kept = await readsOf({ chance: { ...FIRST, seed: SECOND.seed } })
+			console.log(`full read ${full.length} traj reads, chance change ${kept.length}`)
+			expect(chanceRuns(kept)).toHaveLength(1)
+			expect(kept.some((line) => line.startsWith("projection run"))).toBe(false)
+			expect(full.some((line) => line.startsWith("projection run"))).toBe(true)
+			// The three stage-one checks and the one chance read, and nothing else (ADR 0018).
+			expect(kept).toHaveLength(CHECK.length + 1)
+			expect(kept.length).toBeLessThan(full.length)
 		},
 		SLOW_MS,
 	)

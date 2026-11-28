@@ -7,6 +7,9 @@ name: PR title
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
+  # The title is a required check, so a merge queue entry must report it too. The queue holds a pull
+  # request whose title this job already passed, so the entry has nothing to check.
+  merge_group:
 
 permissions:
   contents: read
@@ -17,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check the title
+        if: github.event_name == 'pull_request'
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: |

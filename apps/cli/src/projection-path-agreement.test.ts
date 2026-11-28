@@ -18,6 +18,9 @@ import { applyScenario } from "./scenario-test-support"
  * chance lists for a path is the one the replay of that path reaches, for every path of a run.
  */
 
+/** The two tests replay all 200 paths: about 3 s together alone, and one took 5.3 s under CI load, past Bun's 5 s default. */
+const ALL_PATHS_MS = 20_000
+
 /** A decimal money string as satang, to order and compare figures without a float. */
 const satang = (money: string): bigint => BigInt(money.replace(".", ""))
 
@@ -54,49 +57,57 @@ async function expectEveryPathAgrees(home: string, flags: string[], paths: numbe
 }
 
 describe("projection path agrees with projection chance --outcomes", () => {
-	it("on all 200 paths of a run whose paths never run out: closing, lowest, the year it was lowest in", async () => {
-		const { home, flags } = await outcomesRun(200)
-		await expectEveryPathAgrees(home, flags, 200)
-	})
+	it(
+		"on all 200 paths of a run whose paths never run out: closing, lowest, the year it was lowest in",
+		async () => {
+			const { home, flags } = await outcomesRun(200)
+			await expectEveryPathAgrees(home, flags, 200)
+		},
+		ALL_PATHS_MS,
+	)
 
-	it("on all 200 paths of a plan whose paths run out at different dates, and names the earliest and the lowest", async () => {
-		const home = await projectionHome()
-		const assetsSwing = (account: Scenario["accounts"][number]) =>
-			account.kind === "asset" ? { ...account, volatility: 9000 } : account
-		const plan: Scenario = {
-			...VOLATILE_PLAN,
-			accounts: VOLATILE_PLAN.accounts.map(assetsSwing),
-			flows: [
-				...VOLATILE_PLAN.flows,
-				{
-					id: "buy",
-					kind: "expense",
-					amount: 20_000_000,
-					frequency: "once",
-					start: "2029-01-31",
-					growth: { bps: 0 },
-				},
-			],
-		}
-		expect((await applyScenario(home, "mixed", plan)).code).toBe(0)
-		const flags = [
-			...baseFlags("mixed"),
-			"--horizon",
-			"2031-03-30",
-			"--return-model",
-			"plan",
-			"--paths",
-			"200",
-			"--seed",
-			ILLUSTRATIVE_SEED,
-		]
-		const chance = await expectEveryPathAgrees(home, flags, 200)
-		const ranOut = (chance.outcomes ?? []).filter((outcome) => outcome.runsOut !== null)
-		expect(ranOut).toHaveLength(4)
-		// Four paths run out on the same date, so the earliest is the first of them by index.
-		expect(chance.representative?.earliestRunsOut).toBe(24)
-		expect(chance.representative?.lowest).toBe(115)
-		expect(new Set(ranOut.map((outcome) => outcome.runsOut?.date)).size).toBe(1)
-		expect(ranOut[0]?.index).toBe(24)
-	})
+	it(
+		"on all 200 paths of a plan whose paths run out at different dates, and names the earliest and the lowest",
+		async () => {
+			const home = await projectionHome()
+			const assetsSwing = (account: Scenario["accounts"][number]) =>
+				account.kind === "asset" ? { ...account, volatility: 9000 } : account
+			const plan: Scenario = {
+				...VOLATILE_PLAN,
+				accounts: VOLATILE_PLAN.accounts.map(assetsSwing),
+				flows: [
+					...VOLATILE_PLAN.flows,
+					{
+						id: "buy",
+						kind: "expense",
+						amount: 20_000_000,
+						frequency: "once",
+						start: "2029-01-31",
+						growth: { bps: 0 },
+					},
+				],
+			}
+			expect((await applyScenario(home, "mixed", plan)).code).toBe(0)
+			const flags = [
+				...baseFlags("mixed"),
+				"--horizon",
+				"2031-03-30",
+				"--return-model",
+				"plan",
+				"--paths",
+				"200",
+				"--seed",
+				ILLUSTRATIVE_SEED,
+			]
+			const chance = await expectEveryPathAgrees(home, flags, 200)
+			const ranOut = (chance.outcomes ?? []).filter((outcome) => outcome.runsOut !== null)
+			expect(ranOut).toHaveLength(4)
+			// Four paths run out on the same date, so the earliest is the first of them by index.
+			expect(chance.representative?.earliestRunsOut).toBe(24)
+			expect(chance.representative?.lowest).toBe(115)
+			expect(new Set(ranOut.map((outcome) => outcome.runsOut?.date)).size).toBe(1)
+			expect(ranOut[0]?.index).toBe(24)
+		},
+		ALL_PATHS_MS,
+	)
 })
