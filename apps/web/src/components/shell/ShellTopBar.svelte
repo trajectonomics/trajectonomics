@@ -1,9 +1,6 @@
 <script lang="ts">
 import { afterNavigate } from "$app/navigation"
-import { preferences } from "../../client/preferences.svelte.js"
 import { shellPanels } from "../../client/shell.svelte.js"
-import { currentSnapshot } from "../../client/snapshot.svelte.js"
-import { formatDate } from "../../lib/format"
 import type { PlanRow } from "../../lib/view/plans/rows"
 import { cx } from "../ui/cx"
 import NavIcon from "./NavIcon.svelte"
@@ -22,10 +19,6 @@ interface Props {
 }
 
 let { names, selected, onPlan, rows = [], editable = false }: Props = $props()
-const snapshotState = $derived(currentSnapshot())
-const asOf = $derived(
-	snapshotState.status === "ready" ? formatDate(snapshotState.snapshot.params.asOf) : null,
-)
 
 let menuButton: HTMLButtonElement | undefined = $state()
 let wasOpen = false
@@ -52,7 +45,7 @@ const BUTTON = cx(
 )
 </script>
 
-<!-- The menu button (narrow screens), the plan slot, the As-of date and the display actions. -->
+<!-- The menu button (narrow screens) and the plan switcher: which plan the pages show. -->
 <header class="print:hidden sticky top-0 z-20 border-b border-border bg-background">
 	<div class="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-2 sm:gap-3 sm:px-6">
 		<button
@@ -70,32 +63,6 @@ const BUTTON = cx(
 		<div class="min-w-0 flex-1">
 			<PlanButton {names} {selected} onChange={onPlan} {editable} {rows} />
 		</div>
-		{#if asOf !== null}
-			<span
-				class="hidden h-[34px] items-center rounded-md border border-border bg-card px-3 text-sm text-muted-foreground sm:inline-flex"
-				title={`Figures as of ${asOf}`}><span class="sr-only">Figures as of </span>{asOf}</span
-			>
-		{/if}
-		<button
-			type="button"
-			class={BUTTON}
-			aria-pressed={preferences.hidden}
-			aria-label="Hide amounts"
-			title="Hide amounts"
-			onclick={() => preferences.setHidden(!preferences.hidden)}
-		>
-			<NavIcon name={preferences.hidden ? "eye-off" : "eye"} />
-		</button>
-		<button
-			type="button"
-			class={BUTTON}
-			aria-haspopup="dialog"
-			aria-label="Display options"
-			title="Display options"
-			onclick={() => shellPanels.openOptions()}
-		>
-			<NavIcon name="sliders-horizontal" />
-		</button>
 	</div>
 	<SnapshotStatus />
 </header>

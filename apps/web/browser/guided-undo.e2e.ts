@@ -3,6 +3,7 @@ import { expect, type Locator, type Page, test } from "@playwright/test"
 import { BASE_URL } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
 import { fillHolder } from "./guided-plan"
+import { skipMaskingCheck } from "./masking"
 
 // With Hide amounts on, a guided amount shows the mask once it loses focus. Undo puts the mask back into the field,
 // and its draft must keep the amount typed rather than take the mask as one (#845, from #796): the field shows the
@@ -42,11 +43,13 @@ async function undoAtMasked(page: Page, field: Locator): Promise<void> {
 }
 
 test("Undo at a masked row amount keeps the amount typed", async ({ page }) => {
+	skipMaskingCheck()
 	await moneyStep(page)
 	await undoAtMasked(page, page.locator('input[id^="guided-amount-"]').first())
 })
 
 test("Undo at a masked total keeps the total typed on the short path", async ({ page }) => {
+	skipMaskingCheck()
 	await moneyStep(page, async (one) => {
 		const snapshot = JSON.parse(DEMO) as { reads: Record<string, unknown> }
 		// No rates read is the short path: the ledger states too little to carry rows in.

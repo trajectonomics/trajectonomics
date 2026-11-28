@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test"
 import { BASE_URL, SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, SCREENSHOTS, settle } from "./demo"
 import { fillHolder } from "./guided-plan"
+import { skipMaskingCheck } from "./masking"
 
 // The guided plan's keyboard and drawer behaviour (web ADR 0031): a step announces itself, the New plan drawer closes
 // before the steps show, and Hide amounts masks every figure the money step holds.
@@ -38,6 +39,7 @@ test("Set up step by step closes the New plan drawer and leaves the steps intera
 test("the money step at 360px shows each amount behind a mask when Hide amounts is on", async ({
 	page,
 }) => {
+	skipMaskingCheck()
 	await page.setViewportSize({ width: 360, height: 800 })
 	await chooseBeforeLoad(page, { theme: "light", hideAmounts: false })
 	await page.goto(`${BASE_URL}/plans/new/?demo=1`)
@@ -49,7 +51,13 @@ test("the money step at 360px shows each amount behind a mask when Hide amounts 
 		path: `${SHOTS}/hide-amounts/360/money-amounts-off.png`,
 		fullPage: true,
 	})
-	await page.getByRole("button", { name: "Hide amounts" }).click()
+	// The switch is a stored preference while the feature is on: the next load reads it.
+	await chooseBeforeLoad(page, { theme: "light", hideAmounts: true })
+	await page.reload()
+	await settle(page, "light")
+	await fillHolder(page)
+	await page.getByRole("button", { name: "Next" }).click()
+	await expect(page.getByRole("heading", { name: "Your money" })).toBeVisible()
 	await expect(page.locator('input[placeholder="•••••"]').first()).toBeVisible()
 	await expect(page.getByText("•••••").first()).toBeVisible()
 	await page.screenshot({

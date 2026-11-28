@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { SCRATCH_ORIGIN } from "./base-url"
 import { chooseBeforeLoad, settle } from "./demo"
+import { skipMaskingCheck } from "./masking"
 import { SLOW, setsAndClears } from "./shared-interest"
 import { taxLabelAlert } from "./tax-label-alert"
 import { taxLabelRefusalAtFlow } from "./tax-label-wiring"
@@ -28,6 +29,7 @@ const LOCKED = { plan: "locked-save-360", homeLoan: "14,444" } as const
 
 test("a save from a locked drawer keeps the stored home-loan interest", async ({ page }) => {
 	test.setTimeout(180_000)
+	skipMaskingCheck()
 	await page.setViewportSize({ width: 360, height: 800 })
 	await chooseBeforeLoad(page, { theme: "light", hideAmounts: true })
 	await page.goto(`${SCRATCH_ORIGIN}/settings/tax/?scenario=${LOCKED.plan}`)
@@ -63,10 +65,11 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	).toBeVisible({ timeout: SLOW })
 	await expect(page.locator("main")).toContainText("amount hidden")
 
-	// Show the amounts: the earlier holder's own interest is still stored, on the column of their Return.
-	await page.getByRole("button", { name: "Display options" }).click()
-	await page.getByRole("dialog").getByRole("button", { name: "Hide amounts" }).click()
-	await page.getByRole("button", { name: "Close Display options" }).click()
+	// Show the amounts again from Settings → Display: the top bar's eye is gone (#927).
+	await page.goto(`${SCRATCH_ORIGIN}/settings/display/?scenario=${LOCKED.plan}`)
+	await page.getByRole("button", { name: "Hide amounts" }).click()
+	await page.goto(`${SCRATCH_ORIGIN}/settings/tax/?scenario=${LOCKED.plan}`)
+	await settle(page, "light")
 	const claims = page.locator("section[aria-labelledby='tax-claims-title']")
 	await expect(claims).toContainText("30,000 THB")
 	const home = claims

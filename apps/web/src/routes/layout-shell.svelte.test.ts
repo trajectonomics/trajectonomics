@@ -33,12 +33,12 @@ function menuButton(body: string): string {
 
 beforeEach(() => {
 	replaceSnapshot(SNAPSHOT)
-	shellPanels.closeAll()
+	shellPanels.closeMenu()
 })
 
 afterAll(() => {
 	snapshotLoader.replace(LOADING)
-	shellPanels.closeAll()
+	shellPanels.closeMenu()
 	setTestUrl("http://127.0.0.1/")
 })
 
@@ -60,6 +60,20 @@ describe("the shell's wiring", () => {
 		const label = routeAt("/net-worth/")?.label ?? ""
 		expect(label).not.toBe("")
 		expect(topBar(renderLayout())).not.toContain(`>${label}<`)
+	})
+
+	test("holds only the menu button and the plan switcher", () => {
+		setTestUrl("http://127.0.0.1/net-worth/")
+		const bar = topBar(renderLayout())
+		expect(bar).toContain('aria-label="Open the menu"')
+		expect(bar).toContain('aria-label="Plan: ')
+		for (const gone of [
+			'aria-label="Hide amounts"',
+			'aria-label="Display options"',
+			"Figures as of",
+		]) {
+			expect(bar, gone).not.toContain(gone)
+		}
 	})
 
 	test("says on the menu button whether the menu drawer is open", () => {

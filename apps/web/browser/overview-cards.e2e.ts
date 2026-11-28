@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test"
 import { openDemo, SCREENSHOTS } from "./demo"
 import { measureOverflow } from "./fit"
 import { lineHitsTheLabel } from "./focus-line"
+import { skipMaskingCheck } from "./masking"
 import { visibleTextOf } from "./visible-text"
 
 // The summary below the focus point is a grid of quiet cards: each one is a single stretched link with
@@ -65,6 +66,7 @@ test("a plan that runs out puts its month on the chart and its shortfall under i
 test("Hide amounts leaves the chart, the ring and the bars, and masks every card's figure", async ({
 	page,
 }) => {
+	skipMaskingCheck()
 	await page.setViewportSize({ width: 1280, height: 800 })
 	await openDemo(page, "/", { theme: "light", hideAmounts: true })
 	await expect(page.locator("[data-focus-chart]")).toBeVisible()

@@ -8,7 +8,6 @@ import { replaceSnapshot } from "../../client/snapshot.svelte"
 import type { Snapshot } from "../../lib/contract"
 import { LOADING } from "../../lib/view/state"
 import SiteLink from "../ui/SiteLink.svelte"
-import DisplayOptions from "./DisplayOptions.svelte"
 import PreferenceControls from "./PreferenceControls.svelte"
 import SiteBrand from "./SiteBrand.svelte"
 import SiteNavLinks from "./SiteNavLinks.svelte"
@@ -42,6 +41,7 @@ describe("SiteNavLinks", () => {
 			"Settings",
 			"Tax profile",
 			"Assumptions",
+			"Display",
 		]
 		const at = (text: string) => body.indexOf(text)
 		for (const [index, text] of order.entries()) {
@@ -129,44 +129,18 @@ describe("SiteNavLinks", () => {
 	})
 })
 
-describe("DisplayOptions", () => {
-	const switchState = (body: string, label: string) =>
-		body.match(new RegExp(`<button[^>]*aria-pressed="(true|false)"[^>]*>\\s*${label}`))?.[1]
-
-	test("is a dialog named by its heading, and each switch says whether it is on", () => {
-		const { body } = render(DisplayOptions, {})
-		expect(body).toContain("<dialog")
-		expect(body).toContain('aria-labelledby="display-options-title"')
-		expect(body).toContain('id="display-options-title"')
-		expect(switchState(body, "Hide amounts")).toBe("false")
-		expect(switchState(body, "Dark theme")).toBe("false")
-
-		const saved = { hidden: preferences.hidden, theme: preferences.theme }
-		try {
-			// One switch on at a time, so a switch that read the other's state would fail.
-			preferences.hidden = true
-			preferences.theme = "light"
-			const hidden = render(DisplayOptions, {}).body
-			expect(switchState(hidden, "Hide amounts")).toBe("true")
-			expect(switchState(hidden, "Dark theme")).toBe("false")
-			preferences.hidden = false
-			preferences.theme = "dark"
-			const dark = render(DisplayOptions, {}).body
-			expect(switchState(dark, "Hide amounts")).toBe("false")
-			expect(switchState(dark, "Dark theme")).toBe("true")
-		} finally {
-			preferences.hidden = saved.hidden
-			preferences.theme = saved.theme
-		}
-	})
-})
-
 describe("PreferenceControls", () => {
-	test("gives each switch its name and says whether it is on", () => {
-		const { body } = render(PreferenceControls, {})
-		expect(body).toContain("Hide amounts")
-		expect(body).toContain("Dark theme")
-		expect(body).toContain('aria-pressed="false"')
+	test("offers the Theme switch, and no Hide amounts switch while that feature is off", () => {
+		const saved = preferences.theme
+		try {
+			preferences.theme = "light"
+			const { body } = render(PreferenceControls, {})
+			expect(body).toContain("Dark theme")
+			expect(body).not.toContain("Hide amounts")
+			expect(body).toContain('aria-pressed="false"')
+		} finally {
+			preferences.theme = saved
+		}
 	})
 })
 

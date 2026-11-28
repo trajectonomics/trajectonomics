@@ -1,4 +1,5 @@
 import {
+	HIDE_AMOUNTS_ENABLED,
 	HIDE_KEY,
 	parseHideAmounts,
 	resolveTheme,
@@ -9,8 +10,9 @@ import {
 import { applyTheme, prefersDark, readStored, subscribeExternal, writeStored } from "./browser"
 
 /**
- * The Theme and the hide-amounts switch. Every component reads the one instance, so a change shows at
- * once. A refused write keeps the choice for this page only.
+ * The Theme, and the Hide amounts state the masking components read. Hide amounts is off (#927): the state stays
+ * false and a value stored earlier is ignored, so nobody is left with masked amounts and no way back. Every
+ * component reads the one instance, so a change shows at once. A refused write keeps the choice for this page only.
  */
 class Preferences {
 	theme = $state<Theme>("light")
@@ -22,10 +24,10 @@ class Preferences {
 		subscribeExternal(() => this.sync())
 	}
 
-	/** Reads both settings again: from storage, and from the system when no Theme is stored. */
+	/** Reads the Theme again, from storage and the system, and Hide amounts when its switch is on. */
 	sync(): void {
 		this.theme = resolveTheme(readStored(THEME_KEY), prefersDark())
-		this.hidden = parseHideAmounts(readStored(HIDE_KEY))
+		this.hidden = HIDE_AMOUNTS_ENABLED && parseHideAmounts(readStored(HIDE_KEY))
 		applyTheme(this.theme)
 	}
 
@@ -35,7 +37,9 @@ class Preferences {
 		applyTheme(next)
 	}
 
+	/** Turns Hide amounts on or off while its switch is on; it writes nothing while the feature is off (#927). */
 	setHidden(next: boolean): void {
+		if (!HIDE_AMOUNTS_ENABLED) return
 		this.hidden = next
 		writeStored(HIDE_KEY, serializeHideAmounts(next))
 	}

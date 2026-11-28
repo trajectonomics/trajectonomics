@@ -3,7 +3,7 @@ import { openDemo } from "./demo"
 import { keyboardRound, menuOf, PHONE_PX, planItems, WIDE_PX } from "./shell"
 
 // The shell at a phone and at a desktop (web #701): the menu drawer's four ways to shut, the drawer's
-// state across a width change, the Display options drawer's backdrop, and the one-button plan switcher.
+// state across a width change, and the one-button plan switcher.
 
 test.describe("the menu drawer", () => {
 	for (const how of ["a nav link", "the close button", "the backdrop", "Escape"]) {
@@ -54,22 +54,6 @@ test.describe("the menu drawer", () => {
 		await page.setViewportSize(PHONE_PX)
 		await expect(drawer).toBeHidden()
 	})
-})
-
-test("Display options stays open on a click inside its panel and shuts on a click on the backdrop", async ({
-	page,
-}) => {
-	await page.setViewportSize(PHONE_PX)
-	await openDemo(page, "/net-worth/", { theme: "light" })
-	const dialog = page.getByRole("dialog")
-	await page.getByRole("button", { name: "Display options" }).click()
-	await expect(dialog).toBeVisible()
-
-	await dialog.getByRole("heading", { name: "Display options" }).click()
-	await expect(dialog).toBeVisible()
-
-	await page.mouse.click(5, 400)
-	await expect(dialog).toBeHidden()
 })
 
 test("the top bar's plan button picks a plan, and keeps its keyboard in the menu", async ({

@@ -12,7 +12,6 @@ test("the plan menu walks every item, picks with Enter, and shuts on Tab and on 
 	await openDemo(page, "/net-worth/", { theme: "light" })
 	const button = page.getByRole("button", { name: /^Plan: .+\. Change plan$/ })
 	const menu = page.getByRole("menu", { name: "Plans" })
-	const hideAmounts = page.getByRole("button", { name: "Hide amounts" })
 
 	await button.click()
 	await expect(menu).toBeVisible()
@@ -39,7 +38,11 @@ test("the plan menu walks every item, picks with Enter, and shuts on Tab and on 
 	await expect(menu).toBeVisible()
 	await page.keyboard.press("Tab")
 	await expect(menu).toBeHidden()
-	await expect(hideAmounts).toBeFocused()
+	const left = await page.evaluate(() => {
+		const active = document.activeElement
+		return active !== null && active !== document.body && active.closest("header") === null
+	})
+	expect(left, "focus left the top bar's menu").toBe(true)
 
 	// A click on blank content shuts the menu, and the button takes focus back from the page body.
 	await button.click()

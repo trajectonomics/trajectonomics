@@ -62,7 +62,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-	panels.closeAll()
+	panels.closeMenu()
 })
 
 afterAll(() => {
@@ -71,46 +71,28 @@ afterAll(() => {
 })
 
 describe("the shell panels", () => {
-	test("closeAll shuts both the menu and Display options", () => {
+	test("closeMenu shuts the menu", () => {
 		panels.openMenu()
-		panels.openOptions()
-		panels.closeAll()
-		expect([panels.menu, panels.options]).toEqual([false, false])
-	})
-
-	test("Escape shuts both panels, and another key shuts none", () => {
-		panels.openMenu()
-		panels.openOptions()
-		browser.press("Enter")
-		expect([panels.menu, panels.options]).toEqual([true, true])
-		browser.press("Escape")
-		expect([panels.menu, panels.options]).toEqual([false, false])
-	})
-
-	test("closeMenu shuts the menu and leaves Display options as it was", () => {
-		panels.openMenu()
-		panels.openOptions()
 		panels.closeMenu()
-		expect([panels.menu, panels.options]).toEqual([false, true])
+		expect(panels.menu).toBe(false)
 	})
 
-	test("closeOptions shuts Display options and leaves the menu as it was", () => {
+	test("Escape shuts the menu, and another key leaves it open", () => {
 		panels.openMenu()
-		panels.openOptions()
-		panels.closeOptions()
-		expect([panels.menu, panels.options]).toEqual([true, false])
+		browser.press("Enter")
+		expect(panels.menu).toBe(true)
+		browser.press("Escape")
+		expect(panels.menu).toBe(false)
 	})
 })
 
 describe("the menu at the lg breakpoint", () => {
 	test("shuts when the viewport widens to lg, and stays shut when it narrows again", () => {
 		panels.openMenu()
-		panels.openOptions()
 		const wide = browser.queries[0]
 		expect(wide?.media).toBe("(min-width: 64rem)")
 		wide?.set(true)
 		expect(panels.menu).toBe(false)
-		expect(panels.options).toBe(true)
 		wide?.set(false)
 		expect(panels.menu).toBe(false)
 	})

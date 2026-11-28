@@ -39,7 +39,6 @@ describe("the layout, printed", () => {
 		expect(header?.[1]).toContain("Today's money")
 		expect(header?.[1]).toContain(DEMO.params.scenarios[0] ?? "no plan in the Demo snapshot")
 		expect(body).toContain('<header class="print:hidden')
-		expect(body).toMatch(/<dialog[^>]*class="print:hidden/)
 		expect(body).toMatch(/data-print-header[^>]*class="[^"]*\bhidden\b[^"]*\bprint:block\b/)
 	})
 })
