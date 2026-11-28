@@ -8,11 +8,11 @@ export const ENGLISH_LIVE_DEMO = Object.freeze({
 	liveDemoHeading: "Try the Dashboard right here",
 	liveDemoLead:
 		"The real Dashboard, reading a sample ledger. Click through it; it is read-only. Zoom out to see more on a small screen.",
-	liveDemoTitle: "traj Dashboard — demo",
+	liveDemoTitle: "traj Dashboard demo",
 	liveDemoZoom: "Zoom",
 	liveDemoZoomOut: "Zoom out",
 	liveDemoZoomIn: "Zoom in",
-	liveDemoZoomReset: "Reset zoom to 100%",
+	liveDemoZoomReset: "reset zoom",
 	liveDemoOpen: "Open full page",
 	liveDemoFrameTitle: "The traj Dashboard demo",
 })

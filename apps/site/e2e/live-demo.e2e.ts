@@ -60,6 +60,12 @@ test("the home embeds the real Dashboard and zooms it like browser zoom", async 
 	await expect(level).toHaveText("125%")
 	await expect(zoomIn).toBeDisabled()
 	await expect(zoomOut).toBeEnabled()
+	// The top step marks Zoom in aria-disabled, not disabled, so the focus stays on it, and a press
+	// there does nothing; the status line has said the new level.
+	await expect(zoomIn).toBeFocused()
+	await zoomIn.click({ force: true })
+	await expect(level).toHaveText("125%")
+	await expect(page.locator("[data-live-said]")).toHaveText("125%")
 })
 
 test.describe("the live Demo on a phone", () => {

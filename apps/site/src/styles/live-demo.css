@@ -1,7 +1,6 @@
 /*
  * The live Demo on the home (ADR 0034): the hosted Dashboard in the hero window's frame, with
- * browser-style zoom. At zoom z the iframe lays out at 1/z of the visible box and is scaled by z, so
- * zooming out gives the Dashboard a desk-sized viewport on a phone instead of a squeezed one. Every
+ * browser-style zoom (at zoom z the iframe lays out at 1/z of the box and is scaled by z). Every
  * colour is a Semantic Token Role, and the frame matches the hero's app window (ADR 0022).
  */
 
@@ -66,7 +65,7 @@
 	cursor: pointer;
 }
 
-.live-zoom button:hover:enabled {
+.live-zoom button:hover:enabled:not([aria-disabled="true"]) {
 	border-color: var(--ds-color-foreground);
 }
 
@@ -75,7 +74,8 @@
 	outline-offset: 2px;
 }
 
-.live-zoom button:disabled {
+.live-zoom button:disabled,
+.live-zoom button[aria-disabled="true"] {
 	cursor: default;
 	opacity: 0.45;
 }
@@ -107,7 +107,6 @@
 	position: relative;
 	overflow: hidden;
 	height: min(75svh, 46rem);
-	background: var(--ds-color-background);
 }
 
 .live-viewport iframe {

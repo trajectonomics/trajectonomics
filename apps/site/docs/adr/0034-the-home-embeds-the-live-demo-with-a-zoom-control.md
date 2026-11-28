@@ -29,7 +29,9 @@ this record is the step from that picture to the product itself. The hosted buil
   `min(75svh, 46rem)`, so a zoom step never moves the page.
 - **The controls ship disabled and the script enables them.** A page with no script shows the Demo at
   100%, fully usable, and offers no zoom button that cannot work (ADR 0022). The zoom is never stored;
-  it is this visit's, not a cookie.
+  it is this visit's, not a cookie. Once the script runs, a button at either end is `aria-disabled`
+  rather than `disabled`, so a keyboard user's focus stays on it, and a visually hidden status line
+  says each new level, because the percentage sits inside the reset button's name.
 - **The Site may frame its own Demo.** `/demo/*` now sends `frame-ancestors 'self'` instead of
   `'none'`, in `public/_headers`, in the build's `EXACT` list and in the browser check. Every other
   directive stays as it was, and no `X-Frame-Options` is added: `frame-ancestors` decides for the
@@ -67,4 +69,7 @@ this record is the step from that picture to the product itself. The hosted buil
 - The visual baseline of the home moves, because the section adds content; the browser check masks the
   iframe's viewport, because its lazy load makes its pixels nondeterministic.
 - The Demo's policy now trusts the Site's origin as an ancestor. That is one origin, the Site's own,
-  and `frame-ancestors` still refuses every other site.
+  and `frame-ancestors` still refuses every other site. The docs, the blog and the data site share
+  that origin ([ADR 0033](./0033-one-host-serves-the-site-docs-blog-and-data.md)), so they could frame
+  the Demo too; that is accepted, because the Demo is read-only and carries no sign-in or cookie.
+- The keyboard walk reduces motion for itself only; the file's other keyboard checks keep motion.

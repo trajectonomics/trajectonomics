@@ -19,15 +19,16 @@ const HOMES = PAGES.filter((underTest) => underTest.status === 200)
 for (const scheme of DEVICE_SCHEMES) {
 	for (const underTest of HOMES) {
 		test.describe(`${underTest.name} on a ${scheme} device`, () => {
-			// Motion reduced settles the hero's Demo window on its static state: the chat it would play
-			// swaps which controls are on screen mid-walk, and no fixed list of stops can hold still
-			// under that ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
-			test.use({ colorScheme: scheme, reducedMotion: "reduce" })
+			test.use({ colorScheme: scheme })
 
 			test("Tab reaches every control and each one paints its ring", async ({ page }) => {
 				// The Demo's own controls are a second document to walk through, which makes this the
 				// longest keyboard check; the extra room keeps a loaded machine from failing it.
 				test.setTimeout(60_000)
+				// Motion reduced, for this walk only, settles the hero's Demo window on its static state: the
+				// chat it would play swaps which controls are on screen mid-walk, and no fixed list of stops
+				// can hold still under that ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
+				await page.emulateMedia({ reducedMotion: "reduce" })
 				await openPage(page, underTest)
 				await expectShippedTheme(page)
 				const count = await focusableCount(page)

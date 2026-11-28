@@ -40,8 +40,8 @@ const { dictionary } = Astro.props
 							></path>
 						</svg>
 					</button>
-					<button type="button" data-live-reset aria-label={dictionary.liveDemoZoomReset} disabled>
-						<output data-live-level>100%</output>
+					<button type="button" data-live-reset disabled>
+						<span data-live-level>100%</span><span class="sr-only"> {dictionary.liveDemoZoomReset}</span>
 					</button>
 					<button type="button" data-live-in aria-label={dictionary.liveDemoZoomIn} disabled>
 						<svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" width="12" height="12">
@@ -53,6 +53,7 @@ const { dictionary } = Astro.props
 						</svg>
 					</button>
 				</div>
+				<span class="sr-only" role="status" data-live-said></span>
 				<a class="live-open" href={DEMO_PATH}>{dictionary.liveDemoOpen}</a>
 			</div>
 			<div class="live-viewport" data-live-viewport style="--zoom:1">
@@ -69,30 +70,30 @@ const { dictionary } = Astro.props
 {/*
  * The zoom: one step per press through the eight browser-zoom steps, from 50% to 125%, starting at
  * 100%. The percentage button resets. The control enables its own buttons, so the markup's disabled
- * state is the no-script state, and nothing is stored: the zoom is this visit's, never a cookie.
+ * state is the no-script state, and nothing is stored: the zoom is this visit's, never a cookie. At
+ * either end the button is aria-disabled rather than disabled, so the keyboard focus on it stays put,
+ * and the status line says each new level, because the percentage sits inside a button's name.
  */}
 <script is:inline>
 	;(() => {
 		const live = document.querySelector("[data-live]")
-		const box = live && live.querySelector("[data-live-viewport]")
-		const level = live && live.querySelector("[data-live-level]")
-		const buttons = live && live.querySelectorAll("button")
-		if (!box || !level || !buttons || buttons.length !== 3) return
-		const [out, reset, up] = buttons
-		const steps = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25]
+		const box = live?.querySelector("[data-live-viewport]")
+		const level = live?.querySelector("[data-live-level]")
+		const said = live?.querySelector("[data-live-said]")
+		if (!box || !level || !said) return
+		const [out, reset, up] = live.querySelectorAll("button")
+		const steps = [50, 67, 75, 80, 90, 100, 110, 125]
 		let at = 5
 		const show = (next) => {
 			at = Math.max(0, Math.min(7, next))
-			const zoom = steps[at]
-			box.style.setProperty("--zoom", zoom)
-			level.textContent = Math.round(zoom * 100) + "%"
-			out.disabled = at === 0
-			up.disabled = at === 7
+			box.style.setProperty("--zoom", steps[at] / 100)
+			level.textContent = said.textContent = `${steps[at]}%`
+			out.setAttribute("aria-disabled", at === 0)
+			up.setAttribute("aria-disabled", at === 7)
 		}
 		out.onclick = () => show(at - 1)
 		up.onclick = () => show(at + 1)
 		reset.onclick = () => show(5)
-		show(5)
-		reset.disabled = false
+		for (const button of [out, reset, up]) button.disabled = false
 	})()
 </script>

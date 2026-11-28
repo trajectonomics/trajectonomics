@@ -53,9 +53,10 @@ describe("the live Demo section in every Language", () => {
 						"data-live-in" in button.attributes,
 				),
 			).toEqual([true, true, true])
+			// The reset button's name starts with the level it shows, then says what it does.
 			expect(
 				buttons.map((button) => textOf(page, button)).filter((text) => text.length > 0),
-			).toEqual(["100%"])
+			).toEqual([`100% ${dictionary.liveDemoZoomReset}`])
 			// Both zoom glyphs are drawings, not characters: text in an icon button is text axe cannot
 			// judge the contrast of, and a glyph that is not text also cannot mismatch its label.
 			const icons = elementsByTag(page, "svg")
@@ -67,9 +68,10 @@ describe("the live Demo section in every Language", () => {
 			}
 			expect(buttons.map((button) => button.attributes["aria-label"])).toEqual([
 				dictionary.liveDemoZoomOut,
-				dictionary.liveDemoZoomReset,
+				undefined,
 				dictionary.liveDemoZoomIn,
 			])
+			expect(one(page, "role", "status").attributes["data-live-said"]).toBe("")
 			expect(one(page, "role", "group").attributes["aria-label"]).toBe(dictionary.liveDemoZoom)
 			const [open] = elementsByTag(page, "a")
 			if (open === undefined) throw new Error("the section rendered no way out")
@@ -86,7 +88,7 @@ describe("the live Demo section in every Language", () => {
 			expect(page.text.some((run) => run.text.includes("100%"))).toBe(true)
 			expect(page.elements.some(isInlineScript)).toBe(true)
 			expect(html).toContain('querySelector("[data-live]")')
-			expect(html).toContain("[0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25]")
+			expect(html).toContain("[50, 67, 75, 80, 90, 100, 110, 125]")
 		})
 	}
 })
