@@ -4,8 +4,6 @@ import {
 	AREA_OPACITY,
 	AXIS_BASELINE,
 	AXIS_SIZE,
-	BASELINE_WIDTH,
-	CHART_BASELINE,
 	CHART_END_YEAR,
 	CHART_LEFT,
 	CHART_RIGHT,
@@ -33,15 +31,17 @@ import type { ShareColours } from "./share-colours"
 import type { ShareImage } from "./share-compose"
 import { curveMarkup, curveSegments, pointAt } from "./share-curve"
 import { shortMonthYear } from "./share-date"
+import { mascotOnBaseline, type ShareMascot } from "./share-mascot"
 import { metaText, statementText } from "./share-text"
 
-/** Everything the home card is composed from: the Language's words, the Theme's colours, the lockup. */
+/** Everything the home card is composed from: the words, the colours, the lockup and the mascot. */
 export interface ShareChartComposition {
 	readonly dictionary: Dictionary
 	readonly path: string
 	readonly host: string
 	readonly colours: ShareColours
 	readonly lockup: ShareLockup
+	readonly mascot: ShareMascot
 }
 
 /** The home card: the question, a net-worth line grey while working and orange once free to stop. */
@@ -62,7 +62,7 @@ export function composeShareChart(input: ShareChartComposition): ShareImage {
 			QUESTION_SIZE,
 			colours.foreground,
 		),
-		`<line x1="${CHART_LEFT}" y1="${CHART_BASELINE}" x2="${CHART_RIGHT}" y2="${CHART_BASELINE}" stroke="${colours.mutedForeground}" stroke-width="${BASELINE_WIDTH}"/>`,
+		mascotOnBaseline(input.mascot, colours.mutedForeground),
 		`<path d="${area}" fill="${colours.accent}" fill-opacity="${AREA_OPACITY}"/>`,
 		curveMarkup(working, colours.mutedForeground),
 		curveMarkup(free, colours.accent),

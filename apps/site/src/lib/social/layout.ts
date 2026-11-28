@@ -7,6 +7,9 @@ export const SHARE_IMAGE_HEIGHT = 630
 /** The margin the image's content keeps from its edges, in pixels. */
 export const MARGIN = 72
 
+/** The x the content may reach: the margin mirrored on the right. */
+export const CONTENT_RIGHT = SHARE_IMAGE_WIDTH - MARGIN
+
 /** The height the brand lockup is drawn at, in pixels. */
 export const LOCKUP_HEIGHT = 64
 
