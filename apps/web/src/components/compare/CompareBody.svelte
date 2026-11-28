@@ -11,6 +11,7 @@ import Fact from "../projection/Fact.svelte"
 import Provenance from "../ui/Provenance.svelte"
 import CompareChart from "./CompareChart.svelte"
 import CompareFigures from "./CompareFigures.svelte"
+import CompareFocus from "./CompareFocus.svelte"
 import CompareNotes from "./CompareNotes.svelte"
 import CompareSides from "./CompareSides.svelte"
 
@@ -36,6 +37,7 @@ const sidesWithHashes = $derived([
 </script>
 
 <div class="space-y-8">
+	<CompareFocus {data} {chart} />
 	<CompareSides {sides} />
 	<CompareChart state={chart} {terms} {onTerms} />
 	<CompareFigures {rows} currency={data.currency} {headers} />
