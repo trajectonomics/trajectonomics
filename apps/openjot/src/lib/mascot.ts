@@ -1,12 +1,28 @@
 // The `.ts` extension keeps the module loadable from the node:test files, which run the
 // source through Node's type stripping and do not resolve extensionless imports.
-import { loadSavedTheme } from "./theme.ts";
+import { loadSavedTheme, type AppTheme } from "./theme.ts";
 
 export type Mascot = "robot" | "moo";
 
 // A new identifier, so it uses `openjot` rather than the `moojot` localStorage keys
 // that predate the rename (rule 6 in AGENTS.md).
 const STORAGE_KEY = "openjot_mascot";
+
+/** The mascot a theme implies, used until someone picks one. */
+export function mascotForTheme(theme: AppTheme): Mascot {
+  return theme === "trajectonomics" ? "robot" : "moo";
+}
+
+/** Whether someone has picked a mascot. Until then it follows the theme. */
+export function hasSavedMascot(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw === "robot" || raw === "moo";
+  } catch {
+    return false;
+  }
+}
 
 /**
  * The mascot is its own setting. Until someone picks one, it follows the theme they
@@ -22,7 +38,7 @@ export function loadSavedMascot(): Mascot {
       // ignore storage restrictions
     }
   }
-  return loadSavedTheme() === "trajectonomics" ? "robot" : "moo";
+  return mascotForTheme(loadSavedTheme());
 }
 
 export function saveMascot(mascot: Mascot) {

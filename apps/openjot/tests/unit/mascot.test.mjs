@@ -1,6 +1,6 @@
 import { beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
-import { loadSavedMascot, saveMascot } from "../../src/lib/mascot.ts";
+import { hasSavedMascot, loadSavedMascot, mascotForTheme, saveMascot } from "../../src/lib/mascot.ts";
 
 // mascot.ts reads the browser globals when it is called, so a tiny fake is enough.
 // The Android bridge is added per test; without it the app runs on the desktop build.
@@ -68,4 +68,18 @@ test("saving does not throw when the Android bridge is absent", () => {
   globalThis.window.MooJotAndroid = { hasGalleryPermission: () => true };
   assert.doesNotThrow(() => saveMascot("moo"));
   assert.equal(store.get("openjot_mascot"), "moo");
+});
+
+test("mascotForTheme: Trajectonomics implies the robot, the other themes Moo", () => {
+  assert.equal(mascotForTheme("trajectonomics"), "robot");
+  assert.equal(mascotForTheme("pink-white"), "moo");
+  assert.equal(mascotForTheme("orange-black"), "moo");
+});
+
+test("hasSavedMascot is true only once a valid mascot is saved", () => {
+  assert.equal(hasSavedMascot(), false);
+  store.set("openjot_mascot", "cat");
+  assert.equal(hasSavedMascot(), false);
+  saveMascot("moo");
+  assert.equal(hasSavedMascot(), true);
 });

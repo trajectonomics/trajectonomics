@@ -86,7 +86,7 @@
   import { t } from "$lib/i18n";
   import { omitFromCompare, omitFromSummary, omitRecord } from "$lib/ledgerPatch";
   import { loadSavedHand, loadSavedTheme, saveHand, saveTheme, type AppTheme, type HandMode } from "$lib/theme";
-  import { loadSavedMascot, saveMascot, syncMascotToNative, type Mascot } from "$lib/mascot";
+  import { hasSavedMascot, loadSavedMascot, mascotForTheme, saveMascot, syncMascotToNative, type Mascot } from "$lib/mascot";
   import { activeMascot, activeTheme } from "$lib/themeStore";
   import type {
     Account,
@@ -378,6 +378,16 @@
   // The launcher icon follows the mascot, not the theme it was derived from before this
   // setting existed. On an upgraded install, match it once at startup.
   onMount(() => syncMascotToNative($activeMascot));
+
+  // Until someone picks a mascot, it follows the theme, including a theme picked during
+  // onboarding or in Settings, and the launcher icon follows with it.
+  $effect(() => {
+    const next = mascotForTheme(theme);
+    if (hasSavedMascot() || next === untrack(() => mascot)) return;
+    mascot = next;
+    activeMascot.set(next);
+    syncMascotToNative(next);
+  });
 
   $effect(() => {
     setAnalyticsContext({ ui_language: lang, theme });
