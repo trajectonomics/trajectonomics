@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { Snippet } from "svelte"
 import { currentItemNames } from "../../client/item-names.svelte.js"
+import { currentSearch } from "../../client/location.svelte.js"
+import { taxLabelNotice, taxLabelsHref } from "../../client/tax-label-notice.svelte.js"
 import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
 import { drawerTitle, type PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
@@ -56,6 +58,17 @@ const trying = $derived(drawer?.tryValue === true)
 const flowKind = $derived(kind === "expense" ? "expense" : "income")
 const existingFlow = $derived(doc.flows.find((flow) => flow.id === drawer?.id))
 const existingAccount = $derived(doc.accounts.find((account) => account.id === drawer?.id))
+
+/** Closes the drawer, and offers the Tax labels page a just-saved new income in a taxed plan needs. */
+function flowDone(taxLabelFlow?: string): void {
+	onClose()
+	if (taxLabelFlow !== undefined)
+		taxLabelNotice.offer({
+			plan: name,
+			flow: taxLabelFlow,
+			href: taxLabelsHref(currentSearch(), name),
+		})
+}
 </script>
 
 <!-- The item drawer: one form per item, which saves it as an Edit, or tries a value in the What-if session. -->
@@ -78,7 +91,7 @@ const existingAccount = $derived(doc.accounts.find((account) => account.id === d
 					<AccountForm {name} {doc} {household} {contentHash} existing={existingAccount} tryValue={trying} onDone={onClose} />
 				{/if}
 			{:else}
-				<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} tryValue={trying} onDone={onClose} />
+				<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} tryValue={trying} onDone={flowDone} />
 			{/if}
 		{/key}
 	{/if}

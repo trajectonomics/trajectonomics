@@ -24,17 +24,6 @@ let { view, argv, plan, futures }: Props = $props()
 </script>
 
 <div class="space-y-8">
-	<section aria-labelledby="chance-share" class="space-y-3">
-		<h2 id="chance-share" class="sr-only">The chance of success</h2>
-		<p class="text-5xl font-semibold tracking-tight tabular-nums">{view.share} <span class="text-base font-normal text-muted-foreground">chance</span></p>
-		<p class="text-sm">{view.lasts}</p>
-		<dl class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-			<div>
-				<dt class="text-muted-foreground">Paths</dt>
-				<dd class="tabular-nums">{view.paths}</dd>
-			</div>
-		</dl>
-	</section>
 	<section aria-labelledby="chance-source" class="space-y-2">
 		<h2 id="chance-source" class="sr-only">Where the Return model comes from</h2>
 		<ChanceSource source={view.source} />

@@ -14,9 +14,9 @@ import {
 import { returnLabel } from "../../lib/view/tax-settings/return-name"
 import Badge from "../ui/Badge.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
-import SegmentedControl from "../ui/SegmentedControl.svelte"
 import CarryInTable from "./CarryInTable.svelte"
 import TaxReturnBody from "./TaxReturnBody.svelte"
+import TaxReturnSwitch from "./TaxReturnSwitch.svelte"
 
 interface Props {
 	name: string
@@ -24,11 +24,12 @@ interface Props {
 	/** The household's people, so a Return is named by the role the CLI states ("You", "Your partner"), never by id. */
 	people: PersonNames
 	claimsHolder: string | null
+	/** The Filer of the Return on screen; empty opens on the first Return, the holder's (cli ADR-0075). */
+	chosen: string
+	onReturn: (value: string) => unknown
 }
 
-let { name, run, people, claimsHolder }: Props = $props()
-/** The Filer the person chose; empty opens on the first Return, the holder's (cli ADR-0075). */
-let chosen = $state("")
+let { name, run, people, claimsHolder, chosen, onReturn }: Props = $props()
 const body = $derived(taxBody(run))
 const returns = $derived(returnsOf(run.taxYears))
 /** Two or more Filers mean the plan files separately: one Return each, and a switch between them. */
@@ -58,18 +59,7 @@ const assumptions = $derived(assumptionLines(years))
 		<Badge>{taxStatusWords(run.tax)}</Badge>
 	</div>
 	{#if separate}
-		<div class="space-y-2">
-			<p class="text-sm text-muted-foreground">
-				This plan files separately, so each person has their own Return. Choose one to read.
-			</p>
-			<SegmentedControl
-				name="return"
-				label="Return"
-				{options}
-				value={picked?.filer ?? ""}
-				onChange={(value) => (chosen = value)}
-			/>
-		</div>
+		<TaxReturnSwitch {options} value={picked?.filer ?? ""} onChange={onReturn} />
 	{/if}
 	{#if shown.kind === "no-levy"}
 		<EmptyState title="No tax rules in this plan">

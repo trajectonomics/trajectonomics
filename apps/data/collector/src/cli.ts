@@ -1,12 +1,18 @@
 #!/usr/bin/env bun
 import { runHourlyCommand } from "./commands/hourly"
+import { runLoginCommand } from "./commands/login"
+import { runLogoutCommand } from "./commands/logout"
 import { runQuotaCommand } from "./commands/quota"
 import { runSendCommand } from "./commands/send"
 import { runUsageCommand } from "./commands/usage"
+import { runWhoamiCommand } from "./commands/whoami"
 
 const USAGE = `Usage:
   bun src/cli.ts [usage] [--since <ISO>] [--machine <name>] [--mistral-csv <path>] [--skip-opencode-before <ISO>]
   bun src/cli.ts quota
+  bun src/cli.ts login [--issuer <url>]
+  bun src/cli.ts logout
+  bun src/cli.ts whoami
   bun src/cli.ts send [--url <url>] [--key-file <path>] [files...]
   bun src/cli.ts hourly [--config <path>]`
 
@@ -22,6 +28,18 @@ async function main(argv: readonly string[]): Promise<void> {
 	}
 	if (command === "quota") {
 		await runQuotaCommand(rest)
+		return
+	}
+	if (command === "login") {
+		await runLoginCommand(rest)
+		return
+	}
+	if (command === "logout") {
+		await runLogoutCommand(rest)
+		return
+	}
+	if (command === "whoami") {
+		runWhoamiCommand(rest)
 		return
 	}
 	if (command === "send") {

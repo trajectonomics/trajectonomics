@@ -26,7 +26,11 @@ describe("the data Worker's wrangler.jsonc", () => {
 		expect(config.assets.base_path).toBe(BASE_PATH)
 	})
 
-	test("runs the Worker first for the API and ingest under the base path", () => {
-		expect(config.assets.run_worker_first).toEqual([`${API_PATH}/*`, INGEST_PATH])
+	test("runs the Worker first for the API, ingest and the internal endpoint", () => {
+		expect(config.assets.run_worker_first).toEqual([`${API_PATH}/*`, INGEST_PATH, "/internal/*"])
+	})
+
+	test("configures the auth issuer ingest trusts", () => {
+		expect(config.vars).toEqual({ AUTH_ISSUER: "https://auth.trajectonomics.com" })
 	})
 })

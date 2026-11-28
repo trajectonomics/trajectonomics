@@ -35,9 +35,9 @@ const label = $derived(region === undefined ? "This tax year" : `${region}: this
 		<p class="text-sm text-muted-foreground">Tax for {year.period}, due {year.settles}</p>
 	</header>
 	<div class="grid gap-4 sm:grid-cols-3">
-		<Stat label="Tax due now">{#snippet value()}<Money amount={year.dueBefore} {currency} />{/snippet}</Stat>
-		<Stat label="Tax due with every suggestion">{#snippet value()}<Money amount={year.dueAfter} {currency} />{/snippet}</Stat>
-		<Stat label="Tax saved">{#snippet value()}<Money amount={year.saving} {currency} />{/snippet}</Stat>
+		<Stat label="Tax due now" valueClassName="text-lg">{#snippet value()}<Money amount={year.dueBefore} {currency} />{/snippet}</Stat>
+		<Stat label="Tax due with every suggestion" valueClassName="text-lg">{#snippet value()}<Money amount={year.dueAfter} {currency} />{/snippet}</Stat>
+		<Stat label="Tax saved" valueClassName="text-lg">{#snippet value()}<Money amount={year.saving} {currency} />{/snippet}</Stat>
 	</div>
 	<LineList lines={year.lines} {currency} {people} {claimsHolder} />
 	{#if plan !== null}<YearActions {year} {plan} {people} {claimsHolder} />{/if}

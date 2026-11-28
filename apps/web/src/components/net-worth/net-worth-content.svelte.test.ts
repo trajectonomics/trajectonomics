@@ -16,13 +16,12 @@ const main = netWorth(
 )
 
 describe("NetWorthContent: the headline and the composition", () => {
-	test("shows the headline with its As-of, and the command that produced it", () => {
+	test("shows the command that produced it, and leaves the answer to the focus point above", () => {
 		const { body } = render(NetWorthContent, {
 			props: { view: pageView(okRead(argv("2026-10-31"), main)) },
 		})
-		expect(body).toContain("800.00")
-		expect(body).toContain("As of 31 Oct 2026")
 		expect(body).toContain("traj report networth --as-of 2026-10-31 --json")
+		expect(body).not.toContain('data-focus-answer="true"')
 	})
 
 	test("says plainly that the As-of is before the first transaction", () => {
@@ -109,10 +108,8 @@ describe("NetWorthContent: the history", () => {
 		const { body } = render(NetWorthContent, {
 			props: { view: pageView(okRead(argv("2026-10-31"), empty)) },
 		})
-		expect(body).toContain("Nothing to chart yet")
 		expect(body).toContain("The history has no month-end read to chart.")
 		expect(body).toContain("No asset accounts.")
 		expect(body).toContain("No liability accounts.")
-		expect(body).toContain("No total")
 	})
 })

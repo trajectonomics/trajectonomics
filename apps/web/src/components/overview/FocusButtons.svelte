@@ -3,6 +3,7 @@ import { currentSearch } from "../../client/location.svelte.js"
 import { withSearch } from "../../lib/view/links"
 import type { FocusButton } from "../../lib/view/overview/focus"
 import type { HeroWarning } from "../../lib/view/overview/hero"
+import { PRIMARY_ACTION } from "../ui/focus"
 import SiteLink from "../ui/SiteLink.svelte"
 
 interface Props {
@@ -15,8 +16,6 @@ interface Props {
 
 /** The focus point's one primary action, and beside it the notes the CLI asks the reader to check. */
 let { button, warnings, warningsLabel }: Props = $props()
-const PRIMARY =
-	"inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const CHIP =
 	"inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-accent hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring print:text-foreground"
 /** The first note's anchor, on the FI page, with the address's query string kept before the hash. */
@@ -28,9 +27,9 @@ const noteHref = $derived(
 <!-- The warning triangle is Lucide's triangle-alert (ISC), drawn here as SVG elements. -->
 <div class="flex flex-wrap items-center gap-3">
 	{#if button.external}
-		<a data-primary-action href={button.href} class={PRIMARY}>{button.label}</a>
+		<a data-primary-action href={button.href} class={PRIMARY_ACTION}>{button.label}</a>
 	{:else}
-		<SiteLink data-primary-action href={button.href} class={PRIMARY}>{button.label}</SiteLink>
+		<SiteLink data-primary-action href={button.href} class={PRIMARY_ACTION}>{button.label}</SiteLink>
 	{/if}
 	{#if warnings.length > 0 && warningsLabel !== null}
 		<a data-focus-chip href={noteHref} aria-label={warningsLabel} class={CHIP}>

@@ -1,4 +1,4 @@
-import { BASE_PATH, LEGACY_HOST, SITE_ORIGIN } from "./urls"
+import { BASE_PATH, INTERNAL_HOST, LEGACY_HOST, SITE_ORIGIN } from "./urls"
 
 /** What the Worker answers for one request; `src/http/router.ts` turns it into a Response. */
 export type Route =
@@ -6,9 +6,13 @@ export type Route =
 	| { kind: "peaks" }
 	| { kind: "health" }
 	| { kind: "ingest" }
+	| { kind: "delete_contributor" }
 	| { kind: "not_found" }
 	| { kind: "redirect"; location: string }
 	| { kind: "method_not_allowed"; allow: string }
+
+/** The one path auth's deletion notice reaches on the service-binding host (ADR 0015). */
+const INTERNAL_DELETE_PATH = "/internal/contributors/delete"
 
 /** The parts of a request that decide the route. Hostnames arrive lowercased from `URL`. */
 export type RouteInput = {
@@ -68,10 +72,25 @@ function siteRoute(input: RouteInput): Route {
 }
 
 /**
- * Decides what one request reaches. The old host is the only host whose pages redirect; any other
- * host, including `wrangler dev` on localhost, serves the data site under its base path directly.
+ * The service-binding host answers auth's deletion notice and nothing else (ADR 0015). It has no
+ * DNS, so only a Worker reaching this one through the `DATA` binding ever sends this hostname.
+ */
+function internalRoute(input: RouteInput): Route {
+	if (input.pathname !== INTERNAL_DELETE_PATH) return { kind: "not_found" }
+	if (input.method !== "POST") return { kind: "method_not_allowed", allow: "POST" }
+	return { kind: "delete_contributor" }
+}
+
+/**
+ * Decides what one request reaches. The internal host is checked first and answers one path; the
+ * old host is the only host whose pages redirect; any other host, including `wrangler dev` on
+ * localhost, serves the data site under its base path directly.
  */
 export function routeRequest(input: RouteInput): Route {
+	if (input.hostname === INTERNAL_HOST) return internalRoute(input)
+	// The internal endpoint never redirects: a redirect would turn auth's POST into a GET.
+	if (input.pathname.startsWith("/internal/")) return { kind: "not_found" }
+	if (input.pathname.startsWith(`${BASE_PATH}/internal/`)) return { kind: "not_found" }
 	if (input.hostname === LEGACY_HOST) return legacyRoute(input)
 	return siteRoute(input)
 }

@@ -10,7 +10,7 @@ export async function taxLabelAlert(page: Page): Promise<void> {
 	const plan = "labels-360"
 	await page.setViewportSize({ width: 360, height: 800 })
 	await chooseBeforeLoad(page, { theme: "light" })
-	await page.goto(`${SCRATCH_ORIGIN}/income/?scenario=${plan}`)
+	await page.goto(`${SCRATCH_ORIGIN}/income/?scenario=${plan}&terms=today`)
 	await settle(page, "light")
 
 	// A new income in a taxed plan has no tax label, so the Tax labels form offers it.
@@ -22,7 +22,14 @@ export async function taxLabelAlert(page: Page): Promise<void> {
 	await dialog.getByRole("button", { name: "Save", exact: true }).click()
 	await expect(dialog).toBeHidden({ timeout: SLOW })
 
-	await page.goto(`${SCRATCH_ORIGIN}/settings/tax/?scenario=${plan}`)
+	// The page the drawer closes to offers the Tax labels page for the income just saved, its plan named once and
+	// the rest of the page's query kept.
+	await expect(page.getByText("Give this income a label in Tax labels.")).toBeVisible({
+		timeout: SLOW,
+	})
+	const link = page.getByRole("link", { name: "Tax labels", exact: true })
+	await expect(link).toHaveAttribute("href", `/settings/tax/?scenario=${plan}&terms=today`)
+	await link.click()
 	await settle(page, "light")
 	const form = page.getByRole("form", { name: "Tax labels" })
 	await expect(form).toBeVisible()
