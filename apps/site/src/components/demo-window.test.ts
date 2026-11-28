@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, type HtmlElement, textOf } from "../lib/build/html"
+import { unescapeText } from "../lib/build/html-tag"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
 import {
 	DEMO_APP_NAME,
@@ -145,7 +146,9 @@ describe("the demo window in every Language", () => {
 
 		it(`shows the setup, the CLI command and its JSON one line per element (${language})`, async () => {
 			const page = await render()
-			const commands = withClass(page, "terminal-command").map((element) => textOf(page, element))
+			const commands = withClass(page, "terminal-command").map((element) =>
+				unescapeText(textOf(page, element)),
+			)
 			expect(commands).toEqual([
 				...FI_DEMO_SETUP_COMMANDS.map((command) => `$ ${command}`),
 				`$ ${FI_DEMO_COMMAND}`,

@@ -81,7 +81,7 @@ export interface Dictionary {
 	readonly actionNeedMore: string
 	/** The visitor's answer: the balance and the monthly saving the CLI needs. */
 	readonly actionData: string
-	/** The line above the command: the agent loads the skill, which creates the Scenario and runs the CLI. */
+	/** The line above the command: the agent loads the skill, records the balance and runs the CLI. */
 	readonly actionSkillLine: string
 	/** The date the figure was computed, under the agent's answer. */
 	readonly actionProvenance: string

@@ -35,12 +35,15 @@ export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and fol
 
 /**
  * The commands the demo window shows the agent running before the demo command: a fresh `traj` has
- * no ledger and no Scenario, so the example first creates the `base` Scenario it reads, from the
- * CLI's own template form. A product fixture, the same text in every Language, and not copy.
+ * no ledger and no Scenario, so the example first writes the CLI's own template to `base.json`,
+ * fills it with the user's numbers, and applies it as the `base` Scenario the demo command reads.
+ * The balance itself goes in the ledger. A product fixture, the same text in every Language, and
+ * not copy.
  */
 export const FI_DEMO_SETUP_COMMANDS: readonly string[] = Object.freeze([
 	"traj init",
-	"traj scenario apply --template | traj scenario apply base --file -",
+	"traj scenario apply --template > base.json",
+	"traj scenario apply base --file base.json",
 ])
 
 /**

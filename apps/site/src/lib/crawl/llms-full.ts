@@ -26,9 +26,14 @@ const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent
 /** The pill's two runs: the licence and the release, both facts the page prints. */
 const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 
-/** The demo the page shows: the setup, the command an agent runs, and the abridged JSON it answers with. */
+/**
+ * The demo the page shows: the first-time setup, the command an agent runs, and the abridged JSON it
+ * answers with. The setup label is there because `scenario apply base --file` replaces an existing
+ * `base` plan, so the three commands are a one-time setup and not a repeatable script.
+ */
 const DEMO = [
 	"```bash",
+	"# First-time setup:",
 	...FI_DEMO_SETUP_COMMANDS,
 	FI_DEMO_COMMAND,
 	"```",

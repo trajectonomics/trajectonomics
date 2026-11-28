@@ -13,7 +13,8 @@
 .terminal-command {
 	display: block;
 	font-weight: 500;
-	white-space: pre-wrap;
+	/* A wrapped command keeps its trailing space inside the box, which axe can measure a colour for. */
+	white-space: break-spaces;
 	overflow-wrap: anywhere;
 }
 

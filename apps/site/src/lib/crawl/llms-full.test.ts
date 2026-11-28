@@ -51,9 +51,9 @@ describe("the full Answer engine file", () => {
 		}
 	})
 
-	it("prints the demo's setup, its command and its answer as fenced code, not as a link", () => {
+	it("labels the demo's setup as a first-time setup, which its command and answer follow in code", () => {
 		expect(LLMS_FULL_TXT).toContain(
-			`\`\`\`bash\n${FI_DEMO_SETUP_COMMANDS.join("\n")}\n${FI_DEMO_COMMAND}\n\`\`\``,
+			`\`\`\`bash\n# First-time setup:\n${FI_DEMO_SETUP_COMMANDS.join("\n")}\n${FI_DEMO_COMMAND}\n\`\`\``,
 		)
 		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
 	})
