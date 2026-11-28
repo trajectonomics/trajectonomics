@@ -84,12 +84,13 @@ describe("an any gate mixing a Milestone with a Metric", () => {
 		agrees(gateOf("any", 4600))
 	})
 
-	it("fires on the Metric before the Milestone on some paths, after it on others", () => {
+	it("fires on the Metric on some paths and on the Milestone on others", () => {
 		// Seed 0, 10 paths: 5 cross 4,600 in January, 2 in April, and 3 only once base + 1 month holds.
 		const fired = chance(gateOf("any", 4600), 10).outcomes!.map(
 			(outcome) => outcome.milestones?.["gate"],
 		)
-		expect([...new Set(fired ?? [])].sort()).toEqual(["2026-01-31", "2026-04-30", "2026-07-31"])
+		const [jan, apr, jul] = ["2026-01-31", "2026-04-30", "2026-07-31"]
+		expect(fired).toEqual([jan, jul, jan, jan, jan, jul, apr, jul, apr, jan])
 	})
 })
 
@@ -100,9 +101,10 @@ describe("an all gate mixing a Milestone with a Metric", () => {
 
 	it("fires only on the paths whose Metric holds once the Milestone criterion does", () => {
 		// Seed 0, 10 paths: the Metric holds at 1 July for 7 paths, so 3 never fire.
-		const fired = chance(gateOf("all", 3000), 10).outcomes!.filter(
-			(outcome) => outcome.milestones?.["gate"] !== undefined,
+		const fired = chance(gateOf("all", 3000), 10).outcomes!.map(
+			(outcome) => outcome.milestones?.["gate"],
 		)
-		expect(fired).toHaveLength(7)
+		const jul = "2026-07-31"
+		expect(fired).toEqual([jul, undefined, jul, jul, jul, undefined, jul, undefined, jul, jul])
 	})
 })
