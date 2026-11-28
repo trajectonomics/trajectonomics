@@ -39,7 +39,9 @@ const takeaway = $derived(valueTakeaway(points))
 	{#snippet notes()}
 		<p>
 			Tokens/$ is the week's tokens from <a href="#plans">Limits</a> ÷ the weekly price
-			(monthly USD × 12 / 52). API value/$ is the week's tokens × the blended API list price
+			(monthly USD × 12 / 52). For a plan with a monthly allowance, the week's tokens are
+			capped at the 30-day limit × 7 / 30, because the monthly allowance can stop you before
+			the weekly limit does. API value/$ is the week's tokens × the blended API list price
 			of the plan's own model mix ÷ the weekly price. The blend prices the tokens in, out,
 			cache read and cache write we actually used, and divides by the tokens without cache
 			reads.
