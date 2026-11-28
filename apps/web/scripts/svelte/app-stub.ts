@@ -1,4 +1,4 @@
-// Test stand-in for SvelteKit's `$app/state` and `$app/navigation`. A test sets the address with setTestUrl.
+// Test stand-in for SvelteKit's `$app/state`, `$app/navigation` and `$app/paths`. A test sets the address with setTestUrl.
 
 /** The address bar of the test. Mirrors `page` from `$app/state`: `page.url` is the current URL. */
 export const page = { url: new URL("http://127.0.0.1/") }
@@ -18,3 +18,8 @@ export async function goto(url?: string): Promise<void> {
 
 /** Registers a callback after each navigation: the tests render one page and never navigate, so it never runs. */
 export function afterNavigate(_callback: () => void): void {}
+
+/** A static asset's URL: the test build has no base path, so the asset sits at the root. */
+export function asset(file: string): string {
+	return `/${file}`
+}

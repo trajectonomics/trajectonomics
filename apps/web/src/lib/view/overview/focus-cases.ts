@@ -4,7 +4,7 @@ import type { PersonNames } from "../item-names"
 import { annualRowsOf } from "../projection/annual"
 import { facesOf } from "./focus-faces"
 import { type SetupAction, setupButton } from "./focus-setup"
-import { type FocusView, SEE_PLAN, SEE_RUNS_OUT } from "./focus-types"
+import { type FocusView, SEE_RUNS_OUT } from "./focus-types"
 import { chanceSentence, runsOutSentence, SETUP_ANSWER, SETUP_SENTENCE } from "./focus-words"
 
 /** The data of a successful Read, or null when it is missing or failed. */
@@ -68,7 +68,7 @@ export function answerFocus(
 			kind: "unreachable",
 			answer: `Not by ${yearOf(fi.horizon)}`,
 			sentence,
-			button: SEE_PLAN,
+			button: null,
 			plan,
 			stopDate: null,
 			horizonYear: yearOf(fi.horizon),
@@ -84,7 +84,7 @@ export function answerFocus(
 		kind: "reachable",
 		answer: formatMonth(fi.fi.fiDate),
 		sentence: clause === "" ? sentence : `${sentence} ${clause}`,
-		button: SEE_PLAN,
+		button: null,
 		plan,
 		stopDate: fi.fi.fiDate,
 		horizonYear: yearOf(chance?.horizon ?? run?.horizon ?? fi.horizon),
