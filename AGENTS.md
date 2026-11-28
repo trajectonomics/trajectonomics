@@ -71,6 +71,8 @@ Pick the cheapest model that can finish the brief:
 
 A brief to DeepSeek, on OpenCode Go or on the free tier (`opencode/deepseek-v4.1-flash-free`, used when the paid route is out), carries this repository's code and docs only: never a secret, a token or a person's financial data.
 
+A reviewer reads the pull request in a checkout of its own: `gh pr diff`, or a scratch `git clone --shared` under `~/.cache` (rule 8). It never runs `git checkout` or `git switch` in a worktree it did not create. On 2026-11-28 a reviewer of #945 ran a checkout in the lead session's worktree. A delegate's worktree starts from the lead's HEAD, so the next delegate would have built on the wrong base.
+
 ### DeepSeek on OpenCode Go implements (from 2026-11-25, until the owner says otherwise)
 
 On 2026-11-25 the owner subscribed to OpenCode Go and made `opencode-go/deepseek-v4.1-flash` the main implementor. Earlier that day every DeepSeek route had run dry, and Muse (`muse-ember-1.0`) used up its allowance, so Claude implemented for a few hours. Muse is not used.
