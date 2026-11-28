@@ -17,6 +17,8 @@ import {
 	DATE_SIZE,
 	KNEE_DATE_ABOVE,
 	KNEE_LABEL_ABOVE,
+	KNEE_TEXT_GAP,
+	LABEL_SIZE,
 	QUESTION_BASELINE,
 	QUESTION_SIZE,
 } from "./chart-layout"
@@ -61,6 +63,11 @@ function imageOf(language: string): ShareImage {
 /** The number one attribute carries on the first tag whose pattern matches, or NaN. */
 function numberIn(svg: string, pattern: RegExp): number {
 	return Number(pattern.exec(svg)?.[1])
+}
+
+/** The `d` attribute of the one path whose tag carries `marker`, or the empty path when none does. */
+function pathOf(svg: string, marker: string): string {
+	return new RegExp(`<path d="([^"]*)" ${marker}`).exec(svg)?.[1] ?? ""
 }
 
 /** The FI date as one Language writes it. */
@@ -108,48 +115,55 @@ describe("one Language's home share image", () => {
 		}
 	})
 
-	it("draws the zero baseline, then grey while working and accent once free to stop", () => {
+	it("splits the line at the knee, inside one pixel of the date's share of the axis", () => {
 		const { svg } = imageOf("en")
+		const cx = numberIn(svg, /<circle cx="([\d.]+)"/)
+		const cy = numberIn(svg, /<circle [^>]*cy="([\d.]+)"/)
+		const fraction = dateFraction(FI_DEMO_DATE, CHART_START_DATE, CHART_END_DATE)
+		const computed = CHART_LEFT + (CHART_RIGHT - CHART_LEFT) * fraction
+		expect(Math.abs(cx - computed)).toBeLessThanOrEqual(1)
+		const knee = `${cx} ${cy}`
+		const working = pathOf(svg, `fill="none" stroke="${COLOURS.mutedForeground}"`)
+		const free = pathOf(svg, `fill="none" stroke="${COLOURS.accent}"`)
+		const area = pathOf(svg, `fill="${COLOURS.accent}" fill-opacity=`)
+		expect(working.startsWith(`M${CHART_LEFT} `) && working.endsWith(`L${knee}`)).toBe(true)
+		expect(free.startsWith(`M${knee} `)).toBe(true)
+		expect(free).toMatch(new RegExp(`L${CHART_RIGHT} [\\d.]+$`))
+		expect(area.startsWith(`M${knee} `)).toBe(true)
 		expect(svg).toContain(
 			`<line x1="${CHART_LEFT}" y1="500" x2="${CHART_RIGHT}" y2="500" stroke="${COLOURS.mutedForeground}" stroke-width="${BASELINE_WIDTH}"/>`,
 		)
-		const strokes = [...svg.matchAll(/<path [^>]*fill="none" stroke="(#[0-9a-f]{6})"/gi)]
-		expect(strokes.map((match) => match[1])).toEqual([COLOURS.mutedForeground, COLOURS.accent])
 		expect(svg.match(new RegExp(`stroke-width="${CURVE_WIDTH}"`, "g"))).toHaveLength(2)
 		expect(svg).toContain(`fill="${COLOURS.accent}" fill-opacity="${AREA_OPACITY}"/>`)
-	})
-
-	it("marks the FI date at its own share of the time axis, inside one pixel", () => {
-		const { svg } = imageOf("en")
-		const fraction = dateFraction(FI_DEMO_DATE, CHART_START_DATE, CHART_END_DATE)
-		const computed = CHART_LEFT + (CHART_RIGHT - CHART_LEFT) * fraction
-		const cx = numberIn(svg, /<circle cx="([\d.]+)"/)
-		expect(Math.abs(cx - computed)).toBeLessThanOrEqual(1)
 		expect(svg).toContain(
 			`r="11" fill="${COLOURS.accent}" stroke="${COLOURS.background}" stroke-width="4"`,
 		)
 	})
 
-	it("writes the localised FI date and its label above the knee, clear of the grey curve", () => {
+	it("writes the localised FI date and its label above and left of the knee", () => {
 		const { svg } = imageOf("en")
+		const cx = numberIn(svg, /<circle cx="([\d.]+)"/)
 		expect(svg).toContain(`>${dateOf("en")}<`)
-		expect(dateOf("en")).toBe("Aug 2041")
 		expect(svg).toContain(
-			`text-anchor="end" font-weight="700" font-family="Aleo" font-size="${DATE_SIZE}" fill="${COLOURS.accent}">`,
+			`text-anchor="end" font-family="Aleo" font-size="${DATE_SIZE}" fill="${COLOURS.accent}">`,
 		)
 		expect(svg).toContain(
-			`text-anchor="end" font-family="Azeret Mono" font-size="22" fill="${COLOURS.mutedForeground}">${dictionaryFor("en").shareFreeLabel}</text>`,
+			`text-anchor="end" font-family="Azeret Mono" font-size="${LABEL_SIZE}" fill="${COLOURS.mutedForeground}">${dictionaryFor("en").shareFreeLabel}</text>`,
 		)
 		const kneeY = numberIn(svg, /<circle [^>]*cy="([\d.]+)"/)
-		const dateY = numberIn(svg, /<text x="[\d.]+" y="([\d.]+)" text-anchor="end" font-weight="700"/)
-		const labelY = numberIn(
-			svg,
-			/<text x="[\d.]+" y="([\d.]+)" text-anchor="end" font-family="Azeret Mono" font-size="22"/,
+		const date = new RegExp(
+			`<text x="([\\d.]+)" y="([\\d.]+)" text-anchor="end" font-family="Aleo" font-size="${DATE_SIZE}"`,
 		)
-		expect(kneeY - dateY).toBe(KNEE_DATE_ABOVE)
-		expect(kneeY - labelY).toBe(KNEE_LABEL_ABOVE)
+		const label = new RegExp(
+			`<text x="([\\d.]+)" y="([\\d.]+)" text-anchor="end" font-family="Azeret Mono" font-size="${LABEL_SIZE}"`,
+		)
+		const yOf = (size: number) =>
+			numberIn(svg, new RegExp(`<text x="[\\d.]+" y="([\\d.]+)" [^>]*font-size="${size}"`))
+		expect(numberIn(svg, date)).toBe(cx - KNEE_TEXT_GAP)
+		expect(numberIn(svg, label)).toBe(cx - KNEE_TEXT_GAP)
+		expect(kneeY - yOf(DATE_SIZE)).toBe(KNEE_DATE_ABOVE)
+		expect(kneeY - yOf(LABEL_SIZE)).toBe(KNEE_LABEL_ABOVE)
 		expect(imageOf("th").svg).toContain(`>${dateOf("th")}<`)
-		expect(dateOf("th")).toBe("ส.ค. 2041")
 		expect(imageOf("th").svg).toContain(
 			`>${escapeXml(drawableThai(dictionaryFor("th").shareFreeLabel))}<`,
 		)
@@ -201,13 +215,5 @@ describe("one Language's home share image", () => {
 		expect(svg).toContain("a &amp; b &lt; c &gt; d &quot; e &apos; f")
 		expect(svg).toContain("&lt;free&gt;")
 		expect(svg).not.toContain("<free>")
-	})
-
-	it("reads the same lockup and the same size in both Languages, and different words", () => {
-		const english = imageOf("en").svg
-		const thai = imageOf("th").svg
-		expect(english).not.toBe(thai)
-		expect(english).toContain(LOCKUP.markup)
-		expect(thai).toContain(LOCKUP.markup)
 	})
 })

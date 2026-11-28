@@ -73,7 +73,7 @@ export function composeShareChart(input: ShareChartComposition): ShareImage {
 			knee.y - KNEE_DATE_ABOVE,
 			DATE_SIZE,
 			colours.accent,
-			' text-anchor="end" font-weight="700"',
+			' text-anchor="end"',
 		),
 		metaText(
 			dictionary.shareFreeLabel,

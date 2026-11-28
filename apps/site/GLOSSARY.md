@@ -190,7 +190,7 @@ Language's question above a net-worth line, grey while working and orange once f
 FI date written on the curve; OpenJot's card keeps the page's one-line summary. It is generated and
 never committed, and it is no page subresource, so no page budget counts it
 ([ADR 0018](docs/adr/0018-the-share-image-is-generated-at-build-time.md),
-[ADR 0035](docs/adr/0035-the-home-share-card-shows-the-answer.md)).
+[ADR 0036](docs/adr/0036-the-home-share-card-shows-the-answer.md)).
 _Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:

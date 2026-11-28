@@ -13,15 +13,17 @@ keeps ADR 0018's composition, and `composeShareImage` is untouched.
 
 ## Decision
 
-- **The question, then the answer.** The top row keeps the brand lockup at the margin and moves the
-  host to the top-right corner; the Language name no longer appears. The Language's own
-  `actionQuestion` sits at 44 px, and under it the net-worth line answers it. The words on the card
-  are the question, the date and one label: every word pays rent.
+- **Everything the card draws.** The card draws the wordmark, the host, the question, the line, the
+  date, the label and the two years, and nothing else. The top row keeps the brand lockup at the
+  margin and moves the host to the top-right corner; the Language name no longer appears. The
+  Language's own `actionQuestion` sits at 44 px, and under it the net-worth line answers it. Every
+  word pays rent.
 - **A line, not figures.** The curve is illustrative, drawn from `netWorthShape(u)`: a rising
   exponential through the working years, then a levelling exponential once the person is free to
-  stop, joined with no step at the FI date. No y-axis or amount is shown, so the picture claims only
-  the shape the CLI reports. The working half is `muted-foreground`, the free half `accent`, with a
-  12 % accent area under it, so the free part is the focal point.
+  stop, joined with no step at the FI date. No y-axis or amount is shown. The line is illustrative;
+  the only figure the picture takes from the demo is its FI date, on the demo's time axis. The
+  working half is `muted-foreground`, the free half `accent`, with a 12 % accent area under it, so
+  the free part is the focal point.
 - **The time axis and the date are the demo's own.** The axis runs from `FI_DEMO_AS_OF` to
   `FI_DEMO_HORIZON` at the chart's two ends, labelled with their years. The orange knee sits at
   `FI_DEMO_DATE`'s UTC day position between them (`dateFraction`), never at a written fraction.

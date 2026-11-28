@@ -62,16 +62,34 @@ describe("the date the home card writes on the curve", () => {
 	})
 
 	it("writes every month from January to December with its own name", () => {
-		for (const { language, dictionary } of [
-			{ language: "en", dictionary: dictionaryFor("en") },
-			{ language: "th", dictionary: dictionaryFor("th") },
-		]) {
-			expect({ language, months: dictionary.shareMonths.length }).toEqual({ language, months: 12 })
-			expect({ language, unique: new Set(dictionary.shareMonths).size }).toEqual({
-				language,
-				unique: 12,
-			})
-		}
+		expect(dictionaryFor("en").shareMonths).toEqual([
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec",
+		])
+		expect(dictionaryFor("th").shareMonths).toEqual([
+			"ม.ค.",
+			"ก.พ.",
+			"มี.ค.",
+			"เม.ย.",
+			"พ.ค.",
+			"มิ.ย.",
+			"ก.ค.",
+			"ส.ค.",
+			"ก.ย.",
+			"ต.ค.",
+			"พ.ย.",
+			"ธ.ค.",
+		])
 	})
 })
 
