@@ -24,6 +24,7 @@ function holding(over: Record<string, unknown> = {}): Snapshot {
 		netWorthHistory: [],
 		documents: {},
 		projections: {},
+		monthly: {},
 		fi: {},
 		chance: {},
 		paths: {},
@@ -63,6 +64,7 @@ describe("stillCurrent", () => {
 		for (const code of ["database_busy", "disk_full", "traj_unavailable"]) {
 			expect(stillCurrent(holding({ doctor: failed(code) }), same)).toBe(false)
 			expect(stillCurrent(holding({ projections: { hand: failed(code) } }), same)).toBe(false)
+			expect(stillCurrent(holding({ monthly: { hand: failed(code) } }), same)).toBe(false)
 		}
 	})
 

@@ -39,6 +39,7 @@ function allArgvs(overrides: Partial<PlanInput>): string[][] {
 	const rest = [
 		two.netWorthHistory,
 		...Object.values(two.projections),
+		...Object.values(two.monthly),
 		...Object.values(two.fi),
 		...Object.values(two.taxNotes),
 		two.compare,
@@ -91,6 +92,18 @@ describe("every argv the Plan emits", () => {
 		if (!result.ok) throw new Error(`fixture parameters must hold: ${result.error.code}`)
 		const two = planStageTwo(result.params, stageOne("2026-10-31", ["base"]))
 		expect(two.rates.argv).toEqual(["baseline", "rates", "--as-of", "2026-10-31", "--json"])
+	})
+
+	test("the viewing date's monthly read is one bare run per Scenario, with no --accounts", () => {
+		const result = checkParams(base)
+		if (!result.ok) throw new Error(`fixture parameters must hold: ${result.error.code}`)
+		const two = planStageTwo(result.params, stageOne("2026-10-31", ["base", "retire-early"]))
+		expect(Object.keys(two.monthly)).toEqual(["base", "retire-early"])
+		for (const [name, read] of Object.entries(two.monthly)) {
+			expect(read.argv).toContain(`--scenario=${name}`)
+			expect(read.argv.slice(-2)).toEqual(["--monthly", "--json"])
+			expect(read.argv).not.toContain("--accounts")
+		}
 	})
 })
 
