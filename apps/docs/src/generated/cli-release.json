@@ -1,5 +1,5 @@
 {
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"leaves": [
 		{
 			"name": "account add",
@@ -18,12 +18,20 @@
 			"flags": []
 		},
 		{
+			"name": "account value",
+			"flags": ["--value", "--date", "--against", "--file", "--template", "--dry-run"]
+		},
+		{
 			"name": "backup",
 			"flags": ["--out"]
 		},
 		{
 			"name": "balance",
 			"flags": ["--as-of", "--trial-balance"]
+		},
+		{
+			"name": "baseline rates",
+			"flags": ["--as-of", "--months"]
 		},
 		{
 			"name": "baseline show",
@@ -40,6 +48,9 @@
 				"--age",
 				"--monthly",
 				"--carry-in",
+				"--return-model",
+				"--paths",
+				"--seed",
 				"--port"
 			]
 		},
@@ -57,7 +68,16 @@
 		},
 		{
 			"name": "fi",
-			"flags": ["--as-of", "--horizon", "--scenario", "--set", "--carry-in"]
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--scenario",
+				"--set",
+				"--without",
+				"--add",
+				"--decimal",
+				"--carry-in"
+			]
 		},
 		{
 			"name": "help",
@@ -72,16 +92,105 @@
 			"flags": ["--all"]
 		},
 		{
+			"name": "projection allowances",
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--scenario",
+				"--set",
+				"--without",
+				"--add",
+				"--decimal",
+				"--carry-in",
+				"--labels",
+				"--step",
+				"--budget",
+				"--min-saving"
+			]
+		},
+		{
+			"name": "projection chance",
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--scenario",
+				"--set",
+				"--without",
+				"--add",
+				"--decimal",
+				"--carry-in",
+				"--return-model",
+				"--buckets",
+				"--paths",
+				"--seed",
+				"--outcomes",
+				"--milestone-dates"
+			]
+		},
+		{
 			"name": "projection compare",
-			"flags": ["--as-of", "--horizon", "--set", "--carry-in", "--birth-date", "--age"]
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--set",
+				"--without",
+				"--add",
+				"--decimal",
+				"--carry-in",
+				"--birth-date",
+				"--age"
+			]
+		},
+		{
+			"name": "projection model",
+			"flags": ["--scenario", "--buckets", "--set", "--without", "--add", "--decimal"]
+		},
+		{
+			"name": "projection path",
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--scenario",
+				"--set",
+				"--without",
+				"--add",
+				"--decimal",
+				"--carry-in",
+				"--return-model",
+				"--buckets",
+				"--paths",
+				"--seed",
+				"--index",
+				"--monthly",
+				"--breakdown",
+				"--liabilities",
+				"--accounts",
+				"--spending",
+				"--estate"
+			]
 		},
 		{
 			"name": "projection run",
-			"flags": ["--as-of", "--horizon", "--scenario", "--set", "--carry-in", "--monthly"]
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--scenario",
+				"--set",
+				"--without",
+				"--add",
+				"--decimal",
+				"--carry-in",
+				"--monthly",
+				"--breakdown",
+				"--liabilities",
+				"--accounts",
+				"--spending",
+				"--estate"
+			]
 		},
 		{
 			"name": "report networth",
-			"flags": ["--as-of"]
+			"flags": ["--as-of", "--monthly", "--since", "--until"]
 		},
 		{
 			"name": "report pnl",
@@ -93,7 +202,19 @@
 		},
 		{
 			"name": "scenario apply",
-			"flags": ["--file", "--template", "--as-of", "--dry-run"]
+			"flags": [
+				"--file",
+				"--template",
+				"--as-of",
+				"--from-history",
+				"--months",
+				"--dry-run",
+				"--decimal",
+				"--if-hash",
+				"--set",
+				"--without",
+				"--add"
+			]
 		},
 		{
 			"name": "scenario diff",
@@ -101,19 +222,35 @@
 		},
 		{
 			"name": "scenario fork",
-			"flags": ["--set", "--dry-run"]
+			"flags": ["--set", "--without", "--add", "--decimal", "--no-notes", "--dry-run"]
+		},
+		{
+			"name": "scenario household",
+			"flags": ["--file", "--none", "--dry-run", "--if-hash"]
 		},
 		{
 			"name": "scenario list",
 			"flags": []
 		},
 		{
+			"name": "scenario main",
+			"flags": ["--clear", "--dry-run"]
+		},
+		{
+			"name": "scenario notes",
+			"flags": ["--text", "--file", "--clear", "--dry-run"]
+		},
+		{
+			"name": "scenario rename",
+			"flags": ["--dry-run", "--if-hash"]
+		},
+		{
 			"name": "scenario rm",
-			"flags": ["--dry-run"]
+			"flags": ["--force", "--dry-run"]
 		},
 		{
 			"name": "scenario show",
-			"flags": []
+			"flags": ["--decimal"]
 		},
 		{
 			"name": "scenario tax",
@@ -133,8 +270,11 @@
 				"--donation2x",
 				"--donation1x",
 				"--label",
+				"--merge",
+				"--from-stored",
 				"--none",
-				"--dry-run"
+				"--dry-run",
+				"--if-hash"
 			]
 		},
 		{
@@ -458,6 +598,11 @@
 			"retryable": false
 		},
 		{
+			"code": "default_home_refused",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
 			"code": "disk_full",
 			"exitCode": 1,
 			"retryable": true
@@ -533,6 +678,16 @@
 			"retryable": false
 		},
 		{
+			"code": "scenario_changed",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "scenario_is_main",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
 			"code": "scenario_name_taken",
 			"exitCode": 5,
 			"retryable": false
@@ -554,6 +709,21 @@
 		},
 		{
 			"code": "unsupported_currency",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "valuation_account_invalid",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "valuation_against_invalid",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "valuation_value_negative",
 			"exitCode": 3,
 			"retryable": false
 		}
