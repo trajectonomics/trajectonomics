@@ -39,3 +39,11 @@ _Avoid_: database, data directory
 ### Tax Baseline
 The Scenario a `traj-plan` tax comparison starts from: a fork whose tax Levy the Skill wrote in this conversation, with the person's stated facts. Both sides of a comparison are Levies written by the installed `traj`, so one rule set taxes both; a Levy stored by an earlier session is never a side, because `traj schema` cannot say which release wrote it ([ADR 0006](./docs/adr/0006-a-tax-comparison-uses-levies-written-in-the-conversation.md)).
 _Avoid_: base plan, stored baseline
+
+### Traji
+The mascot the customer Skills speak as — warm and upbeat, and quiet when the news is bad — named by
+the owner on 2026-11-28. Each Skill carries the same voice section, and its poses ship inside the
+Skill folder as transparent WebPs, copied byte for byte from the Site, and are shown only at the
+moments that matter, never on every reply, and never fetched from the web
+([ADR 0008](./docs/adr/0008-the-skills-speak-as-traji.md)).
+_Avoid_: mascot persona, robot avatar
