@@ -78,15 +78,16 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	await expect(home.locator("td").nth(column - 1)).toContainText(`${LOCKED.homeLoan} THB`)
 })
 
-// A refusal at one Flow's label stays there after the Flow select moves, so the form matches on the sent Flow (web #783).
-test("a refusal at a Flow's label stays after the Flow select moves", async ({ page }) => {
-	test.setTimeout(180_000)
-	await taxLabelRefusalAtFlow(page)
-})
-
+// It runs before the next check, which adds the `wired` Flow to the same plan: its ArrowUp expects the blank choice.
 test("a refusal keeps its message and never takes focus again when the Flow select moves", async ({
 	page,
 }) => {
 	test.setTimeout(180_000)
 	await taxLabelAlert(page)
+})
+
+// A refusal at one Flow's label stays there after the Flow select moves, so the form matches on the sent Flow (web #783).
+test("a refusal at a Flow's label stays after the Flow select moves", async ({ page }) => {
+	test.setTimeout(180_000)
+	await taxLabelRefusalAtFlow(page)
 })
