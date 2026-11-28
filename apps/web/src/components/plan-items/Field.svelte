@@ -1,7 +1,7 @@
 <script lang="ts">
 import { lostWindow, maskedFocus } from "../../client/masked-focus.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { draftAfterInput, maskMoney } from "../../lib/format"
+import { maskedDraft, maskMoney } from "../../lib/format"
 import { describedBy, fieldChoices } from "../../lib/view/plan-items/field"
 import type { Choice } from "../../lib/view/plan-items/options"
 
@@ -39,18 +39,25 @@ let {
 
 const choices = $derived(fieldChoices(options, value))
 let focused = $state(false)
+/** The draft the last Undo took away, which only its Redo puts back at a hidden amount. */
+let undone = $state<string | null>(null)
 /** True while the digits show as the mask: a focused field shows the real value, so the person can edit it. */
 const masked = $derived(money && preferences.hidden && !focused && value.trim() !== "")
 const shown = $derived(masked ? maskMoney(value) : value)
 
-/** The draft a typed value makes. Undo can put the mask back, which is no amount, so it keeps the draft and the field. */
+/** The draft a typed value makes. A hidden amount's Undo and Redo are read for what they mean, not the text they compose. */
 function onInput(event: Event & { currentTarget: HTMLInputElement }): void {
 	const field = event.currentTarget
 	const typed = field.value
-	const next = money ? draftAfterInput(value, typed) : typed
-	const caret = (field.selectionStart ?? typed.length) - (typed.length - next.length)
-	value = next
-	if (next !== typed) {
+	const inputType = event instanceof InputEvent ? event.inputType : ""
+	const next =
+		money && preferences.hidden
+			? maskedDraft(value, undone, typed, inputType)
+			: { draft: typed, undone: null }
+	undone = next.undone
+	const caret = (field.selectionStart ?? typed.length) - (typed.length - next.draft.length)
+	value = next.draft
+	if (next.draft !== typed) {
 		field.value = shown
 		field.setSelectionRange(caret, caret)
 	}

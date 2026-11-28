@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { abbreviate } from "./abbreviate"
 import { formatArgv } from "./argv"
 import { formatDate, formatMonth, periodWords } from "./date"
-import { AMOUNT_MASK, draftAfterInput, maskMoney } from "./mask"
+import { AMOUNT_MASK, draftAfterInput, maskedDraft, maskMoney } from "./mask"
 import { formatMoney } from "./money"
 import { formatShare } from "./share"
 
@@ -128,6 +128,46 @@ describe("draftAfterInput", () => {
 		expect(draftAfterInput("6000", `−${AMOUNT_MASK}`)).toBe("6000")
 		expect(draftAfterInput("6000", "7000")).toBe("7000")
 		expect(draftAfterInput("", "12")).toBe("12")
+	})
+})
+
+describe("maskedDraft", () => {
+	test("keeps the draft a masked Undo restores, and holds it for the Redo", () => {
+		expect(maskedDraft("6000", null, AMOUNT_MASK, "historyUndo")).toEqual({
+			draft: "6000",
+			undone: "6000",
+		})
+	})
+
+	test("takes the text an Undo restores, and keeps what it took away", () => {
+		expect(maskedDraft("8800", null, "", "historyUndo")).toEqual({ draft: "", undone: "8800" })
+		expect(maskedDraft("8800", null, "8800", "historyUndo")).toEqual({
+			draft: "8800",
+			undone: "8800",
+		})
+	})
+
+	test("puts back only the draft its Undo took away, so a Redo never doubles an amount", () => {
+		expect(maskedDraft("", "8800", "8800", "historyRedo")).toEqual({ draft: "8800", undone: null })
+		expect(maskedDraft("8800", "8800", "88008800", "historyRedo")).toEqual({
+			draft: "8800",
+			undone: null,
+		})
+		expect(maskedDraft("8800", null, "88008800", "historyRedo")).toEqual({
+			draft: "8800",
+			undone: null,
+		})
+	})
+
+	test("drops the Redo a new edit replaces, and keeps the mask out of the draft", () => {
+		expect(maskedDraft("8800", "8800", "88001", "insertText")).toEqual({
+			draft: "88001",
+			undone: null,
+		})
+		expect(maskedDraft("6000", null, AMOUNT_MASK, "insertFromPaste")).toEqual({
+			draft: "6000",
+			undone: null,
+		})
 	})
 })
 

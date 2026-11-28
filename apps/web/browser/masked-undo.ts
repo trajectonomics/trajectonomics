@@ -43,3 +43,27 @@ export async function maskedAmountPasteMask(page: Page): Promise<void> {
 	await page.keyboard.type("9")
 	await expect(amount).toHaveValue("129345")
 }
+
+// A Redo after an Undo must never double a masked amount (web #807): the mask wrote the field's text out of step with
+// the browser's own history, and the Redo replayed its insert on top of the restored draft instead of in its place.
+export async function maskedAmountRedo(page: Page): Promise<void> {
+	const dialog = await incomeDrawer(page, "redone")
+	const amount = dialog.getByLabel("Amount per occurrence", { exact: true })
+	await page.context().grantPermissions(["clipboard-read", "clipboard-write"])
+	await amount.focus()
+	await page.evaluate(async () => {
+		await navigator.clipboard.writeText("8800")
+	})
+	await page.keyboard.press("Control+v")
+	await expect(amount).toHaveValue("8800")
+
+	// A click elsewhere in the drawer leaves the field, and the mask hides the amount.
+	await dialog.getByRole("heading").click()
+	await expect(amount).toHaveValue("•••••")
+
+	// Undo, then Redo: the field holds the amount once, whichever of the two the browser applies.
+	await page.keyboard.press("Control+z")
+	await page.keyboard.press("Control+Shift+z")
+	await amount.focus()
+	await expect(amount, "the amount after Undo and Redo").toHaveValue("8800")
+}
