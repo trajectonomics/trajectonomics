@@ -22,8 +22,8 @@ export function assumedOf(
 ): AssumedItem[] {
 	return [
 		...templateDefaultItems(row, plain, printed),
-		...unlabelledIncomeItems(row.name, plain, household),
-		...unstatedAllowanceItems(row.name, taxAllowances, plain),
+		...unlabelledIncomeItems(row.name, plain, household, taxAllowances !== undefined),
+		...unstatedAllowanceItems(row.name, taxAllowances, plain, household),
 		...taxFigureItems(plain),
 	]
 }
