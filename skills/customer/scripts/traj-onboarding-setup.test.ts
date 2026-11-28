@@ -147,7 +147,9 @@ describe("what setup leaves behind", () => {
 
 	it("names what setup installed: the commit, the rows, the traj version and the CLI Range", () => {
 		expect(leaves).toContain("**What was installed.**")
-		expect(leaves).toContain("the `commit` from step 2 as the skills' version")
+		expect(leaves).toContain(
+			"the `commit` the global lock records for `traj` now, as the skills' version",
+		)
 		expect(leaves).toContain("installed (and any you skipped, with the range each wanted)")
 		expect(leaves).toContain("the `traj --version` that printed")
 		expect(leaves).toContain("this skill's own frontmatter `cli` states")
