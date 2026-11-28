@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from "svelte"
+import { preferences } from "../../client/preferences.svelte.js"
 import { cx } from "./cx"
 import Provenance from "./Provenance.svelte"
 import SiteLink from "./SiteLink.svelte"
@@ -50,7 +51,8 @@ const heading = $derived(level === 3 ? "h3" : "h2")
 	>
 		{@render children()}
 	</div>
-	{#if argv}
+	<!-- With the traj commands off and no raw provenance, Details is gone, so the footer and its rule go too. -->
+	{#if argv && (preferences.showCommands || details)}
 		<footer class="relative mt-4 border-t border-border pt-3">
 			<Provenance name={title} commands={[argv]} {details} />
 		</footer>

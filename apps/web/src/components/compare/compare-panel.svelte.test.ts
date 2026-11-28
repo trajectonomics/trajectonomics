@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { preferences } from "../../client/preferences.svelte.js"
 import type { ProjectionCompare, ProjectionRun, Read } from "../../lib/contract"
 import { SIDE_A, SIDE_B } from "../../lib/view/compare/fixtures.test-support"
 import {
@@ -43,6 +44,14 @@ function panel(
 }
 
 describe("ComparePanel", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	test("with no comparison, it says a comparison needs two plans and shows the flag", () => {
 		const body = panel({}, null)
 		expect(body).toContain("A comparison needs two plans")

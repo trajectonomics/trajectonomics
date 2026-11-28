@@ -1,4 +1,4 @@
-import { afterAll, afterEach, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { editSession } from "../../client/edit.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
@@ -114,6 +114,14 @@ describe("the actions", () => {
 })
 
 describe("the page over the Demo snapshot", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	const body = (snapshot: Snapshot, scenario = "base") =>
 		render(AllowancesBody, { props: { snapshot, scenario } }).body
 

@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { preferences } from "../../client/preferences.svelte.js"
 import type { NetWorth, Read } from "../../lib/contract"
 import { failedRead, netWorth, okRead, row } from "../../lib/view/overview/fixtures.test-support"
 import NetWorthContent from "./NetWorthContent.svelte"
@@ -16,6 +17,14 @@ const main = netWorth(
 )
 
 describe("NetWorthContent: the headline and the composition", () => {
+	// The commands under Details are a Display setting, off by default.
+	beforeEach(() => {
+		preferences.showCommands = true
+	})
+	afterEach(() => {
+		preferences.showCommands = false
+	})
+
 	test("shows the command that produced it, and leaves the answer to the focus point above", () => {
 		const { body } = render(NetWorthContent, {
 			props: { view: pageView(okRead(argv("2026-10-31"), main)) },
