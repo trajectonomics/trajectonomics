@@ -30,7 +30,7 @@ for (const width of [360, 1280] as const) {
 	}) => {
 		await page.setViewportSize({ width, height: 800 })
 		await serveEstateLabels(page, await longEstateLabels(page))
-		await openDemo(page, "/estate/?at=end", { theme: "light", rootFontSize: 20 })
+		await openDemo(page, "/estate/?estate=end", { theme: "light", rootFontSize: 20 })
 		expect(await measureFlowLabels(page)).toEqual([])
 	})
 }

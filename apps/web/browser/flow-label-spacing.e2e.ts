@@ -58,7 +58,7 @@ for (const width of [360, 1280] as const) {
 		await page.setViewportSize({ width, height: 800 })
 		await spaced(page)
 		await serveEstateLabels(page, await longEstateLabels(page))
-		await openDemo(page, "/estate/?at=end", { theme: "light" })
+		await openDemo(page, "/estate/?estate=end", { theme: "light" })
 		expect(await measureFlowLabels(page), `a ${width}px Estate`).toEqual([])
 	})
 }
@@ -84,7 +84,7 @@ for (const width of [360, 1280] as const) {
 	}) => {
 		await page.setViewportSize({ width, height: 800 })
 		await serveEstateLabels(page, await longEstateLabels(page))
-		await openDemo(page, "/estate/?at=end", { theme: "light" })
+		await openDemo(page, "/estate/?estate=end", { theme: "light" })
 		expect(await measureFlowLabels(page), `before the spacing, ${width}px`).toEqual([])
 		await spacedLater(page)
 		await frames(page)
